@@ -1,0 +1,8 @@
+[submodule "core"]
+	path = core
+	url = git@bitbucket.org:appzonegroup/creditclub.staticapps.common.git
+	branch = Development
+[submodule "pos"]
+	path = pos
+	url = git@bitbucket.org:appzonegroup/creditclub.posapp.library.git
+	branch = Development
