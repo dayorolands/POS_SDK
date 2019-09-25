@@ -9,3 +9,4 @@
 [submodule "ui"]
 	path = ui
 	url = git@bitbucket.org:appzonegroup/creditclub.consolidated.uicentral.git
+	branch = Development
