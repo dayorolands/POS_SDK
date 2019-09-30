@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                           xmlns:app="http://schemas.android.com/apk/res-auto"
+                                           android:id="@+id/credit_club_main_menu_coordinator"
+                                           android:layout_width="match_parent"
+                                           android:layout_height="match_parent"
+                                           android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@color/colorPrimary"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_logo_with_name" />
+
+            <ImageButton
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_centerVertical="true"
+                android:background="#0000"
+                android:onClick="openDrawer"
+                android:padding="20dp"
+                app:srcCompat="@drawable/ic_menu" />
+
+        </RelativeLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/ten_dp"
+                android:paddingBottom="@dimen/ten_dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="@drawable/rectangle"
+                        android:onClick="onRegisterClicked"
+                        android:orientation="vertical"
+                        android:padding="@dimen/ten_dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:padding="30dp"
+                            android:src="@drawable/payday_loan" />
+
+                        <com.appzonegroup.app.fasttrack.ui.TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/register_customer"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textColor="@color/blue" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="@drawable/rectangle"
+                        android:onClick="onDepositClicked"
+                        android:orientation="vertical"
+                        android:padding="@dimen/ten_dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:padding="30dp"
+                            app:srcCompat="@drawable/deposit" />
+
+                        <com.appzonegroup.app.fasttrack.ui.TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Deposit"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textColor="@color/blue" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:paddingLeft="16dp"
+
+                    android:paddingRight="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="@drawable/rectangle"
+                        android:onClick="onWithdrawalClicked"
+                        android:orientation="vertical"
+                        android:padding="@dimen/ten_dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:padding="30dp"
+                            app:srcCompat="@drawable/withdrawal" />
+
+                        <com.appzonegroup.app.fasttrack.ui.TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Token Withdrawal"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textColor="@color/blue" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="@drawable/rectangle"
+                        android:orientation="vertical"
+                        android:padding="@dimen/ten_dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:padding="30dp"
+                            app:srcCompat="@drawable/withdrawal" />
+
+                        <com.appzonegroup.app.fasttrack.ui.TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Card Withdrawal"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textColor="@color/blue" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="@drawable/rectangle"
+                        android:onClick="onLoanRequestClicked"
+                        android:orientation="vertical"
+                        android:padding="@dimen/ten_dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:padding="30dp"
+                            app:srcCompat="@drawable/personal_income" />
+
+                        <com.appzonegroup.app.fasttrack.ui.TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Loan Request"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textColor="@color/blue" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="@drawable/rectangle"
+                        android:onClick="onBVNUpdateClicked"
+                        android:orientation="vertical"
+                        android:padding="@dimen/ten_dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:padding="30dp"
+                            app:srcCompat="@drawable/secured_loan" />
+
+                        <com.appzonegroup.app.fasttrack.ui.TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="BVN Update"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textColor="@color/blue" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp">
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="@drawable/rectangle"
+                        android:onClick="onAgentBalanceClicked"
+                        android:orientation="vertical"
+                        android:padding="@dimen/ten_dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:padding="30dp"
+                            app:srcCompat="@drawable/income" />
+
+                        <com.appzonegroup.app.fasttrack.ui.TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Balance Enquiry"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textColor="@color/blue" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="@drawable/rectangle"
+                        android:onClick="onPayBillClicked"
+                        android:orientation="vertical"
+                        android:padding="@dimen/ten_dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:padding="30dp"
+                            app:srcCompat="@drawable/payday_loan" />
+
+                        <com.appzonegroup.app.fasttrack.ui.TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/pay_a_bill"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textColor="@color/blue" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:paddingLeft="16dp"
+                    android:layout_marginBottom="20dp"
+                    android:paddingRight="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="@drawable/rectangle"
+                        android:onClick="onChangePinClicked"
+                        android:orientation="vertical"
+                        android:padding="@dimen/ten_dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:padding="30dp"
+                            app:srcCompat="@drawable/login_password" />
+
+                        <com.appzonegroup.app.fasttrack.ui.TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Change PIN"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textColor="@color/blue" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="@drawable/rectangle"
+                        android:onClick="onPayBillClicked"
+                        android:orientation="vertical"
+                        android:padding="@dimen/ten_dp"
+                        android:visibility="invisible">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:padding="30dp"
+                            app:srcCompat="@drawable/payday_loan" />
+
+                        <com.appzonegroup.app.fasttrack.ui.TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/pay_a_bill"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textColor="@color/blue" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/white"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/navigation_header"
+        app:itemIconTint="@color/darkGray"
+        app:itemTextColor="@color/darkGray"
+        app:menu="@menu/activity_main_drawer">
+
+
+        <com.appzonegroup.app.fasttrack.ui.TextView
+            android:id="@+id/version_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/ten_dp"
+            android:layout_marginLeft="@dimen/ten_dp"
+            android:gravity="start|bottom"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
+
+    </com.google.android.material.navigation.NavigationView>
+</androidx.drawerlayout.widget.DrawerLayout>

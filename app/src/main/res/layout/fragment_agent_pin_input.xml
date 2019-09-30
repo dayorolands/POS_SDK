@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/ten_dp"
+    android:orientation="vertical">
+
+    <com.appzonegroup.app.fasttrack.ui.TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="@dimen/four_dp"
+        android:textSize="@dimen/medium_sized_text"
+        android:layout_margin="@dimen/five_dp"
+        android:text="@string/agentPIN"
+        android:gravity="center"/>
+
+    <com.appzonegroup.app.fasttrack.ui.EditText
+        android:id="@+id/agent_pin_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberPassword"
+        android:maxLength="4"
+        android:gravity="center"
+        android:hint="@string/agentPIN_hint"
+        android:layout_margin="@dimen/five_dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/back_btn"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/forty_dp"
+            android:text="@string/back"
+            android:layout_weight="1"
+            style="@style/button_style_orange"
+            android:layout_marginRight="@dimen/two_dp"/>
+
+        <Button
+            android:id="@+id/submit_btn"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/forty_dp"
+            android:text="@string/submit"
+            android:layout_marginLeft="@dimen/two_dp"
+            android:layout_weight="1"/>
+
+
+
+    </LinearLayout>
+
+</LinearLayout>

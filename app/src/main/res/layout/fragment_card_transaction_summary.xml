@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="@dimen/five_dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.appzonegroup.app.fasttrack.ui.TextView
+        android:id="@+id/transaction_summary_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/ten_dp"
+        android:hint="@string/transaction_summary"
+        android:textSize="@dimen/medium_sized_text"/>
+
+    <com.appzonegroup.app.fasttrack.ui.TextView
+        android:id="@+id/pin_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:enabled="false"
+        android:textStyle="normal"
+        android:inputType="numberPassword"
+        android:hint="@string/pin_hint"
+        android:textSize="@dimen/large_sized_text"/>
+
+    <GridView
+        android:id="@+id/pin_pad_grid_view"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:gravity="center"
+        android:verticalSpacing="@dimen/ten_dp"
+        android:horizontalSpacing="@dimen/ten_dp"
+        android:layout_marginBottom="@dimen/five_dp"
+        android:numColumns="3"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/back_clear_btn"
+            android:text="@string/back"
+            android:layout_width="0dp"
+            style="@style/button_style"
+            android:layout_height="@dimen/thirty_dp"
+            android:layout_weight="1"
+            android:layout_marginRight="@dimen/two_dp"/>
+
+        <Button
+            android:id="@+id/submit_btn"
+            android:layout_width="0dp"
+            android:text="@string/submit"
+            android:layout_height="@dimen/thirty_dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="@dimen/two_dp"/>
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

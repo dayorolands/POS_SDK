@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".SelectReportActivity">
+
+    <com.appzonegroup.app.fasttrack.ui.TextView
+        android:id="@+id/instructionTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/form_margin_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="@dimen/form_margin_horizontal"
+        android:layout_marginBottom="@dimen/ten_dp"
+        android:text="@string/select_report_type"
+        android:textColor="@color/blue"
+        android:textSize="25dp" />
+
+    <Spinner
+        android:id="@+id/report_type_spinner"
+        style="@style/defaultEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/ReportTypes" />
+
+    <FrameLayout
+        style="@style/defaultEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="show_calendar">
+
+        <ImageView
+            android:layout_width="@dimen/thirty_dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/content_description"
+            android:src="@android:drawable/ic_menu_my_calendar" />
+
+        <com.appzonegroup.app.fasttrack.ui.TextView
+            android:id="@+id/start_date_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/start_date" />
+
+    </FrameLayout>
+
+
+    <FrameLayout
+        style="@style/defaultEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="show_calendar2">
+
+        <ImageView
+            android:layout_width="@dimen/thirty_dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/content_description"
+            android:src="@android:drawable/ic_menu_my_calendar" />
+
+
+        <com.appzonegroup.app.fasttrack.ui.TextView
+            android:id="@+id/end_date_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/end_date" />
+    </FrameLayout>
+
+
+    <com.appzonegroup.app.fasttrack.ui.CustomButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/form_margin_horizontal"
+        android:layout_marginRight="@dimen/form_margin_horizontal"
+        android:onClick="showReport"
+        android:text="@string/submit"
+        android:textColor="@color/white" />
+
+</LinearLayout>

@@ -1,0 +1,90 @@
+package com.appzonegroup.app.fasttrack;
+
+import android.content.Intent;
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Toast;
+
+/**
+ * Created by Oto-obong on 15/7/2017.
+ */
+
+public class ReportActivity extends AppCompatActivity {
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_reports);
+    }
+
+
+    public void switchReports(View view)
+    {
+        Intent intent;
+        switch (view.getId())
+        {
+            case R.id.airtime_report_button:
+            {
+                Toast.makeText(getBaseContext(), "This service is currently unavailable", Toast.LENGTH_LONG).show();
+                //intent = new Intent(getBaseContext(), OpenAccountActivity.class);
+                //startActivity(intent);
+                break;
+            }
+            case R.id.deposit_report_button:
+            {
+                intent = new Intent(getBaseContext(), DepositReportActivity.class);
+                startActivity(intent);
+                break;
+            }
+            case R.id.commision_report_button:{
+                Toast.makeText(getBaseContext(), "This service is currently unavailable", Toast.LENGTH_LONG).show();
+                //intent = new Intent(getBaseContext(), OpenAccountActivity.class);
+                //startActivity(intent);
+                break;
+            }
+
+
+            case R.id.withdrawal_report_button:{
+                intent = new Intent(getBaseContext(), WithdrawalReportActivity.class);
+                startActivity(intent);
+                break;
+            }
+
+
+
+            case R.id.open_account_report_button:
+            {
+                intent = new Intent(getBaseContext(), AccountOpeningReportActivity.class);
+                startActivity(intent);
+                break;
+            }
+            case R.id.loan_report_button:{
+                intent = new Intent(getBaseContext(), LoanRequestReportActivity.class);
+                startActivity(intent);
+                break;
+            }
+
+            case R.id.bvn_update_report_button:{
+                Toast.makeText(getBaseContext(), "This service is currently unavailable", Toast.LENGTH_LONG).show();
+                //intent = new Intent(getBaseContext(), OpenAccountActivity.class);
+                //startActivity(intent);
+                break;
+            }
+
+            case R.id.reload_customers_button:{
+                //Toast.makeText(getBaseContext(), "Fetching customers", Toast.LENGTH_LONG).show();
+                //fetchCustomers();
+                break;
+            }
+
+            default:
+            {
+                intent = new Intent(getBaseContext(), BOILoanRequestActivity.class);
+                startActivity(intent);
+            }
+        }
+    }
+
+}

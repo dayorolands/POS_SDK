@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/toolbar_include"
+        layout="@layout/toolbar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_below="@id/toolbar_include"
+        android:orientation="vertical"
+        android:padding="@dimen/activity_horizontal_margin">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/content_description"
+            android:tint="@color/app_orange"
+            app:srcCompat="@drawable/ic_error_outline" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="@string/error"
+            android:textAllCaps="true"
+            android:textColor="@color/app_orange"
+            android:textSize="@dimen/large_sized_text"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/message_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/five_dp"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:lineSpacingExtra="@dimen/four_dp"
+            android:textColor="@color/app_orange"
+            android:textSize="@dimen/medium_sized_text" />
+
+        <Button
+            android:id="@+id/close_btn"
+            style="@style/AppButton.RoundOrangeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/ten_dp"
+            android:text="@string/close" />
+    </LinearLayout>
+</RelativeLayout>

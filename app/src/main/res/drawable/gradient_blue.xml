@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="false">
+        <layer-list>
+            <item>
+                <shape android:height="4dp">
+                    <solid android:color="#04456b" />
+                    <corners android:radius="@dimen/button_radius" />
+                </shape>
+            </item>
+            <item android:bottom="5dp">
+                <shape>
+                    <gradient android:angle="0" android:endColor="#04456b" android:startColor="#076296" />
+                    <corners android:radius="@dimen/button_radius" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+
+    <item android:state_pressed="true">
+        <layer-list>
+            <item android:bottom="5px">
+                <shape>
+                    <gradient android:angle="270" android:endColor="#04456b" android:startColor="#04456b" />
+                    <corners android:radius="@dimen/button_radius" />
+
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>

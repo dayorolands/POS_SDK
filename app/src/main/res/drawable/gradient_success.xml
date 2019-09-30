@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:state_pressed="false">
+    <layer-list>
+        <!-- SHADOW -->
+        <item>
+            <shape android:height="4dp">
+                <solid android:color="#00d977"/>
+                <!-- alttan gölge -->
+                <corners android:radius="@dimen/button_radius"/>
+            </shape>
+        </item>
+        <!-- BUTTON alttan gölge
+          android:right="5px" to make it round-->
+        <item
+            android:bottom="5dp">
+            <shape>
+                <padding android:bottom="5dp"/>
+                <gradient
+                    android:startColor="#00d9bf"
+                    android:endColor="#00d977"
+                    android:angle="0" />
+                <corners
+                    android:radius="@dimen/button_radius"/>
+                <padding
+                    android:left="10dp"
+                    android:top="10dp"
+                    android:right="5dp"
+                    android:bottom="10dp"/>
+            </shape>
+        </item>
+    </layer-list>
+</item>
+
+<item android:state_pressed="true">
+    <layer-list>
+        <!-- SHADOW -->
+        <item>
+            <shape>
+                <solid android:color="#102746"/>
+                <corners android:radius="@dimen/button_radius"/>
+
+            </shape>
+        </item>
+        <!-- BUTTON -->
+        <item android:bottom="5px">
+            <shape>
+                <padding android:bottom="5dp"/>
+                <gradient
+                    android:startColor="#0b6"
+                    android:endColor="#0b6"
+                    android:angle="270" />
+                <corners
+                    android:radius="@dimen/button_radius"/>
+                <padding
+                    android:left="10dp"
+                    android:top="10dp"
+                    android:right="5dp"
+                    android:bottom="10dp"/>
+            </shape>
+        </item>
+    </layer-list>
+</item>
+</selector>

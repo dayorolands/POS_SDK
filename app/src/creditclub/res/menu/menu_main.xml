@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:activity="com.appzonegroup.app.fasttrack.OpenAccountActivity">
+    <item
+        android:id="@+id/online_functions"
+        android:icon="@drawable/ic_fa_arrow_up"
+        android:title="@string/online_functions" />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/logout"
+        app:showAsAction="never" />
+</menu>

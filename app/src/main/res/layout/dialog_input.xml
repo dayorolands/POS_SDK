@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import type="com.appzonegroup.app.fasttrack.ui.EditText" />
+
+        <variable
+            name="hint"
+            type="java.lang.String" />
+
+        <variable
+            name="icon"
+            type="android.graphics.drawable.Drawable" />
+
+        <variable
+            name="inputType"
+            type="java.lang.String" />
+
+        <variable
+            name="text"
+            type="java.lang.String" />
+
+        <variable
+            name="maxLength"
+            type="Integer" />
+
+        <variable
+            name="disabled"
+            type="java.lang.Boolean" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp">
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/twenty_dp"
+            android:layout_marginEnd="@dimen/twenty_dp"
+            android:layout_marginBottom="@dimen/twenty_dp"
+            android:background="#fff"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/input_layout"
+                        android:layout_width="match_parent"
+                        android:hint="@{hint, default=FIELD}"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/input"
+                            android:layout_width="match_parent"
+                            android:text="@{text}"
+                            android:maxLength="@{maxLength ?? 100}"
+                            android:fontFamily="@string/font_name"
+                            android:enabled="@{!safeUnbox(disabled)}"
+                            android:layout_height="60dp"
+                            android:inputType="@{EditText.deriveInputType(inputType)}" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="end">
+
+                <Button
+                    android:id="@+id/cancel_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="10dp"
+                    style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
+                    android:text="@string/cancel"
+                    android:textColor="@color/app_orange"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/submit_button"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_height="40dp"
+                    android:background="@drawable/round_blue_button"
+                    android:text="@string/enter"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

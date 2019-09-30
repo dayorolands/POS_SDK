@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
+    android:background="@drawable/rectangle">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <com.appzonegroup.app.fasttrack.ui.TextView
+                android:id="@+id/customer_name_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:text="Ekene Madunagu"
+                android:maxLines="1"/>
+            <com.appzonegroup.app.fasttrack.ui.TextView
+                android:id="@+id/time_occurred_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="right"
+                android:textColor="@color/black2"
+                android:textSize="13sp"
+                android:text="2018-03-03"
+                android:maxLines="1"/>
+
+        </LinearLayout>
+            <com.appzonegroup.app.fasttrack.ui.TextView
+                android:id="@+id/phone_no_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textColor="@color/black2"
+                android:textSize="14sp"
+                android:paddingTop="5dp"
+                android:text="08065708630"
+                android:maxLines="1"/>
+            <com.appzonegroup.app.fasttrack.ui.TextView
+                android:id="@+id/amount_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:text="N2,000"
+                android:maxLines="1"/>
+        <LinearLayout
+            android:id="@+id/direction_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="horizontal">
+            <com.appzonegroup.app.fasttrack.ui.TextView
+                android:id="@+id/from_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textColor="@color/black3"
+                android:textSize="13sp"
+                android:text="From: 08065708630"
+                android:maxLines="1"/>
+            <com.appzonegroup.app.fasttrack.ui.TextView
+                android:id="@+id/to_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textColor="@color/black3"
+                android:textSize="13sp"
+                android:text="To: 08065708630"
+                android:maxLines="1"/>
+        </LinearLayout>
+        <!--<LinearLayout-->
+            <!--android:id="@+id/extra_container"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="vertical">-->
+            <!--<com.appzonegroup.app.fasttrack.ui.TextView-->
+                <!--android:id="@+id/product_name_tv"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="2"-->
+                <!--android:textColor="#000000"-->
+                <!--android:textSize="14sp"-->
+                <!--android:text="Product name: Kia Kia Savings"-->
+                <!--android:maxLines="1"/>-->
+            <!--<com.appzonegroup.app.fasttrack.ui.TextView-->
+                <!--android:id="@+id/product_code"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="2"-->
+                <!--android:textColor="#000000"-->
+                <!--android:textSize="16sp"-->
+                <!--android:text="Code: 101"-->
+                <!--android:maxLines="1"/>-->
+        <!--</LinearLayout>-->
+    </LinearLayout>
+</LinearLayout>
+
+
+

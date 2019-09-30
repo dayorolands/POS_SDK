@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black1">#000000</color>
+    <color name="black2">#7f8c8d</color>
+    <color name="black3">#95a5a6</color>
+    <color name="black4">#bdc3c7</color>
+    <color name="colorPrimary">#61297f</color>
+    <color name="colorPrimaryTransparent">#DD61297f</color>
+    <color name="selectorColor">#DFA226</color>
+    <color name="colorPrimaryDark">#441D58</color>
+    <color name="darkGray">#51585c</color>
+    <color name="colorAccent">#DFA226</color>
+    <color name="colorAccentDark">#8B6518</color>
+    <color name="colorAccentTransparent">#DDDFA226</color>
+    <color name="actionBarColor">#CCC</color>
+    <color name="darkGrey">#CED1D4</color>
+    <color name="green">#2ECC71</color>
+    <color name="blue">#61297f</color>
+    <color name="darkBlue">#441D58</color>
+    <color name="darkBlue2">#441D58</color>
+    <color name="white">#fff</color>
+    <color name="veryLightGrey">#6c757d</color>
+    <color name="bluishWhite">#d1d1ff</color>
+    <color name="BGLight">#f8f9fa</color>
+    <color name="black">#000</color>
+    <color name="transparent">#00FFFFFF</color>
+    <color name="red">#F22613</color>
+    <color name="dividerColor">@color/darkGray</color>
+    <color name="app_orange">@color/colorAccent</color>
+    <color name="app_orange_transparent">@color/colorAccent</color>
+</resources>

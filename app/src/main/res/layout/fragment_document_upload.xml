@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <com.appzonegroup.app.fasttrack.ui.TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/passport_photograph"
+            android:textSize="@dimen/medium_sized_text" />
+
+        <ImageView
+            android:id="@+id/passport_image_view"
+            android:layout_width="100dp"
+            android:layout_height="120dp"
+            android:background="#eee"
+            android:layout_margin="50dp"
+            android:layout_marginBottom="10dp"
+            android:contentDescription="@string/content_description"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_person" />
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:weightSum="2">
+
+            <com.appzonegroup.app.fasttrack.ui.CustomButton
+                android:id="@+id/passport_gallery_btn"
+                style="@style/AppButton.RoundBlueButton"
+                android:drawableTop="@drawable/ic_menu_gallery"
+                android:drawablePadding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="1"
+                android:text="@string/gallery"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+            <com.appzonegroup.app.fasttrack.ui.CustomButton
+                android:id="@+id/passport_takePhoto_btn"
+                android:drawableTop="@drawable/ic_menu_camera"
+                android:drawablePadding="10dp"
+                style="@style/AppButton.RoundBlueButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_weight="1"
+                android:text="@string/camera"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!--<include
+            android:layout_margin="@dimen/ten_dp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/two_dp"
+            layout="@layout/horizontal_line"/>
+
+        <com.appzonegroup.app.fasttrack.ui.TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/id_card"
+            android:textSize="@dimen/medium_sized_text"/>
+
+        <ImageView
+            android:id="@+id/id_card_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_identity_card"
+            android:scaleType="centerInside"
+            android:contentDescription="@string/content_description"
+            android:layout_marginBottom="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="2">
+
+            <com.appzonegroup.app.fasttrack.ui.CustomButton
+                android:id="@+id/id_card_gallery_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                style="@style/button_style_orange"
+                android:text="@string/gallery"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+            <com.appzonegroup.app.fasttrack.ui.CustomButton
+                android:id="@+id/id_card_takePhoto_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                style="@style/button_style"
+                android:text="@string/camera"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <include
+            android:layout_margin="@dimen/ten_dp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/two_dp"
+            layout="@layout/horizontal_line"/>
+
+        <com.appzonegroup.app.fasttrack.ui.TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/signature"
+            android:textSize="@dimen/medium_sized_text"/>
+
+        <ImageView
+            android:id="@+id/signature_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_signature"
+            android:scaleType="centerInside"
+            android:contentDescription="@string/content_description"
+            android:layout_marginBottom="10dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="2">
+
+            <com.appzonegroup.app.fasttrack.ui.CustomButton
+                android:id="@+id/signature_gallery_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                style="@style/button_style_orange"
+                android:text="@string/gallery"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+            <com.appzonegroup.app.fasttrack.ui.CustomButton
+                android:id="@+id/signature_takePhoto_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                style="@style/button_style"
+                android:text="@string/camera"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"/>
+
+        </LinearLayout>-->
+
+
+        <com.appzonegroup.app.fasttrack.ui.CustomButton
+            android:id="@+id/next_btn"
+            style="@style/AppButton.RoundBlueButton"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/ten_dp"
+            android:onClick="image_upload_next_clicked"
+            android:text="@string/next"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+
+
+    </LinearLayout>
+
+</ScrollView>

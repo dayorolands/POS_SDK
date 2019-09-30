@@ -1,0 +1,36 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+        android:background="@color/white"
+             tools:context=".fragment.online.ListOptionsFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.appzonegroup.app.fasttrack.ui.TextView
+            android:id="@+id/optionsName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="3dp"
+            android:textColor="@color/blue"
+            android:layout_margin="@dimen/ten_dp"
+            android:singleLine="false"
+            android:textSize="16sp"
+            android:textStyle="normal" />
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:dividerHeight="@dimen/two_dp"
+            android:background="@color/background_floating_material_light"
+            android:divider="@color/white"
+            >
+        </ListView>
+    </LinearLayout>
+
+</FrameLayout>

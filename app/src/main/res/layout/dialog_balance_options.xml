@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="200dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_bg_white"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_weight="1"
+        android:onClick="onWithdrawalClicked"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/customer_balance"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:padding="@dimen/five_dp"
+            android:tint="@color/white"
+            app:srcCompat="@drawable/ic_person" />
+
+        <com.appzonegroup.app.fasttrack.ui.TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Customer"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_weight="1"
+        android:onClick="onAgentBalanceClicked"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/agent_balance"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/gradient_warning"
+            android:padding="@dimen/five_dp"
+            android:tint="@color/white"
+            app:srcCompat="@drawable/ic_agent" />
+
+        <com.appzonegroup.app.fasttrack.ui.TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Agent"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+</LinearLayout>

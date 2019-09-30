@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="@dimen/ten_dp"
+    android:layout_width="300dp"
+    android:layout_gravity="center_horizontal"
+    android:layout_height="wrap_content">
+
+    <com.appzonegroup.app.fasttrack.ui.TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="@dimen/four_dp"
+        android:textSize="@dimen/medium_sized_text"
+        android:layout_margin="@dimen/five_dp"
+        android:text="@string/customer_otp"
+        android:gravity="center"/>
+
+    <com.appzonegroup.app.fasttrack.ui.EditText
+        android:id="@+id/customer_otp_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberPassword"
+        android:gravity="center"
+        android:hint="@string/enter_customer_otp"
+        android:layout_margin="@dimen/five_dp"/>
+
+    <Button
+        android:id="@+id/submit_btn"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/forty_dp"
+        android:text="@string/submit"
+        android:layout_marginTop="@dimen/ten_dp"/>
+
+</LinearLayout>

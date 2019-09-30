@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.appzonegroup.app.fasttrack.ui.TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pin_tv"
+    android:orientation="vertical"
+    android:layout_width="85dp"
+    android:textColor="@color/white"
+    android:background="@color/blue"
+    android:gravity="center"
+    android:textStyle="bold"
+    android:text="DONE"
+    android:textSize="@dimen/medium_sized_text"
+    android:layout_height="@dimen/forty_dp"/>

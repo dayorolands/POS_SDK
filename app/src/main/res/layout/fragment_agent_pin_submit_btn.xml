@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.appzonegroup.app.fasttrack.ui.EditText
+            android:id="@+id/starter_pack_number_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_serial"
+            android:drawableLeft="@drawable/ic_serial"
+            android:hint="@string/serialNumberHint"
+            android:maxLength="8"
+            android:inputType="number"
+            style="@style/defaultEditText"/>
+
+        <com.appzonegroup.app.fasttrack.ui.EditText
+            style="@style/defaultEditText"
+            android:id="@+id/agent_pin_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_password"
+            android:drawableLeft="@drawable/ic_password"
+            android:hint="@string/agentPIN_hint"
+            android:maxLength="4"
+            android:inputType="numberPassword"/>
+
+        <com.appzonegroup.app.fasttrack.ui.CustomButton
+            android:id="@+id/account_info_next_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/form_margin_horizontal"
+            android:layout_marginRight="@dimen/form_margin_horizontal"
+            android:text="@string/submit"
+            android:background="@drawable/gradient_warning"
+            style="@style/button_style"
+            android:onClick="createAccount_click"/>
+
+    </LinearLayout>
+
+</ScrollView>

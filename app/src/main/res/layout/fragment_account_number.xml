@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+
+    <com.appzonegroup.app.fasttrack.ui.EditText
+        android:id="@+id/customer_account_number_et"
+        android:hint="@string/customer_account_number"
+        style="@style/defaultEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLength="10"
+        android:inputType="phone" />
+
+    <com.appzonegroup.app.fasttrack.ui.CustomButton
+        android:id="@+id/next_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gradient_warning"
+        android:text="@string/next"
+        android:layout_marginLeft="@dimen/form_margin_horizontal"
+        android:layout_marginRight="@dimen/form_margin_horizontal"
+        style="@style/button_style"
+        android:onClick="send_customer_token_click"/>
+
+</LinearLayout>

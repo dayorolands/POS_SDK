@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:activity="com.appzonegroup.app.fasttrack.OpenAccountActivity">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/online_functions"
+            android:visible="false"
+            android:icon="@drawable/ic_fa_arrow_up"
+            android:title="@string/online_functions" />
+        <item
+            android:id="@+id/reports"
+            android:icon="@drawable/ic_agent_balance"
+            android:title="@string/reports" />
+        <item
+            android:id="@+id/support"
+            android:icon="@drawable/ic_chat_bubble_outline"
+            android:title="@string/support" />
+        <item
+            android:id="@+id/logout"
+            android:icon="@drawable/logout"
+            android:title="@string/logout" />
+    </group>
+</menu>
+
