@@ -6,3 +6,7 @@
 	path = pos
 	url = git@bitbucket.org:appzonegroup/creditclub.posapp.library.git
 	branch = Development
+[submodule "ui"]
+	path = ui
+	url = git@bitbucket.org:appzonegroup/creditclub.consolidated.uicentral.git
+	branch = Development

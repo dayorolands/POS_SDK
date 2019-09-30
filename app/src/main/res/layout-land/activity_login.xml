@@ -1,0 +1,128 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/twenty_five_dp"
+    android:paddingRight="@dimen/twenty_five_dp"
+    android:background="@drawable/bg_min"
+    tools:activity="com.appzonegroup.app.fasttrack.LoginActivity">
+
+    <!-- Login progress -->
+
+    <LinearLayout
+        android:layout_width="500dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:layout_marginTop="40dp">
+
+        <ImageView
+            android:layout_width="@dimen/hundred_dp"
+            android:layout_height="@dimen/hundred_dp"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_launcher_transparent"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="1dp"
+            android:id="@+id/imageView2" />
+
+        <LinearLayout
+            android:id="@+id/email_login_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="@color/white"
+                style="@style/TextLabel">
+
+                <com.appzonegroup.app.fasttrack.ui.EditText
+                    android:id="@+id/login_phoneNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/userName"
+                    android:textColor="@color/white"
+                    android:inputType="phone"
+                    style="@style/login_editText_style"
+                    android:textSize="@dimen/medium_sized_text"
+                    android:background="@android:color/transparent"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/white"
+                android:layout_marginBottom="@dimen/twenty_five_dp"/>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="@color/white">
+
+                <com.appzonegroup.app.fasttrack.ui.EditText
+                    android:id="@+id/login_pin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/pin"
+                    android:textColor="@color/white"
+                    android:inputType="numberPassword"
+                    style="@style/login_editText_style"
+                    android:background="@color/transparent"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/white"
+                android:layout_marginBottom="70dp"/>
+
+
+
+            <!--<android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="@color/white">
+
+
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="@color/white">
+
+
+
+            </android.support.design.widget.TextInputLayout>-->
+
+            <Button
+                android:id="@+id/email_sign_in_button"
+                style="@style/login_btn_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textSize="@dimen/medium_sized_text"
+                android:textColor="@color/white"
+                android:text="@string/login" />
+
+
+            <!--<TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textStyle="bold"
+                style="?android:textAppearanceMedium"
+                android:text="@string/registerQuestion"
+                android:onClick="register_click"/>-->
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

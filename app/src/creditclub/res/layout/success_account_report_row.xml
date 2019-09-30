@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="30dp"
+    android:gravity="left|center_vertical"
+    android:weightSum="13">
+
+    <TextView
+        android:id="@+id/sn_tv"
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="SN"/>
+
+    <TextView
+        android:id="@+id/surname_tv"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/lastName"
+        android:layout_weight="3"/>
+
+    <TextView
+        android:id="@+id/firstName_tv"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/firstName"
+        android:layout_weight="3"/>
+
+    <TextView
+        android:id="@+id/phone_no_tv"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/phoneNo"
+        android:layout_weight="3"/>
+
+
+    <TextView
+        android:id="@+id/status_tv"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/status"
+        android:layout_weight="4"/>
+
+    <ImageView
+        android:id="@+id/status_im"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:src="@drawable/sync"
+        android:visibility="gone"
+        android:layout_weight="4"/>
+
+    <!--<ImageView
+        android:id="@+id/picture_imageView"
+        android:layout_width="0dp"
+        android:src="@drawable/ic_person"
+
+        android:layout_height="100dp"
+        android:layout_weight="3"
+        android:scaleX="0.8"
+        android:scaleY="0.8"/>
+
+    <TextView
+        android:id="@+id/sn_tv"
+        android:layout_width="@dimen/thirty_dp"
+        android:layout_height="@dimen/twenty_dp"
+        android:text="@string/sn"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_weight="7">
+        <TextView
+            android:id="@+id/fullName_tv"
+            android:textStyle="bold"
+            android:textSize="16dp"
+            android:layout_width="wrap_content"
+            android:text="@string/activationVerificationCode"
+            android:layout_height="@dimen/twenty_dp"
+            android:layout_marginBottom="@dimen/five_dp"/>
+
+        <TextView
+            android:id="@+id/phoneNumber_tv"
+            android:layout_width="wrap_content"
+            android:text="@string/activationVerificationCode"
+            android:layout_height="@dimen/twenty_dp"/>
+
+        <TextView
+            android:id="@+id/remark_tv"
+            android:layout_width="wrap_content"
+            android:textStyle="italic"
+            android:layout_height="@dimen/twenty_dp"/>
+
+    </LinearLayout>-->
+
+
+
+
+
+
+
+
+</LinearLayout>

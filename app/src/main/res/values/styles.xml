@@ -1,0 +1,201 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar.Bridge">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:editTextStyle">@style/editText_style</item>
+        <item name="android:buttonStyle">@style/button_style</item>
+        <item name="android:button">@style/button_style</item>
+        <item name="android:spinnerStyle">@style/spinnerStyle</item>
+        <item name="android:autoCompleteTextViewStyle">@style/autoCompleteTextView_style</item>
+        <item name="android:activatedBackgroundIndicator">@drawable/drawer_item</item>
+        <item name="buttonStyle">@style/button_style</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:textColor">@color/black</item>
+        <!--<item name="button">@style/button_style</item>-->
+        <item name="editTextStyle">@style/editText_style</item>
+        <!--<item name="spinnerStyle">@style/spinnerStyle</item>-->
+        <item name="autoCompleteTextViewStyle">@style/autoCompleteTextView_style</item>
+        <item name="android:fontFamily">@font/rajdani_font</item>
+    </style>
+
+    <style name="Theme.AppCompat.Translucent">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+    <style name="login_btn_style" parent="button_style">
+        <item name="android:background">@drawable/login_button_bg</item>
+    </style>
+
+    <style name="editText_style" parent="Base.Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/edittext_bg</item>
+        <item name="android:paddingTop">@dimen/ten_dp</item>
+        <item name="android:paddingBottom">@dimen/ten_dp</item>
+        <item name="android:paddingLeft">@dimen/ten_dp</item>
+        <item name="android:textSize">@dimen/fifteen_dp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorHint">@color/darkGrey</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
+    <style name="autoCompleteTextView_style" parent="Base.Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:background">@drawable/edittext_bg</item>
+        <item name="android:paddingBottom">@dimen/ten_dp</item>
+        <item name="android:paddingLeft">@dimen/ten_dp</item>
+        <item name="android:textSize">@dimen/fifteen_dp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorHint">@color/darkGrey</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="login_editText_style" parent="Base.Widget.AppCompat.EditText">
+
+        <item name="android:textSize">@dimen/medium_sized_text</item>
+        <item name="android:textColor">@color/white</item>
+
+
+        <item name="android:textColorHint">@color/white</item>
+        <item name="android:paddingLeft">0dp</item>
+
+    </style>
+
+    <style name="spinnerStyle" parent="Base.Widget.AppCompat.Spinner">
+        <item name="android:background">@drawable/spinner_bg</item>
+        <item name="android:divider">@color/darkGrey</item>
+        <item name="android:dividerHeight">@dimen/one_dp</item>
+        <!--<item name="android:dropDownSelector">@drawable/ic_fa_angle_double_down</item>
+        <item name="android:listSelector">@drawable/ic_fa_angle_double_down</item>-->
+    </style>
+
+    <style name="button_style" parent="Base.Widget.AppCompat.Button">
+        <item name="android:padding">10dp</item>
+        <item name="android:background">@drawable/round_blue_button</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/font_size_default</item>
+    </style>
+
+    <style name="AppTheme.RoundButton" parent="Base.Widget.AppCompat.Button">
+        <item name="android:padding">10dp</item>
+        <item name="android:background">@drawable/round_gradient_blue</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/font_size_default</item>
+    </style>
+
+    <style name="button_warning_style" parent="Base.Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_warning_bg</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="button_style_orange" parent="@style/button_style">
+        <!--<item name="android:radius">@dimen/twenty_dp</item>-->
+        <item name="android:background">@drawable/round_orange_button</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="TextLabel" parent="TextAppearance.AppCompat">
+        <!-- Hint color and label color in FALSE state -->
+        <item name="android:textColorHint">@color/white</item>
+        <item name="android:textSize">20sp</item>
+        <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
+        <item name="colorAccent">@color/white</item>
+        <item name="colorControlNormal">@color/white</item>
+        <item name="colorControlActivated">@color/white</item>
+    </style>
+
+    <style name="defaultEditText">
+        <item name="android:background">@drawable/edittext_bg</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_marginLeft">16dp</item>
+        <item name="android:layout_marginRight">16dp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:textSize">@dimen/font_size_default</item>
+        <item name="android:textColor">@color/blue</item>
+    </style>
+
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppTheme.MenuFlexLayout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="alignContent">stretch</item>
+        <item name="alignItems">stretch</item>
+        <item name="flexWrap">wrap</item>
+        <item name="justifyContent">space_evenly</item>
+        <item name="layout_flexGrow">1</item>
+        <item name="layout_flexShrink">1</item>
+        <item name="layout_maxWidth">300dp</item>
+        <item name="layout_minWidth">80dp</item>
+    </style>
+
+    <style name="AppButton.Base" parent="Base.Widget.AppCompat.Button">
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_height">@dimen/thirty_dp</item>
+    </style>
+
+    <style name="AppButton.RoundOrangeButton" parent="AppButton.Base">
+        <item name="android:background">@drawable/round_orange_button</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="AppButton.RoundOrangeOutlineButton" parent="AppButton.Base">
+        <item name="android:background">@drawable/round_orange_outline_button</item>
+        <item name="android:textColor">@color/blue</item>
+    </style>
+
+    <style name="AppButton.RoundWhiteButton" parent="AppButton.Base">
+        <item name="android:background">@drawable/round_white_button</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="AppButton.MoneyButton" parent="AppButton.RoundBlueButton">
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:layout_width">75dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="AppButton.RoundBlueButton" parent="AppButton.Base">
+        <item name="android:background">@drawable/round_blue_button</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="AppButton.NumberButton" parent="AppButton.Base">
+        <item name="android:background">@drawable/number_button</item>
+        <item name="android:textColor">#000</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">0dp</item>
+    </style>
+
+    <style name="TextView.InputLabel" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textColor">?android:textColorHint</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingRight">4dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="TextField" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <!--<item name="boxStrokeColor">@color/blue</item>-->
+    </style>
+</resources>

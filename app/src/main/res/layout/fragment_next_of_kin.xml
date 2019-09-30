@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <com.appzonegroup.app.fasttrack.ui.EditText
+            android:id="@+id/nok_name_et"
+            android:hint="@string/nextOfKinName_hint"
+            android:inputType="textPersonName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/defaultEditText"
+            android:drawableStart="@drawable/ic_next_of_kin"
+            android:drawableLeft="@drawable/ic_next_of_kin"/>
+
+
+        <com.appzonegroup.app.fasttrack.ui.EditText
+            android:id="@+id/nok_phone_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/nextOfKinPhone_hint"
+            android:inputType="phone"
+            style="@style/defaultEditText"
+            android:maxLength="11"
+            android:drawableStart="@drawable/ic_phone"
+            android:drawableLeft="@drawable/ic_phone"/>
+
+        <com.appzonegroup.app.fasttrack.ui.CustomButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            style="@style/button_style"
+            android:background="@drawable/gradient_warning"
+            android:text="@string/next"
+            android:onClick="next_button_click2"/>
+
+    </LinearLayout>
+
+</ScrollView>

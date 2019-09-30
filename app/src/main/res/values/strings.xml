@@ -1,0 +1,432 @@
+<resources>
+    <string name="app_name">Polaris Agency Banking</string>
+    <string name="home">Home</string>
+    <string name="title_activity_login">Login</string>
+    <string name="register_customer">Open Account</string>
+    <string name="check_accounts">View Accounts</string>
+    <string name="title_activity_open_account">Register Customer</string>
+    <string name="action_settings">Settings</string>
+    <string name="logout">Log out</string>
+    <string name="activateAccount">Activate Account</string>
+    <string name="verifyAccount">Verify Account</string>
+    <string name="agentSetup">Agent Setup</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="lastName">Last name</string>
+    <string name="surname">Surname</string>
+    <string name="surname_hint">Enter surname&#8230;</string>
+    <string name="firstName">First Name</string>
+    <string name="first_name_hint">Enter first name&#8230;</string>
+    <string name="phoneNo">Phone Number</string>
+    <string name="confirmPhoneNumber">Confirm Phone Number</string>
+    <string name="phoneNumber_hint">Enter phone number&#8230;</string>
+    <string name="phone_number_required">The customer\'s phone number is required for this transaction.</string>
+    <string name="cvv_instruction">Please enter the 3 or 4-digit number at the back of your card.</string>
+    <string name="bank_required">Please select the bank that issued the ATM card.</string>
+
+    <string name="confirmPhoneNumber_hint">Enter phone number again</string>
+    <string name="dateOfBirth">Date of Birth</string>
+    <string name="syncAccountReport">Sync Account Report</string>
+    <string name="reports">Reports</string>
+    <string name="misc">Miscellaneous</string>
+    <string name="placeOfBirth">Place of Birth</string>
+    <string name="placeOfBirth_hint">Enter place of birth</string>
+    <string name="address">Address</string>
+    <string name="address_hint">Enter address&#8230;</string>
+    <string name="contactDetails">Contact Details</string>
+    <string name="photo">Photo</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="otherDetails">Other Details</string>
+    <string name="cardSerialNumber">Card Serial Number</string>
+    <string name="serialNumber">Serial Number</string>
+    <string name="serialNumberHint">Enter serial number (optional)&#8230;</string>
+    <string name="cardSerialNumber_hint">Enter card serial number</string>
+    <string name="confirmSerialNumber">Confirm Serial Number</string>
+    <string name="confirmSerialNumber_hint">Enter serial number again</string>
+    <string name="nextofkinName">Next of kin Name</string>
+    <string name="nextOfKinName_hint">Enter next of kin name</string>
+    <string name="nextofkinPhoneNo">Next of kin Phone</string>
+    <string name="nextOfKinPhone_hint">Enter next of kin phone number</string>
+    <string name="next">Next</string>
+    <string name="calendar_instruction">Click to select date</string>
+    <string name="setDate">Set Date</string>
+    <string name="createAccount">Create Account</string>
+    <string name="agentPIN">Agent\'s PIN</string>
+    <string name="referralname">Referral Name</string>
+    <string name="referralnumber">Referral\'s phone number</string>
+    <string name="nationalidentityno">National identity number</string>
+    <string name="officersCode">Account officer\'s code</string>
+    <string name="agentPIN_hint">Enter agent\'s PIN</string>
+    <string name="referalname_hint">Enter your referral\'s name</string>
+    <string name="referralnumber_hint">Enter your referral\'s phone number</string>
+    <string name="nationalIdentity_hint">Enter your Identity number</string>
+    <string name="agentCode_hint">Enter your code</string>
+    <string name="updateBVN">Update BVN</string>
+    <string name="update">Update</string>
+    <string name="bvnUpdate">bvn Update</string>
+    <string name="failedBvnUpdate">Failed BVN Update</string>
+    <string name="bvnUpdateReport">BVN Update Report</string>
+    <string name="loanRequestReport">Loan Request Report</string>
+
+    <string name="submit">Submit</string>
+    <string name="accountNumber">Account Number</string>
+    <string name="accountDetails">Account Details</string>
+    <string name="customerBVNDetails">Customer bvn Details</string>
+    <string name="loanRequestDetails">Loan Request Details</string>
+    <string name="accountNumberHint">Enter account number</string>
+    <string name="sn">S/N</string>
+    <string name="customersPIN">Customer\'s PIN</string>
+    <string name="customersPINHint">Enter customer\'s PIN</string>
+    <string name="confirmPIN">Confirm PIN</string>
+    <string name="confirmPINHint">Enter PIN again</string>
+    <string name="customersBVN">Customer\'s BVN</string>
+    <string name="customersBVNHint">Enter customer\'s BVN &#8230;</string>
+    <string name="enterAccountNumber">Enter account number</string>
+    <string name="customerPhone">Customer\'s Phone Number</string>
+    <string name="customerPlaceHolder">No customer details captured</string>
+    <string name="customerInstitution">Customer\'s Institution</string>
+    <string name="marketAssociation">Market Association</string>
+    <string name="memberID">Member ID</string>
+    <string name="loanProduct">Loan Product</string>
+    <string name="product">Product</string>
+    <string name="transactionAmount">Amount</string>
+    <string name="submitRequest">Submit Request</string>
+
+    <string name="gender">Gender</string>
+
+    <string name="religion">Religion</string>
+
+
+    <string name="state">State</string>
+    <string name="enterBVN">Enter BVN</string>
+    <string name="bvn">BVN</string>
+    <string name="registerQuestion">Register?</string>
+
+    <string name="validateCustomer">Validate Customers</string>
+    <string name="validate_account">Validate Account</string>
+
+    <string-array name="Networks">
+        <item>Select Network Operator</item>
+        <item>MTN</item>
+        <item>Airtel</item>
+        <item>Etisalat</item>
+        <item>Glo</item>
+        <item>Visafone</item>
+
+    </string-array>
+
+
+    <string-array name="Gender">
+        <item>Gender…</item>
+        <item>Female</item>
+        <item>Male</item>
+    </string-array>
+
+    <string-array name="Religions">
+        <item>Select your religion </item>
+        <item>ISLAM</item>
+        <item>CHRISTIANITY</item>
+        <item>OTHERS</item>
+    </string-array>
+
+    <string-array name="ReportTypes">
+        <item>--Select Report</item>
+        <item>Balance Enquiry</item>
+        <item>Mini Statement</item>
+        <!--<item>Recharge</item>
+        <item>Bills Payment</item>-->
+        <item>Cash In</item>
+        <item>Cash Out</item>
+        <item>PIN Change</item>
+        <item>PIN Reset</item>
+        <item>Registration</item>
+        <item>Funds Transfer Commercial Bank</item>
+        <!--<item>Funds Transfer Cash In</item>
+        <item>Funds Transfer Cash Out</item>
+        <item>Funds Transfer Local</item>
+        <item>Account Activation</item>
+        <item>Local Funds Transfer</item>
+        <item>Set Default Account</item>
+        <item>Loan Request</item>
+        <item>Card Linking</item>
+        <item>Agent To Agent Funds Transfer</item>-->
+        <item>KiaKia To KiaKia</item>
+        <item>KiaKia To Sterling Bank</item>
+        <item>KiaKia To Other Banks</item>
+        <item>Account Liquidation</item>
+        <item>POS Cash Out</item>
+        <!--<item>BVN Update</item>
+        <item>MFB To Other Banks</item>-->
+    </string-array>
+
+    <string-array name="States">
+        <item>Select your state</item>
+        <item>Abia</item>
+        <item>Abuja</item>
+        <item>Adamawa</item>
+        <item>Akwa-Ibom</item>
+        <item>Anambra</item>
+        <item>Bauchi</item>
+        <item>Bayelsa</item>
+        <item>Benue</item>
+        <item>Borno</item>
+        <item>Cross River</item>
+        <item>Delta</item>
+        <item>Ebonyi</item>
+        <item>Edo</item>
+        <item>Ekiti</item>
+        <item>Enugu</item>
+        <item>Gombe</item>
+        <item>Imo</item>
+        <item>Jigawa</item>
+        <item>Kaduna</item>
+        <item>Kano</item>
+        <item>Katsina</item>
+        <item>Kebbi</item>
+        <item>Kogi</item>
+        <item>Kwara</item>
+        <item>Lagos</item>
+        <item>Nasarawa</item>
+        <item>Niger</item>
+        <item>Ogun</item>
+        <item>Ondo</item>
+        <item>Osun</item>
+        <item>Plateau</item>
+        <item>Rivers</item>
+        <item>Sokoto</item>
+        <item>Taraba</item>
+        <item>Yobe</item>
+        <item>Zamfara</item>
+
+    </string-array>
+
+    <string name="title_activity_loan_request">Loan Request</string>
+    <string name="loan_request">Loan Request</string>
+    <string name="loan_requests">Loan Requests</string>
+    <string name="failed_loan_requests">Failed Loan Requests</string>
+    <string name="reloadCustomers">Reload Customers</string>
+    <string name="reloadAssociation">Reload Association</string>
+    <string name="login">Login</string>
+    <string name="syncAccounts">Synchronized Accounts</string>
+    <string name="failedSyncAccount">Failed Sync. Accounts</string>
+    <string name="beginSync">Synchronize Data</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_phone">Phone</string>
+    <string name="promptPIN">PIN</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This phone number is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email completions."
+    </string>
+    <string name="close">Close</string>
+    <string name="agent_activation">Agent Activation</string>
+    <string name="verification_code">Verification Code</string>
+    <string name="institution_code">Institution Code</string>
+    <string name="select_your_institution">Select your institution</string>
+    <string name="agentCode">Agent\'s Code</string>
+    <string name="code">Code</string>
+    <string name="enter_verification_code">Enter verification code&#8230;</string>
+    <string name="enter_activation_code">Enter activation code&#8230;</string>
+    <string name="codeHint">Enter code</string>
+    <string name="enterPIN">Enter PIN</string>
+    <string name="newAgentQuestion">Are you a new agent?</string>
+    <string name="activationVerificationCode">Activation/Verification Code</string>
+    <string name="DATA_SOURCE">Credit_Club_Offline_Data_Source</string>
+    <string name="title_activity_bvnUpdate">BVN Update</string>
+    <string name="status">Status</string>
+    <string name="amount">Amount</string>
+    <string name="cash_deposit">Cash Deposit</string>
+    <string name="cash_withdraw">Cash Withdraw</string>
+    <string name="deposit_Amount">Deposit Amount</string>
+    <string name="depositAmount_hint">Enter amount</string>
+    <string name="amount_hint">Please enter transactionAmount&#8230;</string>
+    <string name="agentPin_hint">Enter agent\'s PIN</string>
+    <string name="accountNumber_hint">Enter customer\'s account number</string>
+    <string name="customer_account_number">Customer\'s Account Number</string>
+    <string name="customer_account_number_hint">Enter customer\'s account number</string>
+    <string name="customer_phone_number_hint">Enter customer\'s phone number</string>
+    <string name="customer_phone_number">Customer\' Phone Number</string>
+    <string name="agent_phone_number">Enter agent\'s phone number</string>
+    <string name="customer_PIN_hint">Enter customer\'s PIN&#8230;</string>
+    <string name="customerPIN">Customer\'s PIN</string>
+    <string name="withdraw">Withdraw</string>
+    <string name="deposit_btn">Deposit</string>
+    <string name="withdrawal_amount">Withdrawal Amount</string>
+    <string name="enter_otp">Enter token</string>
+    <string name="customer_otp">Customer OTP</string>
+    <string name="enter_customer_otp">Enter customer OTP&#8230;</string>
+    <string name="token">Token</string>
+    <string name="token_hint">Enter the token you received</string>
+    <string name="confirm_otp">Confirm Token</string>
+    <string name="otp_validation">OTP Validation</string>
+    <string name="verify_bvn">BVN verification</string>
+    <string name="error_cause">1. No internet Connection \n2. No BVN has been supplied</string>
+    <string name="error">Error!</string>
+    <string name="retry">Retry</string>
+    <string name="save_offline">Save Offline</string>
+    <string name="cancel">Cancel</string>
+    <string name="transaction_in_progress">Please wait\nDeposit in progress</string>
+    <string name="transaction_in_progress2">Please wait\nWithdrawal in progress</string>
+    <string name="loan_request_in_progress">Please wait\nRequesting loan</string>
+    <string name="sign_in">Sign In (Existing User)</string>
+    <string name="sign_in_menu">Sign In</string>
+    <string name="back_with_arrow"><![CDATA[<< Back]]></string>
+    <string name="back">Back</string>
+    <string name="title_activity_drawer_actvity">DrawerActvity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_activity_menu">Home</string>
+    <string name="open">open</string>
+    <string name="exit">close</string>
+    <string name="title_activity_menu3">Home</string>
+    <string name="AccountName">Account Name</string>
+    <string name="enteraccountName">Enter Account Name</string>
+    <string name="networkoperator">Network Operator</string>
+    <string name="enter_amount">Enter Amount&#8230;</string>
+    <string name="EnterAgentPin">Enter Agent Pin</string>
+    <string name="Selectcategory">Category</string>
+    <string name="category">Select Category</string>
+    <string name="selectcabletype">Select Cable Type</string>
+    <string name="selectpaymenttype">Select Payment Type</string>
+    <string name="email">Email</string>
+    <string name="Pay">Pay</string>
+    <string name="destination_bank">Destination Bank</string>
+    <string name="customer_bank">Customer Bank</string>
+    <string name="destination_account_number">Destination Account Number</string>
+    <string name="userName">Username</string>
+    <string name="password">Password</string>
+    <string name="pin">PIN</string>
+    <string name="airtimetopup">Airtime Top-up</string>
+    <string name="billpayment">Bills Payment</string>
+    <string name="middle_name">Middle Name</string>
+    <string name="fund_stransfer">Funds Transfer</string>
+    <string name="details">Details</string>
+    <string name="narration">Narration</string>
+    <string name="narration_hint">Enter narration</string>
+    <string name="transaction_reference">Transaction Reference</string>
+    <string name="transactionref_hint">Enter Transaction Referrence</string>
+    <string name="depositreport">Deposit Report</string>
+    <string name="customer_s_phone_number">Customer\'s phone number</string>
+    <string name="tenure">Tenure</string>
+    <string name="fundprovidercode">Fund Provider Code</string>
+    <string name="customerid">Customer ID</string>
+    <string name="entercustomerid">Enter customer ID</string>
+    <string name="customer_name">Customer Name</string>
+    <string name="customername_hint">Enter customer\'s name</string>
+    <string name="enterassociationid">Enter association ID</string>
+    <string name="loanproduct_hint">Enter the product ID</string>
+    <string name="productcode_hint">Enter product code</string>
+    <string name="cct">CCT</string>
+    <string name="Categories">Categories</string>
+    <string name="Billers">billers</string>
+    <string name="billerItem">Biller item</string>
+    <string name="font_name">font/roboto_condensed_light.ttf</string>
+    <string name="font_nexa_bold">font/Nexa Bold.otf</string>
+    <string name="pin_hint">Enter your PIN</string>
+    <string name="cvv_hint">Enter card CVV</string>
+    <string name="card_based_cash_out">Card-based Cashout</string>
+    <string name="card">Card</string>
+    <string name="content_description">Images dummy content description</string>
+    <string name="card_cvv_instruction">Your card CVV is the 3 or 4 digit number at the back
+    of your ATM card (as seen in the image below)</string>
+    <string name="what_is_cvv">What is CVV?</string>
+    <string name="interbank_transaction_instruction">Select transaction mode</string>
+    <string name="continue_">Continue</string>
+    <string name="loading">Loading…</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="information">Information</string>
+    <string name="ok">OK</string>
+    <string name="attention">Attention!</string>
+    <string name="withdrawal_by_token">Withdrawal by Token</string>
+    <string name="withdrawal_by_card">Withdrawal by Card</string>
+    <string name="title_activity_card_based_withdrawal2">CardBasedWithdrawalActivity2</string>
+    <string name="transaction_summary">Please enter your PIN to cash out =N=<b>%s</b></string>
+    <string name="title_activity_card_hotlist">Card Hot-list</string>
+
+    <string name="card_pan">Card PAN</string>
+    <string name="card_pan_hint">Enter Card PAN&#8230;</string>
+    <string name="account_number">Account Number</string>
+    <string name="account_number_hint">Enter account number&#8230;</string>
+    <string name="hotlist_reason">Reason for hotlisting</string>
+    <string name="hotlist_reason_hint">Why do you want to hot-list the card?</string>
+    <string name="question">Question</string>
+    <string name="title_activity_token_cash_out">Token-based CashOut</string>
+    <string name="online_functions">Online Functions</string>
+    <string name="requires_internet">(Requires internet)</string>
+    <string name="verification_code_hint">Verification Code</string>
+    <string name="withdrawal_options">Withdrawal Options</string>
+    <string name="sterling_bank_customer">Sterling Bank Customer</string>
+    <string name="other_bank_customer_token">Other Bank Customer (Token)</string>
+    <string name="other_bank_customer_card">Other Bank Customer (Card)</string>
+    <string name="title_activity_withdrawal_by_apitoken">Withdrawal</string>
+    <string name="send_token_to_customer">Send token to customer</string>
+    <string name="enter_amount_to_withdraw">Enter amount to withdraw&#8230;</string>
+    <string name="customer_token">Customer Token</string>
+    <string name="enter_the_token_you_received">Enter the token you received</string>
+    <string name="customer_balance">Customer Balance</string>
+    <string name="agent_s_balance">Agent\'s Balance</string>
+    <string name="pay_a_bill">Pay a Bill</string>
+    <string name="click_to_select_date_of_birth">Click to select date of birth</string>
+    <string name="enter_customer_pin_again">Enter customer PIN\'s again</string>
+    <string name="confirm_new_pin">Confirm New PIN</string>
+    <string name="new_pin">New PIN</string>
+    <string name="old_pin">Old PIN</string>
+    <string name="enter_the_customer_s_account_number">Enter the customer\'s account number</string>
+    <string name="start_date">Start Date</string>
+    <string name="select_report_type">Select Report Type</string>
+    <string name="end_date">End Date</string>
+    <string name="operation_was_completed_successfully">Operation was completed successfully</string>
+    <string name="success">Success</string>
+    <string name="enter_customer_bvn">Enter Customer BVN</string>
+    <string name="account_report">Account Report</string>
+    <string name="change_customer_pin">Change Customer PIN</string>
+    <string name="go_offline">Go Offline</string>
+    <string name="pin_change">PIN Change</string>
+    <string name="use_customer_s_account_number">Use customer\'s account number</string>
+    <string name="please_select_customer_account">Please select customer\'s account number</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="date">Date</string>
+    <string name="customer_id">Customer ID</string>
+    <string name="previous">Previous</string>
+    <string name="reference">Reference</string>
+    <string name="id">ID</string>
+    <string name="refresh">Refresh</string>
+    <string name="please_enter_a_valid_amount">Please enter a valid amount</string>
+    <string name="please_enter_an_amount">Please enter an amount</string>
+    <string name="please_enter_select_customer_account_number">Please enter/select the customer account number</string>
+    <string name="an_error_occurred_while_sending_the_token">An error occurred while sending the token</string>
+    <string name="please_enter_the_account_number">Please enter the account number</string>
+    <string name="please_enter_the_complete_account_number">Please enter the complete 10-digit account number</string>
+    <string name="network_error_message">A network-related error just occurred. Please try again later</string>
+    <string name="please_enter_customers_phone_number">Please enter the customer\'s phone number</string>
+    <string-array name="account_selection">
+        <item>&#8230;</item>
+    </string-array>
+    <string name="passport_photograph">Passport photograph</string>
+    <string name="id_card">ID Card</string>
+    <string name="signature">Signature</string>
+    <string name="please_upload_customers_signature">Please upload the customer\'s signature</string>
+    <string name="please_upload_customer_passport_photo">Please upload customer\'s passport photograph</string>
+    <string name="please_upload_customers_id_card">Please upload the customer\'s ID card</string>
+    <string name="loading_">LOADING…</string>
+    <string name="processing_">Processing…</string>
+    <string name="customer_was_created_successfully">Customer was created successfully</string>
+    <string name="working_try_again_shortly">Working... Please try again shortly</string>
+    <string name="go_back">Go Back</string>
+    <string name="appbar_scrolling_view_behavior" translatable="false">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
+    <string name="commission">Commission</string>
+    <string name="new_pin_confirmation_mismatch">New PIN and new PIN confirmation do not match</string>
+    <string name="enter">Enter</string>
+    <string name="oops">Oops</string>
+    <string name="title_activity_support">SupportActivity</string>
+    <string name="support">Support</string>
+    <string name="email_is_invalid">Email is invalid</string>
+</resources>

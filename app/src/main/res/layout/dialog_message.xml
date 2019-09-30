@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:padding="@dimen/ten_dp"
+    android:layout_width="250dp"
+    android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/ic_help"
+            android:tint="@color/blue"
+            android:layout_gravity="center" />
+
+
+    <com.appzonegroup.app.fasttrack.ui.TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:textSize="22sp"
+        android:gravity="center"
+        android:textAllCaps="true"
+        android:text="@string/information"/>
+
+
+    <com.appzonegroup.app.fasttrack.ui.TextView
+        android:id="@+id/message_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="@dimen/four_dp"
+        android:textSize="@dimen/medium_sized_text"
+        android:layout_margin="@dimen/five_dp"
+        android:gravity="center"/>
+
+    <com.appzonegroup.app.fasttrack.ui.CustomButton
+        android:id="@+id/ok_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/form_margin_horizontal"
+        android:layout_marginRight="@dimen/form_margin_horizontal"
+        android:layout_marginTop="20dp"
+        style="@style/button_style"
+        android:text="@string/close"/>
+
+
+</LinearLayout>

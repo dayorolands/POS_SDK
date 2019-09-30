@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="@dimen/activity_horizontal_margin"
+    android:layout_width="300dp"
+    android:layout_height="395dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/loanRequestDetails"
+            android:paddingBottom="@dimen/fifteen_dp"
+            android:id="@+id/textView" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/accountNumber"/>
+
+        <EditText
+            android:id="@+id/loanReportItem_accountNumber_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:layout_marginBottom="@dimen/fifteen_dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/phoneNo"/>
+
+        <EditText
+            android:id="@+id/loanReportItem_phoneNumber_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:layout_marginBottom="@dimen/fifteen_dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/transactionAmount"/>
+
+        <EditText
+            android:id="@+id/loanReportItem_loanAmount_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:layout_marginBottom="@dimen/fifteen_dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/status"/>
+
+        <EditText
+            android:id="@+id/loanReportItem_status_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:maxLines="4"
+            android:enabled="false"
+            android:layout_marginBottom="@dimen/fifteen_dp"/>
+
+        <Button
+            android:id="@+id/loanReportItem_close_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/close"
+            style="@style/button_style_orange"/>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_menu3"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:activity="com.appzonegroup.app.fasttrack.Menu3Activity"
+    tools:showIn="@layout/app_bar_menu3">
+
+    <GridView
+        android:id="@+id/menu_grid_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="auto_fit"
+        android:columnWidth="150dp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:horizontalSpacing="@dimen/ten_dp"
+        android:verticalSpacing="@dimen/ten_dp"/>
+
+
+    <ListView
+        android:id="@+id/menu_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:dividerHeight="@dimen/fifteen_dp"/>
+<!--
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="50dp"
+                android:weightSum="2">
+
+
+                <ImageButton
+
+                    android:id="@+id/open_account_button"
+                    android:background="@drawable/open_account"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:onClick="take_action"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"/>
+
+                <ImageButton
+
+                    android:id="@+id/cash_deposit_button"
+                    android:background="@drawable/cash_deposit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:layout_marginLeft="10dp"
+                    android:onClick="take_action"
+                    android:layout_gravity="right"
+                    android:layout_weight="1"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginTop="20dp">
+
+                <ImageButton
+
+                    android:id="@+id/cash_withdraw_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:background="@drawable/cash_withdrawal"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:onClick="take_action"/>
+
+                <ImageButton
+
+                    android:id="@+id/bvn_update_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:background="@drawable/bvn_update"
+                    android:layout_marginLeft="10dp"
+                    android:onClick="take_action"
+                    android:layout_weight="1"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:weightSum="2">
+
+
+                <ImageButton
+
+                    android:id="@+id/loan_request_button"
+                    android:background="@drawable/loan_request"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:layout_marginRight="10dp"
+                    android:onClick="take_action"
+                    android:layout_weight="1"/>
+
+                <ImageButton
+
+                    android:id="@+id/funds_transfer_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:background="@drawable/funds_transfer"
+                    android:layout_marginLeft="10dp"
+                    android:onClick="take_action"
+                    android:layout_weight="1"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:weightSum="2">
+
+
+                <ImageButton
+
+                    android:id="@+id/cct_button"
+                    android:background="@drawable/conditional_cash_transfer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:layout_marginRight="10dp"
+                    android:onClick="take_action"
+                    android:layout_weight="1"/>
+
+                <ImageButton
+
+                    android:id="@+id/bills_payment_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:background="@drawable/bills_payment"
+                    android:layout_marginLeft="10dp"
+                    android:onClick="take_action"
+                    android:layout_weight="1"/>
+
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+    </ScrollView>
+-->
+
+
+</LinearLayout>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_bg"
+    android:layout_width="350dp"
+    android:padding="@dimen/five_dp"
+    android:layout_height="wrap_content">
+    <com.appzonegroup.app.fasttrack.ui.TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:textSize="22sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textAllCaps="true"
+        android:text="@string/withdrawal_options"/>
+
+
+    <RadioGroup
+        android:id="@+id/withdrawal_options_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/ten_dp">
+
+        <RadioButton
+            android:id="@+id/sterling_bank_radio_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="@string/sterling_bank_customer" />
+
+        <RadioButton
+            android:id="@+id/other_bank_radio_token_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="@string/other_bank_customer_token" />
+
+        <RadioButton
+            android:id="@+id/other_bank_radio_card_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="@string/other_bank_customer_card" />
+
+    </RadioGroup>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.appzonegroup.app.fasttrack.ui.CustomButton
+            android:id="@+id/cancel_btn"
+            android:text="@string/cancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/form_margin_horizontal"
+            android:layout_marginRight="@dimen/form_margin_horizontal"
+            android:background="@drawable/gradient_primary"
+            android:layout_marginTop="20dp"
+            android:layout_weight="2"
+            android:layout_marginBottom="20dp"
+            style="@style/button_style"/>
+        <com.appzonegroup.app.fasttrack.ui.CustomButton
+            android:layout_weight="2"
+            android:id="@+id/ok_btn"
+            android:text="@string/ok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/form_margin_horizontal"
+            android:layout_marginRight="@dimen/form_margin_horizontal"
+            android:background="@drawable/gradient_warning"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            style="@style/button_style"/>
+    </LinearLayout>
+
+
+
+
+</LinearLayout>

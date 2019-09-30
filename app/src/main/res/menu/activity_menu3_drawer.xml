@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:title="Home" />
+        <item
+            android:id="@+id/nav_reports"
+
+            android:title="Reports" />
+        <item
+            android:id="@+id/nav_request_status"
+
+            android:title="Request Status" />
+        <item
+            android:id="@+id/nav_account_balance"
+
+            android:title="Account Balance" />
+
+        <item
+            android:id="@+id/nav_airtime_top_up"
+
+            android:title="Airtime Top-up" />
+    </group>
+
+
+    <group android:menuCategory="system"
+        android:id="@+id/feedback_group">
+        <item
+            android:title="LOG OUT"
+            android:id="@+id/logout"></item>
+    </group>
+
+</menu>

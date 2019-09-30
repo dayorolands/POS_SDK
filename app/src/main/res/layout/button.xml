@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="src"
+            type="android.graphics.drawable.Drawable" />
+
+        <variable
+            name="text"
+            type="java.lang.String" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/five_dp"
+        android:padding="10dp"
+        app:cardBackgroundColor="#f9f9f9"
+        app:cardCornerRadius="10dp">
+
+        <LinearLayout
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:layout_margin="20dp"
+                android:tint="@color/colorPrimary"
+                android:src="@{src, default=@drawable/payday_loan}" />
+
+            <com.appzonegroup.app.fasttrack.ui.TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@{text, default=Button}"
+                android:textAlignment="center"
+                android:textAllCaps="true"
+                android:textStyle="bold"
+                android:textColor="@color/blue" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

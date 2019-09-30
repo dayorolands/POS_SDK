@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<declare-styleable name="CustomTextView">
+        <attr name="my_font" format="string"/>
+        <attr name="fontColor" format="string"/>
+        <attr name="fontSize" format="string" />
+        <attr name="fontStyle" format="enum">
+            <enum name="BOLD" value="0"/>
+            <enum name="ITALICS" value="1" />
+            <enum name="BOLD_ITALICS" value="2" />
+            <enum name="NONE" value="3"/>
+        </attr>
+    </declare-styleable>-->
+
+</resources>

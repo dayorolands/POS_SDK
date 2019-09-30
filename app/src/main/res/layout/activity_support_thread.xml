@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#2A08237E"
+        tools:context="com.appzonegroup.app.fasttrack.SupportThreadActivity">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/separator"
+            app:layout_constraintTop_toBottomOf="@id/notice_layout"
+            tools:listitem="@layout/item_case_message">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <LinearLayout
+            android:id="@+id/notice_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/appbar">
+
+            <TextView
+                android:id="@+id/notice_tv"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="#60FFFFFF"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:paddingTop="5dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="5dp"
+                android:text="Case has been resolved" />
+
+            <Button
+                android:id="@+id/close_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:background="#F4511E"
+                android:text="Close case" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#ccc"
+            app:layout_constraintBottom_toTopOf="@id/layout_chatbox" />
+
+        <LinearLayout
+            android:id="@+id/layout_chatbox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:minHeight="48dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edittext_chatbox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:hint="Enter message"
+                android:maxLines="6" />
+
+            <Button
+                android:id="@+id/button_chatbox_send"
+                style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
+                android:layout_width="64dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="20dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="SEND"
+                android:textSize="14dp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

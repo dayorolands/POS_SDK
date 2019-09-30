@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingRight="@dimen/five_dp"
+    android:paddingLeft="@dimen/ten_dp"
+    android:background="@drawable/menu_rectangular_bg"
+    android:paddingTop="@dimen/one_dp"
+    android:paddingBottom="@dimen/one_dp">
+
+    <ImageView
+        android:id="@+id/gmail_item_letter"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"/>
+
+    <com.appzonegroup.app.fasttrack.ui.TextView
+        android:id="@+id/gmail_item_title"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/forty_dp"
+        android:layout_toLeftOf="@+id/gmail_item_letter"
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:gravity="center_vertical|right"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
+        tools:text="Title" />
+
+
+
+
+</RelativeLayout>

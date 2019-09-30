@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.appzonegroup.app.fasttrack">
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+
+    <uses-feature android:name="android.hardware.location.gps" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <application
+        android:name=".BankOneApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="${usesCleartextTraffic}"
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:node="replace"
+        tools:replace="icon, label, theme">
+        <activity
+            android:name=".SupportThreadActivity"
+            android:label="@string/support"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".SupportActivity"
+            android:label="@string/support"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".CaseLogActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".AirtimeActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".SplashScreenActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Menu2Activity"
+            android:label="@string/home" />
+        <activity
+            android:name=".OpenAccountActivity"
+            android:label="@string/title_activity_open_account"
+            android:parentActivityName=".Menu2Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
+        </activity>
+        <activity
+            android:name=".AgentSigninActivity"
+            android:label="@string/sign_in_menu"
+            android:parentActivityName=".Menu2Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
+        </activity>
+        <activity
+            android:name=".AirtimeTopupActivity"
+            android:label="@string/airtimetopup"
+            android:parentActivityName=".Menu3Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+        </activity>
+        <activity
+            android:name=".BillsCategoryActivity"
+            android:label="@string/Categories"
+            android:parentActivityName=".Menu3Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+        </activity>
+        <activity
+            android:name=".DetailsActivity"
+            android:label="@string/details"
+            android:parentActivityName=".LoanRequestReportActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.LoanRequestReportActivity" />
+        </activity>
+        <activity
+            android:name=".ReportActivity"
+            android:label="@string/reports"
+            android:parentActivityName=".Menu3Activity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+        </activity>
+        <activity
+            android:name=".FundsTransferActivity"
+            android:label="@string/fund_stransfer"
+            android:parentActivityName=".Menu3Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+        </activity>
+        <activity
+            android:name=".BillPaymentActivity"
+            android:label="@string/billpayment"
+            android:parentActivityName=".BillerItemActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.BillerActivity" />
+        </activity>
+        <activity
+            android:name=".BillerActivity"
+            android:label="@string/billpayment"
+            android:launchMode="singleInstance"
+            android:parentActivityName=".BillsCategoryActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.BillsCategoryActivity" />
+        </activity>
+        <activity
+            android:name=".BillerItemActivity"
+            android:label="@string/billerItem"
+            android:parentActivityName=".BillerActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.BillerActivity" />
+        </activity>
+        <activity
+            android:name=".BeneficiariesActivity"
+            android:label="@string/cct"
+            android:parentActivityName=".Menu3Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+        </activity>
+        <activity
+            android:name=".BeneficiaryDetailActivity"
+            android:label="@string/cct"
+            android:parentActivityName=".Menu3Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+        </activity>
+        <activity
+            android:name=".DepositActivity"
+            android:label="Cash Deposit"
+            android:parentActivityName=".Menu2Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
+            <!--
+ ATTENTION: This intent was auto-generated. Follow instructions at
+  https://g.co/AppIndexing/AndroidStudio to publish your URLs.
+            -->
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                &lt;!&ndash;
+                  ATTENTION: This data URL was auto-generated. We recommend that you use the HTTP scheme.
+                  TODO: Change the host or pathPrefix as necessary.
+                &ndash;&gt;
+                <data
+                    android:host="[ENTER-YOUR-HTTP-HOST-HERE]"
+                    android:pathPrefix="/depositwithdraw"
+                    android:scheme="http" />
+            </intent-filter>
+            -->
+            <!--
+ ATTENTION: This intent was auto-generated. Follow instructions at
+  https://g.co/AppIndexing/AndroidStudio to publish your URLs.
+            -->
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                &lt;!&ndash;
+                  ATTENTION: This data URL was auto-generated. We recommend that you use the HTTP scheme.
+                  TODO: Change the host or pathPrefix as necessary.
+                &ndash;&gt;
+                &lt;!&ndash;<data
+                    android:host="[ENTER-YOUR-HTTP-HOST-HERE]"
+                    android:pathPrefix="/depositwithdraw"
+                    android:scheme="http" />&ndash;&gt;
+            </intent-filter>
+            -->
+        </activity>
+        <activity
+            android:name=".WithdrawActivity"
+            android:label="Cash Withdrawal"
+            android:parentActivityName=".Menu2Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
+        </activity>
+        <activity
+            android:name=".WithdrawOTPActivity"
+            android:label="@string/otp_validation"
+            android:parentActivityName=".Menu2Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
+        </activity>
+        <activity android:name=".BOILoanRequestActivity" />
+        <activity
+            android:name=".CreditClubLoanRequestActivity"
+            android:label="@string/title_activity_loan_request"
+            android:parentActivityName=".Menu3Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+        </activity>
+        <activity
+            android:name=".BalanceEnquiryActivity"
+            android:label="Balance Enquiry"
+            android:parentActivityName=".Menu3Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+        </activity>
+        <activity
+            android:name=".AccountDetailsActivity"
+            android:label="Customer Account Balance"
+            android:parentActivityName=".CreditClubMainMenuActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.CreditClubMainMenuActivity" />
+        </activity>
+        <activity
+            android:name=".PayBillOTPActivity"
+            android:label="OTP Required"
+            android:parentActivityName=".BillPaymentActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.BillPaymentActivity" />
+        </activity>
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".AgentActivationActivity"
+            android:label="@string/agentSetup" />
+
+        <service
+            android:name=".utility.SyncService"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+        <service android:name=".utility.TrackGPS" />
+        <service android:name=".LocationChangedService" />
+
+        <receiver android:name=".utility.MyReceiver" />
+
+        <activity
+            android:name=".BVNUpdateActivity"
+            android:label="@string/title_activity_bvnUpdate"
+            android:parentActivityName=".Menu2Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
+        </activity>
+        <activity
+            android:name=".DataLoaderActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".LoanRequestReportActivity"
+            android:label="@string/loanRequestReport"
+            android:parentActivityName=".Menu2Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
+        </activity>
+        <activity
+            android:name=".Menu3Activity"
+            android:label="@string/title_activity_menu3"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".DepositReportActivity" />
+        <activity android:name=".WithdrawalReportActivity" />
+        <activity android:name=".AccountOpeningReportActivity" />
+        <activity
+            android:name=".WithdrawalByTokenActivity"
+            android:label="@string/withdrawal_by_token"
+            android:parentActivityName=".Menu3Activity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+        </activity>
+        <activity
+            android:name=".CardBasedWithdrawalActivity2"
+            android:label="@string/withdrawal_by_card"
+            android:parentActivityName=".Menu3Activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+        </activity>
+        <!--
+<activity
+            android:name=".CardReaderActivity"
+            android:theme="@style/Theme.AppCompat.Translucent" />
+        -->
+        <activity
+            android:name=".CardHotlistActivity"
+            android:label="@string/title_activity_card_hotlist"
+            android:parentActivityName=".Menu3Activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+        </activity>
+        <activity
+            android:name=".TokenCashOutActivity"
+            android:label="@string/title_activity_token_cash_out"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+        </activity>
+        <activity
+            android:name=".CashoutMainMenuActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".LocationCheckDialog" />
+        <activity
+            android:name=".CustomerRequestOpenAccountActivity"
+            android:label="@string/title_activity_open_account"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.CreditClubMainMenuActivity" />
+        </activity>
+        <activity
+            android:name=".WithdrawalByAPITokenActivity"
+            android:label="@string/title_activity_withdrawal_by_apitoken"
+            android:parentActivityName=".CreditClubMainMenuActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ChangePinActivity"
+            android:label="@string/pin_change"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.CreditClubMainMenuActivity" />
+        </activity>
+        <activity
+            android:name=".ChangeCustomerPinActivity"
+            android:label="@string/change_customer_pin"
+            android:parentActivityName=".CreditClubMainMenuActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".OnlineActivity"
+            android:label="@string/online_functions"
+            android:screenOrientation="portrait">
+
+            <!--
+                <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.CreditClubMainMenuActivity" />
+            -->
+        </activity>
+        <activity
+            android:name=".SelectReportActivity"
+            android:label="@string/reports"
+            android:parentActivityName=".CreditClubMainMenuActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.CreditClubMainMenuActivity" />
+        </activity>
+        <activity
+            android:name=".AccountReportActivity"
+            android:label="@string/account_report"
+            android:launchMode="singleInstance"
+            android:parentActivityName=".SelectReportActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.SelectReportActivity" />
+        </activity>
+        <activity
+            android:name=".CreditClubMainMenuActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".CreditClubSubMenuActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".MiniStatementActivity"
+            android:label="@string/title_activity_basic_mini_statement"
+            android:parentActivityName=".CreditClubSubMenuActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.CreditClubSubMenuActivity" />
+        </activity>
+        <activity
+            android:name="com.esafirm.imagepicker.features.ImagePickerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="5ae667395ec4429e5d7caaf22b1516debe8b386a" />
+
+        <receiver
+            android:name=".NotificationReceiver"
+            android:enabled="true"
+            android:exported="false" /> <!-- <provider -->
+        <!-- android:name="androidx.core.content.FileProvider" -->
+        <!-- android:authorities="${applicationId}.provider" -->
+        <!-- android:exported="false" -->
+        <!-- android:grantUriPermissions="true"> -->
+        <!-- <meta-data -->
+        <!-- android:name="android.support.FILE_PROVIDER_PATHS" -->
+        <!-- android:resource="@xml/provider_paths"/> -->
+        <!-- </provider> -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.imagepicker.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+    </application>
+
+</manifest>
