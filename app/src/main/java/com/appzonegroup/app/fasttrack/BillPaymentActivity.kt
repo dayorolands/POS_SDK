@@ -191,6 +191,7 @@ class BillPaymentActivity : BaseActivity() {
 
                 customerDepositSlipNumber = reference
                 geolocation = gps.geolocationString
+                isRecharge = isAirtime
             }
 
             mainScope.launch {

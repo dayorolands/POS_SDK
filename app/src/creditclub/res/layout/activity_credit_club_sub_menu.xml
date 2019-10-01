@@ -75,6 +75,12 @@
                         app:text='@{@string/register_customer}' />
 
                     <include
+                        android:id="@+id/new_wallet_button"
+                        layout="@layout/button"
+                        app:src='@{@drawable/payday_loan}'
+                        app:text='@{"Open Wallet"}' />
+
+                    <include
                         android:id="@+id/customer_balance_enquiry_button"
                         layout="@layout/button"
                         app:src='@{@drawable/income}'

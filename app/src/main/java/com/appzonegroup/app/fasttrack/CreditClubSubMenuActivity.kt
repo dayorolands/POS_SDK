@@ -47,7 +47,7 @@ class CreditClubSubMenuActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    protected fun render(category: Int) {
+    private fun render(category: Int) {
         binding.title = AppFunctions.Categories[category]
 
         when (category) {
@@ -60,6 +60,7 @@ class CreditClubSubMenuActivity : BaseActivity(), View.OnClickListener {
                 binding.customerBalanceEnquiryButton.button.setOnClickListener(this)
                 binding.bvnUpdateButton.button.setOnClickListener(this)
                 binding.registerButton.button.setOnClickListener(this)
+                binding.newWalletButton.button.setOnClickListener(this)
             }
 
             AppFunctions.Categories.LOAN_CATEGORY -> {
@@ -102,6 +103,8 @@ class CreditClubSubMenuActivity : BaseActivity(), View.OnClickListener {
     private fun openPageById(id: Int) {
         when (id) {
             R.id.register_button -> startActivity(CustomerRequestOpenAccountActivity::class.java)
+
+            R.id.new_wallet_button -> startActivity(NewWalletActivity::class.java)
 
             R.id.deposit_button -> startActivity(DepositActivity::class.java)
 
