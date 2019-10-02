@@ -16,6 +16,7 @@ import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ImageUtils
 import com.crashlytics.android.Crashlytics
 import com.creditclub.core.data.request.CustomerRequest
+import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.ui.widget.DateInputParams
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
@@ -28,13 +29,11 @@ import kotlinx.android.synthetic.main.fragment_customer_request_general_info.vie
 import kotlinx.android.synthetic.main.fragment_next_of_kin.*
 import kotlinx.android.synthetic.main.fragment_next_of_kin.view.*
 import kotlinx.coroutines.launch
-import org.threeten.bp.Duration
 import org.threeten.bp.LocalDate
 import java.io.File
 import java.io.FileOutputStream
 
 class NewWalletActivity : BaseActivity() {
-
     private val binding by contentView<NewWalletActivity, ActivityOpenAccountBinding>(
         R.layout.activity_open_account
     )
@@ -114,6 +113,14 @@ class NewWalletActivity : BaseActivity() {
     }
 
     fun createAccount_click(view: View) {
+//        if (starter_pack_number_et.value.isEmpty()) {
+//            indicateError(
+//                "Please enter the card serial number",
+//                Form.PHOTO_CAPTURE.ordinal,
+//                starter_pack_number_et
+//            )
+//            return
+//        }
 
         starterPackNo = starter_pack_number_et.value
 
@@ -148,6 +155,13 @@ class NewWalletActivity : BaseActivity() {
         val additionalInformation = CustomerRequest.Additional()
         additionalInformation.passport = passportString
         additionalInformation.email = email_et.value
+
+        //additionalInformation.setIDCard(idCardString);
+        /*additionalInformation.setMiddleName(middleName);
+        additionalInformation.setOccupation(occupation);*/
+
+        //additionalInformation.setSignature(signatureString);
+        //additionalInformation.setProvince(province);
 
         customerRequest.additionalInformation = additionalInformation.toJson()
 
@@ -336,18 +350,6 @@ class NewWalletActivity : BaseActivity() {
         return true
     }
 
-    fun show_calendar(view: View) {
-        val dateInputParams =
-            DateInputParams("Date of birth", maxDate = LocalDate.now() - Duration.ofDays(365 * 16))
-
-        showDateInput(dateInputParams) {
-            onSubmit { date ->
-                dob_tv.text = "${date.year}-${date.month + 1}-${date.dayOfMonth}"
-                dob_tv.gravity = Gravity.START
-            }
-        }
-    }
-
     fun image_upload_next_clicked(view: View) {
         if (passportString == null) {
             showError(getString(R.string.please_upload_customer_passport_photo))
@@ -356,6 +358,8 @@ class NewWalletActivity : BaseActivity() {
 
         binding.container.setCurrentItem(binding.container.currentItem + 1, true)
     }
+
+    fun show_calendar(view: View) {}
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -376,7 +380,12 @@ class NewWalletActivity : BaseActivity() {
         }
     }
 
-    inner class GeneralInfoFragment : Fragment() {
+    class GeneralInfoFragment : CreditClubFragment() {
+
+        private val dateInputParams:DateInputParams by lazy {
+            DateInputParams("Date of birth", maxDate = LocalDate.now().minusYears(18))
+        }
+
         override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -396,11 +405,21 @@ class NewWalletActivity : BaseActivity() {
             root.dob_tv.isEnabled = true
             root.email_et.isEnabled = true
 
+            root.dob_tv.setOnClickListener {
+
+                activity.showDateInput(dateInputParams) {
+                    onSubmit { date ->
+                        root.dob_tv.value = "${date.year}-${date.month + 1}-${date.dayOfMonth}"
+                        root.dob_tv.gravity = Gravity.START
+                    }
+                }
+            }
+
             return root
         }
     }
 
-    inner class NextOfKINFragment : Fragment() {
+    class NextOfKINFragment : Fragment() {
 
         override fun onCreateView(
             inflater: LayoutInflater,
@@ -415,7 +434,8 @@ class NewWalletActivity : BaseActivity() {
         }
     }
 
-    inner class DocumentUploadFragment : Fragment() {
+    class DocumentUploadFragment : Fragment() {
+        val activity get() = getActivity() as NewWalletActivity
 
         override fun onCreateView(
             inflater: LayoutInflater,
@@ -426,14 +446,14 @@ class NewWalletActivity : BaseActivity() {
             val rootView = inflater.inflate(R.layout.fragment_document_upload, container, false)
 
             rootView.findViewById<View>(R.id.passport_gallery_btn).setOnClickListener {
-                imageType = ImageType.Passport
+                activity.imageType = ImageType.Passport
                 ImagePicker.create(this).returnMode(ReturnMode.ALL)
                     .folderMode(true)
                     .single().single().showCamera(false).start()
             }
 
             rootView.findViewById<View>(R.id.passport_takePhoto_btn).setOnClickListener {
-                imageType = ImageType.Passport
+                activity.imageType = ImageType.Passport
                 ImagePicker.cameraOnly().start(this)
             }
 
@@ -442,35 +462,36 @@ class NewWalletActivity : BaseActivity() {
 
         override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
             if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
-                try {
-                    val image: Image? = ImagePicker.getFirstImageOrNull(data)
-                    im = view?.findViewById(R.id.passport_image_view)
+                activity.run {
+                    try {
+                        val image: Image? = ImagePicker.getFirstImageOrNull(data)
+                        im = view?.findViewById(R.id.passport_image_view)
 
-                    image ?: return showInternalError()
+                        image ?: return@run showInternalError()
 
-                    mainScope.launch {
-                        showProgressBar("Processing image")
-                        safeRunIO {
-                            val imageFile = File(image.path)
-                            bitmap = BitmapFactory.decodeFile(image.path)
+                        mainScope.launch {
+                            showProgressBar("Processing image")
+                            safeRunIO {
+                                val imageFile = File(image.path)
+                                bitmap = BitmapFactory.decodeFile(image.path)
 
-                            bitmap = compressImage(imageFile)
-                            passportString = Misc.bitmapToString(bitmap!!)
+                                bitmap = compressImage(imageFile)
+                                passportString = Misc.bitmapToString(bitmap!!)
+                            }
+                            im?.setImageBitmap(bitmap)
+                            hideProgressBar()
                         }
-                        im?.setImageBitmap(bitmap)
-                        hideProgressBar()
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                        showInternalError()
                     }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                    showInternalError()
                 }
-            } else {
+            } else
                 super.onActivityResult(requestCode, resultCode, data)
-            }
         }
     }
 
-    inner class AgentPINFragment : Fragment() {
+    class AgentPINFragment : Fragment() {
         override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,

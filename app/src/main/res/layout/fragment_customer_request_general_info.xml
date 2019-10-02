@@ -1,99 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:padding="@dimen/activity_horizontal_margin"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="@dimen/activity_horizontal_margin">
 
         <com.appzonegroup.app.fasttrack.ui.EditText
-            style="@style/defaultEditText"
             android:id="@+id/surname_et"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/surname_hint"
-            android:inputType="textPersonName"
-            android:drawableStart="@drawable/ic_person"
-            android:drawableLeft="@drawable/ic_person"/>
-
-        <com.appzonegroup.app.fasttrack.ui.EditText
             style="@style/defaultEditText"
-            android:id="@+id/first_name_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/first_name_hint"
             android:drawableStart="@drawable/ic_person"
             android:drawableLeft="@drawable/ic_person"
-            android:inputType="textPersonName"/>
+            android:hint="@string/surname_hint"
+            android:inputType="textPersonName" />
+
+        <com.appzonegroup.app.fasttrack.ui.EditText
+            android:id="@+id/first_name_et"
+            style="@style/defaultEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_person"
+            android:drawableLeft="@drawable/ic_person"
+            android:hint="@string/first_name_hint"
+            android:inputType="textPersonName" />
 
 
         <Spinner
-            style="@style/defaultEditText"
             android:id="@+id/gender_spinner"
+            style="@style/defaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:entries="@array/Gender" />
 
         <com.appzonegroup.app.fasttrack.ui.EditText
-            style="@style/defaultEditText"
-            android:drawableStart="@drawable/ic_phone"
-            android:drawableLeft="@drawable/ic_phone"
             android:id="@+id/phone_et"
+            style="@style/defaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_phone"
+            android:drawableLeft="@drawable/ic_phone"
             android:hint="@string/phoneNumber_hint"
             android:inputType="phone"
-            android:maxLength="11"/>
+            android:maxLength="11" />
 
 
         <com.appzonegroup.app.fasttrack.ui.EditText
-            style="@style/defaultEditText"
             android:id="@+id/address_et"
+            style="@style/defaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/ic_address"
             android:drawableLeft="@drawable/ic_address"
             android:hint="@string/address_hint"
-            android:minLines="2"
-            android:inputType="textPostalAddress"/>
+            android:inputType="textPostalAddress"
+            android:minLines="2" />
 
 
         <com.appzonegroup.app.fasttrack.ui.EditText
-            style="@style/defaultEditText"
             android:id="@+id/place_of_birth_et"
+            style="@style/defaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/ic_place"
             android:drawableLeft="@drawable/ic_place"
             android:hint="@string/placeOfBirth_hint"
-            android:inputType="textPostalAddress"/>
+            android:inputType="textPostalAddress" />
 
 
         <com.appzonegroup.app.fasttrack.ui.TextView
             android:id="@+id/dob_tv"
+            style="@style/defaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:enabled="false"
-            style="@style/defaultEditText"
-            android:onClick="show_calendar"
             android:drawableStart="@android:drawable/ic_menu_my_calendar"
             android:drawableLeft="@android:drawable/ic_menu_my_calendar"
-            android:text="@string/click_to_select_date_of_birth"/>
+            android:enabled="false"
+            android:gravity="center"
+            android:onClick="show_calendar"
+            android:text="@string/click_to_select_date_of_birth" />
 
         <com.appzonegroup.app.fasttrack.ui.EditText
-            style="@style/defaultEditText"
             android:id="@+id/email_et"
+            style="@style/defaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/ic_email_black"
             android:drawableLeft="@drawable/ic_email_black"
             android:drawableTint="@color/darkGray"
             android:hint="@string/email"
-            android:inputType="textEmailAddress"/>
+            android:inputType="textEmailAddress" />
 
         <!--<FrameLayout
             android:layout_width="match_parent"
@@ -114,13 +114,13 @@
 
         <com.appzonegroup.app.fasttrack.ui.CustomButton
             android:id="@+id/basic_info_next_btn"
+            style="@style/button_style"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:text="@string/next"
             android:background="@drawable/gradient_warning"
-            style="@style/button_style"
-            android:onClick="next_button_click1"/>
+            android:onClick="next_button_click1"
+            android:text="@string/next" />
 
     </LinearLayout>
 
