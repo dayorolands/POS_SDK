@@ -409,7 +409,7 @@ class NewWalletActivity : BaseActivity() {
 
                 activity.showDateInput(dateInputParams) {
                     onSubmit { date ->
-                        root.dob_tv.value = "${date.year}-${date.month + 1}-${date.dayOfMonth}"
+                        root.dob_tv.value = date.toString("uuuu-MM-dd")
                         root.dob_tv.gravity = Gravity.START
                     }
                 }

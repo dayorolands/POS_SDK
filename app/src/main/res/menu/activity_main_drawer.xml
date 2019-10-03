@@ -12,6 +12,10 @@
             android:icon="@drawable/ic_agent_balance"
             android:title="@string/reports" />
         <item
+            android:id="@+id/commissions"
+            android:icon="@drawable/ic_agent_balance"
+            android:title="@string/commission" />
+        <item
             android:id="@+id/support"
             android:icon="@drawable/ic_chat_bubble_outline"
             android:title="@string/support" />

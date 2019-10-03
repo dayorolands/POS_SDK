@@ -424,6 +424,16 @@
                 android:value="com.appzonegroup.app.fasttrack.CreditClubSubMenuActivity" />
         </activity>
         <activity
+            android:name=".CommissionsActivity"
+            android:label="@string/title_activity_commissions_statement"
+            android:parentActivityName=".CreditClubSubMenuActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.appzonegroup.app.fasttrack.CreditClubSubMenuActivity" />
+        </activity>
+        <activity
             android:name=".NewWalletActivity"
             android:label="@string/title_activity_new_wallet"
             android:parentActivityName=".CreditClubSubMenuActivity">

@@ -430,4 +430,5 @@
     <string name="support">Support</string>
     <string name="email_is_invalid">Email is invalid</string>
     <string name="title_activity_new_wallet">Open Wallet</string>
+    <string name="title_activity_commissions_statement">Commissions</string>
 </resources>

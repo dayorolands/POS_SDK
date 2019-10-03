@@ -353,6 +353,12 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
                     ReportActivity::class.java
                 )
             )
+            R.id.commissions -> startActivity(
+                Intent(
+                    this@CreditClubMainMenuActivity,
+                    CommissionsActivity::class.java
+                )
+            )
             R.id.support -> startActivity(
                 Intent(
                     this@CreditClubMainMenuActivity,
