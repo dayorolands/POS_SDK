@@ -135,15 +135,13 @@ class NewWalletActivity : BaseActivity() {
             return
         }
 
-        val location = String.format("%s;%s", gps.longitude.toString(), gps.latitude.toString())
-
         customerRequest.customerLastName = surname_et.value
         customerRequest.customerFirstName = first_name_et.value
         customerRequest.dateOfBirth = dob
         customerRequest.placeOfBirth = place_of_birth_et.value
         customerRequest.customerPhoneNumber = phone_et.value
         customerRequest.gender = gender
-        customerRequest.geoLocation = location
+        customerRequest.geoLocation = gps.geolocationString
         customerRequest.starterPackNumber = starter_pack_number_et.value
         customerRequest.nokName = nok_name_et.value
         customerRequest.nokPhone = nok_phone_et.value
@@ -155,10 +153,10 @@ class NewWalletActivity : BaseActivity() {
         val additionalInformation = CustomerRequest.Additional()
         additionalInformation.passport = passportString
         additionalInformation.email = email_et.value
+        additionalInformation.middleName = middle_name_et.value
 
         //additionalInformation.setIDCard(idCardString);
-        /*additionalInformation.setMiddleName(middleName);
-        additionalInformation.setOccupation(occupation);*/
+        /*additionalInformation.setOccupation(occupation);*/
 
         //additionalInformation.setSignature(signatureString);
         //additionalInformation.setProvince(province);
@@ -214,6 +212,18 @@ class NewWalletActivity : BaseActivity() {
         }
 
         if (!validate("Last name", surname)) return
+
+        val middleName = middle_name_et.value
+        if (middleName.isEmpty()) {
+            indicateError(
+                "Please enter customer's middle name",
+                Form.GENERAL_INFO.ordinal,
+                middle_name_et
+            )
+            return
+        }
+
+        if (!validate("Middle name", middleName)) return
 
         firstName = first_name_et.value
         if (firstName.isEmpty()) {

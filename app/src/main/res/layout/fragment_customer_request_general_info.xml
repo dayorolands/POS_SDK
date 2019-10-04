@@ -20,6 +20,16 @@
             android:inputType="textPersonName" />
 
         <com.appzonegroup.app.fasttrack.ui.EditText
+            android:id="@+id/middle_name_et"
+            style="@style/defaultEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_person"
+            android:drawableLeft="@drawable/ic_person"
+            android:hint="@string/middle_name_hint"
+            android:inputType="textPersonName" />
+
+        <com.appzonegroup.app.fasttrack.ui.EditText
             android:id="@+id/first_name_et"
             style="@style/defaultEditText"
             android:layout_width="match_parent"

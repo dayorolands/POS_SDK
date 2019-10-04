@@ -182,10 +182,10 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
         val additionalInformation = CustomerRequest.Additional()
         additionalInformation.passport = passportString
         additionalInformation.email = email_et.text.toString()
+        additionalInformation.middleName = middle_name_et.value
 
         //additionalInformation.setIDCard(idCardString);
-        /*additionalInformation.setMiddleName(middleName);
-        additionalInformation.setOccupation(occupation);*/
+        //additionalInformation.setOccupation(occupation);
 
         //additionalInformation.setSignature(signatureString);
         //additionalInformation.setProvince(province);
@@ -299,6 +299,18 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
         }
 
         if (!validate("Last name", surname)) return
+
+        val middleName = middle_name_et.value
+        if (middleName.isEmpty()) {
+            indicateError(
+                "Please enter customer's middle name",
+                Form.GENERAL_INFO.ordinal,
+                middle_name_et
+            )
+            return
+        }
+
+        if (!validate("Middle name", middleName)) return
 
         firstName = first_name_et.text.toString().trim { it <= ' ' }
         if (firstName.isEmpty()) {
