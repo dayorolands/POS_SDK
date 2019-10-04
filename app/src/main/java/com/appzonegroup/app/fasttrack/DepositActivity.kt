@@ -1,20 +1,17 @@
 package com.appzonegroup.app.fasttrack
 
 import android.os.Bundle
-import android.view.View
 import android.widget.EditText
 import com.appzonegroup.app.fasttrack.databinding.ActivityDepositBinding
-import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
-import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.appzonegroup.creditclub.pos.printer.receipt.DepositReceipt
 import com.creditclub.core.data.request.DepositRequest
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.requireAccountInfo
 import com.creditclub.core.util.safeRunIO
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
 

@@ -1,7 +1,7 @@
 package com.appzonegroup.app.fasttrack.receipt
 
-import com.appzonegroup.app.fasttrack.BuildConfig
 import com.appzonegroup.app.fasttrack.model.WithdrawalRequest
+import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.printer.Alignment
 import com.appzonegroup.creditclub.pos.printer.LogoNode
 import com.appzonegroup.creditclub.pos.printer.PrintJob
@@ -26,24 +26,23 @@ class WithdrawalReceipt(request: WithdrawalRequest, accountInfo: AccountInfo) : 
         },
         TextNode(
             """
-Amount : ${request.amount}
+Amount : NGN${request.amount}
 
 Institution Name:
 Institution Code: ${request.institutionCode}
 Agent Phone: ${request.agentPhoneNumber}
 
-Customer Account: ${accountInfo.number.mask(2, 2)}
+Customer Account: ${accountInfo.number.mask(4, 2)}
 Customer Name: ${accountInfo.accountName}
 
 Transaction Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}
-RRN: 
 
 -----------------------------
 
 Please retain your receipt.
 Thank You.
 
-CreditClub Plus v${BuildConfig.VERSION_NAME}
+CreditClub POS v${BuildConfig.VERSION_NAME}
 -----------------------------
             """
         ),

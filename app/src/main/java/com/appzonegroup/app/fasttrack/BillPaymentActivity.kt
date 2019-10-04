@@ -9,10 +9,10 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityBillpaymentBinding
 import com.appzonegroup.app.fasttrack.model.Biller
 import com.appzonegroup.app.fasttrack.model.BillerItem
 import com.appzonegroup.app.fasttrack.model.CustomerAccount
-import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.appzonegroup.creditclub.pos.printer.receipt.BillsPaymentReceipt
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
