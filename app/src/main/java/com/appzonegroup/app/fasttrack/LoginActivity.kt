@@ -47,7 +47,7 @@ class LoginActivity : BaseActivity() {
             if (error != null) return@launch
             response ?: return@launch
 
-            localStorage.agentInfo = response.string()
+            localStorage.agent = response
         }
     }
 
@@ -126,29 +126,41 @@ class LoginActivity : BaseActivity() {
             return
         }
 
-        // Check for a valid password, if the user entered one.
-        if (!isPINValid(pin)) {
-            showError("PIN is invalid", R.id.login_pin)
-            return
+//        // Check for a valid password, if the user entered one.
+//        if (!isPINValid(pin)) {
+//            showError("PIN is invalid", R.id.login_pin)
+//            return
+//        }
+
+        mainScope.launch {
+            showProgressBar("Logging you in")
+            val (response, error) = safeRunIO {
+                creditClubMiddleWareAPI.staticService.confirmAgentInformation(
+                    localStorage.institutionCode,
+                    phoneNumber,
+                    pin
+                )
+            }
+            hideProgressBar()
+
+            if (error != null) return@launch showError(error)
+            if (response == null) return@launch showError("PIN is invalid")
+            if (!response.isSuccessful) return@launch showError(response.responseMessage)
+
+            val lastLogin = "Last Login: " + Misc.dateToLongString(Misc.getCurrentDateTime())
+            LocalStorage.SaveValue(AppConstants.LAST_LOGIN, lastLogin, baseContext)
+
+            val activityToOpen = when {
+                packageName.toLowerCase().contains("cashout") -> CashoutMainMenuActivity::class.java
+                packageName.toLowerCase().contains(".creditclub") -> CreditClubMainMenuActivity::class.java
+                else -> Menu3Activity::class.java
+            }
+
+            val intent = Intent(this@LoginActivity, activityToOpen)
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            startActivity(intent)
+            finish()
         }
-
-        val Login = "Last Login: " + Misc.dateToLongString(Misc.getCurrentDateTime())
-        LocalStorage.SaveValue(AppConstants.LAST_LOGIN, Login, baseContext)
-
-        val activityToOpen: Class<*>
-
-        if (packageName.toLowerCase().contains("cashout")) {
-            activityToOpen = CashoutMainMenuActivity::class.java
-        } else if (packageName.toLowerCase().contains(".creditclub")) {
-            activityToOpen = CreditClubMainMenuActivity::class.java
-        } else {
-            activityToOpen = Menu3Activity::class.java
-        }
-
-        val intent = Intent(this@LoginActivity, activityToOpen)
-        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-        startActivity(intent)
-        finish()
     }
 
     internal fun showError(message: String, viewId: Int) {
@@ -169,152 +181,6 @@ class LoginActivity : BaseActivity() {
         return pin == storedPIN
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     *//*
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-    }*/
-
-    /*@Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-
-        addEmailsToAutoComplete(emails);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-    }*/
-
-    /*private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(LoginActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        phoneEt.setAdapter(adapter);
-    }
-
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
-    }*/
-
-    /*
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    /*public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: ic_register the new customerRequest here.
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                pinEt.setError(getString(R.string.error_incorrect_password));
-                pinEt.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
-    }*/
 
     protected fun ensureLocationEnabled() {
         var locationMode = 0 // 0 == Settings.Secure.LOCATION_MODE_OFF

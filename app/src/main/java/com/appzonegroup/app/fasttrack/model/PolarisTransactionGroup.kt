@@ -13,14 +13,10 @@ object PolarisTransactionGroup : TransactionGroup(
         TransactionType.CashIn,
         TransactionType.CashOut,
         TransactionType.POSCashOut,
-        TransactionType.BalanceEnquiry,
-        TransactionType.MiniStatement,
         TransactionType.Recharge,
         TransactionType.BillsPayment,
-        TransactionType.PINReset,
-        TransactionType.PINChange,
         TransactionType.Registration,
         TransactionType.FundsTransferCommercialBank,
-        TransactionType.AccountLiquidation
+        TransactionType.FundsTransferLocal
     )
 )

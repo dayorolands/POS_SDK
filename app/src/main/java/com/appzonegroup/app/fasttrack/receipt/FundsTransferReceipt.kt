@@ -1,13 +1,12 @@
 package com.appzonegroup.app.fasttrack.receipt
 
 import android.content.Context
-import com.appzonegroup.app.fasttrack.model.WithdrawalRequest
 import com.appzonegroup.creditclub.pos.printer.Alignment
 import com.appzonegroup.creditclub.pos.printer.LogoNode
 import com.appzonegroup.creditclub.pos.printer.PrintNode
 import com.appzonegroup.creditclub.pos.printer.TextNode
 import com.appzonegroup.creditclub.pos.receipt.TransactionReceipt
-import com.creditclub.core.data.model.AccountInfo
+import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
 import com.creditclub.core.util.toString
@@ -19,33 +18,37 @@ import org.threeten.bp.Instant
  * Appzone Ltd
  */
 
-class WithdrawalReceipt(
-    context: Context,
-    val request: WithdrawalRequest,
-    val accountInfo: AccountInfo
-) :
+class FundsTransferReceipt(context: Context, val request: FundsTransferRequest) :
     TransactionReceipt(context) {
 
-    override val nodes: MutableList<PrintNode>
+    override val nodes: List<PrintNode>
         get() {
-            return mutableListOf(
+            val nodes = mutableListOf(
                 LogoNode(),
-                TextNode("Withdrawal").apply {
+
+                TextNode("Funds Transfer").apply {
                     align = Alignment.MIDDLE
                     wordFont = 2
                 },
+
                 TextNode(
                     """
 Agent Code: ${context.localStorage.agent?.agentCode}
 Agent Phone: ${request.agentPhoneNumber}
 --------------------------
-Amount : NGN${request.amount}
+Amount NGN${request.amountInNaira}
 
-Customer Account: ${accountInfo.number.mask(4, 2)}
-Customer Name: ${accountInfo.accountName}
+Beneficiary Name: ${request.beneficiaryAccountName}
+Beneficiary Account Number: ${request.beneficiaryAccountNumber.mask(4, 2)}
 
-Transaction Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}"""
+Transaction Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}
+RRN: ${request.externalTransactionReference}"""
                 )
-            ).apply { addTransactionStatus(); addAll(polarisFooterNodes) }
+            )
+
+            nodes.addTransactionStatus()
+            nodes.addAll(polarisFooterNodes)
+
+            return nodes
         }
 }

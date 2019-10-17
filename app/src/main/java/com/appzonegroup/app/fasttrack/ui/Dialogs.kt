@@ -248,73 +248,73 @@ object Dialogs {
         return dialog
     }
 
-    fun getCustomer(dialogProvider: DialogProvider, title: String = "Select Customer", config: DialogListenerBlock<ApiServiceObject.ApiResult<CustomerAccount>>) {
-        val dialog = getDialog(dialogProvider.activity)
-        val binding = DataBindingUtil.inflate<DialogCustomerDetailsBinding>(
-                LayoutInflater.from(dialogProvider.activity),
-                R.layout.dialog_customer_details,
-                null,
-                false
-        )
-        val listener by lazy { DialogListener<ApiServiceObject.ApiResult<CustomerAccount>>().apply(config) }
-
-        binding.title = title
-        binding.accountNumberButton.setOnClickListener {
-            dialog.dismiss()
-            Dialogs.input(dialogProvider, "Account Number") {
-                onSubmit { accountNumber ->
-                    dismiss()
-
-                    val institutionCode = dialogProvider.activity.localStorage.institutionCode
-                    val url = "${AppConstants.getBaseUrl()}/CreditClubMiddleWareAPI/CreditClubStatic/GetCustomerAccountByPhoneNumber?phoneNumber=$accountNumber&institutionCode=$institutionCode"
-
-                    GlobalScope.launch(Dispatchers.Main) {
-                        dialogProvider.showProgressBar("Getting customer details")
-                        val customerJson = withContext(Dispatchers.Default) {
-                            ApiServiceObject.get(url)
-                        }
-                        dialogProvider.hideProgressBar()
-                        val customer = CustomerHelper.processCustomerAccountInfo(customerJson.value, dialogProvider)
-                                ?: return@launch
-
-                        listener.submit(this@onSubmit, ApiServiceObject.ApiResult(customer, null))
-                    }
-                }
-            }.show()
-        }
-
-
-        binding.phoneNumberButton.setOnClickListener {
-
-            dialog.dismiss()
-            Dialogs.input(dialogProvider, "Phone Number") {
-                onSubmit { phoneNumber ->
-                    dismiss()
-                    val institutionCode = dialogProvider.activity.localStorage.institutionCode
-                    val url="${AppConstants.getBaseUrl()}/CreditClubMiddleWareAPI/CreditClubStatic/GetCustomerAccountByPhoneNumber?phoneNumber=$phoneNumber&institutionCode=$institutionCode"
-
-                    GlobalScope.launch(Dispatchers.Main) {
-                        dialogProvider.showProgressBar("Getting customer details")
-                        val customerJson = withContext(Dispatchers.Default) {
-                            ApiServiceObject.get(url)
-                        }
-                        dialogProvider.hideProgressBar()
-                        val customer = CustomerHelper.processCustomerAccount(customerJson.value, dialogProvider)
-                                ?: return@launch
-
-                        listener.submit(this@onSubmit, ApiServiceObject.ApiResult(customer, null))
-                    }
-                }
-            }.show()
-        }
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(true)
-        dialog.setOnCancelListener {
-            listener.close()
-        }
-        dialog.setContentView(binding.root)
-        dialog.show()
-    }
+//    fun getCustomer(dialogProvider: DialogProvider, title: String = "Select Customer", config: DialogListenerBlock<ApiServiceObject.ApiResult<CustomerAccount>>) {
+//        val dialog = getDialog(dialogProvider.activity)
+//        val binding = DataBindingUtil.inflate<DialogCustomerDetailsBinding>(
+//                LayoutInflater.from(dialogProvider.activity),
+//                R.layout.dialog_customer_details,
+//                null,
+//                false
+//        )
+//        val listener by lazy { DialogListener<ApiServiceObject.ApiResult<CustomerAccount>>().apply(config) }
+//
+//        binding.title = title
+//        binding.accountNumberButton.setOnClickListener {
+//            dialog.dismiss()
+//            Dialogs.input(dialogProvider, "Account Number") {
+//                onSubmit { accountNumber ->
+//                    dismiss()
+//
+//                    val institutionCode = dialogProvider.activity.localStorage.institutionCode
+//                    val url = "${AppConstants.getBaseUrl()}/CreditClubMiddleWareAPI/CreditClubStatic/GetCustomerAccountByPhoneNumber?phoneNumber=$accountNumber&institutionCode=$institutionCode"
+//
+//                    GlobalScope.launch(Dispatchers.Main) {
+//                        dialogProvider.showProgressBar("Getting customer details")
+//                        val customerJson = withContext(Dispatchers.Default) {
+//                            ApiServiceObject.get(url)
+//                        }
+//                        dialogProvider.hideProgressBar()
+//                        val customer = CustomerHelper.processCustomerAccountInfo(customerJson.value, dialogProvider)
+//                                ?: return@launch
+//
+//                        listener.submit(this@onSubmit, ApiServiceObject.ApiResult(customer, null))
+//                    }
+//                }
+//            }.show()
+//        }
+//
+//
+//        binding.phoneNumberButton.setOnClickListener {
+//
+//            dialog.dismiss()
+//            Dialogs.input(dialogProvider, "Phone Number") {
+//                onSubmit { phoneNumber ->
+//                    dismiss()
+//                    val institutionCode = dialogProvider.activity.localStorage.institutionCode
+//                    val url="${AppConstants.getBaseUrl()}/CreditClubMiddleWareAPI/CreditClubStatic/GetCustomerAccountByPhoneNumber?phoneNumber=$phoneNumber&institutionCode=$institutionCode"
+//
+//                    GlobalScope.launch(Dispatchers.Main) {
+//                        dialogProvider.showProgressBar("Getting customer details")
+//                        val customerJson = withContext(Dispatchers.Default) {
+//                            ApiServiceObject.get(url)
+//                        }
+//                        dialogProvider.hideProgressBar()
+//                        val customer = CustomerHelper.processCustomerAccount(customerJson.value, dialogProvider)
+//                                ?: return@launch
+//
+//                        listener.submit(this@onSubmit, ApiServiceObject.ApiResult(customer, null))
+//                    }
+//                }
+//            }.show()
+//        }
+//        dialog.setCancelable(true)
+//        dialog.setCanceledOnTouchOutside(true)
+//        dialog.setOnCancelListener {
+//            listener.close()
+//        }
+//        dialog.setContentView(binding.root)
+//        dialog.show()
+//    }
 
 
     @JvmOverloads

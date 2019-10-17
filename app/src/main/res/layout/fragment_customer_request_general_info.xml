@@ -81,6 +81,17 @@
             android:hint="@string/placeOfBirth_hint"
             android:inputType="textPostalAddress" />
 
+        <com.appzonegroup.app.fasttrack.ui.EditText
+            android:id="@+id/states_et"
+            style="@style/defaultEditText"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_place"
+            android:drawableLeft="@drawable/ic_place"
+            android:hint="@string/state_hint"
+            android:inputType="text" />
+
 
         <com.appzonegroup.app.fasttrack.ui.TextView
             android:id="@+id/dob_tv"
@@ -90,7 +101,7 @@
             android:drawableStart="@android:drawable/ic_menu_my_calendar"
             android:drawableLeft="@android:drawable/ic_menu_my_calendar"
             android:enabled="false"
-            android:gravity="center"
+            android:gravity="center_vertical"
             android:onClick="show_calendar"
             android:text="@string/click_to_select_date_of_birth" />
 

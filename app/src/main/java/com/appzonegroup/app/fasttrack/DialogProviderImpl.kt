@@ -110,7 +110,8 @@ interface DialogProviderImpl : DialogProvider {
     fun renderSuccess(s: String?) {
         activity.setContentView(R.layout.layout_success)
         activity.activity.findViewById<TextView>(R.id.success_message_tv).text = s
-        activity.findViewById<View>(R.id.success_close_button).setOnClickListener { activity.finish() }
+        activity.findViewById<View>(R.id.success_close_button)
+            .setOnClickListener { activity.finish() }
     }
 
     override fun indicateError(message: String?, view: EditText?) {
@@ -296,9 +297,17 @@ interface DialogProviderImpl : DialogProvider {
         binding.hint = params.hint
         binding.inputType = params.type
         binding.maxLength = params.maxLength
+        binding.helperText = params.helperText
 
         binding.submitButton.setOnClickListener {
-            listener.submit(dialog, binding.input.text.toString())
+            val value = binding.input.text.toString()
+
+//            if (params.minLength != null && params.minLength!! > value.length) {
+//                showError("Input must not be less than ${params.minLength}")
+//                return@setOnClickListener
+//            }
+
+            listener.submit(dialog, value)
         }
 
         binding.cancelButton.setOnClickListener {

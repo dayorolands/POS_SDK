@@ -1,13 +1,14 @@
 package com.appzonegroup.app.fasttrack.receipt
 
 import android.content.Context
-import com.appzonegroup.app.fasttrack.model.WithdrawalRequest
 import com.appzonegroup.creditclub.pos.printer.Alignment
 import com.appzonegroup.creditclub.pos.printer.LogoNode
 import com.appzonegroup.creditclub.pos.printer.PrintNode
 import com.appzonegroup.creditclub.pos.printer.TextNode
 import com.appzonegroup.creditclub.pos.receipt.TransactionReceipt
+import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.data.model.AccountInfo
+import com.creditclub.core.data.request.DepositRequest
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
 import com.creditclub.core.util.toString
@@ -19,32 +20,31 @@ import org.threeten.bp.Instant
  * Appzone Ltd
  */
 
-class WithdrawalReceipt(
-    context: Context,
-    val request: WithdrawalRequest,
-    val accountInfo: AccountInfo
-) :
+class DepositReceipt(context: Context, val request: DepositRequest, val accountInfo: AccountInfo) :
     TransactionReceipt(context) {
 
     override val nodes: MutableList<PrintNode>
         get() {
             return mutableListOf(
                 LogoNode(),
-                TextNode("Withdrawal").apply {
+
+                TextNode("Deposit").apply {
                     align = Alignment.MIDDLE
                     wordFont = 2
                 },
+
                 TextNode(
                     """
 Agent Code: ${context.localStorage.agent?.agentCode}
 Agent Phone: ${request.agentPhoneNumber}
 --------------------------
-Amount : NGN${request.amount}
+Amount ${CurrencyFormatter.format("${request.amount}00")}
 
 Customer Account: ${accountInfo.number.mask(4, 2)}
 Customer Name: ${accountInfo.accountName}
 
-Transaction Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}"""
+Transaction Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}
+RRN: ${request.retrievalReferenceNumber}"""
                 )
             ).apply { addTransactionStatus(); addAll(polarisFooterNodes) }
         }

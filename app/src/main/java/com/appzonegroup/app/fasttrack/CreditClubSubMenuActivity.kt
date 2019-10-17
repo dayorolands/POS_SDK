@@ -40,12 +40,12 @@ class CreditClubSubMenuActivity : BaseActivity(), View.OnClickListener {
         render(category)
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        intent?.run {
-            render(getIntExtra(CATEGORY_TYPE, 0))
-        }
-    }
+//    override fun onNewIntent(intent: Intent?) {
+//        super.onNewIntent(intent)
+//        intent?.run {
+//            render(getIntExtra(CATEGORY_TYPE, 0))
+//        }
+//    }
 
     private fun render(category: Int) {
         binding.title = AppFunctions.Categories[category]
@@ -78,7 +78,7 @@ class CreditClubSubMenuActivity : BaseActivity(), View.OnClickListener {
                 binding.airtimeButton.button.setOnClickListener(this)
                 binding.fundsTransferButton.button.setOnClickListener(this)
 
-                if (Platform.supportsPos()) {
+                if (Platform.isPOS) {
                     binding.cardWithdrawalButton.button.setOnClickListener(this)
                 } else {
                     binding.cardWithdrawalButton.button.visibility = View.GONE
@@ -111,7 +111,7 @@ class CreditClubSubMenuActivity : BaseActivity(), View.OnClickListener {
             R.id.token_withdrawal_button -> startActivity(WithdrawActivity::class.java)
 
             R.id.card_withdrawal_button -> {
-                if (Platform.supportsPos()) {
+                if (Platform.isPOS) {
                     val intent = Intent(this, CardMainMenuActivity::class.java)
                     intent.putExtra("SHOW_BACK_BUTTON", true)
                     startActivity(intent)

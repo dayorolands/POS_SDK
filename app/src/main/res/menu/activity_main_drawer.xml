@@ -21,6 +21,7 @@
             android:title="@string/support" />
         <item
             android:id="@+id/logout"
+            android:visible="false"
             android:icon="@drawable/logout"
             android:title="@string/logout" />
     </group>

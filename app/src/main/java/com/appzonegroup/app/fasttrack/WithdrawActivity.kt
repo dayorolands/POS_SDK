@@ -13,6 +13,9 @@ import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.core.type.TokenType
+import com.creditclub.core.util.generateRRN
+import com.creditclub.core.util.sendToken
 import com.google.gson.Gson
 
 /**
@@ -26,7 +29,9 @@ class WithdrawActivity : CustomerBaseActivity() {
     internal var agentPhone = ""
     internal var institutionCode = ""
     internal var gson: Gson = Gson()
-    internal var wtReq = WithdrawalRequest()
+    internal var wtReq = WithdrawalRequest().apply {
+        retrievalReferenceNumber = generateRRN()
+    }
 
     private var tokenSent: Boolean = false
 
@@ -84,8 +89,17 @@ class WithdrawActivity : CustomerBaseActivity() {
             return
         }
 
-        internetAction = InternetAction.SendToken
-        sendCustomerToken(accountInfo.number, amount, false)
+        sendToken(accountInfo, TokenType.Withdrawal, amount.toDouble()) {
+            onSubmit {
+                tokenSent = true
+                this@WithdrawActivity.run {
+                    findViewById<View>(R.id.withdrawal_amount_et).isEnabled = false
+                    findViewById<View>(R.id.top_layout).isEnabled = false
+                    findViewById<View>(R.id.send_token_btn).visibility = View.GONE
+                    findViewById<View>(R.id.token_block).visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     fun withdraw_button_click(view: View) {
@@ -108,12 +122,6 @@ class WithdrawActivity : CustomerBaseActivity() {
             return
         }
 
-        //        String customerPIN = ((EditText) findViewById(R.id.customer_pin_et)).getText().toString().trim();
-        //        if (customerPIN.length() != 4) {
-        //            indicateError("Please enter the customer's PIN", (EditText) findViewById(R.id.customer_pin_et));
-        //            return;
-        //        }
-
         val token = binding!!.tokenEt.text!!.toString().trim { it <= ' ' }
         if (token.length != 5) {
             indicateError("Please enter the customer's token", binding!!.tokenEt)
@@ -126,10 +134,9 @@ class WithdrawActivity : CustomerBaseActivity() {
         wtReq.amount = amount
         wtReq.institutionCode = LocalStorage.getInstitutionCode(baseContext)
         wtReq.token = token
-        //        wtReq.setCustomerPin(customerPIN);
-        //String data = new Gson().toJson(wtReq);
-        //sendJSONPostRequestWithCallback(AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/WithDrawal", data, view );
+
         internetAction = InternetAction.Withdraw
+        showProgressBar("Processing transaction")
         PostCallTask(
             progressDialog,
             this,
@@ -138,9 +145,6 @@ class WithdrawActivity : CustomerBaseActivity() {
             AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/WithDrawal",
             Gson().toJson(wtReq)
         )
-
-        //sendPostRequest(AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/WithDrawal", new Gson().toJson(wtReq));
-
     }
 
     private fun processWithdrawalResponse(result: String?) {
@@ -164,9 +168,12 @@ class WithdrawActivity : CustomerBaseActivity() {
                 LocalStorage.setAgentsPin(LocalStorage.getAgentsPin(baseContext), baseContext)
                 //depositButton.setClickable(true);
 
-                if (Platform.supportsPrinter()) {
+                if (Platform.hasPrinter) {
                     printer.printAsync(
-                        WithdrawalReceipt(wtReq, accountInfo),
+                        WithdrawalReceipt(this, wtReq, accountInfo).apply {
+                            isSuccessful = response.isSuccessful
+                            reason = response.reponseMessage
+                        },
                         "Printing..."
                     ) { printerStatus ->
                         if (printerStatus !== PrinterStatus.READY) {
@@ -182,37 +189,12 @@ class WithdrawActivity : CustomerBaseActivity() {
         } else {
             showError("A network-related error just occurred. Please check your internet connection and try again")
         }
-
     }
 
     override fun processFinished(output: String?) {
 
         if (internetAction == InternetAction.Withdraw) {
             processWithdrawalResponse(output)
-        }
-
-        if (internetAction == InternetAction.SendToken) {
-            val response =
-                Gson().fromJson(output, com.appzonegroup.app.fasttrack.model.Response::class.java)
-
-            if (response == null) {
-                showError(getString(R.string.an_error_occurred_while_sending_the_token))
-                return
-            }
-            if (response.isSuccessful) {
-                tokenSent = true
-                findViewById<View>(R.id.accounts_spinner).isEnabled = false
-                findViewById<View>(R.id.customer_phone_number_et).isEnabled = false
-                findViewById<View>(R.id.wcustomer_account_number_et).isEnabled = false
-                findViewById<View>(R.id.phone_no_check_box).isEnabled = false
-                findViewById<View>(R.id.withdrawal_amount_et).isEnabled = false
-                findViewById<View>(R.id.top_layout).isEnabled = false
-                findViewById<View>(R.id.send_token_btn).visibility = View.GONE
-                findViewById<View>(R.id.token_block).visibility = View.VISIBLE
-                showSuccess(response.reponseMessage)
-            } else {
-                showNotification(response.reponseMessage)
-            }
         }
     }
 }

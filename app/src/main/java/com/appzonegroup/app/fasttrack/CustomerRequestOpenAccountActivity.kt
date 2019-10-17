@@ -14,14 +14,17 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.appzonegroup.app.fasttrack.dataaccess.ProductDAO
 import com.appzonegroup.app.fasttrack.databinding.ActivityOpenAccountBinding
-import com.appzonegroup.app.fasttrack.ui.MySpinnerAdapter
+import com.appzonegroup.app.fasttrack.receipt.NewAccountReceipt
 import com.appzonegroup.app.fasttrack.utility.CalendarDialog
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ImageUtils
+import com.appzonegroup.creditclub.pos.Platform
+import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.crashlytics.android.Crashlytics
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.model.Product
 import com.creditclub.core.data.request.CustomerRequest
+import com.creditclub.core.type.TokenType
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
 import com.esafirm.imagepicker.features.ImagePicker
@@ -31,6 +34,7 @@ import kotlinx.android.synthetic.main.fragment_agent_pin_submit_btn.*
 import kotlinx.android.synthetic.main.fragment_customer_request_account_info.*
 import kotlinx.android.synthetic.main.fragment_customer_request_account_info.view.*
 import kotlinx.android.synthetic.main.fragment_customer_request_general_info.*
+import kotlinx.android.synthetic.main.fragment_customer_request_general_info.view.*
 import kotlinx.android.synthetic.main.fragment_next_of_kin.*
 import kotlinx.android.synthetic.main.fragment_next_of_kin.view.*
 import kotlinx.coroutines.launch
@@ -87,6 +91,8 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
         PHOTO_CAPTURE,
         OTHER_DETAILS
     }
+
+    private val receipt by lazy { NewAccountReceipt(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -169,8 +175,6 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
         customerRequest.geoLocation = location
         customerRequest.starterPackNumber =
             starter_pack_number_et.text.toString().trim { it <= ' ' }
-        customerRequest.nokName = nok_name_et.text.toString().trim { it <= ' ' }
-        customerRequest.nokPhone = nok_phone_et.text.toString().trim { it <= ' ' }
         customerRequest.address = address_et.text.toString().trim { it <= ' ' }
         customerRequest.productCode = productCode
         customerRequest.productName = productName
@@ -183,6 +187,9 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
         additionalInformation.passport = passportString
         additionalInformation.email = email_et.text.toString()
         additionalInformation.middleName = middle_name_et.value
+        additionalInformation.title = if (gender == "female") "Ms" else "Mr"
+        additionalInformation.country = "NGN"
+        additionalInformation.state = states_et.value
 
         //additionalInformation.setIDCard(idCardString);
         //additionalInformation.setOccupation(occupation);
@@ -218,6 +225,31 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
                         ?: getString(R.string.an_error_occurred_please_try_again_later)
                 )
             }
+
+            if (Platform.hasPrinter) {
+                receipt.apply {
+                    isSuccessful = response.isSuccessful
+                    reason = response.responseMessage
+
+                    bvn = customerRequest.bvn
+                    institutionCode = localStorage.institutionCode!!
+                    agentPhoneNumber = localStorage.agentPhone!!
+                    uniqueReferenceID = customerRequest.uniqueReferenceID!!
+
+                    if (response.isSuccessful) {
+                        accountName =
+                            "${customerRequest.customerFirstName} ${additionalInformation.middleName} ${customerRequest.customerLastName}"
+
+                        response.responseMessage?.run {
+                            accountNumber = this
+                        }
+                    }
+                }
+
+                printer.printAsync(receipt) { printerStatus ->
+                    if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
+                }
+            }
         }
     }
 
@@ -235,6 +267,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
 
             hideProgressBar()
 
+            if (error != null && error.isKotlinNPE()) return@launch showError("BVN is invalid")
             if (error != null) return@launch showError(error)
 
             if (result == null) {
@@ -264,9 +297,12 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
                 val accountInfo = AccountInfo()
                 accountInfo.phoneNumber = phoneNumber
 
-                requireAndValidateToken(accountInfo, operationType = "BVNAccountOpeningToken") {
+                requireAndValidateToken(accountInfo, operationType = TokenType.AccountOpening) {
                     onSubmit {
-                        binding.container.setCurrentItem(binding.container.currentItem + 1, true)
+                        binding.container.setCurrentItem(
+                            binding.container.currentItem + 1,
+                            true
+                        )
                     }
                 }
             } catch (e: Exception) {
@@ -291,7 +327,11 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
         surname = surname_et.text.toString().trim { it <= ' ' }
 
         if (surname.isEmpty()) {
-            indicateError("Please enter customer's surname", Form.GENERAL_INFO.ordinal, surname_et)
+            indicateError(
+                "Please enter customer's surname",
+                Form.GENERAL_INFO.ordinal,
+                surname_et
+            )
 
             Crashlytics.logException(Exception("incorrect user name"))
             Crashlytics.log("this is a crash")
@@ -301,16 +341,16 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
         if (!validate("Last name", surname)) return
 
         val middleName = middle_name_et.value
-        if (middleName.isEmpty()) {
-            indicateError(
-                "Please enter customer's middle name",
-                Form.GENERAL_INFO.ordinal,
-                middle_name_et
-            )
-            return
-        }
+//        if (middleName.isEmpty()) {
+//            indicateError(
+//                "Please enter customer's middle name",
+//                Form.GENERAL_INFO.ordinal,
+//                middle_name_et
+//            )
+//            return
+//        }
 
-        if (!validate("Middle name", middleName)) return
+        if (!validate("Middle name", middleName, required = false)) return
 
         firstName = first_name_et.text.toString().trim { it <= ' ' }
         if (firstName.isEmpty()) {
@@ -372,22 +412,26 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
         }
 
         placeOfBirth = place_of_birth_et.text.toString().trim { it <= ' ' }
-        if (placeOfBirth.isEmpty()) {
-            indicateError(
-                "Please enter customer's place of birth",
-                Form.CONTACT_DETAILS.ordinal,
-                place_of_birth_et
-            )
-            return
-        }
+//        if (placeOfBirth.isEmpty()) {
+//            indicateError(
+//                "Please enter customer's place of birth",
+//                Form.CONTACT_DETAILS.ordinal,
+//                place_of_birth_et
+//            )
+//            return
+//        }
 
         val email = email_et.text.toString().trim { it <= ' ' }
+
+        if (email.isEmpty()) {
+            return showError(resources.getString(R.string.field_is_required, "Email"))
+        }
 
         if (email.isNotEmpty() && !email.isValidEmail()) {
             return showError(getString(R.string.email_is_invalid))
         }
 
-        if (!validate("Place of birth", placeOfBirth)) return
+//        if (!validate("Place of birth", placeOfBirth)) return
 
         dob = dob_tv.text.toString().trim { it <= ' ' }
         if (dob.contains("Click")) {
@@ -429,6 +473,8 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
             return
         }
 
+        customerRequest.nokName = nok_name_et.text.toString().trim { it <= ' ' }
+        customerRequest.nokPhone = nok_phone_et.text.toString().trim { it <= ' ' }
 
         binding.container.setCurrentItem(binding.container.currentItem + 1, true)
     }
@@ -453,20 +499,20 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
             R.id.account_info_next_btn -> {
                 bvn = bvn_et.text.toString().trim { it <= ' ' }
 
-                if (product_spinner.selectedItemPosition == 0) {
-                    //    indicateError("Please select a product", Form.PHOTO_CAPTURE.ordinal(), productSpinner);
-                    showError("Please select a product")
-                    return
-                }
-
-                if (bvn.length != 11) {
-                    showError("Please enter the BVN")
-                    return
-                }
-
-                val product = products[product_spinner.selectedItemPosition - 1]
-                productName = product.name
-                productCode = product.code
+//                if (product_spinner.selectedItemPosition == 0) {
+//                    //    indicateError("Please select a product", Form.PHOTO_CAPTURE.ordinal(), productSpinner);
+//                    showError("Please select a product")
+//                    return
+//                }
+//
+//                if (bvn.length != 11) {
+//                    showError("Please enter the BVN")
+//                    return
+//                }
+//
+//                val product = products[product_spinner.selectedItemPosition - 1]
+//                productName = product.name
+//                productCode = product.code
 
                 getCustomerBVN(bvn)
             }
@@ -536,11 +582,16 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
         ): View? {
-            return inflater.inflate(
+            val rootView = inflater.inflate(
                 R.layout.fragment_customer_request_general_info,
                 container,
                 false
             )
+
+            rootView.email_et.hint = "Email"
+            rootView.place_of_birth_et.visibility = View.GONE
+
+            return rootView
         }
     }
 
@@ -553,7 +604,9 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
         ): View? {
             val rootView = inflater.inflate(R.layout.fragment_next_of_kin, container, false)
 
-            (activity as CustomerRequestOpenAccountActivity).addValidPhoneNumberListener(rootView.nok_phone_et)
+            (activity as CustomerRequestOpenAccountActivity).addValidPhoneNumberListener(
+                rootView.nok_phone_et
+            )
 
             return rootView
         }
@@ -570,51 +623,56 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
         ): View? {
 
             val rootView =
-                inflater.inflate(R.layout.fragment_customer_request_account_info, container, false)
+                inflater.inflate(
+                    R.layout.fragment_customer_request_account_info,
+                    container,
+                    false
+                )
 
-            val productAdapter = MySpinnerAdapter(
-                context,
-                android.R.layout.simple_spinner_item,
-                activity.productNames
-            )
-            productAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            rootView.product_spinner.adapter = productAdapter
+//            val productAdapter = MySpinnerAdapter(
+//                context,
+//                android.R.layout.simple_spinner_item,
+//                activity.productNames
+//            )
+//            productAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//            rootView.product_spinner.adapter = productAdapter
+            rootView.product_spinner.visibility = View.GONE
 
-            activity.run {
-
-                mainScope.launch {
-                    showProgressBar("Getting Products...")
-
-                    val (products) = safeRunIO {
-                        creditClubMiddleWareAPI.staticService.getAllProducts(
-                            localStorage.institutionCode,
-                            localStorage.agentPhone
-                        )
-                    }
-
-                    hideProgressBar()
-
-                    products ?: return@launch showNetworkError()
-
-                    this@run.products = products
-
-                    val productDAO = ProductDAO(activity.baseContext)
-                    productDAO.Insert(products)
-
-                    productNames = ArrayList()
-                    productNames.add("Select product...")
-                    for (product in products) {
-                        productNames.add(product.name)
-                    }
-                    productDAO.close()
-
-                    Misc.populateSpinnerWithString(
-                        activity,
-                        productNames,
-                        view?.product_spinner
-                    )
-                }
-            }
+//            activity.run {
+//
+//                mainScope.launch {
+//                    showProgressBar("Getting Products...")
+//
+//                    val (products) = safeRunIO {
+//                        creditClubMiddleWareAPI.staticService.getAllProducts(
+//                            localStorage.institutionCode,
+//                            localStorage.agentPhone
+//                        )
+//                    }
+//
+//                    hideProgressBar()
+//
+//                    products ?: return@launch showNetworkError()
+//
+//                    this@run.products = products
+//
+//                    val productDAO = ProductDAO(activity.baseContext)
+//                    productDAO.Insert(products)
+//
+//                    productNames = ArrayList()
+//                    productNames.add("Select product...")
+//                    for (product in products) {
+//                        productNames.add(product.name)
+//                    }
+//                    productDAO.close()
+//
+//                    Misc.populateSpinnerWithString(
+//                        activity,
+//                        productNames,
+//                        view?.product_spinner
+//                    )
+//                }
+//            }
 
             return rootView
         }
@@ -736,9 +794,8 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
             return when (position) {
                 0 -> AccountInfoFragment()
                 1 -> GeneralInfoFragment()
-                2 -> NextOfKINFragment()
-                3 -> DocumentUploadFragment()
-                4 -> AgentPINFragment()
+                2 -> DocumentUploadFragment()
+                3 -> AgentPINFragment()
                 else -> AccountInfoFragment()
             }
         }
@@ -751,9 +808,8 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
             when (position) {
                 0 -> return "Account Info"
                 1 -> return "General Details"
-                2 -> return "Contact Details"
-                3 -> return "Document Upload"
-                4 -> return "Agent PIN"
+                2 -> return "Document Upload"
+                3 -> return "Agent PIN"
             }
             return null
         }

@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import com.appzonegroup.app.fasttrack.databinding.ActivityBvnupdateBinding
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.request.BVNRequest
+import com.creditclub.core.type.TokenType
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
@@ -121,7 +122,7 @@ class BVNUpdateActivity : CustomerBaseActivity() {
                     return@setOnClickListener
                 }
 
-                activity.requireAndValidateToken(activity.accountInfo, operationType = "BVNUpdateToken") {
+                activity.requireAndValidateToken(activity.accountInfo, operationType = TokenType.BVNUpdate) {
                     onSubmit {
                         val staticService = activity.creditClubMiddleWareAPI.staticService
 

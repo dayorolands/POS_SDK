@@ -39,7 +39,7 @@
     <string name="otherDetails">Other Details</string>
     <string name="cardSerialNumber">Card Serial Number</string>
     <string name="serialNumber">Serial Number</string>
-    <string name="serialNumberHint">Enter serial number (optional)&#8230;</string>
+    <string name="serialNumberHint">Enter card serial number (optional)&#8230;</string>
     <string name="cardSerialNumber_hint">Enter card serial number</string>
     <string name="confirmSerialNumber">Confirm Serial Number</string>
     <string name="confirmSerialNumber_hint">Enter serial number again</string>
@@ -160,43 +160,29 @@
     </string-array>
 
     <string-array name="States">
-        <item>Select your state</item>
-        <item>Abia</item>
-        <item>Abuja</item>
-        <item>Adamawa</item>
-        <item>Akwa-Ibom</item>
-        <item>Anambra</item>
-        <item>Bauchi</item>
-        <item>Bayelsa</item>
-        <item>Benue</item>
-        <item>Borno</item>
-        <item>Cross River</item>
-        <item>Delta</item>
-        <item>Ebonyi</item>
-        <item>Edo</item>
-        <item>Ekiti</item>
-        <item>Enugu</item>
-        <item>Gombe</item>
-        <item>Imo</item>
-        <item>Jigawa</item>
-        <item>Kaduna</item>
-        <item>Kano</item>
-        <item>Katsina</item>
-        <item>Kebbi</item>
-        <item>Kogi</item>
-        <item>Kwara</item>
-        <item>Lagos</item>
-        <item>Nasarawa</item>
-        <item>Niger</item>
-        <item>Ogun</item>
-        <item>Ondo</item>
-        <item>Osun</item>
-        <item>Plateau</item>
-        <item>Rivers</item>
-        <item>Sokoto</item>
-        <item>Taraba</item>
-        <item>Yobe</item>
-        <item>Zamfara</item>
+        <item>LG,LAGOS,Ikeja</item>
+        <item>FC,FCT,Abuja</item>
+        <item>GM,GOMBE,Gombe</item>
+        <item>IM,IMO,Owerri</item>
+        <item>JG,JIGAWA,Dutse</item>
+        <item>KB,KEBBI,Birnin Kebbi</item>
+        <item>KD,KADUNA,Kaduna</item>
+        <item>KG,KOGI,Lokoja</item>
+        <item>KN,KANO,Kano</item>
+        <item>KT,KATSINA,Katsina</item>
+        <item>KW,KWARA,Ilorin</item>
+        <item>NI,NIGER,Minna</item>
+        <item>NS,NASSARAWA,Lafia</item>
+        <item>OG,OGUN,Abeokuta</item>
+        <item>ON,ONDO,Akure</item>
+        <item>OS,OSUN,Osogbo</item>
+        <item>OY,OYO,Ibadan</item>
+        <item>PL,PLATEAU,Jos</item>
+        <item>RV,RIVERS,Port Harcourt</item>
+        <item>SK,SOKOTO,Sokoto</item>
+        <item>TR,TARABA,Jalingo</item>
+        <item>YB,YOBE,Damaturu</item>
+        <item>ZM,ZAMFARA,Gusau</item>
 
     </string-array>
 
@@ -293,7 +279,7 @@
     <string name="category">Select Category</string>
     <string name="selectcabletype">Select Cable Type</string>
     <string name="selectpaymenttype">Select Payment Type</string>
-    <string name="email">Email</string>
+    <string name="email">Email (optional)</string>
     <string name="Pay">Pay</string>
     <string name="destination_bank">Destination Bank</string>
     <string name="customer_bank">Customer Bank</string>
@@ -309,7 +295,7 @@
     <string name="narration">Narration</string>
     <string name="narration_hint">Enter narration</string>
     <string name="transaction_reference">Transaction Reference</string>
-    <string name="transactionref_hint">Enter Transaction Referrence</string>
+    <string name="transactionref_hint">Enter Transaction Reference</string>
     <string name="depositreport">Deposit Report</string>
     <string name="customer_s_phone_number">Customer\'s phone number</string>
     <string name="tenure">Tenure</string>
@@ -419,7 +405,7 @@
     <string name="loading_">LOADING…</string>
     <string name="processing_">Processing…</string>
     <string name="customer_was_created_successfully">Customer was created successfully</string>
-    <string name="working_try_again_shortly">Working... Please try again shortly</string>
+    <string name="working_try_again_shortly">Working… Please try again shortly</string>
     <string name="go_back">Go Back</string>
     <string name="appbar_scrolling_view_behavior" translatable="false">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
     <string name="commission">Commission</string>
@@ -431,4 +417,9 @@
     <string name="email_is_invalid">Email is invalid</string>
     <string name="title_activity_new_wallet">Open Wallet</string>
     <string name="title_activity_commissions_statement">Commissions</string>
+    <string name="pos_card_purchase">Withdrawal</string>
+    <string name="pos_enter_supervisor_pin">Enter device PIN</string>
+    <string name="pos_new_supervisor_pin">New device PIN</string>
+    <string name="pos_confirm_supervisor_pin">Confirm device PIN</string>
+    <string name="pos_supervisor_pin">Device PIN</string>
 </resources>

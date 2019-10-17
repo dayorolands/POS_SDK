@@ -18,6 +18,7 @@ public class WithdrawalRequest {
 
     private String GeoLocation;
     private String AdditionalInformation;
+    private String RetrievalReferenceNumber;
 
     public String getAgentPhoneNumber() {
         return AgentPhoneNumber;
@@ -89,5 +90,13 @@ public class WithdrawalRequest {
 
     public void setAmount(String amount) {
         Amount = amount;
+    }
+
+    public String getRetrievalReferenceNumber() {
+        return RetrievalReferenceNumber;
+    }
+
+    public void setRetrievalReferenceNumber(String retrievalReferenceNumber) {
+        RetrievalReferenceNumber = retrievalReferenceNumber;
     }
 }

@@ -12,7 +12,7 @@ import com.appzonegroup.app.fasttrack.model.CustomerAccount
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
-import com.appzonegroup.creditclub.pos.printer.receipt.BillsPaymentReceipt
+import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
@@ -222,8 +222,13 @@ class BillPaymentActivity : BaseActivity() {
                         }
                     }
 
-                    if (Platform.supportsPrinter()) {
-                        printer.printAsync(BillsPaymentReceipt(paymentRequest)) { printerStatus ->
+                    if (Platform.hasPrinter) {
+                        printer.printAsync(
+                            BillsPaymentReceipt(
+                                this@BillPaymentActivity,
+                                paymentRequest
+                            ).withResponse(response)
+                        ) { printerStatus ->
                             if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
                         }
                     }

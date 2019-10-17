@@ -17,7 +17,7 @@ public class Model2 extends Model1 {
 
     public Model2(ReportItem reportItem)
     {
-        setAmount("₦"+ Misc.toMoneyFormat(reportItem.getAmount() / 100.0));
+        setAmount("NGN"+ Misc.toMoneyFormat(reportItem.getAmount() / 100.0));
         setID(reportItem.getID() + "");
         setDate(reportItem.getDate());
         setFrom(reportItem.getFrom());

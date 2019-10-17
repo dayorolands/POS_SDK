@@ -86,7 +86,21 @@ android {
     productFlavors {
         creditclub {
             dimension "flavor"
+            applicationId "com.appzonegroup.app.creditclub.plus"
+            versionCode 4
+            versionName "1.2.1"
+        }
+
+        polaris {
+            dimension "flavor"
             applicationId "com.appzonegroup.app.creditclub.polaris"
+            versionCode 1
+            versionName "1.0.0"
+        }
+
+        access {
+            dimension "flavor"
+            applicationId "com.appzonegroup.app.creditclub.access"
             versionCode 1
             versionName "1.0.0"
         }

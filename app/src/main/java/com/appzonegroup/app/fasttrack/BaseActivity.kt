@@ -7,6 +7,7 @@ import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
@@ -280,6 +281,16 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse {
                     if (passed) next()
                 }
             }
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

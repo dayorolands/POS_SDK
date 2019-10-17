@@ -4,31 +4,27 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
-import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import androidx.core.app.ActivityCompat
-import com.appzonegroup.app.fasttrack.model.TransferResponse
-import com.appzonegroup.app.fasttrack.scheduler.AndroidSchedulers
-import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
 import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.Misc
+import com.appzonegroup.creditclub.pos.Platform
+import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.data.response.NameEnquiryResponse
-import com.creditclub.core.util.getMessage
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_fundstransfer.*
 import kotlinx.coroutines.launch
-import rx.Subscriber
 import java.util.*
 
 /**
@@ -89,6 +85,13 @@ class FundsTransferActivity : BaseActivity() {
 
             return fundsTransferRequest
         }
+
+    private val receipt by lazy {
+        FundsTransferReceipt(
+            this,
+            fundsTransferRequest
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -193,6 +196,13 @@ class FundsTransferActivity : BaseActivity() {
     }
 
     fun transferFunds(view: View) {
+
+        agentPin = agentPin_et.text.toString()
+        if (agentPin.isEmpty()) {
+            indicateError("Please enter your PIN", agentPin_et as View)
+            return
+        }
+
         amount = amount_et.text.toString().trim { it <= ' ' }
         if (amount === "") {
             indicateError("Please enter an Amount", amount_et as View)
@@ -227,12 +237,13 @@ class FundsTransferActivity : BaseActivity() {
         transferData.setGeoLocation(gpsLocation);*/
 
         mainScope.launch {
-            showProgressBar("Validating customer information")
+            showProgressBar("Transfer in progress")
             val (response, error) = safeRunIO {
                 creditClubMiddleWareAPI.fundsTransferService.transfer(fundsTransferRequest)
             }
             hideProgressBar()
 
+            if (error != null) return@launch showError(error)
             response ?: return@launch showNetworkError()
 
             if (response.isSuccessful) {
@@ -243,6 +254,17 @@ class FundsTransferActivity : BaseActivity() {
                 }
             } else {
                 showError(response.responseMessage)
+            }
+
+            if (Platform.hasPrinter) {
+                receipt.apply {
+                    isSuccessful = response.isSuccessful
+                    reason = response.responseMessage
+                }
+
+                printer.printAsync(receipt) { printerStatus ->
+                    if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
+                }
             }
         }
     }
@@ -268,17 +290,11 @@ class FundsTransferActivity : BaseActivity() {
         }
 
         accountNumber = destinationAccountNumber_et.text.toString()
-        if (accountNumber.length != 10) {
+        if (accountNumber.length != 10 && accountNumber.length != 11) {
             indicateError(
                 "Please enter a valid Account number",
                 destinationAccountNumber_et as View
             )
-            return
-        }
-
-        agentPin = agentPin_et.text.toString()
-        if (agentPin.isEmpty()) {
-            indicateError("Please enter your PIN", agentPin_et as View)
             return
         }
 

@@ -21,7 +21,7 @@ public class Model3 extends Model4 {
         setFrom(reportItem.getFrom());
         setFromPhoneNumber(reportItem.getFromPhoneNumber());
         setTo(reportItem.getTo());
-        setAmount("₦" + Misc.toMoneyFormat(reportItem.getAmount() / 100.0));
+        setAmount("NGN" + Misc.toMoneyFormat(reportItem.getAmount() / 100.0));
         setProductName(reportItem.getProductName());
         setCustomerName(reportItem.getCustomerName());
         setCustomerID(reportItem.getCustomerID());

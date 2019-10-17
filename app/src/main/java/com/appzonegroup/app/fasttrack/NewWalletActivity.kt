@@ -12,12 +12,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.appzonegroup.app.fasttrack.databinding.ActivityOpenAccountBinding
+import com.appzonegroup.app.fasttrack.receipt.NewAccountReceipt
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ImageUtils
+import com.appzonegroup.creditclub.pos.Platform
+import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.crashlytics.android.Crashlytics
+import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.request.CustomerRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.ui.widget.DateInputParams
+import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
 import com.esafirm.imagepicker.features.ImagePicker
@@ -33,7 +38,7 @@ import org.threeten.bp.LocalDate
 import java.io.File
 import java.io.FileOutputStream
 
-class NewWalletActivity : BaseActivity() {
+class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
     private val binding by contentView<NewWalletActivity, ActivityOpenAccountBinding>(
         R.layout.activity_open_account
     )
@@ -58,6 +63,11 @@ class NewWalletActivity : BaseActivity() {
             uniqueReferenceID = Misc.getGUID()
         }
     }
+
+    private val receipt by lazy { NewAccountReceipt(this) }
+
+    override val formData: CustomerRequest
+        get() = customerRequest
 
     private var im: ImageView? = null
 
@@ -143,8 +153,6 @@ class NewWalletActivity : BaseActivity() {
         customerRequest.gender = gender
         customerRequest.geoLocation = gps.geolocationString
         customerRequest.starterPackNumber = starter_pack_number_et.value
-        customerRequest.nokName = nok_name_et.value
-        customerRequest.nokPhone = nok_phone_et.value
         customerRequest.address = address_et.value
         customerRequest.agentPhoneNumber = localStorage.agentPhone
         customerRequest.agentPin = agentPIN
@@ -154,6 +162,9 @@ class NewWalletActivity : BaseActivity() {
         additionalInformation.passport = passportString
         additionalInformation.email = email_et.value
         additionalInformation.middleName = middle_name_et.value
+        additionalInformation.title = if (gender == "female") "Ms" else "Mr"
+        additionalInformation.country = "NGN"
+        additionalInformation.state = states_et.value
 
         //additionalInformation.setIDCard(idCardString);
         /*additionalInformation.setOccupation(occupation);*/
@@ -188,6 +199,31 @@ class NewWalletActivity : BaseActivity() {
                         ?: getString(R.string.an_error_occurred_please_try_again_later)
                 )
             }
+
+            if (Platform.hasPrinter) {
+                receipt.apply {
+                    isSuccessful = response.isSuccessful
+                    reason = response.responseMessage
+
+                    bvn = customerRequest.bvn
+                    institutionCode = localStorage.institutionCode!!
+                    agentPhoneNumber = localStorage.agentPhone!!
+                    uniqueReferenceID = customerRequest.uniqueReferenceID!!
+
+                    if (response.isSuccessful) {
+                        accountName =
+                            "${customerRequest.customerFirstName} ${additionalInformation.middleName} ${customerRequest.customerLastName}"
+
+                        response.responseMessage?.run {
+                            accountNumber = this
+                        }
+                    }
+                }
+
+                printer.printAsync(receipt) { printerStatus ->
+                    if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
+                }
+            }
         }
     }
 
@@ -214,16 +250,16 @@ class NewWalletActivity : BaseActivity() {
         if (!validate("Last name", surname)) return
 
         val middleName = middle_name_et.value
-        if (middleName.isEmpty()) {
-            indicateError(
-                "Please enter customer's middle name",
-                Form.GENERAL_INFO.ordinal,
-                middle_name_et
-            )
-            return
-        }
+//        if (middleName.isEmpty()) {
+//            indicateError(
+//                "Please enter customer's middle name",
+//                Form.GENERAL_INFO.ordinal,
+//                middle_name_et
+//            )
+//            return
+//        }
 
-        if (!validate("Middle name", middleName)) return
+        if (!validate("Middle name", middleName, required = false)) return
 
         firstName = first_name_et.value
         if (firstName.isEmpty()) {
@@ -285,11 +321,20 @@ class NewWalletActivity : BaseActivity() {
         }
 
         placeOfBirth = place_of_birth_et.value
-        if (placeOfBirth.isEmpty()) {
+//        if (placeOfBirth.isEmpty()) {
+//            indicateError(
+//                "Please enter customer's place of birth",
+//                Form.CONTACT_DETAILS.ordinal,
+//                place_of_birth_et
+//            )
+//            return
+//        }
+
+        if (states_et.value.isEmpty()) {
             indicateError(
-                "Please enter customer's place of birth",
+                "Please select a state",
                 Form.CONTACT_DETAILS.ordinal,
-                place_of_birth_et
+                states_et
             )
             return
         }
@@ -300,7 +345,7 @@ class NewWalletActivity : BaseActivity() {
             return showError(getString(R.string.email_is_invalid))
         }
 
-        if (!validate("Place of birth", placeOfBirth)) return
+        if (!validate("Place of birth", placeOfBirth, required = false)) return
 
         dob = dob_tv.value
         if (dob.contains("Click")) {
@@ -342,6 +387,8 @@ class NewWalletActivity : BaseActivity() {
             return
         }
 
+        customerRequest.nokName = nok_name_et.value
+        customerRequest.nokPhone = nok_phone_et.value
 
         binding.container.setCurrentItem(binding.container.currentItem + 1, true)
     }
@@ -392,7 +439,7 @@ class NewWalletActivity : BaseActivity() {
 
     class GeneralInfoFragment : CreditClubFragment() {
 
-        private val dateInputParams:DateInputParams by lazy {
+        private val dateInputParams: DateInputParams by lazy {
             DateInputParams("Date of birth", maxDate = LocalDate.now().minusYears(18))
         }
 
@@ -414,6 +461,30 @@ class NewWalletActivity : BaseActivity() {
             root.address_et.isEnabled = true
             root.dob_tv.isEnabled = true
             root.email_et.isEnabled = true
+            root.place_of_birth_et.visibility = View.GONE
+            root.states_et.visibility = View.VISIBLE
+
+            root.states_et.setOnFocusChangeListener { v, hasFocus ->
+
+                if (hasFocus) {
+                    val stateArray = resources.getStringArray(R.array.States)
+                    val options = stateArray.map {
+                        val stateInfo = it.split(",")
+                        DialogOptionItem(stateInfo[1])
+                    }
+
+                    activity.showOptions(getString(R.string.state_hint), options) {
+                        onSubmit {
+                            root.states_et.value = stateArray[it].split(",").first()
+                            root.states_et.clearFocus()
+                        }
+
+                        onClose {
+                            root.states_et.clearFocus()
+                        }
+                    }
+                }
+            }
 
             root.dob_tv.setOnClickListener {
 
@@ -517,23 +588,21 @@ class NewWalletActivity : BaseActivity() {
         override fun getItem(position: Int): Fragment {
             return when (position) {
                 0 -> GeneralInfoFragment()
-                1 -> NextOfKINFragment()
-                2 -> DocumentUploadFragment()
-                3 -> AgentPINFragment()
+                1 -> DocumentUploadFragment()
+                2 -> AgentPINFragment()
                 else -> GeneralInfoFragment()
             }
         }
 
         override fun getCount(): Int {
-            return 5
+            return 3
         }
 
         override fun getPageTitle(position: Int): CharSequence? {
             when (position) {
                 0 -> return "General Details"
-                1 -> return "Contact Details"
-                2 -> return "Document Upload"
-                3 -> return "Agent PIN"
+                1 -> return "Document Upload"
+                2 -> return "Agent PIN"
             }
             return null
         }

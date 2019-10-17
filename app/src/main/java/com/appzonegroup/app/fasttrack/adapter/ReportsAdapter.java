@@ -101,7 +101,7 @@ public class ReportsAdapter extends ArrayAdapter<ReportItem> {
                 ((TextView)view.findViewById(R.id.time_occurred_tv)).setText(reportItem.getFormatedDate());
                 ((TextView)view.findViewById(R.id.customer_name_tv)).setText(reportItem.getCustomerName() == null ? "[No name]" : reportItem.getCustomerName());
                 ((TextView)view.findViewById(R.id.phone_no_tv)).setText(reportItem.getCustomerPhone());
-                ((TextView)view.findViewById(R.id.amount_tv)).setText("₦"+Misc.toMoneyFormat(reportItem.getAmount() / 100.0));
+                ((TextView)view.findViewById(R.id.amount_tv)).setText("NGN"+Misc.toMoneyFormat(reportItem.getAmount() / 100.0));
             }
         }
 

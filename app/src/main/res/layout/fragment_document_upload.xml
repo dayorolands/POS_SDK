@@ -23,9 +23,9 @@
             android:id="@+id/passport_image_view"
             android:layout_width="100dp"
             android:layout_height="120dp"
-            android:background="#eee"
             android:layout_margin="50dp"
             android:layout_marginBottom="10dp"
+            android:background="#eee"
             android:contentDescription="@string/content_description"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_person" />
@@ -38,25 +38,25 @@
             <com.appzonegroup.app.fasttrack.ui.CustomButton
                 android:id="@+id/passport_gallery_btn"
                 style="@style/AppButton.RoundBlueButton"
-                android:drawableTop="@drawable/ic_menu_gallery"
-                android:drawablePadding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="5dp"
                 android:layout_weight="1"
+                android:drawableTop="@drawable/ic_menu_gallery"
+                android:drawablePadding="10dp"
                 android:text="@string/gallery"
                 android:textColor="@android:color/white"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <com.appzonegroup.app.fasttrack.ui.CustomButton
                 android:id="@+id/passport_takePhoto_btn"
-                android:drawableTop="@drawable/ic_menu_camera"
-                android:drawablePadding="10dp"
                 style="@style/AppButton.RoundBlueButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
                 android:layout_weight="1"
+                android:drawableTop="@drawable/ic_menu_camera"
+                android:drawablePadding="10dp"
                 android:text="@string/camera"
                 android:textColor="@android:color/white"
                 android:textStyle="bold" />

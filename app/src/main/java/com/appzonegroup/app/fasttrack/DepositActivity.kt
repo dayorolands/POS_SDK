@@ -6,7 +6,7 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityDepositBinding
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
-import com.appzonegroup.creditclub.pos.printer.receipt.DepositReceipt
+import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
 import com.creditclub.core.data.request.DepositRequest
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.localStorage
@@ -107,8 +107,17 @@ class DepositActivity : CustomerBaseActivity() {
 
                 LocalStorage.setAgentsPin(depositRequest.agentPin, baseContext)
 
-                if (Platform.supportsPrinter()) {
-                    printer.printAsync(DepositReceipt(this@DepositActivity.depositRequest, accountInfo)) { printerStatus ->
+                if (Platform.hasPrinter) {
+                    printer.printAsync(
+                        DepositReceipt(
+                            this@DepositActivity,
+                            this@DepositActivity.depositRequest,
+                            accountInfo
+                        ).apply {
+                            isSuccessful = response.isSuccessful
+                            reason = response.responseMessage
+                        }
+                    ) { printerStatus ->
                         if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
                     }
                 }

@@ -3,15 +3,12 @@ package com.appzonegroup.app.fasttrack
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
-import android.widget.LinearLayout
 import com.appzonegroup.app.fasttrack.ui.TextView
-import com.appzonegroup.app.fasttrack.utility.Misc
 import com.creditclub.core.data.request.BalanceEnquiryRequest
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
 import kotlinx.android.synthetic.main.activity_balance_enquiry.*
 import kotlinx.coroutines.launch
-import java.util.*
 
 /**
  * Created by Oto-obong on 11/10/2017.
@@ -21,7 +18,7 @@ class BalanceEnquiryActivity : BaseActivity() {
 
     lateinit var available_balance: TextView
     lateinit var balance: TextView
-    internal lateinit var pin: String
+    private var pin = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +29,9 @@ class BalanceEnquiryActivity : BaseActivity() {
 
 
     fun onClick(view: View) {
-        pin = (findViewById<View>(R.id.pin_et) as EditText).text.toString().trim { it <= ' ' }
+        pin = findViewById<EditText>(R.id.pin_et).value
+        findViewById<EditText>(R.id.pin_et).value = ""
+
         if (pin.length != 4) {
             showError("Please enter your PIN")
             return
@@ -59,9 +58,8 @@ class BalanceEnquiryActivity : BaseActivity() {
             response ?: return@launch showNetworkError()
 
             if (response.isSussessful) {
-                val balanceOut = String.format(Locale.getDefault(), "%s %s", "₦", Misc.toMoneyFormat(response.balance))
-                val availableOut =
-                    String.format(Locale.getDefault(), "%s %s", "₦", Misc.toMoneyFormat(response.availableBalance))
+                val balanceOut = "NGN${response.balance}"
+                val availableOut = "${getString(R.string.naira)}${response.availableBalance}"
 
                 localStorage.agentPIN = pin
 

@@ -1,13 +1,11 @@
 package com.appzonegroup.app.fasttrack.receipt
 
 import android.content.Context
-import com.appzonegroup.app.fasttrack.model.WithdrawalRequest
 import com.appzonegroup.creditclub.pos.printer.Alignment
 import com.appzonegroup.creditclub.pos.printer.LogoNode
 import com.appzonegroup.creditclub.pos.printer.PrintNode
 import com.appzonegroup.creditclub.pos.printer.TextNode
 import com.appzonegroup.creditclub.pos.receipt.TransactionReceipt
-import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
 import com.creditclub.core.util.toString
@@ -19,32 +17,39 @@ import org.threeten.bp.Instant
  * Appzone Ltd
  */
 
-class WithdrawalReceipt(
-    context: Context,
-    val request: WithdrawalRequest,
-    val accountInfo: AccountInfo
-) :
-    TransactionReceipt(context) {
+class NewAccountReceipt(context: Context) : TransactionReceipt(context) {
+
+    var bvn: String? = null
+    var institutionCode: String = ""
+    var accountNumber: String = ""
+    var agentPhoneNumber: String = ""
+    var uniqueReferenceID: String = ""
+    var accountName: String = ""
+
+    private val isWalletAccount get() = bvn.isNullOrEmpty()
 
     override val nodes: MutableList<PrintNode>
         get() {
             return mutableListOf(
                 LogoNode(),
-                TextNode("Withdrawal").apply {
+
+                TextNode(if (isWalletAccount) "New Wallet" else "New Account").apply {
                     align = Alignment.MIDDLE
                     wordFont = 2
                 },
+
                 TextNode(
                     """
 Agent Code: ${context.localStorage.agent?.agentCode}
-Agent Phone: ${request.agentPhoneNumber}
+Agent Phone: ${context.localStorage.agent?.phoneNumber}
 --------------------------
-Amount : NGN${request.amount}
 
-Customer Account: ${accountInfo.number.mask(4, 2)}
-Customer Name: ${accountInfo.accountName}
+Account Name: $accountName
+Account Number: ${accountNumber.mask(4, 2)}
+Account Type: ${if (isWalletAccount) "Wallet Account" else "Savings Account"}
 
-Transaction Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}"""
+Creation Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}
+RRN: $uniqueReferenceID"""
                 )
             ).apply { addTransactionStatus(); addAll(polarisFooterNodes) }
         }
