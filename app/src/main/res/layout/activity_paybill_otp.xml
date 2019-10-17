@@ -8,16 +8,18 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@color/white"
+    android:layout_marginTop="80dp"
     tools:activity="com.appzonegroup.app.fasttrack.BillPaymentActivity"
+    android:baselineAligned="false"
     android:orientation="vertical">
 
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/token"/>
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <EditText
         android:id="@+id/payBill_token_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,24 +27,24 @@
         android:inputType="phone"
         android:layout_marginBottom="25dp"/>
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Customer Phone Number"/>
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <EditText
         android:id="@+id/paybill_customerno_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="phone"
         android:layout_marginBottom="25dp"/>
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Customer Email"/>
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <EditText
         android:id="@+id/paybill_customeremail_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

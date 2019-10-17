@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:background="@color/blue"
+    android:background="@color/white"
     android:padding="@dimen/activity_horizontal_margin"
     android:layout_centerVertical="true"
     android:layout_height="match_parent">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/fifty_dp"
         android:orientation="vertical">
 
         <com.appzonegroup.app.fasttrack.ui.EditText
@@ -18,16 +16,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/defaultEditText"
-            android:hint="enter customer's account number"
-            android:inputType="number"
-            android:layout_marginBottom="20dp"/>
+            android:maxLength="10"
+            android:hint="@string/enter_the_customer_s_account_number"
+            android:inputType="number"/>
 
         <com.appzonegroup.app.fasttrack.ui.CustomButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Customers Balance"
+            android:text="@string/submit"
             style="@style/button_style"
-            android:background="@drawable/gradient_primary"
+            android:background="@drawable/gradient_warning"
             android:layout_marginLeft="@dimen/form_margin_horizontal"
             android:layout_marginRight="@dimen/form_margin_horizontal"
             android:layout_marginBottom="@dimen/ten_dp"
@@ -35,31 +33,6 @@
 
 
     </LinearLayout>
-    <com.appzonegroup.app.fasttrack.ui.TextView
-        android:layout_width="match_parent"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:gravity="center"
-        android:textAllCaps="true"
-        android:padding="16dp"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="50dp"
-        android:text="Available Balance"/>
-
-    <com.appzonegroup.app.fasttrack.ui.TextView
-        android:id="@+id/available_balance"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:padding="16dp"
-        android:textStyle="bold"
-        android:textSize="70sp"
-        android:gravity="center"/>
-
-
 
 
 </LinearLayout>

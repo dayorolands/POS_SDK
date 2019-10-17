@@ -6,7 +6,7 @@
     android:background="@color/white"
     android:padding="5dp">
 
-    <TextView
+    <com.appzonegroup.app.fasttrack.ui.TextView
         android:id="@+id/deposit_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
         android:orientation="vertical"
         android:layout_marginTop="10dp">
 
-        <TextView
+        <com.appzonegroup.app.fasttrack.ui.TextView
             android:id="@+id/sendotp_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
         android:orientation="horizontal"
         android:gravity="center">
 
-        <Button
+        <com.appzonegroup.app.fasttrack.ui.CustomButton
             android:id="@+id/sendingotp_ok_btn"
             android:layout_width="80dp"
             android:layout_height="30dp"
@@ -75,7 +75,7 @@
             android:foregroundGravity="right"
             android:layout_gravity="center_horizontal" />
 
-        <Button
+        <com.appzonegroup.app.fasttrack.ui.CustomButton
             android:id="@+id/sendingotp_retry_btn"
             android:layout_width="80dp"
             android:layout_height="30dp"

@@ -12,7 +12,7 @@
         </item>
         <!-- BUTTON alttan gölge
           android:right="5px" to make it round-->
-        <item
+        <!--<item
             android:bottom="5dp">
             <shape>
                 <gradient
@@ -22,7 +22,7 @@
                 <corners
                     android:radius="@dimen/button_radius"/>
             </shape>
-        </item>
+        </item>-->
     </layer-list>
 </item>
 

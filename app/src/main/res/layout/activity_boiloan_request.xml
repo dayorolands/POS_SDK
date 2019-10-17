@@ -12,12 +12,12 @@
 
 
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/customerPhone"/>
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <EditText
         android:id="@+id/loanRequest_customerPhone_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
         android:layout_marginBottom="@dimen/fifteen_dp"
         android:onClick="next_button_click"/>
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <EditText
         android:id="@+id/loanRequest_customerName_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
         android:enabled="false"
         android:layout_marginBottom="@dimen/fifteen_dp"/>
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/customerInstitution"/>
@@ -54,7 +54,7 @@
         android:layout_marginBottom="@dimen/fifteen_dp">
     </Spinner>
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/marketAssociation"/>
@@ -66,12 +66,12 @@
         android:layout_marginBottom="@dimen/fifteen_dp">
     </Spinner>
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/memberID"/>
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <EditText
         android:id="@+id/loanRequest_memberID_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

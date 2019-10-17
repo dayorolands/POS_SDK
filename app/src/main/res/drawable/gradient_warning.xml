@@ -1,47 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:state_pressed="false">
-    <layer-list>
-        <!-- SHADOW -->
-        <item>
-            <shape android:height="4dp">
-                <solid android:color="#ffa100"/>
-                <!-- alttan gölge -->
-                <corners android:radius="@dimen/button_radius"/>
-            </shape>
-        </item>
-        <!-- BUTTON alttan gölge
-          android:right="5px" to make it round-->
-        <item
-            android:bottom="5dp">
-            <shape>
-                <gradient
-                    android:startColor="#fc0"
-                    android:endColor="#ffa100"
-                    android:angle="0" />
-                <corners
-                    android:radius="@dimen/button_radius"/>
-            </shape>
-        </item>
-    </layer-list>
-</item>
+    <item android:state_pressed="false">
+        <shape android:shape="rectangle">
 
-<item android:state_pressed="true">
-    <layer-list>
-        <!-- SHADOW -->
+            <solid android:color="@color/blue" />
 
-        <!-- BUTTON -->
-        <item android:bottom="5px">
-            <shape>
-                <gradient
-                    android:startColor="#db8a00"
-                    android:endColor="#db8a00"
-                    android:angle="270" />
-                <corners
-                    android:radius="@dimen/button_radius"/>
+            <corners android:radius="20dp" />
 
-            </shape>
-        </item>
-    </layer-list>
-</item>
+            <!--<padding android:bottom="10dp" android:left="20dp" android:right="20dp" android:top="10dp" />-->
+            <padding android:left="20dp" android:right="20dp" />
+
+        </shape>
+
+    </item>
+
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+
+            <solid android:color="@color/colorPrimaryDark" />
+
+            <corners android:radius="20dp" />
+
+            <!--<padding android:bottom="10dp" android:left="20dp" android:right="20dp" android:top="10dp" />-->
+            <padding android:left="20dp" android:right="20dp" />
+
+        </shape>
+
+    </item>
 </selector>

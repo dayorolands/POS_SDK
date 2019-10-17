@@ -6,18 +6,18 @@
     <color name="black4">#bdc3c7</color>
     <color name="colorPrimary">#61297f</color>
     <color name="colorPrimaryTransparent">#DD61297f</color>
-    <color name="selectorColor">#DFA226</color>
     <color name="colorPrimaryDark">#441D58</color>
-    <color name="darkGray">#51585c</color>
     <color name="colorAccent">#DFA226</color>
     <color name="colorAccentDark">#8B6518</color>
     <color name="colorAccentTransparent">#DDDFA226</color>
     <color name="actionBarColor">#CCC</color>
     <color name="darkGrey">#CED1D4</color>
     <color name="green">#2ECC71</color>
-    <color name="blue">#61297f</color>
-    <color name="darkBlue">#441D58</color>
-    <color name="darkBlue2">#441D58</color>
+    <color name="blue">@color/colorPrimary</color>
+    <color name="darkBlue">@color/colorPrimaryDark</color>
+    <color name="darkBlue2">@color/colorPrimaryDark</color>
+    <color name="darkGray">#51585c</color>
+    <color name="selectorColor">@color/colorAccent</color>
     <color name="white">#fff</color>
     <color name="veryLightGrey">#6c757d</color>
     <color name="bluishWhite">#d1d1ff</color>
@@ -28,4 +28,7 @@
     <color name="dividerColor">@color/darkGray</color>
     <color name="app_orange">@color/colorAccent</color>
     <color name="app_orange_transparent">@color/colorAccent</color>
+    <color name="colorSplashBg">@color/colorPrimary</color>
+    <color name="colorLoginBg">@color/colorPrimaryTransparent</color>
+    <color name="toolbarLogoTint">#0000</color>
 </resources>

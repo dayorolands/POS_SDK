@@ -17,7 +17,7 @@
         android:id="@+id/login_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimaryTransparent"
+        android:background="@color/colorLoginBg"
         android:weightSum="1">
 
         <LinearLayout
@@ -38,7 +38,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="1dp"
                 android:layout_marginBottom="50dp"
-                android:background="@drawable/ic_logo_original" />
+                android:src="@drawable/ic_logo_original" />
 
 
             <com.google.android.material.textfield.TextInputLayout

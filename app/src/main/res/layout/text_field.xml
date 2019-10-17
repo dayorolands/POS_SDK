@@ -15,9 +15,14 @@
         <variable
             name="inputType"
             type="java.lang.String" />
+
         <variable
             name="text"
             type="java.lang.String" />
+
+        <variable
+            name="maxLength"
+            type="Integer" />
 
         <variable
             name="disabled"
@@ -30,21 +35,22 @@
         android:layout_marginBottom="20dp"
         android:orientation="horizontal">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:tint="@color/colorPrimary"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="15dp"
-            android:src="@{icon}" />
+        <!--<ImageView-->
+            <!--android:layout_width="24dp"-->
+            <!--android:layout_height="24dp"-->
+            <!--android:tint="@color/colorPrimary"-->
+            <!--android:layout_gravity="bottom"-->
+            <!--android:layout_marginBottom="15dp"-->
+            <!--android:src="@{icon}" />-->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:layout_marginEnd="@dimen/twenty_dp"
+            android:orientation="vertical"
             android:layout_marginStart="26dp"
-            android:orientation="vertical">
+            android:layout_marginLeft="26dp"
+            android:layout_marginRight="@dimen/twenty_dp">
 
             <!--<TextView-->
             <!--android:layout_width="match_parent"-->
@@ -55,13 +61,16 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@{hint, default=FIELD}">
+                android:hint="@{hint, default=FIELD}"
+                style="@style/TextField"
+                android:layout_height="wrap_content">
 
-                <com.appzonegroup.app.fasttrack.ui.EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/input"
                     android:layout_width="match_parent"
                     android:text="@{text}"
+                    android:maxLength="@{maxLength ?? 100}"
+                    android:fontFamily="@string/font_name"
                     android:enabled="@{!safeUnbox(disabled)}"
                     android:layout_height="wrap_content"
                     android:inputType="@{EditText.deriveInputType(inputType)}" />

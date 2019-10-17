@@ -422,4 +422,8 @@
     <string name="pos_new_supervisor_pin">New device PIN</string>
     <string name="pos_confirm_supervisor_pin">Confirm device PIN</string>
     <string name="pos_supervisor_pin">Device PIN</string>
+    <string name="enter_pin">Enter PIN</string>
+    <string name="month_label">Month</string>
+    <string name="day_label">Day</string>
+    <string name="year_label">Year</string>
 </resources>

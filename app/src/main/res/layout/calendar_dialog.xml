@@ -15,10 +15,12 @@
     </DatePicker>
 
     <Button
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_gravity="center_horizontal"
         android:layout_height="wrap_content"
+        android:layout_margin="0dp"
         android:id="@+id/calendarViewButton"
-        style="@style/button_style"
+        android:textColor="@color/black"
+        android:background="@drawable/bg_clickable_accent"
         android:text="@string/setDate"/>
 </LinearLayout>

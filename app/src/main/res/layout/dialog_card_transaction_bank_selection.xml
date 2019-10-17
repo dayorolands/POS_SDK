@@ -42,7 +42,6 @@
             android:layout_height="@dimen/forty_dp"
             android:text="@string/cancel"
             android:layout_weight="1"
-            style="@style/button_style_orange"
             android:layout_marginRight="@dimen/two_dp"/>
 
         <Button
@@ -50,7 +49,6 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/forty_dp"
             android:text="@string/continue_"
-            style="@style/button_style"
             android:layout_marginLeft="@dimen/two_dp"
             android:layout_weight="1"/>
 
