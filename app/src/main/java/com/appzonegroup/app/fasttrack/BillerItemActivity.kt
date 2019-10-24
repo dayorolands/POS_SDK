@@ -22,6 +22,7 @@ import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.crashlytics.android.Crashlytics
+import com.creditclub.core.util.localStorage
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -158,7 +159,7 @@ class BillerItemActivity : BaseActivity(), View.OnClickListener {
             var result: String? = ""
             try {
 
-                val url = Misc.getBillerItemURL(biller.billerID.toString()) + "?institutionCode=" + LocalStorage.getInstitutionCode(this)
+                val url = Misc.getBillerItemURL(biller.billerID.toString()) + "?institutionCode=${localStorage.institutionCode}&billerCategoryID=${categoryIdField}&billerID=${biller.billerID}"
                 result = APICaller.makeGetRequest2(url)
 
             } catch (e: Exception) {

@@ -20,12 +20,15 @@ import com.android.volley.toolbox.Volley;
 import com.appzonegroup.app.fasttrack.dataaccess.AssociationDAO;
 import com.appzonegroup.app.fasttrack.model.*;
 import com.appzonegroup.app.fasttrack.utility.CustomAutoCompleteAdapter;
+import com.appzonegroup.app.fasttrack.utility.FunctionIds;
 import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.Misc;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -38,6 +41,12 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
 
     ArrayList<Association> associations;
     ArrayList<LoanProduct> eligibleLoanProducts;
+
+    @Nullable
+    @Override
+    public Integer getFunctionId() {
+        return FunctionIds.LOAN_REQUEST;
+    }
 
     /**
      * The {@link PagerAdapter} that will provide

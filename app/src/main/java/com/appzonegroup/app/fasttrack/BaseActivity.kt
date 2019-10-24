@@ -10,65 +10,48 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatDelegate
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.appzonegroup.app.fasttrack.model.AppConstants
-import com.appzonegroup.app.fasttrack.model.Customer
-import com.appzonegroup.app.fasttrack.model.CustomerAccount
 import com.appzonegroup.app.fasttrack.model.TokenRequest
-import com.appzonegroup.app.fasttrack.network.ApiServiceObject
 import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.ui.PosDialogProvider
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
+import com.appzonegroup.app.fasttrack.utility.LogOutTimerUtil
 import com.appzonegroup.app.fasttrack.utility.SyncService
+import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.task.AsyncResponse
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask
 import com.appzonegroup.creditclub.pos.printer.PosPrinter
 import com.appzonegroup.creditclub.pos.service.ConfigService
-import com.creditclub.core.data.request.ConfirmTokenRequest
-import com.creditclub.core.data.request.SendTokenRequest
 import com.creditclub.core.util.isMyServiceRunning
-import com.creditclub.core.util.safeRunIO
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.security.SecureRandom
 
 /**
  * Created by Joseph on 1/21/2018.
  */
 
 @SuppressLint("Registered")
-open class BaseActivity : DialogProviderActivity(), AsyncResponse {
-    override val app by lazy { application as BankOneApplication }
+open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUtil.LogOutListener {
 
     val printer by lazy { PosPrinter(this, posDialogProvider) }
     val posDialogProvider by lazy { PosDialogProvider(this) }
-    val scope by lazy { GlobalScope }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        LogOutTimerUtil.startLogoutTimer(this, this)
+
         if (!isMyServiceRunning(SyncService::class.java)) {
             startService(Intent(this, SyncService::class.java))
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-//        if (!gps.canGetLocation()) {
-//            gps.showSettingsAlert()
-//        }
     }
 
     open fun showNotification(message: String) {
@@ -122,16 +105,28 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse {
             Log.e("creditclub", "failed json parsing")
         }
 
-        val request = JsonObjectRequest(Request.Method.POST, url, convertedObject, sucessCallback, errorCallback)
+        val request = JsonObjectRequest(
+            Request.Method.POST,
+            url,
+            convertedObject,
+            sucessCallback,
+            errorCallback
+        )
         queue.add(request)
     }
 
-    /*public void sendJSONPostRequestWithCallback(String url, String data){
-        sendJSONPostRequestWithCallback(url, data, null,null, null);
-    }*/
+    fun openPage(clazz: Class<*>) {
+        activity.startActivity(Intent(activity, clazz))
+    }
+
+    fun renderSuccess(s: String?) {
+        activity.setContentView(R.layout.layout_success)
+        activity.findViewById<TextView>(R.id.success_message_tv).text = s
+        activity.findViewById<View>(R.id.success_close_button)
+            .setOnClickListener { activity.finish() }
+    }
 
     fun addValidPhoneNumberListener(editText: EditText) {
-
 
         editText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
@@ -139,8 +134,6 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse {
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                //Log.e("Listener", "Listener");
-
                 phoneNumberEditTextFilter(editText, this)
             }
 
@@ -180,7 +173,8 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse {
                 view.isClickable = true
             }
             val result = `object`.toString()
-            val response = Gson().fromJson(result, com.appzonegroup.app.fasttrack.model.Response::class.java)
+            val response =
+                Gson().fromJson(result, com.appzonegroup.app.fasttrack.model.Response::class.java)
             if (response.isSuccessful) {
                 showSuccess(response.reponseMessage)
             } else {
@@ -221,10 +215,6 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse {
 
     }
 
-    /*public void sendJSONPostRequestWithCallback(String url, String data, View view){
-        sendJSONPostRequestWithCallback(url, data, null,null, view);
-    }*/
-
     fun goBack(v: View) {
         onBackPressed()
     }
@@ -241,10 +231,17 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse {
         alertBuilder.show()
     }
 
-    fun requestPin(title: String = "Enter PIN", next: (String?) -> Unit) {
-        Dialogs.requestPin(this, title, next)
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        LogOutTimerUtil.startLogoutTimer(this, this)
+        Log.e("TIMER", "User interacting with screen")
     }
 
+    override fun doLogout() {
+        logout {
+            putExtra("SESSION_TIMEOUT", true)
+        }
+    }
 
     fun <T> catchError(block: () -> T): T? {
         try {
@@ -257,7 +254,11 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse {
         return null
     }
 
-    fun confirmAdminPassword(password: String, closeOnFail: Boolean = false, next: (Boolean) -> Unit) {
+    fun confirmAdminPassword(
+        password: String,
+        closeOnFail: Boolean = false,
+        next: (Boolean) -> Unit
+    ) {
         val status = password == ConfigService.getInstance(this).adminPin
         if (!status) {
             if (closeOnFail) return showError<Nothing>("Incorrect Password") {
@@ -274,7 +275,11 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse {
     fun adminAction(next: () -> Unit) {
         val passwordType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
 
-        com.appzonegroup.creditclub.pos.widget.Dialogs.input(this, "Administrator password", passwordType) {
+        com.appzonegroup.creditclub.pos.widget.Dialogs.input(
+            this,
+            "Administrator password",
+            passwordType
+        ) {
             onSubmit { password ->
                 dismiss()
                 confirmAdminPassword(password) { passed ->

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import com.appzonegroup.app.fasttrack.ui.TextView
+import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.request.BalanceEnquiryRequest
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
@@ -19,6 +20,7 @@ class BalanceEnquiryActivity : BaseActivity() {
     lateinit var available_balance: TextView
     lateinit var balance: TextView
     private var pin = ""
+    override val functionId = FunctionIds.AGENT_BALANCE_ENQUIRY
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,8 +34,13 @@ class BalanceEnquiryActivity : BaseActivity() {
         pin = findViewById<EditText>(R.id.pin_et).value
         findViewById<EditText>(R.id.pin_et).value = ""
 
-        if (pin.length != 4) {
+        if (pin.isEmpty()) {
             showError("Please enter your PIN")
+            return
+        }
+
+        if (pin.length != 4) {
+            showError("Agent PIN must be 4 digits")
             return
         }
 

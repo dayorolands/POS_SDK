@@ -1,29 +1,33 @@
 package com.appzonegroup.app.fasttrack
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.core.view.GravityCompat
-import com.appzonegroup.app.fasttrack.app.AppFunctions
 import com.appzonegroup.app.fasttrack.databinding.ActivityCreditClubMainMenuBinding
 import com.appzonegroup.app.fasttrack.model.AgentInfo
-import com.appzonegroup.app.fasttrack.ui.TextView
-import com.appzonegroup.app.fasttrack.utility.ActivityMisc
-import com.appzonegroup.app.fasttrack.utility.Dialogs
+import com.appzonegroup.app.fasttrack.utility.logout
+import com.appzonegroup.app.fasttrack.utility.openPageById
+import com.creditclub.core.AppFunctions
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.packageInfo
+import com.creditclub.core.util.safeRunIO
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
+import kotlinx.coroutines.launch
 
 class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val binding by contentView<CreditClubMainMenuActivity, ActivityCreditClubMainMenuBinding>(
         R.layout.activity_credit_club_main_menu
     )
+
+    private val frequentBindings by lazy {
+        listOf(binding.frequent.fn1, binding.frequent.fn2, binding.frequent.fn3)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,11 +58,44 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
                 findViewById<TextView>(R.id.phone_no_tv).text = info.phoneNumber
             }
         }
+
+        getFavorites()
     }
 
-    private fun logout() {
-        startActivity(Intent(this@CreditClubMainMenuActivity, LoginActivity::class.java))
-        finish()
+    override fun onResume() {
+        super.onResume()
+        getFavorites()
+    }
+
+    private fun getFavorites() {
+        binding.frequent.root.visibility = View.GONE
+        frequentBindings.forEach { it.root.visibility = View.GONE }
+
+        mainScope.launch {
+            val (list) = safeRunIO {
+                coreDatabase.appFunctionUsageDao().getMostUsed()
+            }
+
+            if (list == null || list.isEmpty()) {
+                return@launch
+            }
+
+            binding.frequent.root.visibility = View.VISIBLE
+
+            for (appFunctionUsage in list) {
+
+                AppFunctions[appFunctionUsage.fid]?.run {
+                    val index = list.indexOf(appFunctionUsage)
+
+                    frequentBindings[index].root.visibility = View.VISIBLE
+                    if (icon != null) frequentBindings[index].iconIv.setImageResource(icon!!)
+                    frequentBindings[index].nameTv.setText(label)
+                    frequentBindings[index].root.setOnClickListener {
+                        openPageById(id)
+                    }
+                }
+            }
+        }
     }
 
 //    private fun openPlayStore() {
@@ -92,7 +129,6 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
         } catch (ex: Exception) {
             finish()
         }
-
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -125,67 +161,6 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
         }
 
         return true
-    }
-
-    fun onRegisterClicked(v: View) {
-        ActivityMisc.startActivity(
-            this@CreditClubMainMenuActivity,
-            CustomerRequestOpenAccountActivity::class.java
-        )
-    }
-
-    fun onDepositClicked(v: View) {
-        ActivityMisc.startActivity(this@CreditClubMainMenuActivity, DepositActivity::class.java)
-    }
-
-    fun onWithdrawalClicked(v: View) {
-        startActivity(WithdrawActivity::class.java)
-    }
-
-    fun onAgentBalanceClicked(v: View) {
-        val optionsDialog =
-            Dialogs.getDialog(R.layout.dialog_balance_options, this@CreditClubMainMenuActivity)
-        optionsDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        optionsDialog.setCanceledOnTouchOutside(true)
-        optionsDialog.findViewById<View>(R.id.agent_balance).setOnClickListener {
-            startActivity(BalanceEnquiryActivity::class.java)
-            optionsDialog.dismiss()
-        }
-
-        optionsDialog.findViewById<View>(R.id.customer_balance).setOnClickListener {
-            startActivity(AccountDetailsActivity::class.java)
-            optionsDialog.dismiss()
-        }
-
-        optionsDialog.show()
-    }
-
-    fun onChangePinClicked(v: View) {
-        val optionsDialog =
-            Dialogs.getDialog(R.layout.dialog_balance_options, this@CreditClubMainMenuActivity)
-        optionsDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        optionsDialog.setCanceledOnTouchOutside(true)
-        optionsDialog.findViewById<View>(R.id.agent_balance)
-            .setOnClickListener { startActivity(ChangePinActivity::class.java) }
-        optionsDialog.findViewById<View>(R.id.customer_balance)
-            .setOnClickListener { startActivity(ChangeCustomerPinActivity::class.java) }
-
-        optionsDialog.show()
-    }
-
-    fun onLoanRequestClicked(v: View) {
-        startActivity(CreditClubLoanRequestActivity::class.java)
-    }
-
-    fun onBVNUpdateClicked(v: View) {
-        ActivityMisc.startActivity(this@CreditClubMainMenuActivity, BVNUpdateActivity::class.java)
-    }
-
-    fun onPayBillClicked(view: View) {
-        showNotification(
-            "This function is not available at the moment. Please look out for it in our next update.",
-            false
-        )
     }
 
     fun openDrawer(view: View) {

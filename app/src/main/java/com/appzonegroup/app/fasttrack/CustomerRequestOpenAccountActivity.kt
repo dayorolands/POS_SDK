@@ -16,11 +16,13 @@ import com.appzonegroup.app.fasttrack.dataaccess.ProductDAO
 import com.appzonegroup.app.fasttrack.databinding.ActivityOpenAccountBinding
 import com.appzonegroup.app.fasttrack.receipt.NewAccountReceipt
 import com.appzonegroup.app.fasttrack.utility.CalendarDialog
+import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ImageUtils
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.crashlytics.android.Crashlytics
+import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.model.Product
 import com.creditclub.core.data.request.CustomerRequest
@@ -43,10 +45,12 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.*
 
-class CustomerRequestOpenAccountActivity : BaseActivity() {
+class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
     private val binding by contentView<CustomerRequestOpenAccountActivity, ActivityOpenAccountBinding>(
         R.layout.activity_open_account
     )
+
+    override val functionId = FunctionIds.ACCOUNT_OPENING
 
     internal var lastName: String = ""
     internal var bvn: String = ""
@@ -69,7 +73,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
 
     private var passportString: String? = null
 
-    internal val customerRequest by lazy {
+    override val formData by lazy {
         CustomerRequest().apply {
             uniqueReferenceID = Misc.getGUID()
         }
@@ -166,22 +170,22 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
 
         val location = String.format("%s;%s", gps.longitude.toString(), gps.latitude.toString())
 
-        customerRequest.customerLastName = surname_et.text.toString().trim { it <= ' ' }
-        customerRequest.customerFirstName = first_name_et.text.toString().trim { it <= ' ' }
-        customerRequest.dateOfBirth = dob
-        customerRequest.placeOfBirth = place_of_birth_et.text.toString().trim { it <= ' ' }
-        customerRequest.customerPhoneNumber = phone_et.text.toString().trim { it <= ' ' }
-        customerRequest.gender = gender
-        customerRequest.geoLocation = location
-        customerRequest.starterPackNumber =
+        formData.customerLastName = surname_et.text.toString().trim { it <= ' ' }
+        formData.customerFirstName = first_name_et.text.toString().trim { it <= ' ' }
+        formData.dateOfBirth = dob
+        formData.placeOfBirth = place_of_birth_et.text.toString().trim { it <= ' ' }
+        formData.customerPhoneNumber = phone_et.text.toString().trim { it <= ' ' }
+        formData.gender = gender.substring(0, 1).toLowerCase()
+        formData.geoLocation = location
+        formData.starterPackNumber =
             starter_pack_number_et.text.toString().trim { it <= ' ' }
-        customerRequest.address = address_et.text.toString().trim { it <= ' ' }
-        customerRequest.productCode = productCode
-        customerRequest.productName = productName
-        customerRequest.bvn = bvn
-        customerRequest.agentPhoneNumber = localStorage.agentPhone
-        customerRequest.agentPin = agentPIN
-        customerRequest.institutionCode = localStorage.institutionCode
+        formData.address = address_et.text.toString().trim { it <= ' ' }
+        formData.productCode = productCode
+        formData.productName = productName
+        formData.bvn = bvn
+        formData.agentPhoneNumber = localStorage.agentPhone
+        formData.agentPin = agentPIN
+        formData.institutionCode = localStorage.institutionCode
 
         val additionalInformation = CustomerRequest.Additional()
         additionalInformation.passport = passportString
@@ -197,7 +201,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
         //additionalInformation.setSignature(signatureString);
         //additionalInformation.setProvince(province);
 
-        customerRequest.additionalInformation =
+        formData.additionalInformation =
             Json.stringify(CustomerRequest.Additional.serializer(), additionalInformation)
 
         mainScope.launch {
@@ -206,7 +210,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
             val service = creditClubMiddleWareAPI.staticService
 
             val (response, error) = safeRunIO {
-                service.register(customerRequest)
+                service.register(formData)
             }
             hideProgressBar()
 
@@ -231,14 +235,14 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
                     isSuccessful = response.isSuccessful
                     reason = response.responseMessage
 
-                    bvn = customerRequest.bvn
+                    bvn = formData.bvn
                     institutionCode = localStorage.institutionCode!!
                     agentPhoneNumber = localStorage.agentPhone!!
-                    uniqueReferenceID = customerRequest.uniqueReferenceID!!
+                    uniqueReferenceID = formData.uniqueReferenceID!!
 
                     if (response.isSuccessful) {
                         accountName =
-                            "${customerRequest.customerFirstName} ${additionalInformation.middleName} ${customerRequest.customerLastName}"
+                            "${formData.customerFirstName} ${additionalInformation.middleName} ${formData.customerLastName}"
 
                         response.responseMessage?.run {
                             accountNumber = this
@@ -287,6 +291,9 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
 
                 first_name_et.setText(firstName)
                 first_name_et.isFocusable = false
+
+                middle_name_et.value = result.otherNames
+                middle_name_et.isFocusable = false
 
                 phone_et.setText(phoneNumber)
                 phone_et.isFocusable = false
@@ -341,14 +348,18 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
         if (!validate("Last name", surname)) return
 
         val middleName = middle_name_et.value
-//        if (middleName.isEmpty()) {
-//            indicateError(
-//                "Please enter customer's middle name",
-//                Form.GENERAL_INFO.ordinal,
-//                middle_name_et
-//            )
-//            return
-//        }
+
+        if (BuildConfig.FLAVOR == "access") {
+
+            if (middleName.isEmpty()) {
+                indicateError(
+                    "Please enter customer's middle name",
+                    Form.GENERAL_INFO.ordinal,
+                    middle_name_et
+                )
+                return
+            }
+        }
 
         if (!validate("Middle name", middleName, required = false)) return
 
@@ -473,8 +484,8 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
             return
         }
 
-        customerRequest.nokName = nok_name_et.text.toString().trim { it <= ' ' }
-        customerRequest.nokPhone = nok_phone_et.text.toString().trim { it <= ' ' }
+        formData.nokName = nok_name_et.text.toString().trim { it <= ' ' }
+        formData.nokPhone = nok_phone_et.text.toString().trim { it <= ' ' }
 
         binding.container.setCurrentItem(binding.container.currentItem + 1, true)
     }
@@ -505,10 +516,10 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
 //                    return
 //                }
 //
-//                if (bvn.length != 11) {
-//                    showError("Please enter the BVN")
-//                    return
-//                }
+                if (bvn.length != 11) {
+                    showError("Please enter the BVN")
+                    return
+                }
 //
 //                val product = products[product_spinner.selectedItemPosition - 1]
 //                productName = product.name
@@ -590,6 +601,10 @@ class CustomerRequestOpenAccountActivity : BaseActivity() {
 
             rootView.email_et.hint = "Email"
             rootView.place_of_birth_et.visibility = View.GONE
+
+            if (BuildConfig.FLAVOR == "access") {
+                rootView.middle_name_et.hint = "Enter middle name"
+            }
 
             return rootView
         }

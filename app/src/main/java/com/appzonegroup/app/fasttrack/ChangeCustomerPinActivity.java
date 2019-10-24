@@ -1,6 +1,9 @@
 package com.appzonegroup.app.fasttrack;
 
 import android.os.Bundle;
+
+import com.appzonegroup.app.fasttrack.utility.FunctionIds;
+import com.creditclub.core.ui.widget.DialogListener;
 import com.google.android.material.tabs.TabLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -27,7 +30,12 @@ import com.appzonegroup.app.fasttrack.utility.TrackGPS;
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask;
 import com.google.gson.Gson;
 
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
+import kotlin.jvm.functions.Function1;
 
 /**
  * Created by madunagu-ekene-david on 4/19/2018.
@@ -42,6 +50,11 @@ public class ChangeCustomerPinActivity extends BaseActivity {
     String customerAccount = "";
     TrackGPS gps;
 
+    @Nullable
+    @Override
+    public Integer getFunctionId() {
+        return FunctionIds.CUSTOMER_CHANGE_PIN;
+    }
 
     String data;
     Gson gson;
@@ -221,49 +234,24 @@ public class ChangeCustomerPinActivity extends BaseActivity {
         com.appzonegroup.app.fasttrack.model.Response response = new Gson().fromJson(output, com.appzonegroup.app.fasttrack.model.Response.class);
 
         if(response.isSuccessful()){
-            showNotification("PIN changed successfully");
+            showSuccess("Pin Changed Successfully", new Function1<DialogListener<? extends Object>, Unit>() {
+                @Override
+                public Unit invoke(DialogListener<?> dialogListener) {
+                    dialogListener.onClose(new Function0<Unit>() {
+                        @Override
+                        public Unit invoke() {
+                            finish();
+                            return null;
+                        }
+                    });
+                    return null;
+                }
+            });
         }
         else{
             showError(response.getReponseMessage());
         }
 
-    }
-
-    public void sendPostRequest(String url, String data){
-        RequestQueue queue = Volley.newRequestQueue(this);
-        JSONObject convertedObject = null;
-        try {
-            convertedObject = new JSONObject(data);
-        }
-        catch (Exception e){
-            Log.e("creditclub","failed json parsing");
-        }
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,convertedObject, new com.android.volley.Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject object) {
-                String result = object.toString();
-                result = result.replace("\\", "").replace("\n", "").trim();
-                com.appzonegroup.app.fasttrack.model.Response response = new Gson().fromJson(result, com.appzonegroup.app.fasttrack.model.Response.class);
-                if(response.isSuccessful()){
-                    showNotification("Pin Changed Successfully");
-                }
-                else{
-                    showError(response.getReponseMessage());
-                }
-            }
-
-
-        }, new com.android.volley.Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                showError("A network-related error just occurred. Please try again later");
-            }
-
-        });
-        queue.add(request);
     }
 
     public static class CustomerAccountNumberFragment extends Fragment {

@@ -9,10 +9,10 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityBillpaymentBinding
 import com.appzonegroup.app.fasttrack.model.Biller
 import com.appzonegroup.app.fasttrack.model.BillerItem
 import com.appzonegroup.app.fasttrack.model.CustomerAccount
+import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
-import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
@@ -63,8 +63,7 @@ class BillPaymentActivity : BaseActivity() {
             amountET.visibility = View.VISIBLE
         } else {
             amountIsNeeded = false
-            //amountTV.setVisibility(View.GONE);
-            amountET.setText((billerItem.amountField / 100).toString())
+            amountET.setText(billerItem.amountField.toString())
             amountET.isEnabled = false
             amountET.isFocusable = false
         }
@@ -164,79 +163,82 @@ class BillPaymentActivity : BaseActivity() {
             return showNotification("Customer Email is invalid")
         }
 
-        requestPin("Enter Agent Pin") { pin ->
-            pin ?: return@requestPin
-
-            val paymentRequest = PayBillRequest().apply {
-                agentPhoneNumber = localStorage.agentPhone
-                agentPin = pin
-                institutionCode = app.institutionCode
-                customerId = "${fieldOneET.text}"
-                merchantBillerIdField = "${billerItem.merchantBillerIdField}"
-                billItemID = billerItem.billerItemIdField
-                amount = "${amountET.text}"
-                billerCategoryID = categoryIdField
-                customerEmail = "${customer_email_et.text}"
+        val paymentRequest = PayBillRequest().apply {
+            agentPhoneNumber = localStorage.agentPhone
+            institutionCode = localStorage.institutionCode
+            customerId = "${fieldOneET.text}"
+            merchantBillerIdField = "${billerItem.merchantBillerIdField}"
+            billItemID = billerItem.billerItemIdField
+            amount = "${amountET.text}"
+            billerCategoryID = categoryIdField
+            customerEmail = "${customer_email_et.text}"
 //                customerPhone = customer.phoneNumber
-                accountNumber = localStorage.agentPhone
-                billerName = biller.billerNameField
-                paymentItemCode = billerItem.paymentCodeField
-                paymentItemName = billerItem.billerItemNameField
-                billerCategoryName = categoryNameField
-                customerName = name_et.text.toString()
+            accountNumber = localStorage.agentPhone
+            billerName = biller.billerNameField
+            paymentItemCode = billerItem.paymentCodeField
+            paymentItemName = billerItem.billerItemNameField
+            billerCategoryName = categoryNameField
+            customerName = name_et.text.toString()
 
-                customerPhone = if (isAirtime) {
-                    fieldOneET.text.toString()
-                } else phone_et.text.toString()
+            customerPhone = if (isAirtime) {
+                fieldOneET.text.toString()
+            } else phone_et.text.toString()
 
-                customerDepositSlipNumber = reference
-                geolocation = gps.geolocationString
-                isRecharge = isAirtime
-            }
+            customerDepositSlipNumber = reference
+            geolocation = gps.geolocationString
+            isRecharge = isAirtime
+        }
 
-            mainScope.launch {
-                showProgressBar("Processing...")
+        requestPIN("Enter Agent Pin") {
+            onSubmit { pin ->
+                pin ?: return@onSubmit
 
-                val (response, error) = safeRunIO {
-                    creditClubMiddleWareAPI.billsPaymentService.runTransaction(paymentRequest)
-                }
+                paymentRequest.agentPin = pin
 
-                hideProgressBar()
+                mainScope.launch {
+                    showProgressBar("Processing...")
 
-                if (error != null) return@launch showError(error)
-
-                if (response == null) {
-                    showError("An error occurred")
-                    return@launch
-                }
-
-                if (response.isSuccessFul == true) {
-
-                    showSuccess<Unit>(
-                        response.responseMessage
-                            ?: "Transaction successful"
-                    ) {
-                        onClose {
-                            setResult(1)
-                            finish()
-                        }
+                    val (response, error) = safeRunIO {
+                        creditClubMiddleWareAPI.billsPaymentService.runTransaction(paymentRequest)
                     }
 
-                    if (Platform.hasPrinter) {
-                        printer.printAsync(
-                            BillsPaymentReceipt(
-                                this@BillPaymentActivity,
-                                paymentRequest
-                            ).withResponse(response)
-                        ) { printerStatus ->
-                            if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
-                        }
+                    hideProgressBar()
+
+                    if (error != null) return@launch showError(error)
+
+                    if (response == null) {
+                        showError("An error occurred")
+                        return@launch
                     }
-                } else {
-                    showError(
-                        response.responseMessage
-                            ?: getString(R.string.an_error_occurred_please_try_again_later)
-                    )
+
+                    if (response.isSuccessFul == true) {
+
+                        showSuccess<Unit>(
+                            response.responseMessage
+                                ?: "Transaction successful"
+                        ) {
+                            onClose {
+                                setResult(1)
+                                finish()
+                            }
+                        }
+
+                        if (Platform.hasPrinter) {
+                            printer.printAsync(
+                                BillsPaymentReceipt(
+                                    this@BillPaymentActivity,
+                                    paymentRequest
+                                ).withResponse(response)
+                            ) { printerStatus ->
+                                if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
+                            }
+                        }
+                    } else {
+                        showError(
+                            response.responseMessage
+                                ?: getString(R.string.an_error_occurred_please_try_again_later)
+                        )
+                    }
                 }
             }
         }
