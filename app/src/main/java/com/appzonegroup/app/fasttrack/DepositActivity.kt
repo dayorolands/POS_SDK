@@ -7,6 +7,7 @@ import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
+import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.request.DepositRequest
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.localStorage
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 
 class DepositActivity : CustomerBaseActivity() {
     private val binding by contentView<DepositActivity, ActivityDepositBinding>(R.layout.activity_deposit)
+    override val functionId = FunctionIds.DEPOSIT
 
     private val depositRequest by lazy { DepositRequest() }
 

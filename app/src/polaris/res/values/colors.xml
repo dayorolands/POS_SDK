@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#61297f</color>
+    <color name="colorPrimaryTransparent">#DD61297f</color>
+    <color name="colorPrimaryDark">#441D58</color>
+    <color name="colorAccent">#DFA226</color>
+    <color name="colorAccentDark">#8B6518</color>
+    <color name="colorAccentTransparent">#DDDFA226</color>
+    <color name="fundsTransferSameBankTint">#0000</color>
+    <color name="navHeaderLogoTint">#0000</color>
+    <color name="menuBackground">#1161297f</color>
+</resources>

@@ -17,6 +17,7 @@ import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
+import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.data.response.NameEnquiryResponse
@@ -52,6 +53,8 @@ class FundsTransferActivity : BaseActivity() {
     internal var nameEnquiryResponse: NameEnquiryResponse? = null
 
     private var isSameBank = false
+
+    override val functionId = FunctionIds.FUNDS_TRANSFER
 
     private val fundsTransferRequest: FundsTransferRequest
         get() {

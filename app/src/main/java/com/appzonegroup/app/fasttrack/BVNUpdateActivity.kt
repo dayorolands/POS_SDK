@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.appzonegroup.app.fasttrack.databinding.ActivityBvnupdateBinding
+import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.request.BVNRequest
 import com.creditclub.core.type.TokenType
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 
 class BVNUpdateActivity : CustomerBaseActivity() {
     private val binding by contentView<BVNUpdateActivity, ActivityBvnupdateBinding>(R.layout.activity_bvnupdate)
+    override val functionId = FunctionIds.BVN_UPDATE
 
     override fun onCustomerReady(savedInstanceState: Bundle?){
         binding.container.adapter = SectionsPagerAdapter(supportFragmentManager)
@@ -72,7 +74,7 @@ class BVNUpdateActivity : CustomerBaseActivity() {
         }
     }
 
-    inner class AuthorizationFragment : CreditClubFragment() {
+    class AuthorizationFragment : CreditClubFragment() {
         override val activity get() = getActivity() as BVNUpdateActivity
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -99,7 +101,7 @@ class BVNUpdateActivity : CustomerBaseActivity() {
 
                         activity.hideProgressBar()
 
-                        if (error != null) return@launch showError(error)
+                        if (error != null) return@launch activity.showError(error)
 
                         if (response == null) {
                             activity.showError("BVN is invalid")

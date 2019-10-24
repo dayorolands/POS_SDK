@@ -6,12 +6,13 @@ import android.widget.EditText;
 
 import com.appzonegroup.app.fasttrack.model.AppConstants;
 import com.appzonegroup.app.fasttrack.model.ChangePinRequest;
+import com.appzonegroup.app.fasttrack.utility.FunctionIds;
 import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.TrackGPS;
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask;
 import com.google.gson.Gson;
 
-
+import org.jetbrains.annotations.Nullable;
 
 
 /**
@@ -27,6 +28,12 @@ public class ChangePinActivity extends BaseActivity {
 
     String data;
     Gson gson;
+
+    @Nullable
+    @Override
+    public Integer getFunctionId() {
+        return FunctionIds.AGENT_CHANGE_PIN;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

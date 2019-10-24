@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.appzonegroup.app.fasttrack.databinding.ActivityOpenAccountBinding
 import com.appzonegroup.app.fasttrack.receipt.NewAccountReceipt
+import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ImageUtils
 import com.appzonegroup.creditclub.pos.Platform
@@ -42,6 +43,7 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
     private val binding by contentView<NewWalletActivity, ActivityOpenAccountBinding>(
         R.layout.activity_open_account
     )
+    override val functionId = FunctionIds.NEW_WALLET
 
     private var dob: String = ""
     private var agentPIN = ""
@@ -150,7 +152,7 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
         customerRequest.dateOfBirth = dob
         customerRequest.placeOfBirth = place_of_birth_et.value
         customerRequest.customerPhoneNumber = phone_et.value
-        customerRequest.gender = gender
+        customerRequest.gender = gender.substring(0, 1).toLowerCase()
         customerRequest.geoLocation = gps.geolocationString
         customerRequest.starterPackNumber = starter_pack_number_et.value
         customerRequest.address = address_et.value
@@ -250,14 +252,18 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
         if (!validate("Last name", surname)) return
 
         val middleName = middle_name_et.value
-//        if (middleName.isEmpty()) {
-//            indicateError(
-//                "Please enter customer's middle name",
-//                Form.GENERAL_INFO.ordinal,
-//                middle_name_et
-//            )
-//            return
-//        }
+
+        if (BuildConfig.FLAVOR == "access") {
+
+            if (middleName.isEmpty()) {
+                indicateError(
+                    "Please enter customer's middle name",
+                    Form.GENERAL_INFO.ordinal,
+                    middle_name_et
+                )
+                return
+            }
+        }
 
         if (!validate("Middle name", middleName, required = false)) return
 
@@ -464,6 +470,11 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
             root.place_of_birth_et.visibility = View.GONE
             root.states_et.visibility = View.VISIBLE
 
+
+            if (BuildConfig.FLAVOR == "access") {
+                root.middle_name_et.hint = "Enter middle name"
+            }
+
             root.states_et.setOnFocusChangeListener { v, hasFocus ->
 
                 if (hasFocus) {
@@ -473,7 +484,7 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
                         DialogOptionItem(stateInfo[1])
                     }
 
-                    activity.showOptions(getString(R.string.state_hint), options) {
+                    dialogProvider.showOptions(getString(R.string.state_hint), options) {
                         onSubmit {
                             root.states_et.value = stateArray[it].split(",").first()
                             root.states_et.clearFocus()
@@ -488,7 +499,7 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
 
             root.dob_tv.setOnClickListener {
 
-                activity.showDateInput(dateInputParams) {
+                dialogProvider.showDateInput(dateInputParams) {
                     onSubmit { date ->
                         root.dob_tv.value = date.toString("uuuu-MM-dd")
                         root.dob_tv.gravity = Gravity.START

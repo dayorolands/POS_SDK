@@ -16,6 +16,7 @@ import com.appzonegroup.app.fasttrack.model.BillCategory
 import com.appzonegroup.app.fasttrack.network.APICaller
 import com.appzonegroup.app.fasttrack.scheduler.AndroidSchedulers
 import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
+import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.crashlytics.android.Crashlytics
@@ -35,6 +36,7 @@ class BillsCategoryActivity : BaseActivity(), View.OnClickListener {
     internal val backgroundHandler: Handler by lazy { Misc.setupScheduler() }
     internal val listView: ListView by lazy { findViewById<View>(R.id.category_listview) as ListView }
     internal var categoryAdapter: CategoryAdapter? = null
+    override val functionId = FunctionIds.PAY_BILL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,10 +132,10 @@ class BillsCategoryActivity : BaseActivity(), View.OnClickListener {
                                     this@BillsCategoryActivity,
                                     BillerActivity::class.java
                                 ).apply {
-                                    putExtra("categoryId", billCategory.id)
+                                    putExtra("categoryId", billCategory.id ?: billCategory.billerCategoryId)
                                     LocalStorage.SaveValue(
                                         AppConstants.CATEGORYID,
-                                        billCategory.id,
+                                        billCategory.id ?: billCategory.billerCategoryId,
                                         baseContext
                                     )
 

@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter
 import com.appzonegroup.app.fasttrack.databinding.ActivityCaseLogBinding
 import com.appzonegroup.app.fasttrack.model.PostRequestBody
 import com.appzonegroup.app.fasttrack.network.ApiServiceObject
+import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.model.CaseCategory
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.isValidEmail
@@ -21,6 +22,7 @@ import kotlinx.coroutines.withContext
 
 class CaseLogActivity : BaseActivity() {
     val binding by contentView<CaseLogActivity, ActivityCaseLogBinding>(R.layout.activity_case_log)
+//    override val functionId = FunctionIds.SUPPORT
 
     private var categoryList: List<CaseCategory>? = null
 

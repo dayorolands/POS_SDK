@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="navHeaderLogoTint">#0000</color>
+    <color name="splashOverlay">@color/colorPrimaryTransparent</color>
+    <color name="menuButtonIconTint">@color/transparent</color>
+    <!--    <color name="colorLoginBg">@color/transparent</color>-->
+    <color name="colorAccentContrast">@color/white</color>
+    <color name="menuBackground">#1108237e</color>
+    <color name="fundsTransferSameBankTint">@color/transparent</color>
+</resources>

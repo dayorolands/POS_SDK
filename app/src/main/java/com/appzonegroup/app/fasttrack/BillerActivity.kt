@@ -1,35 +1,32 @@
 package com.appzonegroup.app.fasttrack
 
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.Toast
-
 import com.appzonegroup.app.fasttrack.adapter.BillerAdapter
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.model.Biller
 import com.appzonegroup.app.fasttrack.network.APICaller
+import com.appzonegroup.app.fasttrack.network.ApiServiceObject.BASE_URL
 import com.appzonegroup.app.fasttrack.scheduler.AndroidSchedulers
 import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
 import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.crashlytics.android.Crashlytics
+import com.creditclub.core.util.localStorage
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-
-import java.util.ArrayList
-
 import rx.Observable
 import rx.Subscriber
 import rx.functions.Func0
+import java.util.*
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 4/12/2019.
@@ -58,8 +55,10 @@ class BillerActivity : BaseActivity(), View.OnClickListener {
             propertyChanged = extras!!.getString("propertyChanged")
         } else {
             categoryIdField = LocalStorage.GetValueFor(AppConstants.CATEGORYID, this@BillerActivity)
-            categoryNameField = LocalStorage.GetValueFor(AppConstants.CATEGORYNAME, this@BillerActivity)
-            propertyChanged = LocalStorage.GetValueFor(AppConstants.PROPERTYCHANGED, this@BillerActivity)
+            categoryNameField =
+                LocalStorage.GetValueFor(AppConstants.CATEGORYNAME, this@BillerActivity)
+            propertyChanged =
+                LocalStorage.GetValueFor(AppConstants.PROPERTYCHANGED, this@BillerActivity)
         }
 
         title = categoryNameField
@@ -76,75 +75,97 @@ class BillerActivity : BaseActivity(), View.OnClickListener {
 
     internal fun runScheduler() {
         myObservable()
-                // Run on a background thread
-                .subscribeOn(HandlerScheduler.from(backgroundHandler))
-                // Be notified on the main thread
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<String>() {
+            // Run on a background thread
+            .subscribeOn(HandlerScheduler.from(backgroundHandler))
+            // Be notified on the main thread
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Subscriber<String>() {
 
-                    override fun onCompleted() {
+                override fun onCompleted() {
 
+                }
+
+                override fun onError(e: Throwable) {
+                    /*if (loadingDialog.isShowing())
+    {
+    loadingDialog.dismiss();
+    }*/
+                    //Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
+                    Log.e(this@BillerActivity.javaClass.simpleName, e.toString())
+                    Crashlytics.logException(Exception("Message: An error just occurred. Please try again later, Cause: " + e.message))
+
+                }
+
+                override fun onNext(result: String?) {
+                    var result = result
+
+                    hideProgressBar()
+
+                    if (result == null) {
+                        Dialogs.showErrorMessage(
+                            this@BillerActivity,
+                            "An error occurred. Please ensure that you have internet connection"
+                        )
+                        return
                     }
 
-                    override fun onError(e: Throwable) {
-                        /*if (loadingDialog.isShowing())
-        {
-        loadingDialog.dismiss();
-        }*/
-                        //Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
-                        Log.e(this@BillerActivity.javaClass.simpleName, e.toString())
-                        Crashlytics.logException(Exception("Message: An error just occurred. Please try again later, Cause: " + e.message))
+                    if (result.isEmpty()) {
+                        Toast.makeText(
+                            baseContext,
+                            "You don't seem to have internet... Please ensure that you have internet connection",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        //return;
+                    } else {
 
-                    }
+                        result = result.replace("\\", "").replace("\n", "").trim { it <= ' ' }
+                        if (result.startsWith("\"") && result.endsWith("\"")) {
+                            result = result.substring(1, result.length - 1)
+                        }
+                        result = result.replace("\"D1", "D1")
+                        result = result.replace("”", "")
 
-                    override fun onNext(result: String?) {
-                        var result = result
+                        Log.e(this@BillerActivity.javaClass.simpleName, result)
 
-                        hideProgressBar()
+                        val typeToken = object : TypeToken<List<Biller>>() {}
 
-                        if (result == null) {
-                            Dialogs.showErrorMessage(this@BillerActivity, "An error occurred. Please ensure that you have internet connection")
-                            return
+                        var billers = Gson().fromJson<List<Biller>>(result, typeToken.type)
+                        billers = billers.filter { b ->
+                            b.categoryIdField == categoryIdField || b.billerCategoryId == categoryIdField
                         }
 
-                        if (result.isEmpty()) {
-                            Toast.makeText(baseContext, "You don't seem to have internet... Please ensure that you have internet connection", Toast.LENGTH_LONG).show()
-                            //return;
-                        } else {
+                        val billerAdapter = BillerAdapter(this@BillerActivity, billers)
+                        listView.adapter = billerAdapter
 
-                            result = result.replace("\\", "").replace("\n", "").trim { it <= ' ' }
-                            if (result.startsWith("\"") && result.endsWith("\"")) {
-                                result = result.substring(1, result.length - 1)
-                            }
-                            result = result.replace("\"D1", "D1")
-                            result = result.replace("”", "")
+                        listView.onItemClickListener =
+                            AdapterView.OnItemClickListener { parent, view, position, id ->
+                                val biller = billers[position]
 
-                            Log.e(this@BillerActivity.javaClass.simpleName, result)
-
-                            val typeToken = object : TypeToken<ArrayList<Biller>>() {
-
-                            }
-                            val reports = Gson().fromJson<ArrayList<Biller>>(result, typeToken.type).filter { b -> b.categoryIdField == categoryIdField }
-                            val billerAdapter = BillerAdapter(this@BillerActivity, reports)
-                            listView.adapter = billerAdapter
-
-                            listView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-                                val biller = reports[position]
-
-                                startActivityForResult(Intent(this@BillerActivity, BillerItemActivity::class.java).apply {
-                                    putExtra("customer", intent.getSerializableExtra("customer"))
-                                    putExtra("biller", biller)
-                                    putExtra("categoryId", categoryIdField)
-                                    putExtra("categoryName", categoryNameField)
-                                    putExtra("isAirtime", intent.getBooleanExtra("isAirtime", false))
-                                }, 1)
+                                startActivityForResult(
+                                    Intent(
+                                        this@BillerActivity,
+                                        BillerItemActivity::class.java
+                                    ).apply {
+                                        putExtra(
+                                            "customer",
+                                            intent.getSerializableExtra("customer")
+                                        )
+                                        putExtra("biller", biller)
+                                        putExtra("categoryId", categoryIdField)
+                                        putExtra("categoryName", categoryNameField)
+                                        putExtra(
+                                            "isAirtime",
+                                            intent.getBooleanExtra("isAirtime", false)
+                                        )
+                                    }, 1
+                                )
                             }
 
-                            listView.invalidate()
-                        }
-
+                        listView.invalidate()
                     }
-                })
+
+                }
+            })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -170,7 +191,8 @@ class BillerActivity : BaseActivity(), View.OnClickListener {
         return Observable.defer(Func0<Observable<String>> {
             var result: String? = ""
             try {
-                val url = Misc.getBillersURL(categoryIdField) + "?institutionCode=" + LocalStorage.getInstitutionCode(this)
+                val url =
+                    "${BASE_URL}/api/PayBills/GetBillers?institutionCode=${localStorage.institutionCode}&billerCategoryID=${categoryIdField}"
                 result = APICaller.makeGetRequest2(url)
             } catch (e: Exception) {
                 Log.e("Register", e.message)
