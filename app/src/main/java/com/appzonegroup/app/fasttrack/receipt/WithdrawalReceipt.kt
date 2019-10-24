@@ -1,13 +1,13 @@
 package com.appzonegroup.app.fasttrack.receipt
 
 import android.content.Context
-import com.appzonegroup.app.fasttrack.model.WithdrawalRequest
 import com.appzonegroup.creditclub.pos.printer.Alignment
 import com.appzonegroup.creditclub.pos.printer.LogoNode
 import com.appzonegroup.creditclub.pos.printer.PrintNode
 import com.appzonegroup.creditclub.pos.printer.TextNode
 import com.appzonegroup.creditclub.pos.receipt.TransactionReceipt
 import com.creditclub.core.data.model.AccountInfo
+import com.creditclub.core.data.request.WithdrawalRequest
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
 import com.creditclub.core.util.toString
@@ -32,7 +32,7 @@ class WithdrawalReceipt(
                 LogoNode(),
                 TextNode("Withdrawal").apply {
                     align = Alignment.MIDDLE
-                    wordFont = 2
+                    wordFont = 35
                 },
                 TextNode(
                     """
@@ -46,6 +46,6 @@ Customer Name: ${accountInfo.accountName}
 
 Transaction Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}"""
                 )
-            ).apply { addTransactionStatus(); addAll(polarisFooterNodes) }
+            ).apply { addTransactionStatus(); addAll(footerNodes(context)) }
         }
 }

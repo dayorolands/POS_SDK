@@ -1,11 +1,12 @@
 package com.appzonegroup.app.fasttrack
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.Editable
 import android.text.TextUtils
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -14,26 +15,48 @@ import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
+import com.appzonegroup.creditclub.pos.Platform
+import com.appzonegroup.creditclub.pos.util.posConfig
+import com.appzonegroup.creditclub.pos.util.posParameters
 import com.creditclub.core.util.localStorage
+import com.creditclub.core.util.packageInfo
+import com.creditclub.core.util.safeRun
 import com.creditclub.core.util.safeRunIO
 import kotlinx.coroutines.launch
-import java.util.*
 
-class LoginActivity : BaseActivity() {
-
-    private val REQUEST_READ_CONTACTS = 0
+class LoginActivity : DialogProviderActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        (findViewById<View>(R.id.version_tv) as TextView).text =
-            String.format(Locale.getDefault(), "Version %s", Misc.getVersionName(this))
+
+        findViewById<TextView>(R.id.version_tv).text = "Version ${packageInfo?.versionName}"
 
         if (BuildConfig.DEBUG) {
             findViewById<EditText>(R.id.login_phoneNumber).setText(localStorage.agentPhone)
         }
 
-        addValidPhoneNumberListener(findViewById(R.id.login_phoneNumber))
+        findViewById<EditText>(R.id.login_phoneNumber).also {
+            it.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+
+                }
+
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                    phoneNumberEditTextFilter(it, this)
+                }
+
+                override fun afterTextChanged(s: Editable) {
+
+                }
+            })
+        }
+
         findViewById<View>(R.id.email_sign_in_button).setOnClickListener { attemptLogin() }
 
         mainScope.launch {
@@ -47,40 +70,60 @@ class LoginActivity : BaseActivity() {
             if (error != null) return@launch
             response ?: return@launch
 
-            localStorage.agent = response
+            safeRun {
+                localStorage.agent = response
+                if (Platform.isPOS) {
+                    if (posConfig.terminalId != response.terminalID) {
+                        posParameters.reset()
+                    }
+
+                    posConfig.terminalId = response.terminalID ?: ""
+                }
+            }
         }
+
+        if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
+            showError("Timeout due to inactivity")
+        }
+    }
+
+    fun phoneNumberEditTextFilter(editText: EditText, textWatcher: TextWatcher) {
+        val numbers = "0123456789"
+
+        val text = editText.text.toString().trim { it <= ' ' }
+
+        val textToCharArray = text.toCharArray()
+
+        val accumulator = StringBuilder()
+
+        for (c in textToCharArray) {
+            if (numbers.contains(c + "")) {
+                accumulator.append(c)
+            }
+        }
+        editText.removeTextChangedListener(textWatcher)
+
+        //This line without the line before and after will cause endless loop
+        //of call to the text changed listener
+        editText.setText(accumulator)
+        editText.addTextChangedListener(textWatcher)
+        editText.setSelection(accumulator.length)
     }
 
     override fun onResume() {
         super.onResume()
         ensureLocationEnabled()
-
-    }
-
-    /**
-     * Callback received when a permissions request has been completed.
-     */
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //populateAutoComplete();
-            }
-        }
     }
 
     override fun onBackPressed() {
 
         val notification = Dialogs.getQuestionDialog(this@LoginActivity, "Do you want to exit? ")
-        val logout_no_button = notification.findViewById<Button>(R.id.cancel_btn)
-        val logout_yes_button = notification.findViewById<Button>(R.id.ok_btn)
+        val logoutNoButton = notification.findViewById<Button>(R.id.cancel_btn)
+        val logoutYesButton = notification.findViewById<Button>(R.id.ok_btn)
 
-        logout_no_button.setOnClickListener { notification.dismiss() }
+        logoutNoButton.setOnClickListener { notification.dismiss() }
 
-        logout_yes_button.setOnClickListener {
+        logoutYesButton.setOnClickListener {
             notification.dismiss()
             val intent = Intent(Intent.ACTION_MAIN)
             intent.addCategory(Intent.CATEGORY_HOME)
@@ -88,17 +131,9 @@ class LoginActivity : BaseActivity() {
             startActivity(intent)
         }
         notification.show()
-
     }
 
-    /**
-     * Attempts to sign in or register the customer specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private fun attemptLogin() {
-
-        // Store values at the time of the login attempt.
         val phoneNumber = (findViewById<View>(R.id.login_phoneNumber) as EditText).text.toString()
         val pin = (findViewById<View>(R.id.login_pin) as EditText).text.toString()
 
@@ -112,25 +147,15 @@ class LoginActivity : BaseActivity() {
             return
         }
 
-
-        /*if (!Misc.isValidNumber(phoneNumber))
-        {
-            showError("Phone number is invalid. Please enter a valid phone number");
-            return;
-        }*/
-
-
-        // Check for a valid phone number.
         if (!isPhoneValid(phoneNumber)) {
             showError("Phone number is incorrect", R.id.login_phoneNumber)
             return
         }
 
-//        // Check for a valid password, if the user entered one.
-//        if (!isPINValid(pin)) {
-//            showError("PIN is invalid", R.id.login_pin)
-//            return
-//        }
+        if (pin.length != 4) {
+            showError("PIN must be 4 digits")
+            return
+        }
 
         mainScope.launch {
             showProgressBar("Logging you in")
@@ -163,26 +188,17 @@ class LoginActivity : BaseActivity() {
         }
     }
 
-    internal fun showError(message: String, viewId: Int) {
-        Dialogs.getErrorDialog(this, message).show()
+    private fun showError(message: String, viewId: Int) {
+        showError(message)
         findViewById<View>(viewId).requestFocus()
     }
 
     private fun isPhoneValid(phoneNumber: String): Boolean {
-        //TODO: Replace this with your own logic
-
         val storedPhone = LocalStorage.GetValueFor(AppConstants.AGENT_PHONE, baseContext)
         return phoneNumber == storedPhone
     }
 
-    private fun isPINValid(pin: String): Boolean {
-        //TODO: Replace this with your own logic
-        val storedPIN = LocalStorage.GetValueFor(AppConstants.AGENT_PIN, baseContext)
-        return pin == storedPIN
-    }
-
-
-    protected fun ensureLocationEnabled() {
+    private fun ensureLocationEnabled() {
         var locationMode = 0 // 0 == Settings.Secure.LOCATION_MODE_OFF
         var locationProviders: String? = null
 
@@ -205,15 +221,6 @@ class LoginActivity : BaseActivity() {
 
         val locationEnabled = !TextUtils.isEmpty(locationProviders) || locationMode != 0
         if (!locationEnabled) {
-//            android.app.AlertDialog.Builder(this)
-//                .setCancelable(false)
-//                .setMessage("An active GPS service is needed for this application. Click 'OK' to activate it.")
-//                .setPositiveButton(android.R.string.ok) { dialog, which ->
-//                    //this will navigate user to the device location settings screen
-//                    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-//                    startActivity(intent)
-//                }
-//                .show()
 
             com.appzonegroup.app.fasttrack.ui.Dialogs.confirm(
                 this,
@@ -231,30 +238,7 @@ class LoginActivity : BaseActivity() {
                     finish()
                 }
             }
-            /*Intent s = new Intent(getApplicationContext(), LocationCheckDialog.class);
-            s.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(s);*/
         }
     }
-
-    override fun processFinished(output: String?) {
-
-//        if (output != null) {
-//            val (_, error) = safeRun {
-//                val info = Gson().fromJson(output, AgentInfo::class.java)
-//                if (info.isStatus) {
-//                    LocalStorage.setAgentInfo(this, output)
-//                    //LocalStorage.SaveValue(AppConstants.AGENT_NAME, info.getAgentName(), this);
-//                }
-//            }
-//
-//            if (error != null) Crashlytics.logException(error)
-//        } else {
-//            if (LocalStorage.getAgentInfo(this) == null) {
-//                showError("You do not have internet on your device. Please make interrnet available and try again")
-//            }
-//        }
-    }
-
 }
 

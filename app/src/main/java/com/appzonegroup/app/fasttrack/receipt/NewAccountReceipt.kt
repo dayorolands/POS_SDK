@@ -35,7 +35,7 @@ class NewAccountReceipt(context: Context) : TransactionReceipt(context) {
 
                 TextNode(if (isWalletAccount) "New Wallet" else "New Account").apply {
                     align = Alignment.MIDDLE
-                    wordFont = 2
+                    wordFont = 35
                 },
 
                 TextNode(
@@ -43,7 +43,6 @@ class NewAccountReceipt(context: Context) : TransactionReceipt(context) {
 Agent Code: ${context.localStorage.agent?.agentCode}
 Agent Phone: ${context.localStorage.agent?.phoneNumber}
 --------------------------
-
 Account Name: $accountName
 Account Number: ${accountNumber.mask(4, 2)}
 Account Type: ${if (isWalletAccount) "Wallet Account" else "Savings Account"}
@@ -51,6 +50,6 @@ Account Type: ${if (isWalletAccount) "Wallet Account" else "Savings Account"}
 Creation Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}
 RRN: $uniqueReferenceID"""
                 )
-            ).apply { addTransactionStatus(); addAll(polarisFooterNodes) }
+            ).apply { addTransactionStatus(); addAll(footerNodes(context)) }
         }
 }

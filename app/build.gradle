@@ -12,6 +12,7 @@ buildscript {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlinx-serialization'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 
@@ -34,6 +35,8 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
+        versionCode 4
+        versionName "1.2.1"
     }
 
     lintOptions {
@@ -63,7 +66,7 @@ android {
     buildTypes {
         release {
             shrinkResources false
-            minifyEnabled false
+//            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField("String", "API_HOST", '"https://api.mybankone.com"')
             buildConfigField("String", "HOST", '"https://mybankone.com"')
@@ -87,22 +90,16 @@ android {
         creditclub {
             dimension "flavor"
             applicationId "com.appzonegroup.app.creditclub.plus"
-            versionCode 4
-            versionName "1.2.1"
         }
 
         polaris {
             dimension "flavor"
             applicationId "com.appzonegroup.app.creditclub.polaris"
-            versionCode 1
-            versionName "1.0.0"
         }
 
         access {
             dimension "flavor"
             applicationId "com.appzonegroup.app.creditclub.access"
-            versionCode 1
-            versionName "1.0.0"
         }
     }
     sourceSets {

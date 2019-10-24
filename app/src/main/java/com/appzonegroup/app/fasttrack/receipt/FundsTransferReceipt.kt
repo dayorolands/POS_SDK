@@ -28,7 +28,7 @@ class FundsTransferReceipt(context: Context, val request: FundsTransferRequest) 
 
                 TextNode("Funds Transfer").apply {
                     align = Alignment.MIDDLE
-                    wordFont = 2
+                    wordFont = 35
                 },
 
                 TextNode(
@@ -47,7 +47,7 @@ RRN: ${request.externalTransactionReference}"""
             )
 
             nodes.addTransactionStatus()
-            nodes.addAll(polarisFooterNodes)
+            nodes.addAll(footerNodes(context))
 
             return nodes
         }

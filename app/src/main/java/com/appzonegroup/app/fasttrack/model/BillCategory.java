@@ -1,5 +1,7 @@
 package com.appzonegroup.app.fasttrack.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by Oto-obong on 02/08/2017.
  */
@@ -17,6 +19,8 @@ public class BillCategory {
 
     private String IsAirtime;
 
+    @SerializedName("BillerCategoryID")
+    private String billerCategoryId;
 
     public String getID() {
         return ID;
@@ -56,5 +60,13 @@ public class BillCategory {
 
     public void setIsAirtime(String isAirtime) {
         IsAirtime = isAirtime;
+    }
+
+    public String getBillerCategoryId() {
+        return billerCategoryId;
+    }
+
+    public void setBillerCategoryId(String billerCategoryId) {
+        this.billerCategoryId = billerCategoryId;
     }
 }

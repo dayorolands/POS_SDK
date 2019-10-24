@@ -384,25 +384,6 @@
             -->
         </activity>
         <activity
-            android:name=".SelectReportActivity"
-            android:label="@string/reports"
-            android:parentActivityName=".CreditClubMainMenuActivity"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.CreditClubMainMenuActivity" />
-        </activity>
-        <activity
-            android:name=".AccountReportActivity"
-            android:label="@string/account_report"
-            android:launchMode="singleInstance"
-            android:parentActivityName=".SelectReportActivity"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.SelectReportActivity" />
-        </activity>
-        <activity
             android:name=".CreditClubMainMenuActivity"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
@@ -442,6 +423,128 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.CreditClubSubMenuActivity" />
         </activity>
+
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.TerminalOptionsActivity"
+            android:label="Terminal Options"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.UpdateActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.MenuActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.CardWithdrawalActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="true"
+            android:label="Make Payment"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.ReversalActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="true"
+            android:label="Reversal"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.ReversalActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.BalanceInquiryActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="true"
+            android:label="Balance Inquiry"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.RefundActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="true"
+            android:label="Refund"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.SalesCompleteActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="true"
+            android:label="Sales Completion"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.PreAuthActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="true"
+            android:label="Pre Auth"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.CashBackActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="true"
+            android:label="Cash Back"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.CashAdvanceActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:exported="true"
+            android:label="Cash Advance"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.UnsettledTransactionsActivity"
+            android:exported="true"
+            android:label="Pending Confirmations"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.ReprintMenuActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.appzonegroup.creditclub.pos.ReprintAnyActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <service
+            android:name="com.appzonegroup.creditclub.pos.service.DownloadService"
+            android:exported="false" />
+        <service
+            android:name="com.appzonegroup.creditclub.pos.service.SyncService"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name="com.esafirm.imagepicker.features.ImagePickerActivity"
             android:screenOrientation="portrait"

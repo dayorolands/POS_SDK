@@ -21,15 +21,4 @@ class CustomerAccount : Serializable {
 
     @SerializedName("LinkingBankAccounts")
     var linkingBankAccounts: ArrayList<AccountInfo> = ArrayList()
-
-    val accountNames: ArrayList<String>
-        get() {
-            val names = ArrayList<String>()
-            names.add(BankOneApplication.getInstance().getString(R.string.please_select_customer_account))
-            for (accountInfo in linkingBankAccounts) {
-                names.add(String.format(Locale.getDefault(), "%s - %s", accountInfo.accountName, accountInfo.number))
-            }
-
-            return names
-        }
 }

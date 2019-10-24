@@ -30,7 +30,7 @@ class DepositReceipt(context: Context, val request: DepositRequest, val accountI
 
                 TextNode("Deposit").apply {
                     align = Alignment.MIDDLE
-                    wordFont = 2
+                    wordFont = 35
                 },
 
                 TextNode(
@@ -46,6 +46,6 @@ Customer Name: ${accountInfo.accountName}
 Transaction Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}
 RRN: ${request.retrievalReferenceNumber}"""
                 )
-            ).apply { addTransactionStatus(); addAll(polarisFooterNodes) }
+            ).apply { addTransactionStatus(); addAll(footerNodes(context)) }
         }
 }

@@ -18,7 +18,6 @@ import com.google.gson.Gson;
 import java.util.Locale;
 
 import rx.Observable;
-import rx.functions.Action1;
 
 /**
  * Created by Oto-obong on 03/08/2017.
@@ -58,50 +57,46 @@ public class DataLoaderActivity extends BaseActivity {
 
     private void getTokenKey() {
 
-            new Thread() {
-                public void run() {
+        new Thread() {
+            public void run() {
 
-                    String tokenUrl = AppConstants.getApiTokenUrl() + "GetToken?appId=edef4ef";
-                    Observable<String> observable = Observable.from(new String[]{APICaller.makeGetRequest2(tokenUrl)});
-                    observable.subscribe(new Action1<String>() {
+                String tokenUrl = AppConstants.getApiTokenUrl() + "GetToken?appId=edef4ef";
+                Observable<String> observable = Observable.from(new String[]{APICaller.makeGetRequest2(tokenUrl)});
+                observable.subscribe(s -> {
+                    if (s != null) {
 
-                        @Override
-                        public void call(String s) {
+                        activateDecryption = true;
+                        token = new Gson().fromJson(s.trim(), Token.class);
 
+                        try {
+                            String Token = TripleDES.decrypt(token.getToken());
+                            LocalStorage.SaveValue(AppConstants.API_TOKEN, Token, getBaseContext());
+                            Intent intent = new Intent(DataLoaderActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                            finish();
 
-                            if (s != null) {
+                        } catch (Exception e) {
+                            e.printStackTrace();
 
-                                activateDecryption = true;
-                                token = new Gson().fromJson(s.trim(), Token.class);
-
-                                try {
-
-                                    String Token =  TripleDES.decrypt(token.getToken());
-                                    LocalStorage.SaveValue(AppConstants.API_TOKEN, Token, getBaseContext());
-                                    Intent intent = new Intent(DataLoaderActivity.this, LoginActivity.class);
-                                    startActivity(intent);
-                                    finish();
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-
-                                    Crashlytics.logException(new Exception(e.getMessage()));
-                                }
-
-                            } else {
-                                showNoDetailNotification();
-                            }
-
+                            Crashlytics.logException(new Exception(e.getMessage()));
                         }
-                    });
 
-                }
+                    } else {
+                        showNoDetailNotification();
+                    }
 
-            }.start();
+                }, throwable -> {
+                    throwable.printStackTrace();
+                    Crashlytics.logException(new Exception(throwable.getMessage()));
+                });
 
-        }
+            }
 
-    void showNoDetailNotification(){
+        }.start();
+
+    }
+
+    void showNoDetailNotification() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -112,19 +107,24 @@ public class DataLoaderActivity extends BaseActivity {
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         Toast.makeText(getBaseContext(), "Still loading data... Please wait", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void processFinished(String output) {
-        if (output != null)
-        {
-            AgentInfo info = new Gson().fromJson(output, AgentInfo.class);
-            if (info.isStatus())
-            {
-                LocalStorage.setAgentInfo(this, output);
-                //LocalStorage.SaveValue(AppConstants.AGENT_NAME, info.getAgentName(), this);
+        if (output != null) {
+            try {
+                AgentInfo info = new Gson().fromJson(output, AgentInfo.class);
+                if (info.isStatus()) {
+                    LocalStorage.setAgentInfo(this, output);
+                    //LocalStorage.SaveValue(AppConstants.AGENT_NAME, info.getAgentName(), this);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Crashlytics.logException(ex);
+                Toast.makeText(getBaseContext(), "No details was received. Try again", Toast.LENGTH_LONG).show();
+                if (!isFinishing()) finish();
             }
         }
         /*else

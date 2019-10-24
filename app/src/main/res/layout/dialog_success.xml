@@ -4,7 +4,7 @@
     android:layout_width="300dp"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
-    app:cardBackgroundColor="@color/colorPrimary"
+    app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="20dp"
     app:cardElevation="3dp">
 
@@ -18,6 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_gravity="center"
+            android:tint="@color/colorPrimary"
             android:contentDescription="@string/content_description"
             app:srcCompat="@drawable/ic_sentiment_satisfied" />
 
@@ -29,7 +30,7 @@
             android:gravity="center"
             android:text="@string/success"
             android:textAllCaps="true"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="22sp"
             android:textStyle="bold" />
 
@@ -41,7 +42,7 @@
             android:gravity="center"
             android:lineSpacingExtra="@dimen/four_dp"
             android:text="@string/operation_was_completed_successfully"
-            android:textColor="@color/white"
+            android:textColor="@color/black2"
             android:textSize="@dimen/medium_sized_text" />
 
         <com.appzonegroup.app.fasttrack.ui.CustomButton

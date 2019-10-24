@@ -26,7 +26,7 @@ class BillsPaymentReceipt(context: Context, val request: PayBillRequest) :
 
                 TextNode(if (request.isRecharge) "Airtime Recharge" else "Bills Payment").apply {
                     align = Alignment.MIDDLE
-                    wordFont = 2
+                    wordFont = 35
                 },
 
                 TextNode(

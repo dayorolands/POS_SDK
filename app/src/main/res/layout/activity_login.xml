@@ -9,9 +9,10 @@
 
     <ImageView
         android:layout_width="match_parent"
-        android:scaleType="matrix"
         android:layout_height="match_parent"
-        android:src="@drawable/card_background"/>
+        android:background="@color/colorPrimary"
+        android:scaleType="centerCrop"
+        android:src="@drawable/card_background" />
 
     <ScrollView
         android:id="@+id/login_form"
@@ -109,7 +110,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:layout_marginStart="@dimen/ten_dp"
+        android:layout_marginBottom="10dp"
         android:textColor="@color/white"
         android:textStyle="bold" />
 
