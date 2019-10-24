@@ -2,6 +2,7 @@ package com.appzonegroup.app.fasttrack
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import com.appzonegroup.app.fasttrack.ui.DialogProviderImpl
 import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.creditclub.core.ui.CreditClubActivity
 

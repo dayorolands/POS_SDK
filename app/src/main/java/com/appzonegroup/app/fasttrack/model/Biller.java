@@ -27,6 +27,8 @@ public class Biller implements Serializable {
     private int showOnAtmField;
     private String accessBillerNameField;
 
+    @SerializedName("BillerCategoryID")
+    private String billerCategoryId;
 
     public int getBillerID() {
         return BillerID;
@@ -140,5 +142,11 @@ public class Biller implements Serializable {
         this.accessBillerNameField = accessBillerNameField;
     }
 
+    public String getBillerCategoryId() {
+        return billerCategoryId;
+    }
 
+    public void setBillerCategoryId(String billerCategoryId) {
+        this.billerCategoryId = billerCategoryId;
+    }
 }

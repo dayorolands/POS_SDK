@@ -152,7 +152,7 @@
 
     <style name="AppButton.RoundOrangeButton" parent="AppButton.Base">
         <item name="android:background">@drawable/round_orange_button</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/colorAccentContrast</item>
     </style>
 
     <style name="AppButton.RoundOrangeOutlineButton" parent="AppButton.Base">

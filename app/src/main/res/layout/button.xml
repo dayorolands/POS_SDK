@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
@@ -13,37 +12,32 @@
             type="java.lang.String" />
     </data>
 
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:background="@drawable/round_white_button"
+        style="@style/Widget.AppCompat.Button"
         android:layout_margin="@dimen/five_dp"
-        android:padding="10dp"
-        app:cardBackgroundColor="#f9f9f9"
-        app:cardCornerRadius="10dp">
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="10dp">
 
-        <LinearLayout
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_margin="20dp"
+            android:src="@{src, default=@drawable/payday_loan}"
+            android:tint="@color/menuButtonIconTint" />
+
+        <com.appzonegroup.app.fasttrack.ui.TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="24dp"
-                android:layout_margin="20dp"
-                android:tint="@color/colorPrimary"
-                android:src="@{src, default=@drawable/payday_loan}" />
-
-            <com.appzonegroup.app.fasttrack.ui.TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@{text, default=Button}"
-                android:textAlignment="center"
-                android:textAllCaps="true"
-                android:textStyle="bold"
-                android:textColor="@color/blue" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+            android:text="@{text, default=Button}"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textColor="@color/blue"
+            android:textStyle="bold" />
+    </LinearLayout>
 </layout>

@@ -512,18 +512,6 @@
             android:label="Online Functions">
         </activity>
         <activity
-            android:name=".SelectReportActivity"
-            android:parentActivityName=".CreditClubMainMenuActivity"
-            android:screenOrientation="portrait"
-            android:label="Select Report">
-        </activity>
-        <activity
-            android:name=".AccountReportActivity"
-            android:parentActivityName=".SelectReportActivity"
-            android:screenOrientation="portrait"
-            android:label="Reports">
-        </activity>
-        <activity
             android:name=".ChangeCustomerPinActivity"
             android:parentActivityName=".CreditClubMainMenuActivity"
             android:screenOrientation="portrait"

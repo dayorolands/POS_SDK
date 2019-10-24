@@ -4,12 +4,12 @@
     <color name="black2">#7f8c8d</color>
     <color name="black3">#95a5a6</color>
     <color name="black4">#bdc3c7</color>
-    <color name="colorPrimary">#61297f</color>
-    <color name="colorPrimaryTransparent">#DD61297f</color>
-    <color name="colorPrimaryDark">#441D58</color>
-    <color name="colorAccent">#DFA226</color>
-    <color name="colorAccentDark">#8B6518</color>
-    <color name="colorAccentTransparent">#DDDFA226</color>
+    <color name="colorPrimary">#08237e</color>
+    <color name="colorPrimaryTransparent">#DD08237e</color>
+    <color name="colorPrimaryDark">#061957</color>
+    <color name="colorAccent">#e95b0c</color>
+    <color name="colorAccentDark">#A2400A</color>
+    <color name="colorAccentTransparent">#DDe95b0c</color>
     <color name="actionBarColor">#CCC</color>
     <color name="darkGrey">#CED1D4</color>
     <color name="green">#2ECC71</color>
@@ -31,4 +31,7 @@
     <color name="colorSplashBg">@color/colorPrimary</color>
     <color name="colorLoginBg">@color/colorPrimaryTransparent</color>
     <color name="toolbarLogoTint">#0000</color>
+    <color name="navHeaderLogoTint">@color/colorAccent</color>
+    <color name="fundsTransferSameBankTint">@color/colorAccent</color>
+    <color name="splashOverlay">@color/transparent</color>
 </resources>

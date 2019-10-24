@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">Polaris Agency Banking</string>
+    <string name="app_name">CreditClub Plus</string>
+    <string name="institution_name">CreditClub</string>
+    <string name="institution_website">http://www.appzonegroup.com/products/creditclub</string>
     <string name="home">Home</string>
     <string name="title_activity_login">Login</string>
     <string name="register_customer">Open Account</string>
@@ -412,7 +414,7 @@
     <string name="new_pin_confirmation_mismatch">New PIN and new PIN confirmation do not match</string>
     <string name="enter">Enter</string>
     <string name="oops">Oops</string>
-    <string name="title_activity_support">SupportActivity</string>
+    <string name="title_activity_support">Support</string>
     <string name="support">Support</string>
     <string name="email_is_invalid">Email is invalid</string>
     <string name="title_activity_new_wallet">Open Wallet</string>
@@ -426,4 +428,8 @@
     <string name="month_label">Month</string>
     <string name="day_label">Day</string>
     <string name="year_label">Year</string>
+    <string name="receivers_account_number">Receivers Account Number</string>
+    <string name="state_hint">Select State</string>
+    <string name="funds_transfer_same_bank">Same Bank</string>
+    <string name="bills_airtime_category_id">3</string>
 </resources>

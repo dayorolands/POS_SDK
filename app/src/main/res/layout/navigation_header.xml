@@ -6,9 +6,13 @@
     android:background="@color/blue"
     android:layout_height="wrap_content"
     android:padding="20dp">
+
     <ImageView
-        android:layout_width="@dimen/fifty_dp"
+        android:tint="@color/navHeaderLogoTint"
+        android:layout_width="wrap_content"
+        android:scaleType="fitStart"
         android:layout_height="@dimen/fifty_dp"
+        android:padding="@dimen/ten_dp"
         app:srcCompat="@drawable/ic_launcher_transparent"/>
 
     <com.appzonegroup.app.fasttrack.ui.TextView

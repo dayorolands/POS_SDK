@@ -1,6 +1,8 @@
 package com.appzonegroup.app.fasttrack.receipt
 
+import android.content.Context
 import com.appzonegroup.app.fasttrack.BuildConfig
+import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.creditclub.pos.printer.Alignment
 import com.appzonegroup.creditclub.pos.printer.PrintNode
 import com.appzonegroup.creditclub.pos.printer.TextNode
@@ -11,24 +13,21 @@ import com.appzonegroup.creditclub.pos.printer.TextNode
  * Appzone Ltd
  */
 
-val polarisFooterNodes = listOf<PrintNode>(
-    TextNode(
-        """
------------------------------
+fun footerNodes(context: Context) = listOf<PrintNode>(
 
-Please retain your receipt.
-Thank You.
-
-Polaris Agency Banking v${BuildConfig.VERSION_NAME}
------------------------------"""
-    ),
-
-    TextNode("Powered by Polaris Bank").apply {
+    TextNode("-----------------------------").apply {
         align = Alignment.MIDDLE
+        wordFont = 15
     },
 
-    TextNode("https://www.polarisbanklimited.com").apply {
+    TextNode("${context.getString(R.string.app_name)} v${BuildConfig.VERSION_NAME}. Powered by ${context.getString(R.string.institution_name)}").apply {
+        align = Alignment.MIDDLE
+        wordFont = 15
+    },
+
+    TextNode(context.getString(R.string.institution_website)).apply {
         align = Alignment.MIDDLE
         walkPaperAfterPrint = 10
+        wordFont = 15
     }
 )

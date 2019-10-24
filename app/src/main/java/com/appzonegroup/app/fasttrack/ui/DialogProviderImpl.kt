@@ -1,4 +1,4 @@
-package com.appzonegroup.app.fasttrack
+package com.appzonegroup.app.fasttrack.ui
 
 import android.annotation.SuppressLint
 import android.app.Dialog
@@ -11,10 +11,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.DialogCustomerRequestOptionsBinding
 import com.appzonegroup.app.fasttrack.databinding.DialogInputBinding
 import com.appzonegroup.app.fasttrack.databinding.PinpadBinding
-import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.CalendarDialog
 import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.ui.widget.*
@@ -57,11 +57,11 @@ interface DialogProviderImpl : DialogProvider {
         activity.runOnUiThread {
             hideProgressBar()
             val dialog = Dialogs.getErrorDialog(activity, message)
-            val dialogblock = DialogListener.create(block)
+            val listener = DialogListener.create(block)
 
             dialog.close_btn.setOnClickListener {
                 dialog.dismiss()
-                dialogblock.close()
+                listener.close()
             }
 
             dialog.show()
@@ -69,14 +69,14 @@ interface DialogProviderImpl : DialogProvider {
     }
 
     override fun <T> showInfo(message: String?, block: DialogListenerBlock<T>): Dialog {
-        val dialogblock = DialogListener.create(block)
+        val listener = DialogListener.create(block)
         val dialog = Dialogs.getErrorDialog(activity, message)
 
         activity.runOnUiThread {
             hideProgressBar()
             dialog.close_btn.setOnClickListener {
                 dialog.dismiss()
-                dialogblock.close()
+                listener.close()
             }
 
             dialog.show()
@@ -96,22 +96,15 @@ interface DialogProviderImpl : DialogProvider {
         activity.runOnUiThread {
             hideProgressBar()
             val dialog = Dialogs.getSuccessDialog(activity, message)
-            val dialogblock = DialogListener.create(block)
+            val listener = DialogListener.create(block)
 
             dialog.close_btn.setOnClickListener {
                 dialog.dismiss()
-                dialogblock.close()
+                listener.close()
             }
 
             dialog.show()
         }
-    }
-
-    fun renderSuccess(s: String?) {
-        activity.setContentView(R.layout.layout_success)
-        activity.activity.findViewById<TextView>(R.id.success_message_tv).text = s
-        activity.findViewById<View>(R.id.success_close_button)
-            .setOnClickListener { activity.finish() }
     }
 
     override fun indicateError(message: String?, view: EditText?) {
@@ -148,7 +141,7 @@ interface DialogProviderImpl : DialogProvider {
                 val listener = DialogListener.create(block)
 
                 progressDialog.findViewById<View>(R.id.cancel_button).setOnClickListener {
-                    if (progressDialog.isShowing) progressDialog.dismiss()
+                    if (progressDialog.isShowing) progressDialog.hide()
                     listener.close()
                 }
             } else progressDialog.setOnCancelListener { }
@@ -184,10 +177,6 @@ interface DialogProviderImpl : DialogProvider {
         return handleProgressBar(title, message, block = block)
     }
 
-    fun openPage(clazz: Class<*>) {
-        activity.startActivity(Intent(activity, clazz))
-    }
-
     override fun requestPIN(title: String, block: DialogListenerBlock<String>) {
         val dialog = Dialogs.getDialog(activity)
         dialog.setCancelable(true)
@@ -195,7 +184,8 @@ interface DialogProviderImpl : DialogProvider {
 
         val listener = DialogListener.create(block)
         val inflater = LayoutInflater.from(activity)
-        val binding = DataBindingUtil.inflate<PinpadBinding>(inflater, R.layout.pinpad, null, false)
+        val binding = DataBindingUtil.inflate<PinpadBinding>(inflater,
+            R.layout.pinpad, null, false)
         binding.title = title
 
         binding.pinChangeHandler = object : Dialogs.PinChangeHandler {
@@ -227,7 +217,10 @@ interface DialogProviderImpl : DialogProvider {
             dialog.dismiss()
             listener.close()
         }
-        dialog.setOnCancelListener { listener.close() }
+        dialog.setOnCancelListener {
+            dialog.dismiss()
+            listener.close()
+        }
         dialog.show()
     }
 
@@ -274,7 +267,10 @@ interface DialogProviderImpl : DialogProvider {
             dialog.dismiss()
             listener.close()
         }
-        dialog.setOnCancelListener { listener.close() }
+        dialog.setOnCancelListener {
+            dialog.dismiss()
+            listener.close()
+        }
         dialog.show()
     }
 
@@ -316,6 +312,7 @@ interface DialogProviderImpl : DialogProvider {
         }
 
         dialog.setOnCancelListener {
+            dialog.dismiss()
             listener.close()
         }
 
@@ -375,11 +372,12 @@ interface DialogProviderImpl : DialogProvider {
         binding.title = title
         binding.container.layoutManager = LinearLayoutManager(activity)
         binding.container.adapter = DialogOptionAdapter(options) {
-            listener.submit(dialog, it)
             dialog.dismiss()
+            listener.submit(dialog, it)
         }
 
         dialog.setOnCancelListener {
+            dialog.dismiss()
             listener.close()
         }
 

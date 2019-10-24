@@ -3,9 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_splash"
     android:gravity="center"
-    android:background="@color/colorSplashBg"
     tools:activity=".SplashScreenActivity">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/splashOverlay" />
 
     <ImageView
         android:layout_width="200dp"

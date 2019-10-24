@@ -31,9 +31,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="98dp"
                     android:onClick="onSameBankClick"
-                    android:padding="@dimen/five_dp"
+                    android:padding="15dp"
                     android:scaleType="centerInside"
-                    android:src="@drawable/ic_launcher_transparent" />
+                    android:tint="@color/fundsTransferSameBankTint"
+                    android:src="@drawable/funds_transfer_same_bank" />
 
                 <com.appzonegroup.app.fasttrack.ui.TextView
                     android:layout_width="match_parent"
@@ -41,7 +42,7 @@
                     android:layout_marginTop="10dp"
                     android:gravity="center"
                     android:onClick="onSameBankClick"
-                    android:text="Polaris bank"
+                    android:text="@string/funds_transfer_same_bank"
                     android:textAlignment="center"
                     android:textAllCaps="true"
                     android:textColor="@color/colorPrimary"

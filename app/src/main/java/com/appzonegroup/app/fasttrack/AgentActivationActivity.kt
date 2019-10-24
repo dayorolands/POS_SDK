@@ -61,7 +61,7 @@ class AgentActivationActivity : BaseActivity() {
         }
 
         if (Platform.isPOS) {
-            Platform.setup(this)
+//            Platform.setup(this)
 
             binding.btnTerminalOptions.visibility = View.VISIBLE
             binding.btnTerminalOptions.setOnClickListener {
