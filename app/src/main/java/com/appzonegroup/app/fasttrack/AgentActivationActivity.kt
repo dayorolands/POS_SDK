@@ -31,6 +31,7 @@ class AgentActivationActivity : BaseActivity() {
     internal var institutionCode: String = ""
     var phoneNumber = ""
     var pin = ""
+    override val hasLogoutTimer = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

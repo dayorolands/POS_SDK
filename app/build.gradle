@@ -30,7 +30,6 @@ android {
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
-        applicationId "com.appzonegroup.app.creditclub.polaris"
         minSdkVersion 21
         targetSdkVersion 28
         multiDexEnabled true
@@ -94,7 +93,7 @@ android {
 
         polaris {
             dimension "flavor"
-            applicationId "com.appzonegroup.app.creditclub.polaris"
+            applicationId "com.creditclub.polaris"
         }
 
         access {

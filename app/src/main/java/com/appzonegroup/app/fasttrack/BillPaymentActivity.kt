@@ -211,6 +211,17 @@ class BillPaymentActivity : BaseActivity() {
                         return@launch
                     }
 
+                    if (Platform.hasPrinter) {
+                        val receipt = BillsPaymentReceipt(
+                            this@BillPaymentActivity,
+                            paymentRequest
+                        ).withResponse(response)
+
+                        printer.printAsync(receipt) { printerStatus ->
+                            if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
+                        }
+                    }
+
                     if (response.isSuccessFul == true) {
 
                         showSuccess<Unit>(
@@ -220,17 +231,6 @@ class BillPaymentActivity : BaseActivity() {
                             onClose {
                                 setResult(1)
                                 finish()
-                            }
-                        }
-
-                        if (Platform.hasPrinter) {
-                            printer.printAsync(
-                                BillsPaymentReceipt(
-                                    this@BillPaymentActivity,
-                                    paymentRequest
-                                ).withResponse(response)
-                            ) { printerStatus ->
-                                if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
                             }
                         }
                     } else {

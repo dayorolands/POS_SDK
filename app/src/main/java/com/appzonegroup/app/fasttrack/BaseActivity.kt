@@ -31,7 +31,6 @@ import com.appzonegroup.creditclub.pos.printer.PosPrinter
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.creditclub.core.util.isMyServiceRunning
 import com.google.gson.Gson
-import kotlinx.coroutines.GlobalScope
 import org.json.JSONObject
 
 /**
@@ -43,11 +42,12 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUt
 
     val printer by lazy { PosPrinter(this, posDialogProvider) }
     val posDialogProvider by lazy { PosDialogProvider(this) }
+    override val hasLogoutTimer = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        LogOutTimerUtil.startLogoutTimer(this, this)
+        if (hasLogoutTimer) LogOutTimerUtil.startLogoutTimer(this, this)
 
         if (!isMyServiceRunning(SyncService::class.java)) {
             startService(Intent(this, SyncService::class.java))

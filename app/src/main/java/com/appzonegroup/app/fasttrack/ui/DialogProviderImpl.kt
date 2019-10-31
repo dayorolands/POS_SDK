@@ -294,6 +294,7 @@ interface DialogProviderImpl : DialogProvider {
         binding.inputType = params.type
         binding.maxLength = params.maxLength
         binding.helperText = params.helperText
+        binding.input.setText(params.initialValue)
 
         binding.submitButton.setOnClickListener {
             val value = binding.input.text.toString()

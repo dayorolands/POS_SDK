@@ -29,6 +29,7 @@ class BankOneApplication : CreditClubApplication() {
 
     val authResponse: AuthResponse
         get() {
+            if (!localStorage.agentIsActivated) return AuthResponse("","")
             val phoneNumber = "234${localStorage.agent?.phoneNumber?.substring(1)}"
 
             return AuthResponse(phoneNumber, localStorage.agent?.agentCode)
