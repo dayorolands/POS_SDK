@@ -1,4 +1,1 @@
-include ':core', ':ui'
-include ':pos'
-
 include ':app'

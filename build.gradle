@@ -83,10 +83,9 @@ allprojects {
             name 'Google'
         }
         maven { url "https://jitpack.io" }
-//        maven {
-//            git:ssh://git
-//            url "https://api.bitbucket.org/1.0/repositories/jeroenmols/maven_repository/raw/releases"
-//        }
+        maven {
+            url "https://bitbucket.org/appzonegroup/creditclub.maven/raw/releases"
+        }
     }
 }
 configurations {
