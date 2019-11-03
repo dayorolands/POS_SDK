@@ -118,7 +118,7 @@ android {
 
 dependencies {
     implementation('com.creditclub.core:core:1.0.1')
-    implementation('com.creditclub.ui:uicentral:1.0.1')
+    implementation('com.creditclub.ui:uicentral:1.0.2')
     implementation('com.creditclub.pos:pos:1.0.1')
 
     implementation fileTree(dir: 'jniLibs', include: ['*.so'])
