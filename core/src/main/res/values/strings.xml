@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">CreditClub</string>
+    <string name="grafana_app_name" translatable="false">CreditClub</string>
+    <string name="version_management_app_name" translatable="false">CreditClub</string>
+    <string name="variable_is_required">%1$s is required</string>
+    <string name="variable_contains_invalid_characters">%1$s contains invalid characters</string>
+    <string name="variable_is_invalid">%1$s is invalid</string>
+    <string name="last_name">Last Name</string>
+    <string name="first_name">First Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="gender">Gender</string>
+    <string name="agent_phone_number">Agent Phone Number</string>
+    <string name="institution_code">Institution Code</string>
+    <string name="customer_account_number">Customer Account Number</string>
+    <string name="amount">Amount</string>
+    <string name="agent_pin">Agent Pin</string>
+    <string name="DATA_SOURCE" translatable="false">Credit_Club_Offline_Data_Source</string>
+    <string name="APP_DATA_SOURCE" translatable="false">Credit_Club_App_Data_Source</string>
+    <string name="please_select_a_customer_account">Please select a customer account</string>
+    <string name="please_enter_a_valid_agent_pin">Please enter a valid agent pin</string>
+    <string name="field_is_required">%1$s is required</string>
+    <string name="an_error_occurred">An error occurred</string>
+    <string name="amount_must_be_greater_than_zero">Amount must be greater than zero</string>
+    <string name="special_characters_not_permitted">%1$s is invalid. Only hyphens(-) are allowed</string>
+    <string name="please_enter_a_valid_customer_address">Please enter a valid customer address. Only commas(,), hyphens(-), and periods(.) are allowed</string>
+    <string name="an_error_occurred_please_try_again_later">An error occurred. Please try again later</string>
+    <string name="account_opening">Account Opening</string>
+    <string name="a_network_error_occurred">A network error occurred. Please try again later</string>
+    <string name="an_internal_error_occurred">An internal error occurred. Please try again later</string>
+    <string name="request_time_out">The request timed-out. Please try again later</string>
+    <string name="connection_refused_error">Connection refused. Please check your internet connection and try again</string>
+    <string name="server_response_error">We cannot interpret the server response at this time. Please try again later</string>
+    <string name="please_replace">Please replace</string>
+    <string name="receivers_account_number">Receiver\'s account number</string>
+    <string name="state_hint">Select State</string>
+</resources>
