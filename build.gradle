@@ -1,0 +1,117 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlinx-serialization'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply from: 'https://raw.githubusercontent.com/osarogie/GitAsMaven/master/publish-bitbucket.gradle'
+
+kapt {
+    generateStubs = true
+}
+
+android {
+    compileSdkVersion versions.compileSdk
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        versionCode 1
+        versionName ARTIFACT_VERSION
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    dataBinding {
+        enabled = true
+    }
+
+    buildTypes {
+        release {
+//            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "API_HOST", '"https://api.mybankone.com"')
+            buildConfigField("String", "HOST", '"https://mybankone.com"')
+            manifestPlaceholders = [usesCleartextTraffic: "false"]
+        }
+
+        debug {
+            minifyEnabled false
+            debuggable true
+            buildConfigField("String", "API_HOST", '"http://52.224.166.115"')
+            buildConfigField("String", "HOST", '"http://52.224.166.115"')
+            manifestPlaceholders = [usesCleartextTraffic: "true"]
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    api files('libs/bcprov-jdk15on-148.jar')
+
+    implementation "androidx.appcompat:appcompat:${versions.appcompat}"
+    implementation "com.google.dagger:dagger:${versions.dagger}"
+    implementation "androidx.core:core-ktx:${versions.coreKtx}"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${versions.serialization}"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}"
+
+    api "com.squareup.okhttp3:okhttp:${versions.okhttp}"
+    api "com.squareup.okhttp3:logging-interceptor:${versions.okhttp}"
+    api "com.squareup.retrofit2:retrofit:${versions.retrofit}"
+    api "com.squareup.retrofit2:converter-scalars:${versions.retrofit}"
+    api 'com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0'
+
+    implementation "androidx.room:room-runtime:${versions.room}"
+    kapt "androidx.room:room-compiler:${versions.room}"
+
+    implementation "androidx.lifecycle:lifecycle-extensions:${versions.lifecycle}"
+    kapt "androidx.lifecycle:lifecycle-compiler:${versions.lifecycle}"
+
+    // Time
+    api 'com.jakewharton.threetenabp:threetenabp:1.2.0'
+
+    testImplementation 'junit:junit:4.12'
+
+    // Core library
+    androidTestImplementation 'androidx.test:core:1.2.0'
+
+    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
+
+    // Assertions
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.ext:truth:1.2.0'
+    androidTestImplementation 'com.google.truth:truth:0.42'
+
+    // Espresso dependencies
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    // Co-routine Tests
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.0'
+
+    // For api backward compatibility
+    implementation 'com.android.volley:volley:1.1.0'
+
+    api "org.koin:koin-android:${versions.koin}"
+    api "org.koin:koin-androidx-scope:${versions.koin}"
+    api "org.koin:koin-androidx-viewmodel:${versions.koin}"
+
+    api 'com.github.esafirm.android-image-picker:imagepicker:2.1.0'
+    api 'com.github.esafirm.android-image-picker:rximagepicker:2.1.0'
+    api "com.github.bumptech.glide:glide:${versions.glide}"
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+
+    implementation "com.microsoft.appcenter:appcenter-analytics:${versions.appCenter}"
+    implementation "com.microsoft.appcenter:appcenter-crashes:${versions.appCenter}"
+}
+
+repositories {
+    mavenCentral()
+}
