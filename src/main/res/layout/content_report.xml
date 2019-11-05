@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="@layout/activity_report">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <View
+            android:id="@+id/toolbarBackground"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintBottom_toTopOf="@id/dateSeparatorView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/home"
+            android:layout_width="60dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_clickable_primary"
+            android:padding="17dp"
+            android:src="@drawable/ic_arrow_back_black_24dp"
+            android:tint="#fff"
+            app:layout_constraintBottom_toBottomOf="@id/toolbarBackground"
+            app:layout_constraintEnd_toStartOf="@id/reportTypeSeparatorView1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/reportTypeSeparatorView1"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="#2000"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@id/toolbarBackground"
+            app:layout_constraintEnd_toStartOf="@id/reportTypeLayout"
+            app:layout_constraintStart_toEndOf="@id/home"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/reportTypeSeparatorView2"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="#2000"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@id/toolbarBackground"
+            app:layout_constraintEnd_toStartOf="@id/refreshButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/refreshButton"
+            android:layout_width="60dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_clickable_primary"
+            android:padding="17dp"
+            android:src="@drawable/ic_refresh_black_24dp"
+            android:tint="#fff"
+            app:layout_constraintBottom_toBottomOf="@id/toolbarBackground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/reportTypeLayout"
+            style="@style/AppButton.Round.Accent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginVertical="10dp"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@id/toolbarBackground"
+            app:layout_constraintEnd_toStartOf="@id/reportTypeSeparatorView2"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/reportTypeSeparatorView1"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/reportTypeContentTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Unknown report"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_arrow_drop_down_black_24dp"
+                android:tint="@color/white" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@id/dateSeparatorView"
+            app:layout_constraintTop_toBottomOf="@id/toolbarBackground" />
+
+        <LinearLayout
+            android:id="@+id/startDateLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_clickable_primary"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toStartOf="@id/dateSeparatorView"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbarBackground">
+
+            <TextView
+                android:id="@+id/startDateLabelTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:text="Start Date"
+                android:textAllCaps="true"
+                android:textColor="#8fff" />
+
+            <TextView
+                android:id="@+id/startDateContentTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingBottom="10dp"
+                android:text="0000-00-00"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/dateSeparatorView"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="#2000"
+            app:layout_constraintBottom_toBottomOf="@id/startDateLayout"
+            app:layout_constraintEnd_toStartOf="@id/endDateLayout"
+            app:layout_constraintStart_toEndOf="@id/startDateLayout"
+            app:layout_constraintTop_toBottomOf="@id/toolbarBackground" />
+
+        <LinearLayout
+            android:id="@+id/endDateLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_clickable_primary"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/dateSeparatorView"
+            app:layout_constraintTop_toBottomOf="@id/toolbarBackground">
+
+            <TextView
+                android:id="@+id/endDateLabelTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:text="End Date"
+                android:textAllCaps="true"
+                android:textColor="#8fff" />
+
+            <TextView
+                android:id="@+id/endDateContentTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingBottom="10dp"
+                android:text="0000-00-00"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dateSeparatorView" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/prevButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_chevron_left_black_24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <LinearLayout
+            android:id="@+id/transactionStatusLayout"
+            style="@style/AppButton.Round.Accent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="15dp"
+            android:backgroundTint="@color/colorAccent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@id/prevButton"
+            app:layout_constraintEnd_toStartOf="@id/nextButton"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/prevButton"
+            app:layout_constraintTop_toTopOf="@id/prevButton">
+
+            <TextView
+                android:id="@+id/transactionStatusContentTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Successful"
+                android:textAllCaps="true"
+                android:textColor="@color/colorAccentContrast"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_arrow_drop_down_black_24dp"
+                android:tint="@color/colorAccentContrast" />
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/nextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_chevron_right_black_24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

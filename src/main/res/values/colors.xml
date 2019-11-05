@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black1">#000000</color>
+    <color name="black2">#7f8c8d</color>
+    <color name="black3">#95a5a6</color>
+    <color name="black4">#bdc3c7</color>
+    <color name="colorPrimary">@color/blue</color>
+    <color name="colorPrimaryTransparent">#9908237e</color>
+    <color name="selectorColor">#FFF7EC00</color>
+    <color name="colorPrimaryDark">#061957</color>
+    <color name="darkGray">#51585c</color>
+    <color name="colorAccent">#FFA400</color>
+    <color name="colorAccentDark">#925D00</color>
+    <color name="colorAccentTransparent">#99FFA400</color>
+    <color name="colorSplashBg">@color/colorPrimary</color>
+    <color name="actionBarColor">#CCC</color>
+    <color name="darkGrey">#CED1D4</color>
+    <color name="green">#2ECC71</color>
+    <color name="blue">#08237e</color>
+    <color name="darkBlue">#054296</color>
+    <color name="darkBlue2">#052296</color>
+    <color name="white">#fff</color>
+    <color name="veryLightGrey">#6c757d</color>
+    <color name="bluishWhite">#d1d1ff</color>
+    <color name="BGLight">#f8f9fa</color>
+    <color name="black">#000</color>
+    <color name="transparent">#00FFFFFF</color>
+    <color name="red">#F22613</color>
+    <color name="dividerColor">@color/darkGray</color>
+    <color name="menuButtonIconTint">@color/colorPrimary</color>
+    <color name="colorAccentContrast">@color/black</color>
+    <color name="menuBackground">@color/white</color>
+</resources>
