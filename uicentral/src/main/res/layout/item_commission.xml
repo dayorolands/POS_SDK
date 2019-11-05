@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="report"
+            type="com.creditclub.core.data.model.CommissionReport.Report" />
+
+        <variable
+            name="logDate"
+            type="String" />
+
+        <variable
+            name="settlementDate"
+            type="String" />
+
+        <variable
+            name="datePaid"
+            type="String" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/commissionAmountTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="16dp"
+            android:text="@{`NGN` + report.commissionAmount, default=`NGN0.00`}"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/displayMessageTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@{`Transaction of NGN` + report.transactionAmount, default=`Display message`}"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/commissionAmountTv" />
+
+        <TextView
+            android:id="@+id/dateLoggedTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="@{`Date logged: ` + logDate, default=`Date logged`}"
+            android:textColor="@color/colorAccentDark"
+            app:layout_constraintStart_toStartOf="@id/displayMessageTv"
+            app:layout_constraintTop_toBottomOf="@id/displayMessageTv" />
+
+        <TextView
+            android:id="@+id/dateSettledTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone"
+            android:text="@{`Date earned: ` + settlementDate, default=`Date settled`}"
+            android:textColor="@color/colorAccentDark"
+            app:layout_constraintStart_toStartOf="@id/dateLoggedTv"
+            app:layout_constraintTop_toBottomOf="@id/dateLoggedTv" />
+
+        <TextView
+            android:id="@+id/datePaidTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone"
+            android:text="@{`Date paid: ` + datePaid, default=`Date paid`}"
+            android:textColor="@color/colorAccentDark"
+            app:layout_constraintStart_toStartOf="@id/dateLoggedTv"
+            app:layout_constraintTop_toBottomOf="@id/dateSettledTv"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#ddd"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@id/datePaidTv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
