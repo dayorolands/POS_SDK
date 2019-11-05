@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="src"
+            type="android.graphics.drawable.Drawable" />
+
+        <variable
+            name="text"
+            type="java.lang.String" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/button"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:background="@drawable/round_white_button"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_margin="@dimen/five_dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_margin="20dp"
+            android:src="@{src, default=@drawable/ic_check_circle}" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@{text, default=Button}"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textColor="@color/blue"
+            android:textStyle="bold" />
+    </LinearLayout>
+</layout>

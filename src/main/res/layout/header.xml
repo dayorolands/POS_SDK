@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="subtitle"
+            type="String" />
+
+        <variable
+            name="hideBackButton"
+            type="Boolean" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="vertical"
+        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="3dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:orientation="vertical">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:orientation="vertical"
+                app:cardBackgroundColor="#0000"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp" />
+
+            <ImageView
+                android:id="@+id/go_back"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:onClick="goBack"
+                android:padding="20dp"
+                android:visibility="@{safeUnbox(hideBackButton)?View.GONE:View.VISIBLE, default=visible}"
+                app:srcCompat="@drawable/ic_arrow_back" />
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:onClick="goBack"
+                android:padding="17dp"
+                android:visibility="@{safeUnbox(hideBackButton)?View.VISIBLE:View.GONE, default=gone}"
+                app:srcCompat="@mipmap/ic_launcher_round" />
+
+            <LinearLayout
+                android:id="@+id/logo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:elevation="3dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="@{subtitle.isEmpty()?View.VISIBLE:View.GONE, default=visible}">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="2dp"
+                    android:contentDescription="@string/logo"
+                    app:srcCompat="@drawable/ic_logo" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/logo"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:fontFamily="@font/rajdani_font"
+                android:text="@{subtitle, default=Welcome}"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="@{subtitle.isEmpty()?View.GONE:View.VISIBLE, default=gone}" />
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

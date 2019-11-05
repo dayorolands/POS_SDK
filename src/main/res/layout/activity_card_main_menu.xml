@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="hideBackButton"
+            type="Boolean" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/menuBackground"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/header"
+            layout="@layout/header"
+            app:hideBackButton='@{hideBackButton}'
+            app:subtitle='@{"Welcome"}' />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/header"
+            android:background="#fff"
+            tools:context=".CardMainMenuActivity">
+
+            <LinearLayout
+                android:id="@+id/cont"
+                style="@style/AppTheme.MenuLayout"
+                android:paddingBottom="20dp">
+
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/main_menu"
+                    style="@style/AppTheme.MenuFlexLayout">
+
+                    <include
+                        android:id="@+id/purchase_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_purchase}'
+                        app:text='@{@string/pos_card_purchase}' />
+
+                    <include
+                        android:id="@+id/cash_back_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_purchase}'
+                        android:visibility="gone"
+                        app:text='@{"Purchase with CashBack"}' />
+
+                    <include
+                        android:id="@+id/refund_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_purchase}'
+                        app:text='@{"Refund"}' />
+
+                    <include
+                        android:id="@+id/reversal_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_reversal}'
+                        app:text='@{"Reversal"}' />
+
+                    <include
+                        android:id="@+id/auth_button"
+                        android:visibility="gone"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_auth}'
+                        app:text='@{"Pre auth"}' />
+
+                    <include
+                        android:id="@+id/sales_completion_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_auth}'
+                        android:visibility="gone"
+                        app:text='@{"Sales Completion"}' />
+
+                    <include
+                        android:id="@+id/deposit_button"
+                        android:visibility="gone"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_reversal}'
+                        app:text='@{"deposit"}' />
+
+                    <include
+                        android:id="@+id/balance_button"
+                        layout="@layout/card_menu_button"
+                        android:visibility="gone"
+                        app:src='@{@drawable/ic_reversal}'
+                        app:text='@{"Balance Inquiry"}' />
+
+                    <include
+                        android:id="@+id/bill_pay_button"
+                        layout="@layout/card_menu_button"
+                        android:visibility="gone"
+                        app:src='@{@drawable/ic_pay_bills}'
+                        app:text='@{"bill pay"}' />
+
+                    <include
+                        android:id="@+id/cash_adv_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_cash_out}'
+                        android:visibility="gone"
+                        app:text='@{"cash adv"}' />
+
+                    <include
+                        android:id="@+id/eod_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_cash_out}'
+                        app:text='@{"End of day"}' />
+
+                    <include
+                        android:id="@+id/admin_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_admin}'
+                        app:text='@{"admin"}' />
+
+                    <include
+                        android:id="@+id/reprint_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_reprint}'
+                        app:text='@{"reprint"}' />
+
+                    <include
+                        android:id="@+id/unsettled_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_schedule}'
+                        app:text='@{"unsettled"}' />
+
+                    <include
+                        android:id="@+id/key_download_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_reprint}'
+                        app:text='@{"Download Keys"}' />
+
+                    <include
+                        android:id="@+id/parameter_download_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_schedule}'
+                        app:text='@{"Download Parameters"}' />
+                </com.google.android.flexbox.FlexboxLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
+
+</layout>

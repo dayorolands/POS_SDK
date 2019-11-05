@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".CardTransactionActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fff">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/header"
+                layout="@layout/header"
+                app:subtitle='@{"Select an account type"}' />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/header"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+
+                <com.google.android.flexbox.FlexboxLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:alignContent="center"
+                    app:alignItems="center"
+                    app:flexWrap="wrap"
+                    app:justifyContent="space_evenly"
+                    app:layout_flexGrow="1"
+                    app:layout_flexShrink="1"
+                    app:layout_maxWidth="300dp"
+                    app:layout_minWidth="80dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <include
+                            android:id="@+id/default_radio_button"
+                            layout="@layout/card_menu_button"
+                            app:src='@{@drawable/ic_default}'
+                            app:text='@{"Default"}' />
+                    </LinearLayout>
+
+                    <!--<LinearLayout-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content">-->
+
+                        <include
+                            layout="@layout/card_menu_button"
+                            android:id="@+id/savings_radio_button"
+                            app:src='@{@drawable/ic_savings}'
+                            app:text='@{"Savings"}' />
+                    <!--</LinearLayout>-->
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <include
+                            android:id="@+id/current_radio_button"
+                            layout="@layout/card_menu_button"
+                            app:src='@{@drawable/ic_current}'
+                            app:text='@{"Current"}' />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <include
+                            android:id="@+id/credit_radio_button"
+                            layout="@layout/card_menu_button"
+                            app:src='@{@drawable/ic_credit}'
+                            app:text='@{"Credit"}' />
+                    </LinearLayout>
+                </com.google.android.flexbox.FlexboxLayout>
+            </LinearLayout>
+        </RelativeLayout>
+    </ScrollView>
+</layout>

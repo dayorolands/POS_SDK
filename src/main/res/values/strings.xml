@@ -1,0 +1,172 @@
+<resources>
+    <string name="app_name">TrezPay 2.0</string>
+    <string name="loading">Loading</string>
+    <string name="please_wait">Please wait</string>
+    <string name="title_activity_cash_out_form">CashOutFormActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <!-- Print -->
+    <string name="print_test">Print Test</string>
+    <string name="printer_version">Printer Version：</string>
+    <string name="bar_code">Barcode:</string>
+    <string name="print_bar_code">Print Barcode</string>
+    <string name="D_bar_code">Qrcode:</string>
+    <string name="print_2D_barcode">Print Qrcode</string>
+    <string name="walk_paper_lines">Walk Paper Lines:</string>
+    <string name="walk_paper_test">Walk Paper</string>
+    <string name="left_margin">Left Margin:</string>
+    <string name="right_margin">Right Margin</string>
+    <string name="row_space">Row Space:</string>
+    <string name="font_size">Font Size：</string>
+    <string name="gray_level">Gray Level:</string>
+    <string name="print_content">Print Content：</string>
+    <string name="chinese_example">ZH Example</string>
+    <string name="english_example">EN Example</string>
+    <string name="fr_example">FR Example</string>
+    <string name="clear_text">Clear</string>
+    <string name="print_text">Print Text</string>
+    <string name="printing_wait">Printing, please wait……</string>
+    <string name="D_barcode_loading">Qrcode loading</string>
+    <string name="generate_barcode_wait">Generating barcode, please wait……</string>
+    <string name="input_print_data">Please input print data</string>
+    <string name="maker_search_distance">Walk Paper For Search Black Block:</string>
+    <string name="maker_walk_distance">Walk Paper After Haved Search:</string>
+    <string name="maker_walk_distance_range">(0–255)</string>
+    <string name="maker">Black Block Detection</string>
+    <string name="maker_error">maker input value not fit</string>
+    <string name="maker_not_find">Cannot Find Black Block</string>
+    <string name="papercut">Paper Cut</string>
+    <string name="walk_paper_intput_value">walk paper intput value not fit</string>
+    <string name="print_picture">Print Picture</string>
+    <string name="sure">sure</string>
+    <string name="not_find_picture">not find picture</string>
+    <string name="input_command">Please Input Command</string>
+    <string name="execute_command">Execute Command</string>
+    <string name="watting">Please wait while checking driver version</string>
+    <string name="noPaper">No paper</string>
+    <string name="noPaperNotice">No paper, please put paper in and retry</string>
+    <string name="LowBattery">Low battery, please connect the charger!</string>
+    <string name="overTemp">over temp !</string>
+    <string name="ptintInit">Printer initialing… Please try again after a few seconds.</string>
+    <string name="outOfLeft">Beyond the left margin！</string>
+    <string name="outOfLine">Beyond the row space！</string>
+    <string name="outOfFont">Beyond the font size！</string>
+    <string name="outOfGray">Beyond the gray level！</string>
+    <string name="outOfCharSpace">Beyond The Char Space！</string>
+    <string name="empty">The content is empty！</string>
+    <string name="lengthNotEnougth">The length is not enough！</string>
+    <string name="index_text">Print Text</string>
+    <string name="index_pic">Picture/Qrcode</string>
+    <string name="index_comm">Print Command</string>
+    <string name="input_content">input content</string>
+    <string name="dialog_comfirm">ConFirm</string>
+    <string name="operation_result">Result</string>
+    <string name="bl_dy">Print</string>
+    <string name="print_waring">Tip: If the SDK provides the function of can not meet your printing needs, you can send the print instruction way for implementation</string>
+    <string name="printer_type_common">SerialPort Printer</string>
+    <string name="printer_type_usb">USB Printer</string>
+    <string name="printer_type_select">Select Printer Type</string>
+    <string name="operation_fail">Operation failed</string>
+
+    <!--POS Strings-->
+    <string name="pos_1_purchase">1. Withdrawal</string>
+    <string name="pos_2_reversal">2. Reversal</string>
+    <string name="pos_3_auth">3. Auth</string>
+    <string name="pos_4_deposit">4. Deposit</string>
+    <string name="pos_5_bill_pay">5. BillPay</string>
+    <string name="pos_5_cash_adv">5. Cash Adv</string>
+    <string name="pos_6_admin">6. Admin</string>
+    <string name="pos_7_reprint">7. Reprint</string>
+    <string name="pay">Pay</string>
+    <string name="logo">Logo</string>
+    <string name="close">Close</string>
+    <string name="content_description" />
+    <string name="operation_was_completed_successfully">Success</string>
+    <string name="cash_out_successful">Cash out successful</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="naira">NGN</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact based on your message
+        history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Network</string>
+
+    <string name="pref_title_sync_frequency">POS Keep Alive</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>5 minutes</item>
+        <item>8 minutes</item>
+        <item>10 minutes</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>5</item>
+        <item>8</item>
+        <item>10</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="enter_pin">Enter Pin</string>
+    <string name="print">Print</string>
+    <string name="month_label">Month</string>
+    <string name="day_label">Day</string>
+    <string name="year_label">Year</string>
+    <string name="transaction_successful">Transaction Successful</string>
+    <string name="pos_enter_supervisor_pin">Enter Device PIN</string>
+    <string name="pos_new_supervisor_pin">New Device PIN</string>
+    <string name="pos_confirm_supervisor_pin">Confirm Device PIN</string>
+    <string name="pos_supervisor_pin">Device PIN</string>
+    <string name="pos_card_purchase">Withdrawal</string>
+    <string name="pos_transaction_declined">Transaction Declined</string>
+    <string name="pos_transaction_approved">Transaction Approved</string>
+    <string name="pos_terminal_id_required">You need a terminal ID to access card functions. Please contact your administrator for assistance</string>
+    <string name="pos_card_transactions">Card Transactions</string>
+</resources>
