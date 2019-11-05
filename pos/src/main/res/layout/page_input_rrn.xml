@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".CardTransactionActivity">
+
+    <data>
+
+        <variable
+            name="title"
+            type="String" />
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/header"
+                layout="@layout/header"
+                app:subtitle='@{title}' />
+
+            <include
+                android:id="@+id/rrn_field"
+                layout="@layout/text_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                app:hint='@{"Enter RRN"}'
+                app:inputType='@{"number"}' />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_margin="20dp"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/confirm_cashout_button"
+                    style="@style/AppButton.RoundOrangeButton"
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="10dp"
+                    android:layout_weight="1"
+                    android:onClick="next"
+                    android:text="Cancel"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/confirm_rrn_button"
+                    style="@style/AppButton.RoundBlueButton"
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="10dp"
+                    android:layout_weight="1"
+                    android:onClick="next"
+                    android:text="Proceed"
+                    android:textSize="20sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!--<com.google.android.material.floatingactionbutton.FloatingActionButton-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_margin="20dp"-->
+        <!--android:text="Next"-->
+        <!--app:backgroundTint="@color/colorPrimary"-->
+        <!--app:srcCompat="@drawable/ic_check_circle" />-->
+    </RelativeLayout>
+</layout>

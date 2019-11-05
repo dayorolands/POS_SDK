@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#112b81</color>
+    <color name="colorPrimaryDark">#061957</color>
+
+    <color name="posColorPrimary">#112b81</color>
+    <color name="posPrimary">#112b81</color>
+    <color name="posColorPrimaryDark">#061957</color>
+    <color name="posPrimaryDark">#061957</color>
+
+    <color name="white">#fff</color>
+    <color name="notificationAreaColor">#185186</color>
+    <color name="colorAccent">#f57f17</color>
+    <color name="black">#000</color>
+    <color name="blue">#076296</color>
+    <color name="darkGray">#51585c</color>
+    <color name="white_smoke">#F5F5F5</color>
+    <color name="white_50">#88FFFFFF</color>
+
+    <color name="app_orange">#ED5B07</color>
+    <color name="app_orange_transparent">#ED5B0700</color>
+    <color name="app_blue">#02407A</color>
+    <color name="red">#cc0404</color>
+
+    <color name="searchDialogResultColor">@android:color/secondary_text_light</color>
+    <color name="searchDialogResultHighlightColor">#FFED2E47</color>
+    <color name="green">#53F30F</color>
+    <color name="menuButtonIconTint">@color/transparent</color>
+    <color name="transparent">#0000</color>
+    <color name="menuBackground">#EFEFEF</color>
+</resources>
