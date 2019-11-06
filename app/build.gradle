@@ -11,9 +11,9 @@ buildscript {
 }
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 
 repositories {
@@ -64,8 +64,8 @@ android {
 
     buildTypes {
         release {
-            shrinkResources false
-//            minifyEnabled false
+            shrinkResources true
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField("String", "API_HOST", '"https://api.mybankone.com"')
             buildConfigField("String", "HOST", '"https://mybankone.com"')
@@ -93,7 +93,7 @@ android {
 
         polaris {
             dimension "flavor"
-            applicationId "com.creditclub.polaris"
+            applicationId "com.appzonegroup.app.creditclub.polaris"
         }
 
         access {
@@ -114,21 +114,24 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 dependencies {
-    implementation('com.creditclub.core:core:1.0.1')
-    implementation('com.creditclub.ui:uicentral:1.0.2')
-    implementation('com.creditclub.pos:pos:1.0.1')
+    implementation project(path: ':core')
+    implementation project(path: ':uicentral')
+    implementation project(path: ':pos')
 
     implementation fileTree(dir: 'jniLibs', include: ['*.so'])
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation files('libs/java-json.jar')
 
     implementation 'com.jakewharton:butterknife:7.0.1'
-    annotationProcessor 'com.jakewharton:butterknife:7.0.1'
+    kapt 'com.jakewharton:butterknife:7.0.1'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.material:material:1.1.0-alpha10'
     implementation 'com.google.code.gson:gson:2.8.5'
