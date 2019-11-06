@@ -1,9 +1,8 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlinx-serialization'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply from: 'https://raw.githubusercontent.com/osarogie/GitAsMaven/master/publish-bitbucket.gradle'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlinx-serialization'
 
 kapt {
     generateStubs = true
