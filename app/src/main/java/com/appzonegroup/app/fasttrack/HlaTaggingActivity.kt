@@ -4,15 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import com.appzonegroup.app.fasttrack.databinding.ActivityHlaTaggingBinding
 import com.appzonegroup.app.fasttrack.databinding.ItemAddImageBinding
+import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.contract.FormDataHolder
+import com.creditclub.core.data.model.GeoTagCoordinate
+import com.creditclub.core.data.model.StatesAndLgas
 import com.creditclub.core.data.request.OfflineHLATaggingRequest
 import com.creditclub.core.model.CreditClubImage
-import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.includesSpecialCharacters
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.showError
 import com.esafirm.imagepicker.features.ImagePicker
 import com.esafirm.imagepicker.model.Image
 import kotlinx.coroutines.launch
@@ -24,61 +28,50 @@ typealias ImageListenerBlock = (CreditClubImage) -> Unit
 class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingRequest> {
 
     private val binding by contentView<HlaTaggingActivity, ActivityHlaTaggingBinding>(R.layout.activity_hla_tagging)
-    override val formData: OfflineHLATaggingRequest = OfflineHLATaggingRequest()
-    private val images = Array<String?>(4) { null }
+    override val functionId = FunctionIds.HLA_TAGGING
     private var imageListener: ImageListenerBlock? = null
+
+    override val formData: OfflineHLATaggingRequest = OfflineHLATaggingRequest().apply {
+        pictures = Array(4) { null }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        binding.stateSelector.run {
+        mainScope.launch {
+            dialogProvider.showProgressBar("Loading")
+            val (statesAndLgas, error) = safeRunIO {
+                creditClubMiddleWareAPI.offlineHlaTaggingService.getStatesAndLGAs()
+            }
+            dialogProvider.hideProgressBar()
 
-            val stateArray = resources.getStringArray(R.array.States)
-            val stateOptions = stateArray.map {
-                val stateInfo = it.split(",")
-                DialogOptionItem(stateInfo[1], extraInfo = stateInfo[0])
+            val finishOnFail: DialogListenerBlock<Nothing> = {
+                onClose {
+                    finish()
+                }
             }
 
-            root.setOnClickListener {
-                dialogProvider.showOptions(getString(R.string.state_hint), stateOptions) {
-                    onSubmit { selectedState ->
-                        if (this@run.selected != stateOptions[selectedState]) {
-                            binding.lgaSelector.selected = null
-                        }
+            if (error != null) return@launch dialogProvider.showError(error, finishOnFail)
 
-                        this@run.selected = stateOptions[selectedState]
-                    }
-                }
-            }
-        }
+            val infoError = "Couldn't get State/LGA information"
 
-        binding.lgaSelector.run {
+            statesAndLgas ?: return@launch dialogProvider.showError(infoError, finishOnFail)
 
-            root.setOnClickListener {
-                val state = binding.stateSelector.selected
-                if (state == null) {
-                    dialogProvider.showError("Select a state first")
-                    return@setOnClickListener
-                }
+            if (statesAndLgas.status) return@launch dialogProvider.showError(infoError, finishOnFail)
 
-                val lgaArray = resources.getStringArray(R.array.lgas)
-                val lgaOptions = lgaArray.filter { it.substring(0, 2) == state.extraInfo }.map {
-                    val stateInfo = it.split(",")
-                    DialogOptionItem(stateInfo[2], extraInfo = stateInfo[1])
-                }
+            statesAndLgas.lgas ?: return@launch dialogProvider.showError(
+                "Couldn't get LGA information",
+                finishOnFail
+            )
 
-                dialogProvider.showOptions(getString(R.string.lga_hint), lgaOptions) {
-                    onSubmit { selectedState ->
-                        if (this@run.selected != lgaOptions[selectedState]) {
-                            binding.lgaSelector.selected = null
-                        }
+            statesAndLgas.states ?: return@launch dialogProvider.showError(
+                "Couldn't get state information",
+                finishOnFail
+            )
 
-                        this@run.selected = lgaOptions[selectedState]
-                    }
-                }
-            }
+            populateStateInformation(statesAndLgas)
         }
 
         listOf(
@@ -93,7 +86,7 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
                     imageBinding.imageView.setImageBitmap(bitmap)
 
                     val (bitmapString) = safeRunIO { image.bitmapString }
-                    images[i] = bitmapString
+                    formData.pictures!![i] = bitmapString
                     imageBinding.processing = false
                 }
             })
@@ -102,12 +95,52 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
         binding.btnUpload.setOnClickListener { onSubmit() }
     }
 
+    private fun populateStateInformation(info: StatesAndLgas) {
+
+        binding.stateSelector.run {
+
+            val stateArray = info.states!!
+            val stateOptions = stateArray.map { DialogOptionItem(it.name, extraInfo = it.id) }
+
+            root.setOnClickListener {
+                dialogProvider.showOptions(getString(R.string.state_hint), stateOptions) {
+                    onSubmit { position ->
+                        if (this@run.selected != stateOptions[position]) {
+                            binding.lgaSelector.selected = null
+                        }
+
+                        this@run.selected = stateOptions[position]
+                    }
+                }
+            }
+        }
+
+        binding.lgaSelector.run {
+
+            root.setOnClickListener {
+                val state = binding.stateSelector.selected
+                if (state == null) {
+                    dialogProvider.showError("Select a state first")
+                    return@setOnClickListener
+                }
+
+                val lgaArray = info.lgas!!.filter { it.stateId == state.extraInfo }
+                val lgaOptions = lgaArray.map { DialogOptionItem(it.name, extraInfo = it.id) }
+
+                dialogProvider.showOptions(getString(R.string.lga_hint), lgaOptions) {
+                    onSubmit { position ->
+                        this@run.selected = lgaOptions[position]
+                    }
+                }
+            }
+        }
+    }
+
     private fun onSubmit() {
         formData.name = binding.nameLayout.input.value
         formData.description = binding.descriptionLayout.input.value
         formData.state = binding.stateSelector.selected?.extraInfo
         formData.lga = binding.lgaSelector.selected?.extraInfo
-        formData.pictures = images
 
         if (!validate("Location name", formData.name)) return
         if (!validate("Location description", formData.description)) return
@@ -120,7 +153,7 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
         }
 
         formData.dateTagged = Instant.now().toString()
-        formData.location = gps.geolocationString
+        formData.location = GeoTagCoordinate(gps.latitude.toString(), gps.longitude.toString())
         formData.agentPhoneNumber = localStorage.agent?.phoneNumber
         formData.institutionCode = localStorage.institutionCode
 

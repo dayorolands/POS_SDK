@@ -1,8 +1,10 @@
 package com.creditclub.core.data.api
 
+import com.creditclub.core.data.model.StatesAndLgas
 import com.creditclub.core.data.request.OfflineHLATaggingRequest
 import com.creditclub.core.data.response.BackendResponse
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 
@@ -14,4 +16,7 @@ interface OfflineHlaTaggingService {
 
     @POST("api/OfflineHLATagging/PostOfflineTaggingData")
     suspend fun postOfflineTaggingData(@Body request: OfflineHLATaggingRequest): BackendResponse?
+
+    @GET("api/OfflineHLATagging/GetStatesAndLGAs")
+    suspend fun getStatesAndLGAs(): StatesAndLgas?
 }

@@ -45,7 +45,7 @@
                 android:id="@+id/selectedTv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{selected.title, default=`-`}"
+                android:text="@{selected.title ?? `-`}"
                 android:textAllCaps="true"
                 android:textColor="@color/black"
                 android:textSize="15sp"
