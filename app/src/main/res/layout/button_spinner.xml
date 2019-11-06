@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="selected"
+            type="com.creditclub.core.ui.widget.DialogOptionItem" />
+
+        <variable
+            name="label"
+            type="String" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/container"
+        style="@style/AppButton.RoundWhiteButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_white_button"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@id/prevButton"
+        app:layout_constraintEnd_toStartOf="@id/nextButton"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@id/prevButton"
+        app:layout_constraintTop_toTopOf="@id/prevButton">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/labelTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{label, default=Select}"
+                android:textAllCaps="true"
+                android:textColor="#333"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/selectedTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{selected.title, default=`-`}"
+                android:textAllCaps="true"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow_drop_down_black_24dp"
+            android:tint="#333" />
+    </LinearLayout>
+</layout>

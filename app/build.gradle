@@ -89,16 +89,19 @@ android {
         creditclub {
             dimension "flavor"
             applicationId "com.appzonegroup.app.creditclub.plus"
+            buildConfigField("String", "APP_CENTER_SECRET", '"68061503-999a-4252-a5b9-3dc90922c664"')
         }
 
         polaris {
             dimension "flavor"
             applicationId "com.appzonegroup.app.creditclub.polaris"
+            buildConfigField("String", "APP_CENTER_SECRET", '"2e095fa7-b94c-4c79-b34f-0958cafa0463"')
         }
 
         access {
             dimension "flavor"
             applicationId "com.appzonegroup.app.creditclub.access"
+            buildConfigField("String", "APP_CENTER_SECRET", '"2067cb70-93f0-4806-a07b-df015f9e9743"')
         }
     }
     sourceSets {
@@ -129,7 +132,7 @@ dependencies {
     implementation files('libs/java-json.jar')
 
     implementation 'com.jakewharton:butterknife:7.0.1'
-    kapt 'com.jakewharton:butterknife:7.0.1'
+    annotationProcessor 'com.jakewharton:butterknife:7.0.1'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'

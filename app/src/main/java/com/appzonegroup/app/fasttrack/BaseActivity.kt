@@ -54,6 +54,11 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUt
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (hasLogoutTimer) LogOutTimerUtil.startLogoutTimer(this, this)
+    }
+
     open fun showNotification(message: String) {
         //Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
         if (progressDialog.isShowing) progressDialog.dismiss()

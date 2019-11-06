@@ -26,7 +26,7 @@
     <string name="an_error_occurred_please_try_again_later">An error occurred. Please try again later</string>
     <string name="account_opening">Account Opening</string>
     <string name="a_network_error_occurred">A network error occurred. Please try again later</string>
-    <string name="an_internal_error_occurred">An internal error occurred. Please try again later</string>
+    <string name="an_internal_error_occurred">An internal error occurred. Please try again later or contact your administrator</string>
     <string name="request_time_out">The request timed-out. Please try again later</string>
     <string name="connection_refused_error">Connection refused. Please check your internet connection and try again</string>
     <string name="server_response_error">We cannot interpret the server response at this time. Please try again later</string>

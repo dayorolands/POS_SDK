@@ -11,6 +11,9 @@ import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.localStorage
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.Crashes
 import io.fabric.sdk.android.Fabric
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
@@ -54,6 +57,11 @@ class BankOneApplication : CreditClubApplication() {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 
         Fabric.with(this, Crashlytics())
+        AppCenter.start(
+            this, BuildConfig.APP_CENTER_SECRET,
+            Analytics::class.java, Crashes::class.java
+        )
+
         registerAppFunctions()
     }
 }
