@@ -7,6 +7,7 @@ import com.appzonegroup.app.fasttrack.databinding.ItemAddImageBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.model.GeoTagCoordinate
+import com.creditclub.core.data.model.State
 import com.creditclub.core.data.model.StatesAndLgas
 import com.creditclub.core.data.request.OfflineHLATaggingRequest
 import com.creditclub.core.model.CreditClubImage
@@ -32,7 +33,7 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
     private var imageListener: ImageListenerBlock? = null
 
     override val formData: OfflineHLATaggingRequest = OfflineHLATaggingRequest().apply {
-        pictures = Array(4) { null }
+        pictures = mutableListOf(null, null, null, null)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,8 +43,8 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
 
         mainScope.launch {
             dialogProvider.showProgressBar("Loading")
-            val (statesAndLgas, error) = safeRunIO {
-                creditClubMiddleWareAPI.offlineHlaTaggingService.getStatesAndLGAs()
+            val (response, error) = safeRunIO {
+                creditClubMiddleWareAPI.offlineHlaTaggingService.getStatesAndLGA()
             }
             dialogProvider.hideProgressBar()
 
@@ -57,21 +58,19 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
 
             val infoError = "Couldn't get State/LGA information"
 
-            statesAndLgas ?: return@launch dialogProvider.showError(infoError, finishOnFail)
+            response ?: return@launch dialogProvider.showError(infoError, finishOnFail)
 
-            if (statesAndLgas.status) return@launch dialogProvider.showError(infoError, finishOnFail)
-
-            statesAndLgas.lgas ?: return@launch dialogProvider.showError(
-                "Couldn't get LGA information",
+            if (!response.status) return@launch dialogProvider.showError(
+                response.message,
                 finishOnFail
             )
 
-            statesAndLgas.states ?: return@launch dialogProvider.showError(
+            response.data ?: return@launch dialogProvider.showError(
                 "Couldn't get state information",
                 finishOnFail
             )
 
-            populateStateInformation(statesAndLgas)
+            populateStateInformation(response)
         }
 
         listOf(
@@ -86,7 +85,7 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
                     imageBinding.imageView.setImageBitmap(bitmap)
 
                     val (bitmapString) = safeRunIO { image.bitmapString }
-                    formData.pictures!![i] = bitmapString
+                    formData.pictures?.set(i, bitmapString)
                     imageBinding.processing = false
                 }
             })
@@ -99,7 +98,7 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
 
         binding.stateSelector.run {
 
-            val stateArray = info.states!!
+            val stateArray = info.data!!
             val stateOptions = stateArray.map { DialogOptionItem(it.name, extraInfo = it.id) }
 
             root.setOnClickListener {
@@ -109,7 +108,9 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
                             binding.lgaSelector.selected = null
                         }
 
-                        this@run.selected = stateOptions[position]
+                        selected = stateOptions[position]
+
+                        populateLgaInformation(stateArray[position])
                     }
                 }
             }
@@ -118,18 +119,23 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
         binding.lgaSelector.run {
 
             root.setOnClickListener {
-                val state = binding.stateSelector.selected
-                if (state == null) {
-                    dialogProvider.showError("Select a state first")
-                    return@setOnClickListener
-                }
+                dialogProvider.showError("Select a state first")
+                return@setOnClickListener
+            }
+        }
+    }
 
-                val lgaArray = info.lgas!!.filter { it.stateId == state.extraInfo }
+    private fun populateLgaInformation(state: State) {
+        binding.lgaSelector.run {
+
+            root.setOnClickListener {
+
+                val lgaArray = state.lgas ?: emptyList()
                 val lgaOptions = lgaArray.map { DialogOptionItem(it.name, extraInfo = it.id) }
 
                 dialogProvider.showOptions(getString(R.string.lga_hint), lgaOptions) {
                     onSubmit { position ->
-                        this@run.selected = lgaOptions[position]
+                        selected = lgaOptions[position]
                     }
                 }
             }

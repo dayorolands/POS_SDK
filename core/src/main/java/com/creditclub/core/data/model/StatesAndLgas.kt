@@ -12,9 +12,6 @@ class StatesAndLgas {
     @SerialName("Message")
     var message: String? = null
 
-    @SerialName("LGAS")
-    var lgas: Array<Lga>? = null
-
-    @SerialName("States")
-    var states: Array<State>? = null
+    @SerialName("Data")
+    var data: List<State>? = null
 }

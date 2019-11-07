@@ -11,4 +11,7 @@ class State {
 
     @SerialName("Name")
     var name = ""
+
+    @SerialName("LGAs")
+    var lgas: List<Lga>? = null
 }

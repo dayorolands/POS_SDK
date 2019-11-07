@@ -17,6 +17,6 @@ interface OfflineHlaTaggingService {
     @POST("api/OfflineHLATagging/PostOfflineTaggingData")
     suspend fun postOfflineTaggingData(@Body request: OfflineHLATaggingRequest): BackendResponse?
 
-    @GET("api/OfflineHLATagging/GetStatesAndLGAs")
-    suspend fun getStatesAndLGAs(): StatesAndLgas?
+    @GET("api/OfflineHLATagging/GetStatesAndLGA")
+    suspend fun getStatesAndLGA(): StatesAndLgas?
 }

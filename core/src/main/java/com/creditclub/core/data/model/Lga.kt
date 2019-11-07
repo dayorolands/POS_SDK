@@ -9,9 +9,6 @@ class Lga {
     @SerialName("ID")
     var id = ""
 
-    @SerialName("StateID")
-    var stateId = ""
-
     @SerialName("Name")
     var name = ""
 }

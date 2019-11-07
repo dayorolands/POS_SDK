@@ -19,7 +19,7 @@ class OfflineHLATaggingRequest {
     var agentPhoneNumber: String? = null
 
     @SerialName("Pictures")
-    var pictures: Array<String?>? = null
+    var pictures: MutableList<String?>? = null
 
     @SerialName("Description")
     var description: String? = null
