@@ -209,13 +209,13 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
             if (error != null) return@launch showError(error)
             response ?: return@launch showError(IOException())
 
-            if (response.isSuccessful) {
+            if (response.status) {
                 dialogProvider.showSuccess<Nothing>("Location tagged successfully") {
                     onClose {
                         finish()
                     }
                 }
-            } else dialogProvider.showError(response.responseMessage)
+            } else dialogProvider.showError(response.message)
         }
     }
 
