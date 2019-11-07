@@ -70,7 +70,7 @@ dependencies {
     kapt "androidx.room:room-compiler:${versions.room}"
 
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.lifecycle}"
-    kapt "androidx.lifecycle:lifecycle-compiler:${versions.lifecycle}"
+    implementation "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}"
 
     // Time
     api 'com.jakewharton.threetenabp:threetenabp:1.2.0'

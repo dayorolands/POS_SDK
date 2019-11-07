@@ -31,6 +31,7 @@ class SyncService : BaseService(), Logger {
         log("Starting service")
 //        logPosNotifications()
         performReversals()
+        logIsoRequests()
     }
 
     //    @Synchronized
@@ -69,6 +70,10 @@ class SyncService : BaseService(), Logger {
                 delay(10000)
             }
         }
+    }
+
+    fun logIsoRequests() {
+
     }
 
     fun performReversals() {

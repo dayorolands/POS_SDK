@@ -10,13 +10,17 @@ import com.appzonegroup.creditclub.pos.util.RoomConverters
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-@Database(entities = [FinancialTransaction::class, Reversal::class, PosNotification::class], version = 7)
+@Database(
+    entities = [FinancialTransaction::class, Reversal::class, PosNotification::class],
+    version = 7
+)
 @TypeConverters(RoomConverters::class)
 abstract class PosDatabase : RoomDatabase() {
 
     abstract fun financialTransactionDao(): FinancialTransactionDao
     abstract fun reversalDao(): ReversalDao
     abstract fun posNotificationDao(): PosNotificationDao
+    abstract fun isoRequestLogDao(): IsoRequestLogDao
 
     companion object {
 
@@ -30,9 +34,7 @@ abstract class PosDatabase : RoomDatabase() {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
                         PosDatabase::class.java, "credit_club_pos.db"
-                    )
-                        .fallbackToDestructiveMigration()
-                        .build()
+                    ).build()
                 }
 
                 return INSTANCE as PosDatabase

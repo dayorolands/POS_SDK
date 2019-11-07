@@ -2,12 +2,11 @@ package com.appzonegroup.creditclub.pos.models
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.google.gson.annotations.SerializedName
+import com.creditclub.core.data.contract.IISoRequestLog
+import com.creditclub.core.serializer.TimeInstantSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.threeten.bp.Instant
-import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
-import java.util.*
 
 
 /**
@@ -17,62 +16,45 @@ import java.util.*
 
 @Entity
 @Serializable
-class IsoRequestLog {
-    @delegate:Transient
-    @delegate:Ignore
-    private val paymentDateDf by lazy {
-        DateTimeFormatter.ofPattern("dd-MM-YYYY hh:mm:ss").withLocale(Locale.ENGLISH)
-            .withZone(ZoneId.of("UTC"))
-    }
+class IsoRequestLog : IISoRequestLog {
 
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
+    override var id: Long = 0
 
-    @SerializedName("Guid")
-    var guid: String? = "2058HK58-00022224148-1031170618"
+    @SerialName("UniqueID")
+    override var uniqueId: String = ""
 
-    @SerializedName("Amount")
-    var amount: Double? = 0.00
+    @SerialName("InstitutionCode")
+    override var institutionCode: String = ""
 
-    @SerializedName("Reference")
-    var reference: String? = ""
+    @SerialName("TerminalID")
+    override var terminalId: String = ""
 
-    @SerializedName("Currency")
-    var currency: String? = "NGN"
+    @SerialName("RRN")
+    override var rrn: String = ""
 
-    @SerializedName("Type")
-    var type: String? = "Invoice"
+    @SerialName("TransactionType")
+    override var transactionType: String = ""
 
-    @SerializedName("CardScheme")
-    var cardScheme: String? = "Debit MasterCard"
+    @SerialName("Amount")
+    override var amount: String = ""
 
-    @SerializedName("StatusCode")
-    var statusCode: String? = "00"
+    @SerialName("AgentCode")
+    override var agentCode: String = ""
 
-    @SerializedName("PaymentDate")
-    var paymentDate: String? = "2018-10-31 17:06:18"
+    @SerialName("GPSCoordinates")
+    override var gpsCoordinates: String = ""
 
-    @SerializedName("RetrievalReferenceNumber")
-    var retrievalReferenceNumber: String? = "000220000148"
+    @SerialName("ResponseCode")
+    override var responseCode: String = ""
 
-    @SerializedName("MaskedPAN")
-    var maskedPAN: String? = "539983******9569"
+    @Serializable(with = TimeInstantSerializer::class)
+    @SerialName("RequestTime")
+    override var requestTime: Instant = Instant.now()
 
-    @SerializedName("Nuban")
-    var nuban: String? = ""
-
-    @SerializedName("CustomerName")
-    var customerName: String? = "SAIDU/M"
-
-    @SerializedName("StatusDescription")
-    var statusDescription: String? = "Approved or completed successfully"
-
-    @SerializedName("AdditionalInformation")
-    var additionalInformation: String? = ""
-
-    fun paymentDate(instant: Instant): String? {
-        return paymentDateDf.format(instant)
-    }
+    @Serializable(with = TimeInstantSerializer::class)
+    @SerialName("ResponseTime")
+    override var responseTime: Instant = requestTime
 }
 
 @Dao
