@@ -26,7 +26,7 @@ class CreditClubImage(id: Long, name: String, path: String) : Image(id, name, pa
         bitmap ?: return@lazy null
 
         val byteArrayOutputStream = ByteArrayOutputStream()
-        bitmap?.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
 
         Base64.encodeToString(byteArray, Base64.DEFAULT)
@@ -40,7 +40,7 @@ class CreditClubImage(id: Long, name: String, path: String) : Image(id, name, pa
 
             val file = File(path)
             val fOut = FileOutputStream(file)
-            newBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut)
+            newBitmap.compress(Bitmap.CompressFormat.JPEG, 50, fOut)
             fOut.flush()
             fOut.close()
 
