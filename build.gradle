@@ -48,13 +48,14 @@ buildscript {
             'mockito_kotlin'     : '2.0.0-RC3',
             'okhttp'             : '3.12.1',
             'retrofit'           : '2.6.0',
-            'room'               : '2.2.0',
+            'room'               : '2.2.1',
             'supportLibrary'     : '28.0.0',
-            'serialization'     : '0.12.0',
+            'serialization'      : '0.12.0',
             'test_rules'         : '1.1.0-beta02',
             'test_runner'        : '1.1.0-beta02',
             'ui_automator'       : '2.2.0-beta02',
-            'viewPager2'         : '1.0.0-beta02'
+            'viewPager2'         : '1.0.0-beta02',
+            'work'               : '2.2.0'
     ]
 
     repositories {

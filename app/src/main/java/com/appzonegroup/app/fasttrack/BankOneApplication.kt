@@ -6,6 +6,8 @@ import com.appzonegroup.app.fasttrack.app.LocalInstitutionConfig
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.ui.MyDialogProvider
 import com.appzonegroup.app.fasttrack.utility.registerAppFunctions
+import com.appzonegroup.creditclub.pos.Platform
+import com.appzonegroup.creditclub.pos.startPosApp
 import com.crashlytics.android.Crashlytics
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.config.IInstitutionConfig
@@ -55,5 +57,9 @@ class BankOneApplication : CreditClubApplication() {
 
         Fabric.with(this, Crashlytics())
         registerAppFunctions()
+
+        if (Platform.isPOS) {
+            startPosApp()
+        }
     }
 }

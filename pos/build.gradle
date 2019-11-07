@@ -85,5 +85,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
 
+    implementation "androidx.work:work-runtime-ktx:${versions.work}"
+
     testImplementation 'junit:junit:4.12'
 }
