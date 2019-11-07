@@ -2,13 +2,14 @@ package com.appzonegroup.creditclub.pos.service
 
 import android.content.Intent
 import android.util.Log
-import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.contract.Logger
+import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.models.NotificationResponse
 import com.appzonegroup.creditclub.pos.util.MyReceiver
 import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
+import com.creditclub.core.util.safeRunIO
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -54,7 +55,8 @@ class SyncService : BaseService(), Logger {
                 responseString?.also {
                     Log.e("PosNotificationS", responseString)
                     try {
-                        val response = serializer.fromJson(responseString, NotificationResponse::class.java)
+                        val response =
+                            serializer.fromJson(responseString, NotificationResponse::class.java)
                         if (response != null) {
                             if (response.isSuccessFul) {
                                 dao.delete(notifications.first().id)
@@ -72,8 +74,33 @@ class SyncService : BaseService(), Logger {
         }
     }
 
-    fun logIsoRequests() {
+    private fun logIsoRequests() {
 
+        ioScope.launch {
+            val dao = PosDatabase.getInstance(this@SyncService).isoRequestLogDao()
+            var requestLogs = dao.all()
+            Log.e("IsoRequestLog", "Starting")
+
+            while (requestLogs.isNotEmpty()) {
+                val firstRequestLog = requestLogs.first()
+
+                val (response) = safeRunIO {
+                    creditClubMiddleWareAPI.staticService.logToGrafanaForPOSTransactions(
+                        firstRequestLog,
+                        "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}",
+                        config.terminalId
+                    )
+                }
+
+                if (response?.status == true) {
+                    dao.delete(firstRequestLog)
+                }
+
+                requestLogs = dao.all()
+
+                delay(10000)
+            }
+        }
     }
 
     fun performReversals() {

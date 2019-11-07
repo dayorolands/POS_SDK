@@ -31,5 +31,5 @@ interface IISoRequestLog {
 
     var requestTime: Instant
 
-    var responseTime: Instant
+    var responseTime: Instant?
 }

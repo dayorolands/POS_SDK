@@ -1,15 +1,22 @@
 package com.appzonegroup.creditclub.pos.helpers
 
+import android.content.Context
 import android.util.Log
 import com.appzonegroup.creditclub.pos.card.CardIsoMsg
+import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.extension.generateLog
+import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.SocketJob
 import com.appzonegroup.creditclub.pos.util.TerminalUtils
+import com.creditclub.core.util.localStorage
+import com.creditclub.core.util.safeRun
 import kotlinx.coroutines.*
 import org.jpos.iso.ISOException
+import org.threeten.bp.Instant
 import java.io.IOException
 import java.net.ConnectException
 
@@ -17,7 +24,11 @@ import java.net.ConnectException
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/15/2019.
  * Appzone Ltd
  */
-class IsoSocketHelper(val config: ConfigService, val parameters: ParameterService) {
+class IsoSocketHelper(
+    val config: ConfigService,
+    val parameters: ParameterService,
+    val context: Context
+) {
     private val tag = IsoSocketHelper::class.java.simpleName
 
     @Throws(ISOException::class, IOException::class, ConnectException::class)
@@ -26,7 +37,7 @@ class IsoSocketHelper(val config: ConfigService, val parameters: ParameterServic
             val result = withContext(Dispatchers.Default) {
                 send(isoMsg)
             }
-                    next(result)
+            next(result)
         }
     }
 
@@ -37,10 +48,15 @@ class IsoSocketHelper(val config: ConfigService, val parameters: ParameterServic
     }
 
     fun send(request: BaseIsoMsg): Result {
-        var response: BaseIsoMsg? = null
-        var error: Exception? = null
+        val dao = PosDatabase.getInstance(context).isoRequestLogDao()
 
-        try {
+        val isoRequestLog = request.generateLog().apply {
+            institutionCode = context.localStorage.institutionCode ?: ""
+            agentCode = context.localStorage.agent?.agentCode ?: ""
+            gpsCoordinates = "0;0"
+        }
+
+        val (response, error) = safeRun {
             request.terminalId41 = config.terminalId
             val sessionKey = parameters.sessionKey
             val outputData = request.prepare(sessionKey)
@@ -50,7 +66,7 @@ class IsoSocketHelper(val config: ConfigService, val parameters: ParameterServic
 
             println("MESSAGE: " + String(output!!))
 
-            response = BaseIsoMsg()
+            val response = BaseIsoMsg()
             response.packager = ISO87Packager()
             response.unpack(output)
             TerminalUtils.logISOMsg(response)
@@ -60,16 +76,26 @@ class IsoSocketHelper(val config: ConfigService, val parameters: ParameterServic
             } else {
                 Log.d(tag, "Successful Call to Nibss")
             }
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-            Log.d(tag, e.message, e)
-            error = e
-        } finally {
-            return Result(response, error)
+
+            response
         }
+
+        isoRequestLog.responseTime = Instant.now()
+
+        if (response == null) {
+            isoRequestLog.responseCode = "TE"
+        } else isoRequestLog.responseCode = response.responseCode39 ?: "XX"
+
+        dao.save(isoRequestLog)
+
+        return Result(response, error)
     }
 
-    suspend fun attempt(request: CardIsoMsg, maxAttempts: Int, onReattempt: suspend (attempt: Int) -> Unit): Boolean {
+    suspend fun attempt(
+        request: CardIsoMsg,
+        maxAttempts: Int,
+        onReattempt: suspend (attempt: Int) -> Unit
+    ): Boolean {
         for (attempt in 1..maxAttempts) {
             if (attempt > 1) onReattempt(attempt)
 

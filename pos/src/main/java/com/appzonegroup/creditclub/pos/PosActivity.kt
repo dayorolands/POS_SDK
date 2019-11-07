@@ -21,8 +21,8 @@ import com.appzonegroup.creditclub.pos.widget.Dialogs
 abstract class PosActivity : DialogProviderActivity(), ServiceProvider {
     override val config by lazy { ConfigService.getInstance(this) }
     override val parameters by lazy { ParameterService.getInstance(this) }
-    override val callHomeService by lazy { CallHomeService.getInstance(config, parameters) }
-    override val isoSocketHelper by lazy { IsoSocketHelper(config, parameters) }
+    override val callHomeService by lazy { CallHomeService.getInstance(config, parameters, this) }
+    override val isoSocketHelper by lazy { IsoSocketHelper(config, parameters, this) }
 
     val printer by lazy { PosPrinter(this, this) }
 

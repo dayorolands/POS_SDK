@@ -1,6 +1,9 @@
 package com.appzonegroup.creditclub.pos.extension
 
 import android.util.Log
+import com.appzonegroup.creditclub.pos.models.IsoRequestLog
+import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
+import com.creditclub.core.util.localStorage
 import org.jpos.iso.ISOException
 import org.jpos.iso.ISOMsg
 
@@ -111,5 +114,16 @@ fun ISOMsg.log() {
         e.printStackTrace()
     } finally {
         Log.d(TAG, "--------------------")
+    }
+}
+
+fun BaseIsoMsg.generateLog(): IsoRequestLog {
+    
+    return IsoRequestLog().apply {
+        uniqueId = "${terminalId41}-${retrievalReferenceNumber37}-${transmissionDateTime7}"
+        rrn = retrievalReferenceNumber37 ?: ""
+        transactionType = processingCode3?.substring(0, 2) ?: ""
+        terminalId = terminalId41 ?: ""
+        amount = getString(4) ?: "0"
     }
 }

@@ -11,8 +11,8 @@ def safeExtGet(prop, fallback) {
 android {
     compileSdkVersion safeExtGet("compileSdkVersion", 28)
     defaultConfig {
-        minSdkVersion safeExtGet("minSdkVersion", 22)
-        targetSdkVersion safeExtGet("targetSdkVersion", 28)
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
         versionCode 1
         versionName ARTIFACT_VERSION
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -35,6 +35,11 @@ android {
             buildConfigField("String", "API_HOST", '"http://52.224.166.115"')
 
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
+        }
+    }
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas".toString())
         }
     }
     testOptions {

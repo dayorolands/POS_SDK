@@ -54,7 +54,7 @@ class IsoRequestLog : IISoRequestLog {
 
     @Serializable(with = TimeInstantSerializer::class)
     @SerialName("ResponseTime")
-    override var responseTime: Instant = requestTime
+    override var responseTime: Instant? = null
 }
 
 @Dao
@@ -63,13 +63,13 @@ interface IsoRequestLogDao {
     fun saveAll(requestLog: List<IsoRequestLog>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun save(posNotification: IsoRequestLog)
+    fun save(isoRequestLog: IsoRequestLog)
 
     @Update
-    fun update(posNotification: IsoRequestLog)
+    fun update(isoRequestLog: IsoRequestLog)
 
     @Delete
-    fun delete(posNotification: IsoRequestLog)
+    fun delete(isoRequestLog: IsoRequestLog)
 
     @Query("DELETE FROM IsoRequestLog")
     fun deleteAll()
