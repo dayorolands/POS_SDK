@@ -30,9 +30,13 @@
         tools:node="replace"
         tools:replace="icon, label, theme">
         <activity
+            android:name=".HlaTaggingActivity"
+            android:label="@string/title_activity_hla_tagging"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".SupportThreadActivity"
             android:label="@string/support"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SupportActivity"
             android:label="@string/support"
@@ -399,7 +403,6 @@
             android:label="@string/title_activity_basic_mini_statement"
             android:parentActivityName=".CreditClubSubMenuActivity"
             android:theme="@style/AppTheme.NoActionBar">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.CreditClubSubMenuActivity" />
@@ -409,7 +412,6 @@
             android:label="@string/title_activity_commissions_statement"
             android:parentActivityName=".CreditClubSubMenuActivity"
             android:theme="@style/AppTheme.NoActionBar">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.CreditClubSubMenuActivity" />
@@ -418,12 +420,10 @@
             android:name=".NewWalletActivity"
             android:label="@string/title_activity_new_wallet"
             android:parentActivityName=".CreditClubSubMenuActivity">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.CreditClubSubMenuActivity" />
         </activity>
-
         <activity
             android:name="com.appzonegroup.creditclub.pos.TerminalOptionsActivity"
             android:label="Terminal Options"
@@ -531,13 +531,13 @@
             android:name="com.appzonegroup.creditclub.pos.ReprintAnyActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <service
             android:name="com.appzonegroup.creditclub.pos.service.DownloadService"
             android:exported="false" />
         <service
             android:name="com.appzonegroup.creditclub.pos.service.SyncService"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
 
