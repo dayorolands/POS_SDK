@@ -7,6 +7,7 @@ import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.ui.MyDialogProvider
 import com.appzonegroup.app.fasttrack.utility.registerAppFunctions
 import com.appzonegroup.creditclub.pos.Platform
+import com.appzonegroup.creditclub.pos.loadPosModules
 import com.appzonegroup.creditclub.pos.startPosApp
 import com.crashlytics.android.Crashlytics
 import com.creditclub.core.CreditClubApplication
@@ -27,6 +28,8 @@ class BankOneApplication : CreditClubApplication() {
                     MyDialogProvider(context)
                 }
             })
+
+            if (Platform.isPOS) loadPosModules()
         }
 
     val authResponse: AuthResponse

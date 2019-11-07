@@ -12,10 +12,14 @@ import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.SocketJob
 import com.appzonegroup.creditclub.pos.util.TerminalUtils
+import com.creditclub.core.data.prefs.LocalStorage
+import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRun
 import kotlinx.coroutines.*
 import org.jpos.iso.ISOException
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import org.threeten.bp.Instant
 import java.io.IOException
 import java.net.ConnectException
@@ -27,9 +31,13 @@ import java.net.ConnectException
 class IsoSocketHelper(
     val config: ConfigService,
     val parameters: ParameterService,
-    val context: Context
-) {
+    context: Context
+): KoinComponent {
     private val tag = IsoSocketHelper::class.java.simpleName
+
+    private val database: PosDatabase by inject()
+    private val localStorage: LocalStorage by inject()
+    private val gps: TrackGPS by inject()
 
     @Throws(ISOException::class, IOException::class, ConnectException::class)
     fun sendAsync(isoMsg: BaseIsoMsg, next: (Result) -> Unit) {
@@ -48,12 +56,12 @@ class IsoSocketHelper(
     }
 
     fun send(request: BaseIsoMsg): Result {
-        val dao = PosDatabase.getInstance(context).isoRequestLogDao()
+        val dao = database.isoRequestLogDao()
 
         val isoRequestLog = request.generateLog().apply {
-            institutionCode = context.localStorage.institutionCode ?: ""
-            agentCode = context.localStorage.agent?.agentCode ?: ""
-            gpsCoordinates = "0;0"
+            institutionCode = localStorage.institutionCode ?: ""
+            agentCode = localStorage.agent?.agentCode ?: ""
+            gpsCoordinates = gps.geolocationString
         }
 
         val (response, error) = safeRun {

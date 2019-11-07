@@ -1,12 +1,10 @@
 package com.appzonegroup.creditclub.pos.service
 
-import android.content.Intent
 import android.util.Log
 import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.contract.Logger
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.models.NotificationResponse
-import com.appzonegroup.creditclub.pos.util.MyReceiver
 import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
 import com.creditclub.core.util.safeRunIO
 import com.google.gson.Gson
@@ -18,16 +16,8 @@ import kotlinx.coroutines.launch
 class SyncService : BaseService(), Logger {
     override val tag: String = "SyncService"
 
-    private val intent by lazy { Intent(this, MyReceiver::class.java) }
-//    private val am by lazy { getSystemService(Context.ALARM_SERVICE) as AlarmManager }
-//    private val pi: PendingIntent by lazy { PendingIntent.getBroadcast(this, 1, intent, 0) }
-
-//    private var interval = 60000 * 10 // 60  minutes
-
     override fun onCreate() {
         super.onCreate()
-
-//        am.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + interval, interval.toLong(), pi)
 
         log("Starting service")
 //        logPosNotifications()
@@ -74,10 +64,11 @@ class SyncService : BaseService(), Logger {
         }
     }
 
+    @Synchronized
     private fun logIsoRequests() {
 
         ioScope.launch {
-            val dao = PosDatabase.getInstance(this@SyncService).isoRequestLogDao()
+            val dao = posDatabase.isoRequestLogDao()
             var requestLogs = dao.all()
             Log.e("IsoRequestLog", "Starting")
 
@@ -103,7 +94,8 @@ class SyncService : BaseService(), Logger {
         }
     }
 
-    fun performReversals() {
+    @Synchronized
+    private fun performReversals() {
         GlobalScope.launch(Dispatchers.Default) {
             log("Starting reversal checker")
 

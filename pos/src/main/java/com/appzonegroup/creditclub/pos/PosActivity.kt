@@ -30,8 +30,9 @@ abstract class PosActivity : DialogProviderActivity(), ServiceProvider {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        callHomeService.startCallHomeTimer()
-//        callHomeService.callHome()
+        if (config.terminalId.isNotEmpty()) {
+            callHomeService.startCallHomeTimer()
+        }
 
         if (!isMyServiceRunning(SyncService::class.java)) {
             startService(Intent(this, SyncService::class.java))
@@ -53,7 +54,11 @@ abstract class PosActivity : DialogProviderActivity(), ServiceProvider {
         next(status)
     }
 
-    fun confirmAdminPassword(password: String, closeOnFail: Boolean = false, next: (Boolean) -> Unit) {
+    fun confirmAdminPassword(
+        password: String,
+        closeOnFail: Boolean = false,
+        next: (Boolean) -> Unit
+    ) {
         val status = password == config.adminPin
         if (!status) {
             if (closeOnFail) return showError("Incorrect Password") {

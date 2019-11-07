@@ -3,8 +3,10 @@ package com.appzonegroup.creditclub.pos.service
 import android.content.Intent
 import android.os.IBinder
 import com.appzonegroup.creditclub.pos.contract.ServiceProvider
+import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.creditclub.core.CreditClubService
+import org.koin.android.ext.android.inject
 
 
 /**
@@ -16,6 +18,7 @@ abstract class BaseService : CreditClubService(), ServiceProvider {
     override val parameters by lazy { ParameterService.getInstance(this) }
     override val callHomeService by lazy { CallHomeService.getInstance(config, parameters, this) }
     override val isoSocketHelper by lazy { IsoSocketHelper(config, parameters, this) }
+    val posDatabase: PosDatabase by inject()
 
     override fun onBind(intent: Intent): IBinder? {
         return null
