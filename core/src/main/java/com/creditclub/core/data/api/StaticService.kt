@@ -141,7 +141,7 @@ interface StaticService {
 
     @POST("CreditClubStatic/LogToGrafanaForPOSTransactions")
     suspend fun logToGrafanaForPOSTransactions(
-        @Body request: IISoRequestLog,
+        @Body request: RequestBody,
         @Header("Authorization") authToken: String,
         @Header("TerminalID") terminalID: String
     ): RequestStatus?

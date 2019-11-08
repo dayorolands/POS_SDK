@@ -89,11 +89,12 @@ object MenuPages {
 POS Configuration
 -----------------
 
+POS Mode: ${posMode.label}
 APN: ${getApnInfo(it)}
 Host Name: $host
 Terminal ID: $terminalId
-IP: $ip
-Port: $port
+IP: ${posMode.ip}
+Port: ${posMode.port}
 Keep Alive (Call Home) in seconds: $callHome
                             """.trimIndent()
                                     ),

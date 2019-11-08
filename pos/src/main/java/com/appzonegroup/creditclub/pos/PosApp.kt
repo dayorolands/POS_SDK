@@ -26,6 +26,7 @@ fun Application.startPosApp() {
     }
 
     if (get<ConfigService>().terminalId.isNotEmpty()) {
+        get<ParameterService>().downloadKeysAsync()
         get<CallHomeService>().startCallHomeTimer()
     }
 }

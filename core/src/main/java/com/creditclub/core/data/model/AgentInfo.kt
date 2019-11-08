@@ -23,4 +23,7 @@ class AgentInfo {
 
     @SerialName("TerminalID")
     var terminalID: String? = null
+
+    @SerialName("PosMode")
+    var posMode: String? = null
 }

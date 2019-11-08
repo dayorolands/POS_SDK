@@ -1,9 +1,11 @@
 package com.appzonegroup.creditclub.pos.service
 
+import android.os.Looper
 import android.util.Log
 import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.contract.Logger
 import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.models.NotificationResponse
 import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
 import com.creditclub.core.util.safeRunIO
@@ -12,6 +14,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType
+import okhttp3.RequestBody
 
 class SyncService : BaseService(), Logger {
     override val tag: String = "SyncService"
@@ -68,16 +73,20 @@ class SyncService : BaseService(), Logger {
     private fun logIsoRequests() {
 
         ioScope.launch {
+            Looper.myLooper() ?: Looper.prepare()
             val dao = posDatabase.isoRequestLogDao()
             var requestLogs = dao.all()
             Log.e("IsoRequestLog", "Starting")
 
+            val mediaType = MediaType.parse("application/json")
+
             while (requestLogs.isNotEmpty()) {
                 val firstRequestLog = requestLogs.first()
+                val requestBody = RequestBody.create(mediaType, Json.stringify(IsoRequestLog.serializer(), firstRequestLog))
 
                 val (response) = safeRunIO {
                     creditClubMiddleWareAPI.staticService.logToGrafanaForPOSTransactions(
-                        firstRequestLog,
+                        requestBody,
                         "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}",
                         config.terminalId
                     )

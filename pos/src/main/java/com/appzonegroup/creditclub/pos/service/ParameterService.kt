@@ -1,6 +1,7 @@
 package com.appzonegroup.creditclub.pos.service
 
 import android.content.Context
+import android.os.Looper
 import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.contract.DialogProvider
 import com.appzonegroup.creditclub.pos.data.PosDatabase
@@ -169,7 +170,7 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
         TerminalUtils.logISOMsg(isoMsg)
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(config.ip, config.port, isoMsg.pack())
+            SocketJob.sslSocketConnectionJob(config.posMode.ip, config.posMode.port, isoMsg.pack())
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -219,7 +220,7 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(config.ip, config.port, isoMsg.pack())
+            SocketJob.sslSocketConnectionJob(config.posMode.ip, config.posMode.port, isoMsg.pack())
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -268,7 +269,7 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(config.ip, config.port, isoMsg.pack())
+            SocketJob.sslSocketConnectionJob(config.posMode.ip, config.posMode.port, isoMsg.pack())
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -278,7 +279,7 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
         }
 
-        println("MESSAGE: " + String(output!!))
+        println("MESSAGE: " + String(output))
         isoMsg.unpack(output)
 
         TerminalUtils.logISOMsg(isoMsg)
@@ -329,11 +330,12 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
         if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
 
         val isoRequestLog = isoMsg.generateRequestLog()
-        val (output) = safeRun {
-            SocketJob.sslSocketConnectionJob(config.ip, config.port, finalMsgBytes)
+        val (output, error) = safeRun {
+            SocketJob.sslSocketConnectionJob(config.posMode.ip, config.posMode.port, finalMsgBytes)
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
+            if (error != null) throw error
         } else {
             isoMsg.unpack(output)
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
@@ -387,9 +389,11 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
         }
     }
 
-    private fun IsoRequestLog.saveToDb(responseCode: String) {
+    private fun IsoRequestLog.saveToDb(serverResponseCode: String) {
         responseTime = Instant.now()
+        responseCode = serverResponseCode
 
+        Looper.myLooper() ?: Looper.prepare()
         val dao = database.isoRequestLogDao()
         dao.save(this)
     }

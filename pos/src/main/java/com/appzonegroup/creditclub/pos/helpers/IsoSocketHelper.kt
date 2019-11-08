@@ -1,11 +1,11 @@
 package com.appzonegroup.creditclub.pos.helpers
 
 import android.content.Context
+import android.os.Looper
 import android.util.Log
 import com.appzonegroup.creditclub.pos.card.CardIsoMsg
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.extension.generateLog
-import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
@@ -14,7 +14,6 @@ import com.appzonegroup.creditclub.pos.util.SocketJob
 import com.appzonegroup.creditclub.pos.util.TerminalUtils
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.TrackGPS
-import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRun
 import kotlinx.coroutines.*
 import org.jpos.iso.ISOException
@@ -32,7 +31,7 @@ class IsoSocketHelper(
     val config: ConfigService,
     val parameters: ParameterService,
     context: Context
-): KoinComponent {
+) : KoinComponent {
     private val tag = IsoSocketHelper::class.java.simpleName
 
     private val database: PosDatabase by inject()
@@ -56,6 +55,7 @@ class IsoSocketHelper(
     }
 
     fun send(request: BaseIsoMsg): Result {
+        Looper.myLooper() ?: Looper.prepare()
         val dao = database.isoRequestLogDao()
 
         val isoRequestLog = request.generateLog().apply {
@@ -70,7 +70,8 @@ class IsoSocketHelper(
             val outputData = request.prepare(sessionKey)
             request.dump(System.out, "REQUEST")
             Log.d(tag, "RESULT : " + String(outputData))
-            val output = SocketJob.sslSocketConnectionJob(config.ip, config.port, outputData)
+            val output =
+                SocketJob.sslSocketConnectionJob(config.posMode.ip, config.posMode.port, outputData)
 
             println("MESSAGE: " + String(output!!))
 

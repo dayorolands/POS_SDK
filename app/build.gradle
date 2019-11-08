@@ -129,7 +129,7 @@ dependencies {
     implementation files('libs/java-json.jar')
 
     implementation 'com.jakewharton:butterknife:7.0.1'
-    kapt 'com.jakewharton:butterknife:7.0.1'
+    annotationProcessor 'com.jakewharton:butterknife:7.0.1'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'

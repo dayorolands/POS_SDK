@@ -67,10 +67,17 @@ open class ConfigService protected constructor(
 
     open var posModeStr: String? by valueStore("POS_MODE", "POSVAS")
 
-    open val posMode: PosMode
-        get() = when (posModeStr) {
-            "EPMS" -> PosMode.EPMS
-            else -> PosMode.POSVAS
+    open var posMode: PosMode
+        get() {
+            return when (posModeStr) {
+                "EPMS" -> PosMode.EPMS
+                "EPMS_TEST" -> PosMode.EPMS_TEST
+                "POSVAS_TEST" -> PosMode.POSVAS_TEST
+                else -> PosMode.POSVAS
+            }
+        }
+        set(value) {
+            posModeStr = value.name
         }
 
     fun resetNetwork() {

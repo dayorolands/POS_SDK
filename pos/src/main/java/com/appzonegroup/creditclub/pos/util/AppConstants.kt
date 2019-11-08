@@ -8,9 +8,9 @@ package com.appzonegroup.creditclub.pos.util
 
 object AppConstants {
     var APN = "web.gprs.mtnnigeria.net"
-    var IP = TerminalUtils.IP
+    var IP = "196.6.103.18"
     var HOST = "ctms.nibss-plc.com"
-    var PORT = TerminalUtils.PORT
+    var PORT = 5023
 
     var CALL_HOME = "600"
     var TID = ""

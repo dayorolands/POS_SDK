@@ -72,12 +72,17 @@ class LoginActivity : DialogProviderActivity() {
 
             safeRun {
                 localStorage.agent = response
+
                 if (Platform.isPOS) {
-                    if (posConfig.terminalId != response.terminalID) {
-                        posParameters.reset()
-                    }
+                    val configHasChanged =
+                        posConfig.terminalId != response.terminalID // || posConfig.posModeStr != response.posMode
 
                     posConfig.terminalId = response.terminalID ?: ""
+//                    posConfig.posModeStr = response.posMode
+
+                    if (configHasChanged) {
+                        posParameters.reset()
+                    }
                 }
             }
         }

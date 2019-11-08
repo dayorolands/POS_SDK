@@ -39,8 +39,8 @@ fun ISOMsg.log() {
 fun ISOMsg.generateLog(): IsoRequestLog {
     
     return IsoRequestLog().apply {
-        uniqueId = "${terminalId41}-${retrievalReferenceNumber37}-${transmissionDateTime7}"
-        rrn = retrievalReferenceNumber37 ?: ""
+        rrn = retrievalReferenceNumber37 ?:stan11 ?: ""
+        uniqueId = "${terminalId41}-${rrn}-${transmissionDateTime7}"
         transactionType = processingCode3?.substring(0, 2) ?: ""
         terminalId = terminalId41 ?: ""
         amount = transactionAmount4 ?: "0"

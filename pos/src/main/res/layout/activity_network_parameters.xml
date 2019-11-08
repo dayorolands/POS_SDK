@@ -29,6 +29,10 @@
         <variable
             name="terminalId"
             type="String" />
+
+        <variable
+            name="posMode"
+            type="String" />
     </data>
 
     <ScrollView
@@ -48,15 +52,19 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:text="Device"
-                android:textSize="20sp"
-                android:visibility="gone" />
+                android:textSize="20sp" />
 
             <include
                 android:id="@+id/terminal_id_item"
                 layout="@layout/network_settings_item"
-                android:visibility="gone"
                 app:title='@{"Terminal ID"}'
                 app:value='@{terminalId}' />
+
+            <include
+                android:id="@+id/pos_mode_item"
+                layout="@layout/network_settings_item"
+                app:title='@{"POS Mode"}'
+                app:value='@{posMode}' />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -111,18 +119,21 @@
             <include
                 android:id="@+id/ip_address_item"
                 layout="@layout/network_settings_item"
+                android:visibility="gone"
                 app:title='@{"IP Address"}'
                 app:value="@{ip}" />
 
             <include
                 android:id="@+id/port_item"
                 layout="@layout/network_settings_item"
+                android:visibility="gone"
                 app:title='@{"Port"}'
                 app:value="@{port}" />
 
             <include
                 android:id="@+id/apn_item"
                 layout="@layout/network_settings_item"
+                android:visibility="gone"
                 app:title='@{"APN"}'
                 app:value="@{apn}" />
 
