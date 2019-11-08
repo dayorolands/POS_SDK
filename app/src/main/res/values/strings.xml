@@ -185,7 +185,9 @@
         <item>TR,TARABA,Jalingo</item>
         <item>YB,YOBE,Damaturu</item>
         <item>ZM,ZAMFARA,Gusau</item>
+    </string-array>
 
+    <string-array name="lgas">
     </string-array>
 
     <string name="title_activity_loan_request">Loan Request</string>
@@ -432,4 +434,7 @@
     <string name="state_hint">Select State</string>
     <string name="funds_transfer_same_bank">Same Bank</string>
     <string name="bills_airtime_category_id">3</string>
+    <string name="title_activity_hla_tagging">HLA Tagging</string>
+    <string name="hla_tagging">HLA Tagging</string>
+    <string name="lga_hint">Select LGA</string>
 </resources>

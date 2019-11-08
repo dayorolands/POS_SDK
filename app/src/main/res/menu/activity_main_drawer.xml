@@ -20,6 +20,10 @@
             android:icon="@drawable/ic_chat_bubble_outline"
             android:title="@string/support" />
         <item
+            android:id="@+id/fn_hla_tagging"
+            android:icon="@drawable/ic_maps_and_flags"
+            android:title="@string/hla_tagging" />
+        <item
             android:id="@+id/logout"
             android:visible="false"
             android:icon="@drawable/logout"

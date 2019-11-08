@@ -17,10 +17,6 @@ import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.service.SyncService
 import com.appzonegroup.creditclub.pos.widget.Dialogs
 
-/**
- * Created by Joseph on 1/21/2018.
- */
-
 @SuppressLint("Registered")
 abstract class PosActivity : DialogProviderActivity(), ServiceProvider {
     override val config by lazy { ConfigService.getInstance(this) }
