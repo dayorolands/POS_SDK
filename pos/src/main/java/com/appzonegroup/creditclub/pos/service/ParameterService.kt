@@ -1,11 +1,19 @@
 package com.appzonegroup.creditclub.pos.service
 
 import android.content.Context
+import android.os.Looper
 import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.contract.DialogProvider
+import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.extension.generateLog
 import com.appzonegroup.creditclub.pos.extension.hasFailed
+import com.appzonegroup.creditclub.pos.extension.responseCode39
 import com.appzonegroup.creditclub.pos.extension.responseMessage
+import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.util.*
+import com.creditclub.core.data.prefs.LocalStorage
+import com.creditclub.core.util.TrackGPS
+import com.creditclub.core.util.safeRun
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +22,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jpos.iso.ISOMsg
 import org.jpos.iso.ISOUtil
+import org.koin.core.KoinComponent
+import org.koin.core.inject
+import org.threeten.bp.Instant
 import java.io.ByteArrayOutputStream
 import java.util.*
 
@@ -21,11 +32,15 @@ import java.util.*
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/27/2019.
  * Appzone Ltd
  */
-open class ParameterService protected constructor(context: Context) {
+open class ParameterService protected constructor(context: Context) : KoinComponent {
     private val prefs by lazy { context.getSharedPreferences("Parameters", 0) }
     internal open val config by lazy {
         ConfigService.getInstance(context)
     }
+
+    private val database: PosDatabase by inject()
+    private val localStorage: LocalStorage by inject()
+    private val gps: TrackGPS by inject()
 
     open var masterKey = prefs.getString("MasterKey", "") as String
         set(value) {
@@ -153,7 +168,17 @@ open class ParameterService protected constructor(context: Context) {
         isoMsg.packager = packager
 
         TerminalUtils.logISOMsg(isoMsg)
-        val output = SocketJob.sslSocketConnectionJob(config.ip, config.port, isoMsg.pack())
+        val isoRequestLog = isoMsg.generateRequestLog()
+        val (output, error) = safeRun {
+            SocketJob.sslSocketConnectionJob(config.posMode.ip, config.posMode.port, isoMsg.pack())
+        }
+        if (output == null) {
+            isoRequestLog.saveToDb("TE")
+            throw error!!
+        } else {
+            isoMsg.unpack(output)
+            isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
+        }
 
         println("MESSAGE: " + String(output!!))
         isoMsg.unpack(output)
@@ -193,7 +218,17 @@ open class ParameterService protected constructor(context: Context) {
 
         TerminalUtils.logISOMsg(isoMsg)
 
-        val output = SocketJob.sslSocketConnectionJob(config.ip, config.port, isoMsg.pack())
+        val isoRequestLog = isoMsg.generateRequestLog()
+        val (output, error) = safeRun {
+            SocketJob.sslSocketConnectionJob(config.posMode.ip, config.posMode.port, isoMsg.pack())
+        }
+        if (output == null) {
+            isoRequestLog.saveToDb("TE")
+            throw error!!
+        } else {
+            isoMsg.unpack(output)
+            isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
+        }
 
         println("MESSAGE: " + String(output!!))
         isoMsg.unpack(output)
@@ -232,9 +267,19 @@ open class ParameterService protected constructor(context: Context) {
 
         TerminalUtils.logISOMsg(isoMsg)
 
-        val output = SocketJob.sslSocketConnectionJob(config.ip, config.port, isoMsg.pack())
+        val isoRequestLog = isoMsg.generateRequestLog()
+        val (output, error) = safeRun {
+            SocketJob.sslSocketConnectionJob(config.posMode.ip, config.posMode.port, isoMsg.pack())
+        }
+        if (output == null) {
+            isoRequestLog.saveToDb("TE")
+            throw error!!
+        } else {
+            isoMsg.unpack(output)
+            isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
+        }
 
-        println("MESSAGE: " + String(output!!))
+        println("MESSAGE: " + String(output))
         isoMsg.unpack(output)
 
         TerminalUtils.logISOMsg(isoMsg)
@@ -284,8 +329,17 @@ open class ParameterService protected constructor(context: Context) {
 
         if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
 
-        val output = SocketJob.sslSocketConnectionJob(config.ip, config.port, finalMsgBytes)
-        isoMsg.unpack(output)
+        val isoRequestLog = isoMsg.generateRequestLog()
+        val (output, error) = safeRun {
+            SocketJob.sslSocketConnectionJob(config.posMode.ip, config.posMode.port, finalMsgBytes)
+        }
+        if (output == null) {
+            isoRequestLog.saveToDb("TE")
+            if (error != null) throw error
+        } else {
+            isoMsg.unpack(output)
+            isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
+        }
 
         if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
 
@@ -324,6 +378,24 @@ open class ParameterService protected constructor(context: Context) {
         sessionKey = ""
         pinKey = ""
         updatedAt = ""
+    }
+
+    private fun ISOMsg.generateRequestLog(): IsoRequestLog {
+
+        return generateLog().apply {
+            institutionCode = localStorage.institutionCode ?: ""
+            agentCode = localStorage.agent?.agentCode ?: ""
+            gpsCoordinates = gps.geolocationString
+        }
+    }
+
+    private fun IsoRequestLog.saveToDb(serverResponseCode: String) {
+        responseTime = Instant.now()
+        responseCode = serverResponseCode
+
+        Looper.myLooper() ?: Looper.prepare()
+        val dao = database.isoRequestLogDao()
+        dao.save(this)
     }
 
     class KeyDownloadException(message: String) : Exception("Key Download Failed. $message")

@@ -1,36 +1,33 @@
 package com.appzonegroup.creditclub.pos.service
 
-import android.content.Intent
+import android.os.Looper
 import android.util.Log
-import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.contract.Logger
+import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.models.NotificationResponse
-import com.appzonegroup.creditclub.pos.util.MyReceiver
 import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
+import com.creditclub.core.util.safeRunIO
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType
+import okhttp3.RequestBody
 
 class SyncService : BaseService(), Logger {
     override val tag: String = "SyncService"
 
-    private val intent by lazy { Intent(this, MyReceiver::class.java) }
-//    private val am by lazy { getSystemService(Context.ALARM_SERVICE) as AlarmManager }
-//    private val pi: PendingIntent by lazy { PendingIntent.getBroadcast(this, 1, intent, 0) }
-
-//    private var interval = 60000 * 10 // 60  minutes
-
     override fun onCreate() {
         super.onCreate()
-
-//        am.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().timeInMillis + interval, interval.toLong(), pi)
 
         log("Starting service")
 //        logPosNotifications()
         performReversals()
+        logIsoRequests()
     }
 
     //    @Synchronized
@@ -53,7 +50,8 @@ class SyncService : BaseService(), Logger {
                 responseString?.also {
                     Log.e("PosNotificationS", responseString)
                     try {
-                        val response = serializer.fromJson(responseString, NotificationResponse::class.java)
+                        val response =
+                            serializer.fromJson(responseString, NotificationResponse::class.java)
                         if (response != null) {
                             if (response.isSuccessFul) {
                                 dao.delete(notifications.first().id)
@@ -71,7 +69,42 @@ class SyncService : BaseService(), Logger {
         }
     }
 
-    fun performReversals() {
+    @Synchronized
+    private fun logIsoRequests() {
+
+        ioScope.launch {
+            Looper.myLooper() ?: Looper.prepare()
+            val dao = posDatabase.isoRequestLogDao()
+            var requestLogs = dao.all()
+            Log.e("IsoRequestLog", "Starting")
+
+            val mediaType = MediaType.parse("application/json")
+
+            while (requestLogs.isNotEmpty()) {
+                val firstRequestLog = requestLogs.first()
+                val requestBody = RequestBody.create(mediaType, Json.stringify(IsoRequestLog.serializer(), firstRequestLog))
+
+                val (response) = safeRunIO {
+                    creditClubMiddleWareAPI.staticService.logToGrafanaForPOSTransactions(
+                        requestBody,
+                        "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}",
+                        config.terminalId
+                    )
+                }
+
+                if (response?.status == true) {
+                    dao.delete(firstRequestLog)
+                }
+
+                requestLogs = dao.all()
+
+                delay(10000)
+            }
+        }
+    }
+
+    @Synchronized
+    private fun performReversals() {
         GlobalScope.launch(Dispatchers.Default) {
             log("Starting reversal checker")
 

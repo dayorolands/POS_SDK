@@ -1,5 +1,6 @@
 package com.appzonegroup.creditclub.pos.service
 
+import android.content.Context
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.models.messaging.NetworkManagement
 import com.appzonegroup.creditclub.pos.models.messaging.isoMsg
@@ -14,11 +15,12 @@ import kotlin.concurrent.schedule
 
 class CallHomeService(
     private val config: ConfigService,
-    parameters: ParameterService
+    parameters: ParameterService,
+    context: Context
 ) {
     private val period get() = 1000L * config.callHome.toLong()
     private var isCallHomeTimerRunning = false
-    private val connection by lazy { IsoSocketHelper(config, parameters) }
+    private val connection by lazy { IsoSocketHelper(config, parameters, context) }
     private var callHomeTask = createTimer()
 
     fun startCallHomeTimer() {
@@ -56,8 +58,16 @@ class CallHomeService(
     companion object {
         private var INSTANCE: CallHomeService? = null
 
-        fun getInstance(config: ConfigService, parameters: ParameterService): CallHomeService {
-            if (INSTANCE == null) INSTANCE = CallHomeService(config, parameters)
+        fun getInstance(
+            config: ConfigService,
+            parameters: ParameterService,
+            context: Context
+        ): CallHomeService {
+
+            if (INSTANCE == null) {
+                INSTANCE = CallHomeService(config, parameters, context.applicationContext)
+            }
+
             return INSTANCE as CallHomeService
         }
     }

@@ -24,8 +24,6 @@ import java.security.NoSuchAlgorithmException;
 
 public class TerminalUtils {
 
-    public static int PORT = 5023;
-    public static String IP = "196.6.103.18";
     private static String TAG = TerminalUtils.class.getSimpleName();
 
     public static void logISOMsg(ISOMsg msg) {

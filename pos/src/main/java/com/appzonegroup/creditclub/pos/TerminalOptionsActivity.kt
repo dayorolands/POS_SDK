@@ -9,7 +9,9 @@ import android.view.View
 import androidx.databinding.DataBindingUtil
 import com.appzonegroup.creditclub.pos.databinding.ActivityNetworkParametersBinding
 import com.appzonegroup.creditclub.pos.databinding.NetworkSettingsItemBinding
+import com.appzonegroup.creditclub.pos.util.PosMode
 import com.appzonegroup.creditclub.pos.widget.Dialogs
+import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.ui.widget.TextFieldParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -21,6 +23,12 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
     lateinit var binding: ActivityNetworkParametersBinding
 
     override fun onClick(v: View?) {
+
+        if (v?.id == R.id.terminal_id_item) {
+            dialogProvider.showError("Terminal ID cannot be set manually. Please contact your administrator")
+            return
+        }
+
         val hint: String
         val value: String?
         when (v?.id) {
@@ -134,8 +142,20 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
         binding.terminalIdItem.cont.setOnClickListener(this)
         binding.callHomeItem.cont.setOnClickListener(this)
 
-//        createValueChangeListener(
-//            binding.hostItem,
+        binding.posModeItem.run {
+            val posModeOptions = PosMode.values().map { DialogOptionItem(it.label) }
+            cont.setOnClickListener {
+                dialogProvider.showOptions("Select POS mode", posModeOptions) {
+                    onSubmit { position ->
+                        val newPosMode = PosMode.values()[position]
+                        config.posMode = newPosMode
+                        binding.posMode = newPosMode.label
+                    }
+                }
+            }
+        }
+
+//        binding.hostItem.createValueChangeListener(
 //            TextFieldParams("Enter Host", initialValue = config.host),
 //            onChange = { value ->
 //                config.host = value
@@ -193,6 +213,7 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
         binding.port = config.port.toString()
         binding.callHome = "Call Home interval in seconds: " + config.callHome
         binding.terminalId = config.terminalId
+        binding.posMode = config.posMode.label
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -202,17 +223,16 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
         return true
     }
 
-    private fun createValueChangeListener(
-        hostItem: NetworkSettingsItemBinding,
+    private fun NetworkSettingsItemBinding.createValueChangeListener(
         textFieldParams: TextFieldParams,
         onChange: (String) -> Unit
     ) {
-        hostItem.cont.setOnClickListener {
+        cont.setOnClickListener {
             dialogProvider.showInput(textFieldParams) {
-                onSubmit { value ->
+                onSubmit { newValue ->
                     dismiss()
-                    hostItem.value = value
-                    onChange(value)
+                    value = newValue
+                    onChange(newValue)
                 }
             }
         }

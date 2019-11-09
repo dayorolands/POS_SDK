@@ -21,8 +21,8 @@ import com.appzonegroup.creditclub.pos.widget.Dialogs
 abstract class PosActivity : DialogProviderActivity(), ServiceProvider {
     override val config by lazy { ConfigService.getInstance(this) }
     override val parameters by lazy { ParameterService.getInstance(this) }
-    override val callHomeService by lazy { CallHomeService.getInstance(config, parameters) }
-    override val isoSocketHelper by lazy { IsoSocketHelper(config, parameters) }
+    override val callHomeService by lazy { CallHomeService.getInstance(config, parameters, this) }
+    override val isoSocketHelper by lazy { IsoSocketHelper(config, parameters, this) }
 
     val printer by lazy { PosPrinter(this, this) }
 
@@ -30,8 +30,9 @@ abstract class PosActivity : DialogProviderActivity(), ServiceProvider {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        callHomeService.startCallHomeTimer()
-//        callHomeService.callHome()
+        if (config.terminalId.isNotEmpty()) {
+            callHomeService.startCallHomeTimer()
+        }
 
         if (!isMyServiceRunning(SyncService::class.java)) {
             startService(Intent(this, SyncService::class.java))
@@ -53,7 +54,11 @@ abstract class PosActivity : DialogProviderActivity(), ServiceProvider {
         next(status)
     }
 
-    fun confirmAdminPassword(password: String, closeOnFail: Boolean = false, next: (Boolean) -> Unit) {
+    fun confirmAdminPassword(
+        password: String,
+        closeOnFail: Boolean = false,
+        next: (Boolean) -> Unit
+    ) {
         val status = password == config.adminPin
         if (!status) {
             if (closeOnFail) return showError("Incorrect Password") {
