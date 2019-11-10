@@ -58,3 +58,13 @@
 
 # OkHttp platform used only on JVM and when Conscrypt dependency is available.
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
+
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.SerializationKt
+-keep,includedescriptorclasses class com.creditclub.core.data.**$$serializer { *; }
+-keepclassmembers class com.creditclub.core.data.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.creditclub.core.data.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}

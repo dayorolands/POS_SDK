@@ -56,3 +56,30 @@
 
 -keep class com.appzonegroup.creditclub.pos.models.PosNotification { *; }
 -keep class com.appzonegroup.app.fasttrack.model.** { *; }
+
+-keepattributes Signature
+# For using GSON @Expose annotation
+-keepattributes *Annotation*
+# Gson specific classes
+-keep class sun.misc.Unsafe { *; }
+#-keep class com.google.gson.stream.** { *; }
+
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.SerializationKt
+-keep,includedescriptorclasses class com.creditclub.core.data.**$$serializer { *; }
+-keepclassmembers class com.creditclub.core.data.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.creditclub.core.data.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.SerializationKt
+-keep,includedescriptorclasses class com.appzonegroup.creditclub.pos.models.**$$serializer { *; }
+-keepclassmembers class com.appzonegroup.creditclub.pos.models.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.appzonegroup.creditclub.pos.models.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}

@@ -57,3 +57,20 @@
 
 # OkHttp platform used only on JVM and when Conscrypt dependency is available.
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
+
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.SerializationKt
+-keep,includedescriptorclasses class com.appzonegroup.creditclub.pos.models.**$$serializer { *; }
+-keepclassmembers class com.appzonegroup.creditclub.pos.models.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.appzonegroup.creditclub.pos.models.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+-keepattributes Signature
+# For using GSON @Expose annotation
+-keepattributes *Annotation*
+# Gson specific classes
+-keep class sun.misc.Unsafe { *; }
+#-keep class com.google.gson.stream.** { *; }
