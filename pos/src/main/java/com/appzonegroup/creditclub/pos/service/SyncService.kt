@@ -80,7 +80,7 @@ class SyncService : BaseService(), Logger {
 
             val mediaType = MediaType.parse("application/json")
 
-            while (requestLogs.isNotEmpty()) {
+            while (true) {
                 val firstRequestLog = requestLogs.first()
                 val requestBody = RequestBody.create(mediaType, Json.stringify(IsoRequestLog.serializer(), firstRequestLog))
 
@@ -88,7 +88,7 @@ class SyncService : BaseService(), Logger {
                     creditClubMiddleWareAPI.staticService.logToGrafanaForPOSTransactions(
                         requestBody,
                         "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}",
-                        config.terminalId
+                        firstRequestLog.terminalId
                     )
                 }
 

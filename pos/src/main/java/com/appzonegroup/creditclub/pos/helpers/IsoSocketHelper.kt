@@ -55,6 +55,8 @@ class IsoSocketHelper(
     }
 
     fun send(request: BaseIsoMsg): Result {
+        request.terminalId41 = config.terminalId
+
         Looper.myLooper() ?: Looper.prepare()
         val dao = database.isoRequestLogDao()
 
@@ -65,7 +67,6 @@ class IsoSocketHelper(
         }
 
         val (response, error) = safeRun {
-            request.terminalId41 = config.terminalId
             val sessionKey = parameters.sessionKey
             val outputData = request.prepare(sessionKey)
             request.dump(System.out, "REQUEST")
@@ -89,11 +90,12 @@ class IsoSocketHelper(
             response
         }
 
-        isoRequestLog.responseTime = Instant.now()
-
         if (response == null) {
             isoRequestLog.responseCode = "TE"
-        } else isoRequestLog.responseCode = response.responseCode39 ?: "XX"
+        } else {
+            isoRequestLog.responseTime = Instant.now()
+            isoRequestLog.responseCode = response.responseCode39 ?: "XX"
+        }
 
         dao.save(isoRequestLog)
 
