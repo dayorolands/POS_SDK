@@ -32,6 +32,7 @@ android {
             debuggable true
             buildConfigField("String", "API_HOST", '"http://52.224.166.115"')
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
+            matchingFallbacks = ['release', 'debug']
         }
 
         debug {

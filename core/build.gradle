@@ -36,6 +36,7 @@ android {
             buildConfigField("String", "API_HOST", '"http://52.224.166.115"')
             buildConfigField("String", "HOST", '"http://52.224.166.115"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
+            matchingFallbacks = ['release', 'debug']
         }
 
         debug {
