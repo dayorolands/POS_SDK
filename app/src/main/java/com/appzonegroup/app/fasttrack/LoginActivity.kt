@@ -30,7 +30,9 @@ class LoginActivity : DialogProviderActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        findViewById<TextView>(R.id.version_tv).text = "Version ${packageInfo?.versionName}"
+        val environment = if (BuildConfig.DEBUG) ". Staging" else ""
+        findViewById<TextView>(R.id.version_tv).text =
+            "Version ${packageInfo?.versionName}$environment"
 
         if (BuildConfig.DEBUG) {
             findViewById<EditText>(R.id.login_phoneNumber).setText(localStorage.agentPhone)

@@ -47,7 +47,9 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
 
         binding.navView.setNavigationItemSelectedListener(this)
 
-        binding.versionTv.value = "v${packageInfo?.versionName}. Powered by CreditClub"
+        val environment = if (BuildConfig.DEBUG) ". Staging" else ""
+
+        binding.versionTv.value = "v${packageInfo?.versionName}$environment. Powered by CreditClub"
         binding.logoutButton.setOnClickListener { logout() }
 
         localStorage.agentInfo?.run {
