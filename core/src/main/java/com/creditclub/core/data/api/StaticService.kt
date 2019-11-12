@@ -1,6 +1,5 @@
 package com.creditclub.core.data.api
 
-import com.creditclub.core.data.contract.IISoRequestLog
 import com.creditclub.core.data.model.*
 import com.creditclub.core.data.request.*
 import com.creditclub.core.data.response.BackendResponse
@@ -79,7 +78,10 @@ interface StaticService {
     suspend fun getAllLoanProducts(@Query("institutionCode") institutionCode: String?): ResponseBody
 
     @GET("CreditClubStatic/GetAllProducts")
-    suspend fun getAllProducts(@Query("institutionCode") institutionCode: String?, @Query("agentPhoneNumber") agentPhoneNumber: String?): List<Product>?
+    suspend fun getAllProducts(
+        @Query("institutionCode") institutionCode: String?,
+        @Query("agentPhoneNumber") agentPhoneNumber: String?
+    ): List<Product>?
 
     @GET("CreditClubStatic/GetAgentDetails")
     suspend fun getAgentDetails(
@@ -110,33 +112,33 @@ interface StaticService {
 
     @GET("CreditClubStatic/GetCustomerAccountByPhoneNumber")
     suspend fun getCustomerAccountByPhoneNumber(
-        @Query("institutionCode") institutionCode: String?, @Query(
-            "phoneNumber"
-        ) phoneNumber: String
+        @Query("institutionCode") institutionCode: String?,
+        @Query("phoneNumber") phoneNumber: String
     ): CustomerAccount?
 
     @GET("CreditClubStatic/GetAgentInfoByPhoneNumber")
     suspend fun getAgentInfoByPhoneNumber(
-        @Query("institutionCode") institutionCode: String?, @Query(
-            "phoneNumber"
-        ) phoneNumber: String?
+        @Query("institutionCode") institutionCode: String?,
+        @Query("phoneNumber") phoneNumber: String?
     ): AgentInfo?
 
     @GET("CreditClubStatic/GetCustomerAccountByAccountNumber")
     suspend fun getCustomerAccountByAccountNumber(
-        @Query("institutionCode") institutionCode: String?, @Query(
-            "accountNumber"
-        ) accountNumber: String
+        @Query("institutionCode") institutionCode: String?,
+        @Query("accountNumber") accountNumber: String
     ): AccountInfo?
 
     @POST("CreditClubStatic/GetCustomerDetailsByBVN")
-    suspend fun getCustomerDetailsByBVN(@Query("instituionCode") institutionCode: String?, @Query("BVN") bvn: String): BVNDetails?
+    suspend fun getCustomerDetailsByBVN(
+        @Query("instituionCode") institutionCode: String?,
+        @Query("BVN") bvn: String
+    ): BVNDetails?
 
     @POST("CreditClubStatic/POSCashOutNotification")
     suspend fun posCashOutNotification(
-        @Body request: RequestBody, @Header("Authorization") authToken: String, @Header(
-            "TerminalID"
-        ) terminalID: String
+        @Body request: RequestBody,
+        @Header("Authorization") authToken: String,
+        @Header("TerminalID") terminalID: String
     ): PosNotificationResponse?
 
     @POST("CreditClubStatic/LogToGrafanaForPOSTransactions")

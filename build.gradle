@@ -14,7 +14,7 @@ buildscript {
 
     ext.versions = [
             'compileSdk'         : 28,
-            'minSdk'             : 16,
+            'minSdk'             : 21,
             'targetSdk'          : 28,
             'appcompat'          : '1.1.0',
             'androidx'           : '1.0.0',
@@ -84,9 +84,6 @@ allprojects {
             name 'Google'
         }
         maven { url "https://jitpack.io" }
-        maven {
-            url "https://bitbucket.org/appzonegroup/creditclub.maven/raw/releases"
-        }
     }
 }
 configurations {

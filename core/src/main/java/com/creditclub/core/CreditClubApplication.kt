@@ -20,7 +20,6 @@ open class CreditClubApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
         AndroidThreeTen.init(this)
 
         koinApp = startKoin {

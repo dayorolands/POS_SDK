@@ -17,10 +17,16 @@ import com.creditclub.core.util.requireAccountInfo
 abstract class CustomerBaseActivity : BaseActivity() {
     protected var accountInfo = AccountInfo()
 
+    val customerRequestOptions: Array<CustomerRequestOption>
+        get() = resources.getStringArray(R.array.customer_request_options).map {
+            val indexAndLabel = it.split(",")
+            CustomerRequestOption.values()[indexAndLabel.first().toInt()]
+        }.toTypedArray()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requireAccountInfo(available = arrayOf(CustomerRequestOption.AccountNumber)) {
+        requireAccountInfo(available = customerRequestOptions) {
             onSubmit {
                 accountInfo = it
                 onCustomerReady(savedInstanceState)
@@ -37,7 +43,7 @@ abstract class CustomerBaseActivity : BaseActivity() {
     @JvmOverloads
     fun javaRequireAccountInfo(
         title: String = "Get customer by...",
-        available: Array<CustomerRequestOption> = arrayOf(CustomerRequestOption.AccountNumber),
+        available: Array<CustomerRequestOption> = customerRequestOptions,
         block: DialogListenerBlock<AccountInfo>
     ) = requireAccountInfo(title, available, block)
 }
