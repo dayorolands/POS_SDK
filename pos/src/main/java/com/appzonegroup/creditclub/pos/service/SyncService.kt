@@ -75,28 +75,31 @@ class SyncService : BaseService(), Logger {
         ioScope.launch {
             Looper.myLooper() ?: Looper.prepare()
             val dao = posDatabase.isoRequestLogDao()
-            var requestLogs = dao.all()
             Log.e("IsoRequestLog", "Starting")
 
             val mediaType = MediaType.parse("application/json")
 
             while (true) {
-                val firstRequestLog = requestLogs.first()
-                val requestBody = RequestBody.create(mediaType, Json.stringify(IsoRequestLog.serializer(), firstRequestLog))
+                val requestLogs = dao.all()
 
-                val (response) = safeRunIO {
-                    creditClubMiddleWareAPI.staticService.logToGrafanaForPOSTransactions(
-                        requestBody,
-                        "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}",
-                        firstRequestLog.terminalId
+                for (requestLog in requestLogs) {
+                    val requestBody = RequestBody.create(
+                        mediaType,
+                        Json.stringify(IsoRequestLog.serializer(), requestLog)
                     )
-                }
 
-                if (response?.status == true) {
-                    dao.delete(firstRequestLog)
-                }
+                    val (response) = safeRunIO {
+                        creditClubMiddleWareAPI.staticService.logToGrafanaForPOSTransactions(
+                            requestBody,
+                            "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}",
+                            requestLog.terminalId
+                        )
+                    }
 
-                requestLogs = dao.all()
+                    if (response?.status == true) {
+                        dao.delete(requestLog)
+                    }
+                }
 
                 delay(10000)
             }
