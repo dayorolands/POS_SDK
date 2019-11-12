@@ -100,7 +100,7 @@ android {
 
         access {
             dimension "flavor"
-            applicationId "com.appzonegroup.app.creditclub.access"
+            applicationId "com.creditclub.access"
             buildConfigField("String", "APP_CENTER_SECRET", '"2067cb70-93f0-4806-a07b-df015f9e9743"')
         }
     }
