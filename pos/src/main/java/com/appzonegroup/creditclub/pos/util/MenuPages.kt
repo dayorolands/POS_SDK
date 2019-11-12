@@ -108,43 +108,6 @@ Keep Alive (Call Home) in seconds: $callHome
                         }
                     },
 
-                    Modules.KEY_DOWNLOAD to actionButton {
-                        name = "Download Keys"
-
-                        onClick {
-                            try {
-//                                KeyExchange(it).start(true)
-                                ParameterService.getInstance(it).downloadKeysAsync(it, true)
-                            } catch (ex: Exception) {
-                                ex.printStackTrace()
-                            }
-                        }
-                    },
-
-//                    Modules.LOGON to actionButton {
-//                        name = "Logon"
-//                    },
-
-                    Modules.DOWNLOAD_PARAMETER to actionButton {
-                        name = "Download Parameter"
-
-                        onClick {
-                            ParameterService.getInstance(it).downloadParametersAsync(it)
-                        }
-                    },
-
-//                    Modules.DOWNLOAD_BILL to actionButton {
-//                        name = "DOWNLOAD BILL"
-//                    },
-
-//                    Modules.PRINT_LIBS to actionButton {
-//                        name = "PRINT LIBS"
-//                    },
-
-//                    Modules.BALANCE to actionButton {
-//                        name = "BALANCE"
-//                    },
-
                     Modules.PRINT_PARAMETER to actionButton {
                         name = "PRINT PARAMETER"
                         onClick {
@@ -174,10 +137,6 @@ Country Code: ${parameters.countryCode}
                             }
                         }
                     },
-
-//                    Modules.DOWNLOAD_AID to actionButton {
-//                        name = "DOWNLOAD AID"
-//                    },
 //
                     Modules.DOWN_CAPK to actionButton {
                         name = "DOWN CAPK"
