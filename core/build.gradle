@@ -33,6 +33,7 @@ android {
 
         releaseStaging {
             debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField("String", "API_HOST", '"http://52.224.166.115"')
             buildConfigField("String", "HOST", '"http://52.224.166.115"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
