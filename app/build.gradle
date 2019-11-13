@@ -93,6 +93,18 @@ android {
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
         }
+
+        debugLive {
+            shrinkResources false
+            minifyEnabled false
+            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "API_HOST", '"https://api.mybankone.com"')
+            buildConfigField("String", "HOST", '"https://mybankone.com"')
+            buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
+            manifestPlaceholders = [usesCleartextTraffic: "false"]
+            matchingFallbacks = ['debug', 'release']
+        }
     }
 
     flavorDimensions "flavor"
