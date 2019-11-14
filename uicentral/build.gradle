@@ -31,7 +31,7 @@ android {
             matchingFallbacks = ['release', 'debug']
         }
 
-        releaseStaging {
+        debugLive {
             debuggable true
             matchingFallbacks = ['debug', 'release']
         }

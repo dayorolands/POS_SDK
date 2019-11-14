@@ -62,6 +62,10 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
         }
 
         getFavorites()
+
+        binding.navView.menu.getItem(R.id.online_functions).run {
+            isVisible = institutionConfig.hasOnlineFunctions
+        }
     }
 
     override fun onResume() {

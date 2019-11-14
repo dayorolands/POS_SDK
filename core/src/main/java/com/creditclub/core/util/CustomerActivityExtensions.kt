@@ -34,7 +34,7 @@ private val tokenParams = TextFieldParams(
 
 fun CreditClubActivity.requireAccountInfo(
     title: String = "Get customer by...",
-    available: Array<CustomerRequestOption> = arrayOf(
+    options: Array<CustomerRequestOption> = arrayOf(
         CustomerRequestOption.PhoneNumber,
         CustomerRequestOption.AccountNumber
     ),
@@ -179,10 +179,10 @@ fun CreditClubActivity.requireAccountInfo(
         }
     }
 
-    if (available.size == 1) {
-        DialogListener.create(requestDialogBlock).submit(Dialog(this), available.first())
+    if (options.size == 1) {
+        DialogListener.create(requestDialogBlock).submit(Dialog(this), options.first())
     } else {
-        dialogProvider.showCustomerRequestOptions(title, available, requestDialogBlock)
+        dialogProvider.showCustomerRequestOptions(title, options, requestDialogBlock)
     }
 }
 

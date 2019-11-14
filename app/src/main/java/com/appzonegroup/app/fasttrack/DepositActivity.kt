@@ -34,7 +34,7 @@ class DepositActivity : CustomerBaseActivity() {
             setText(accountInfo.accountName)
 
             val chooseAnotherAccount = {
-                requireAccountInfo(available = customerRequestOptions) {
+                requireAccountInfo(options = customerRequestOptions) {
                     onSubmit { newInfo ->
                         accountInfo = newInfo
 

@@ -115,7 +115,7 @@ fun BaseActivity.openPageById(id: Int) {
         R.id.customer_balance_enquiry_button -> {
             ioScope.launch { logFunctionUsage(FunctionIds.CUSTOMER_BALANCE_ENQUIRY) }
 //                startActivity(AccountDetailsActivity::class.java)
-            requireAccountInfo(available = arrayOf(CustomerRequestOption.AccountNumber)) {
+            requireAccountInfo(options = arrayOf(CustomerRequestOption.AccountNumber)) {
                 onSubmit { accountInfo ->
                     customerBalanceEnquiry(accountInfo)
                 }

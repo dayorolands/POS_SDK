@@ -26,7 +26,7 @@ abstract class CustomerBaseActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requireAccountInfo(available = customerRequestOptions) {
+        requireAccountInfo(options = customerRequestOptions) {
             onSubmit {
                 accountInfo = it
                 onCustomerReady(savedInstanceState)
@@ -39,11 +39,4 @@ abstract class CustomerBaseActivity : BaseActivity() {
     }
 
     abstract fun onCustomerReady(savedInstanceState: Bundle?)
-
-    @JvmOverloads
-    fun javaRequireAccountInfo(
-        title: String = "Get customer by...",
-        available: Array<CustomerRequestOption> = customerRequestOptions,
-        block: DialogListenerBlock<AccountInfo>
-    ) = requireAccountInfo(title, available, block)
 }

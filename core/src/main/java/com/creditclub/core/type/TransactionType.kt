@@ -29,7 +29,7 @@ enum class TransactionType(val code: Int, val label: String) {
     FundsTransferCommercialBank(10, "Funds Transfer Commercial Bank"),
     FundsTransferCashIn(11, "Funds Transfer Cash In"),
     FundsTransferCashOut(12, "Funds Transfer Cash Out"),
-    FundsTransferLocal(13, "Funds Transfer Local"),
+    IntraBankFundTransfer(13, "Intrabank Funds Transfer"),
     AccountActivation(14, "Account Activation"),
     LocalFundsTransfer(15, "Local Funds Transfer"),
     SetDefaultAccount(16, "Set Default Account"),

@@ -18,6 +18,7 @@ import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
 import io.fabric.sdk.android.Fabric
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
@@ -26,7 +27,7 @@ class BankOneApplication : CreditClubApplication() {
     override val modules: KoinAppDeclaration?
         get() = {
             modules(module {
-                single { institutionConfig }
+                single<IInstitutionConfig> { LocalInstitutionConfig.create(androidContext()) }
                 factory<DialogProvider>(override = true) { (context: Context) ->
                     MyDialogProvider(context)
                 }
@@ -41,20 +42,6 @@ class BankOneApplication : CreditClubApplication() {
             val phoneNumber = "234${localStorage.agent?.phoneNumber?.substring(1)}"
 
             return AuthResponse(phoneNumber, localStorage.agent?.agentCode)
-        }
-
-    private val institutionConfig: IInstitutionConfig
-        get() {
-            val config = LocalInstitutionConfig
-            config.flows.run {
-                tokenWithdrawal.customerPin = resources.getBoolean(R.bool.token_withdrawal_customer_pin)
-
-                if (!resources.getBoolean(R.bool.flow_bvn_update)) bvnUpdate = null
-                if (!resources.getBoolean(R.bool.flow_customer_pin_change)) customerPinChange = null
-                if (!resources.getBoolean(R.bool.flow_wallet_opening)) walletOpening = null
-            }
-
-            return config
         }
 
     override fun onCreate() {

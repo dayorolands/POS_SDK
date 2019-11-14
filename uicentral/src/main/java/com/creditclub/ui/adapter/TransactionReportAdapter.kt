@@ -73,7 +73,12 @@ class TransactionReportAdapter(
     override fun getItemViewType(position: Int): Int {
         return when (transactionType) {
             TransactionType.MiniStatement, TransactionType.KiaKiaToKiaKia -> 1
-            TransactionType.FundsTransferCommercialBank, TransactionType.KiaKiaToSterlingBank, TransactionType.KiaKiaToOtherBanks, TransactionType.FundsTransferLocal -> 2
+
+            TransactionType.FundsTransferCommercialBank,
+            TransactionType.KiaKiaToSterlingBank,
+            TransactionType.KiaKiaToOtherBanks,
+            TransactionType.LocalFundsTransfer -> 2
+
             TransactionType.Registration -> 3
             TransactionType.BillsPayment, TransactionType.CashIn, TransactionType.CashOut, TransactionType.Recharge -> 4
             TransactionType.PINChange, TransactionType.PINReset -> 5

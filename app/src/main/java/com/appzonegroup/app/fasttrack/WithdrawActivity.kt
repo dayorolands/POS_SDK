@@ -11,11 +11,8 @@ import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.request.WithdrawalRequest
 import com.creditclub.core.type.TokenType
+import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
-import com.creditclub.core.util.generateRRN
-import com.creditclub.core.util.localStorage
-import com.creditclub.core.util.safeRunIO
-import com.creditclub.core.util.sendToken
 import kotlinx.coroutines.launch
 
 /**
@@ -28,6 +25,7 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
         R.layout.activity_withdraw
     )
     override val functionId = FunctionIds.TOKEN_WITHDRAWAL
+    private val tokenWithdrawalConfig by lazy { institutionConfig.flows.tokenWithdrawal }
 
     override val formData = WithdrawalRequest().apply {
         retrievalReferenceNumber = generateRRN()
@@ -47,7 +45,7 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
         val accountInfoEt = findViewById<EditText>(R.id.account_info_et)
 
         val chooseAnotherAccount = {
-            javaRequireAccountInfo {
+            requireAccountInfo(options = customerRequestOptions) {
                 onSubmit { accountInfo ->
                     this@WithdrawActivity.accountInfo = accountInfo
                     accountInfoEt.setText(accountInfo.accountName)
@@ -61,7 +59,7 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
             setOnClickListener { if (accountInfoEt.isFocused) chooseAnotherAccount() }
         }
 
-        if (institutionConfig.flows.tokenWithdrawal.customerPin) {
+        if (tokenWithdrawalConfig.customerPin) {
             binding.customerPinEt.visibility = View.VISIBLE
         }
     }
@@ -115,7 +113,7 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
             return
         }
 
-        if (institutionConfig.flows.tokenWithdrawal.customerPin) {
+        if (tokenWithdrawalConfig.customerPin) {
             formData.customerPin = binding.customerPinEt.value
 
             if (formData.customerPin.isNullOrEmpty()) {
@@ -127,6 +125,8 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
                 indicateError("Customer PIN must be 4 digits", binding.customerPinEt)
                 return
             }
+        } else {
+            formData.customerPin = "0000"
         }
 
         val token = binding.tokenEt.value
