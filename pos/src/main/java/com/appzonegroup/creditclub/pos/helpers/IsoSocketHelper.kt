@@ -39,7 +39,7 @@ class IsoSocketHelper(
     private val gps: TrackGPS by inject()
 
     @Throws(ISOException::class, IOException::class, ConnectException::class)
-    fun sendAsync(isoMsg: BaseIsoMsg, next: (Result) -> Unit) {
+    inline fun sendAsync(isoMsg: BaseIsoMsg, crossinline next: (Result) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
             val result = withContext(Dispatchers.Default) {
                 send(isoMsg)
@@ -48,7 +48,7 @@ class IsoSocketHelper(
         }
     }
 
-    fun open(block: suspend CoroutineScope.() -> Unit) {
+    inline fun open(crossinline block: suspend CoroutineScope.() -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
             block()
         }
@@ -102,10 +102,10 @@ class IsoSocketHelper(
         return Result(response, error)
     }
 
-    suspend fun attempt(
+    suspend inline fun attempt(
         request: CardIsoMsg,
         maxAttempts: Int,
-        onReattempt: suspend (attempt: Int) -> Unit
+        crossinline onReattempt: suspend (attempt: Int) -> Unit
     ): Boolean {
         for (attempt in 1..maxAttempts) {
             if (attempt > 1) onReattempt(attempt)

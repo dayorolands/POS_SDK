@@ -1,5 +1,6 @@
 package com.creditclub.core.util
 
+import com.crashlytics.android.Crashlytics
 import com.creditclub.core.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,18 +12,21 @@ import kotlinx.coroutines.withContext
  * Appzone Ltd
  */
 
-suspend fun <T> ioContext(block: suspend CoroutineScope.() -> T): T = withContext(Dispatchers.IO) { block() }
+suspend inline fun <T> ioContext(crossinline block: suspend CoroutineScope.() -> T): T =
+    withContext(Dispatchers.IO) { block() }
 
-suspend fun <T> safeRunIO(block: suspend CoroutineScope.() -> T): SafeRunResult<T> = withContext(Dispatchers.IO) {
-    var data: T? = null
-    var error: Exception? = null
+suspend inline fun <T> safeRunIO(crossinline block: suspend CoroutineScope.() -> T): SafeRunResult<T> =
+    withContext(Dispatchers.IO) {
+        var data: T? = null
+        var error: Exception? = null
 
-    try {
-        data = block()
-    } catch (ex: Exception) {
-        error = ex
-        if (BuildConfig.DEBUG) ex.printStackTrace()
+        try {
+            data = block()
+        } catch (ex: Exception) {
+            error = ex
+            Crashlytics.logException(ex)
+            if (BuildConfig.DEBUG) ex.printStackTrace()
+        }
+
+        SafeRunResult(data, error)
     }
-
-    SafeRunResult(data, error)
-}

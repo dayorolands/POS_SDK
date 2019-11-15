@@ -48,7 +48,6 @@ class BankOneApplication : CreditClubApplication() {
         super.onCreate()
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 
-        Fabric.with(this, Crashlytics())
         AppCenter.start(
             this, BuildConfig.APP_CENTER_SECRET,
             Analytics::class.java, Crashes::class.java

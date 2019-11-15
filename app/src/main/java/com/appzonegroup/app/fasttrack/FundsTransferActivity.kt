@@ -34,23 +34,22 @@ import java.util.*
 
 class FundsTransferActivity : BaseActivity() {
 
-    internal val destinationBankSpinner: Spinner by lazy { findViewById<View>(R.id.spinner_destination_bank) as Spinner }
-    internal val destinationAccountNumber_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_accountnumber) as EditText }
-    internal val accountName_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_accountname) as EditText }
-    internal val amount_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_amount) as EditText }
-    internal val agentPin_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_agentpin) as EditText }
-    internal val narrationEt: EditText by lazy { findViewById(R.id.fundstransfer_narration_et) as EditText }
+    private val destinationBankSpinner: Spinner by lazy { findViewById<View>(R.id.spinner_destination_bank) as Spinner }
+    private val destinationAccountNumber_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_accountnumber) as EditText }
+    private val amount_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_amount) as EditText }
+    private val agentPin_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_agentpin) as EditText }
+    private val narrationEt: EditText by lazy { findViewById(R.id.fundstransfer_narration_et) as EditText }
 
-    internal var destinationBank: String = ""
+    private var destinationBank: String = ""
     internal var accountNumber: String = ""
     internal var amount: String = "0"
     internal var agentPin: String = ""
-    internal var gson: Gson = Gson()
-    internal var banks = emptyList<Bank>()
+    private var banks = emptyList<Bank>()
     internal val backgroundHandler: Handler by lazy { Misc.setupScheduler() }
-    internal val locationManager: LocationManager by lazy { getSystemService(Context.LOCATION_SERVICE) as LocationManager }
+    private val locationManager: LocationManager by lazy { getSystemService(Context.LOCATION_SERVICE) as LocationManager }
 
-    internal var nameEnquiryResponse: NameEnquiryResponse? = null
+    private val externalTransactionReference = UUID.randomUUID().toString().substring(0, 8)
+    private var nameEnquiryResponse: NameEnquiryResponse? = null
 
     private var isSameBank = false
 
@@ -67,8 +66,7 @@ class FundsTransferActivity : BaseActivity() {
             fundsTransferRequest.amountInNaira = amount.toDouble()
 
             fundsTransferRequest.isToRelatedCommercialBank = isSameBank
-            fundsTransferRequest.externalTransactionReference =
-                UUID.randomUUID().toString().substring(0, 8)
+            fundsTransferRequest.externalTransactionReference = externalTransactionReference
             fundsTransferRequest.geoLocation = gps.geolocationString
             fundsTransferRequest.narration = narrationEt.text.toString().trim { it <= ' ' }
 
