@@ -110,7 +110,9 @@ class LoginActivity : DialogProviderActivity() {
             SurveyDialog.create(this, questions) {
                 onSubmit { answers ->
                     ioScope.launch {
-                        creditClubMiddleWareAPI.staticService.submitSurvey(answers)
+                        safeRunIO {
+                            creditClubMiddleWareAPI.staticService.submitSurvey(answers)
+                        }
                     }
                 }
             }.show()

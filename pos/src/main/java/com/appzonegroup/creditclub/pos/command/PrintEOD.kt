@@ -42,28 +42,35 @@ class PrintEOD(
 
             if (transactions.isEmpty()) return@open dialogProvider.showError("No Transactions")
 
+            var totalAmount = 0L
+
             val text = StringBuilder("END OF DAY RECEIPT $localDate")
             text.append("\n-----------------------\n")
             for (trn in transactions) {
                 val iso = trn.isoMsg
+                if (iso.isSuccessful) totalAmount += iso.transactionAmount4?.toLong() ?: 0
 
                 text.append("\nTime    ${trn.prettyTime}")
                 text.append("\nType    ${trn.type}")
                 text.append("\nPAN     ${trn.pan}")
                 text.append("\nAmount  ${CurrencyFormatter.format(iso.transactionAmount4)}")
                 text.append("\nRRN     ${trn.isoMsg.retrievalReferenceNumber37}")
-                text.append("\nStatus  ${if (iso.responseCode39 == "00") "APPROVED" else "DECLINED"}")
+                text.append("\nStatus  ${if (iso.isSuccessful) "APPROVED" else "DECLINED"}")
 //                text .append("\n${iso.stan11}  ${iso.retrievalReferenceNumber37} ${CurrencyFormatter.format(iso.transactionAmount4)}")
                 text.append("\n------------------\n")
             }
 
-            text.append("\n\nTotal Card Transactions ${transactions.size}")
+            text.append("\n\n${CurrencyFormatter.format("$totalAmount")} in card transactions")
+            text.append("\nTotal Card Transactions ${transactions.size}")
             text.append("\nTotal Cash Transactions 0")
 
             val node = TextNode(text.toString())
             node.walkPaperAfterPrint = 20
 
-            PosPrinter(context, dialogProvider).printAsync(node, message = "Printing Report") { printerStatus ->
+            PosPrinter(context, dialogProvider).printAsync(
+                node,
+                message = "Printing Report"
+            ) { printerStatus ->
                 if (printerStatus != PrinterStatus.READY) {
                     dialogProvider.showError(printerStatus.message)
                     return@printAsync
