@@ -150,4 +150,7 @@ interface StaticService {
 
     @POST("CreditClubStatic/MiniStatement")
     suspend fun miniStatement(@Body request: MiniStatementRequest): MiniStatementResponse?
+
+    @POST("CreditClubStatic/SubmitSurvey")
+    suspend fun submitSurvey(@Body answers: List<SurveyAnswer>)
 }

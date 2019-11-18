@@ -47,9 +47,17 @@ class AgentActivationActivity : BaseActivity() {
                     return@OnClickListener
                 }
 
-                localStorage.institutionCode = "100287"
+                code = binding.codeEt.value
+                if (code.length < 6) {
+                    indicateError(
+                        "Enter institution code in the verification code input",
+                        binding.codeEt
+                    )
+                    return@OnClickListener
+                }
+
+                localStorage.institutionCode = code.substring(0, 6)
                 localStorage.agentPhone = phoneNumber
-                localStorage.agentPIN = "1111"
                 localStorage.cacheAuth = Gson().toJson(AuthResponse(phoneNumber, "1111"))
                 localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
                 localStorage.putString(AppConstants.AGENT_CODE, "1111")
@@ -161,12 +169,12 @@ class AgentActivationActivity : BaseActivity() {
                 if (response.isSuccessful) {
                     localStorage.institutionCode = institutionCode
                     localStorage.agentPhone = phoneNumber
-                    localStorage.agentPIN = pin
                     localStorage.cacheAuth = Gson().toJson(AuthResponse(phoneNumber, code))
                     localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
                     localStorage.putString(AppConstants.AGENT_CODE, code)
 
-                    val intent = Intent(this@AgentActivationActivity, DataLoaderActivity::class.java)
+                    val intent =
+                        Intent(this@AgentActivationActivity, DataLoaderActivity::class.java)
                     intent.putExtra(AppConstants.LOAD_DATA, LoadDataType.OTHER_DATA.ordinal)
                     startActivity(intent)
                     finish()
@@ -181,7 +189,11 @@ class AgentActivationActivity : BaseActivity() {
             mainScope.launch {
                 showProgressBar("Verifying")
                 val (response) = safeRunIO {
-                    creditClubMiddleWareAPI.staticService.agentVerification(code, phoneNumber, institutionCode)
+                    creditClubMiddleWareAPI.staticService.agentVerification(
+                        code,
+                        phoneNumber,
+                        institutionCode
+                    )
                 }
                 hideProgressBar()
 
@@ -197,7 +209,11 @@ class AgentActivationActivity : BaseActivity() {
                     binding.codeEt.setText("")
                     binding.codeEt.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4))
                     binding.codeEt.requestFocus()
-                    institutionCode = response.responseMessage ?: if (code.length >= 6) code.substring(0, 6) else code
+                    institutionCode =
+                        response.responseMessage ?: if (code.length >= 6) code.substring(
+                            0,
+                            6
+                        ) else code
 
                     showNotification("Verification successful")
                 } else {

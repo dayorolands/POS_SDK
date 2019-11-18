@@ -12,12 +12,15 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.appzonegroup.app.fasttrack.model.AppConstants
+import com.appzonegroup.app.fasttrack.ui.SurveyDialog
 import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.util.posConfig
 import com.appzonegroup.creditclub.pos.util.posParameters
+import com.creditclub.core.data.model.SurveyQuestion
+import com.creditclub.core.data.model.SurveyQuestionType
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.safeRun
@@ -91,6 +94,26 @@ class LoginActivity : DialogProviderActivity() {
 
         if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
             showError("Timeout due to inactivity")
+        } else {
+            val questions = listOf(
+                SurveyQuestion(
+                    "How likely are you to recommend this app to someone",
+                    SurveyQuestionType.Rating
+                ),
+                SurveyQuestion("Question 2", SurveyQuestionType.MultipleChoice),
+                SurveyQuestion(
+                    "How likely are you to recommend this app to someone",
+                    SurveyQuestionType.Rating
+                )
+            )
+
+            SurveyDialog.create(this, questions) {
+                onSubmit { answers ->
+                    ioScope.launch {
+                        creditClubMiddleWareAPI.staticService.submitSurvey(answers)
+                    }
+                }
+            }.show()
         }
     }
 

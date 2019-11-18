@@ -14,6 +14,7 @@ import com.creditclub.core.AppFunctions
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.packageInfo
+import com.creditclub.core.util.safeRun
 import com.creditclub.core.util.safeRunIO
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
@@ -63,8 +64,10 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
 
         getFavorites()
 
-        binding.navView.menu.getItem(R.id.online_functions).run {
-            isVisible = institutionConfig.hasOnlineFunctions
+        safeRun {
+            binding.navView.menu.getItem(R.id.online_functions).run {
+                isVisible = institutionConfig.hasOnlineFunctions
+            }
         }
     }
 

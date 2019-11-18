@@ -11,7 +11,11 @@ import com.creditclub.core.data.model.DeviceTransactionInformation
 import com.creditclub.core.data.model.DeviceTransactionInformationDAO
 import com.creditclub.core.util.CoreDBConverters
 
-@Database(entities = [DeviceTransactionInformation::class, AppFunctionUsage::class], version = 1)
+@Database(
+    entities = [DeviceTransactionInformation::class, AppFunctionUsage::class],
+    version = 1,
+    exportSchema = true
+)
 @TypeConverters(CoreDBConverters::class)
 abstract class CoreDatabase : RoomDatabase() {
     abstract fun deviceTransactionInformationDao(): DeviceTransactionInformationDAO
