@@ -9,7 +9,9 @@ import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.request.DepositRequest
+import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.util.delegates.contentView
+import com.creditclub.core.util.finishOnClose
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.requireAccountInfo
 import com.creditclub.core.util.safeRunIO
@@ -58,7 +60,7 @@ class DepositActivity : CustomerBaseActivity() {
     }
 
     private fun attemptDeposit() {
-        val amount = binding.depositAmountEt.text.toString().trim { it <= ' ' }
+        val amount = binding.depositAmountEt.value
         if (amount.isEmpty()) {
             indicateError("Amount should be greater than 0", binding.depositAmountEt)
             return
@@ -76,7 +78,7 @@ class DepositActivity : CustomerBaseActivity() {
             return
         }
 
-        val agentPIN = binding.agentPinEt.text.toString()
+        val agentPIN = binding.agentPinEt.value
 
         if (agentPIN.isEmpty()) {
             indicateError("Please enter your PIN", binding.agentPinEt)
@@ -92,40 +94,32 @@ class DepositActivity : CustomerBaseActivity() {
 
         mainScope.launch {
             showProgressBar("Processing Transaction", "Please wait...")
-
             val (response) = safeRunIO {
                 creditClubMiddleWareAPI.staticService.deposit(this@DepositActivity.depositRequest)
             }
-
-            response ?: return@launch showNetworkError()
+            response ?: return@launch showNetworkError(finishOnClose)
 
             if (response.isSuccessful) {
-
-                showSuccess<Unit>("The deposit was successful") {
-                    onClose {
-                        finish()
-                    }
-                }
-
-                LocalStorage.setAgentsPin(depositRequest.agentPin, baseContext)
-
-                if (Platform.hasPrinter) {
-                    printer.printAsync(
-                        DepositReceipt(
-                            this@DepositActivity,
-                            this@DepositActivity.depositRequest,
-                            accountInfo
-                        ).apply {
-                            isSuccessful = response.isSuccessful
-                            reason = response.responseMessage
-                        }
-                    ) { printerStatus ->
-                        if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
-                    }
-                }
+                showSuccess("The deposit was successful", finishOnClose)
             } else {
-                showError(response.responseMessage ?: "An error occurred. Please try again later")
-                binding.depositBtn.isClickable = true
+                val message =
+                    response.responseMessage ?: "An error occurred. Please try again later"
+                showError(message, finishOnClose)
+            }
+
+            if (Platform.hasPrinter) {
+                printer.printAsync(
+                    DepositReceipt(
+                        this@DepositActivity,
+                        this@DepositActivity.depositRequest,
+                        accountInfo
+                    ).apply {
+                        isSuccessful = response.isSuccessful
+                        reason = response.responseMessage
+                    }
+                ) { printerStatus ->
+                    if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
+                }
             }
         }
     }

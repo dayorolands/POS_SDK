@@ -14,6 +14,7 @@ import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.creditclub.core.data.request.PayBillRequest
+import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
 import kotlinx.android.synthetic.main.activity_billpayment.*
@@ -191,24 +192,40 @@ class BillPaymentActivity : BaseActivity() {
 
         requestPIN("Enter Agent Pin") {
             onSubmit { pin ->
-                pin ?: return@onSubmit
-
                 paymentRequest.agentPin = pin
 
                 mainScope.launch {
                     showProgressBar("Processing...")
-
                     val (response, error) = safeRunIO {
                         creditClubMiddleWareAPI.billsPaymentService.runTransaction(paymentRequest)
                     }
-
                     hideProgressBar()
 
-                    if (error != null) return@launch showError(error)
+                    val finishOnClose: DialogListenerBlock<Nothing> = {
+                        onClose {
+                            setResult(1)
+                            finish()
+                        }
+                    }
+
+                    if (error != null) return@launch showError(error, finishOnClose)
 
                     if (response == null) {
-                        showError("An error occurred")
+                        showError("An error occurred", finishOnClose)
                         return@launch
+                    }
+
+                    if (response.isSuccessFul == true) {
+                        showSuccess(
+                            response.responseMessage ?: "Transaction successful",
+                            finishOnClose
+                        )
+                    } else {
+                        showError(
+                            response.responseMessage
+                                ?: getString(R.string.an_error_occurred_please_try_again_later),
+                            finishOnClose
+                        )
                     }
 
                     if (Platform.hasPrinter) {
@@ -220,24 +237,6 @@ class BillPaymentActivity : BaseActivity() {
                         printer.printAsync(receipt) { printerStatus ->
                             if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
                         }
-                    }
-
-                    if (response.isSuccessFul == true) {
-
-                        showSuccess<Unit>(
-                            response.responseMessage
-                                ?: "Transaction successful"
-                        ) {
-                            onClose {
-                                setResult(1)
-                                finish()
-                            }
-                        }
-                    } else {
-                        showError(
-                            response.responseMessage
-                                ?: getString(R.string.an_error_occurred_please_try_again_later)
-                        )
                     }
                 }
             }

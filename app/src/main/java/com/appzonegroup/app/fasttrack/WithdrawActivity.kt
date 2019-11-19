@@ -160,33 +160,29 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
             }
             hideProgressBar()
 
-            if (error != null) return@launch showError(error)
-            response ?: return@launch showError("Transaction failed. Please try again later")
+            if (error != null) return@launch showError(error, finishOnClose)
+            response ?: return@launch showError("Transaction failed. Please try again later", finishOnClose)
 
             if (response.isSuccessful) {
+                showSuccess("The withdrawal was successful", finishOnClose)
 
-                showSuccess<Nothing>("The withdrawal was successful") {
-                    onClose {
-                        finish()
-                    }
-                }
-
-                if (Platform.hasPrinter) {
-                    val receipt = WithdrawalReceipt(this@WithdrawActivity, formData, accountInfo)
-                    receipt.apply {
-                        isSuccessful = response.isSuccessful
-                        reason = response.responseMessage
-                    }
-
-                    printer.printAsync(receipt, "Printing...") { printerStatus ->
-                        if (printerStatus !== PrinterStatus.READY) {
-                            showError(printerStatus.message)
-                        }
-                    }
-                }
             } else {
-                showError(response.responseMessage)
+                showError(response.responseMessage,finishOnClose)
                 findViewById<View>(R.id.withdraw_btn).isClickable = true
+            }
+
+            if (Platform.hasPrinter) {
+                val receipt = WithdrawalReceipt(this@WithdrawActivity, formData, accountInfo)
+                receipt.apply {
+                    isSuccessful = response.isSuccessful
+                    reason = response.responseMessage
+                }
+
+                printer.printAsync(receipt, "Printing...") { printerStatus ->
+                    if (printerStatus !== PrinterStatus.READY) {
+                        showError(printerStatus.message)
+                    }
+                }
             }
         }
     }

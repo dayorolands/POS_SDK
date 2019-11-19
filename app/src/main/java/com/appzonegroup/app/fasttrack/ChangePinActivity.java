@@ -134,7 +134,6 @@ public class ChangePinActivity extends BaseActivity {
             result = result.replace("\\", "").replace("\n", "").trim();
             com.appzonegroup.app.fasttrack.model.Response response = new Gson().fromJson(result, com.appzonegroup.app.fasttrack.model.Response.class);
             if(response.isSuccessful()){
-                LocalStorage.setAgentsPin(newPin, getBaseContext());
                 showNotification("Your PIN was changed successfully", true);
             }
             else{

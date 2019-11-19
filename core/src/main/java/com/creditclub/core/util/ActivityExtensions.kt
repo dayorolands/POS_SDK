@@ -1,8 +1,10 @@
 package com.creditclub.core.util
 
+import android.app.Activity
 import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
+import com.creditclub.core.ui.widget.DialogListenerBlock
 
 
 /**
@@ -22,3 +24,10 @@ fun Context.isMyServiceRunning(serviceClass: Class<*>): Boolean {
 
     return false
 }
+
+val Activity.finishOnClose: DialogListenerBlock<Nothing>
+    get() = {
+        onClose {
+            finish()
+        }
+    }

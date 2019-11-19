@@ -12,18 +12,18 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import androidx.core.app.ActivityCompat
+import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
 import com.appzonegroup.app.fasttrack.utility.Dialogs
+import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
-import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
-import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.data.response.NameEnquiryResponse
+import com.creditclub.core.util.finishOnClose
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_fundstransfer.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -219,24 +219,6 @@ class FundsTransferActivity : BaseActivity() {
             return
         }
 
-        /*if (gpsLocation == null)
-        {
-            showError("Please switch on your ic_phone GPS, shake your ic_phone and try again.");
-            return;
-        }*/
-        /*gson = new Gson();
-        FundsTransferRequest transferData = new FundsTransferRequest();
-        transferData.setAgentPhoneNumber(LocalStorage.GetValueFor(AppConstants.AGENT_PHONE, getBaseContext()));
-        transferData.setAgentPin(agentPin);
-        transferData.setAuthToken("681B3AEA-835E-456D-ADBB-8C4C6D9CBADC");
-        transferData.setBeneficiaryAccountNumber(accountNumber);
-        transferData.setAmountInNaira(amountDouble);
-        Bank bank = banks.get(destinationBankSpinner.getSelectedItemPosition() - 1);
-        transferData.setBeneficiaryInstitutionCode(bank.getBankCode());
-        transferData.setToRelatedCommercialBank(bank.getBankCode().equals("000001"));
-        transferData.setExternalTransactionReference(UUID.randomUUID().toString().substring(0, 8));
-        transferData.setGeoLocation(gpsLocation);*/
-
         mainScope.launch {
             showProgressBar("Transfer in progress")
             val (response, error) = safeRunIO {
@@ -244,17 +226,13 @@ class FundsTransferActivity : BaseActivity() {
             }
             hideProgressBar()
 
-            if (error != null) return@launch showError(error)
-            response ?: return@launch showNetworkError()
+            if (error != null) return@launch showError(error, finishOnClose)
+            response ?: return@launch showNetworkError(finishOnClose)
 
             if (response.isSuccessful) {
-                showSuccess<Nothing>("Transfer was successful") {
-                    onClose {
-                        finish()
-                    }
-                }
+                showSuccess("Transfer was successful", finishOnClose)
             } else {
-                showError(response.responseMessage)
+                showError(response.responseMessage, finishOnClose)
             }
 
             if (Platform.hasPrinter) {
@@ -301,7 +279,6 @@ class FundsTransferActivity : BaseActivity() {
 
         mainScope.launch {
             showProgressBar("Validating account information")
-
             val (response, error) = safeRunIO {
                 creditClubMiddleWareAPI.fundsTransferService.nameEnquiry(fundsTransferRequest)
             }

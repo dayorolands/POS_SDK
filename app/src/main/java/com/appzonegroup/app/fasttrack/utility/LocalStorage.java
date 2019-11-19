@@ -106,10 +106,6 @@ public class LocalStorage {
         return GetValueFor(AppConstants.AGENT_PIN, ctx);
     }
 
-    public static void setAgentsPin(String pin,Context ctx) {
-          LocalStorage.SaveValue(AppConstants.AGENT_PIN, pin, ctx);
-    }
-
     public static void setAgentInfo(Context context, String jsonValue)
     {
         SaveValue(AppConstants.AGENT_INFO, jsonValue, context);
