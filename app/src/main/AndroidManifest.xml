@@ -554,6 +554,10 @@
             android:name="io.fabric.ApiKey"
             android:value="5ae667395ec4429e5d7caaf22b1516debe8b386a" />
 
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <receiver
             android:name=".NotificationReceiver"
             android:enabled="true"
