@@ -5,6 +5,7 @@ import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.TrackGPS
+import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
@@ -30,10 +31,14 @@ val locationModule = module {
 
 val apiModule = module {
     single(named("middleware")) {
+        val cacheSize = 10L * 1024 * 1024 // 10 MB
+        val cache = Cache(androidContext().cacheDir, cacheSize)
+
         OkHttpClient().newBuilder()
             .connectTimeout(1, TimeUnit.MINUTES)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(1, TimeUnit.MINUTES)
+            .writeTimeout(2, TimeUnit.MINUTES)
+            .cache(cache)
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level =
                     if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE

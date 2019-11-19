@@ -2,7 +2,6 @@ package com.appzonegroup.app.fasttrack
 
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -26,6 +25,7 @@ import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.model.Product
 import com.creditclub.core.data.request.CustomerRequest
+import com.creditclub.core.model.CreditClubImage
 import com.creditclub.core.type.TokenType
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
@@ -766,21 +766,18 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
             if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
                 activity.run {
                     try {
-                        val image: Image? = ImagePicker.getFirstImageOrNull(data)
+                        val tmpImage: Image? = ImagePicker.getFirstImageOrNull(data)
                         im = view?.findViewById(R.id.passport_image_view)
-
-                        image ?: return@run showInternalError()
+                        tmpImage ?: return@run showInternalError()
+                        val image = CreditClubImage(tmpImage)
 
                         mainScope.launch {
                             showProgressBar("Processing image")
-                            safeRunIO {
-                                val imageFile = File(image.path)
-                                bitmap = BitmapFactory.decodeFile(image.path)
 
-                                bitmap = compressImage(imageFile)
-                                passportString = Misc.bitmapToString(bitmap!!)
-                            }
+                            val (bitmap) = safeRunIO { image.bitmap }
                             im?.setImageBitmap(bitmap)
+
+                            passportString = safeRunIO { image.bitmapString }.data
                             hideProgressBar()
                         }
                     } catch (ex: Exception) {

@@ -12,6 +12,7 @@ import com.creditclub.ui.adapter.MiniStatementAdapter
 import com.creditclub.ui.databinding.ActivityMiniStatementBinding
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDate
+import org.threeten.bp.Period
 
 
 /**
@@ -25,6 +26,9 @@ class ActivityMiniStatementManager(
 
     private val adapter by lazy { MiniStatementAdapter(activity, emptyList()) }
     private var agentPIN = ""
+
+    private var endDate = LocalDate.now()
+    private var startDate = endDate.minusDays(6)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,18 +50,25 @@ class ActivityMiniStatementManager(
                     supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
                     val today = LocalDate.now()
+                    val threeMonthsAgo = today.minusMonths(2)
 
-                    binding.content.endDateContentTv.text = today.toString("uuuu-MM-dd")
-                    binding.content.startDateContentTv.text =
-                        today.minusMonths(3).toString("uuuu-MM-dd")
+                    binding.content.endDateContentTv.text = endDate.toString("uuuu-MM-dd")
+                    binding.content.startDateContentTv.text = startDate.toString("uuuu-MM-dd")
 
                     binding.refreshButton.setOnClickListener {
                         fetchMiniStatement()
                     }
 
                     binding.content.startDateLayout.setOnClickListener {
-                        showDateInput(DateInputParams("Select start date", maxDate = today)) {
+                        showDateInput(
+                            DateInputParams(
+                                "Select start date",
+                                maxDate = today,
+                                minDate = threeMonthsAgo
+                            )
+                        ) {
                             onSubmit { date ->
+                                startDate = date
                                 binding.content.startDateContentTv.text =
                                     date.toString("uuuu-MM-dd")
                                 fetchMiniStatement()
@@ -66,8 +77,15 @@ class ActivityMiniStatementManager(
                     }
 
                     binding.content.endDateLayout.setOnClickListener {
-                        showDateInput(DateInputParams("Select end date", maxDate = today)) {
+                        showDateInput(
+                            DateInputParams(
+                                "Select end date",
+                                maxDate = today,
+                                minDate = threeMonthsAgo
+                            )
+                        ) {
                             onSubmit { date ->
+                                endDate = date
                                 binding.content.endDateContentTv.text = date.toString("uuuu-MM-dd")
                                 fetchMiniStatement()
                             }
@@ -87,6 +105,14 @@ class ActivityMiniStatementManager(
     }
 
     private fun fetchMiniStatement(closeOnFail: Boolean = false) {
+        if (Period.between(startDate, endDate).days < 0) {
+            return showError("Start date must not be greater than end date")
+        }
+
+        if (Period.between(startDate, endDate).days > 6) {
+            return showError("Date range must not be more than seven (7) days")
+        }
+
         activity.run {
             mainScope.launch {
                 val request = MiniStatementRequest().apply {
@@ -109,7 +135,9 @@ class ActivityMiniStatementManager(
                 response ?: return@launch showInternalError()
 
                 if (response.isSuccessful) {
-                    adapter.setData(response.data)
+                    if (response.data?.isNullOrEmpty() == true) {
+                        showError("You don't have any transaction for this period")
+                    } else adapter.setData(response.data)
                 } else {
                     showError<Nothing>(response.responseMessage) {
                         onClose {

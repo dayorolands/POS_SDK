@@ -34,7 +34,7 @@ object ApiServiceObject {
         OkHttpClient.Builder()
             .connectTimeout(2, TimeUnit.MINUTES)
             .readTimeout(2, TimeUnit.MINUTES)
-            .writeTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(2, TimeUnit.SECONDS)
             .addInterceptor(logger).build()
     }
 
