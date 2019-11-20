@@ -38,10 +38,12 @@ class BankOneApplication : CreditClubApplication() {
 
     val authResponse: AuthResponse
         get() {
-            if (!localStorage.agentIsActivated) return AuthResponse("","")
+            val defaults: AuthResponse.() -> Unit = { sessionId = sessionId ?: "nothing" }
+
+            if (!localStorage.agentIsActivated) return AuthResponse("", "").apply(defaults)
             val phoneNumber = "234${localStorage.agent?.phoneNumber?.substring(1)}"
 
-            return AuthResponse(phoneNumber, localStorage.agent?.agentCode)
+            return AuthResponse(phoneNumber, localStorage.agent?.agentCode).apply(defaults)
         }
 
     override fun onCreate() {
