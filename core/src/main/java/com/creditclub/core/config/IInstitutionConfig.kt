@@ -9,4 +9,6 @@ interface IInstitutionConfig {
     var transactionTypes: List<TransactionType>
 
     var flows: FlowConfig
+
+    var categories: CategoryConfig
 }

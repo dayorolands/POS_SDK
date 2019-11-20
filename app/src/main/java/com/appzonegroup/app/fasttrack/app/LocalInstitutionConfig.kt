@@ -2,6 +2,7 @@ package com.appzonegroup.app.fasttrack.app
 
 import android.content.Context
 import com.appzonegroup.app.fasttrack.R
+import com.creditclub.core.config.CategoryConfig
 import com.creditclub.core.config.FlowConfig
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.type.TransactionType
@@ -17,6 +18,8 @@ class LocalInstitutionConfig : IInstitutionConfig {
     override var transactionTypes: List<TransactionType> = TransactionType.values().toList()
 
     override var flows: FlowConfig = FlowConfig()
+
+    override var categories: CategoryConfig = CategoryConfig()
 
     companion object {
 
@@ -41,6 +44,10 @@ class LocalInstitutionConfig : IInstitutionConfig {
                 if (!resources.getBoolean(R.bool.flow_wallet_opening)) {
                     walletOpening = null
                 }
+            }
+
+            config.categories.run {
+                loans = resources.getBoolean(R.bool.category_loan)
             }
 
             return config

@@ -4,4 +4,5 @@
     <string-array name="customer_request_options">
         <item>2,Account Number</item>
     </string-array>
+    <bool name="category_loan">false</bool>
 </resources>

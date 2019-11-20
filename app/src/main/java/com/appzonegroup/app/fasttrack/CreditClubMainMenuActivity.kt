@@ -34,7 +34,14 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
 
         binding.agentCategoryButton.button.setOnClickListener(categoryClickListener(AppFunctions.Categories.AGENT_CATEGORY))
         binding.customerCategoryButton.button.setOnClickListener(categoryClickListener(AppFunctions.Categories.CUSTOMER_CATEGORY))
-        binding.loanCategoryButton.button.setOnClickListener(categoryClickListener(AppFunctions.Categories.LOAN_CATEGORY))
+        binding.loanCategoryButton.run {
+            if (institutionConfig.categories.loans) {
+                root.visibility = View.VISIBLE
+                button.setOnClickListener(categoryClickListener(AppFunctions.Categories.LOAN_CATEGORY))
+            } else {
+                root.visibility = View.GONE
+            }
+        }
         binding.transactionsCategoryButton.button.setOnClickListener(
             categoryClickListener(
                 AppFunctions.Categories.TRANSACTIONS_CATEGORY

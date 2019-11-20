@@ -5,4 +5,5 @@
         <item>1,Phone Number</item>
         <item>2,Account Number</item>
     </string-array>
+    <bool name="category_loan">true</bool>
 </resources>

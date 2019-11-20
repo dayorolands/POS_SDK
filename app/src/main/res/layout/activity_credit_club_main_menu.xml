@@ -85,7 +85,6 @@
                         <include
                             android:id="@+id/loan_category_button"
                             layout="@layout/button"
-                            android:visibility="gone"
                             app:src='@{@drawable/personal_income}'
                             app:text='@{"Loans"}' />
                     </com.google.android.flexbox.FlexboxLayout>
