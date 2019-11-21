@@ -116,6 +116,12 @@ android {
             applicationId "com.creditclub.access"
             buildConfigField("String", "APP_CENTER_SECRET", '"2067cb70-93f0-4806-a07b-df015f9e9743"')
         }
+
+        heritage {
+            dimension "flavor"
+            applicationId "com.creditclub.heritage"
+            buildConfigField("String", "APP_CENTER_SECRET", '""')
+        }
     }
     sourceSets {
         main {
