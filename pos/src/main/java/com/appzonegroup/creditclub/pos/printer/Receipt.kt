@@ -1,6 +1,7 @@
 package com.appzonegroup.creditclub.pos.printer
 
 import android.content.Context
+import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.util.localStorage
@@ -46,7 +47,7 @@ class Receipt(val context: Context, val transaction: FinancialTransaction) : Pri
             nodes.add(
                 TextNode(
                     """$merchantDetails
-Merchant Id: ${merchantId}
+Merchant Id: $merchantId
 Agent Name: ${context.localStorage.agent?.agentName}
 Agent Code: ${context.localStorage.agent?.agentCode}
 TID: $terminalId
@@ -59,7 +60,7 @@ STAN: $stan
 PAN Seq No: 01
 Cardholder: $cardHolder
 EXP:$cardExp
-Acquirer:AppZone
+Acquirer: ${context.getString(R.string.pos_acquirer)}
 PTSP:3GEE PAY
 Verification Mode: PIN"""
                 )

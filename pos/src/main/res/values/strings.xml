@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">TrezPay 2.0</string>
+    <string name="institution_name">Appzone</string>
+    <string name="pos_acquirer">@string/institution_name</string>
     <string name="loading">Loading</string>
     <string name="please_wait">Please wait</string>
     <string name="title_activity_cash_out_form">CashOutFormActivity</string>
