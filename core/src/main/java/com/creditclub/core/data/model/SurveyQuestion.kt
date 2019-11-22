@@ -10,12 +10,10 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 class SurveyQuestion(
+    @SerialName("ID") var id: String = "0",
     @SerialName("Name") var name: String = "",
     @SerialName("Type") var type: SurveyQuestionType = SurveyQuestionType.Rating
 ) {
-
-    @SerialName("ID")
-    var id: String = "0"
 
     @SerialName("Options")
     var options: List<Option>? = null

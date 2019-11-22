@@ -76,11 +76,12 @@
                     <me.relex.circleindicator.CircleIndicator3
                         android:id="@+id/indicator"
                         android:layout_width="0dp"
+                        android:layout_marginStart="16dp"
                         android:layout_height="48dp"
                         android:layout_weight="1"
-                        app:ci_drawable="@drawable/accent_dark_radius"
+                        app:ci_drawable="@drawable/accent_radius"
                         app:ci_drawable_unselected="@drawable/accent_radius"
-                        app:ci_gravity="start" />
+                        app:ci_gravity="start|center_vertical" />
 
                     <Button
                         android:id="@+id/btn_submit"

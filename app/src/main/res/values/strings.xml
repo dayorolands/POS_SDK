@@ -187,8 +187,7 @@
         <item>ZM,ZAMFARA,Gusau</item>
     </string-array>
 
-    <string-array name="lgas">
-    </string-array>
+    <string-array name="lgas"></string-array>
 
     <string name="title_activity_loan_request">Loan Request</string>
     <string name="loan_request">Loan Request</string>
@@ -437,4 +436,5 @@
     <string name="title_activity_hla_tagging">HLA Tagging</string>
     <string name="hla_tagging">HLA Tagging</string>
     <string name="lga_hint">Select LGA</string>
+    <string name="please_confirm">Please confirm</string>
 </resources>

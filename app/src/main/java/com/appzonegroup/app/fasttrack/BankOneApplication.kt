@@ -17,6 +17,8 @@ import com.creditclub.core.util.localStorage
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.PicassoProvider
 import io.fabric.sdk.android.Fabric
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.KoinAppDeclaration
@@ -38,7 +40,7 @@ class BankOneApplication : CreditClubApplication() {
 
     val authResponse: AuthResponse
         get() {
-            if (!localStorage.agentIsActivated) return AuthResponse("","")
+            if (!localStorage.agentIsActivated) return AuthResponse("", "")
             val phoneNumber = "234${localStorage.agent?.phoneNumber?.substring(1)}"
 
             return AuthResponse(phoneNumber, localStorage.agent?.agentCode)
@@ -47,7 +49,9 @@ class BankOneApplication : CreditClubApplication() {
     override fun onCreate() {
         super.onCreate()
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
-
+        Picasso.setSingletonInstance(
+            Picasso.Builder(this).loggingEnabled(BuildConfig.DEBUG).build()
+        )
         AppCenter.start(
             this, BuildConfig.APP_CENTER_SECRET,
             Analytics::class.java, Crashes::class.java

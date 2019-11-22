@@ -11,6 +11,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 class SurveyAnswer(
     @SerialName("QuestionID") var questionId: String = "",
-    @SerialName("AnswerID") var answerId: String = "",
-    @SerialName("Rating") var rating: Float = 0F
+    @SerialName("AnswerID") var answerId: String? = null,
+    @SerialName("Rating") var rating: Float? = null
 )

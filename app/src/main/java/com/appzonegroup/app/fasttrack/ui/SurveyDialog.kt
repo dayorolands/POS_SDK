@@ -32,7 +32,8 @@ class SurveyDialog private constructor(context: Context, questions: List<SurveyQ
         SurveyAnswer(questionId = questions[it].id)
     }
 
-    private var listener: DialogListenerBlock<List<SurveyAnswer>>? = null
+    var listener: DialogListenerBlock<List<SurveyAnswer>>? = null
+        private set
 
     private var binding: DialogSurveyBinding = DataBindingUtil.inflate(
         LayoutInflater.from(context),
@@ -64,7 +65,10 @@ class SurveyDialog private constructor(context: Context, questions: List<SurveyQ
     }
 
     private fun onNext() {
-        viewPager.setCurrentItem(viewPager.currentItem + 1, true)
+        if (viewPager.currentItem == viewPager.adapter?.itemCount?.minus(1) ?: 0) {
+            DialogListener.create(listener!!).submit(this, answers)
+            dismiss()
+        } else viewPager.setCurrentItem(viewPager.currentItem + 1, true)
     }
 
     inner class SurveyAdapter(override var values: List<SurveyQuestion>) :
@@ -108,6 +112,7 @@ class SurveyDialog private constructor(context: Context, questions: List<SurveyQ
                         list.layoutManager = LinearLayoutManager(context)
                         list.adapter = SurveyMultipleChoiceAdapter(options, onItemClick = {
                             answer.answerId = question.options!![it].id
+                            onNext()
                         })
                     }
                 }

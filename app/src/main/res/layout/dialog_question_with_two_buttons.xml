@@ -1,68 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="@drawable/dialog_bg"
-    android:layout_width="250dp"
-    android:padding="@dimen/form_margin_horizontal"
-    android:layout_height="wrap_content">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/fifty_dp"
-        app:srcCompat="@drawable/ic_help"
-        android:tint="@color/white"
-        android:layout_gravity="center" />
-
-    <com.appzonegroup.app.fasttrack.ui.TextView
-        android:layout_width="match_parent"
+    <androidx.cardview.widget.CardView
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="22sp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
-        android:textColor="@color/white"
-        android:gravity="center"
-        android:textAllCaps="true"
-        android:text="@string/information"/>
+        android:layout_margin="5dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="3dp">
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
-        android:id="@+id/message_tv"
-        android:textColor="@color/white"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:lineSpacingExtra="@dimen/four_dp"
-        android:textSize="@dimen/medium_sized_text"
-        android:text=""
-        android:layout_margin="@dimen/five_dp"
-        android:gravity="center"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <com.appzonegroup.app.fasttrack.ui.CustomButton
-            android:id="@+id/cancel_btn"
-            android:text="@string/cancel"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/five_dp"
-            android:background="@drawable/gradient_orange"
-            android:layout_weight="2"
-            android:textColor="@color/white"
-            style="@style/button_style"/>
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:orientation="vertical">
 
-        <com.appzonegroup.app.fasttrack.ui.CustomButton
-            android:layout_weight="2"
-            android:id="@+id/ok_btn"
-            android:text="@string/ok"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/five_dp"
-            android:background="@drawable/gradient_warning"
-            style="@style/button_style"/>
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/content_description"
+                android:tint="@color/colorAccent"
+                app:srcCompat="@drawable/ic_help" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="@string/please_confirm"
+                android:textColor="@color/black"
+                android:textSize="@dimen/large_sized_text"
+                android:textStyle="bold" />
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/message_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/ten_dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center"
+                android:lineSpacingExtra="@dimen/four_dp"
+                android:text=""
+                android:textColor="@color/black2"
+                android:textSize="@dimen/medium_sized_text" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/cancel_btn"
+                    style="@style/AppButton.RoundOrangeButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_marginEnd="@dimen/five_dp"
+                    android:layout_weight="2"
+                    android:text="@string/cancel"
+                    android:textColor="@color/white" />
+
+                <Button
+                    android:id="@+id/ok_btn"
+                    style="@style/AppButton.RoundBlueButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_marginStart="@dimen/five_dp"
+                    android:layout_weight="2"
+                    android:text="@string/ok" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</layout>
