@@ -17,9 +17,9 @@ class BannerActivity : AppCompatActivity() {
         binding.btnSkip.setOnClickListener { finish() }
         binding.viewPager.adapter = SurveyAdapter(
             listOf(
-                "https://images.unsplash.com/photo-1574423466237-dd5717123e2b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=600&q=80",
-                "https://images.unsplash.com/photo-1574352935372-6b793d74ccd9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=675&q=80",
-                "https://images.unsplash.com/photo-1574342668504-21a158819842?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80"
+                "https://www.nairaland.com/attachments/4780893_firstdiasporasamplepost5_jpegedc0fafcbae1e363daa659878074460c",
+                "https://pbs.twimg.com/media/C1QYfkAW8AE6Q3V.jpg",
+                "https://www.bellanaija.com/wp-content/uploads/2016/09/instagram-1.jpg"
             )
         )
         binding.indicator.setViewPager(binding.viewPager)
