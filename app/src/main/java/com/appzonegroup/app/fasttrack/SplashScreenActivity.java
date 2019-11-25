@@ -6,14 +6,17 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import com.appzonegroup.app.fasttrack.model.AppConstants;
 import com.appzonegroup.app.fasttrack.utility.Dialogs;
 import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.crashlytics.android.Crashlytics;
+
 import io.fabric.sdk.android.Fabric;
 
 public class SplashScreenActivity extends AppCompatActivity {
@@ -22,6 +25,11 @@ public class SplashScreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!isTaskRoot()) {
+            finish();
+            return;
+        }
 
         try {
             Fabric.with(this, new Crashlytics());
