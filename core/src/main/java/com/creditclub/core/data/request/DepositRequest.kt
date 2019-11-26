@@ -30,4 +30,7 @@ class DepositRequest {
 
     @SerialName("RetrievalReferenceNumber")
     var retrievalReferenceNumber: String? = generateRRN()
+
+    @SerialName("UniqueReferenceID")
+    var uniqueReferenceID: String? = null
 }

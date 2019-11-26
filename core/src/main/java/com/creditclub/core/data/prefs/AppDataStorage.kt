@@ -32,6 +32,7 @@ class AppDataStorage(
         const val NoResponseCount = "NO_RESPONSE_COUNT"
         const val ErrorResponseCount = "ERROR_RESPONSE_COUNT"
         const val RequestCount = "REQUEST_COUNT"
+
         private var INSTANCE: AppDataStorage? = null
 
         fun getInstance(context: Context): AppDataStorage {

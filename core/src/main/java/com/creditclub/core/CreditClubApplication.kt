@@ -1,6 +1,7 @@
 package com.creditclub.core
 
 import android.app.Application
+import com.google.android.play.core.missingsplits.MissingSplitsManagerFactory
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -20,6 +21,11 @@ open class CreditClubApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        if (MissingSplitsManagerFactory.create(this).disableAppIfMissingRequiredSplits()) {
+            return
+        }
+
         AndroidThreeTen.init(this)
 
         koinApp = startKoin {
