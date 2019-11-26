@@ -321,11 +321,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
         </activity>
-        <!--
-<activity
-            android:name=".CardReaderActivity"
-            android:theme="@style/Theme.AppCompat.Translucent" />
-        -->
+        <activity
+            android:label="@string/update"
+            android:name="com.creditclub.ui.UpdateActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CardHotlistActivity"
             android:label="@string/title_activity_card_hotlist"
