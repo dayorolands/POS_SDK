@@ -10,11 +10,13 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityCreditClubMainMenuBind
 import com.appzonegroup.app.fasttrack.model.AgentInfo
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
+import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.AppFunctions
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.safeRunIO
+import com.creditclub.ui.UpdateActivity
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
@@ -73,6 +75,8 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
         binding.navView.menu.getItem(0).run {
             isVisible = institutionConfig.hasOnlineFunctions
         }
+
+        binding.navView.menu.findItem(R.id.fn_update)?.isVisible = !Platform.isPOS
     }
 
     override fun onResume() {
@@ -110,27 +114,6 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
             }
         }
     }
-
-//    private fun openPlayStore() {
-//        val appPackageName = packageInfo?.packageName
-//
-//        try {
-//            startActivity(
-//                Intent(
-//                    Intent.ACTION_VIEW,
-//                    Uri.parse("market://details?id=$appPackageName")
-//                )
-//            )
-//        } catch (anfe: android.content.ActivityNotFoundException) {
-//            startActivity(
-//                Intent(
-//                    Intent.ACTION_VIEW,
-//                    Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
-//                )
-//            )
-//        }
-//
-//    }
 
     override fun onBackPressed() {
         try {
@@ -171,6 +154,7 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
                     SupportActivity::class.java
                 )
             )
+            R.id.fn_update -> startActivity(UpdateActivity::class.java)
             R.id.fn_hla_tagging -> startActivity(HlaTaggingActivity::class.java)
         }
 
