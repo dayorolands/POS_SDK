@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 open class BackendResponse {
     @SerialName("ReponseMessage")
     var responseMessage: String? = null
-        get() = if (field?.isEmpty() == true) message ?: "" else field
+        get() = if (field.isNullOrEmpty()) message else field
 
     @SerialName("IsSuccessful")
     var isSuccessful: Boolean = false

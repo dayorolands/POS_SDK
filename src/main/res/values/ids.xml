@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="fn_account_opening" type="id" />
+    <item name="fn_hla_tagging" type="id" />
     <item name="fn_support" type="id" />
 </resources>

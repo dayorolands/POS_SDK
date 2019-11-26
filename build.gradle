@@ -1,9 +1,8 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlinx-serialization'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply from: 'https://raw.githubusercontent.com/osarogie/GitAsMaven/master/publish-bitbucket.gradle'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlinx-serialization'
 
 kapt {
     generateStubs = true
@@ -26,15 +25,21 @@ android {
 
     buildTypes {
         release {
-//            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField("String", "API_HOST", '"https://api.mybankone.com"')
             buildConfigField("String", "HOST", '"https://mybankone.com"')
             manifestPlaceholders = [usesCleartextTraffic: "false"]
         }
 
+        releaseStaging {
+            debuggable true
+            buildConfigField("String", "API_HOST", '"http://52.224.166.115"')
+            buildConfigField("String", "HOST", '"http://52.224.166.115"')
+            manifestPlaceholders = [usesCleartextTraffic: "true"]
+            matchingFallbacks = ['release', 'debug']
+        }
+
         debug {
-            minifyEnabled false
             debuggable true
             buildConfigField("String", "API_HOST", '"http://52.224.166.115"')
             buildConfigField("String", "HOST", '"http://52.224.166.115"')
@@ -71,7 +76,7 @@ dependencies {
     kapt "androidx.room:room-compiler:${versions.room}"
 
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.lifecycle}"
-    kapt "androidx.lifecycle:lifecycle-compiler:${versions.lifecycle}"
+    implementation "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}"
 
     // Time
     api 'com.jakewharton.threetenabp:threetenabp:1.2.0'
@@ -108,8 +113,8 @@ dependencies {
     api "com.github.bumptech.glide:glide:${versions.glide}"
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
 
-    implementation "com.microsoft.appcenter:appcenter-analytics:${versions.appCenter}"
-    implementation "com.microsoft.appcenter:appcenter-crashes:${versions.appCenter}"
+    api "com.microsoft.appcenter:appcenter-analytics:${versions.appCenter}"
+    api "com.microsoft.appcenter:appcenter-crashes:${versions.appCenter}"
 }
 
 repositories {
