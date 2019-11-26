@@ -29,6 +29,7 @@ object FunctionIds {
     const val CARD_TRANSACTIONS = 16
     const val FUNDS_TRANSFER = 17
     const val HLA_TAGGING = 18
+    const val FAQS = 19
 }
 
 fun registerAppFunctions() {
@@ -50,4 +51,5 @@ fun registerAppFunctions() {
     AppFunctions.register(FunctionIds.CARD_TRANSACTIONS, AppFunction(R.id.card_withdrawal_button, R.string.pos_card_transactions, R.drawable.withdrawal))
     AppFunctions.register(FunctionIds.FUNDS_TRANSFER, AppFunction(R.id.funds_transfer_button, R.string.fund_stransfer, R.drawable.deposit))
     AppFunctions.register(FunctionIds.HLA_TAGGING, AppFunction(R.id.fn_hla_tagging, R.string.hla_tagging, R.drawable.ic_maps_and_flags))
+    AppFunctions.register(FunctionIds.FAQS, AppFunction(R.id.fn_faq, R.string.title_activity_faq, R.drawable.ic_help))
 }

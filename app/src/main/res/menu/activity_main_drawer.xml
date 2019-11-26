@@ -24,6 +24,10 @@
             android:icon="@drawable/ic_maps_and_flags"
             android:title="@string/hla_tagging" />
         <item
+            android:id="@+id/fn_faq"
+            android:icon="@drawable/ic_help"
+            android:title="@string/title_activity_faq" />
+        <item
             android:id="@+id/logout"
             android:visible="false"
             android:icon="@drawable/logout"
