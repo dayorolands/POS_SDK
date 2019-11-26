@@ -67,7 +67,6 @@ dependencies {
     api files('libs/bcprov-jdk15on-148.jar')
 
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
-    implementation "com.google.dagger:dagger:${versions.dagger}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
@@ -122,9 +121,6 @@ dependencies {
     api 'com.github.esafirm.android-image-picker:rximagepicker:2.1.0'
     api "com.github.bumptech.glide:glide:${versions.glide}"
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
-
-    api "com.microsoft.appcenter:appcenter-analytics:${versions.appCenter}"
-    api "com.microsoft.appcenter:appcenter-crashes:${versions.appCenter}"
 
     implementation("com.crashlytics.sdk.android:crashlytics:${versions.crashlytics}@aar") {
         transitive = true
