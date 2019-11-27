@@ -10,19 +10,19 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.creditclub.core.data.CreditClubMiddleWareAPI
-import com.creditclub.core.util.appDataStorage
+import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.util.*
 import kotlinx.android.synthetic.main.activity_update.*
 import kotlinx.android.synthetic.main.content_update.*
-import org.koin.android.ext.android.inject
+import kotlinx.coroutines.launch
 
-class UpdateActivity : AppCompatActivity() {
+class UpdateActivity : CreditClubActivity() {
 
-    private val middleWareAPI: CreditClubMiddleWareAPI by inject()
+    private var latestVersion = appDataStorage.latestVersion
+
     private val fileName by lazy {
-        "${getString(R.string.version_management_app_name)}${appDataStorage.latestVersion}.apk"
+        "${getString(R.string.version_management_app_name)}${latestVersion?.version}.apk"
     }
 
     private var isProcessing = false
@@ -31,14 +31,12 @@ class UpdateActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_update)
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        defaultState()
-
-        if (!appDataStorage.latestVersion.isNullOrEmpty()) availableState()
-        else checkingState()
+        checkingState()
 
         primaryButton.setOnClickListener {
-            if (appDataStorage.latestVersion.isNullOrEmpty()) {
+            if (latestVersion?.version.isNullOrEmpty()) {
                 if (isProcessing) defaultState() else checkingState()
             } else {
                 if (isProcessing) availableState() else updatingState()
@@ -58,6 +56,15 @@ class UpdateActivity : AppCompatActivity() {
         primaryButton.text = "Cancel"
         statusTv.text = "Checking for updates..."
         progressBar.visibility = View.VISIBLE
+
+        mainScope.launch {
+            val error = getLatestVersion().error
+
+            if (error != null) return@launch dialogProvider.showError(error)
+
+            latestVersion = appDataStorage.latestVersion
+            availableState()
+        }
     }
 
     private fun updatingState() {
@@ -93,7 +100,7 @@ class UpdateActivity : AppCompatActivity() {
 //                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 //                startActivity(intent)
 //            } else {
-            val url = appDataStorage.latestVersionLink
+            val url = latestVersion?.link
             val request = DownloadManager.Request(Uri.parse(url))
             request.setDescription("Downloading")
             request.setTitle("POS application update")

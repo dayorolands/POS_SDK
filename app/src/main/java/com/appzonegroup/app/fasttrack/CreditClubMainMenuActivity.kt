@@ -8,10 +8,12 @@ import android.widget.TextView
 import androidx.core.view.GravityCompat
 import com.appzonegroup.app.fasttrack.databinding.ActivityCreditClubMainMenuBinding
 import com.appzonegroup.app.fasttrack.model.AgentInfo
+import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.AppFunctions
+import com.creditclub.core.util.appDataStorage
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.packageInfo
@@ -76,7 +78,36 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
             isVisible = institutionConfig.hasOnlineFunctions
         }
 
-        binding.navView.menu.findItem(R.id.fn_update)?.isVisible = !Platform.isPOS
+        if (Platform.isPOS) {
+            binding.navView.menu.findItem(R.id.fn_update)?.isVisible = true
+
+            appDataStorage.latestVersion?.run {
+                val currentVersion = packageInfo?.versionName
+                if (currentVersion != null) {
+                    if (canUpdate(currentVersion)) {
+                        val updateIsRequired = updateRequired(currentVersion)
+                        val message = "A new version (v$version) is available."
+                        val subtitle =
+                            if (updateIsRequired) "Please update with ${daysOfGraceLeft()} days"
+                            else "Please update"
+
+                        val dialog =
+                            Dialogs.confirm(this@CreditClubMainMenuActivity, message, subtitle) {
+                                onSubmit {
+                                    if (it) startActivity(UpdateActivity::class.java)
+                                    else if (updateIsRequired) finish()
+                                }
+
+                                onClose {
+                                    if (updateIsRequired) finish()
+                                }
+                            }
+                        dialog.setCancelable(!updateIsRequired)
+                        dialog.setCanceledOnTouchOutside(!updateIsRequired)
+                    }
+                }
+            }
+        }
     }
 
     override fun onResume() {

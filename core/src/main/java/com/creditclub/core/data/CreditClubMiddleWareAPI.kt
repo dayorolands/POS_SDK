@@ -43,5 +43,5 @@ open class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient) {
 
     val offlineHlaTaggingService by retrofit.service(OfflineHlaTaggingService::class)
 
-    val versionService by retrofit.service(VersionService::class.java)
+    val versionService by retrofit.service(VersionService::class)
 }

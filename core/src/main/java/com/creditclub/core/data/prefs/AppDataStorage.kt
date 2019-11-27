@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.creditclub.core.R
+import com.creditclub.core.data.model.AppVersion
 import com.creditclub.core.util.delegates.valueStore
+import kotlinx.serialization.json.Json
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
@@ -18,8 +20,21 @@ class AppDataStorage(
     )
 ) : SharedPreferences by pref {
 
-    var latestVersion: String? by valueStore("LATEST_VERSION")
+    private var latestVersionJson: String? by valueStore("LATEST_VERSION_JSON")
     var latestVersionLink: String? by valueStore("LATEST_VERSION_LINK")
+
+    var latestVersion: AppVersion?
+        get() = if (latestVersionJson != null) {
+            Json.nonstrict.parse(
+                AppVersion.serializer(),
+                latestVersionJson!!
+            )
+        } else null
+        set(value) {
+            latestVersionJson = if (value != null) {
+                Json.stringify(AppVersion.serializer(), value)
+            } else null
+        }
 
     fun getString(key: String): String? = getString(key, null)
 
