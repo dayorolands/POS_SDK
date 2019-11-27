@@ -78,32 +78,34 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
             isVisible = institutionConfig.hasOnlineFunctions
         }
 
-        if (Platform.isPOS) {
-            binding.navView.menu.findItem(R.id.fn_update)?.isVisible = true
+        binding.navView.menu.findItem(R.id.fn_update)?.isVisible = Platform.isPOS
 
+        if (Platform.isPOS) {
             appDataStorage.latestVersion?.run {
                 val currentVersion = packageInfo?.versionName
                 if (currentVersion != null) {
-                    if (canUpdate(currentVersion)) {
-                        val updateIsRequired = updateRequired(currentVersion)
+                    if (updateIsAvailable(currentVersion)) {
+                        val updateIsRequired = updateIsRequired(currentVersion)
+                        val mustUpdate = updateIsRequired && daysOfGraceLeft() < 1
                         val message = "A new version (v$version) is available."
                         val subtitle =
-                            if (updateIsRequired) "Please update with ${daysOfGraceLeft()} days"
+                            if (updateIsRequired && mustUpdate) "You need to update now"
+                            else if (updateIsRequired) "Please update with ${daysOfGraceLeft()} days"
                             else "Please update"
 
                         val dialog =
                             Dialogs.confirm(this@CreditClubMainMenuActivity, message, subtitle) {
                                 onSubmit {
                                     if (it) startActivity(UpdateActivity::class.java)
-                                    else if (updateIsRequired) finish()
+                                    else if (mustUpdate) finish()
                                 }
 
                                 onClose {
-                                    if (updateIsRequired) finish()
+                                    if (mustUpdate) finish()
                                 }
                             }
-                        dialog.setCancelable(!updateIsRequired)
-                        dialog.setCanceledOnTouchOutside(!updateIsRequired)
+                        dialog.setCancelable(!mustUpdate)
+                        dialog.setCanceledOnTouchOutside(false)
                     }
                 }
             }

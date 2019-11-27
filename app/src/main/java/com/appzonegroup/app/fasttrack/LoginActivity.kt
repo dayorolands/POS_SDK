@@ -18,6 +18,7 @@ import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.util.posConfig
 import com.appzonegroup.creditclub.pos.util.posParameters
+import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.util.*
 import kotlinx.coroutines.launch
 
@@ -86,7 +87,7 @@ class LoginActivity : DialogProviderActivity() {
             }
         }
 
-        mainScope.launch { getLatestVersion() }
+        mainScope.launch { (application as CreditClubApplication).getLatestVersion () }
 
         if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
             showError("Timeout due to inactivity")

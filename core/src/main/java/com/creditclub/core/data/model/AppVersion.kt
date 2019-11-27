@@ -16,20 +16,21 @@ data class AppVersion(
     var version: String? = null,
 
     @SerialName("GracePeriod")
-    var gracePeriod: String? = null
+    var gracePeriod: Int? = null
 ) {
 
     @SerialName("NotifiedAt")
     @Serializable(with = LocalDateSerializer::class)
     var notifiedAt: LocalDate = LocalDate.now()
 
-    fun updateRequired(currentVersion: String): Boolean {
-        return canUpdate(currentVersion) && daysOfGraceLeft() < 0
+    fun updateIsRequired(currentVersion: String): Boolean {
+        return gracePeriod != null && updateIsAvailable(currentVersion) && daysOfGraceLeft() < 1
     }
 
-    fun canUpdate(currentVersion: String): Boolean {
+    fun updateIsAvailable(currentVersion: String): Boolean {
         return version ?: "0" > currentVersion
     }
 
-    fun daysOfGraceLeft(): Int = Period.between(notifiedAt, LocalDate.now()).days
+    fun daysOfGraceLeft(): Int =
+        (gracePeriod ?: 365) - Period.between(notifiedAt, LocalDate.now()).days
 }

@@ -2,7 +2,6 @@
     <string name="app_name">CreditClub</string>
     <string name="ota_app_name">CreditClub</string>
     <string name="grafana_app_name" translatable="false">CreditClub</string>
-    <string name="version_management_app_name" translatable="false">CreditClub</string>
     <string name="variable_is_required">%1$s is required</string>
     <string name="variable_contains_invalid_characters">%1$s contains invalid characters</string>
     <string name="variable_is_invalid">%1$s is invalid</string>

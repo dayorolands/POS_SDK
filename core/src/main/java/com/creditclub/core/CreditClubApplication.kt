@@ -1,8 +1,12 @@
 package com.creditclub.core
 
 import android.app.Application
+import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.util.appDataStorage
+import com.creditclub.core.util.safeRunIO
 import com.google.android.play.core.missingsplits.MissingSplitsManagerFactory
 import com.jakewharton.threetenabp.AndroidThreeTen
+import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.KoinApplication
@@ -35,5 +39,25 @@ open class CreditClubApplication : Application() {
             modules(listOf(apiModule, locationModule, dataModule))
             modules?.invoke(this)
         }
+    }
+
+    open suspend fun getLatestVersion() = safeRunIO {
+        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI = get()
+
+        val appName = getString(R.string.ota_app_name)
+        val newVersion =
+            creditClubMiddleWareAPI.versionService.getLatestVersionAndDownloadLink(appName)
+
+        if (newVersion != null) {
+            val previousVersion = appDataStorage.latestVersion
+            previousVersion?.run {
+                if (version == newVersion.version) {
+                    newVersion.notifiedAt = previousVersion.notifiedAt
+                }
+            }
+            appDataStorage.latestVersion = newVersion
+        }
+
+        newVersion
     }
 }

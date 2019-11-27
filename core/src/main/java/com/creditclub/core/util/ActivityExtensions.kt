@@ -34,16 +34,3 @@ val Activity.finishOnClose: DialogListenerBlock<Nothing>
             finish()
         }
     }
-
-suspend inline fun Activity.getLatestVersion() = safeRun {
-    val creditClubMiddleWareAPI: CreditClubMiddleWareAPI = get()
-
-    val appName = getString(R.string.ota_app_name)
-    val version = creditClubMiddleWareAPI.versionService.getLatestVersionAndDownloadLink(appName)
-
-    if (version != null) {
-        appDataStorage.latestVersion = version
-    }
-
-    version
-}

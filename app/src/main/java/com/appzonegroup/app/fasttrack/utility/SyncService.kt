@@ -57,8 +57,8 @@ class SyncService : Service(), Logger {
 //        startMiddlewareNotifications()
 
         val handler = Handler()
-        val updateChecker = UpdateChecker(this, "Single")
-        updateChecker.run()
+//        val updateChecker = UpdateChecker(this, "Single")
+//        updateChecker.run()
         /*Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -76,7 +76,7 @@ class SyncService : Service(), Logger {
         }, 60 * 60 * 1000, 60000);*/
 
         handler.postDelayed({
-            updateChecker.run()
+//            updateChecker.run()
             //new UpdateChecker(SyncService.this, "Single");
         }, (60 * 60 * 1000).toLong())//Check every hour
     }

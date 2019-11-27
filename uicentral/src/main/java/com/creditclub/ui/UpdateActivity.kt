@@ -11,6 +11,7 @@ import android.os.Environment
 import android.util.Log
 import android.view.View
 import androidx.core.app.ActivityCompat
+import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
 import kotlinx.android.synthetic.main.activity_update.*
@@ -20,11 +21,7 @@ import kotlinx.coroutines.launch
 class UpdateActivity : CreditClubActivity() {
 
     private var latestVersion = appDataStorage.latestVersion
-
-    private val fileName by lazy {
-        "${getString(R.string.version_management_app_name)}${latestVersion?.version}.apk"
-    }
-
+    private val fileName get() = "${getString(R.string.ota_app_name)}${latestVersion?.version}.apk"
     private var isProcessing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,12 +55,25 @@ class UpdateActivity : CreditClubActivity() {
         progressBar.visibility = View.VISIBLE
 
         mainScope.launch {
-            val error = getLatestVersion().error
+            val error = (application as CreditClubApplication).getLatestVersion().error
 
-            if (error != null) return@launch dialogProvider.showError(error)
+            if (error != null) return@launch dialogProvider.showError<Nothing>(error) {
+                onClose {
+                    finish()
+                }
+            }
 
             latestVersion = appDataStorage.latestVersion
-            availableState()
+
+            if (latestVersion?.updateIsAvailable(packageInfo!!.versionName) != true) {
+                val message =
+                    "Congratulations. You're on the latest version of ${getString(R.string.app_name)}"
+                dialogProvider.showSuccess<Nothing>(message) {
+                    onClose {
+                        finish()
+                    }
+                }
+            } else availableState()
         }
     }
 
@@ -79,7 +89,7 @@ class UpdateActivity : CreditClubActivity() {
     private fun availableState() {
         isProcessing = false
         primaryButton.text = "Download"
-        statusTv.text = "Update to new version"
+        statusTv.text = "A new version (v${latestVersion?.version}) is available for download"
         progressBar.visibility = View.INVISIBLE
     }
 
@@ -103,7 +113,7 @@ class UpdateActivity : CreditClubActivity() {
             val url = latestVersion?.link
             val request = DownloadManager.Request(Uri.parse(url))
             request.setDescription("Downloading")
-            request.setTitle("POS application update")
+            request.setTitle("${getString(R.string.app_name)} application update")
             request.allowScanningByMediaScanner()
 //            request.setRequiresCharging(false)// Set if charging is required to begin the download
             request.setAllowedOverMetered(true)
@@ -118,6 +128,7 @@ class UpdateActivity : CreditClubActivity() {
             statusTv.text = "Check your notifications the see download progress"
 
             setContentView(R.layout.layout_empty)
+            dialogProvider.showSuccess("Download has started. \nPlease check your notifications to see download progress")
 //            }
         }
     }
@@ -149,10 +160,5 @@ class UpdateActivity : CreditClubActivity() {
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             download()
         }
-    }
-
-    companion object {
-        //        private val TAG = UpdateActivity::class.java.simpleName
-        internal const val PREFS_FILENAME = "Updates"
     }
 }
