@@ -1,0 +1,78 @@
+{
+  "IsSuccessful": true,
+  "ReponseMessage": null,
+  "Data": [
+    {
+      "Question": "I cannot download the app on my device. Why and what should I do?",
+      "Answer": "The app supports devices with a minimum android version of 5.0. Ensure that the android version of your device is between 5.0 and above."
+    },
+    {
+      "Question": "I cannot activate the app on my phone. What should I do?",
+      "Answer": "Ensure that the phone number, verification code and activation code are correct. The phone number must be 11 digits, verification code must be 16 digits and activation code must be 4 digits.  "
+    },
+    {
+      "Question": "I have not received my verification code. What should I do?",
+      "Answer": "Contact the Admin to resend the verification code."
+    },
+    {
+      "Question": "I get a notification to turn on my location when I launch the app. Why?",
+      "Answer": "You are required to turn on your location because the application tracks where you are when you make a transaction. "
+    },
+    {
+      "Question": "I cannot remember my PIN. What should I do?",
+      "Answer": "Contact the Admin. They will reset the PIN. You will receive an SMS stating the new default PIN which you will have to change. "
+    },
+    {
+      "Question": "The app has locked me out. What should I do?",
+      "Answer": "Contact the Admin. You must have input a wrong PIN more than 3 times. The admin will reset your PIN tries and you can regain access with your same PIN"
+    },
+    {
+      "Question": "I cannot perform a withdrawal or funds transfer because I have reached transaction limit. What should I do?",
+      "Answer": "Contact the Admin to reset transaction limit."
+    },
+    {
+      "Question": "I no longer want to be an agent. What should I do?",
+      "Answer": "Contact the Admin and report the issue."
+    },
+    {
+      "Question": "I am trying to open account for a customer but the BVN is flagging an error. What happened?",
+      "Answer": "The BVN being used has been blacklisted by Sterling bank on suspicion of fraudulent economic activities. Therefore, an account cannot be opened for the customer using that BVN."
+    },
+    {
+      "Question": "Customers have not been receiving SMS for their transactions. What should I do?",
+      "Answer": "Contact the Admin and report the issue."
+    },
+    {
+      "Question": "How can I easily communicate issues to the admin?",
+      "Answer": "Make use of the support module. You can log a case and communicate with a support personnel on the case logged"
+    },
+    {
+      "Question": "How can I know if my logged issue is resolved?",
+      "Answer": "Navigate to the case under question under the ‘Support' module. If there is a ‘Resolve' button at the top right corner of the page, then the support staff has marked the case as resolved. "
+    },
+    {
+      "Question": "How can I reuse my account if i misplace my device or it was stolen?",
+      "Answer": "Report the incidence. Your account will be unlinked from the stolen or misplaced device. When you get a new device, contact the admin to reactivate your account. Your account will be linked to the new device. \nLinking and unlinking of devices is only necessary if the device is POS terminal."
+    },
+    {
+      "Question": "Can I operate on multiple devices?",
+      "Answer": "Each account is mapped to a POS terminal. Therefore, an agent can only have 1 profile per terminal. \nHowever, if the device is a mobile phone, an agent can set up his/her profile on multiple devices. This is because card transactions cannot be performed on the mobile phone"
+    },
+    {
+      "Question": "What is HLA tagging?",
+      "Answer": "Highly Lucrative Area (HLA) is a feature to know locations that are lucrative e.g. shopping malls, marketplaces, etc."
+    },
+    {
+      "Question": "How do I confirm the status of a transaction?",
+      "Answer": "Navigate to ‘Report' page.  Select a date range for the transaction and check against the various status."
+    },
+    {
+      "Question": "What do I do if my card transaction commission does not settle?",
+      "Answer": "On your POS terminal, navigate to “card transactions”, select “unsettled transaction” and select the particular transaction record that didn’t settle. Click on the “settle” button to manually settle your transaction."
+    },
+    {
+      "Question": "How can I update the app?",
+      "Answer": "A notification will be pushed to your android device whenever there is a new update. The update will be available on Google Play store."
+    }
+  ]
+}

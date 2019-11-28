@@ -134,6 +134,8 @@ fun BaseActivity.openPageById(id: Int) {
 
         R.id.fn_hla_tagging -> startActivity(HlaTaggingActivity::class.java)
 
+        R.id.fn_faq -> startActivity(FaqActivity::class.java)
+
         else -> showNotification(
             "This function is not available at the moment. Please look out for it in our next update.",
             false

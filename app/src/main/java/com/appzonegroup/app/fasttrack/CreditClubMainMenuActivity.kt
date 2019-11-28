@@ -172,6 +172,7 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
                 )
             )
             R.id.fn_hla_tagging -> startActivity(HlaTaggingActivity::class.java)
+            R.id.fn_faq -> startActivity(FaqActivity::class.java)
         }
 
         return true

@@ -1,5 +1,7 @@
 package com.creditclub.core.util
 
+import java.io.InputStream
+
 /**
  * Helper to force a when statement to assert all options are matched in a when statement.
  *
@@ -18,3 +20,10 @@ package com.creditclub.core.util
  */
 inline val <T> T.exhaustive: T
     get() = this
+
+val InputStream.rawContents: String
+    get() {
+        val bytes = ByteArray(available())
+        read(bytes, 0, bytes.size)
+        return String(bytes)
+    }

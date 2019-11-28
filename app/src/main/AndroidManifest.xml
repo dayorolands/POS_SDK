@@ -30,6 +30,10 @@
         tools:node="replace"
         tools:replace="icon, label, theme">
         <activity
+            android:name=".FaqActivity"
+            android:label="@string/title_activity_faq"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".HlaTaggingActivity"
             android:label="@string/title_activity_hla_tagging"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -553,7 +557,6 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="5ae667395ec4429e5d7caaf22b1516debe8b386a" />
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
