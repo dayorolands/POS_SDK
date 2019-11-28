@@ -20,7 +20,8 @@ private const val defaultZone = "UTC+01:00"
 const val CREDIT_CLUB_DATE_PATTERN = "uuuu-MM-dd'T'HH:mm:ss[.SSS][xxx][xx][X]"
 
 private fun formatter(pattern: String, zoneID: String = defaultZone): DateTimeFormatter {
-    return DateTimeFormatter.ofPattern(pattern).withLocale(Locale.ENGLISH).withZone(ZoneId.of(zoneID))
+    return DateTimeFormatter.ofPattern(pattern).withLocale(Locale.ENGLISH)
+        .withZone(ZoneId.of(zoneID))
 }
 
 val Date.shortString: String
@@ -74,6 +75,8 @@ fun Instant.toString(pattern: String, zoneID: String = defaultZone): String {
 fun LocalDate.toString(pattern: String, zoneID: String = defaultZone): String {
     return formatter(pattern, zoneID).format(this)
 }
+
+fun String.toLocalDate() = LocalDate.parse(this)
 
 fun String.toInstant(pattern: String, zoneID: String = defaultZone): Instant {
     return Instant.from(formatter(pattern, zoneID).parse(this))

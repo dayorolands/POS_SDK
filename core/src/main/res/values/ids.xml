@@ -4,4 +4,5 @@
     <item name="fn_hla_tagging" type="id" />
     <item name="fn_support" type="id" />
     <item name="fn_faq" type="id" />
+    <item name="fn_update" type="id" />
 </resources>

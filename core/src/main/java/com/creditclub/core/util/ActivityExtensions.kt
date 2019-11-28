@@ -4,7 +4,10 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
+import com.creditclub.core.R
+import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.ui.widget.DialogListenerBlock
+import org.koin.android.ext.android.get
 
 
 /**

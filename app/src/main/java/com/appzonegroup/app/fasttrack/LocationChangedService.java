@@ -8,14 +8,18 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.provider.Settings;
 import android.text.TextUtils;
+
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse;
 import com.appzonegroup.app.fasttrack.model.online.Response;
 import com.appzonegroup.app.fasttrack.network.online.APIHelper;
 import com.appzonegroup.app.fasttrack.utility.GPSTracker;
 import com.appzonegroup.app.fasttrack.utility.LocalStorage;
+import com.creditclub.core.util.SafeRunKt;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import kotlin.jvm.functions.Function0;
 
 public class LocationChangedService extends Service {
 
@@ -58,18 +62,18 @@ public class LocationChangedService extends Service {
                                     latitude = "0.0";
                                     longitude = "0.0";
                                 }
-                                APIHelper luh = new APIHelper(getApplicationContext());
-                                BankOneApplication bankOneApplication = (BankOneApplication)getApplication();
-                                AuthResponse ar = bankOneApplication.getAuthResponse();
-                                if (ar != null && luh != null) {
-                                    luh.updateLocationAgent(ar.getPhoneNumber().replace("234", "0"), longitude, latitude, new APIHelper.VolleyCallback<String>() {
-                                        @Override
-                                        public void onCompleted(Exception e, String result,boolean status) {
+
+                                SafeRunKt.safeRun(() -> {
+                                    APIHelper luh = new APIHelper(getApplicationContext());
+                                    BankOneApplication bankOneApplication = (BankOneApplication) getApplication();
+                                    AuthResponse ar = bankOneApplication.getAuthResponse();
+                                    if (ar != null && luh != null) {
+                                        luh.updateLocationAgent(ar.getPhoneNumber().replace("234", "0"), longitude, latitude, (e, result, status) -> {
                                             if (status) {
                                                 if (result.trim().length() > 0) {
                                                     try {
                                                         String encrypted = Response.fixResponse(result, null);
-                                                    }catch(Exception c){
+                                                    } catch (Exception c) {
                                                         c.printStackTrace();
                                                     }
                                                 } else {
@@ -82,9 +86,11 @@ public class LocationChangedService extends Service {
 
                                                 }
                                             }
-                                        }
-                                    });
-                                }
+                                        });
+                                    }
+
+                                    return null;
+                                });
                             }
                         });
 

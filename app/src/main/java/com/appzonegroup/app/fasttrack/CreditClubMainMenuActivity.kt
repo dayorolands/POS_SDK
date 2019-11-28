@@ -8,13 +8,17 @@ import android.widget.TextView
 import androidx.core.view.GravityCompat
 import com.appzonegroup.app.fasttrack.databinding.ActivityCreditClubMainMenuBinding
 import com.appzonegroup.app.fasttrack.model.AgentInfo
+import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
+import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.AppFunctions
+import com.creditclub.core.util.appDataStorage
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.safeRunIO
+import com.creditclub.ui.UpdateActivity
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
@@ -73,6 +77,39 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
         binding.navView.menu.getItem(0).run {
             isVisible = institutionConfig.hasOnlineFunctions
         }
+
+        binding.navView.menu.findItem(R.id.fn_update)?.isVisible = Platform.isPOS
+
+        if (Platform.isPOS) {
+            appDataStorage.latestVersion?.run {
+                val currentVersion = packageInfo?.versionName
+                if (currentVersion != null) {
+                    if (updateIsAvailable(currentVersion)) {
+                        val updateIsRequired = updateIsRequired(currentVersion)
+                        val mustUpdate = updateIsRequired && daysOfGraceLeft() < 1
+                        val message = "A new version (v$version) is available."
+                        val subtitle =
+                            if (updateIsRequired && mustUpdate) "You need to update now"
+                            else if (updateIsRequired) "Please update with ${daysOfGraceLeft()} days"
+                            else "Please update"
+
+                        val dialog =
+                            Dialogs.confirm(this@CreditClubMainMenuActivity, message, subtitle) {
+                                onSubmit {
+                                    if (it) startActivity(UpdateActivity::class.java)
+                                    else if (mustUpdate) finish()
+                                }
+
+                                onClose {
+                                    if (mustUpdate) finish()
+                                }
+                            }
+                        dialog.setCancelable(!mustUpdate)
+                        dialog.setCanceledOnTouchOutside(false)
+                    }
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -110,27 +147,6 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
             }
         }
     }
-
-//    private fun openPlayStore() {
-//        val appPackageName = packageInfo?.packageName
-//
-//        try {
-//            startActivity(
-//                Intent(
-//                    Intent.ACTION_VIEW,
-//                    Uri.parse("market://details?id=$appPackageName")
-//                )
-//            )
-//        } catch (anfe: android.content.ActivityNotFoundException) {
-//            startActivity(
-//                Intent(
-//                    Intent.ACTION_VIEW,
-//                    Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
-//                )
-//            )
-//        }
-//
-//    }
 
     override fun onBackPressed() {
         try {
@@ -171,6 +187,7 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
                     SupportActivity::class.java
                 )
             )
+            R.id.fn_update -> startActivity(UpdateActivity::class.java)
             R.id.fn_hla_tagging -> startActivity(HlaTaggingActivity::class.java)
             R.id.fn_faq -> startActivity(FaqActivity::class.java)
         }

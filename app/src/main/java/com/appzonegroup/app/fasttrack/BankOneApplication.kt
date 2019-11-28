@@ -10,9 +10,16 @@ import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.loadPosModules
 import com.appzonegroup.creditclub.pos.startPosApp
 import com.creditclub.core.CreditClubApplication
+import com.creditclub.core.R
 import com.creditclub.core.config.IInstitutionConfig
+import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.model.AppVersion
 import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.SafeRunResult
+import com.creditclub.core.util.appDataStorage
 import com.creditclub.core.util.localStorage
+import com.creditclub.core.util.safeRunIO
+import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
@@ -49,6 +56,29 @@ class BankOneApplication : CreditClubApplication() {
 
         if (Platform.isPOS) {
             startPosApp()
+        }
+    }
+
+    override suspend fun getLatestVersion(): SafeRunResult<AppVersion?> {
+        return if (!Platform.isPOS) super.getLatestVersion()
+        else safeRunIO {
+            val creditClubMiddleWareAPI: CreditClubMiddleWareAPI = get()
+
+            val appName = "${getString(R.string.ota_app_name)}POS"
+            val newVersion =
+                creditClubMiddleWareAPI.versionService.getLatestVersionAndDownloadLink(appName)
+
+            if (newVersion != null) {
+                val previousVersion = appDataStorage.latestVersion
+                previousVersion?.run {
+                    if (version == newVersion.version) {
+                        newVersion.notifiedAt = previousVersion.notifiedAt
+                    }
+                }
+                appDataStorage.latestVersion = newVersion
+            }
+
+            newVersion
         }
     }
 }
