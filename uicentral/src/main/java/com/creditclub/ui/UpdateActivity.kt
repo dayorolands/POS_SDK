@@ -99,23 +99,11 @@ class UpdateActivity : CreditClubActivity() {
 
     private fun download() {
         if (hasStoragePermission) {
-//            val file = File(Environment.DIRECTORY_DOWNLOADS, fileName)
-////            val file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-//            if (file.exists()) {
-//                val intent = Intent(Intent.ACTION_VIEW)
-//                intent.setDataAndType(
-//                    Uri.fromFile(file),
-//                    "application/vnd.android.package-archive"
-//                )
-//                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                startActivity(intent)
-//            } else {
             val url = latestVersion?.link
             val request = DownloadManager.Request(Uri.parse(url))
             request.setDescription("Downloading")
             request.setTitle("${getString(R.string.app_name)} application update")
             request.allowScanningByMediaScanner()
-//            request.setRequiresCharging(false)// Set if charging is required to begin the download
             request.setAllowedOverMetered(true)
             request.setMimeType("application/vnd.android.package-archive")
             request.setAllowedOverRoaming(true)
@@ -128,8 +116,13 @@ class UpdateActivity : CreditClubActivity() {
             statusTv.text = "Check your notifications the see download progress"
 
             setContentView(R.layout.layout_empty)
-            dialogProvider.showSuccess("Download has started. \nPlease check your notifications to see download progress")
-//            }
+            val message =
+                "Download has started. \nPlease check your notifications to see download progress"
+            dialogProvider.showSuccess<Nothing>(message) {
+                onClose {
+                    finish()
+                }
+            }
         }
     }
 
