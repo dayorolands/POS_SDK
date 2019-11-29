@@ -22,6 +22,7 @@ open class CreditClubApplication : Application() {
 
     private lateinit var koinApp: KoinApplication
     protected open val modules: KoinAppDeclaration? = null
+    open val otaAppName: String get() = getString(R.string.ota_app_name)
 
     override fun onCreate() {
         super.onCreate()
@@ -43,10 +44,8 @@ open class CreditClubApplication : Application() {
 
     open suspend fun getLatestVersion() = safeRunIO {
         val creditClubMiddleWareAPI: CreditClubMiddleWareAPI = get()
-
-        val appName = getString(R.string.ota_app_name)
         val newVersion =
-            creditClubMiddleWareAPI.versionService.getLatestVersionAndDownloadLink(appName)
+            creditClubMiddleWareAPI.versionService.getLatestVersionAndDownloadLink(otaAppName)
 
         if (newVersion != null) {
             val previousVersion = appDataStorage.latestVersion

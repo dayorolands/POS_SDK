@@ -26,6 +26,9 @@ import org.koin.dsl.module
 
 class BankOneApplication : CreditClubApplication() {
 
+    override val otaAppName: String
+        get() = if (Platform.isPOS) "${super.otaAppName}POS" else super.otaAppName
+
     override val modules: KoinAppDeclaration?
         get() = {
             modules(module {
@@ -56,29 +59,6 @@ class BankOneApplication : CreditClubApplication() {
 
         if (Platform.isPOS) {
             startPosApp()
-        }
-    }
-
-    override suspend fun getLatestVersion(): SafeRunResult<AppVersion?> {
-        return if (!Platform.isPOS) super.getLatestVersion()
-        else safeRunIO {
-            val creditClubMiddleWareAPI: CreditClubMiddleWareAPI = get()
-
-            val appName = "${getString(R.string.ota_app_name)}POS"
-            val newVersion =
-                creditClubMiddleWareAPI.versionService.getLatestVersionAndDownloadLink(appName)
-
-            if (newVersion != null) {
-                val previousVersion = appDataStorage.latestVersion
-                previousVersion?.run {
-                    if (version == newVersion.version) {
-                        newVersion.notifiedAt = previousVersion.notifiedAt
-                    }
-                }
-                appDataStorage.latestVersion = newVersion
-            }
-
-            newVersion
         }
     }
 }
