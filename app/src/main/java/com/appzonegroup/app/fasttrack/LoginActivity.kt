@@ -20,15 +20,16 @@ import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.util.posConfig
 import com.appzonegroup.creditclub.pos.util.posParameters
 import com.creditclub.core.data.model.SurveyQuestion
-import com.creditclub.core.data.model.SurveyQuestionType
+import com.creditclub.core.data.prefs.JsonStorage
 import com.creditclub.core.data.request.SubmitSurveyRequest
-import com.creditclub.core.util.localStorage
-import com.creditclub.core.util.packageInfo
-import com.creditclub.core.util.safeRun
-import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.util.*
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 
-class LoginActivity : DialogProviderActivity() {
+class LoginActivity : CreditClubActivity() {
+
+    private val jsonStore by lazy { JsonStorage.getStore(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,45 +95,83 @@ class LoginActivity : DialogProviderActivity() {
         }
 
         if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
-            showError("Timeout due to inactivity")
+            dialogProvider.showError("Timeout due to inactivity")
         } else {
-            startActivity(Intent(this, BannerActivity::class.java))
+            val loggedOut = intent.getBooleanExtra("LOGGED_OUT", false)
 
-            val questions = listOf(
-                SurveyQuestion(
-                    "1",
-                    "How likely are you to recommend this app to someone",
-                    SurveyQuestionType.Rating
-                ),
-                SurveyQuestion("2", "Question 2", SurveyQuestionType.MultipleChoice).apply {
-                    options = listOf(
-                        SurveyQuestion.Option("1", "Option 1"),
-                        SurveyQuestion.Option("2", "Option 2"),
-                        SurveyQuestion.Option("3", "Option 3"),
-                        SurveyQuestion.Option("4", "Option 4")
-                    )
-                },
-                SurveyQuestion(
-                    "3",
-                    "Please rate your experience with our Funds Transfer",
-                    SurveyQuestionType.Rating
-                )
-            )
+            if (!loggedOut && jsonStore.has("BANNER_IMAGES")) {
+                startActivity(Intent(this, BannerActivity::class.java))
+            }
+
+            checkLocalSurveyQuestions()
+        }
+
+        downloadBannerImages()
+        downloadSurveyQuestions()
+    }
+
+    private fun checkLocalSurveyQuestions() {
+        if (jsonStore.has("SURVEY_QUESTIONS")) {
+            val questionsJson = jsonStore.get<List<SurveyQuestion>>("SURVEY_QUESTIONS")
+            val questions = questionsJson.data ?: return
+            if (questions.isEmpty()) return
 
             SurveyDialog.create(this, questions) {
                 onSubmit { data ->
                     ioScope.launch {
                         safeRunIO {
-                            creditClubMiddleWareAPI.staticService.submitSurvey(SubmitSurveyRequest().apply {
+                            val surveyData = SubmitSurveyRequest().apply {
                                 answers = data
                                 institutionCode = localStorage.institutionCode
                                 agentPhoneNumber = localStorage.agent?.phoneNumber
                                 geoLocation = gps.geolocationString
-                            })
+                            }
+
+                            creditClubMiddleWareAPI.staticService.submitSurvey(surveyData)
                         }
+                        jsonStore.delete("SURVEY_QUESTIONS")
                     }
                 }
             }.show()
+        }
+    }
+
+    private fun downloadBannerImages() {
+        ioScope.launch {
+            val (response) = safeRunIO {
+                creditClubMiddleWareAPI.staticService.getBannerImages(
+                    localStorage.institutionCode,
+                    localStorage.agent?.phoneNumber,
+                    packageInfo?.versionName
+                )
+            }
+
+            response ?: return@launch
+            val bannerImageList = response.data ?: return@launch
+
+            if (response.isSuccessful()) {
+                bannerImageList.forEach { Picasso.get().load(it).fetch() }
+                jsonStore.save("BANNER_IMAGES", bannerImageList)
+            }
+        }
+    }
+
+    private fun downloadSurveyQuestions() {
+        ioScope.launch {
+            val (response) = safeRunIO {
+                creditClubMiddleWareAPI.staticService.getSurveyQuestions(
+                    localStorage.institutionCode,
+                    localStorage.agent?.phoneNumber,
+                    packageInfo?.versionName
+                )
+            }
+
+            response ?: return@launch
+            val surveyQuestions = response.data ?: return@launch
+
+            if (response.isSuccessful()) {
+                jsonStore.save("SURVEY_QUESTIONS", surveyQuestions)
+            }
         }
     }
 
@@ -202,12 +241,12 @@ class LoginActivity : DialogProviderActivity() {
         }
 
         if (pin.length != 4) {
-            showError("PIN must be 4 digits")
+            dialogProvider.showError("PIN must be 4 digits")
             return
         }
 
         mainScope.launch {
-            showProgressBar("Logging you in")
+            dialogProvider.showProgressBar("Logging you in")
             val (response, error) = safeRunIO {
                 creditClubMiddleWareAPI.staticService.confirmAgentInformation(
                     localStorage.institutionCode,
@@ -215,11 +254,11 @@ class LoginActivity : DialogProviderActivity() {
                     pin
                 )
             }
-            hideProgressBar()
+            dialogProvider.hideProgressBar()
 
-            if (error != null) return@launch showError(error)
-            if (response == null) return@launch showError("PIN is invalid")
-            if (!response.isSuccessful) return@launch showError(response.responseMessage)
+            if (error != null) return@launch dialogProvider.showError(error)
+            if (response == null) return@launch dialogProvider.showError("PIN is invalid")
+            if (!response.isSuccessful) return@launch dialogProvider.showError(response.responseMessage)
 
             val lastLogin = "Last Login: " + Misc.dateToLongString(Misc.getCurrentDateTime())
             LocalStorage.SaveValue(AppConstants.LAST_LOGIN, lastLogin, baseContext)
@@ -238,7 +277,7 @@ class LoginActivity : DialogProviderActivity() {
     }
 
     private fun showError(message: String, viewId: Int) {
-        showError(message)
+        dialogProvider.showError(message)
         findViewById<View>(viewId).requestFocus()
     }
 

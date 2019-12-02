@@ -2,10 +2,7 @@ package com.creditclub.core.data.api
 
 import com.creditclub.core.data.model.*
 import com.creditclub.core.data.request.*
-import com.creditclub.core.data.response.BackendResponse
-import com.creditclub.core.data.response.MiniStatementResponse
-import com.creditclub.core.data.response.PosNotificationResponse
-import com.creditclub.core.data.response.RequestStatus
+import com.creditclub.core.data.response.*
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.http.*
@@ -153,4 +150,18 @@ interface StaticService {
 
     @POST("CreditClubStatic/SubmitSurvey")
     suspend fun submitSurvey(@Body request: SubmitSurveyRequest)
+
+    @GET("CreditClubStatic/GetBannerImages")
+    suspend fun getBannerImages(
+        @Query("InstitutionCode") institutionCode: String?,
+        @Query("AgentPhonNumber") agentPhoneNumber: String?,
+        @Query("AppVersionName") appVersionName: String?
+    ): ApiResponse<List<String>>
+
+    @GET("CreditClubStatic/GetSurveyQuestions")
+    suspend fun getSurveyQuestions(
+        @Query("InstitutionCode") institutionCode: String?,
+        @Query("AgentPhoneNumber") agentPhoneNumber: String?,
+        @Query("AppVersionName") appVersionName: String?
+    ): ApiResponse<List<SurveyQuestion>>
 }

@@ -29,7 +29,7 @@ class SurveyDialog private constructor(context: Context, questions: List<SurveyQ
     Dialog(context) {
 
     val answers: MutableList<SurveyAnswer> = MutableList(questions.size) {
-        SurveyAnswer(questionId = questions[it].id)
+        SurveyAnswer()
     }
 
     var listener: DialogListenerBlock<List<SurveyAnswer>>? = null
@@ -93,6 +93,7 @@ class SurveyDialog private constructor(context: Context, questions: List<SurveyQ
         override fun onBindViewHolder(holder: SurveyDialog.ViewHolder, position: Int) {
             val question = values[position]
             val answer = answers[position]
+            answer.questionId = question.id
 
             with(holder.binding) {
                 when (this) {

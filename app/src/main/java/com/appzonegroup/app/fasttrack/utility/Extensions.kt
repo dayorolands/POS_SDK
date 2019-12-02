@@ -26,6 +26,8 @@ fun Activity.logout(block: (Intent.() -> Unit)? = null) {
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
+    intent.putExtra("LOGGED_OUT", true)
+
     if (block != null) intent.apply(block)
 
     finish()
