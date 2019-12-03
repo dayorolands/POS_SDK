@@ -3,10 +3,13 @@ package com.appzonegroup.creditclub.pos
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Application
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.view.WindowManager
+import android.widget.EditText
+import android.widget.Toast
 import com.appzonegroup.creditclub.pos.contract.ServiceProvider
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.printer.PosPrinter
@@ -16,15 +19,17 @@ import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.service.SyncService
 import com.appzonegroup.creditclub.pos.widget.Dialogs
+import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.ui.widget.DialogListenerBlock
 
 @SuppressLint("Registered")
-abstract class PosActivity : DialogProviderActivity(), ServiceProvider {
+abstract class PosActivity : CreditClubActivity(), ServiceProvider {
     override val config by lazy { ConfigService.getInstance(this) }
     override val parameters by lazy { ParameterService.getInstance(this) }
     override val callHomeService by lazy { CallHomeService.getInstance(config, parameters, this) }
     override val isoSocketHelper by lazy { IsoSocketHelper(config, parameters, this) }
 
-    val printer by lazy { PosPrinter(this, this) }
+    val printer by lazy { PosPrinter(this, dialogProvider) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,31 +48,31 @@ abstract class PosActivity : DialogProviderActivity(), ServiceProvider {
     fun confirmSupervisorPin(pin: String, closeOnFail: Boolean = false, next: (Boolean) -> Unit) {
         val status = pin == config.supervisorPin
         if (!status) {
-            if (closeOnFail) return showError("Authentication Failed") {
+            if (closeOnFail) return dialogProvider.showError<Nothing>("Authentication Failed") {
                 onClose {
                     finish()
                 }
             }
 
-            showError("Authentication Failed")
+            dialogProvider.showError("Authentication Failed")
         }
         next(status)
     }
 
-    fun confirmAdminPassword(
+    private fun confirmAdminPassword(
         password: String,
         closeOnFail: Boolean = false,
         next: (Boolean) -> Unit
     ) {
         val status = password == config.adminPin
         if (!status) {
-            if (closeOnFail) return showError("Incorrect Password") {
+            if (closeOnFail) return dialogProvider.showError<Nothing>("Incorrect Password") {
                 onClose {
                     finish()
                 }
             }
 
-            showError("Incorrect Password")
+            dialogProvider.showError("Incorrect Password")
         }
         next(status)
     }
@@ -85,12 +90,12 @@ abstract class PosActivity : DialogProviderActivity(), ServiceProvider {
         printer.checkAsync { printerStatus ->
             if (printerStatus != PrinterStatus.READY) {
                 if (closeOnFail) {
-                    showError(printerStatus.message) {
+                    dialogProvider.showError<Nothing>(printerStatus.message) {
                         onClose {
                             finish()
                         }
                     }
-                } else showError(printerStatus.message)
+                } else dialogProvider.showError(printerStatus.message)
 
                 return@checkAsync
             }
@@ -121,7 +126,7 @@ abstract class PosActivity : DialogProviderActivity(), ServiceProvider {
         startActivity(Intent(this, classToStart))
     }
 
-    fun isMyServiceRunning(serviceClass: Class<*>): Boolean {
+    private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {
         val manager = getSystemService(Application.ACTIVITY_SERVICE) as ActivityManager?
         manager?.run {
             for (service in getRunningServices(Integer.MAX_VALUE)) {
@@ -132,5 +137,44 @@ abstract class PosActivity : DialogProviderActivity(), ServiceProvider {
         }
 
         return false
+    }
+
+    fun openPage(clazz: Class<*>) {
+        startActivity(Intent(this, clazz))
+    }
+
+    fun indicateError(message: String, view: EditText?) {
+        hideProgressBar()
+        view?.also {
+            view.isFocusable = true
+            view.isEnabled = true
+            view.error = message
+            view.requestFocus()
+        }
+
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    fun showError(message: String?) = dialogProvider.showError(message)
+
+    fun showError(message: String?, block: DialogListenerBlock<Nothing>) {
+        dialogProvider.showError(message, block)
+    }
+
+    fun showSuccess(message: String?) = dialogProvider.showError(message)
+
+    fun showSuccess(message: String?, block: DialogListenerBlock<Nothing>) {
+        dialogProvider.showError(message, block)
+    }
+
+    fun hideProgressBar() = dialogProvider.hideProgressBar()
+
+    fun showProgressBar(
+        title: String,
+        subtitle: String = "Please wait...",
+        isCancellable: Boolean = false,
+        block: DialogListenerBlock<Nothing>? = null
+    ): Dialog {
+        return dialogProvider.showProgressBar(title, subtitle, isCancellable, block)
     }
 }

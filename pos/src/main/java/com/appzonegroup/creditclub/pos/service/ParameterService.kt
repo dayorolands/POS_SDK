@@ -3,7 +3,6 @@ package com.appzonegroup.creditclub.pos.service
 import android.content.Context
 import android.os.Looper
 import com.appzonegroup.creditclub.pos.BuildConfig
-import com.appzonegroup.creditclub.pos.contract.DialogProvider
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.extension.generateLog
 import com.appzonegroup.creditclub.pos.extension.hasFailed
@@ -12,6 +11,7 @@ import com.appzonegroup.creditclub.pos.extension.responseMessage
 import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.util.*
 import com.creditclub.core.data.prefs.LocalStorage
+import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.safeRun
 import com.google.gson.Gson

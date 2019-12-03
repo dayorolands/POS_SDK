@@ -11,7 +11,6 @@ import com.appzonegroup.creditclub.pos.databinding.ActivityCardMainMenuBinding
 import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.MenuPage
 import com.appzonegroup.creditclub.pos.util.MenuPages
-import com.appzonegroup.creditclub.pos.util.Modules
 import com.appzonegroup.creditclub.pos.widget.Dialogs
 
 
@@ -55,8 +54,8 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                     binding.unsettledButton.button.setOnClickListener(this)
                     binding.keyDownloadButton.button.setOnClickListener(this)
                     binding.parameterDownloadButton.button.setOnClickListener(this)
-                    
-                    parameters.downloadAsync(this)
+
+                    parameters.downloadAsync(dialogProvider)
                 }
             }
         }
@@ -77,7 +76,7 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                     }
                 }
                 R.id.reprint_button -> supervisorAction {
-//                    Modules[Modules.REPRINT_LAST].click(this)
+                    //                    Modules[Modules.REPRINT_LAST].click(this)
                     startActivity(ReprintMenuActivity::class.java)
                 }
 //                R.id.balance_button -> {
@@ -118,13 +117,13 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                 }
                 R.id.key_download_button -> {
                     try {
-                        ParameterService.getInstance(this).downloadKeysAsync(this, true)
+                        ParameterService.getInstance(this).downloadKeysAsync(dialogProvider, true)
                     } catch (ex: Exception) {
                         ex.printStackTrace()
                     }
                 }
                 R.id.parameter_download_button -> {
-                    ParameterService.getInstance(this).downloadParametersAsync(this)
+                    ParameterService.getInstance(this).downloadParametersAsync(dialogProvider)
                 }
 
                 else -> showError("This function is disabled.")

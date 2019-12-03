@@ -124,10 +124,10 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
         if (!canPerformTransaction) return
 
         mainScope.launch {
-            showProgressBar("Loading card functions")
+            dialogProvider.showProgressBar("Loading card functions")
             loadEmv()
             delay(1000)
-            hideProgressBar()
+            dialogProvider.hideProgressBar()
 
             printerDependentAction(true) {
                 cardReader.waitForCard { cardEvent ->

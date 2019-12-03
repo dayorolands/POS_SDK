@@ -20,7 +20,6 @@ import com.android.volley.toolbox.Volley
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.model.TokenRequest
 import com.appzonegroup.app.fasttrack.ui.Dialogs
-import com.appzonegroup.app.fasttrack.ui.PosDialogProvider
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.LogOutTimerUtil
 import com.appzonegroup.app.fasttrack.utility.SyncService
@@ -40,8 +39,7 @@ import org.json.JSONObject
 @SuppressLint("Registered")
 open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUtil.LogOutListener {
 
-    val printer by lazy { PosPrinter(this, posDialogProvider) }
-    val posDialogProvider by lazy { PosDialogProvider(this) }
+    val printer by lazy { PosPrinter(this, dialogProvider) }
     override val hasLogoutTimer = true
 
     override fun onCreate(savedInstanceState: Bundle?) {

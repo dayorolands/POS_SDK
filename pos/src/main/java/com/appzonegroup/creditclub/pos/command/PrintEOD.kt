@@ -2,12 +2,12 @@ package com.appzonegroup.creditclub.pos.command
 
 import android.content.Context
 import com.appzonegroup.creditclub.pos.data.PosDatabase
-import com.appzonegroup.creditclub.pos.contract.DialogProvider
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.printer.PosPrinter
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.printer.TextNode
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
+import com.creditclub.core.ui.widget.DialogProvider
 import kotlinx.coroutines.*
 
 /**

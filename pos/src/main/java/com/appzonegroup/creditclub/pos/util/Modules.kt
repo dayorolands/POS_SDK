@@ -1,10 +1,10 @@
 package com.appzonegroup.creditclub.pos.util
 
-import com.appzonegroup.creditclub.pos.PosActivity
 import com.appzonegroup.creditclub.pos.CardWithdrawalActivity
+import com.appzonegroup.creditclub.pos.PosActivity
 import com.appzonegroup.creditclub.pos.R
-import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.command.PrintEOD
+import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.printer.Receipt
@@ -150,6 +150,6 @@ object Modules {
     }
 
     private fun printEod(activity: PosActivity, localDate: String = TransmissionDateParams().localDate) {
-        PrintEOD(activity, activity.isoSocketHelper, activity, localDate).run()
+        PrintEOD(activity, activity.isoSocketHelper, activity.dialogProvider, localDate).run()
     }
 }

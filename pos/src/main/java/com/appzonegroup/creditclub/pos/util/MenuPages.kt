@@ -1,7 +1,7 @@
 package com.appzonegroup.creditclub.pos.util
 
-import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
 import com.appzonegroup.creditclub.pos.R
+import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
 import com.appzonegroup.creditclub.pos.printer.PosPrinter
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.printer.TextNode
@@ -83,7 +83,7 @@ object MenuPages {
 
                         onClick {
                             it.config.run {
-                                PosPrinter(it, it).printAsync(
+                                PosPrinter(it, it.dialogProvider).printAsync(
                                     TextNode(
                                         """
 POS Configuration
@@ -114,7 +114,7 @@ Keep Alive (Call Home) in seconds: $callHome
                             try {
                                 val parameters = ParameterService.getInstance(it).parameters
 
-                                PosPrinter(it, it).printAsync(
+                                PosPrinter(it, it.dialogProvider).printAsync(
                                     TextNode(
                                         """
 POS Parameters

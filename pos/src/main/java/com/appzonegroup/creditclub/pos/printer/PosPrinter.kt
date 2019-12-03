@@ -10,7 +10,7 @@ import android.os.BatteryManager
 import android.os.Looper
 import android.widget.Toast
 import com.appzonegroup.creditclub.pos.R
-import com.appzonegroup.creditclub.pos.contract.DialogProvider
+import com.creditclub.core.ui.widget.DialogProvider
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
