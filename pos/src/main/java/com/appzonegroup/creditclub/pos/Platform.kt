@@ -4,19 +4,16 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Environment
-import com.appzonegroup.creditclub.pos.card.PosManager
+import com.appzonegroup.creditclub.pos.provider.mpos.MPosManager
 import com.appzonegroup.creditclub.pos.provider.sunmi.SunmiPosManager
 import com.appzonegroup.creditclub.pos.provider.telpo.TelpoPosManager
 import com.appzonegroup.creditclub.pos.util.PosType
 import com.telpo.tps550.api.util.StringUtil
-import com.telpo.tps550.api.util.SystemUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.koin.core.KoinApplication
 import org.koin.core.KoinComponent
 import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
 import java.io.File
 import java.io.FileOutputStream
 
@@ -70,6 +67,9 @@ object Platform : KoinComponent {
         } else if (TelpoPosManager.isCompatible()) {
             posType = PosType.TELPO
             loadKoinModules(TelpoPosManager.module)
+        } else if (MPosManager.isCompatible()) {
+            posType = PosType.MPOS
+            loadKoinModules(MPosManager.module)
         }
 
         if (isPOS) {

@@ -11,18 +11,18 @@ import com.appzonegroup.creditclub.pos.card.CardReaderEventListener
  */
 class MPosCardReader : CardReader {
     override fun waitForCard(onEventChange: CardReaderEventListener) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun read(amountStr: String, onReadCard: CardDataListener) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun endWatch() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override suspend fun startWatch(onEventChange: CardReaderEventListener) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 }

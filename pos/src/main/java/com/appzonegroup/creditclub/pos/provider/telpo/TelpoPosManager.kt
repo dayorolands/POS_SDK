@@ -1,12 +1,14 @@
 package com.appzonegroup.creditclub.pos.provider.telpo
 
 import com.appzonegroup.creditclub.pos.BuildConfig
-import com.appzonegroup.creditclub.pos.PosActivity
 import com.appzonegroup.creditclub.pos.card.PosManager
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.safeRun
 import com.telpo.emv.EmvService
 import com.telpo.pinpad.PinpadService
 import com.telpo.tps550.api.util.SystemUtil
+import org.koin.core.KoinComponent
+import org.koin.core.get
 import org.koin.dsl.module
 
 
@@ -14,7 +16,7 @@ import org.koin.dsl.module
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 04/12/2019.
  * Appzone Ltd
  */
-class TelpoPosManager(val activity: PosActivity) : PosManager {
+class TelpoPosManager(val activity: CreditClubActivity) : PosManager, KoinComponent {
     override val cardReader by lazy { TelpoCardReader(activity, emvListener) }
 
     private val emvListener by lazy {
@@ -32,7 +34,7 @@ class TelpoPosManager(val activity: PosActivity) : PosManager {
         EmvService.Emv_SetDebugOn(if (BuildConfig.DEBUG) 1 else 0)
 
         StartEmvService(activity).run()
-        StartPinPadService(activity, activity.parameters).run()
+        StartPinPadService(activity, get()).run()
 
         EmvService.Emv_RemoveAllApp()
         EmvService.Emv_RemoveAllCapk()
@@ -51,7 +53,7 @@ class TelpoPosManager(val activity: PosActivity) : PosManager {
             private set
 
         val module = module {
-            factory<PosManager>(override = true) { (activity: PosActivity) ->
+            factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
                 TelpoPosManager(activity)
             }
         }

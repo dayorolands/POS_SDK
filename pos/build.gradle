@@ -71,6 +71,8 @@ dependencies {
     api files('libs/SmartCardLib.jar')
     api files('libs/telpo_api.jar')
     api files('libs/PayLib-release-1.4.17.aar')
+    api files('libs/iBridge.jar')
+    api files('libs/jhlblueconn.jar')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"

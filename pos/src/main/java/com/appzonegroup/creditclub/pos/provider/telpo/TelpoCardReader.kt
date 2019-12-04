@@ -2,21 +2,30 @@ package com.appzonegroup.creditclub.pos.provider.telpo
 
 import android.app.Dialog
 import android.util.Log
-import com.appzonegroup.creditclub.pos.PosActivity
 import com.appzonegroup.creditclub.pos.BuildConfig
-import com.appzonegroup.creditclub.pos.card.*
+import com.appzonegroup.creditclub.pos.card.CardDataListener
+import com.appzonegroup.creditclub.pos.card.CardReader
+import com.appzonegroup.creditclub.pos.card.CardReaderEvent
+import com.appzonegroup.creditclub.pos.card.CardReaderEventListener
 import com.appzonegroup.creditclub.pos.command.WakeUpAndUnlock
+import com.appzonegroup.creditclub.pos.service.ConfigService
+import com.appzonegroup.creditclub.pos.service.ParameterService
+import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.util.hideProgressBar
+import com.creditclub.core.util.showProgressBar
 import com.telpo.emv.EmvParam
 import com.telpo.emv.EmvService
 import com.telpo.emv.util.StringUtil
 import com.telpo.pinpad.PinParam
 import com.telpo.pinpad.PinpadService
 import kotlinx.coroutines.*
+import org.koin.core.KoinComponent
+import org.koin.core.get
 
 class TelpoCardReader(
-    private val flow: PosActivity,
+    private val flow: CreditClubActivity,
     private val emvListener: TelpoEmvListener
-) : CardReader {
+) : CardReader, KoinComponent {
 
     private val emvService: EmvService = emvListener.emvService
     private var readJob: Job? = null
@@ -249,8 +258,8 @@ class TelpoCardReader(
     private fun setEmvParams() {
         val emvParam = EmvParam().apply {
             MerchName = "AppZone".toByteArray()
-            MerchId = flow.parameters.parameters.cardAcceptorId.toByteArray()
-            TermId = flow.config.terminalId.toByteArray()
+            MerchId = get<ParameterService>().parameters.cardAcceptorId.toByteArray()
+            TermId = get<ConfigService>().terminalId.toByteArray()
             TerminalType = 0x22
             Capability = byteArrayOf(0xE0.toByte(), 0xF9.toByte(), 0xC8.toByte())
             ExCapability = byteArrayOf(0xE0.toByte(), 0x00, 0xF0.toByte(), 0xA0.toByte(), 0x01)

@@ -5,11 +5,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.util.Log
-import com.appzonegroup.creditclub.pos.PosActivity
 import com.appzonegroup.creditclub.pos.card.CardReader
 import com.appzonegroup.creditclub.pos.card.PosManager
 import com.appzonegroup.creditclub.pos.provider.sunmi.emv.EmvUtil
 import com.appzonegroup.creditclub.pos.provider.sunmi.utils.ThreadPoolUtil
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.safeRun
 import org.koin.dsl.module
 import sunmi.paylib.SunmiPayKernel
@@ -25,11 +25,9 @@ class SunmiPosManager(val context: Context) : PosManager {
     private var isConnected = false
     private var configMap: Map<String, String> = mapOf()
 
-    override val cardReader: CardReader
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val cardReader: CardReader by lazy { SunmiCardReader() }
 
-    override val sessionData: PosManager.SessionData
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val sessionData = PosManager.SessionData()
 
     override fun loadEmv() {
         payKernel.initPaySDK(context, connectCallback)
@@ -68,7 +66,7 @@ class SunmiPosManager(val context: Context) : PosManager {
 
     companion object {
         val module = module {
-            factory<PosManager>(override = true) { (activity: PosActivity) ->
+            factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
                 SunmiPosManager(activity)
             }
         }

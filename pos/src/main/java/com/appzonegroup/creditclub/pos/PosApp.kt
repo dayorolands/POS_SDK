@@ -10,8 +10,6 @@ import com.appzonegroup.creditclub.pos.service.SyncService
 import com.creditclub.core.util.isMyServiceRunning
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.KoinApplication
-import org.koin.core.KoinComponent
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 
