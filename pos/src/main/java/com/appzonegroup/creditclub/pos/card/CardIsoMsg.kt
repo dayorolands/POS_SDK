@@ -165,7 +165,7 @@ open class CardIsoMsg : BaseIsoMsg() {
         track2Data35 = data.track2
         retrievalReferenceNumber37 = rrnString
         serviceRestrictionCode40 = data.src
-        iccData55 = data.spitIccString()
+        iccData55 = data.iccString
         if (data.pinBlock.isNotEmpty()) pinData = data.pinBlock
 
         run {

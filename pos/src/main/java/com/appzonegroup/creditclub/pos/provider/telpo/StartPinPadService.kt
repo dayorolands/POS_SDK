@@ -1,6 +1,7 @@
-package com.appzonegroup.creditclub.pos.command
+package com.appzonegroup.creditclub.pos.provider.telpo
 
 import android.content.Context
+import com.appzonegroup.creditclub.pos.command.PosCommand
 import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.Misc
 import com.telpo.pinpad.PinpadService

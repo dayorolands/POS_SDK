@@ -11,6 +11,8 @@ import com.creditclub.core.util.isMyServiceRunning
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.KoinApplication
+import org.koin.core.KoinComponent
+import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 
 
@@ -31,9 +33,9 @@ fun Application.startPosApp() {
     }
 }
 
-fun KoinApplication.loadPosModules() {
+fun loadPosModules() {
 
-    modules(module {
+    loadKoinModules(module {
         single { ConfigService.getInstance(androidContext()) }
         single { PosDatabase.getInstance(androidContext()) }
         single { ParameterService.getInstance(androidContext()) }

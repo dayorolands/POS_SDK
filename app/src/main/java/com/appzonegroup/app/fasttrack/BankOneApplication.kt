@@ -37,8 +37,6 @@ class BankOneApplication : CreditClubApplication() {
                     MyDialogProvider(context)
                 }
             })
-
-            if (Platform.isPOS) loadPosModules()
         }
 
     val authResponse: AuthResponse
@@ -56,9 +54,6 @@ class BankOneApplication : CreditClubApplication() {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 
         registerAppFunctions()
-
-        if (Platform.isPOS) {
-            startPosApp()
-        }
+        Platform.test(this)
     }
 }

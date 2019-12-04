@@ -1,10 +1,10 @@
-package com.appzonegroup.creditclub.pos.card
+package com.appzonegroup.creditclub.pos.provider.telpo
 
 import android.app.KeyguardManager
 import android.content.Context
 import android.os.PowerManager
 import android.util.Log
-import com.appzonegroup.creditclub.pos.PosActivity
+import com.appzonegroup.creditclub.pos.card.PosManager
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.telpo.emv.*
 import com.telpo.emv.util.StringUtil
@@ -15,13 +15,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class CustomEmvServiceListener(
-    private val context: PosActivity,
-    val emvService: EmvService = EmvService.getInstance()
+class TelpoEmvListener(
+    private val context: Context,
+    val emvService: EmvService,
+    private val sessionData: PosManager.SessionData
 ) : EmvServiceListener() {
-    //    var logBuf = StringBuffer("")
     var pinBlock: String? = null
-    var amount = 0L
     var mResult: Int = 0
     private var bUIThreadisRunning = true
 
@@ -31,7 +30,10 @@ class CustomEmvServiceListener(
         kl.disableKeyguard()
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val wl =
-            pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.SCREEN_DIM_WAKE_LOCK, "pre:bright")
+            pm.newWakeLock(
+                PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.SCREEN_DIM_WAKE_LOCK,
+                "pre:bright"
+            )
         wl.acquire(10 * 60 * 1000L /*10 minutes*/)
         wl.release()
     }
@@ -53,7 +55,7 @@ class CustomEmvServiceListener(
                 }
                 param.CardNo = p.toString()
                 Log.w("listener", "CardNo: " + param.CardNo)
-                AppendDis("PAN: " + param.CardNo)
+                log("PAN: " + param.CardNo)
             }
 
             param.KeyIndex = 0
@@ -61,27 +63,27 @@ class CustomEmvServiceListener(
             param.MaxPinLen = 4
             param.MinPinLen = 4
             param.IsShowCardNo = 0
-            param.Amount = CurrencyFormatter.format("$amount")
+            param.Amount = CurrencyFormatter.format("${sessionData.amount}")
             PinpadService.Open(context)
             wakeUpAndUnlock(context)
             ret = PinpadService.TP_PinpadGetPin(param)
             pinBlock = StringUtil.bytesToHexString(param.Pin_Block)
-            AppendDis("TP_PinpadGetPin: " + ret + "\nPinblock: " + StringUtil.bytesToHexString(param.Pin_Block))
+            log("TP_PinpadGetPin: " + ret + "\nPinblock: " + StringUtil.bytesToHexString(param.Pin_Block))
             if (ret == PinpadService.PIN_ERROR_CANCEL) {
                 mResult = EmvService.ERR_USERCANCEL
-                AppendDis("get pin : user cancel")
+                log("get pin : user cancel")
             } else if (ret == PinpadService.PIN_OK && StringUtil.bytesToHexString(param.Pin_Block) == "00000000") {
                 mResult = EmvService.ERR_NOPIN
-                AppendDis("get pin : no pin")
+                log("get pin : no pin")
             } else if (ret == PinpadService.PIN_OK) {
                 mResult = EmvService.EMV_TRUE
-                AppendDis("get pin success: " + StringUtil.bytesToHexString(param.Pin_Block))
+                log("get pin success: " + StringUtil.bytesToHexString(param.Pin_Block))
             } else if (ret == PinpadService.PIN_ERROR_TIMEOUT) {
                 mResult = EmvService.ERR_TIMEOUT
-                AppendDis("get pin : timeout")
+                log("get pin : timeout")
             } else {
                 mResult = EmvService.EMV_FALSE
-                AppendDis("get pin error: $ret")
+                log("get pin error: $ret")
             }
 
             bUIThreadisRunning = false
@@ -149,7 +151,7 @@ class CustomEmvServiceListener(
                 param.CardNo = panstr.substring(0, index)
             }
         }
-        AppendDis("PAN: " + param.CardNo)
+        log("PAN: " + param.CardNo)
         //paywave
         //-------------------------------------------------------------------------------------------------------
 
@@ -182,7 +184,7 @@ class CustomEmvServiceListener(
                 param.CardNo = panstr.substring(0, index)
             }
         }
-        AppendDis("PAN: " + param.CardNo)
+        log("PAN: " + param.CardNo)
 
 
         return EmvService.EMV_TRUE
@@ -218,7 +220,7 @@ class CustomEmvServiceListener(
     }
 
     override fun onInputAmount(AmountData: EmvAmountData): Int {
-        AmountData.Amount = amount
+        AmountData.Amount = sessionData.amount
         AmountData.TransCurrCode = 840.toShort()
         AmountData.ReferCurrCode = 840.toShort()
         AmountData.TransCurrExp = 2.toByte()
@@ -227,14 +229,7 @@ class CustomEmvServiceListener(
         return EmvService.EMV_TRUE
     }
 
-    private fun AppendDis(msg: String) {
-//        logBuf.append(msg)
-//        logBuf.append("\n")
-//        context.runOnUiThread {
-//            //            val text = logBuf.toString()
-////            Toast.makeText(context, "$text Selection: ${text.length}", Toast.LENGTH_LONG).show()
-//        }
+    private fun log(msg: String) {
         Log.d("MyEMV", msg)
-
     }
 }

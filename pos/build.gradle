@@ -70,6 +70,7 @@ dependencies {
     api files('libs/jpos-1.9.0.jar')
     api files('libs/SmartCardLib.jar')
     api files('libs/telpo_api.jar')
+    api files('libs/PayLib-release-1.4.17.aar')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"

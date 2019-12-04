@@ -1,13 +1,22 @@
 package com.appzonegroup.creditclub.pos
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Environment
+import com.appzonegroup.creditclub.pos.card.PosManager
+import com.appzonegroup.creditclub.pos.provider.sunmi.SunmiPosManager
+import com.appzonegroup.creditclub.pos.provider.telpo.TelpoPosManager
+import com.appzonegroup.creditclub.pos.util.PosType
 import com.telpo.tps550.api.util.StringUtil
 import com.telpo.tps550.api.util.SystemUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.KoinApplication
+import org.koin.core.KoinComponent
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 import java.io.File
 import java.io.FileOutputStream
 
@@ -15,39 +24,25 @@ import java.io.FileOutputStream
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 6/29/2019.
  * Appzone Ltd
  */
-object Platform {
-    private var deviceType = -1
+object Platform : KoinComponent {
 
     @JvmStatic
     val isPOS
-        get() = supportsPos()
+        get() = posType != PosType.NONE
 
     @JvmStatic
     val hasPrinter
         get() = supportsPrinter()
 
-    init {
-        try {
-            deviceType = SystemUtil.getDeviceType()
-        } catch (ex: Exception) {
-            if (BuildConfig.DEBUG) ex.printStackTrace()
-        } catch (err: UnsatisfiedLinkError) {
-            if (BuildConfig.DEBUG) err.printStackTrace()
-        }
-    }
-
     @JvmStatic
-    fun supportsPos(): Boolean {
-        if (deviceType == -1) return false
-
-        return deviceType == StringUtil.DeviceModelEnum.TPS450C.ordinal || deviceType == StringUtil.DeviceModelEnum.TPS360IC.ordinal || deviceType == StringUtil.DeviceModelEnum.TPS900.ordinal
-    }
+    var posType = PosType.NONE
+        private set
 
     @JvmStatic
     fun supportsPrinter(): Boolean {
-        if (deviceType == -1) return false
+        if (TelpoPosManager.deviceType == -1) return false
 
-        return deviceType == StringUtil.DeviceModelEnum.TPS900.ordinal
+        return TelpoPosManager.deviceType == StringUtil.DeviceModelEnum.TPS900.ordinal
     }
 
     @JvmStatic
@@ -68,6 +63,20 @@ object Platform {
         }
     }
 
+    fun test(application: Application) {
+        if (SunmiPosManager.isCompatible(application)) {
+            posType = PosType.SUNMI
+            loadKoinModules(SunmiPosManager.module)
+        } else if (TelpoPosManager.isCompatible()) {
+            posType = PosType.TELPO
+            loadKoinModules(TelpoPosManager.module)
+        }
+
+        if (isPOS) {
+            loadPosModules()
+            application.startPosApp()
+        }
+    }
 
     @Throws(Exception::class)
     fun Context.copyAssetToFolder(assetName: String, savePath: String, saveName: String) {

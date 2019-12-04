@@ -1,4 +1,4 @@
-package com.appzonegroup.creditclub.pos.util;
+package com.appzonegroup.creditclub.pos.provider.telpo;
 
 import android.util.Log;
 import com.telpo.emv.EmvApp;
