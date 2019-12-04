@@ -1,9 +1,9 @@
 package com.appzonegroup.creditclub.pos
 
 import android.os.Bundle
-import com.appzonegroup.creditclub.pos.models.messaging.AuthorizationRequest
 import com.appzonegroup.creditclub.pos.card.CardData
 import com.appzonegroup.creditclub.pos.card.cardIsoMsg
+import com.appzonegroup.creditclub.pos.models.messaging.AuthorizationRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -16,7 +16,7 @@ class BalanceInquiryActivity : CardTransactionActivity() {
 
     override fun onReadCard(cardData: CardData) {
         GlobalScope.launch(Dispatchers.Main) {
-            showProgressBar("Receiving...")
+            dialogProvider.showProgressBar("Receiving...")
 
             val request = cardIsoMsg(cardData, ::AuthorizationRequest) {
                 processingCode3 = processingCode("31")

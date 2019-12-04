@@ -3,17 +3,18 @@ package com.appzonegroup.creditclub.pos
 import android.Manifest
 import android.app.DownloadManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.view.View
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.appzonegroup.creditclub.pos.databinding.ActivityUpdateBinding
+import com.creditclub.core.util.showSuccess
 import kotlinx.android.synthetic.main.activity_update.*
-import androidx.core.app.ActivityCompat
-import android.content.pm.PackageManager
-import android.os.Build
-import android.util.Log
 
 
 class UpdateActivity : PosActivity() {

@@ -32,7 +32,7 @@ class UnsettledTransactionsActivity : PosActivity(), Logger {
         PosNotificationAdapter(emptyList()) {
             onSettle { posNotification ->
                 GlobalScope.launch(Dispatchers.Main) {
-                    showProgressBar("Settling")
+                    dialogProvider.showProgressBar("Settling")
 
                     log("Running middleware notifications....")
 
@@ -49,7 +49,7 @@ class UnsettledTransactionsActivity : PosActivity(), Logger {
                     val (responseString, error) = withContext(Dispatchers.IO) {
                         ApiService.post(url, dataToSend, headers.build())
                     }
-                    hideProgressBar()
+                    dialogProvider.hideProgressBar()
 
                     responseString ?: return@launch showError("A network error occurred. Please try again later")
 

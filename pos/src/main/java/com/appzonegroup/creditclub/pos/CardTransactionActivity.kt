@@ -30,6 +30,7 @@ import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.service.ApiService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
+import com.creditclub.core.util.indicateError
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.page_input_amount.*
 import kotlinx.android.synthetic.main.page_input_rrn.*
@@ -222,7 +223,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                     CardTransactionStatus.Success -> {
 
                         if (cardData.pan.isEmpty()) {
-                            hideProgressBar()
+                            dialogProvider.hideProgressBar()
                             renderTransactionFailure("Could not read card")
 
                             return@read
@@ -231,7 +232,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                         val thisMonth = Instant.now().format("YYMM").toInt()
 
                         if (cardData.exp.substring(0, 4).toInt() < thisMonth) {
-                            hideProgressBar()
+                            dialogProvider.hideProgressBar()
                             renderTransactionFailure("Invalid Card")
 
                             return@read
@@ -259,7 +260,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
 
         GlobalScope.launch(Dispatchers.Main) {
             if (cardData.pinBlock.isEmpty()) {
-                showProgressBar("Pin Ok")
+                dialogProvider.showProgressBar("Pin Ok")
                 delay(1000)
             }
 //            else {
@@ -268,7 +269,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
 //                }
 //            }
 
-            showProgressBar("Receiving...")
+            dialogProvider.showProgressBar("Receiving...")
             try {
                 callHomeService.stopCallHomeTimer()
 
@@ -407,7 +408,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
 
                 attemptReversal(request)
             } finally {
-                hideProgressBar()
+                dialogProvider.hideProgressBar()
             }
         }
     }
@@ -415,7 +416,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
     private suspend fun attemptReversal(request: BaseIsoMsg) {
         if (request.mti == "0200") withContext(Dispatchers.Default) {
             runOnUiThread {
-                showProgressBar("Transmission Error \nReversing...")
+                dialogProvider.showProgressBar("Transmission Error \nReversing...")
             }
 
             delay(1000)
@@ -428,7 +429,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
 
             val success = isoSocketHelper.attempt(reversal, 4, onReattempt = {
                 runOnUiThread {
-                    showProgressBar("Reversing...$it")
+                    dialogProvider.showProgressBar("Reversing...$it")
                 }
 
                 delay(1000)
