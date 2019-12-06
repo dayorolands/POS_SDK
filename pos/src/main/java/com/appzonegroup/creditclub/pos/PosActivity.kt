@@ -84,6 +84,8 @@ abstract class PosActivity : CreditClubActivity(), ServiceProvider {
     }
 
     fun printerDependentAction(closeOnFail: Boolean = false, block: () -> Unit) {
+        return block()
+
         printer.checkAsync { printerStatus ->
             if (printerStatus != PrinterStatus.READY) {
                 if (closeOnFail) {

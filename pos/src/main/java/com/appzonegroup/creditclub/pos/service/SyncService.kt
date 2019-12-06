@@ -26,8 +26,8 @@ class SyncService : BaseService(), Logger {
 
         log("Starting service")
 //        logPosNotifications()
-        performReversals()
-        logIsoRequests()
+//        performReversals()
+//        logIsoRequests()
     }
 
     //    @Synchronized

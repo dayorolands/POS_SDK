@@ -10,6 +10,7 @@ def safeExtGet(prop, fallback) {
 
 android {
     compileSdkVersion safeExtGet("compileSdkVersion", 28)
+    useLibrary 'org.apache.http.legacy'
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
@@ -63,6 +64,7 @@ android {
 
 dependencies {
     implementation project(path: ':core')
+    implementation project(path: ':uicentral')
     implementation fileTree(dir: 'jniLibs', include: ['*.so'])
 
     api files('libs/emv.jar')
@@ -71,8 +73,8 @@ dependencies {
     api files('libs/SmartCardLib.jar')
     api files('libs/telpo_api.jar')
     api files('libs/PayLib-release-1.4.17.aar')
-    api files('libs/iBridge.jar')
-    api files('libs/jhlblueconn.jar')
+//    api files('libs/iBridge.jar')
+//    api files('libs/jhlblueconn.jar')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
@@ -108,6 +110,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
 
     implementation "androidx.work:work-runtime-ktx:${versions.work}"
+    implementation 'com.loopj.android:android-async-http:1.4.10'
 
     testImplementation 'junit:junit:4.12'
 }

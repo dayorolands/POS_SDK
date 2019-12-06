@@ -2,7 +2,6 @@ package com.appzonegroup.app.fasttrack.ui
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.DatePicker
@@ -53,15 +52,14 @@ interface DialogProviderImpl : DialogProvider {
         }
     }
 
-    override fun <T> showError(message: String?, block: DialogListenerBlock<T>) {
+    override fun <T> showError(message: String?, block: DialogListenerBlock<T>?) {
         activity.runOnUiThread {
             hideProgressBar()
             val dialog = Dialogs.getErrorDialog(activity, message)
-            val listener = DialogListener.create(block)
 
             dialog.close_btn.setOnClickListener {
                 dialog.dismiss()
-                listener.close()
+                if (block != null) DialogListener.create(block).close()
             }
 
             dialog.show()
@@ -184,8 +182,10 @@ interface DialogProviderImpl : DialogProvider {
 
         val listener = DialogListener.create(block)
         val inflater = LayoutInflater.from(activity)
-        val binding = DataBindingUtil.inflate<PinpadBinding>(inflater,
-            R.layout.pinpad, null, false)
+        val binding = DataBindingUtil.inflate<PinpadBinding>(
+            inflater,
+            R.layout.pinpad, null, false
+        )
         binding.title = title
 
         binding.pinChangeHandler = object : Dialogs.PinChangeHandler {
@@ -350,38 +350,40 @@ interface DialogProviderImpl : DialogProvider {
         options: List<DialogOptionItem>,
         block: DialogListenerBlock<Int>
     ) {
-        val dialog = Dialogs.getDialog(activity)
-        val listener = DialogListener.create(block)
+        activity.runOnUiThread {
+            val dialog = Dialogs.getDialog(activity)
+            val listener = DialogListener.create(block)
 
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(false)
+            dialog.setCancelable(true)
+            dialog.setCanceledOnTouchOutside(false)
 
-        val binding = DataBindingUtil.inflate<DialogOptionsBinding>(
-            LayoutInflater.from(activity),
-            R.layout.dialog_options,
-            null,
-            false
-        )
+            val binding = DataBindingUtil.inflate<DialogOptionsBinding>(
+                LayoutInflater.from(activity),
+                R.layout.dialog_options,
+                null,
+                false
+            )
 
-        dialog.setContentView(binding.root)
+            dialog.setContentView(binding.root)
 
-        binding.cancelButton.setOnClickListener {
-            dialog.dismiss()
-            listener.close()
+            binding.cancelButton.setOnClickListener {
+                dialog.dismiss()
+                listener.close()
+            }
+
+            binding.title = title
+            binding.container.layoutManager = LinearLayoutManager(activity)
+            binding.container.adapter = DialogOptionAdapter(options) {
+                dialog.dismiss()
+                listener.submit(dialog, it)
+            }
+
+            dialog.setOnCancelListener {
+                dialog.dismiss()
+                listener.close()
+            }
+
+            dialog.show()
         }
-
-        binding.title = title
-        binding.container.layoutManager = LinearLayoutManager(activity)
-        binding.container.adapter = DialogOptionAdapter(options) {
-            dialog.dismiss()
-            listener.submit(dialog, it)
-        }
-
-        dialog.setOnCancelListener {
-            dialog.dismiss()
-            listener.close()
-        }
-
-        dialog.show()
     }
 }

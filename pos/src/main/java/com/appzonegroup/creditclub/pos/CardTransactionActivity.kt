@@ -30,6 +30,7 @@ import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.service.ApiService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
+import com.appzonegroup.creditclub.pos.util.PosType
 import com.creditclub.core.util.indicateError
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.page_input_amount.*
@@ -99,11 +100,15 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
 
         mainScope.launch {
             dialogProvider.showProgressBar("Loading card functions")
-            withContext(Dispatchers.Default) { posManager.loadEmv() }
+            posManager.loadEmv()
             delay(1000)
             dialogProvider.hideProgressBar()
 
             printerDependentAction(true) {
+                if (Platform.posType == PosType.MPOS) {
+                    return@printerDependentAction readCard()
+                }
+
                 posManager.cardReader.waitForCard { cardEvent ->
                     when (cardEvent) {
                         CardReaderEvent.REMOVED, CardReaderEvent.CANCELLED -> {

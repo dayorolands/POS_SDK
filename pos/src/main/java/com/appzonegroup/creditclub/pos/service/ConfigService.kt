@@ -47,11 +47,7 @@ open class ConfigService protected constructor(
             prefs.edit().putString("CALL_HOME", value).apply()
         }
 
-    open var terminalId = prefs.getString("TERMINAL_ID", "") as String
-        set(value) {
-            field = value
-            prefs.edit().putString("TERMINAL_ID", value).apply()
-        }
+    open var terminalId = "2076DK33"
 
     open var supervisorPin = prefs.getString("SUPERVISOR_PIN", "1111") as String
         set(value) {

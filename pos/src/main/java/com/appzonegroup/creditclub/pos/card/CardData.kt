@@ -38,7 +38,7 @@ abstract class CardData {
 
     // Status fields
     var aid: String = ""
-    var ret: Int = -1
+    open var ret: Int = -1
 
     val type: String
         get() = when (aid) {

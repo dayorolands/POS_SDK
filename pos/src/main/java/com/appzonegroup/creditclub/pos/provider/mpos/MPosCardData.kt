@@ -8,7 +8,7 @@ import com.appzonegroup.creditclub.pos.card.CardReaderEvent
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 04/12/2019.
  * Appzone Ltd
  */
-class MPosCardData(val map: Map<String, String>) : CardData() {
+class MPosCardData(override var ret: Int, val map: Map<String, String>) : CardData() {
 
     override val iccString: String? = map["IcData55"]
 
