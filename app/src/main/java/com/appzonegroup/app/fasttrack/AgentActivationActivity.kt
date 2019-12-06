@@ -47,9 +47,17 @@ class AgentActivationActivity : BaseActivity() {
                     return@OnClickListener
                 }
 
-                localStorage.institutionCode = "100287"
+                code = binding.codeEt.value
+                if (code.length < 6) {
+                    indicateError(
+                        "Enter institution code in the verification code input",
+                        binding.codeEt
+                    )
+                    return@OnClickListener
+                }
+
+                localStorage.institutionCode = code.substring(0, 6)
                 localStorage.agentPhone = phoneNumber
-                localStorage.agentPIN = "1111"
                 localStorage.cacheAuth = Gson().toJson(AuthResponse(phoneNumber, "1111"))
                 localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
                 localStorage.putString(AppConstants.AGENT_CODE, "1111")
