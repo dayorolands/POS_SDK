@@ -20,7 +20,7 @@
 
     <application
         android:name=".BankOneApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/network_security_config"
@@ -28,7 +28,8 @@
         android:usesCleartextTraffic="${usesCleartextTraffic}"
         tools:ignore="GoogleAppIndexingWarning"
         tools:node="replace"
-        tools:replace="icon, label, theme">
+        tools:replace="icon, label, theme"
+        tools:targetApi="n">
         <activity
             android:name=".FaqActivity"
             android:label="@string/title_activity_faq"
