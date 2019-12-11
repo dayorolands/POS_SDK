@@ -438,21 +438,18 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.MenuActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.CardWithdrawalActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
             android:label="Make Payment"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
@@ -461,7 +458,6 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.ReversalActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
             android:label="Reversal"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.ReversalActivity"
@@ -470,7 +466,6 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.BalanceInquiryActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
             android:label="Balance Inquiry"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
@@ -479,7 +474,6 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.RefundActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
             android:label="Refund"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
@@ -488,7 +482,6 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.SalesCompleteActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
             android:label="Sales Completion"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
@@ -497,7 +490,6 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.PreAuthActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
             android:label="Pre Auth"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
@@ -506,7 +498,6 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.CashBackActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
             android:label="Cash Back"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
@@ -515,7 +506,6 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.CashAdvanceActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
             android:label="Cash Advance"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
@@ -523,7 +513,6 @@
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.UnsettledTransactionsActivity"
-            android:exported="true"
             android:label="Pending Confirmations"
             android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity" />
         <activity
@@ -535,9 +524,7 @@
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <service
-            android:name="com.appzonegroup.creditclub.pos.service.DownloadService"
-            android:exported="false" />
+        <service android:name="com.appzonegroup.creditclub.pos.service.DownloadService" />
         <service
             android:name="com.appzonegroup.creditclub.pos.service.SyncService"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
