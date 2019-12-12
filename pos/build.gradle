@@ -75,7 +75,6 @@ dependencies {
     api files('libs/PayLib-release-1.4.17.aar')
     api files('libs/iBridge.jar')
     api files('libs/jhlblueconn.jar')
-    api files('libs/android-async-http-1.4.7.jar')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"

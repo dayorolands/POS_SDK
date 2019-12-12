@@ -47,7 +47,11 @@ open class ConfigService protected constructor(
             prefs.edit().putString("CALL_HOME", value).apply()
         }
 
-    open var terminalId = "2076DK33"
+    open var terminalId = prefs.getString("TERMINAL_ID", "") as String
+        set(value) {
+            field = value
+            prefs.edit().putString("TERMINAL_ID", value).apply()
+        }
 
     open var supervisorPin = prefs.getString("SUPERVISOR_PIN", "1111") as String
         set(value) {
@@ -61,7 +65,7 @@ open class ConfigService protected constructor(
             prefs.edit().putString("ADMIN_PIN", value).apply()
         }
 
-    open var posModeStr: String? by valueStore("POS_MODE", "POSVAS")
+    open var posModeStr: String? by valueStore("POS_MODE", "EPMS")
 
     open var posMode: PosMode
         get() {

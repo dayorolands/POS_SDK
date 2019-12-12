@@ -65,6 +65,8 @@ android {
 
 dependencies {
     api files('libs/bcprov-jdk15on-148.jar')
+//    api files('libs/android-async-http-1.4.7.jar')
+    api 'com.loopj.android:android-async-http:1.4.10'
 
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"

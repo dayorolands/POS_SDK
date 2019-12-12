@@ -7,6 +7,8 @@ import com.appzonegroup.creditclub.pos.card.CardReader
 import com.appzonegroup.creditclub.pos.card.CardTransactionStatus
 import com.appzonegroup.creditclub.pos.card.PosManager
 import com.appzonegroup.creditclub.pos.service.ParameterService
+import com.appzonegroup.creditclub.pos.util.Misc
+import com.appzonegroup.creditclub.pos.util.TerminalUtils
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogProvider
@@ -14,6 +16,10 @@ import com.creditclub.core.ui.widget.build
 import com.jhl.bluetooth.ibridge.BluetoothIBridgeDevice
 import com.jhl.jhlblueconn.BlueStateListenerCallback
 import com.jhl.jhlblueconn.BluetoothCommmanager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.koin.dsl.module
@@ -32,7 +38,8 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     private var scanDeviceListenerBlock: DialogListenerBlock<Unit>? = null
     private var readCardBlock: CardDataListener? = null
     private var findDeviceDialog: FindDeviceDialog? = null
-//    private var looper = Looper.myLooper() ?: Looper.prepare()
+    //    private var looper = Looper.myLooper() ?: Looper.prepare()
+    private val keyController by lazy { KeyController() }
 
     var device: BluetoothIBridgeDevice? = null
         private set
@@ -61,6 +68,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
 
     override fun onUpdateRSAState(bool: Boolean?, i: Int) {
         print("...")
+        connectionManager.deviceInfo
     }
 
     override fun onBluetoothIng() {
@@ -82,6 +90,8 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     }
 
     override fun onLoadMasterKeySuccess(bool: Boolean?) {
+        print("...")
+        connectionManager.writeWorkKey(Misc.hexStringToByte(parameters.masterKey))
     }
 
     override fun onGetCAPublicKeyListFailure(i: Int, str: String?) {
@@ -113,15 +123,15 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     }
 
     override fun onTimeout() {
-        hideProgressBar()
-        readCardBlock?.invoke(MPosCardData(CardTransactionStatus.Timeout.code, mapOf()))
+        activity.runOnUiThread {
+            hideProgressBar()
+            readCardBlock?.invoke(MPosCardData(CardTransactionStatus.Timeout.code, mapOf()))
+        }
     }
 
     override fun onBluetoothConnected() {
         hideProgressBar()
-//        connectionManager.writeMainKey(Misc.hexStringToByte(parameters.masterKey))
-//        connectionManager.writeWorkKey(Misc.hexStringToByte(parameters.pinKey))
-        connectionManager.deviceInfo
+        connectionManager.writeMainKey(Misc.hexStringToByte(parameters.pinKey))
     }
 
     override fun onGetCAPublicKeyParamsSuccess(str: String?) {
@@ -167,6 +177,12 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     }
 
     override fun onLoadWorkKeySuccess(bool: Boolean?) {
+        print("...")
+        val publicKey = keyController.generatePrivateAndPublicKeys()
+        publicKey?.also {
+            connectionManager.setTimeout(10000)
+            connectionManager.updateRSA("")
+        }
     }
 
     override fun onAddCAPublicKeySuccess() {
@@ -183,8 +199,16 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
 
     override fun onReadCardData(p0: MutableMap<Any?, Any?>?) {
         activity.runOnUiThread {
-            hideProgressBar()
-            readCardBlock?.invoke(MPosCardData(1, p0 as Map<String, String>))
+            GlobalScope.launch(Dispatchers.Main) {
+                showProgressBar("Processing")
+
+                val track2 = withContext(Dispatchers.Default) {
+                    keyController.decrypt(TerminalUtils.hexStringToByteArray(p0!!["EncryptTrack2"] as String))
+                }
+
+                hideProgressBar()
+                readCardBlock?.invoke(MPosCardData(1, p0 as Map<String, String>))
+            }
         }
     }
 
@@ -195,7 +219,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     override fun onError(p0: Int, p1: String?) {
         activity.runOnUiThread {
             hideProgressBar()
-            readCardBlock?.invoke(MPosCardData(p0, mapOf()))
+            readCardBlock?.invoke(MPosCardData(MPosErrorCode[p0], mapOf()))
         }
     }
 
