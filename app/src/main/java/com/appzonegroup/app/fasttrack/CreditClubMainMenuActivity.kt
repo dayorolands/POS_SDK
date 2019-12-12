@@ -78,9 +78,15 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
             isVisible = institutionConfig.hasOnlineFunctions
         }
 
-        binding.navView.menu.findItem(R.id.fn_update)?.isVisible = Platform.isPOS
+        val hasPosUpdateManager = Platform.isPOS && BuildConfig.FLAVOR == "creditclub"
 
-        if (Platform.isPOS) {
+        binding.navView.menu.findItem(R.id.fn_update)?.isVisible = hasPosUpdateManager
+
+        binding.navView.menu.findItem(R.id.fn_hla_tagging)?.run {
+            isVisible = institutionConfig.hasHlaTagging
+        }
+
+        if (hasPosUpdateManager) {
             appDataStorage.latestVersion?.run {
                 val currentVersion = packageInfo?.versionName
                 if (currentVersion != null) {

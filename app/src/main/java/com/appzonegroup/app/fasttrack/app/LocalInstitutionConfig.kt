@@ -15,6 +15,8 @@ class LocalInstitutionConfig : IInstitutionConfig {
 
     override var hasOnlineFunctions: Boolean = false
 
+    override var hasHlaTagging: Boolean = false
+
     override var transactionTypes: List<TransactionType> = TransactionType.values().toList()
 
     override var flows: FlowConfig = FlowConfig()
@@ -28,6 +30,7 @@ class LocalInstitutionConfig : IInstitutionConfig {
             val resources = context.resources
 
             config.hasOnlineFunctions = resources.getBoolean(R.bool.online_functions_enabled)
+            config.hasHlaTagging = resources.getBoolean(R.bool.hla_enabled)
 
             config.flows.run {
                 tokenWithdrawal.customerPin =
