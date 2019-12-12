@@ -1,48 +1,46 @@
 package com.appzonegroup.creditclub.pos.provider.mpos
 
-import android.annotation.SuppressLint
 import android.util.Log
 import java.security.Key
 import java.security.KeyPairGenerator
-import java.security.PrivateKey
-import java.security.PublicKey
 import java.security.interfaces.RSAPublicKey
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
 class KeyController {
-    private var privateKey: PrivateKey? = null
-    var privateKeyEncoded: ByteArray? = null
-        private set
+//    var privateKey: PrivateKey? = null
+//        private set
+//
+//    var publicKey: PublicKey? = null
+//        private set
 
-    var publicKey: PublicKey? = null
-        private set
+    val keyPair by lazy {
+        val keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM_RSA)
+        keyPairGenerator.initialize(2048)
+        keyPairGenerator.genKeyPair()
+    }
 
     @Throws(Exception::class)
     private fun generateKey(passwordValueByteArray: ByteArray): Key {
         return SecretKeySpec(passwordValueByteArray, ALGORITHM_AES)
     }
 
-    @SuppressLint("NewApi")
     fun decrypt(encryptedValue: ByteArray?): String? {
         return try {
-//            val privateKey = KeyFactory.getInstance(ALGORITHM_RSA)
-//                .generatePrivate(PKCS8EncodedKeySpec(privateKeyEncoded))
-            val cipher = Cipher.getInstance(ALGORITHM_RSA_ECB_PKCS1PADDING)
-            cipher.init(2, privateKey)
-            String(cipher.doFinal(encryptedValue))
+            val cipher = Cipher.getInstance(ALGORITHM_RSA)
+            cipher.init(2, keyPair.private)
+            byteToHex(cipher.doFinal(encryptedValue))
         } catch (e: Exception) {
             Log.e("Exception {}", e.stackTrace.toString())
             null
         }
     }
 
-    @SuppressLint("NewApi")
-    fun encrypt(value: ByteArray?): String? {
+    fun encrypt(value: ByteArray?): ByteArray? {
         return try {
-            val cipher = Cipher.getInstance(ALGORITHM_RSA_ECB_PKCS1PADDING)
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey)
-            String(cipher.doFinal(value))
+            val cipher = Cipher.getInstance(ALGORITHM_RSA)
+            cipher.init(Cipher.ENCRYPT_MODE, keyPair.public)
+            cipher.doFinal(value)
         } catch (e: Exception) {
             Log.e("Exception {}", e.stackTrace.toString())
             null
@@ -50,20 +48,17 @@ class KeyController {
     }
 
     fun generatePrivateAndPublicKeys(): String? {
-        val publicKeyEncoded: String? = null
         return try {
-            val keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM_RSA)
-            keyPairGenerator.initialize(2048)
-            val keyPair = keyPairGenerator.genKeyPair()
-//            android.util.Base64.encodeToString(keyPair.public.encoded, 0)
-            privateKeyEncoded = keyPair.private.encoded
-            privateKey = keyPair.private
+            android.util.Base64.encodeToString(keyPair.public.encoded, 0)
+//            privateKey = keyPair.private
+//            publicKey = keyPair.public
             val modulus = (keyPair.public as RSAPublicKey).modulus.toByteArray()
             val publicKey = ByteArray(modulus.size - 1)
             System.arraycopy(modulus, 1, publicKey, 0, publicKey.size)
+
             byteToHex(publicKey)
         } catch (e: Exception) {
-            publicKeyEncoded
+            null
         }
     }
 

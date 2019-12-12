@@ -6,6 +6,8 @@ interface IInstitutionConfig {
 
     var hasOnlineFunctions: Boolean
 
+    var hasHlaTagging: Boolean
+
     var transactionTypes: List<TransactionType>
 
     var flows: FlowConfig

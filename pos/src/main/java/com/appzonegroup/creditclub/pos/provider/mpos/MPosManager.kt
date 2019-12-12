@@ -53,6 +53,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     }
 
     override fun loadEmv() {
+        println("...")
     }
 
     override fun cleanUpEmv() {
@@ -125,7 +126,9 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     override fun onTimeout() {
         activity.runOnUiThread {
             hideProgressBar()
-            readCardBlock?.invoke(MPosCardData(CardTransactionStatus.Timeout.code, mapOf()))
+            readCardBlock?.invoke(
+                MPosCardData(CardTransactionStatus.Timeout.code, mapOf(), keyController)
+            )
         }
     }
 
@@ -181,7 +184,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
         val publicKey = keyController.generatePrivateAndPublicKeys()
         publicKey?.also {
             connectionManager.setTimeout(10000)
-            connectionManager.updateRSA("")
+            connectionManager.updateRSA(it)
         }
     }
 
@@ -207,7 +210,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
                 }
 
                 hideProgressBar()
-                readCardBlock?.invoke(MPosCardData(1, p0 as Map<String, String>))
+                readCardBlock?.invoke(MPosCardData(1, p0 as Map<String, String>, keyController))
             }
         }
     }
@@ -219,7 +222,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     override fun onError(p0: Int, p1: String?) {
         activity.runOnUiThread {
             hideProgressBar()
-            readCardBlock?.invoke(MPosCardData(MPosErrorCode[p0], mapOf()))
+            readCardBlock?.invoke(MPosCardData(MPosErrorCode[p0], mapOf(), keyController))
         }
     }
 
@@ -254,7 +257,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
             }
 
             onClose {
-                block(MPosCardData(-1, mapOf()))
+                block(MPosCardData(-1, mapOf(), keyController))
             }
         }
     }
