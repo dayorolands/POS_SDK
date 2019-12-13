@@ -21,19 +21,6 @@ class MPosCardReader(private val posManager: MPosManager, dialogProvider: Dialog
     }
 
     override fun read(amountStr: String, onReadCard: CardDataListener) {
-//        if (posManager.connectionManager.isBTConnected) {
-//            posManager.connectionManager.swipeCard(0, amountStr.toAmountLong())
-//        } else {
-//            posManager.findDevice {
-//                onSubmit {
-//                    posManager.connectionManager.swipeCard(0, amountStr.toAmountLong())
-//                }
-//
-//                onClose {
-//                    onReadCard(MPosCardData(-1, mapOf()))
-//                }
-//            }
-//        }
         posManager.readCard(onReadCard)
     }
 
@@ -62,9 +49,5 @@ class MPosCardReader(private val posManager: MPosManager, dialogProvider: Dialog
                 }
             }
         }
-    }
-
-    private fun String.toAmountLong(): Long {
-        return (substring(3).toDouble() * 100).toLong()
     }
 }

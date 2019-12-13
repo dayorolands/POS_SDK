@@ -1,28 +1,17 @@
 package com.appzonegroup.creditclub.pos.provider.mpos
 
 import android.util.Log
-import java.security.Key
+import com.creditclub.core.util.safeRun
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPublicKey
 import javax.crypto.Cipher
-import javax.crypto.spec.SecretKeySpec
 
-class KeyController {
-//    var privateKey: PrivateKey? = null
-//        private set
-//
-//    var publicKey: PublicKey? = null
-//        private set
+internal class KeyController {
 
-    val keyPair by lazy {
+    private val keyPair by lazy {
         val keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM_RSA)
-        keyPairGenerator.initialize(2048)
+        keyPairGenerator.initialize(KEY_SIZE)
         keyPairGenerator.genKeyPair()
-    }
-
-    @Throws(Exception::class)
-    private fun generateKey(passwordValueByteArray: ByteArray): Key {
-        return SecretKeySpec(passwordValueByteArray, ALGORITHM_AES)
     }
 
     fun decrypt(encryptedValue: ByteArray?): String? {
@@ -36,66 +25,30 @@ class KeyController {
         }
     }
 
-    fun encrypt(value: ByteArray?): ByteArray? {
-        return try {
-            val cipher = Cipher.getInstance(ALGORITHM_RSA)
-            cipher.init(Cipher.ENCRYPT_MODE, keyPair.public)
-            cipher.doFinal(value)
-        } catch (e: Exception) {
-            Log.e("Exception {}", e.stackTrace.toString())
-            null
-        }
-    }
-
-    fun generatePrivateAndPublicKeys(): String? {
-        return try {
-            android.util.Base64.encodeToString(keyPair.public.encoded, 0)
-//            privateKey = keyPair.private
-//            publicKey = keyPair.public
+    val publicKeyHex: String?
+        get() = safeRun {
             val modulus = (keyPair.public as RSAPublicKey).modulus.toByteArray()
-            val publicKey = ByteArray(modulus.size - 1)
-            System.arraycopy(modulus, 1, publicKey, 0, publicKey.size)
+            val publicKeyBytes = ByteArray(modulus.size - 1)
+            System.arraycopy(modulus, 1, publicKeyBytes, 0, publicKeyBytes.size)
 
-            byteToHex(publicKey)
-        } catch (e: Exception) {
-            null
-        }
-    }
+            byteToHex(publicKeyBytes)
+        }.data
 
     private fun byteToHex(bytes: ByteArray): String {
         var str: String
-        val str2 = ""
         val sb = StringBuilder("")
+
         for (b in bytes) {
             val strHex = Integer.toHexString(b.toInt() and 255)
-            str = if (strHex.length == 1) {
-                "0$strHex"
-            } else {
-                strHex
-            }
+            str = (if (strHex.length == 1) "0$strHex" else strHex)
             sb.append(str)
         }
+
         return sb.toString().trim { it <= ' ' }
     }
 
-    private fun ttkey(): String {
-        return try {
-            val gen = KeyPairGenerator.getInstance(ALGORITHM_RSA)
-            gen.initialize(2048)
-            val modulus = (gen.genKeyPair().public as RSAPublicKey).modulus.toByteArray()
-            val publicKey = ByteArray(modulus.size - 1)
-            System.arraycopy(modulus, 1, publicKey, 0, publicKey.size)
-            byteToHex(publicKey)
-        } catch (e: Exception) {
-            ""
-        }
-    }
-
     companion object {
-        private const val ALGORITHM_AES = "AES"
-        private const val ALGORITHM_AES_CBC_NOPADDING = "AES/CBC/NoPadding"
         private const val ALGORITHM_RSA = "RSA"
-        private const val ALGORITHM_RSA_ECB_PKCS1PADDING = "RSA/ECB/PKCS1Padding"
         private const val KEY_SIZE = 2048
     }
 }
