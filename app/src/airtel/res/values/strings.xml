@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Airtel Agents</string>
+    <string name="institution_name">Airtel</string>
+    <string name="institution_website">https://www.airtel.com.ng</string>
+    <string name="funds_transfer_same_bank">Airtel</string>
+    <!--    <string name="bills_airtime_category_id">93</string>-->
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#0A3060</color>
+    <color name="colorPrimaryTransparent">#DD0A3060</color>
+    <color name="colorPrimaryDark">#061B36</color>
+    <color name="colorAccent">#e20010</color>
+    <color name="colorAccentDark">#830009</color>
+    <color name="colorAccentTransparent">#DDe20010</color>
+    <color name="colorSplashBg">#FFF</color>
+    <color name="colorLoginBg">#DD130101</color>
+    <color name="toolbarLogoTint">#FFF</color>
+    <color name="menuBackground">#11e20010</color>
+    <color name="navHeaderLogoTint">#0000</color>
+    <color name="colorAccentContrast">@color/white</color>
+</resources>
