@@ -4,6 +4,8 @@ import com.creditclub.core.type.TransactionType
 
 interface IInstitutionConfig {
 
+    var name: String
+
     var hasOnlineFunctions: Boolean
 
     var transactionTypes: List<TransactionType>

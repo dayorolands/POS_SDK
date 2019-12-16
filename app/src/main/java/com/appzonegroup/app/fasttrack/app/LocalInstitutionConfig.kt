@@ -1,17 +1,21 @@
 package com.appzonegroup.app.fasttrack.app
 
 import android.content.Context
+import com.appzonegroup.app.fasttrack.BuildConfig
 import com.appzonegroup.app.fasttrack.R
 import com.creditclub.core.config.CategoryConfig
 import com.creditclub.core.config.FlowConfig
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.type.TransactionType
+import com.creditclub.core.util.localStorage
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 17/10/2019.
  * Appzone Ltd
  */
-class LocalInstitutionConfig : IInstitutionConfig {
+class LocalInstitutionConfig private constructor() : IInstitutionConfig {
+
+    override lateinit var name: String
 
     override var hasOnlineFunctions: Boolean = false
 
@@ -31,6 +35,7 @@ class LocalInstitutionConfig : IInstitutionConfig {
 
             config.hasOnlineFunctions = resources.getBoolean(R.bool.online_functions_enabled)
             config.hasHlaTagging = resources.getBoolean(R.bool.hla_enabled)
+            config.name = resources.getString(R.string.institution_name)
 
             config.flows.run {
                 tokenWithdrawal.customerPin =
@@ -51,6 +56,22 @@ class LocalInstitutionConfig : IInstitutionConfig {
 
             config.categories.run {
                 loans = resources.getBoolean(R.bool.category_loan)
+            }
+
+            // Manual overrides for creditclub variant
+            if (BuildConfig.FLAVOR == "creditclub") {
+                val institutionCode = context.localStorage.institutionCode
+
+                config.name = when (institutionCode) {
+                    "100567" -> "Sterling Bank"
+                    "100568" -> "TCF MFB"
+                    else -> "My Bank"
+                }
+
+                if (institutionCode == "100568") {
+                    config.categories.loans = false
+                    config.hasHlaTagging = false
+                }
             }
 
             return config
