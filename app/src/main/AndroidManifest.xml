@@ -28,7 +28,7 @@
         android:usesCleartextTraffic="${usesCleartextTraffic}"
         tools:ignore="GoogleAppIndexingWarning"
         tools:node="replace"
-        tools:replace="icon, label, theme"
+        tools:replace="icon, label, theme, allowBackup"
         tools:targetApi="n">
         <activity
             android:name=".FaqActivity"
