@@ -132,7 +132,10 @@ class BillsCategoryActivity : BaseActivity(), View.OnClickListener {
                                     this@BillsCategoryActivity,
                                     BillerActivity::class.java
                                 ).apply {
-                                    putExtra("categoryId", billCategory.id ?: billCategory.billerCategoryId)
+                                    putExtra(
+                                        "categoryId",
+                                        billCategory.id ?: billCategory.billerCategoryId
+                                    )
                                     LocalStorage.SaveValue(
                                         AppConstants.CATEGORYID,
                                         billCategory.id ?: billCategory.billerCategoryId,
