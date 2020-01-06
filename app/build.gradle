@@ -118,6 +118,11 @@ android {
             dimension "flavor"
             applicationId "com.creditclub.heritage"
         }
+
+        airtel {
+            dimension "flavor"
+            applicationId "com.creditclub.airtel"
+        }
     }
     sourceSets {
         main {
