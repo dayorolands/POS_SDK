@@ -3,6 +3,7 @@ package com.appzonegroup.creditclub.pos.service
 import android.os.Looper
 import android.util.Log
 import com.appzonegroup.creditclub.pos.BuildConfig
+import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.contract.Logger
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.models.IsoRequestLog
@@ -71,6 +72,8 @@ class SyncService : BaseService(), Logger {
 
     @Synchronized
     private fun logIsoRequests() {
+
+        if (!Platform.isPOS) return
 
         ioScope.launch {
             Looper.myLooper() ?: Looper.prepare()
