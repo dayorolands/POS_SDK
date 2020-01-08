@@ -14,6 +14,7 @@ interface PosManager {
     fun cleanUpEmv()
 
     class SessionData {
+        var cashBackAmount = 0L
         var amount = 0L
         var pinBlock: String? = null
     }

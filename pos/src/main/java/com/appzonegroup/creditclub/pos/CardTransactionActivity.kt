@@ -106,7 +106,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
 
             printerDependentAction(true) {
                 if (Platform.posType == PosType.MPOS) {
-                    return@printerDependentAction readCard()
+                    return@printerDependentAction onSelectAccountType()
                 }
 
                 posManager.cardReader.waitForCard { cardEvent ->

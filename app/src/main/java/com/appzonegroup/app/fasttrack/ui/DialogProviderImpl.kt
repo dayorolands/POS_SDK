@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.R
+import com.appzonegroup.app.fasttrack.databinding.DialogConfirmBinding
 import com.appzonegroup.app.fasttrack.databinding.DialogCustomerRequestOptionsBinding
 import com.appzonegroup.app.fasttrack.databinding.DialogInputBinding
 import com.appzonegroup.app.fasttrack.databinding.PinpadBinding
@@ -381,6 +382,50 @@ interface DialogProviderImpl : DialogProvider {
             dialog.setOnCancelListener {
                 dialog.dismiss()
                 listener.close()
+            }
+
+            dialog.show()
+        }
+    }
+
+    override fun confirm(params: DialogConfirmParams, block: DialogListenerBlock<Boolean>?) {
+        activity.runOnUiThread {
+            val dialog = Dialogs.getDialog(context)
+
+            dialog.setCancelable(true)
+            dialog.setCanceledOnTouchOutside(false)
+
+            val listener by lazy {
+                if (block != null) DialogListener.create(block)
+                else null
+            }
+            val binding = DataBindingUtil.inflate<DialogConfirmBinding>(
+                LayoutInflater.from(context),
+                R.layout.dialog_confirm,
+                null,
+                false
+            )
+            dialog.setContentView(binding.root)
+            binding.title = params.title
+            binding.subtitle = params.subtitle
+            binding.okButton.setOnClickListener {
+                if (block != null) {
+                    dialog.dismiss()
+                    listener?.submit(dialog, true)
+                }
+            }
+            binding.cancelButton.setOnClickListener {
+                if (block != null) {
+                    dialog.dismiss()
+                    listener?.close()
+                }
+            }
+
+            dialog.setOnCancelListener {
+                if (block != null) {
+                    dialog.dismiss()
+                    listener?.close()
+                }
             }
 
             dialog.show()
