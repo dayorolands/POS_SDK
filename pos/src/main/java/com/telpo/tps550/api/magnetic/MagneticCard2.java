@@ -1,8 +1,10 @@
 package com.telpo.tps550.api.magnetic;
 
 import android.content.Context;
+
 import com.telpo.tps550.api.InternalErrorException;
 import com.telpo.tps550.api.TelpoException;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -86,7 +88,7 @@ public class MagneticCard2 {
     }
 
     public static synchronized String[] read() throws TelpoException {
-        String[] result;
+        String[] result = {};
         synchronized (MagneticCard2.class) {
             String[] strArr = new String[3];
             try {
