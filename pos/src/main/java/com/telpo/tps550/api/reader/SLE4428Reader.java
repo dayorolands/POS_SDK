@@ -1,10 +1,12 @@
 package com.telpo.tps550.api.reader;
 
-import amlib.ccid.Reader4428;
 import android.content.Context;
 import android.util.Log;
+
 import java.security.InvalidParameterException;
 import java.util.Arrays;
+
+import amlib.ccid.Reader4428;
 
 public class SLE4428Reader extends CardReader {
     private static final String TAG = "SLE4428Reader";
@@ -25,7 +27,7 @@ public class SLE4428Reader extends CardReader {
         } else if (this.reader_type == 2 || this.reader_type == 1 || this.reader_type == 0) {
             return read_main_mem(this.cardType, addr, num);
         } else {
-            Reader4428 reader4428 = this.reader;
+            Reader4428 reader4428 = (Reader4428) this.reader;
             byte[] readData = new byte[num];
             int[] returnLen = new int[1];
             int a = addr;
@@ -68,7 +70,7 @@ public class SLE4428Reader extends CardReader {
             throw new InvalidParameterException();
         } else {
             if (this.reader_type != 2 && this.reader_type != 1 && this.reader_type != 0) {
-                int result = this.reader.SLE4428Cmd_VerifyPSCAndEraseErrorCounter(psc[0], psc[1], new int[1]);
+                int result = ((Reader4428) this.reader).SLE4428Cmd_VerifyPSCAndEraseErrorCounter(psc[0], psc[1], new int[1]);
                 if (result != 0) {
                     Log.e(TAG, "4428 verify psc and erase error counter failed: " + result);
                     return false;
@@ -90,7 +92,7 @@ public class SLE4428Reader extends CardReader {
             return false;
         } else {
             if (this.reader_type != 2 && this.reader_type != 1 && this.reader_type != 0) {
-                Reader4428 reader4428 = this.reader;
+                Reader4428 reader4428 = (Reader4428) this.reader;
                 byte[] readData = new byte[data.length];
                 byte[] readPB = new byte[data.length];
                 int[] returnLen = new int[1];
@@ -130,7 +132,7 @@ public class SLE4428Reader extends CardReader {
             return false;
         } else {
             if (this.reader_type != 2 && this.reader_type != 1 && this.reader_type != 0) {
-                Reader4428 reader4428 = this.reader;
+                Reader4428 reader4428 = (Reader4428) this.reader;
                 int i = 0;
                 int addr = 1022;
                 while (i < 2) {

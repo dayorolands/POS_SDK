@@ -1,10 +1,12 @@
 package com.telpo.tps550.api.reader;
 
-import amlib.ccid.Reader4442;
 import android.content.Context;
 import android.util.Log;
+
 import java.security.InvalidParameterException;
 import java.util.Arrays;
+
+import amlib.ccid.Reader4442;
 
 public class SLE4442Reader extends CardReader {
     private static final String TAG = "SLE4442Reader";
@@ -25,7 +27,7 @@ public class SLE4442Reader extends CardReader {
         } else if (this.reader_type == 2 || this.reader_type == 1 || this.reader_type == 0) {
             return read_main_mem(this.cardType, addr, num);
         } else {
-            Reader4442 reader4442 = this.reader;
+            Reader4442 reader4442 = (Reader4442) this.reader;
             byte[] readData = new byte[num];
             int[] returnLen = new int[1];
             if (num == 256) {
@@ -64,7 +66,7 @@ public class SLE4442Reader extends CardReader {
             return false;
         } else {
             if (this.reader_type != 2 && this.reader_type != 1 && this.reader_type != 0) {
-                Reader4442 reader4442 = this.reader;
+                Reader4442 reader4442 = (Reader4442) this.reader;
                 if (addr < 32 && (pm = readProtectionMemory()) != null && pm.length == 4) {
                     int pmInt = (pm[0] & 255) | ((pm[1] << 8) & 65280) | ((pm[2] << 16) & 16711680) | ((pm[3] << 24) & -16777216);
                     if (data.length + addr > 32) {
@@ -112,7 +114,7 @@ public class SLE4442Reader extends CardReader {
             throw new InvalidParameterException();
         } else {
             if (this.reader_type != 2 && this.reader_type != 1 && this.reader_type != 0) {
-                Reader4442 reader4442 = this.reader;
+                Reader4442 reader4442 = (Reader4442) this.reader;
                 byte[] readData = new byte[1];
                 int[] returnLen = new int[1];
                 int result = reader4442.SLE4442Cmd_ReadSecurityMemory((byte) 1, readData, returnLen);
@@ -167,7 +169,7 @@ public class SLE4442Reader extends CardReader {
             return false;
         } else {
             if (this.reader_type != 2 && this.reader_type != 1 && this.reader_type != 0) {
-                Reader4442 reader4442 = this.reader;
+                Reader4442 reader4442 = (Reader4442) this.reader;
                 for (int i = 0; i < 3; i++) {
                     int result = reader4442.SLE4442Cmd_UpdateSecurityMemory((byte) (i + 1), pscNew[i]);
                     if (result != 0) {
@@ -188,7 +190,7 @@ public class SLE4442Reader extends CardReader {
         }
         byte[] readData = new byte[4];
         int[] returnLen = new int[1];
-        int result = this.reader.SLE4442Cmd_ReadProtectionMemory((byte) 4, readData, returnLen);
+        int result = ((Reader4442) this.reader).SLE4442Cmd_ReadProtectionMemory((byte) 4, readData, returnLen);
         if (result == 0) {
             return Arrays.copyOf(readData, returnLen[0]);
         }

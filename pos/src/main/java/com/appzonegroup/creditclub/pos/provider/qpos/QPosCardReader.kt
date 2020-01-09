@@ -16,7 +16,7 @@ class QPosCardReader(private val posManager: QPosManager, dialogProvider: Dialog
 
     override fun waitForCard(onEventChange: CardReaderEventListener) {
         requireDevice(onEventChange) {
-            posManager.connectionManager.swipeCard(4000, 0)
+            //            posManager.connectionManager.swipeCard(4000, 0)
         }
     }
 
@@ -36,7 +36,7 @@ class QPosCardReader(private val posManager: QPosManager, dialogProvider: Dialog
         crossinline onEventChange: CardReaderEventListener,
         crossinline block: () -> Unit
     ) {
-        if (posManager.connectionManager.isBTConnected) {
+        if (posManager.pos.bluetoothState) {
             block()
         } else {
             posManager.findDevice {

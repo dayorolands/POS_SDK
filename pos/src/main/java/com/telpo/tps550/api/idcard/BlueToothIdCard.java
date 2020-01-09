@@ -10,10 +10,12 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
+
 import com.telpo.tps550.api.TelpoException;
 import com.telpo.tps550.api.util.ReaderUtils;
 import com.zkteco.android.IDReader.IDPhotoHelper;
 import com.zkteco.android.IDReader.WLTService;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -398,7 +400,7 @@ public class BlueToothIdCard {
                     }
                 }
             } catch (Exception e2) {
-                int i3 = pos;
+//                int i3 = pos;
                 return null;
             }
         }

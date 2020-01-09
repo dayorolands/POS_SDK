@@ -9,7 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Build;
 import android.util.Log;
-import android_serialport_api.SerialPort;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -23,6 +23,7 @@ import com.telpo.tps550.api.iccard.NotEnoughBufferException;
 import com.telpo.tps550.api.util.ShellUtils;
 import com.telpo.tps550.api.util.StringUtil;
 import com.telpo.tps550.api.util.SystemUtil;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,6 +33,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
+
+import android_serialport_api.SerialPort;
 
 public class ThermalPrinter {
     public static final int ALGIN_LEFT = 0;
@@ -694,7 +697,7 @@ public class ThermalPrinter {
             byte[] cmdStr = null;
             int count = 0;
             try {
-                serial = SystemUtil.getDeviceType() == StringUtil.DeviceModelEnum.TPS650T.ordinal() ? new SerialPort(true,"/system/xbin/su",new File("/dev/ttyS0"), 460800, 0) : new SerialPort(new File("/dev/ttyS4"), 460800, 0);
+                serial = SystemUtil.getDeviceType() == StringUtil.DeviceModelEnum.TPS650T.ordinal() ? new SerialPort(true, "/system/xbin/su", new File("/dev/ttyS0"), 460800, 0) : new SerialPort(true, "/system/xbin/su", new File("/dev/ttyS4"), 460800, 0);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (SecurityException e2) {
@@ -783,7 +786,7 @@ public class ThermalPrinter {
             byte[] cmdStr = null;
             int count = 0;
             try {
-                serial = SystemUtil.getDeviceType() == StringUtil.DeviceModelEnum.TPS650T.ordinal() ? new SerialPort(true,"/system/xbin/su",new File("/dev/ttyS0"), 460800, 0) : new SerialPort(new File("/dev/ttyS4"), 460800, 0);
+                serial = SystemUtil.getDeviceType() == StringUtil.DeviceModelEnum.TPS650T.ordinal() ? new SerialPort(true, "/system/xbin/su", new File("/dev/ttyS0"), 460800, 0) : new SerialPort(true, "/system/xbin/su", new File("/dev/ttyS4"), 460800, 0);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (SecurityException e2) {
@@ -1419,18 +1422,18 @@ public class ThermalPrinter {
                     }
                     try {
                         String ver2 = new String(version, 1, version[0], "UTF-8");
-                        try {
+//                        try {
                             Log.d("idcard demo", "printer version:" + ver2);
                             ver = ver2;
-                        } catch (UnsupportedEncodingException e) {
-                            e = e;
-                            ver = ver2;
-                            e.printStackTrace();
-                            return ver;
-                        }
+//                        } catch (UnsupportedEncodingException e) {
+//                            e = e;
+//                            ver = ver2;
+//                            e.printStackTrace();
+//                            return ver;
+//                        }
                     } catch (UnsupportedEncodingException e2) {
-                        e = e2;
-                        e.printStackTrace();
+//                        e = e2;
+//                        e.printStackTrace();
                         return ver;
                     }
                 } else {
@@ -1997,5 +2000,6 @@ public class ThermalPrinter {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return fileContent;
     }
 }
