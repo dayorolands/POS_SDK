@@ -78,12 +78,11 @@ dependencies {
     api files('libs/core-3.1.0.jar')
     api files('libs/jpos-1.9.0.jar')
     api files('libs/SmartCardLib.jar')
-    implementation files('libs/telpo_api.jar')
+    api files('libs/telpo_api.jar')
     api files('libs/PayLib-release-1.4.17.aar')
     api files('libs/iBridge.jar')
     api files('libs/jhlblueconn.jar')
     implementation files('libs/dspread_android_pos_sdk_2.9.4.jar')
-    api files('libs/sun.misc.BASE64Decoder.jar')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
