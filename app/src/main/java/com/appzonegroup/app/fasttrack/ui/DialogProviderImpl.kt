@@ -67,21 +67,19 @@ interface DialogProviderImpl : DialogProvider {
         }
     }
 
-    override fun <T> showInfo(message: String?, block: DialogListenerBlock<T>): Dialog {
-        val listener = DialogListener.create(block)
-        val dialog = Dialogs.getErrorDialog(activity, message)
+    override fun <T> showInfo(message: String?, block: DialogListenerBlock<T>?) {
+        val listener = block?.build()
+        val dialog = Dialogs.getInformationDialog(activity, message, false)
 
         activity.runOnUiThread {
             hideProgressBar()
-            dialog.close_btn.setOnClickListener {
+            dialog.findViewById<View>(R.id.ok_btn).setOnClickListener {
                 dialog.dismiss()
-                listener.close()
+                listener?.close()
             }
 
             dialog.show()
         }
-
-        return dialog
     }
 
     override fun showSuccess(message: String?) {
