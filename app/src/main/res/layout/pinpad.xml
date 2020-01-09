@@ -38,7 +38,7 @@
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="20dp"
                     android:text='@{title, default=@string/enter_pin}'
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <ImageView
@@ -219,17 +219,33 @@
                         android:background="#ddd" />
 
                     <!--<ImageButton-->
-                        <!--android:id="@+id/backspace"-->
-                        <!--style="@style/AppButton.NumberButton"-->
-                        <!--android:onClick="@{pinChangeHandler::onBackspacePressed}"-->
-                        <!--android:src="@drawable/ic_backspace_arrow" />-->
+                    <!--android:id="@+id/backspace"-->
+                    <!--style="@style/AppButton.NumberButton"-->
+                    <!--android:onClick="@{pinChangeHandler::onBackspacePressed}"-->
+                    <!--android:src="@drawable/ic_backspace_arrow" />-->
                     <Button
                         android:id="@+id/backspace"
                         style="@style/AppButton.NumberButton"
-                        android:textColor="@color/red"
                         android:onClick="@{pinChangeHandler::onBackspacePressed}"
-                        android:text="Clear" />
+                        android:text="Clear"
+                        android:textColor="@color/red" />
                 </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical|end"
+                android:weightSum="1">
+
+                <Button
+                    android:id="@+id/enter"
+                    style="@style/AppButton.NumberButton"
+                    android:background="@color/blue"
+                    android:onClick="@{pinChangeHandler::onEnterPressed}"
+                    android:text="Enter"
+                    android:textColor="@color/white" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

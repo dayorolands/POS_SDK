@@ -21,10 +21,6 @@ import com.creditclub.core.ui.widget.*
 import com.creditclub.ui.adapter.DialogOptionAdapter
 import com.creditclub.ui.databinding.DialogOptionsBinding
 import kotlinx.android.synthetic.main.dialog_error.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
 
@@ -177,7 +173,7 @@ interface DialogProviderImpl : DialogProvider {
     override fun requestPIN(title: String, block: DialogListenerBlock<String>) {
         val dialog = Dialogs.getDialog(activity)
         dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(true)
+        dialog.setCanceledOnTouchOutside(false)
 
         val listener = DialogListener.create(block)
         val inflater = LayoutInflater.from(activity)
@@ -195,19 +191,16 @@ interface DialogProviderImpl : DialogProvider {
 
                 pin.add(digit)
                 binding.pinTv.text = "*".repeat(pin.size)
-
-                if (pin.size == 4) {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        delay(500)
-                        dialog.dismiss()
-                        listener.submit(dialog, pin.joinToString(""))
-                    }
-                }
             }
 
             override fun onBackspacePressed(view: View) {
                 pin.clear()
                 binding.pinTv.text = ""
+            }
+
+            override fun onEnterPressed(view: View) {
+                dialog.dismiss()
+                listener.submit(dialog, pin.joinToString(""))
             }
         }
 

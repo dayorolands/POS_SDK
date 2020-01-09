@@ -17,7 +17,7 @@ public class BillCategory {
 
     private String Description;
 
-    private String IsAirtime;
+    private boolean IsAirtime;
 
     @SerializedName("BillerCategoryID")
     private String billerCategoryId;
@@ -54,11 +54,11 @@ public class BillCategory {
         Description = description;
     }
 
-    public String getIsAirtime() {
+    public boolean getIsAirtime() {
         return IsAirtime;
     }
 
-    public void setIsAirtime(String isAirtime) {
+    public void setIsAirtime(boolean isAirtime) {
         IsAirtime = isAirtime;
     }
 

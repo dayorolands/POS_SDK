@@ -161,6 +161,8 @@ object Dialogs {
 
         fun onBackspacePressed(view: View)
 
+        fun onEnterPressed(view: View)
+
         fun onChange(digit: Byte)
     }
 }
