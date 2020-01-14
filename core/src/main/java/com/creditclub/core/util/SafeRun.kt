@@ -11,7 +11,7 @@ import com.creditclub.core.BuildConfig
 
 data class SafeRunResult<T>(val data: T?, val error: Exception?)
 
-inline fun <T> safeRun(block: () -> T): SafeRunResult<T> {
+inline fun <T> safeRun(crossinline block: () -> T): SafeRunResult<T> {
     var data: T? = null
     var error: Exception? = null
 
@@ -19,7 +19,11 @@ inline fun <T> safeRun(block: () -> T): SafeRunResult<T> {
         data = block()
     } catch (ex: Exception) {
         error = ex
-        Crashlytics.logException(ex)
+        try {
+            Crashlytics.logException(ex)
+        } catch (ex: Exception) {
+            if (BuildConfig.DEBUG) ex.printStackTrace()
+        }
         if (BuildConfig.DEBUG) ex.printStackTrace()
     }
 
