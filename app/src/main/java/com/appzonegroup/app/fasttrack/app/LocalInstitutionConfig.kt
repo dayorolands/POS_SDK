@@ -64,14 +64,15 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
 
                 config.name = when (institutionCode) {
                     "100567" -> "Sterling Bank"
-                    "100568" -> "TCF MFB"
+                    "100568", "100309" -> "TCF MFB"
                     else -> "My Bank"
                 }
 
-                if (institutionCode == "100568") {
-                    config.categories.loans = false
-                    config.hasHlaTagging = false
-                }
+                val isTcfBank = institutionCode == "100568" || institutionCode == "100309"
+
+                config.categories.loans = !isTcfBank
+                config.hasHlaTagging = !isTcfBank
+                config.hasOnlineFunctions = !isTcfBank
             }
 
             return config
