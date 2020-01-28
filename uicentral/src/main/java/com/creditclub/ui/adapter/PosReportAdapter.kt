@@ -22,10 +22,21 @@ class PosReportAdapter(override var values: List<PosTransactionReport.Report>) :
         with(holder.binding) {
             amountTv.text = transaction.transactionAmount.toString()
             customerNameTv.text = transaction.customerAccountNumber
-            phoneNoTv.text = transaction.customerPhoneNumber
             timeOccurredTv.text =
                 transaction.dateLogged.toInstant(CREDIT_CLUB_DATE_PATTERN).timeAgo()
             toTv.text = null
+            if (transaction.settlementDate == null) {
+                dateSettledTv.text = "Unsettled"
+                dateSettledTv.setTextColor(
+                    dateSettledTv.context.resources.getColor(R.color.colorAccent)
+                )
+            } else {
+                dateSettledTv.text =
+                    "Settled ${transaction.settlementDate?.toInstant(CREDIT_CLUB_DATE_PATTERN)?.timeAgo()}"
+                dateSettledTv.setTextColor(
+                    dateSettledTv.context.resources.getColor(R.color.green)
+                )
+            }
         }
     }
 }

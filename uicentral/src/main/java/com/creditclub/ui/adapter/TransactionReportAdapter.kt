@@ -98,21 +98,21 @@ class TransactionReportAdapter(
                         idLabel.visibility - View.GONE
                     }
 
-                    fromTv.text = item.from
+                    fromTv.text = item.to
                     toTv.text = item.to
                     dateTv.text = item.date?.replace("T", " ")
                     phoneNoTv.text = item.fromPhoneNumber
                 }
 
                 is ItemReport2Binding -> {
-                    fromTv.text = item.from
+                    fromTv.text = item.to
                     amountTv.text = item.amount.toNairaString()
                     dateTv.text = item.date?.replace("T", " ")
                     phoneNoTv.text = item.fromPhoneNumber
                 }
 
                 is ItemReport3Binding -> {
-                    fromTv.text = item.from
+                    fromTv.text = item.to
                     amountTv.text = item.amount.toNairaString()
                     dateTv.text = item.date?.replace("T", " ")
                     phoneNoTv.text = item.fromPhoneNumber
@@ -120,7 +120,7 @@ class TransactionReportAdapter(
                 }
 
                 is ItemReport4Binding -> {
-                    fromTv.text = item.from
+                    fromTv.text = item.to
                     productNameTv.text = item.productName
                     dateTv.text = item.date?.replace("T", " ")
                     amountTv.text = item.amount.toNairaString()
@@ -129,7 +129,7 @@ class TransactionReportAdapter(
                 }
 
                 is ItemReport5Binding -> {
-                    fromTv.text = item.from
+                    fromTv.text = item.to
                     idTv.text = item.id.toString()
                     dateTv.text = item.date?.replace("T", " ")
                     phoneNoTv.text = item.fromPhoneNumber
@@ -145,6 +145,5 @@ class TransactionReportAdapter(
         }
     }
 
-    inner class ViewHolder(val binding: ViewDataBinding) :
-        SimpleAdapter.ViewHolder(binding.root)
+    inner class ViewHolder(val binding: ViewDataBinding) : SimpleAdapter.ViewHolder(binding.root)
 }
