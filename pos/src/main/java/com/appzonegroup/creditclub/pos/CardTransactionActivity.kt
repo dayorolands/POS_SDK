@@ -243,7 +243,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
             emvListener.amount = amountText.toLong()
 
             localStorage.agent?.cardLimit?.run {
-                if (this < emvListener.amount) {
+                if (this < emvListener.amount / 100) {
                     showError("The limit for this transaction is NGN${this}")
                     return
                 }
