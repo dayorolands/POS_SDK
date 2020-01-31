@@ -3,10 +3,8 @@ package com.creditclub.core.data.api
 import android.util.Log
 import com.creditclub.core.BuildConfig
 import com.creditclub.core.data.Encryption
-import okhttp3.*
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.http.GET
-import retrofit2.http.Query
+import okhttp3.MultipartBody
+import retrofit2.http.*
 
 interface BankOneService {
 
@@ -15,26 +13,34 @@ interface BankOneService {
         @Query("MSISDN") phoneNumber: String,
         @Query("SESSION_ID") sessionID: String,
         @Query("ACTIVATION_CODE") activationCode: String,
-        @Query("GEO_LOCATION") location: String,
-        @Query("INSTITUTION_CODE") institutionCode: String?
-    ): ResponseBody
+        @Query("GEO_LOCATION") encryptedLocation: String,
+        @Query("INSTITUTION_CODE") encryptedInstitutionCode: String?
+    ): String?
 
     @GET("BankOneService.aspx?OPERATION=31e8a9fe53164155")
-    suspend fun operationInit(): ResponseBody
+    suspend fun operationInit(): String?
+
+    @Multipart
+    @POST("BankOneImageUploadService.aspx?OPERATION=NEXT&USE_XML=True")
+    suspend fun operationNextImage(
+        @Query("MSISDN") msisdn: String,
+        @Query("SESSION_ID") sessionId: String,
+        @Query("GEO_LOCATION") encryptedLocation: String?,
+        @Query("INSTITUTION_CODE") encryptedInstitutionCode: String?,
+        @Query("FULL_IMAGE") isFullImage: Boolean,
+        @Part file: MultipartBody.Part
+    ): String?
 
     object UrlGenerator {
-        private const val PRODUCTION_URL = BuildConfig.HOST + "/"
-        private const val CREDIT_CLUB_AGENT_URL_NEW =
-            PRODUCTION_URL + "CreditClubClient/HttpJavaClient/BankOneService.aspx?"
-        private const val CREDIT_CLUB_LOCATION_UPDATE_URL =
-            PRODUCTION_URL + "CreditClub/HttpJavaClient/MobileService.aspx"
+        private const val BASE_URL =
+            "${BuildConfig.API_HOST}/CreditClubClient/HttpJavaClient/BankOneService.aspx?"
 
-        private const val BASE_URL = CREDIT_CLUB_AGENT_URL_NEW
         private const val BASE_URL_IMAGE =
             BuildConfig.API_HOST + "/CreditClubClient/HttpJavaClient/BankOneImageUploadService.aspx"
 
         @JvmStatic
-        val BASE_URL_LOCATION = CREDIT_CLUB_LOCATION_UPDATE_URL
+        val BASE_URL_LOCATION =
+            "${BuildConfig.API_HOST}/CreditClub/HttpJavaClient/MobileService.aspx"
 
         @JvmStatic
         fun operationInit(
@@ -97,7 +103,9 @@ interface BankOneService {
         ): String {
             val finalString = ("OPERATION=baf5ce0ca516124f&MSISDN=" + Encryption.encrypt(msisdn)
                     + "&SESSION_ID=" + Encryption.encrypt(sessionId) + "&TEXT="
-                    + Encryption.encrypt(text) + "&USE_XML=True&GEO_LOCATION=" + Encryption.encrypt(location)
+                    + Encryption.encrypt(text) + "&USE_XML=True&GEO_LOCATION=" + Encryption.encrypt(
+                location
+            )
                     + "&INSTITUTION_CODE=" + Encryption.encrypt(institutionCode))
             return BASE_URL + finalString
         }
@@ -111,7 +119,9 @@ interface BankOneService {
             isFullImage: Boolean
         ): String {
             val finalString = ("?OPERATION=NEXT&MSISDN=" + msisdn
-                    + "&SESSION_ID=" + sessionId + "&USE_XML=True&GEO_LOCATION=" + Encryption.encrypt(location)
+                    + "&SESSION_ID=" + sessionId + "&USE_XML=True&GEO_LOCATION=" + Encryption.encrypt(
+                location
+            )
                     + "&INSTITUTION_CODE=" + Encryption.encrypt(institutionCode) + "&FULL_IMAGE=" + isFullImage.toString())
             Log.d("Call", finalString)
 
@@ -126,10 +136,15 @@ interface BankOneService {
             location: String,
             institutionCode: String?
         ): String {
-            val finalString = ("OPERATION=" + Encryption.encrypt("CONTINUE") + "&MSISDN=" + Encryption.encrypt(msisdn)
-                    + "&SESSION_ID=" + Encryption.encrypt(sessionId) + "&TEXT="
-                    + Encryption.encrypt(text) + "&USE_XML=True&GEO_LOCATION=" + Encryption.encrypt(location)
-                    + "&INSTITUTION_CODE=" + Encryption.encrypt(institutionCode))
+            val finalString =
+                ("OPERATION=" + Encryption.encrypt("CONTINUE") + "&MSISDN=" + Encryption.encrypt(
+                    msisdn
+                )
+                        + "&SESSION_ID=" + Encryption.encrypt(sessionId) + "&TEXT="
+                        + Encryption.encrypt(text) + "&USE_XML=True&GEO_LOCATION=" + Encryption.encrypt(
+                    location
+                )
+                        + "&INSTITUTION_CODE=" + Encryption.encrypt(institutionCode))
             return BASE_URL + finalString
         }
 
@@ -141,7 +156,9 @@ interface BankOneService {
             institutionCode: String?
         ): String {
             val finalString = ("OPERATION=CONTINUE&MSISDN=" + msisdn
-                    + "&SESSION_ID=" + sessionId + "&USE_XML=True&GEO_LOCATION=" + Encryption.encrypt(location)
+                    + "&SESSION_ID=" + sessionId + "&USE_XML=True&GEO_LOCATION=" + Encryption.encrypt(
+                location
+            )
                     + "&INSTITUTION_CODE=" + Encryption.encrypt(institutionCode))
             return BASE_URL_IMAGE + finalString
         }

@@ -21,7 +21,7 @@ class PosReportAdapter(override var values: List<PosTransactionReport.Report>) :
 
         with(holder.binding) {
             amountTv.text = transaction.transactionAmount.toString()
-            customerNameTv.text = transaction.customerAccountNumber
+            customerNameTv.text = transaction.transactionReference
             timeOccurredTv.text =
                 transaction.dateLogged.toInstant(CREDIT_CLUB_DATE_PATTERN).timeAgo()
             toTv.text = null
@@ -32,7 +32,7 @@ class PosReportAdapter(override var values: List<PosTransactionReport.Report>) :
                 )
             } else {
                 dateSettledTv.text =
-                    "Settled ${transaction.settlementDate?.toInstant(CREDIT_CLUB_DATE_PATTERN)?.timeAgo()}"
+                    "Settled ${transaction.settlementDate?.toInstant(CREDIT_CLUB_DATE_PATTERN)?.timeAgo()} with NGN${transaction.amountCreditedToAgent}"
                 dateSettledTv.setTextColor(
                     dateSettledTv.context.resources.getColor(R.color.green)
                 )

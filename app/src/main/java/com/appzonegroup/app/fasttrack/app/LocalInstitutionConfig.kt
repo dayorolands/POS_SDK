@@ -41,6 +41,9 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
                 tokenWithdrawal.customerPin =
                     resources.getBoolean(R.bool.token_withdrawal_customer_pin)
 
+                accountOpening.products =
+                    resources.getBoolean(R.bool.account_opening_products)
+
                 if (!resources.getBoolean(R.bool.flow_bvn_update)) {
                     bvnUpdate = null
                 }

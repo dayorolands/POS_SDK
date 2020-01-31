@@ -19,7 +19,10 @@ import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.util.posConfig
 import com.appzonegroup.creditclub.pos.util.posParameters
 import com.creditclub.core.CreditClubApplication
-import com.creditclub.core.util.*
+import com.creditclub.core.util.localStorage
+import com.creditclub.core.util.packageInfo
+import com.creditclub.core.util.safeRun
+import com.creditclub.core.util.safeRunIO
 import kotlinx.coroutines.launch
 
 class LoginActivity : DialogProviderActivity() {
@@ -85,6 +88,8 @@ class LoginActivity : DialogProviderActivity() {
                     }
                 }
             }
+
+            firebaseAnalytics.setUserId(localStorage.agent?.agentCode)
         }
 
         mainScope.launch { (application as CreditClubApplication).getLatestVersion () }

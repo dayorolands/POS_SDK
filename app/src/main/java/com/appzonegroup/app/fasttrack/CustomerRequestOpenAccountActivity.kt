@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentPagerAdapter
 import com.appzonegroup.app.fasttrack.dataaccess.ProductDAO
 import com.appzonegroup.app.fasttrack.databinding.ActivityOpenAccountBinding
 import com.appzonegroup.app.fasttrack.receipt.NewAccountReceipt
+import com.appzonegroup.app.fasttrack.ui.MySpinnerAdapter
 import com.appzonegroup.app.fasttrack.utility.CalendarDialog
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.Misc
@@ -97,6 +98,8 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
     }
 
     private val receipt by lazy { NewAccountReceipt(this) }
+
+    private val config get() = institutionConfig.flows.accountOpening
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -510,20 +513,22 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
             R.id.account_info_next_btn -> {
                 bvn = bvn_et.text.toString().trim { it <= ' ' }
 
-//                if (product_spinner.selectedItemPosition == 0) {
-//                    //    indicateError("Please select a product", Form.PHOTO_CAPTURE.ordinal(), productSpinner);
-//                    showError("Please select a product")
-//                    return
-//                }
-//
+                if (config.products && product_spinner.selectedItemPosition == 0) {
+                    //    indicateError("Please select a product", Form.PHOTO_CAPTURE.ordinal(), productSpinner);
+                    showError("Please select a product")
+                    return
+                }
+
                 if (bvn.length != 11) {
                     showError("Please enter the BVN")
                     return
                 }
-//
-//                val product = products[product_spinner.selectedItemPosition - 1]
-//                productName = product.name
-//                productCode = product.code
+
+                if (config.products) {
+                    val product = products[product_spinner.selectedItemPosition - 1]
+                    productName = product.name
+                    productCode = product.code
+                }
 
                 getCustomerBVN(bvn)
             }
@@ -644,50 +649,54 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
                     false
                 )
 
-//            val productAdapter = MySpinnerAdapter(
-//                context,
-//                android.R.layout.simple_spinner_item,
-//                activity.productNames
-//            )
-//            productAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//            rootView.product_spinner.adapter = productAdapter
-            rootView.product_spinner.visibility = View.GONE
+            if (activity.config.products) {
+                rootView.product_spinner.visibility = View.VISIBLE
+                val productAdapter = MySpinnerAdapter(
+                    context,
+                    android.R.layout.simple_spinner_item,
+                    activity.productNames
+                )
+                productAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                rootView.product_spinner.adapter = productAdapter
 
-//            activity.run {
-//
-//                mainScope.launch {
-//                    showProgressBar("Getting Products...")
-//
-//                    val (products) = safeRunIO {
-//                        creditClubMiddleWareAPI.staticService.getAllProducts(
-//                            localStorage.institutionCode,
-//                            localStorage.agentPhone
-//                        )
-//                    }
-//
-//                    hideProgressBar()
-//
-//                    products ?: return@launch showNetworkError()
-//
-//                    this@run.products = products
-//
-//                    val productDAO = ProductDAO(activity.baseContext)
-//                    productDAO.Insert(products)
-//
-//                    productNames = ArrayList()
-//                    productNames.add("Select product...")
-//                    for (product in products) {
-//                        productNames.add(product.name)
-//                    }
-//                    productDAO.close()
-//
-//                    Misc.populateSpinnerWithString(
-//                        activity,
-//                        productNames,
-//                        view?.product_spinner
-//                    )
-//                }
-//            }
+                activity.run {
+
+                    mainScope.launch {
+                        showProgressBar("Getting Products...")
+
+                        val (products) = safeRunIO {
+                            creditClubMiddleWareAPI.staticService.getAllProducts(
+                                localStorage.institutionCode,
+                                localStorage.agentPhone
+                            )
+                        }
+
+                        hideProgressBar()
+
+                        products ?: return@launch showNetworkError()
+
+                        this@run.products = products
+
+                        val productDAO = ProductDAO(activity.baseContext)
+                        productDAO.Insert(products)
+
+                        productNames = ArrayList()
+                        productNames.add("Select product...")
+                        for (product in products) {
+                            productNames.add(product.name)
+                        }
+                        productDAO.close()
+
+                        Misc.populateSpinnerWithString(
+                            activity,
+                            productNames,
+                            view?.product_spinner
+                        )
+                    }
+                }
+            } else {
+                rootView.product_spinner.visibility = View.GONE
+            }
 
             return rootView
         }

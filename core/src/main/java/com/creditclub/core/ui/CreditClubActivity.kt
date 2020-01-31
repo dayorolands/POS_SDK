@@ -1,9 +1,9 @@
 package com.creditclub.core.ui
 
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.R
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.CoreDatabase
@@ -13,6 +13,7 @@ import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.getMessage
 import com.creditclub.core.util.logFunctionUsage
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,6 +40,9 @@ abstract class CreditClubActivity : AppCompatActivity() {
     open val mainScope by lazy { CoroutineScope(Dispatchers.Main) }
     open val ioScope by lazy { CoroutineScope(Dispatchers.IO) }
 
+    protected lateinit var firebaseAnalytics: FirebaseAnalytics
+        private set
+
     var TextView.value: String
         get() = text.toString().trim { it <= ' ' }
         set(value) {
@@ -47,6 +51,11 @@ abstract class CreditClubActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE
+        )
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
         if (functionId != null) {
             mainScope.launch {

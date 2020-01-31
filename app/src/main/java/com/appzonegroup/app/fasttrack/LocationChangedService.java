@@ -2,7 +2,6 @@ package com.appzonegroup.app.fasttrack;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -13,13 +12,10 @@ import com.appzonegroup.app.fasttrack.model.online.AuthResponse;
 import com.appzonegroup.app.fasttrack.model.online.Response;
 import com.appzonegroup.app.fasttrack.network.online.APIHelper;
 import com.appzonegroup.app.fasttrack.utility.GPSTracker;
-import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.creditclub.core.util.SafeRunKt;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-import kotlin.jvm.functions.Function0;
 
 public class LocationChangedService extends Service {
 
@@ -130,14 +126,10 @@ public class LocationChangedService extends Service {
         int locationMode = 0; // 0 == Settings.Secure.LOCATION_MODE_OFF
         String locationProviders = null;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            try {
-                locationMode = Settings.Secure.getInt(getApplicationContext().getContentResolver(), Settings.Secure.LOCATION_MODE);
-            } catch (Settings.SettingNotFoundException e) {
-                //Log.e("Settings", "Location setting not found", e);
-            }
-        } else {
-            locationProviders = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+        try {
+            locationMode = Settings.Secure.getInt(getApplicationContext().getContentResolver(), Settings.Secure.LOCATION_MODE);
+        } catch (Settings.SettingNotFoundException e) {
+            //Log.e("Settings", "Location setting not found", e);
         }
 
         boolean locationEnabled = !TextUtils.isEmpty(locationProviders) || (locationMode != 0);
