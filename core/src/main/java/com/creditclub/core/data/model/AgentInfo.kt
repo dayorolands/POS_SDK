@@ -26,4 +26,7 @@ class AgentInfo {
 
     @SerialName("PosMode")
     var posMode: String? = null
+
+    @SerialName("CardLimit")
+    var cardLimit: Double? = null
 }

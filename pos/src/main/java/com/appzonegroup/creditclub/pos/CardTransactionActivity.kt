@@ -33,6 +33,7 @@ import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.service.ApiService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.appzonegroup.creditclub.pos.util.StableAPPCAPK
+import com.creditclub.core.util.localStorage
 import com.google.gson.Gson
 import com.telpo.emv.EmvService
 import com.telpo.pinpad.PinpadService
@@ -240,6 +241,14 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
         try {
             stopTimer()
             emvListener.amount = amountText.toLong()
+
+            localStorage.agent?.cardLimit?.run {
+                if (this < emvListener.amount) {
+                    showError("The limit for this transaction is NGN${this}")
+                    return
+                }
+            }
+
             val amountStr = format(amountText)
 
             cardReader.endWatch()
@@ -497,7 +506,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
         }
 
         amountText = "$amountText$num".toLong().toString()
-        amountTv.text = format(amountText)
+        amountTv.text = format(amountText).replace("NGN", "")
     }
 
     fun onSelectPresetNumber(view: View?) {
@@ -509,7 +518,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
             else -> ""
         }
 
-        amountTv.text = format(amountText)
+        amountTv.text = format(amountText).replace("NGN", "")
     }
 
     fun onBackspacePressed(view: View?) {
@@ -518,7 +527,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
 //        amountText = amountText.substring(0, amountText.length - 1)
 //        if (amountText.isEmpty())
         amountText = "0"
-        amountTv.text = format(amountText)
+        amountTv.text = format(amountText).replace("NGN", "")
     }
 
     fun format(text: String): String = CurrencyFormatter.format(text)
@@ -545,7 +554,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
 
         title = "Amount"
         amountText = "0"
-        amountTv.text = format(amountText)
+        amountTv.text = format(amountText).replace("NGN", "")
     }
 
 
