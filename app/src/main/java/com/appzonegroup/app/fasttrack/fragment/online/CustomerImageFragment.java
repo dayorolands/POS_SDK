@@ -44,7 +44,6 @@ import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages;
 import com.appzonegroup.app.fasttrack.utility.online.ImageUtils;
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson;
 import com.crashlytics.android.Crashlytics;
-import com.koushikdutta.async.future.FutureCallback;
 
 import org.json.JSONObject;
 
@@ -246,43 +245,40 @@ public class CustomerImageFragment extends Fragment implements View.OnClickListe
                             //final AuthResponse authResponse = LocalStorage.getCachedAuthResponse(getActivity());
                             final AuthResponse authResponse = ((BankOneApplication)getActivity().getApplication()).getAuthResponse();
                             ah.getNextOperationImage(authResponse.getPhoneNumber(), authResponse.getSessionId(), finalFile, finalLocation, getOptionsText().isShouldCompress(),
-                                    new FutureCallback<String>() {
-                                        @Override
-                                        public void onCompleted(Exception e, String result) {
-                                            pdialog.dismiss();
-                                            if (e == null && result != null) {
-                                                try {
-                                                    String answer = Response.fixResponse(result);
-                                                    Log.e("Answer", answer);
-                                                    Log.e("AnswerLength", answer.length() + "");
-                                                    if (TextUtils.isEmpty(answer.trim())) {
-                                                        Toast.makeText(getActivity(), "Upload successful!", Toast.LENGTH_SHORT).show();
-                                                        Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.SUCCESS_COUNT, authResponse.getSessionId());
-                                                        moveToNext();
-                                                    }
-                                                } catch (Exception c) {
-                                                    c.printStackTrace();
+                                    (e, result) -> {
+                                        pdialog.dismiss();
+                                        if (e == null && result != null) {
+                                            try {
+                                                String answer = Response.fixResponse(result);
+                                                Log.e("Answer", answer);
+                                                Log.e("AnswerLength", answer.length() + "");
+                                                if (TextUtils.isEmpty(answer.trim())) {
+                                                    Toast.makeText(getActivity(), "Upload successful!", Toast.LENGTH_SHORT).show();
+                                                    Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.SUCCESS_COUNT, authResponse.getSessionId());
+                                                    moveToNext();
+                                                }
+                                            } catch (Exception c) {
+                                                c.printStackTrace();
+                                                showDialogWithGoHomeAction("Something went wrong! Please try again.");
+                                                Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_RESPONSE_COUNT, authResponse.getSessionId());
+                                            }
+                                        } else {
+                                            if (e != null) {
+                                                Log.e("ErrorResponse", e.toString());
+                                                e.printStackTrace();
+                                                if (e instanceof TimeoutException) {
                                                     showDialogWithGoHomeAction("Something went wrong! Please try again.");
                                                     Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_RESPONSE_COUNT, authResponse.getSessionId());
+                                                } else {
+                                                    Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_INTERNET_COUNT, authResponse.getSessionId());
+                                                    dialog.setMessage("Connection lost").setPositiveButton("OK", null).show();
                                                 }
                                             } else {
-                                                if (e != null) {
-                                                    Log.e("ErrorResponse", e.toString());
-                                                    e.printStackTrace();
-                                                    if (e instanceof TimeoutException) {
-                                                        showDialogWithGoHomeAction("Something went wrong! Please try again.");
-                                                        Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_RESPONSE_COUNT, authResponse.getSessionId());
-                                                    } else {
-                                                        Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_INTERNET_COUNT, authResponse.getSessionId());
-                                                        dialog.setMessage("Connection lost").setPositiveButton("OK", null).show();
-                                                    }
-                                                } else {
-                                                    dialog.setMessage("Connection lost").setPositiveButton("OK", null).show();
-                                                    Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_INTERNET_COUNT, authResponse.getSessionId());
-                                                }
+                                                dialog.setMessage("Connection lost").setPositiveButton("OK", null).show();
+                                                Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_INTERNET_COUNT, authResponse.getSessionId());
                                             }
-
                                         }
+
                                     });
                         }
                     };

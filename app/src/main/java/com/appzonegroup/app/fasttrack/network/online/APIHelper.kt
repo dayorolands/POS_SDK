@@ -1,6 +1,7 @@
 package com.appzonegroup.app.fasttrack.network.online
 
 import android.content.Context
+import android.net.Uri
 import com.android.volley.AuthFailureError
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
@@ -8,15 +9,22 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.appzonegroup.app.fasttrack.model.TransactionCountType
 import com.appzonegroup.app.fasttrack.utility.Misc
+import com.creditclub.core.data.CreditClubClient
 import com.creditclub.core.data.Encryption
 import com.creditclub.core.data.api.BankOneService
 import com.creditclub.core.data.api.VolleyCompatibility
 import com.creditclub.core.util.localStorage
-import com.koushikdutta.async.future.FutureCallback
-import com.koushikdutta.ion.Ion
+import com.creditclub.core.util.safeRunIO
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeoutException
+
 
 /**
  * @author fdamilola on 9/5/15.
@@ -24,12 +32,18 @@ import java.util.concurrent.TimeoutException
  */
 class APIHelper(private val ctx: Context) {
 
+    private val client by lazy { CreditClubClient() }
+
     interface VolleyCallback<T> {
         fun onCompleted(e: Exception?, result: T?, status: Boolean)
     }
 
     fun attemptValidation(
-        pNumber: String, sessionId: String, activationCode: String, location: String, state: Boolean,
+        pNumber: String,
+        sessionId: String,
+        activationCode: String,
+        location: String,
+        state: Boolean,
         callback: VolleyCallback<String>
     )//, FutureCallback<String> futureCallback)
     {
@@ -42,11 +56,6 @@ class APIHelper(private val ctx: Context) {
             state,
             ctx.localStorage.institutionCode
         )
-
-        /*Ion.with(getCtx())
-                .load("GET", url)
-                .setTimeout(30000)
-                .asString().setCallback(futureCallback);*/
 
         val req = StringRequest(
             Request.Method.GET,
@@ -158,20 +167,43 @@ class APIHelper(private val ctx: Context) {
         callback: FutureCallback<String>
     ) {
         Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId)
-        Ion.with(ctx)
-            .load(
-                "POST",
-                BankOneService.UrlGenerator.operationNextImage(
+//        Ion.with(ctx)
+//            .load(
+//                "POST",
+//                BankOneService.UrlGenerator.operationNextImage(
+//                    pNumber,
+//                    sessionId,
+//                    location,
+//                    ctx.localStorage.institutionCode,
+//                    isFullImage
+//                )
+//            )
+//            .setTimeout(180000)
+//            .setMultipartFile("file", image)
+//            .asString().setCallback(callback)
+
+        GlobalScope.launch(Dispatchers.Main) {
+            val requestFile: RequestBody = RequestBody.create(
+                MediaType.parse(ctx.contentResolver.getType(Uri.fromFile(image))),
+                image
+            )
+
+            val body =
+                MultipartBody.Part.createFormData("file", image.name, requestFile)
+
+            val (response, error) = safeRunIO {
+                client.bankOneService.operationNextImage(
                     pNumber,
                     sessionId,
-                    location,
-                    ctx.localStorage.institutionCode,
-                    isFullImage
+                    Encryption.encrypt(location),
+                    Encryption.encrypt(ctx.localStorage.institutionCode),
+                    isFullImage,
+                    body
                 )
-            )
-            .setTimeout(180000)
-            .setMultipartFile("file", image)
-            .asString().setCallback(callback)
+            }
+
+            callback.onCompleted(error, response)
+        }
     }
 
     fun continueNextOperation(
@@ -216,26 +248,31 @@ class APIHelper(private val ctx: Context) {
             Response.Listener { response -> callback.onCompleted(null, response, true) })
     }
 
-    fun continueNextOperationImage(
-        pNumber: String, sessionId: String, image: File, location: String,
-        callback: FutureCallback<String>
-    ) {
-        Ion.with(ctx)
-            .load(
-                "POST",
-                BankOneService.UrlGenerator.operationContinueImage(
-                    pNumber,
-                    sessionId,
-                    location,
-                    ctx.localStorage.institutionCode
-                )
-            )
-            .setTimeout(180000)
-            .setMultipartFile("file", image)
-            .asString().setCallback(callback)
-    }
+//    fun continueNextOperationImage(
+//        pNumber: String, sessionId: String, image: File, location: String,
+//        callback: FutureCallback<String>
+//    ) {
+//        Ion.with(ctx)
+//            .load(
+//                "POST",
+//                BankOneService.UrlGenerator.operationContinueImage(
+//                    pNumber,
+//                    sessionId,
+//                    location,
+//                    ctx.localStorage.institutionCode
+//                )
+//            )
+//            .setTimeout(180000)
+//            .setMultipartFile("file", image)
+//            .asString().setCallback(callback)
+//    }
 
-    fun updateLocationAgent(number: String, longitude: String, latitude: String, callback: VolleyCallback<String>) {
+    fun updateLocationAgent(
+        number: String,
+        longitude: String,
+        latitude: String,
+        callback: VolleyCallback<String>
+    ) {
 
         val req = object : StringRequest(
             Request.Method.POST,
@@ -253,8 +290,6 @@ class APIHelper(private val ctx: Context) {
 
 
                 return params
-
-
             }
         }
 
@@ -288,7 +323,8 @@ class APIHelper(private val ctx: Context) {
 
                 val params = HashMap<String, String?>()
                 params["OPERATION"] = Encryption.encrypt("OFFLINE_DEPOSIT")
-                params["AGENT_PHONE_NUMBER"] = Encryption.encrypt(agentPhoneNumber.replace("234", "0"))
+                params["AGENT_PHONE_NUMBER"] =
+                    Encryption.encrypt(agentPhoneNumber.replace("234", "0"))
                 params["CUSTOMER_PHONE_NUMBER"] = Encryption.encrypt(customerPhoneNumber)
                 params["AMOUNT"] = Encryption.encrypt(amount)
                 params["SESSION_ID"] = Encryption.encrypt(sessionId)
@@ -310,6 +346,17 @@ class APIHelper(private val ctx: Context) {
             req,
             Response.Listener { response -> callback.onCompleted(null, response, true) })
     }
+
+
+    interface FutureCallback<T> {
+        /**
+         * onCompleted is called by the Future with the result or exception of the asynchronous operation.
+         * @param e Exception encountered by the operation
+         * @param result Result returned from the operation
+         */
+        fun onCompleted(e: Exception?, result: T?)
+    }
+
 
     companion object {
         private const val MY_SOCKET_TIMEOUT_MS = 300000

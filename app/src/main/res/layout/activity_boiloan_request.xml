@@ -17,8 +17,7 @@
         android:layout_height="wrap_content"
         android:text="@string/customerPhone"/>
 
-    <EditText
-        android:id="@+id/loanRequest_customerPhone_et"
+    <com.creditclub.ui.widget.EditText        android:id="@+id/loanRequest_customerPhone_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/customerPhone"
@@ -34,8 +33,7 @@
         android:layout_marginBottom="@dimen/fifteen_dp"
         android:onClick="next_button_click"/>
 
-    <EditText
-        android:id="@+id/loanRequest_customerName_tv"
+    <com.creditclub.ui.widget.EditText        android:id="@+id/loanRequest_customerName_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/customerPlaceHolder"
@@ -71,8 +69,7 @@
         android:layout_height="wrap_content"
         android:text="@string/memberID"/>
 
-    <EditText
-        android:id="@+id/loanRequest_memberID_et"
+    <com.creditclub.ui.widget.EditText        android:id="@+id/loanRequest_memberID_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/memberID"

@@ -1,9 +1,7 @@
 package com.appzonegroup.creditclub.pos.card
 
 import android.app.Dialog
-import android.util.Log
 import com.appzonegroup.creditclub.pos.PosActivity
-import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.command.WakeUpAndUnlock
 import com.telpo.emv.EmvParam
 import com.telpo.emv.EmvService
@@ -202,9 +200,7 @@ class CardReader(private val flow: PosActivity, private val emvServiceListener: 
                         publishProgress("IC card detected...")
                         withContext(Dispatchers.Default) {
                             ret = EmvService.IccCard_Poweron()
-                            Log.w("readcard", "IccCard_Poweron: $ret")
                             ret = emvService.Emv_TransInit()
-                            Log.w("readcard", "Emv_TransInit: $ret")
 
                             setEmvParams()
                             startMs = System.currentTimeMillis()
@@ -212,7 +208,6 @@ class CardReader(private val flow: PosActivity, private val emvServiceListener: 
                             cancelWatchJob()
 
                             ret = emvService.Emv_StartApp(EmvService.EMV_FALSE)
-                            Log.w("readcard", "Emv_StartApp: $ret")
                         }
 
                         deviceClose()
@@ -239,9 +234,7 @@ class CardReader(private val flow: PosActivity, private val emvServiceListener: 
         }
     }
 
-    private fun log(s: String) {
-        if (BuildConfig.DEBUG) Log.d("CardReader", s)
-    }
+    private inline fun log(s: String) = Unit
 
     private fun setEmvParams() {
         val emvParam = EmvParam().apply {
@@ -303,9 +296,7 @@ class CardReader(private val flow: PosActivity, private val emvServiceListener: 
         return true
     }
 
-    private fun appendDis(msg: String) {
-        Log.d("MyEMV", msg)
-    }
+    private inline fun appendDis(msg: String) = Unit
 
     private fun powerOnIcc(): Boolean {
         val ret = EmvService.IccCard_Poweron()

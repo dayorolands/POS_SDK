@@ -17,8 +17,6 @@ import com.appzonegroup.app.fasttrack.utility.Dialogs;
 import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.crashlytics.android.Crashlytics;
 
-import io.fabric.sdk.android.Fabric;
-
 public class SplashScreenActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST = 200;
 
@@ -32,7 +30,6 @@ public class SplashScreenActivity extends AppCompatActivity {
         }
 
         try {
-            Fabric.with(this, new Crashlytics());
             logUser();
 
             setContentView(R.layout.activity_splashscreen);
@@ -61,16 +58,10 @@ public class SplashScreenActivity extends AppCompatActivity {
                         Intent intent = new Intent(SplashScreenActivity.this, AgentActivationActivity.class);
                         startActivity(intent);
 
-                    } else if (LocalStorage.GetValueFor(AppConstants.API_TOKEN, getBaseContext()) == null) {
-
-                        Intent intent = new Intent(SplashScreenActivity.this, DataLoaderActivity.class);
-                        startActivity(intent);
-
                     } else {
                         startService(new Intent(SplashScreenActivity.this, LocationChangedService.class));
                         Intent intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
                         startActivity(intent);
-                        //finish();
                     }
 
                     finish();

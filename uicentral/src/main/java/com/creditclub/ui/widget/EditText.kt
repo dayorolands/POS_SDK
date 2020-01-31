@@ -1,4 +1,4 @@
-package com.appzonegroup.creditclub.pos.widget
+package com.creditclub.ui.widget
 
 import android.content.Context
 import android.text.InputType
@@ -6,34 +6,9 @@ import android.util.AttributeSet
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
-import com.appzonegroup.creditclub.pos.R
 import com.google.android.material.textfield.TextInputEditText
-import java.util.*
-
-
-/**
- * Created by Joseph on 7/25/2018.
- */
 
 class EditText : TextInputEditText {
-
-    constructor(context: Context) : super(context)
-
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-
-    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(
-        context,
-        attrs,
-        defStyle
-    )
-
-    private fun setColor(context: Context, color: String?) {
-        setTextColor(context.resources.getColor(R.color.black))
-    }
-
-    private fun setFontSize(size: Float) {
-        textSize = size
-    }
 
     init {
         customSelectionActionModeCallback = object : ActionMode.Callback {
@@ -53,8 +28,20 @@ class EditText : TextInputEditText {
         }
     }
 
+    constructor(context: Context) : super(context)
+
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
+
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(
+        context,
+        attrs,
+        defStyle
+    )
+
     companion object {
-        private var inputTypes: MutableMap<String, Int> = HashMap()
+
+        private val TAG = "EditText"
+        var inputTypes: MutableMap<String, Int> = HashMap()
 
         init {
             inputTypes["date"] =
@@ -119,4 +106,3 @@ class EditText : TextInputEditText {
         }
     }
 }
-

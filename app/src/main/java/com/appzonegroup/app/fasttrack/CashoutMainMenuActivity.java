@@ -2,6 +2,8 @@ package com.appzonegroup.app.fasttrack;
 
 import android.app.Dialog;
 import android.content.Intent;
+
+import com.appzonegroup.creditclub.pos.CardMainMenuActivity;
 import com.google.android.material.navigation.NavigationView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -168,7 +170,7 @@ public class CashoutMainMenuActivity extends AppCompatActivity implements Naviga
                 break;
             }
             case R.drawable.ic_money:
-            {
+            case R.drawable.conditional_cash_transfer: {
                 startActivity(FundsTransferActivity.class);
                 break;
             }
@@ -188,7 +190,7 @@ public class CashoutMainMenuActivity extends AppCompatActivity implements Naviga
                     @Override
                     public void onClick(View view) {
                         infoDialog.dismiss();
-                        startActivity(CardBasedWithdrawalActivity2.class);
+                        startActivity(CardMainMenuActivity.class);
                     }
                 });
                 infoDialog.show();
@@ -207,12 +209,6 @@ public class CashoutMainMenuActivity extends AppCompatActivity implements Naviga
             case R.drawable.bvn_update:{
 
                 indicateError("This service is currently unavailable", findViewById(R.id.bvn_update_button));
-                break;
-            }
-
-            case R.drawable.conditional_cash_transfer:{
-                //startActivity(BeneficiariesActivity.class);
-                startActivity(FundsTransferActivity.class);
                 break;
             }
 
@@ -254,13 +250,10 @@ public class CashoutMainMenuActivity extends AppCompatActivity implements Naviga
                                 public void onClick(View view) {
 
                                     infoDialog.dismiss();
-                                    startActivity(CardBasedWithdrawalActivity2.class);
+                                    startActivity(CardMainMenuActivity.class);
                                 }
                             });
                             infoDialog.show();
-
-
-
                         }
                         dialog.dismiss();
                     }

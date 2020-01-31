@@ -1233,7 +1233,7 @@ public class OpenAccountActivity extends AppCompatActivity {
 
             String accountJson = gson.toJson(account);
 
-            String response = APICaller.makePostRequest(url, accountJson, Token);
+            String response = APICaller.postRequest(OpenAccountActivity.this, url, accountJson, Token);
 
 
             ResponseBody serverResponse;
