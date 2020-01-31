@@ -242,11 +242,10 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
             stopTimer()
             emvListener.amount = amountText.toLong()
 
-            localStorage.agent?.cardLimit?.run {
-                if (this < emvListener.amount / 100) {
-                    showError("The limit for this transaction is NGN${this}")
-                    return
-                }
+            val cardLimit: Double = localStorage.agent?.cardLimit ?: 50000.0
+            if (cardLimit < emvListener.amount / 100) {
+                showError("The limit for this transaction is NGN${cardLimit}")
+                return
             }
 
             val amountStr = format(amountText)
