@@ -26,6 +26,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.threeten.bp.Instant
 import java.io.ByteArrayOutputStream
+import java.security.SecureRandom
 import java.util.*
 
 /**
@@ -159,7 +160,7 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
         isoMsg.mti = "0800"
         isoMsg.set(3, "9A0000")
         isoMsg.set(7, dateParams.transmissionDateTime)
-        val rrn = Random().nextInt(1000)
+        val rrn = SecureRandom().nextInt(1000)
         val rrnString = String.format("%06d", rrn)
         isoMsg.set(11, rrnString)
         isoMsg.set(12, dateParams.localTime)
@@ -206,7 +207,7 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
         isoMsg.mti = "0800"
         isoMsg.set(3, "9B0000")
         isoMsg.set(7, dateParams.transmissionDateTime)
-        val rrn = Random().nextInt(1000)
+        val rrn = SecureRandom().nextInt(1000)
         val rrnString = String.format("%06d", rrn)
         isoMsg.set(11, rrnString)
         isoMsg.set(12, dateParams.localTime)
@@ -255,7 +256,7 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
         isoMsg.mti = "0800"
         isoMsg.set(3, "9G0000")
         isoMsg.set(7, dateParams.transmissionDateTime)
-        val rrn = Random().nextInt(1000)
+        val rrn = SecureRandom().nextInt(1000)
         val rrnString = String.format("%06d", rrn)
         isoMsg.set(11, rrnString)
         isoMsg.set(12, dateParams.localTime)
@@ -305,7 +306,7 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
             mti = "0800"
             set(3, "9C0000")
             set(7, dateParams.transmissionDateTime)
-            val rrn = Random().nextInt(1000)
+            val rrn = SecureRandom().nextInt(1000)
             val rrnString = String.format("%06d", rrn)
             set(11, rrnString)
             set(12, dateParams.localTime)

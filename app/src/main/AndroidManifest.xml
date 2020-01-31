@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.appzonegroup.app.fasttrack">
@@ -19,7 +19,6 @@
         android:required="true" />
 
     <application
-        android:name=".BankOneApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -27,6 +26,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="${usesCleartextTraffic}"
         tools:ignore="GoogleAppIndexingWarning"
+        android:name=".BankOneApplication"
         tools:node="replace"
         tools:replace="icon, label, theme, allowBackup"
         tools:targetApi="n">
@@ -67,15 +67,9 @@
         <activity
             android:name=".OpenAccountActivity"
             android:label="@string/title_activity_open_account"
-            android:parentActivityName=".Menu2Activity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
-        </activity>
-        <activity
-            android:name=".AgentSigninActivity"
-            android:label="@string/sign_in_menu"
-            android:parentActivityName=".Menu2Activity">
+            android:parentActivityName=".CreditClubMainMenuActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:replace="android:parentActivityName">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
@@ -95,14 +89,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
-        </activity>
-        <activity
-            android:name=".DetailsActivity"
-            android:label="@string/details"
-            android:parentActivityName=".LoanRequestReportActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.LoanRequestReportActivity" />
         </activity>
         <activity
             android:name=".ReportActivity"
@@ -132,7 +118,6 @@
         <activity
             android:name=".BillerActivity"
             android:label="@string/billpayment"
-            android:launchMode="singleInstance"
             android:parentActivityName=".BillsCategoryActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -145,22 +130,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.BillerActivity" />
-        </activity>
-        <activity
-            android:name=".BeneficiariesActivity"
-            android:label="@string/cct"
-            android:parentActivityName=".Menu3Activity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
-        </activity>
-        <activity
-            android:name=".BeneficiaryDetailActivity"
-            android:label="@string/cct"
-            android:parentActivityName=".Menu3Activity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
         </activity>
         <activity
             android:name=".DepositActivity"
@@ -218,14 +187,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
         </activity>
-        <activity
-            android:name=".WithdrawOTPActivity"
-            android:label="@string/otp_validation"
-            android:parentActivityName=".Menu2Activity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
-        </activity>
         <activity android:name=".BOILoanRequestActivity" />
         <activity
             android:name=".CreditClubLoanRequestActivity"
@@ -250,14 +211,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.CreditClubMainMenuActivity" />
-        </activity>
-        <activity
-            android:name=".PayBillOTPActivity"
-            android:label="OTP Required"
-            android:parentActivityName=".BillPaymentActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.BillPaymentActivity" />
         </activity>
         <activity
             android:name=".LoginActivity"
@@ -294,20 +247,10 @@
             android:name=".DataLoaderActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".LoanRequestReportActivity"
-            android:label="@string/loanRequestReport"
-            android:parentActivityName=".Menu2Activity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
-        </activity>
-        <activity
             android:name=".Menu3Activity"
             android:label="@string/title_activity_menu3"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".DepositReportActivity" />
-        <activity android:name=".WithdrawalReportActivity" />
-        <activity android:name=".AccountOpeningReportActivity" />
+
         <activity
             android:name=".WithdrawalByTokenActivity"
             android:label="@string/withdrawal_by_token"
@@ -317,24 +260,13 @@
                 android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
         </activity>
         <activity
-            android:name=".CardBasedWithdrawalActivity2"
-            android:label="@string/withdrawal_by_card"
-            android:parentActivityName=".Menu3Activity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
-        </activity>
-        <activity
-            android:label="@string/update"
             android:name="com.creditclub.ui.UpdateActivity"
+            android:label="@string/update"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CardHotlistActivity"
             android:label="@string/title_activity_card_hotlist"
             android:parentActivityName=".Menu3Activity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -343,7 +275,6 @@
         <activity
             android:name=".TokenCashOutActivity"
             android:label="@string/title_activity_token_cash_out"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -351,13 +282,11 @@
         </activity>
         <activity
             android:name=".CashoutMainMenuActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".LocationCheckDialog" />
         <activity
             android:name=".CustomerRequestOpenAccountActivity"
-            android:label="@string/title_activity_open_account"
-            android:screenOrientation="portrait">
+            android:label="@string/title_activity_open_account">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.CreditClubMainMenuActivity" />
@@ -369,8 +298,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ChangePinActivity"
-            android:label="@string/pin_change"
-            android:screenOrientation="portrait">
+            android:label="@string/pin_change">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.CreditClubMainMenuActivity" />
@@ -378,12 +306,10 @@
         <activity
             android:name=".ChangeCustomerPinActivity"
             android:label="@string/change_customer_pin"
-            android:parentActivityName=".CreditClubMainMenuActivity"
-            android:screenOrientation="portrait" />
+            android:parentActivityName=".CreditClubMainMenuActivity" />
         <activity
             android:name=".OnlineActivity"
-            android:label="@string/online_functions"
-            android:screenOrientation="portrait">
+            android:label="@string/online_functions">
 
             <!--
                 <meta-data
@@ -395,12 +321,10 @@
             android:name=".CreditClubMainMenuActivity"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CreditClubSubMenuActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MiniStatementActivity"
@@ -430,8 +354,7 @@
         </activity>
         <activity
             android:name="com.appzonegroup.creditclub.pos.TerminalOptionsActivity"
-            android:label="Terminal Options"
-            android:screenOrientation="portrait" />
+            android:label="Terminal Options" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.UpdateActivity"
             android:launchMode="singleTask"
@@ -525,10 +448,13 @@
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <service android:name="com.appzonegroup.creditclub.pos.service.DownloadService" />
+        <service
+            android:name="com.appzonegroup.creditclub.pos.service.DownloadService"
+            android:exported="false" />
         <service
             android:name="com.appzonegroup.creditclub.pos.service.SyncService"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
 
@@ -538,12 +464,12 @@
 
         <activity
             android:name="com.esafirm.imagepicker.features.ImagePickerActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="5ae667395ec4429e5d7caaf22b1516debe8b386a" />
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -551,15 +477,8 @@
         <receiver
             android:name=".NotificationReceiver"
             android:enabled="true"
-            android:exported="false" /> <!-- <provider -->
-        <!-- android:name="androidx.core.content.FileProvider" -->
-        <!-- android:authorities="${applicationId}.provider" -->
-        <!-- android:exported="false" -->
-        <!-- android:grantUriPermissions="true"> -->
-        <!-- <meta-data -->
-        <!-- android:name="android.support.FILE_PROVIDER_PATHS" -->
-        <!-- android:resource="@xml/provider_paths"/> -->
-        <!-- </provider> -->
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.imagepicker.provider"

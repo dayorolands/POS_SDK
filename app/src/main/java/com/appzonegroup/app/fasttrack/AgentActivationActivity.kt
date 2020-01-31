@@ -217,11 +217,6 @@ class AgentActivationActivity : BaseActivity() {
         }
     }
 
-    fun signin_click(view: View) {
-        val intent = Intent(this@AgentActivationActivity, AgentSigninActivity::class.java)
-        startActivity(intent)
-    }
-
     override fun onBackPressed() {
         AlertDialog.Builder(this)
             .setIcon(android.R.drawable.ic_dialog_alert)

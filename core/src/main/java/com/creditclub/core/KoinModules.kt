@@ -6,6 +6,7 @@ import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.TrackGPS
 import okhttp3.Cache
+import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
@@ -33,8 +34,12 @@ val apiModule = module {
     single(named("middleware")) {
         val cacheSize = 10L * 1024 * 1024 // 10 MB
         val cache = Cache(androidContext().cacheDir, cacheSize)
+        val certificatePinner = CertificatePinner.Builder()
+            .add("api.mybankone.com", "sha256/goId03pe7sxzYmTdNcd1vI+psOY/FX5YGYjkPeioB0w=")
+            .build()
 
         OkHttpClient().newBuilder()
+            .certificatePinner(certificatePinner)
             .connectTimeout(1, TimeUnit.MINUTES)
             .readTimeout(1, TimeUnit.MINUTES)
             .writeTimeout(2, TimeUnit.MINUTES)

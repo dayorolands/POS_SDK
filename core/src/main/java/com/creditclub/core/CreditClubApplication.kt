@@ -1,17 +1,22 @@
 package com.creditclub.core
 
 import android.app.Application
+import android.widget.Toast
+import com.crashlytics.android.Crashlytics
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.util.appDataStorage
 import com.creditclub.core.util.safeRunIO
 import com.google.android.play.core.missingsplits.MissingSplitsManagerFactory
 import com.jakewharton.threetenabp.AndroidThreeTen
+import io.fabric.sdk.android.Fabric
+import io.fabric.sdk.android.services.common.CommonUtils
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
+import kotlin.system.exitProcess
 
 
 /**
@@ -26,6 +31,13 @@ open class CreditClubApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        Fabric.with(this, Crashlytics())
+        Crashlytics.getInstance()
+
+        if (CommonUtils.isRooted(this)) {
+            Toast.makeText(this, "Sorry, Cannot run app on a rooted device", Toast.LENGTH_LONG).show()
+            exitProcess(0)
+        }
 
         if (MissingSplitsManagerFactory.create(this).disableAppIfMissingRequiredSplits()) {
             return

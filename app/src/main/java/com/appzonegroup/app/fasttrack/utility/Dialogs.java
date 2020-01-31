@@ -8,15 +8,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.TextView;
 
 import com.appzonegroup.app.fasttrack.R;
-import com.appzonegroup.app.fasttrack.adapter.PinpadGridViewAdapter;
 
 /**
  * Created by Joseph on 6/5/2016.
@@ -29,41 +26,6 @@ public class Dialogs {
         progressDialog.show();
 
         return progressDialog;
-    }
-
-    public static Dialog getPINDialog(final Activity activity)
-    {
-        try {
-            final Dialog dialog = getDialog(R.layout.dialog_scambled_keyboard, activity);
-            ((GridView) dialog.findViewById(R.id.pin_pad_grid_view)).setAdapter(new PinpadGridViewAdapter(activity, Misc.getScrambledPINPadText()));
-
-            dialog.findViewById(R.id.instruction_info_image_view).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    final Dialog instructionDialog = getDialog(R.layout.card_pan_instruction, activity);
-                    instructionDialog.findViewById(R.id.close_btn).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            instructionDialog.dismiss();
-                        }
-                    });
-                    instructionDialog.show();
-                }
-            });
-
-            dialog.findViewById(R.id.cancel_btn).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    dialog.dismiss();
-                }
-            });
-
-            return dialog;
-        }catch (Exception ex)
-        {
-            Log.e("PIN Dialog", ex.toString());
-            return null;
-        }
     }
 
     public static Dialog getDialog(Activity activity, String message, String okButtonText, String cancelButtonText, View.OnClickListener okButtonListener, View.OnClickListener cancelButtonListener)
@@ -128,20 +90,6 @@ public class Dialogs {
             ((TextView)dialog.findViewById(R.id.message_tv)).setText(message);
 
         dialog.findViewById(R.id.close_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-
-        return dialog;
-    }
-
-    public static Dialog getBankSelectionDialog(Activity activity)
-    {
-        final Dialog dialog = getDialog(R.layout.dialog_card_transaction_bank_selection, activity);
-
-        dialog.findViewById(R.id.cancel_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
@@ -219,23 +167,8 @@ public class Dialogs {
         return dialog;
     }
 
-    public static Dialog getPhoneNumberInputDialog(Activity activity)
-    {
-        final Dialog dialog = getDialog(R.layout.dialog_card_transaction_phone_input, activity);
-
-        dialog.findViewById(R.id.cancel_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-
-        return dialog;
-    }
-
     public static void showErrorMessage(Activity activity, String message)
     {
         getErrorDialog(activity, message).show();
     }
-
 }

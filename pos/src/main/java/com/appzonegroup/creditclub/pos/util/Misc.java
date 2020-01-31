@@ -19,6 +19,7 @@ import com.appzonegroup.creditclub.pos.card.CardMisc;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.security.SecureRandom;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -103,7 +104,7 @@ public class Misc extends CardMisc {
         };
 
         ArrayList<String> outputList = new ArrayList<>();
-        Random random = new Random();
+        Random random = new SecureRandom();
         while (pinPadText.size() > 3) {
             int index = random.nextInt(pinPadText.size() - 3);
 

@@ -13,6 +13,7 @@ import com.creditclub.core.BuildConfig
 
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.security.SecureRandom
 import java.text.NumberFormat
 import java.util.*
 
@@ -44,7 +45,7 @@ object Misc {
             }
 
             val outputList = ArrayList<String>()
-            val random = Random()
+            val random = SecureRandom()
             while (pinPadText.size > 3) {
                 val index = random.nextInt(pinPadText.size - 3)
 

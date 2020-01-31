@@ -1,7 +1,7 @@
 package com.creditclub.core.util
 
 import com.creditclub.core.BuildConfig
-import java.util.*
+import java.security.SecureRandom
 
 
 /**
@@ -20,8 +20,8 @@ fun Double.toNairaString(): String {
 }
 
 fun generateRRN(): String {
-    val stan = Random().nextInt(1000000)
-    val rrnPart = Random().nextInt(100000)
+    val stan = SecureRandom().nextInt(1000000)
+    val rrnPart = SecureRandom().nextInt(100000)
     val stanString = String.format("%06d", stan)
 
     return String.format("1%05d", rrnPart) + stanString

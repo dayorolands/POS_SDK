@@ -19,8 +19,7 @@
             android:layout_height="wrap_content"
             android:text="bvn Number"/>
 
-        <EditText
-
+        <com.creditclub.ui.widget.EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter bvn number"

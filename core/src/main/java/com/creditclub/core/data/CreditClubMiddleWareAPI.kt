@@ -5,7 +5,8 @@ import com.creditclub.core.data.api.*
 import com.creditclub.core.util.delegates.service
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
-import okhttp3.*
+import okhttp3.MediaType
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 

@@ -15,8 +15,7 @@
             android:layout_height="wrap_content"
             android:text="@string/email"/>
 
-        <EditText
-            android:id="@+id/contactInfo_email_et"
+        <com.creditclub.ui.widget.EditText            android:id="@+id/contactInfo_email_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/address_hint"
@@ -28,8 +27,7 @@
             android:layout_height="wrap_content"
             android:text="@string/address"/>
 
-        <EditText
-            android:id="@+id/contactInfo_address_et"
+        <com.creditclub.ui.widget.EditText            android:id="@+id/contactInfo_address_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/address_hint"
@@ -41,8 +39,7 @@
             android:layout_height="wrap_content"
             android:text="@string/placeOfBirth"/>
 
-        <EditText
-            android:id="@+id/contactInfo_placeOfBirth_et"
+        <com.creditclub.ui.widget.EditText            android:id="@+id/contactInfo_placeOfBirth_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/placeOfBirth_hint"
@@ -70,8 +67,7 @@
             android:layout_height="wrap_content"
             android:text="@string/confirmPhoneNumber"/>
 
-        <EditText
-            android:id="@+id/contactInfo_confirmNokPhone_et"
+        <com.creditclub.ui.widget.EditText            android:id="@+id/contactInfo_confirmNokPhone_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/confirmPhoneNumber_hint"
