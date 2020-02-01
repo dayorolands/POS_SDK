@@ -170,7 +170,7 @@ class ActivityReportManager(
                             institutionCode = localStorage.institutionCode
                             from = binding.content.startDateContentTv.text.toString()
                             to = binding.content.endDateContentTv.text.toString()
-                            status = "${TransactionStatus.Successful.code}"
+                            status = selectedTransactionStatus.code
                         }
 
                         request.startIndex = "$startIndex"

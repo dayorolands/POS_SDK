@@ -15,5 +15,5 @@ class POSTransactionReportRequest {
     var to: String? = ""
     var startIndex: String? = ""
     var maxSize: String? = ""
-    var status: String? = ""
+    var status: Int? = 3
 }
