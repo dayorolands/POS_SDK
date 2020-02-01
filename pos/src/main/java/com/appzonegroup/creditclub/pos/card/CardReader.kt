@@ -234,7 +234,8 @@ class CardReader(private val flow: PosActivity, private val emvServiceListener: 
         }
     }
 
-    private inline fun log(s: String) = Unit
+    private fun log(s: String) {
+    }
 
     private fun setEmvParams() {
         val emvParam = EmvParam().apply {
@@ -296,7 +297,8 @@ class CardReader(private val flow: PosActivity, private val emvServiceListener: 
         return true
     }
 
-    private inline fun appendDis(msg: String) = Unit
+    private fun appendDis(msg: String) {
+    }
 
     private fun powerOnIcc(): Boolean {
         val ret = EmvService.IccCard_Poweron()
