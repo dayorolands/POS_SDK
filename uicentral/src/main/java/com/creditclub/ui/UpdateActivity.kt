@@ -9,11 +9,14 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import androidx.core.app.ActivityCompat
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.util.*
+import com.creditclub.core.util.appDataStorage
+import com.creditclub.core.util.packageInfo
+import com.creditclub.core.util.showError
 import kotlinx.android.synthetic.main.activity_update.*
 import kotlinx.android.synthetic.main.content_update.*
 import kotlinx.coroutines.launch
@@ -152,6 +155,16 @@ class UpdateActivity : CreditClubActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             download()
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }
