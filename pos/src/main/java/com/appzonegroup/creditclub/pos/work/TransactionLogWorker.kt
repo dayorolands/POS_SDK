@@ -4,7 +4,8 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.models.Receipt
+import com.appzonegroup.creditclub.pos.models.PosTransaction
+import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.util.safeRunSuspend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -25,11 +26,11 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         if (!Platform.isPOS) Result.failure()
 
-        val receiptDao = posDatabase.receiptDao()
+        val posTransactionDao = posDatabase.posTransactionDao()
         val mediaType = MediaType.parse("application/json")
-        val serializer = Receipt.serializer()
+        val serializer = PosTransaction.serializer()
 
-        val jobs = receiptDao.all().map { receipt ->
+        val jobs = posTransactionDao.all().map { receipt ->
             async {
                 val requestBody = RequestBody.create(
                     mediaType,
@@ -44,8 +45,8 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
                     )
                 }
 
-                if (response?.status == true) {
-                    receiptDao.delete(receipt)
+                if (response.isSuccessful) {
+                    posTransactionDao.delete(receipt)
                 }
             }
         }

@@ -2,10 +2,7 @@ package com.creditclub.core.data.api
 
 import com.creditclub.core.data.model.*
 import com.creditclub.core.data.request.*
-import com.creditclub.core.data.response.BackendResponse
-import com.creditclub.core.data.response.MiniStatementResponse
-import com.creditclub.core.data.response.PosNotificationResponse
-import com.creditclub.core.data.response.RequestStatus
+import com.creditclub.core.data.response.*
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.http.*
@@ -156,5 +153,5 @@ interface StaticService {
         @Body request: RequestBody,
         @Header("Authorization") authToken: String,
         @Header("TerminalID") terminalID: String?
-    ): RequestStatus?
+    ): ApiResponse<String>?
 }

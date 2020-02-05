@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 @Database(
-    entities = [FinancialTransaction::class, Reversal::class, PosNotification::class, IsoRequestLog::class, Receipt::class],
+    entities = [FinancialTransaction::class, Reversal::class, PosNotification::class, IsoRequestLog::class, PosTransaction::class],
     version = 9,
     exportSchema = true
 )
@@ -24,7 +24,7 @@ abstract class PosDatabase : RoomDatabase() {
     abstract fun reversalDao(): ReversalDao
     abstract fun posNotificationDao(): PosNotificationDao
     abstract fun isoRequestLogDao(): IsoRequestLogDao
-    abstract fun receiptDao(): ReceiptDao
+    abstract fun posTransactionDao(): PosTransactionDao
 
     companion object {
 
@@ -75,7 +75,7 @@ abstract class PosDatabase : RoomDatabase() {
 
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
-                    "CREATE TABLE `Receipt` (`id` INTEGER, `bankName` TEXT,`agentName` TEXT," +
+                    "CREATE TABLE `PosTransaction` (`id` INTEGER, `bankName` TEXT,`agentName` TEXT," +
                             "`agentCode` TEXT,`institutionCode` TEXT,`agentPhoneNumber` TEXT," +
                             "`pan` TEXT,`terminalId` TEXT,`transactionType` TEXT,`stan` TEXT," +
                             "`amount` TEXT,`cardType` TEXT,`expiryDate` TEXT,`responseCode` TEXT," +

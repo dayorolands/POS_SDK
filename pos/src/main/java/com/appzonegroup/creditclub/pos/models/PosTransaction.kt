@@ -5,6 +5,7 @@ import androidx.room.*
 import com.creditclub.core.serializer.TimeInstantSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.koin.core.KoinComponent
 import org.threeten.bp.Instant
 
 
@@ -14,7 +15,7 @@ import org.threeten.bp.Instant
  */
 @Entity
 @Serializable
-class Receipt {
+class PosTransaction {
     @PrimaryKey(autoGenerate = true)
     @SerialName("ID")
     var id = 0
@@ -85,34 +86,36 @@ class Receipt {
 
     @SerialName("IsASystemChange")
     var isASystemChange = true
+
+    companion object : KoinComponent
 }
 
 @Dao
-interface ReceiptDao {
+interface PosTransactionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun saveAll(requestLog: List<Receipt>)
+    fun saveAll(posTransactions: List<PosTransaction>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun save(Receipt: Receipt)
+    fun save(posTransaction: PosTransaction)
 
     @Update
-    fun update(Receipt: Receipt)
+    fun update(posTransaction: PosTransaction)
 
     @Delete
-    fun delete(Receipt: Receipt)
+    fun delete(posTransaction: PosTransaction)
 
-    @Query("DELETE FROM Receipt")
+    @Query("DELETE FROM PosTransaction")
     fun deleteAll()
 
-    @Query("Delete from Receipt where id >= :start AND ID <= :end")
+    @Query("Delete from PosTransaction where id >= :start AND ID <= :end")
     fun deleteRange(start: Int, end: Int)
 
-    @Query("Delete from Receipt where id = :id")
+    @Query("Delete from PosTransaction where id = :id")
     fun delete(id: Int)
 
-    @Query("SELECT * FROM Receipt")
-    fun allAsync(): LiveData<List<Receipt>>
+    @Query("SELECT * FROM PosTransaction")
+    fun allAsync(): LiveData<List<PosTransaction>>
 
-    @Query("SELECT * FROM Receipt")
-    fun all(): List<Receipt>
+    @Query("SELECT * FROM PosTransaction")
+    fun all(): List<PosTransaction>
 }
