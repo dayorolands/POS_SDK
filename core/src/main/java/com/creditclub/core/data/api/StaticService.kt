@@ -150,4 +150,11 @@ interface StaticService {
 
     @POST("CreditClubStatic/MiniStatement")
     suspend fun miniStatement(@Body request: MiniStatementRequest): MiniStatementResponse?
+
+    @POST("CreditClubStatic/TransactionLog")
+    suspend fun transactionLog(
+        @Body request: RequestBody,
+        @Header("Authorization") authToken: String,
+        @Header("TerminalID") terminalID: String?
+    ): RequestStatus?
 }
