@@ -59,7 +59,7 @@ abstract class PosDatabase : RoomDatabase() {
             }
         }
 
-        private val MIGRATION_7_8 = object : Migration(7, 8) {
+        internal val MIGRATION_7_8 = object : Migration(7, 8) {
 
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
@@ -71,18 +71,18 @@ abstract class PosDatabase : RoomDatabase() {
             }
         }
 
-        private val MIGRATION_8_9 = object : Migration(8, 9) {
+        internal val MIGRATION_8_9 = object : Migration(8, 9) {
 
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
-                    "CREATE TABLE `PosTransaction` (`id` INTEGER, `bankName` TEXT,`agentName` TEXT," +
-                            "`agentCode` TEXT,`institutionCode` TEXT,`agentPhoneNumber` TEXT," +
-                            "`pan` TEXT,`terminalId` TEXT,`transactionType` TEXT,`stan` TEXT," +
-                            "`amount` TEXT,`cardType` TEXT,`expiryDate` TEXT,`responseCode` TEXT," +
-                            "`retrievalReferenceNumber` TEXT,`appName` TEXT,`ptsp` TEXT," +
-                            "`website` TEXT,`merchantDetails` TEXT,`merchantId` TEXT," +
-                            "`cardHolder` TEXT,`dateTime` TEXT,`isASystemChange` BOOLEAN, " +
-                            "PRIMARY KEY(`id`))"
+                    "CREATE TABLE IF NOT EXISTS `PosTransaction` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                            "`bankName` TEXT, `agentName` TEXT, `agentCode` TEXT, " +
+                            "`agentPhoneNumber` TEXT, `institutionCode` TEXT, `pan` TEXT, " +
+                            "`terminalId` TEXT, `transactionType` TEXT, `stan` TEXT, `amount` TEXT, " +
+                            "`cardType` TEXT, `expiryDate` TEXT, `responseCode` TEXT, " +
+                            "`retrievalReferenceNumber` TEXT, `appName` TEXT, `ptsp` TEXT, " +
+                            "`website` TEXT, `merchantDetails` TEXT, `merchantId` TEXT, " +
+                            "`cardHolder` TEXT, `dateTime` TEXT, `isASystemChange` INTEGER NOT NULL)"
                 )
             }
         }
