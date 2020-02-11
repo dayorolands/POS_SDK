@@ -2,6 +2,7 @@ package com.appzonegroup.app.fasttrack
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.text.InputFilter
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -32,6 +33,11 @@ class AgentActivationActivity : BaseActivity() {
     var phoneNumber = ""
     var pin = ""
     override val hasLogoutTimer = false
+    private val deviceId
+        get() = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ANDROID_ID
+        )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -155,7 +161,8 @@ class AgentActivationActivity : BaseActivity() {
             request.confirmNewPin = pin
             request.newPin = pin
             request.geoLocation = ""
-            request.oldPin = code//binding.oldPinEt
+            request.oldPin = code
+            request.deviceId = deviceId
 
             mainScope.launch {
                 showProgressBar("Activating")
@@ -174,7 +181,8 @@ class AgentActivationActivity : BaseActivity() {
                     localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
                     localStorage.putString(AppConstants.AGENT_CODE, code)
 
-                    val intent = Intent(this@AgentActivationActivity, DataLoaderActivity::class.java)
+                    val intent =
+                        Intent(this@AgentActivationActivity, DataLoaderActivity::class.java)
                     intent.putExtra(AppConstants.LOAD_DATA, LoadDataType.OTHER_DATA.ordinal)
                     startActivity(intent)
                     finish()
@@ -189,7 +197,12 @@ class AgentActivationActivity : BaseActivity() {
             mainScope.launch {
                 showProgressBar("Verifying")
                 val (response) = safeRunIO {
-                    creditClubMiddleWareAPI.staticService.agentVerification(code, phoneNumber, institutionCode)
+                    creditClubMiddleWareAPI.staticService.agentVerification(
+                        code,
+                        phoneNumber,
+                        institutionCode,
+                        deviceId
+                    )
                 }
                 hideProgressBar()
 
@@ -205,7 +218,11 @@ class AgentActivationActivity : BaseActivity() {
                     binding.codeEt.setText("")
                     binding.codeEt.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4))
                     binding.codeEt.requestFocus()
-                    institutionCode = response.responseMessage ?: if (code.length >= 6) code.substring(0, 6) else code
+                    institutionCode =
+                        response.responseMessage ?: if (code.length >= 6) code.substring(
+                            0,
+                            6
+                        ) else code
 
                     showNotification("Verification successful")
                 } else {

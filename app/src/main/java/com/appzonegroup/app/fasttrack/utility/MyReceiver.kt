@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.crashlytics.android.Crashlytics
 import com.creditclub.core.util.isMyServiceRunning
 
 /**
@@ -20,7 +19,6 @@ class MyReceiver : BroadcastReceiver() {
                 context.startService(i)
             } catch (ex: IllegalStateException) {
                 ex.printStackTrace()
-                Crashlytics.logException(ex)
 
                 i.putExtra("NEED_FOREGROUND_KEY", true)
 
@@ -32,9 +30,7 @@ class MyReceiver : BroadcastReceiver() {
                     }
                 } catch (ex2: IllegalStateException) {
                     ex2.printStackTrace()
-                    Crashlytics.logException(ex2)
                 }
-
             }
         }
     }

@@ -53,7 +53,8 @@ interface StaticService {
     suspend fun agentVerification(
         @Query("verificationCode") verificationCode: String,
         @Query("agentPhoneNumber") agentPhoneNumber: String,
-        @Query("institutionCode") institutionCode: String?
+        @Query("institutionCode") institutionCode: String?,
+        @Query("deviceId") deviceId: String?
     ): BackendResponse?
 
     @POST("CreditClubStatic/AgentActivation")
