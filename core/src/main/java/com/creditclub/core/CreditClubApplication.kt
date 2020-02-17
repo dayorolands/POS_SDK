@@ -2,6 +2,8 @@ package com.creditclub.core
 
 import android.app.Application
 import android.widget.Toast
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.crashlytics.android.Crashlytics
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.util.appDataStorage
@@ -23,7 +25,11 @@ import kotlin.system.exitProcess
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
  * Appzone Ltd
  */
-open class CreditClubApplication : Application() {
+open class CreditClubApplication : Application(), Configuration.Provider {
+    override fun getWorkManagerConfiguration() =
+        Configuration.Builder()
+            .setMinimumLoggingLevel(if (BuildConfig.DEBUG) android.util.Log.DEBUG else android.util.Log.INFO)
+            .build()
 
     private lateinit var koinApp: KoinApplication
     protected open val modules: KoinAppDeclaration? = null
@@ -35,7 +41,8 @@ open class CreditClubApplication : Application() {
         Crashlytics.getInstance()
 
         if (CommonUtils.isRooted(this)) {
-            Toast.makeText(this, "Sorry, Cannot run app on a rooted device", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Sorry, Cannot run app on a rooted device", Toast.LENGTH_LONG)
+                .show()
             exitProcess(0)
         }
 
@@ -44,6 +51,7 @@ open class CreditClubApplication : Application() {
         }
 
         AndroidThreeTen.init(this)
+        WorkManager.initialize(this, workManagerConfiguration)
 
         koinApp = startKoin {
             androidLogger()

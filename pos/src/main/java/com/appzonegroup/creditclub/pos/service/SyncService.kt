@@ -4,11 +4,15 @@ import android.os.Looper
 import android.util.Log
 import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.Platform
+import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.contract.Logger
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.models.NotificationResponse
+import com.appzonegroup.creditclub.pos.models.PosTransaction
 import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
+import com.creditclub.core.data.response.isSuccessful
+import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +33,7 @@ class SyncService : BaseService(), Logger {
 //        logPosNotifications()
         performReversals()
         logIsoRequests()
+        logReceipts()
     }
 
     //    @Synchronized
@@ -64,6 +69,48 @@ class SyncService : BaseService(), Logger {
                 }
 
                 notifications = dao.all()
+
+                delay(10000)
+            }
+        }
+    }
+
+
+    @Synchronized
+    private fun logReceipts() {
+
+        if (!Platform.isPOS) return
+
+        ioScope.launch {
+            Looper.myLooper() ?: Looper.prepare()
+
+            val receiptDao = posDatabase.posTransactionDao()
+            val mediaType = MediaType.parse("application/json")
+            val serializer = PosTransaction.serializer()
+
+            while (true) {
+                receiptDao.all().forEach { receipt ->
+                    receipt.website="http://www.appzonegroup.com/products/creditclub"
+                    receipt.agentPhoneNumber=localStorage.agent?.phoneNumber
+                    receipt.bankName = getString(R.string.pos_acquirer)
+
+                    val requestBody = RequestBody.create(
+                        mediaType,
+                        Json.stringify(serializer, receipt)
+                    )
+
+                    val (response) = safeRunIO {
+                        creditClubMiddleWareAPI.staticService.transactionLog(
+                            requestBody,
+                            "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}",
+                            receipt.terminalId
+                        )
+                    }
+
+                    if (response.isSuccessful) {
+                        receiptDao.delete(receipt)
+                    }
+                }
 
                 delay(10000)
             }

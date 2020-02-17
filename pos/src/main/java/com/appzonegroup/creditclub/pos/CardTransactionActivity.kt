@@ -378,6 +378,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                         db.runInTransaction {
                             db.financialTransactionDao().save(transaction)
                             db.posTransactionDao().save(PosTransaction.create(response).apply {
+                                bankName = getString(R.string.pos_acquirer)
                                 cardHolder = cardData.holder
                                 cardType = cardData.type
                             })
