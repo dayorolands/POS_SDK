@@ -73,9 +73,12 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
 
                 val isTcfBank = institutionCode == "100568" || institutionCode == "100309"
 
-                config.categories.loans = !isTcfBank
-                config.hasHlaTagging = !isTcfBank
-                config.hasOnlineFunctions = !isTcfBank
+                if (isTcfBank) {
+                    config.categories.loans = false
+                    config.hasHlaTagging = false
+                    config.hasOnlineFunctions = false
+                    config.flows.bvnUpdate = null
+                }
             }
 
             return config
