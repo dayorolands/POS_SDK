@@ -27,8 +27,8 @@ android {
         abortOnError false
     }
 
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding = true
     }
 
     aaptOptions {
@@ -60,8 +60,8 @@ android {
             minifyEnabled false
             debuggable true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "API_HOST", '"http://52.224.166.115"')
-            buildConfigField("String", "HOST", '"http://52.224.166.115"')
+            buildConfigField("String", "API_HOST", '"http://52.168.85.231"')
+            buildConfigField("String", "HOST", '"http://52.168.85.231"')
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             matchingFallbacks = ['release', 'debug']
@@ -70,8 +70,8 @@ android {
         debug {
             minifyEnabled false
             debuggable true
-            buildConfigField("String", "API_HOST", '"http://52.224.166.115"')
-            buildConfigField("String", "HOST", '"http://52.224.166.115"')
+            buildConfigField("String", "API_HOST", '"http://52.168.85.231"')
+            buildConfigField("String", "HOST", '"http://52.168.85.231"')
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
         }

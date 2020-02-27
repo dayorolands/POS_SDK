@@ -28,13 +28,6 @@ class CreditClubSubMenuActivity : BaseActivity(), View.OnClickListener {
         render(category)
     }
 
-//    override fun onNewIntent(intent: Intent?) {
-//        super.onNewIntent(intent)
-//        intent?.run {
-//            render(getIntExtra(CATEGORY_TYPE, 0))
-//        }
-//    }
-
     private fun render(category: Int) {
         binding.title = AppFunctions.Categories[category]
 

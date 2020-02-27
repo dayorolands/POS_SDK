@@ -7,12 +7,12 @@ import com.creditclub.core.util.safeRunIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import okhttp3.Headers
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
+import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
+import java.io.IOException
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 /**
@@ -33,7 +33,10 @@ object VolleyCompatibility {
     }
 
     @JvmStatic
-    fun processVolleyRequestWithOkHttp(req: StringRequest, listener: com.android.volley.Response.Listener<String>) {
+    fun processVolleyRequestWithOkHttp(
+        req: StringRequest,
+        listener: com.android.volley.Response.Listener<String>
+    ) {
 //        val mediaType = MediaType.parse("text/plain")
 
         GlobalScope.launch(Dispatchers.Main) {
@@ -56,7 +59,17 @@ object VolleyCompatibility {
             val request = requestBuilder.build()
 
             val (response, error) = safeRunIO {
-                client.newCall(request).execute()
+                suspendCoroutine<Response> { continuation ->
+                    client.newCall(request).enqueue(object : Callback {
+                        override fun onFailure(call: Call, e: IOException) {
+                            throw e
+                        }
+
+                        override fun onResponse(call: Call, response: Response) {
+                            continuation.resume(response)
+                        }
+                    })
+                }
             }
 
             if (error != null) req.errorListener.onErrorResponse(VolleyError(error))

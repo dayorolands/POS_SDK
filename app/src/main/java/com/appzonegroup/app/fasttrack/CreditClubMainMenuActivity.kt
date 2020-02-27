@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.view.GravityCompat
 import com.appzonegroup.app.fasttrack.databinding.ActivityCreditClubMainMenuBinding
-import com.appzonegroup.app.fasttrack.model.AgentInfo
 import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
@@ -20,7 +19,6 @@ import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.ui.UpdateActivity
 import com.google.android.material.navigation.NavigationView
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
 class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -63,9 +61,7 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
         binding.versionTv.value = "v${packageInfo?.versionName}$environment. Powered by CreditClub"
         binding.logoutButton.setOnClickListener { logout() }
 
-        localStorage.agentInfo?.run {
-            val info = Gson().fromJson(this, AgentInfo::class.java)
-
+        localStorage.agent?.let { info ->
             binding.navView.getHeaderView(0).run {
                 findViewById<TextView>(R.id.username_tv).text = info.agentName
                 findViewById<TextView>(R.id.phone_no_tv).text = info.phoneNumber

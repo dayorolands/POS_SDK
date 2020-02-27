@@ -1,18 +1,15 @@
 package com.appzonegroup.app.fasttrack
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.appzonegroup.app.fasttrack.model.AppConstants
-import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
@@ -92,7 +89,7 @@ class LoginActivity : DialogProviderActivity() {
             firebaseAnalytics.setUserId(localStorage.agent?.agentCode)
         }
 
-        mainScope.launch { (application as CreditClubApplication).getLatestVersion () }
+        mainScope.launch { (application as CreditClubApplication).getLatestVersion() }
 
         if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
             showError("Timeout due to inactivity")
@@ -128,21 +125,15 @@ class LoginActivity : DialogProviderActivity() {
     }
 
     override fun onBackPressed() {
-
-        val notification = Dialogs.getQuestionDialog(this@LoginActivity, "Do you want to exit? ")
-        val logoutNoButton = notification.findViewById<Button>(R.id.cancel_btn)
-        val logoutYesButton = notification.findViewById<Button>(R.id.ok_btn)
-
-        logoutNoButton.setOnClickListener { notification.dismiss() }
-
-        logoutYesButton.setOnClickListener {
-            notification.dismiss()
-            val intent = Intent(Intent.ACTION_MAIN)
-            intent.addCategory(Intent.CATEGORY_HOME)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
+        dialogProvider.confirm("Close Application", null) {
+            onSubmit {
+                val intent = Intent(Intent.ACTION_MAIN)
+                intent.addCategory(Intent.CATEGORY_HOME)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finish()
+            }
         }
-        notification.show()
     }
 
     private fun attemptLogin() {
@@ -187,13 +178,7 @@ class LoginActivity : DialogProviderActivity() {
             val lastLogin = "Last Login: " + Misc.dateToLongString(Misc.getCurrentDateTime())
             LocalStorage.SaveValue(AppConstants.LAST_LOGIN, lastLogin, baseContext)
 
-            val activityToOpen = when {
-                packageName.toLowerCase().contains("cashout") -> CashoutMainMenuActivity::class.java
-                packageName.toLowerCase().contains(".creditclub") -> CreditClubMainMenuActivity::class.java
-                else -> Menu3Activity::class.java
-            }
-
-            val intent = Intent(this@LoginActivity, activityToOpen)
+            val intent = Intent(this@LoginActivity, CreditClubMainMenuActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             startActivity(intent)
             finish()
@@ -211,31 +196,19 @@ class LoginActivity : DialogProviderActivity() {
     }
 
     private fun ensureLocationEnabled() {
-        var locationMode = 0 // 0 == Settings.Secure.LOCATION_MODE_OFF
-        var locationProviders: String? = null
+        var locationMode = 0
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            try {
-                locationMode = Settings.Secure.getInt(
-                    applicationContext.contentResolver,
-                    Settings.Secure.LOCATION_MODE
-                )
-            } catch (e: Settings.SettingNotFoundException) {
-
-            }
-
-        } else {
-            locationProviders = Settings.Secure.getString(
+        try {
+            locationMode = Settings.Secure.getInt(
                 applicationContext.contentResolver,
-                Settings.Secure.LOCATION_PROVIDERS_ALLOWED
+                Settings.Secure.LOCATION_MODE
             )
+        } catch (e: Settings.SettingNotFoundException) {
+
         }
 
-        val locationEnabled = !TextUtils.isEmpty(locationProviders) || locationMode != 0
-        if (!locationEnabled) {
-
-            com.appzonegroup.app.fasttrack.ui.Dialogs.confirm(
-                this,
+        if (locationMode == 0) {
+            dialogProvider.confirm(
                 "An active GPS service is needed for this application",
                 "Click 'OK' to activate it"
             ) {

@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.R
+import com.appzonegroup.app.fasttrack.databinding.DialogConfirmBinding
 import com.appzonegroup.app.fasttrack.databinding.DialogCustomerRequestOptionsBinding
 import com.appzonegroup.app.fasttrack.databinding.DialogInputBinding
 import com.appzonegroup.app.fasttrack.databinding.PinpadBinding
@@ -179,8 +180,10 @@ interface DialogProviderImpl : DialogProvider {
 
         val listener = DialogListener.create(block)
         val inflater = LayoutInflater.from(activity)
-        val binding = DataBindingUtil.inflate<PinpadBinding>(inflater,
-            R.layout.pinpad, null, false)
+        val binding = DataBindingUtil.inflate<PinpadBinding>(
+            inflater,
+            R.layout.pinpad, null, false
+        )
         binding.title = title
 
         binding.pinChangeHandler = object : Dialogs.PinChangeHandler {
@@ -374,6 +377,34 @@ interface DialogProviderImpl : DialogProvider {
             listener.close()
         }
 
+        dialog.show()
+    }
+
+    override fun confirm(title: String, subtitle: String?, block: DialogListenerBlock<Boolean>) {
+        val dialog = Dialogs.getDialog(context)
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        val dialogConfig by lazy {
+            DialogListener.create(block)
+        }
+        val binding = DataBindingUtil.inflate<DialogConfirmBinding>(
+            LayoutInflater.from(context),
+            R.layout.dialog_confirm,
+            null,
+            false
+        )
+        dialog.setContentView(binding.root)
+        binding.title = title
+        binding.subtitle = subtitle ?: "Are you sure?"
+        binding.okButton.setOnClickListener {
+            dialog.dismiss()
+            dialogConfig.submit(dialog, true)
+        }
+        dialog.setOnCancelListener {
+            dialog.dismiss()
+            dialogConfig.close()
+        }
+        binding.cancelButton.setOnClickListener { dialog.cancel() }
         dialog.show()
     }
 }

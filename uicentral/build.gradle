@@ -16,8 +16,8 @@ android {
         consumerProguardFiles 'consumer-rules.pro'
     }
 
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding = true
     }
 
     buildTypes {
