@@ -95,6 +95,35 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:374244995616:android:58915261ca30aa2d114245",
+        "android_client_info": {
+          "package_name": "com.creditclub.airtel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "374244995616-r5b0hcls5cbcritv8unbids9934uau4m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxV_Hi6_sN84FD9Ha3rAFRcuK2FT2Zozs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "374244995616-r5b0hcls5cbcritv8unbids9934uau4m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:374244995616:android:9e3f8ff1022d2d7b114245",
         "android_client_info": {
           "package_name": "com.creditclub.fcmb"
