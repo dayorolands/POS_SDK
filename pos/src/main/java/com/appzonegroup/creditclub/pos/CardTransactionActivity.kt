@@ -18,14 +18,12 @@ import com.appzonegroup.creditclub.pos.command.StartEmvService
 import com.appzonegroup.creditclub.pos.command.StartPinPadService
 import com.appzonegroup.creditclub.pos.contract.Logger
 import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.data.create
 import com.appzonegroup.creditclub.pos.databinding.PageInputRrnBinding
 import com.appzonegroup.creditclub.pos.databinding.PageTransactionErrorBinding
 import com.appzonegroup.creditclub.pos.databinding.PageVerifyCashoutBinding
 import com.appzonegroup.creditclub.pos.extension.format
-import com.appzonegroup.creditclub.pos.models.FinancialTransaction
-import com.appzonegroup.creditclub.pos.models.NotificationResponse
-import com.appzonegroup.creditclub.pos.models.PosNotification
-import com.appzonegroup.creditclub.pos.models.Reversal
+import com.appzonegroup.creditclub.pos.models.*
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
@@ -377,7 +375,14 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                     withContext(Dispatchers.IO) {
                         val db = PosDatabase.getInstance(this@CardTransactionActivity)
 
-                        db.financialTransactionDao().save(transaction)
+                        db.runInTransaction {
+                            db.financialTransactionDao().save(transaction)
+                            db.posTransactionDao().save(PosTransaction.create(response).apply {
+                                bankName = getString(R.string.pos_acquirer)
+                                cardHolder = cardData.holder
+                                cardType = cardData.type
+                            })
+                        }
 
                         if (response.isSuccessful) {
                             val posNotification = PosNotification.create(transaction)

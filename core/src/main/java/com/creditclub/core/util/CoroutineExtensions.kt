@@ -30,3 +30,18 @@ suspend inline fun <T> safeRunIO(crossinline block: suspend CoroutineScope.() ->
 
         SafeRunResult(data, error)
     }
+
+suspend inline fun <T> safeRunSuspend(crossinline block: suspend () -> T): SafeRunResult<T> {
+    var data: T? = null
+    var error: Exception? = null
+
+    try {
+        data = block()
+    } catch (ex: Exception) {
+        error = ex
+        Crashlytics.logException(ex)
+        if (BuildConfig.DEBUG) ex.printStackTrace()
+    }
+
+    return SafeRunResult(data, error)
+}
