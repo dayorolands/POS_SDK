@@ -16,10 +16,8 @@ import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.util.posConfig
 import com.appzonegroup.creditclub.pos.util.posParameters
 import com.creditclub.core.CreditClubApplication
-import com.creditclub.core.util.localStorage
-import com.creditclub.core.util.packageInfo
-import com.creditclub.core.util.safeRun
-import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.*
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.launch
 
 class LoginActivity : DialogProviderActivity() {
@@ -28,12 +26,9 @@ class LoginActivity : DialogProviderActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val environment = if (BuildConfig.DEBUG) ". Staging" else ""
-        findViewById<TextView>(R.id.version_tv).text =
-            "Version ${packageInfo?.versionName}$environment"
-
-        if (BuildConfig.DEBUG) {
-            findViewById<EditText>(R.id.login_phoneNumber).setText(localStorage.agentPhone)
+        debugOnly {
+            version_tv.text = "Version ${packageInfo?.versionName}. Staging"
+            login_phoneNumber.setText(localStorage.agent?.phoneNumber)
         }
 
         findViewById<EditText>(R.id.login_phoneNumber).also {
@@ -73,17 +68,17 @@ class LoginActivity : DialogProviderActivity() {
             safeRun {
                 localStorage.agent = response
 
-                if (Platform.isPOS) {
-                    val configHasChanged =
-                        posConfig.terminalId != response.terminalID // || posConfig.posModeStr != response.posMode
-
-                    posConfig.terminalId = response.terminalID ?: ""
-//                    posConfig.posModeStr = response.posMode
-
-                    if (configHasChanged) {
-                        posParameters.reset()
-                    }
-                }
+//                if (Platform.isPOS) {
+//                    val configHasChanged =
+//                        posConfig.terminalId != response.terminalID // || posConfig.posModeStr != response.posMode
+//
+//                    posConfig.terminalId = response.terminalID ?: ""
+////                    posConfig.posModeStr = response.posMode
+//
+//                    if (configHasChanged) {
+//                        posParameters.reset()
+//                    }
+//                }
             }
 
             firebaseAnalytics.setUserId(localStorage.agent?.agentCode)

@@ -12,11 +12,8 @@ import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.AppFunctions
-import com.creditclub.core.util.appDataStorage
+import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
-import com.creditclub.core.util.localStorage
-import com.creditclub.core.util.packageInfo
-import com.creditclub.core.util.safeRunIO
 import com.creditclub.ui.UpdateActivity
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.launch
@@ -56,9 +53,11 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
 
         binding.navView.setNavigationItemSelectedListener(this)
 
-        val environment = if (BuildConfig.DEBUG) ". Staging" else ""
+        binding.versionTv.value = "v${packageInfo?.versionName}. Powered by CreditClub"
+        debugOnly {
+            binding.versionTv.value = "v${packageInfo?.versionName}. Staging. Powered by CreditClub"
+        }
 
-        binding.versionTv.value = "v${packageInfo?.versionName}$environment. Powered by CreditClub"
         binding.logoutButton.setOnClickListener { logout() }
 
         localStorage.agent?.let { info ->

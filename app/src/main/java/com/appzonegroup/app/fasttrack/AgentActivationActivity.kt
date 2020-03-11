@@ -15,6 +15,7 @@ import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
 import com.crashlytics.android.Crashlytics
 import com.creditclub.core.data.request.PinChangeRequest
+import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
@@ -43,7 +44,7 @@ class AgentActivationActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding
 
-        if (BuildConfig.DEBUG) {
+        debugOnly {
             binding.skipButton.visibility = View.VISIBLE
             binding.skipButton.setOnClickListener(View.OnClickListener {
                 phoneNumber = binding.phoneNumberEt.text.toString().trim(' ')

@@ -1,9 +1,9 @@
 package com.creditclub.core.ui
 
 import android.os.Bundle
-import android.view.WindowManager
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.creditclub.core.AppFunctions
 import com.creditclub.core.R
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.CoreDatabase
@@ -12,6 +12,7 @@ import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.getMessage
+import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.logFunctionUsage
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.CoroutineScope
@@ -51,17 +52,21 @@ abstract class CreditClubActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE
-        )
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
-        if (functionId != null) {
+        functionId?.also { id ->
+            val screenName = getString(AppFunctions[id]!!.label)
+            firebaseAnalytics.setCurrentScreen(this, screenName, null)
+
             mainScope.launch {
-                logFunctionUsage(functionId!!)
+                logFunctionUsage(id)
             }
         }
+
+        firebaseAnalytics.setUserId(localStorage.agent?.agentCode)
+        firebaseAnalytics.setUserProperty("agent_name", localStorage.agent?.agentName)
+        firebaseAnalytics.setUserProperty("agent_phone", localStorage.agent?.phoneNumber)
+        firebaseAnalytics.setUserProperty("terminal_id", localStorage.agent?.terminalID)
     }
 
     fun showNetworkError() = showNetworkError<Nothing>(null)

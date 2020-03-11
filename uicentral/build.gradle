@@ -30,11 +30,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             matchingFallbacks = ['release', 'debug']
         }
-
-        debugLive {
-            debuggable true
-            matchingFallbacks = ['debug', 'release']
-        }
     }
 
 }

@@ -46,15 +46,6 @@ android {
             buildConfigField("String", "HOST", '"http://52.168.85.231"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
         }
-
-        debugLive {
-            debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "API_HOST", '"https://api.mybankone.com"')
-            buildConfigField("String", "HOST", '"https://mybankone.com"')
-            manifestPlaceholders = [usesCleartextTraffic: "false"]
-            matchingFallbacks = ['debug', 'release']
-        }
     }
 
     compileOptions {
