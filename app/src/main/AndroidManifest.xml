@@ -28,7 +28,6 @@
         tools:ignore="GoogleAppIndexingWarning"
         android:name=".BankOneApplication"
         tools:node="replace"
-        tools:replace="icon, label, theme, allowBackup"
         tools:targetApi="n">
         <activity
             android:name=".FaqActivity"
@@ -488,6 +487,9 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+        <meta-data
+            android:name="firebase_performance_logcat_enabled"
+            android:value="true" />
     </application>
 
 </manifest>

@@ -36,7 +36,7 @@ interface DialogProviderImpl : DialogProvider {
 
     override fun hideProgressBar() {
         activity.runOnUiThread {
-            if (progressDialog.isShowing) {
+            if (progressDialog.isShowing && !activity.isFinishing) {
                 progressDialog.dismiss()
             }
         }

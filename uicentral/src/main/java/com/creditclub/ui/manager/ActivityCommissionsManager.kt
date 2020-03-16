@@ -15,6 +15,7 @@ import com.creditclub.ui.adapter.CommissionReportAdapter
 import com.creditclub.ui.databinding.ActivityCommissionsBinding
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDate
+import org.threeten.bp.Period
 
 
 /**
@@ -39,20 +40,22 @@ class ActivityCommissionsManager(
     private val reportTypeOptions = transactionGroup.map { DialogOptionItem(it.label) }
     private val paymentStatusOptions = PaymentStatus.values().map { DialogOptionItem(it.label) }
 
+    private var endDate = LocalDate.now()
+    private var startDate = endDate.minusDays(7)
+    private var today = LocalDate.now()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding.content.container.layoutManager = LinearLayoutManager(activity)
 
-        val today = LocalDate.now()
-
-        binding.content.endDateContentTv.text = today.toString("uuuu-MM-dd")
-        binding.content.startDateContentTv.text =
-            today.minusMonths(3).toString("uuuu-MM-dd")
+        binding.content.endDateContentTv.text = endDate.toString("uuuu-MM-dd")
+        binding.content.startDateContentTv.text = startDate.toString("uuuu-MM-dd")
 
         binding.content.startDateLayout.setOnClickListener {
             showDateInput(DateInputParams("Select start date", maxDate = today)) {
                 onSubmit { date ->
+                    startDate = date
                     binding.content.startDateContentTv.text =
                         date.toString("uuuu-MM-dd")
                 }
@@ -62,6 +65,7 @@ class ActivityCommissionsManager(
         binding.content.endDateLayout.setOnClickListener {
             showDateInput(DateInputParams("Select end date", maxDate = today)) {
                 onSubmit { date ->
+                    endDate = date
                     binding.content.endDateContentTv.text = date.toString("uuuu-MM-dd")
                 }
             }
@@ -128,18 +132,6 @@ class ActivityCommissionsManager(
 
     override fun render() {
         super.render()
-//
-//        if (startIndex + maxSize < totalCount) {
-//            binding.content.nextButton.show()
-//        } else {
-//            binding.content.nextButton.hide()
-//        }
-//
-//        if (startIndex >= maxSize) {
-//            binding.content.prevButton.show()
-//        } else {
-//            binding.content.prevButton.hide()
-//        }
 
         binding.content.nextButton.visibility =
             if (startIndex + maxSize < totalCount) View.VISIBLE else View.INVISIBLE
@@ -154,6 +146,11 @@ class ActivityCommissionsManager(
 
     private fun fetchReport() {
         with(activity) {
+            if (Period.between(startDate, endDate).days > 7) {
+                showError("Date range cannot be more than 7 days")
+                return
+            }
+
             mainScope.launch {
 
                 showProgressBar("Getting commissions")

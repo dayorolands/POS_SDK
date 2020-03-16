@@ -68,17 +68,17 @@ class LoginActivity : DialogProviderActivity() {
             safeRun {
                 localStorage.agent = response
 
-//                if (Platform.isPOS) {
-//                    val configHasChanged =
-//                        posConfig.terminalId != response.terminalID // || posConfig.posModeStr != response.posMode
-//
-//                    posConfig.terminalId = response.terminalID ?: ""
-////                    posConfig.posModeStr = response.posMode
-//
-//                    if (configHasChanged) {
-//                        posParameters.reset()
-//                    }
-//                }
+                if (Platform.isPOS) {
+                    val configHasChanged =
+                        posConfig.terminalId != response.terminalID // || posConfig.posModeStr != response.posMode
+
+                    posConfig.terminalId = response.terminalID ?: ""
+//                    posConfig.posModeStr = response.posMode
+
+                    if (configHasChanged) {
+                        posParameters.reset()
+                    }
+                }
             }
 
             firebaseAnalytics.setUserId(localStorage.agent?.agentCode)

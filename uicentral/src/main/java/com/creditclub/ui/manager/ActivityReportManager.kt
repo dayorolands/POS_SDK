@@ -33,9 +33,10 @@ class ActivityReportManager(
 
     private var startIndex = 0
     private val maxSize = 20
+    private var totalCount = 0
+
     private var selectedTransactionType = transactionGroup.first()
     private var selectedTransactionStatus = TransactionStatus.Successful
-    private var totalCount = 0
     private var transactionAdapter = TransactionReportAdapter(emptyList(), selectedTransactionType)
     private var posReportAdapter = PosReportAdapter(emptyList())
 

@@ -5,6 +5,7 @@ import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.TrackGPS
+import com.creditclub.core.util.debugOnly
 import okhttp3.Cache
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
@@ -38,17 +39,20 @@ val apiModule = module {
             .add("api.mybankone.com", "sha256/goId03pe7sxzYmTdNcd1vI+psOY/FX5YGYjkPeioB0w=")
             .build()
 
-        OkHttpClient().newBuilder()
+        val builder = OkHttpClient().newBuilder()
             .certificatePinner(certificatePinner)
             .connectTimeout(1, TimeUnit.MINUTES)
             .readTimeout(1, TimeUnit.MINUTES)
             .writeTimeout(2, TimeUnit.MINUTES)
             .cache(cache)
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level =
-                    if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
-            })
-            .build()
+
+        debugOnly {
+            val interceptor = HttpLoggingInterceptor()
+            interceptor.level = HttpLoggingInterceptor.Level.BODY
+            builder.addInterceptor(interceptor)
+        }
+
+        return@single builder.build()
     }
 
     single { CreditClubMiddleWareAPI(get(named("middleware"))) }

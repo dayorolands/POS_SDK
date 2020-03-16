@@ -219,8 +219,8 @@ class CustomEmvServiceListener(
 
     override fun onInputAmount(AmountData: EmvAmountData): Int {
         AmountData.Amount = amount
-        AmountData.TransCurrCode = 840.toShort()
-        AmountData.ReferCurrCode = 840.toShort()
+        AmountData.TransCurrCode = 566.toShort()
+        AmountData.ReferCurrCode = 566.toShort()
         AmountData.TransCurrExp = 2.toByte()
         AmountData.ReferCurrExp = 2.toByte()
         AmountData.ReferCurrCon = 0

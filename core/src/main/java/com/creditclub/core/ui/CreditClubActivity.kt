@@ -55,11 +55,13 @@ abstract class CreditClubActivity : AppCompatActivity() {
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
         functionId?.also { id ->
-            val screenName = getString(AppFunctions[id]!!.label)
-            firebaseAnalytics.setCurrentScreen(this, screenName, null)
+            AppFunctions[id]?.also { appFunction ->
+                val screenName = getString(appFunction.label)
+                firebaseAnalytics.setCurrentScreen(this, screenName, null)
 
-            mainScope.launch {
-                logFunctionUsage(id)
+                mainScope.launch {
+                    logFunctionUsage(id)
+                }
             }
         }
 
