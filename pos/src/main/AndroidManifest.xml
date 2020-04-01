@@ -46,26 +46,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.TerminalOptionsActivity"
-            android:label="Settings"
+            android:label="Terminal Options"
             android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity" />
-        <activity
-            android:name="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.appzonegroup.creditclub.pos.CARD_MENU" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
         <activity
             android:name="com.appzonegroup.creditclub.pos.MenuActivity"
             android:configChanges="orientation|keyboardHidden"

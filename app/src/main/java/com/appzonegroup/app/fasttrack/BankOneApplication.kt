@@ -19,6 +19,7 @@ import com.creditclub.core.util.SafeRunResult
 import com.creditclub.core.util.appDataStorage
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
+import com.google.firebase.FirebaseApp
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.KoinAppDeclaration

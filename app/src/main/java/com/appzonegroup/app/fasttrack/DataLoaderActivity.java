@@ -9,7 +9,7 @@ import com.appzonegroup.app.fasttrack.model.AgentInfo;
 import com.appzonegroup.app.fasttrack.model.AppConstants;
 import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.task.GetCallTask;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 
 import java.util.Locale;
@@ -55,7 +55,7 @@ public class DataLoaderActivity extends BaseActivity {
                 finish();
             } catch (Exception ex) {
                 ex.printStackTrace();
-                Crashlytics.logException(ex);
+                FirebaseCrashlytics.getInstance().recordException(ex);
                 Toast.makeText(getBaseContext(), "No details was received. Try again", Toast.LENGTH_LONG).show();
                 if (!isFinishing()) finish();
             }

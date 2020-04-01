@@ -13,7 +13,7 @@ import com.appzonegroup.app.fasttrack.model.LoadDataType
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.data.request.PinChangeRequest
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.delegates.contentView
@@ -98,7 +98,7 @@ class AgentActivationActivity : BaseActivity() {
                 "You did not enter your phone number",
                 binding.phoneNumberEt
             )
-            Crashlytics.logException(Exception("No phone number was entered"))
+            FirebaseCrashlytics.getInstance().recordException(Exception("No phone number was entered"))
             return
         }
 
@@ -107,31 +107,31 @@ class AgentActivationActivity : BaseActivity() {
                 "You did not enter your verification code",
                 binding.codeEt
             )
-            Crashlytics.logException(Exception("verification code not inputted"))
+            FirebaseCrashlytics.getInstance().recordException(Exception("verification code not inputted"))
             return
         }
 
         /*if (isActivation && ((EditText)findViewById(R.id.agentActivation_oldPINEt)).getText().toString().length() == 0){
             indicateError("You did not enter your old PIN", ((EditText)findViewById(R.id.agentActivation_PINEt)));
-            Crashlytics.logException(new Exception("No PIN was entered"));
+            FirebaseCrashlytics.getInstance().recordException(new Exception("No PIN was entered"));
             return;
         }*/
 
         if (isActivation && binding.newPinEt.text.toString().isEmpty()) {
             indicateError("You did not enter the PIN", binding.newPinEt)
-            Crashlytics.logException(Exception("No PIN was entered"))
+            FirebaseCrashlytics.getInstance().recordException(Exception("No PIN was entered"))
             return
         }
 
         if (isActivation && binding.newPinConfirmationEt.text.toString().isEmpty()) {
             indicateError("You did not confirm the PIN", binding.newPinConfirmationEt)
-            Crashlytics.logException(Exception("PIN entry was not confirmed"))
+            FirebaseCrashlytics.getInstance().recordException(Exception("PIN entry was not confirmed"))
             return
         }
 
         if (isActivation && binding.newPinEt.text.toString().length != 4) {
             indicateError("Your PIN must have 4-digit", binding.newPinEt)
-            Crashlytics.logException(Exception("Pin was not 4 digits"))
+            FirebaseCrashlytics.getInstance().recordException(Exception("Pin was not 4 digits"))
             return
         }
 
@@ -140,7 +140,7 @@ class AgentActivationActivity : BaseActivity() {
                 "Your PIN Confirmation must have 4-digit",
                 binding.newPinConfirmationEt
             )
-            Crashlytics.logException(Exception("confirmation pin was not 4 digits"))
+            FirebaseCrashlytics.getInstance().recordException(Exception("confirmation pin was not 4 digits"))
             return
         }
 

@@ -1,6 +1,6 @@
 package com.creditclub.core.util
 
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.BuildConfig
 
 
@@ -20,7 +20,7 @@ inline fun <T> safeRun(crossinline block: () -> T): SafeRunResult<T> {
     } catch (ex: Exception) {
         error = ex
         try {
-            Crashlytics.logException(ex)
+            FirebaseCrashlytics.getInstance().recordException(ex)
         } catch (ex: Exception) {
             if (BuildConfig.DEBUG) ex.printStackTrace()
         }

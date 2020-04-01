@@ -32,7 +32,7 @@ import com.appzonegroup.app.fasttrack.utility.Misc;
 import com.creditclub.core.data.Encryption;
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages;
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -174,7 +174,7 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
                     processData(result);
                 } else {
                     if (e != null) {
-                        Crashlytics.logException(e);
+                        FirebaseCrashlytics.getInstance().recordException(e);
                         e.printStackTrace();
                         if (e instanceof TimeoutException) {
                             dialog.setMessage("Something went wrong! Please try again.")

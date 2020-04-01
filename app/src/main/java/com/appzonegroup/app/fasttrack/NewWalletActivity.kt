@@ -18,7 +18,7 @@ import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ImageUtils
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.request.CustomerRequest
 import com.creditclub.core.ui.CreditClubFragment
@@ -116,7 +116,7 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
 
             newBitmap
         } catch (e: Exception) {
-            Crashlytics.logException(e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             e.printStackTrace()
             if (BuildConfig.DEBUG) Log.e("Image", "Save file error!$e")
 
@@ -244,8 +244,8 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
         if (surname.isEmpty()) {
             indicateError("Please enter customer's surname", Form.GENERAL_INFO.ordinal, surname_et)
 
-            Crashlytics.logException(Exception("incorrect user name"))
-            Crashlytics.log("this is a crash")
+            firebaseCrashlytics.recordException(Exception("incorrect user name"))
+            firebaseCrashlytics.log("this is a crash")
             return
         }
 

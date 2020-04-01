@@ -21,7 +21,7 @@ import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ImageUtils
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.model.Product
@@ -140,7 +140,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
 
             newBitmap
         } catch (e: Exception) {
-            Crashlytics.logException(e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             e.printStackTrace()
             if (BuildConfig.DEBUG) Log.e("Image", "Save file error!$e")
 
@@ -317,7 +317,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                Crashlytics.logException(Exception(e.message))
+                FirebaseCrashlytics.getInstance().recordException(Exception(e.message))
 
                 showError("An error occurred. Please try again")
             }
@@ -343,8 +343,8 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
                 surname_et
             )
 
-            Crashlytics.logException(Exception("incorrect user name"))
-            Crashlytics.log("this is a crash")
+            firebaseCrashlytics.recordException(Exception("incorrect user name"))
+            firebaseCrashlytics.log("this is a crash")
             return
         }
 
