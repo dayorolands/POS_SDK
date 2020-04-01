@@ -22,7 +22,7 @@ import com.appzonegroup.app.fasttrack.utility.Misc;
 import com.creditclub.core.data.Encryption;
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages;
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.json.JSONObject;
 
@@ -134,7 +134,7 @@ public class OnlineActivity extends BaseActivity {
                                 }
                             }
                         } catch (Exception c) {
-                            Crashlytics.logException(c);
+                            FirebaseCrashlytics.getInstance().recordException(c);
                             c.printStackTrace();
                         }
                     } else {

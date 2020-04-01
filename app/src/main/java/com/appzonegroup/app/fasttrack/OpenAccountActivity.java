@@ -58,7 +58,7 @@ import com.appzonegroup.app.fasttrack.utility.CalendarDialog;
 import com.appzonegroup.app.fasttrack.utility.ImageManipulations;
 import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.TrackGPS;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -287,10 +287,10 @@ public class OpenAccountActivity extends AppCompatActivity {
                     fo.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
-                    Crashlytics.logException(new Exception(e.getMessage()));
+                    FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Crashlytics.logException(new Exception(e.getMessage()));
+                    FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                 }
 
                 identityPhoto_ImageView.setImageBitmap(thumbnail);
@@ -316,10 +316,10 @@ public class OpenAccountActivity extends AppCompatActivity {
                     fo.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
-                    Crashlytics.logException(new Exception(e.getMessage()));
+                    FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Crashlytics.logException(new Exception(e.getMessage()));
+                    FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                 }
 
                 passportPhoto_ImageView.setImageBitmap(thumbnail);
@@ -346,10 +346,10 @@ public class OpenAccountActivity extends AppCompatActivity {
                     fo.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
-                    Crashlytics.logException(new Exception(e.getMessage()));
+                    FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Crashlytics.logException(new Exception(e.getMessage()));
+                    FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                 }
 
                 signaturePhoto_ImageView.setImageBitmap(thumbnail);
@@ -713,8 +713,8 @@ public class OpenAccountActivity extends AppCompatActivity {
         if (surname.length() == 0){
             indicateError("Please enter customer's surname", Form.GENERAL_INFO.ordinal(), surnameEt);
 
-            Crashlytics.logException(new Exception("incorrect user name"));
-            Crashlytics.log("this is a crash");
+            FirebaseCrashlytics.getInstance().recordException(new Exception("incorrect user name"));
+            FirebaseCrashlytics.getInstance().log("this is a crash");
             return;
         }
 
@@ -1146,12 +1146,12 @@ public class OpenAccountActivity extends AppCompatActivity {
                     return  true;
                 }catch(Exception e) {
 
-                    Crashlytics.logException(new Exception(e.getMessage()));
+                    FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                     return false;
                 }
             }catch(Exception e){
 
-                Crashlytics.logException(new Exception(e.getMessage()));
+                FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                 return false;
             }
         }
@@ -1248,19 +1248,19 @@ public class OpenAccountActivity extends AppCompatActivity {
 
                 }else if (serverResponse.getStatus() != null) {
 
-                    Crashlytics.logException(new Exception(serverResponse.getModelResponse().getResponseMessage()));
+                    FirebaseCrashlytics.getInstance().recordException(new Exception(serverResponse.getModelResponse().getResponseMessage()));
                     return serverResponse.getModelResponse().getResponseMessage();
 
                 }else {
 
-                    Crashlytics.logException(new Exception(serverResponse.getModelResponse().getResponseMessage()));
+                    FirebaseCrashlytics.getInstance().recordException(new Exception(serverResponse.getModelResponse().getResponseMessage()));
 
                     return serverResponse.getModelResponse().getResponseMessage();
                 }
 
             }catch (Exception ex){
 
-                Crashlytics.logException(new Exception(ex.getMessage()));
+                FirebaseCrashlytics.getInstance().recordException(new Exception(ex.getMessage()));
                 return null;
             }
         }

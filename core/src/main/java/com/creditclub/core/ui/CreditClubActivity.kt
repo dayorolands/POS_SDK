@@ -15,6 +15,7 @@ import com.creditclub.core.util.getMessage
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.logFunctionUsage
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,6 +44,8 @@ abstract class CreditClubActivity : AppCompatActivity() {
 
     protected lateinit var firebaseAnalytics: FirebaseAnalytics
         private set
+
+    protected val firebaseCrashlytics by lazy { FirebaseCrashlytics.getInstance() }
 
     var TextView.value: String
         get() = text.toString().trim { it <= ' ' }

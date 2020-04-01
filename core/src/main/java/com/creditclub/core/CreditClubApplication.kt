@@ -4,14 +4,13 @@ import android.app.Application
 import android.widget.Toast
 import androidx.work.Configuration
 import androidx.work.WorkManager
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.util.appDataStorage
 import com.creditclub.core.util.safeRunIO
 import com.google.android.play.core.missingsplits.MissingSplitsManagerFactory
+import com.google.firebase.FirebaseApp
 import com.jakewharton.threetenabp.AndroidThreeTen
-import io.fabric.sdk.android.Fabric
-import io.fabric.sdk.android.services.common.CommonUtils
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -37,21 +36,12 @@ open class CreditClubApplication : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-        Fabric.with(this, Crashlytics())
-        Crashlytics.getInstance()
-
-        if (CommonUtils.isRooted(this)) {
-            Toast.makeText(this, "Sorry, Cannot run app on a rooted device", Toast.LENGTH_LONG)
-                .show()
-            exitProcess(0)
-        }
 
         if (MissingSplitsManagerFactory.create(this).disableAppIfMissingRequiredSplits()) {
             return
         }
 
         AndroidThreeTen.init(this)
-        WorkManager.initialize(this, workManagerConfiguration)
 
         koinApp = startKoin {
             androidLogger()

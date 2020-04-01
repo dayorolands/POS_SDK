@@ -43,7 +43,7 @@ import com.creditclub.core.data.Encryption;
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages;
 import com.appzonegroup.app.fasttrack.utility.online.ImageUtils;
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.json.JSONObject;
 
@@ -564,7 +564,7 @@ public class CustomerImageFragment extends Fragment implements View.OnClickListe
             //Log.e("FileSize", String.valueOf(Float.parseFloat(file.length()+"")/1024f) + "");
             return file;
         } catch (Exception e) {
-            Crashlytics.logException(e);
+            FirebaseCrashlytics.getInstance().recordException(e);
             e.printStackTrace();
             Log.e("Image", "Save file error!" + e.toString());
             return null;

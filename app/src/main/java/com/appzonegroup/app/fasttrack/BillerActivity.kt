@@ -19,7 +19,7 @@ import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
 import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.util.localStorage
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -92,7 +92,7 @@ class BillerActivity : BaseActivity(), View.OnClickListener {
     }*/
                     //Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
                     Log.e(this@BillerActivity.javaClass.simpleName, e.toString())
-                    Crashlytics.logException(Exception("Message: An error just occurred. Please try again later, Cause: " + e.message))
+                    FirebaseCrashlytics.getInstance().recordException(Exception("Message: An error just occurred. Please try again later, Cause: " + e.message))
 
                 }
 
@@ -196,7 +196,7 @@ class BillerActivity : BaseActivity(), View.OnClickListener {
                 result = APICaller.makeGetRequest2(url)
             } catch (e: Exception) {
                 Log.e("Register", e.message)
-                Crashlytics.logException(Exception(e.message))
+                FirebaseCrashlytics.getInstance().recordException(Exception(e.message))
             }
 
             Observable.just(result)

@@ -34,7 +34,7 @@ import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.Misc;
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages;
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.json.JSONObject;
 
@@ -159,7 +159,7 @@ public class EnterDetailFragment extends Fragment implements View.OnClickListene
                                                     processData(result, txt);
                                                 }else{
                                                     if(e != null){
-                                                        Crashlytics.logException(e);
+                                                        FirebaseCrashlytics.getInstance().recordException(e);
                                                     }
                                                     Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_INTERNET_COUNT, authResponse.getSessionId());
                                                     dialog.setMessage("Connection lost").setPositiveButton("OK", null).create().setCanceledOnTouchOutside(false);

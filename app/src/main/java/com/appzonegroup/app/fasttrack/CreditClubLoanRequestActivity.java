@@ -23,7 +23,7 @@ import com.appzonegroup.app.fasttrack.utility.CustomAutoCompleteAdapter;
 import com.appzonegroup.app.fasttrack.utility.FunctionIds;
 import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.Misc;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -168,7 +168,7 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
 
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                Crashlytics.logException(new Exception(e.getMessage()));
+                                FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                                 showError(e.getMessage());
                             }
                         } else {
@@ -213,7 +213,7 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
 
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Crashlytics.logException(new Exception(e.getMessage()));
+                        FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                         showError(e.getMessage());
                     }
                 } else {
@@ -280,7 +280,7 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
                                 mViewPager.setCurrentItem(1, true);
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                Crashlytics.logException(new Exception(e.getMessage()));
+                                FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                                 showError(e.getMessage());
                             }
                         } else {

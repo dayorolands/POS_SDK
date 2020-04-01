@@ -21,7 +21,7 @@ import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
 import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.util.localStorage
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -87,7 +87,7 @@ class BillerItemActivity : BaseActivity(), View.OnClickListener {
                             loadingDialog.dismiss()
                         }
                         Toast.makeText(baseContext, e.toString(), Toast.LENGTH_LONG).show()
-                        Crashlytics.logException(Exception("An error occurred. Please try again later"))
+                        FirebaseCrashlytics.getInstance().recordException(Exception("An error occurred. Please try again later"))
                     }
 
                     override fun onNext(result: String?) {
@@ -164,7 +164,7 @@ class BillerItemActivity : BaseActivity(), View.OnClickListener {
 
             } catch (e: Exception) {
                 Log.e("Register", e.message)
-                Crashlytics.logException(Exception(e.message))
+                FirebaseCrashlytics.getInstance().recordException(Exception(e.message))
             }
 
             Observable.just(result)
