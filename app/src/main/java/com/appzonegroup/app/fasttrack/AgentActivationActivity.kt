@@ -1,19 +1,16 @@
 package com.appzonegroup.app.fasttrack
 
-import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.text.InputFilter
 import android.view.View
-import androidx.appcompat.app.AlertDialog
 import com.android.volley.Response
 import com.appzonegroup.app.fasttrack.databinding.ActivityAgentActivationBinding
 import com.appzonegroup.app.fasttrack.model.AppConstants
-import com.appzonegroup.app.fasttrack.model.LoadDataType
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
+import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.data.request.PinChangeRequest
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.delegates.contentView
@@ -33,7 +30,7 @@ class AgentActivationActivity : BaseActivity() {
     internal var institutionCode: String = ""
     var phoneNumber = ""
     var pin = ""
-    override val hasLogoutTimer = false
+    override val hasLogoutTimer get() = false
     private val deviceId
         get() = Settings.Secure.getString(
             contentResolver,
@@ -69,16 +66,12 @@ class AgentActivationActivity : BaseActivity() {
                 localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
                 localStorage.putString(AppConstants.AGENT_CODE, "1111")
 
-                val intent = Intent(this@AgentActivationActivity, DataLoaderActivity::class.java)
-                intent.putExtra(AppConstants.LOAD_DATA, LoadDataType.OTHER_DATA.ordinal)
-                startActivity(intent)
+                startActivity(LoginActivity::class.java)
                 finish()
             })
         }
 
         if (Platform.isPOS) {
-//            Platform.setup(this)
-
             binding.btnTerminalOptions.visibility = View.VISIBLE
             binding.btnTerminalOptions.setOnClickListener {
                 adminAction {
@@ -98,7 +91,7 @@ class AgentActivationActivity : BaseActivity() {
                 "You did not enter your phone number",
                 binding.phoneNumberEt
             )
-            FirebaseCrashlytics.getInstance().recordException(Exception("No phone number was entered"))
+            firebaseCrashlytics.recordException(Exception("No phone number was entered"))
             return
         }
 
@@ -107,31 +100,31 @@ class AgentActivationActivity : BaseActivity() {
                 "You did not enter your verification code",
                 binding.codeEt
             )
-            FirebaseCrashlytics.getInstance().recordException(Exception("verification code not inputted"))
+            firebaseCrashlytics.recordException(Exception("verification code not inputted"))
             return
         }
 
         /*if (isActivation && ((EditText)findViewById(R.id.agentActivation_oldPINEt)).getText().toString().length() == 0){
             indicateError("You did not enter your old PIN", ((EditText)findViewById(R.id.agentActivation_PINEt)));
-            FirebaseCrashlytics.getInstance().recordException(new Exception("No PIN was entered"));
+            firebaseCrashlytics.recordException(new Exception("No PIN was entered"));
             return;
         }*/
 
         if (isActivation && binding.newPinEt.text.toString().isEmpty()) {
             indicateError("You did not enter the PIN", binding.newPinEt)
-            FirebaseCrashlytics.getInstance().recordException(Exception("No PIN was entered"))
+            firebaseCrashlytics.recordException(Exception("No PIN was entered"))
             return
         }
 
         if (isActivation && binding.newPinConfirmationEt.text.toString().isEmpty()) {
             indicateError("You did not confirm the PIN", binding.newPinConfirmationEt)
-            FirebaseCrashlytics.getInstance().recordException(Exception("PIN entry was not confirmed"))
+            firebaseCrashlytics.recordException(Exception("PIN entry was not confirmed"))
             return
         }
 
         if (isActivation && binding.newPinEt.text.toString().length != 4) {
             indicateError("Your PIN must have 4-digit", binding.newPinEt)
-            FirebaseCrashlytics.getInstance().recordException(Exception("Pin was not 4 digits"))
+            firebaseCrashlytics.recordException(Exception("Pin was not 4 digits"))
             return
         }
 
@@ -140,7 +133,7 @@ class AgentActivationActivity : BaseActivity() {
                 "Your PIN Confirmation must have 4-digit",
                 binding.newPinConfirmationEt
             )
-            FirebaseCrashlytics.getInstance().recordException(Exception("confirmation pin was not 4 digits"))
+            firebaseCrashlytics.recordException(Exception("confirmation pin was not 4 digits"))
             return
         }
 
@@ -153,96 +146,98 @@ class AgentActivationActivity : BaseActivity() {
 
         showProgressBar("Processing...")
 
-        if (isActivation) {
+        mainScope.launch {
+            if (isActivation) activate()
+            else verify()
+        }
+    }
 
-            val request = PinChangeRequest()
-            request.activationCode = code
-            request.institutionCode = institutionCode
-            request.agentPhoneNumber = phoneNumber
-            request.confirmNewPin = pin
-            request.newPin = pin
-            request.geoLocation = ""
-            request.oldPin = code
-            request.deviceId = deviceId
+    private suspend inline fun activate() {
+        val request = PinChangeRequest()
+        request.activationCode = code
+        request.institutionCode = institutionCode
+        request.agentPhoneNumber = phoneNumber
+        request.confirmNewPin = pin
+        request.newPin = pin
+        request.geoLocation = ""
+        request.oldPin = code
+        request.deviceId = deviceId
 
-            mainScope.launch {
-                showProgressBar("Activating")
-                val (response) = safeRunIO {
-                    creditClubMiddleWareAPI.staticService.completeActivationWithPinChange(request)
-                }
-                hideProgressBar()
+        showProgressBar("Activating")
+        val (response) = safeRunIO {
+            creditClubMiddleWareAPI.staticService.completeActivationWithPinChange(request)
+        }
+        hideProgressBar()
 
-                response ?: return@launch showNetworkError()
+        response ?: return showNetworkError()
 
-                if (response.isSuccessful) {
-                    localStorage.institutionCode = institutionCode
-                    localStorage.agentPhone = phoneNumber
-                    localStorage.agentPIN = pin
-                    localStorage.cacheAuth = Gson().toJson(AuthResponse(phoneNumber, code))
-                    localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
-                    localStorage.putString(AppConstants.AGENT_CODE, code)
+        if (response.isSuccessful) {
+            localStorage.institutionCode = institutionCode
+            localStorage.agentPhone = phoneNumber
+            localStorage.agentPIN = pin
+            localStorage.cacheAuth = Gson().toJson(AuthResponse(phoneNumber, code))
+            localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
+            localStorage.putString(AppConstants.AGENT_CODE, code)
 
-                    val intent =
-                        Intent(this@AgentActivationActivity, DataLoaderActivity::class.java)
-                    intent.putExtra(AppConstants.LOAD_DATA, LoadDataType.OTHER_DATA.ordinal)
-                    startActivity(intent)
-                    finish()
-                    showNotification("Activation was successful")
-                } else {
-                    response.responseMessage ?: return@launch showNetworkError()
+            firebaseAnalytics.logEvent("activation", Bundle().apply {
+                putString("agent_code", localStorage.agent?.agentCode)
+                putString("institution_code", institutionCode)
+                putString("phone_number", phoneNumber)
+            })
 
-                    showError(response.responseMessage)
-                }
-            }
+            syncAgentInfo()
+            firebaseAnalytics.setUserId(localStorage.agent?.agentCode)
+
+            startActivity(LoginActivity::class.java)
+            finish()
         } else {
-            mainScope.launch {
-                showProgressBar("Verifying")
-                val (response) = safeRunIO {
-                    creditClubMiddleWareAPI.staticService.agentVerification(
-                        code,
-                        phoneNumber,
-                        institutionCode,
-                        deviceId
-                    )
-                }
-                hideProgressBar()
+            response.responseMessage ?: return showNetworkError()
 
-                response ?: return@launch showNetworkError()
+            showError(response.responseMessage)
+        }
+    }
 
-                if (response.isSuccessful) {
-                    isActivation = true
+    private suspend inline fun verify() {
+        showProgressBar("Verifying")
+        val (response) = safeRunIO {
+            creditClubMiddleWareAPI.staticService.agentVerification(
+                code,
+                phoneNumber,
+                institutionCode,
+                deviceId
+            )
+        }
+        hideProgressBar()
 
-                    binding.pinLayout.visibility = View.VISIBLE
-                    binding.phoneNumberEt.visibility = View.GONE
-                    binding.instructionTv.text = getString(R.string.activateAccount)
-                    binding.codeEt.hint = getString(R.string.enter_activation_code)
-                    binding.codeEt.setText("")
-                    binding.codeEt.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4))
-                    binding.codeEt.requestFocus()
-                    institutionCode =
-                        response.responseMessage ?: if (code.length >= 6) code.substring(
-                            0,
-                            6
-                        ) else code
+        response ?: return showNetworkError()
 
-                    showNotification("Verification successful")
-                } else {
-                    response.responseMessage ?: return@launch showNetworkError()
+        if (response.isSuccessful) {
+            isActivation = true
 
-                    showError(response.responseMessage)
-                }
-            }
+            binding.pinLayout.visibility = View.VISIBLE
+            binding.phoneNumberEt.visibility = View.GONE
+            binding.instructionTv.text = getString(R.string.activateAccount)
+            binding.codeEt.hint = getString(R.string.enter_activation_code)
+            binding.codeEt.setText("")
+            binding.codeEt.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4))
+            binding.codeEt.requestFocus()
+            institutionCode =
+                response.responseMessage ?: if (code.length >= 6) code.substring(0, 6) else code
+
+            showNotification("Verification successful")
+        } else {
+            response.responseMessage ?: return showNetworkError()
+
+            showError(response.responseMessage)
         }
     }
 
     override fun onBackPressed() {
-        AlertDialog.Builder(this)
-            .setIcon(android.R.drawable.ic_dialog_alert)
-            .setTitle("Closing Activity")
-            .setMessage("Are you sure you want to close this activity?")
-            .setPositiveButton("Yes") { _, _ -> finish() }
-            .setNegativeButton("No", null)
-            .show()
+        dialogProvider.confirm("Cancel Activation", "Are you sure you want to close this page?") {
+            onSubmit {
+                if (it) finish()
+            }
+        }
     }
 }
 

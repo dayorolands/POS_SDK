@@ -8,15 +8,15 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
-import android.widget.TextView
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
-import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.util.posConfig
-import com.appzonegroup.creditclub.pos.util.posParameters
+import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
 import com.creditclub.core.CreditClubApplication
-import com.creditclub.core.util.*
+import com.creditclub.core.util.debugOnly
+import com.creditclub.core.util.localStorage
+import com.creditclub.core.util.packageInfo
+import com.creditclub.core.util.safeRunIO
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.launch
 
@@ -55,35 +55,9 @@ class LoginActivity : DialogProviderActivity() {
         findViewById<View>(R.id.email_sign_in_button).setOnClickListener { attemptLogin() }
 
         mainScope.launch {
-            val (response, error) = safeRunIO {
-                creditClubMiddleWareAPI.staticService.getAgentInfoByPhoneNumber(
-                    localStorage.institutionCode,
-                    localStorage.agentPhone
-                )
-            }
-
-            if (error != null) return@launch
-            response ?: return@launch
-
-            safeRun {
-                localStorage.agent = response
-
-                if (Platform.isPOS) {
-                    val configHasChanged =
-                        posConfig.terminalId != response.terminalID // || posConfig.posModeStr != response.posMode
-
-                    posConfig.terminalId = response.terminalID ?: ""
-//                    posConfig.posModeStr = response.posMode
-
-                    if (configHasChanged) {
-                        posParameters.reset()
-                    }
-                }
-            }
-
+            syncAgentInfo()
             firebaseAnalytics.setUserId(localStorage.agent?.agentCode)
         }
-
         mainScope.launch { (application as CreditClubApplication).getLatestVersion() }
 
         if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
@@ -170,6 +144,12 @@ class LoginActivity : DialogProviderActivity() {
             if (response == null) return@launch showError("PIN is invalid")
             if (!response.isSuccessful) return@launch showError(response.responseMessage)
 
+            firebaseAnalytics.logEvent("login", Bundle().apply {
+                putString("agent_code", localStorage.agent?.agentCode)
+                putString("institution_code", localStorage.institutionCode)
+                putString("phone_number", phoneNumber)
+            })
+
             val lastLogin = "Last Login: " + Misc.dateToLongString(Misc.getCurrentDateTime())
             LocalStorage.SaveValue(AppConstants.LAST_LOGIN, lastLogin, baseContext)
 
@@ -203,10 +183,10 @@ class LoginActivity : DialogProviderActivity() {
         }
 
         if (locationMode == 0) {
-            dialogProvider.confirm(
-                "An active GPS service is needed for this application",
-                "Click 'OK' to activate it"
-            ) {
+            val title = "An active GPS service is needed for this application"
+            val subtitle = "Click 'OK' to activate it"
+
+            dialogProvider.confirm(title, subtitle) {
                 onSubmit {
                     if (it) {
                         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)

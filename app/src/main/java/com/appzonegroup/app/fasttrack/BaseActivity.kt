@@ -40,7 +40,7 @@ import org.json.JSONObject
 open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUtil.LogOutListener {
 
     val printer by lazy { PosPrinter(this, dialogProvider) }
-    override val hasLogoutTimer = true
+    override val hasLogoutTimer get() = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

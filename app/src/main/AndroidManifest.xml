@@ -241,9 +241,6 @@
                 android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
         </activity>
         <activity
-            android:name=".DataLoaderActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".Menu3Activity"
             android:label="@string/title_activity_menu3"
             android:theme="@style/AppTheme.NoActionBar" />

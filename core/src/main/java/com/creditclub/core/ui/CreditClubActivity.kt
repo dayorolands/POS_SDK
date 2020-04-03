@@ -68,10 +68,12 @@ abstract class CreditClubActivity : AppCompatActivity() {
             }
         }
 
-        firebaseAnalytics.setUserId(localStorage.agent?.agentCode)
-        firebaseAnalytics.setUserProperty("agent_name", localStorage.agent?.agentName)
-        firebaseAnalytics.setUserProperty("agent_phone", localStorage.agent?.phoneNumber)
-        firebaseAnalytics.setUserProperty("terminal_id", localStorage.agent?.terminalID)
+        localStorage.agent?.let { agent ->
+            firebaseAnalytics.setUserId(agent.agentCode)
+            firebaseAnalytics.setUserProperty("agent_name", agent.agentName)
+            firebaseAnalytics.setUserProperty("agent_phone", agent.phoneNumber)
+            firebaseAnalytics.setUserProperty("terminal_id", agent.terminalID)
+        }
     }
 
     fun showNetworkError() = showNetworkError<Nothing>(null)
