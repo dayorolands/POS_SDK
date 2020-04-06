@@ -34,16 +34,16 @@ android {
         releaseStaging {
             debuggable true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "API_HOST", '"http://52.168.85.231"')
-            buildConfigField("String", "HOST", '"http://52.168.85.231"')
+            buildConfigField("String", "API_HOST", '"http://62.173.32.17"')
+            buildConfigField("String", "HOST", '"http://62.173.32.17"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             matchingFallbacks = ['release', 'debug']
         }
 
         debug {
             debuggable true
-            buildConfigField("String", "API_HOST", '"http://52.168.85.231"')
-            buildConfigField("String", "HOST", '"http://52.168.85.231"')
+            buildConfigField("String", "API_HOST", '"http://62.173.32.17"')
+            buildConfigField("String", "HOST", '"http://62.173.32.17"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
         }
     }
