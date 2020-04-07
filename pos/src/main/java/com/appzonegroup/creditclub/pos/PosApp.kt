@@ -1,15 +1,14 @@
 package com.appzonegroup.creditclub.pos
 
 import android.app.Application
-import android.content.Intent
 import androidx.work.*
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
-import com.appzonegroup.creditclub.pos.service.SyncService
+import com.appzonegroup.creditclub.pos.work.IsoRequestLogWorker
+import com.appzonegroup.creditclub.pos.work.ReversalWorker
 import com.appzonegroup.creditclub.pos.work.TransactionLogWorker
-import com.creditclub.core.util.isMyServiceRunning
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.KoinApplication
@@ -23,11 +22,6 @@ import java.util.concurrent.TimeUnit
  */
 
 fun Application.startPosApp() {
-
-    if (!isMyServiceRunning(SyncService::class.java)) {
-        startService(Intent(this, SyncService::class.java))
-    }
-
     val workManager = WorkManager.getInstance(this)
 
     val constraints = Constraints.Builder()
@@ -35,14 +29,30 @@ fun Application.startPosApp() {
         .build()
 
     val transactionLogRequest =
-        PeriodicWorkRequestBuilder<TransactionLogWorker>(1, TimeUnit.MINUTES)
+        PeriodicWorkRequestBuilder<TransactionLogWorker>(15, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
 
     workManager.enqueueUniquePeriodicWork(
         "TRANSACTION_LOG",
-        ExistingPeriodicWorkPolicy.KEEP,
+        ExistingPeriodicWorkPolicy.REPLACE,
         transactionLogRequest
+    )
+
+    workManager.enqueueUniquePeriodicWork(
+        "ISO_REQUEST_LOG",
+        ExistingPeriodicWorkPolicy.REPLACE,
+        PeriodicWorkRequestBuilder<IsoRequestLogWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+    )
+
+    workManager.enqueueUniquePeriodicWork(
+        "REVERSAL",
+        ExistingPeriodicWorkPolicy.REPLACE,
+        PeriodicWorkRequestBuilder<ReversalWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
     )
 
     if (get<ConfigService>().terminalId.isNotEmpty()) {

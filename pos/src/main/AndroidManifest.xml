@@ -140,19 +140,6 @@
             android:name="com.appzonegroup.creditclub.pos.ReprintAnyActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
-        <service
-            android:name="com.appzonegroup.creditclub.pos.service.DownloadService"
-            android:exported="false" />
-        <service
-            android:name="com.appzonegroup.creditclub.pos.service.SyncService"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </service>
     </application>
 
 </manifest>

@@ -1,15 +1,12 @@
 package com.creditclub.core
 
 import android.app.Application
-import android.widget.Toast
 import androidx.work.Configuration
 import androidx.work.WorkManager
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.util.appDataStorage
 import com.creditclub.core.util.safeRunIO
 import com.google.android.play.core.missingsplits.MissingSplitsManagerFactory
-import com.google.firebase.FirebaseApp
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
@@ -17,7 +14,6 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
-import kotlin.system.exitProcess
 
 
 /**
@@ -50,6 +46,12 @@ open class CreditClubApplication : Application(), Configuration.Provider {
             modules(listOf(apiModule, locationModule, dataModule))
             modules?.invoke(this)
         }
+
+        val myConfig = Configuration.Builder()
+            .setMinimumLoggingLevel(if (BuildConfig.DEBUG) android.util.Log.DEBUG else android.util.Log.INFO)
+            .build()
+
+        WorkManager.initialize(this, myConfig)
     }
 
     open suspend fun getLatestVersion() = safeRunIO {

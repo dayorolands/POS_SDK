@@ -22,13 +22,11 @@ import com.appzonegroup.app.fasttrack.model.TokenRequest
 import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.LogOutTimerUtil
-import com.appzonegroup.app.fasttrack.utility.SyncService
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.task.AsyncResponse
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask
 import com.appzonegroup.creditclub.pos.printer.PosPrinter
 import com.appzonegroup.creditclub.pos.service.ConfigService
-import com.creditclub.core.util.isMyServiceRunning
 import com.google.gson.Gson
 import org.json.JSONObject
 
@@ -46,10 +44,6 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUt
         super.onCreate(savedInstanceState)
 
         if (hasLogoutTimer) LogOutTimerUtil.startLogoutTimer(this, this)
-
-        if (!isMyServiceRunning(SyncService::class.java)) {
-            startService(Intent(this, SyncService::class.java))
-        }
     }
 
     override fun onResume() {

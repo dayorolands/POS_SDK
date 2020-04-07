@@ -218,19 +218,8 @@
             android:name=".AgentActivationActivity"
             android:label="@string/agentSetup" />
 
-        <service
-            android:name=".utility.SyncService"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </service>
         <service android:name=".utility.TrackGPS" />
         <service android:name=".LocationChangedService" />
-
-        <receiver android:name=".utility.MyReceiver" />
 
         <activity
             android:name=".BVNUpdateActivity"
@@ -448,21 +437,6 @@
             android:name="com.appzonegroup.creditclub.pos.ReprintAnyActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
-
-        <service
-            android:name="com.appzonegroup.creditclub.pos.service.DownloadService"
-            android:exported="false" />
-        <service
-            android:name="com.appzonegroup.creditclub.pos.service.SyncService"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </service>
-
         <activity
             android:name="com.esafirm.imagepicker.features.ImagePickerActivity"
             android:theme="@style/AppTheme.NoActionBar"
@@ -486,9 +460,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-        <meta-data
-            android:name="firebase_performance_logcat_enabled"
-            android:value="true" />
+        <provider
+            android:name="androidx.work.impl.WorkManagerInitializer"
+            android:authorities="${applicationId}.workmanager-init"
+            tools:node="remove" />
     </application>
 
 </manifest>

@@ -9,6 +9,7 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityAgentActivationBinding
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
+import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
 import com.creditclub.core.data.request.PinChangeRequest
@@ -66,8 +67,7 @@ class AgentActivationActivity : BaseActivity() {
                 localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
                 localStorage.putString(AppConstants.AGENT_CODE, "1111")
 
-                startActivity(LoginActivity::class.java)
-                finish()
+                logout()
             })
         }
 
@@ -188,8 +188,7 @@ class AgentActivationActivity : BaseActivity() {
             syncAgentInfo()
             firebaseAnalytics.setUserId(localStorage.agent?.agentCode)
 
-            startActivity(LoginActivity::class.java)
-            finish()
+            logout()
         } else {
             response.responseMessage ?: return showNetworkError()
 

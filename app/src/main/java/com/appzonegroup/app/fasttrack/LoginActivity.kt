@@ -18,6 +18,7 @@ import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.safeRunIO
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class LoginActivity : DialogProviderActivity() {

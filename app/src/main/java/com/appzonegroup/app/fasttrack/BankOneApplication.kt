@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.appzonegroup.app.fasttrack.app.LocalInstitutionConfig
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.ui.MyDialogProvider
+import com.appzonegroup.app.fasttrack.utility.extensions.registerWorkers
 import com.appzonegroup.app.fasttrack.utility.registerAppFunctions
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.loadPosModules
@@ -57,6 +58,7 @@ class BankOneApplication : CreditClubApplication() {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 
         registerAppFunctions()
+        registerWorkers()
 
         if (Platform.isPOS) {
             startPosApp()
