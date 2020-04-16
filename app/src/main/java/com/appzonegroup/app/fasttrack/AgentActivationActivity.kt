@@ -12,6 +12,7 @@ import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
+import com.appzonegroup.creditclub.pos.extension.posSerialNumber
 import com.creditclub.core.data.request.PinChangeRequest
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.delegates.contentView
@@ -203,7 +204,8 @@ class AgentActivationActivity : BaseActivity() {
                 code,
                 phoneNumber,
                 institutionCode,
-                deviceId
+                deviceId,
+                if (Platform.isPOS) posSerialNumber else null
             )
         }
         hideProgressBar()
