@@ -204,8 +204,7 @@ class AgentActivationActivity : BaseActivity() {
                 code,
                 phoneNumber,
                 institutionCode,
-                deviceId,
-                if (Platform.isPOS) posSerialNumber else null
+                if (Platform.isPOS) posSerialNumber else deviceId
             )
         }
         hideProgressBar()

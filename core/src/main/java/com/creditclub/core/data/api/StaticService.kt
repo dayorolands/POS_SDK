@@ -51,8 +51,7 @@ interface StaticService {
         @Query("verificationCode") verificationCode: String,
         @Query("agentPhoneNumber") agentPhoneNumber: String,
         @Query("institutionCode") institutionCode: String?,
-        @Query("deviceId") deviceId: String?,
-        @Query("serialNumber") serialNumber: String?
+        @Query("deviceId") deviceId: String?
     ): BackendResponse?
 
     @POST("CreditClubStatic/AgentActivation")
