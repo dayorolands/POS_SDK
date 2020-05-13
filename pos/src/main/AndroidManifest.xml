@@ -41,10 +41,6 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name="com.appzonegroup.creditclub.pos.UpdateActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name="com.appzonegroup.creditclub.pos.TerminalOptionsActivity"
             android:label="Terminal Options"
             android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity" />

@@ -12,7 +12,7 @@ public class ApiGenerator {
     private static final String CREDIT_CLUB_LOCATION_UPDATE_URL = BuildConfig.API_HOST + "/CreditClubClient/HttpJavaClient/MobileService.aspx";
     private static final String BASE_URL = CREDIT_CLUB_AGENT_URL_NEW;
 
-    private static final String BASE_URL_IMAGE = BuildConfig.HOST + "/creditclub/Httpjavaclient/BankOneImageUploadService.aspx";
+    private static final String BASE_URL_IMAGE = BuildConfig.API_HOST + "/creditclub/Httpjavaclient/BankOneImageUploadService.aspx";
 
     public static final String BASE_URL_LOCATION = CREDIT_CLUB_LOCATION_UPDATE_URL;
 

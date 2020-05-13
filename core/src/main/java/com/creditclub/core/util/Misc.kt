@@ -1,25 +1,12 @@
 package com.creditclub.core.util
 
-import android.app.Activity
-import android.graphics.Bitmap
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
-import android.util.Base64
-import android.util.Log
-import android.widget.ArrayAdapter
-import android.widget.Spinner
-import com.creditclub.core.BuildConfig
-
-import java.io.ByteArrayOutputStream
-import java.io.File
 import java.security.SecureRandom
-import java.text.NumberFormat
 import java.util.*
 
 object Misc {
-
-    private val BASE_URL = BuildConfig.API_HOST + "/CreditClubMiddleWareAPI/api"
 
     val guid: String
         get() = UUID.randomUUID().toString().substring(0, 8)
@@ -59,9 +46,6 @@ object Misc {
 
             return outputList
         }
-
-    val categoryURL: String
-        get() = "$BASE_URL/PayBills/GetBillerCategories"
 
     val currentDateTime: Date
         get() {
@@ -194,73 +178,6 @@ object Misc {
 
     private fun isRegexMatch(regex: String, string: String): Boolean {
         return string.matches(regex.toRegex())
-    }
-
-//    fun setupScheduler(): Handler {
-//        val backgroundThread = BackgroundThread()
-//        backgroundThread.start()
-//        return Handler(backgroundThread.getLooper())
-//    }
-
-    fun populateSpinnerWithString(activity: Activity, data: ArrayList<String>, spinner: Spinner) {
-        val arrayAdapter = ArrayAdapter(activity, android.R.layout.simple_spinner_item, data)
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = arrayAdapter
-    }
-
-    fun getAlbumStorageDir(albumName: String): File {
-        // Get the directory for the user's public pictures directory.
-        val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), albumName)
-        if (!file.mkdirs()) {
-            Log.e("TakePicture", "Directory not created")
-        }
-        return file
-    }
-
-    fun bitmapToString(bitmap: Bitmap): String {
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-        val byteArray = byteArrayOutputStream.toByteArray()
-        // String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-        return Base64.encodeToString(byteArray, Base64.DEFAULT)
-    }
-
-    fun toMoneyFormat(moneyFloat: Double): String {
-        val formatter = NumberFormat.getCurrencyInstance()
-        return formatter.format(moneyFloat).replace("$", "").replace("£", "")
-    }
-
-    fun getPendingBeneficiaries(institutionCode: String, agentPhoneNumber: String): String {
-
-        val url = (BASE_URL + "/OfflineCashOut/GetPendingBeneficiaries?" + "institutionCode=%s"
-                + "&agentPhoneNumber=%s")
-
-        return String.format(url, institutionCode, agentPhoneNumber)
-    }
-
-    fun syncBeneficiaryUrl(institutionCode: String, agentPhoneNumber: String, trackingReference: String): String {
-
-        val url = (BASE_URL + "/OfflineCashOut/UpdatePaidBeneficiary?" + "institutionCode=%s" + "&agentPhoneNumber=%s"
-                + "&offlineBeneficiaryTrackingRef=%s")
-
-        return String.format(url, institutionCode, agentPhoneNumber, trackingReference)
-    }
-
-    fun getAgentsAccountEnquiry(agentPhoneNumber: String, institutionCode: String, agentPin: String): String {
-        val url = (BASE_URL + "/CoreBanking/AgentAccountEnquiry?" + "agentPhoneNumber=%s" + "&institutionCode=%s"
-                + "&agentPIn=%s")
-
-        return String.format(url, agentPhoneNumber, institutionCode, agentPin)
-    }
-
-    fun getCustomerAccountEnquiry(
-        customerAccountNumber: String, institutionCode: String,
-        agentsPhoneNo: String, pin: String
-    ): String {
-        val url = (BASE_URL + "/CoreBanking/CustomerAccountEnquiry?" + "accountNo=%s" + "&institutionCode=%s"
-                + "&agentPhoneNumber=%s" + "&pin=%s")
-
-        return String.format(url, customerAccountNumber, institutionCode, agentsPhoneNo, pin)
     }
 
     private fun externalMemoryAvailable(): Boolean {

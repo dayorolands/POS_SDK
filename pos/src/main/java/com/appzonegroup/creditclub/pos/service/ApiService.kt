@@ -20,13 +20,6 @@ import java.util.concurrent.TimeUnit
  */
 
 object ApiService {
-    private const val HOST = BuildConfig.API_HOST
-    const val BASE_URL = "$HOST/CreditClubMiddlewareAPI/CreditClubStatic"
-
-    const val CASE_LOG = "api/CaseLog"
-    const val STATIC = "CreditClubStatic"
-    const val PAY_BILLS = "api/PayBills"
-
     private val client: OkHttpClient by lazy {
         val logger = HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE

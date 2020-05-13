@@ -5,6 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.api.BackendConfig
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -18,4 +19,5 @@ abstract class BaseWorker(context: Context, params: WorkerParameters) :
 
     val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
     val posDatabase: PosDatabase by inject()
+    val backendConfig: BackendConfig by inject()
 }

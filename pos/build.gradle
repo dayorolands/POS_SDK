@@ -24,22 +24,6 @@ android {
     buildTypes {
         release {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "API_HOST", '"https://api.mybankone.com"')
-            buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
-        }
-
-        releaseStaging {
-            debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "API_HOST", '"http://62.173.32.17"')
-            buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
-            matchingFallbacks = ['release', 'debug']
-        }
-
-        debug {
-            debuggable true
-            buildConfigField("String", "API_HOST", '"http://62.173.32.17"')
-            buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
         }
     }
     kapt {

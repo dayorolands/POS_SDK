@@ -2,6 +2,7 @@ package com.creditclub.core
 
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.TrackGPS
@@ -55,5 +56,5 @@ val apiModule = module {
         return@single builder.build()
     }
 
-    single { CreditClubMiddleWareAPI(get(named("middleware"))) }
+    single { CreditClubMiddleWareAPI(get(named("middleware")), get<BackendConfig>().apiHost) }
 }

@@ -388,7 +388,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                             val posNotification = PosNotification.create(transaction)
                             db.posNotificationDao().save(posNotification)
 
-                            val url = "${ApiService.BASE_URL}/POSCashOutNotification"
+                            val url = "${backendConfig.apiHost}/CreditClubMiddlewareAPI/CreditClubStatic/POSCashOutNotification"
 
                             val dataToSend = Gson().toJson(posNotification)
                             log("PosNotification request: $dataToSend")
@@ -396,7 +396,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                             val headers = Headers.Builder()
                             headers.add(
                                 "Authorization",
-                                "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}"
+                                "iRestrict ${backendConfig.posNotificationToken}"
                             )
                             headers.add("TerminalID", config.terminalId)
 

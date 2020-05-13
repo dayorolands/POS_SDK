@@ -29,7 +29,7 @@ class IsoRequestLogWorker(context: Context, params: WorkerParameters) :
                 val (response) = safeRunSuspend {
                     creditClubMiddleWareAPI.staticService.logToGrafanaForPOSTransactions(
                         requestBody,
-                        "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}",
+                        "iRestrict ${backendConfig.posNotificationToken}",
                         requestLog.terminalId
                     )
                 }

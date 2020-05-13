@@ -942,12 +942,9 @@ public class OpenAccountActivity extends AppCompatActivity {
         mNotificationManager.notify(1234567, mBuilder.build());
     }*/
 
-    public static class CapturePhotoFragment extends Fragment{
+    public class CapturePhotoFragment extends Fragment{
 
         CapturePhoto_SectionsPagerAdapter mAppSectionsPagerAdapter;
-
-        public static  ImageView agentPhoto_ImageView;
-
 
         public CapturePhotoFragment(){
 
@@ -957,9 +954,9 @@ public class OpenAccountActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 
             View rootView = inflater.inflate(R.layout.fragment_capture_photo, container, false);
-            mAppSectionsPagerAdapter =  new CapturePhoto_SectionsPagerAdapter(getFragmentManager());
+            mAppSectionsPagerAdapter =  new CapturePhoto_SectionsPagerAdapter(getSupportFragmentManager());
 
-            final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+//            final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
             mViewPager2 = (ViewPager) rootView.findViewById(R.id.capture_container);
             mViewPager2.setAdapter(mAppSectionsPagerAdapter);

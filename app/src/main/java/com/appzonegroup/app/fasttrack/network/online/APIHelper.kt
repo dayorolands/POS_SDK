@@ -7,6 +7,7 @@ import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
+import com.appzonegroup.app.fasttrack.BuildConfig
 import com.appzonegroup.app.fasttrack.model.TransactionCountType
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.creditclub.core.data.CreditClubClient
@@ -32,7 +33,7 @@ import java.util.concurrent.TimeoutException
  */
 class APIHelper(private val ctx: Context) {
 
-    private val client by lazy { CreditClubClient() }
+    private val client by lazy { CreditClubClient(BuildConfig.API_HOST) }
 
     interface VolleyCallback<T> {
         fun onCompleted(e: Exception?, result: T?, status: Boolean)

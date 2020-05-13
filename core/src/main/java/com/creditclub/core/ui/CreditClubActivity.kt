@@ -8,6 +8,7 @@ import com.creditclub.core.R
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
@@ -35,6 +36,7 @@ abstract class CreditClubActivity : AppCompatActivity() {
     open val dialogProvider: DialogProvider by inject { parametersOf(this) }
     open val coreDatabase: CoreDatabase by inject()
     open val institutionConfig: IInstitutionConfig by inject()
+    open val backendConfig: BackendConfig by inject()
 
     open val hasLogoutTimer = false
     open val functionId: Int? = null

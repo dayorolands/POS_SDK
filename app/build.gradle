@@ -49,37 +49,33 @@ android {
             shrinkResources false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "flavor", "backend"
+
+    productFlavors {
+        live {
+            dimension "backend"
             buildConfigField("String", "API_HOST", '"https://api.mybankone.com"')
-            buildConfigField("String", "HOST", '"https://mybankone.com"')
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "false"]
         }
 
-        releaseStaging {
-            shrinkResources false
-            minifyEnabled false
-            debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "API_HOST", '"http://62.173.32.17"')
-            buildConfigField("String", "HOST", '"http://62.173.32.17"')
-            buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
-            manifestPlaceholders = [usesCleartextTraffic: "true"]
-            matchingFallbacks = ['release', 'debug']
-        }
-
-        debug {
-            minifyEnabled false
-            debuggable true
-            buildConfigField("String", "API_HOST", '"http://62.173.32.17"')
-            buildConfigField("String", "HOST", '"http://62.173.32.17"')
+        staging {
+            dimension "backend"
+            buildConfigField("String", "API_HOST", '"http://staging.mybankone.com"')
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
         }
-    }
 
-    flavorDimensions "flavor"
+        ipnx {
+            dimension "backend"
+            buildConfigField("String", "API_HOST", '"http://62.173.32.17"')
+            buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
+            manifestPlaceholders = [usesCleartextTraffic: "true"]
+        }
 
-    productFlavors {
         creditclub {
             dimension "flavor"
             applicationId "com.appzonegroup.app.creditclub.plus"

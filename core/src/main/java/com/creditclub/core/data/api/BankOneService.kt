@@ -1,9 +1,10 @@
 package com.creditclub.core.data.api
 
 import android.util.Log
-import com.creditclub.core.BuildConfig
 import com.creditclub.core.data.Encryption
 import okhttp3.MultipartBody
+import org.koin.core.KoinComponent
+import org.koin.core.get
 import retrofit2.http.*
 
 interface BankOneService {
@@ -31,16 +32,18 @@ interface BankOneService {
         @Part file: MultipartBody.Part
     ): String?
 
-    object UrlGenerator {
-        private const val BASE_URL =
-            "${BuildConfig.API_HOST}/CreditClubClient/HttpJavaClient/BankOneService.aspx?"
+    object UrlGenerator : KoinComponent {
+        private val apiHost get() = get<BackendConfig>().apiHost
 
-        private const val BASE_URL_IMAGE =
-            BuildConfig.API_HOST + "/CreditClubClient/HttpJavaClient/BankOneImageUploadService.aspx"
+        private val BASE_URL =
+            "${apiHost}/CreditClubClient/HttpJavaClient/BankOneService.aspx?"
+
+        private val BASE_URL_IMAGE =
+            "${apiHost}/CreditClubClient/HttpJavaClient/BankOneImageUploadService.aspx"
 
         @JvmStatic
         val BASE_URL_LOCATION =
-            "${BuildConfig.API_HOST}/CreditClub/HttpJavaClient/MobileService.aspx"
+            "${apiHost}/CreditClub/HttpJavaClient/MobileService.aspx"
 
         @JvmStatic
         fun operationInit(

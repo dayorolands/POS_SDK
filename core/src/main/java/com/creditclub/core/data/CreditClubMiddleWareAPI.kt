@@ -1,6 +1,5 @@
 package com.creditclub.core.data
 
-import com.creditclub.core.BuildConfig
 import com.creditclub.core.data.api.*
 import com.creditclub.core.util.delegates.service
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -15,11 +14,11 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/4/2019.
  * Appzone Ltd
  */
-open class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient) {
+open class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) {
     private val contentType = MediaType.get("application/json")
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("${BuildConfig.API_HOST}/CreditClubMiddlewareAPI/")
+        .baseUrl("${apiHost}/CreditClubMiddlewareAPI/")
         .client(okHttpClient)
         .addConverterFactory(NullOnEmptyConverterFactory.create())
         .addConverterFactory(ScalarsConverterFactory.create())

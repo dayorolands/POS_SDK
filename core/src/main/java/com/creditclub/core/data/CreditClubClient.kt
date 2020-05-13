@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/4/2019.
  * Appzone Ltd
  */
-open class CreditClubClient {
+open class CreditClubClient(baseUrl: String) {
     private val certificatePinner = CertificatePinner.Builder()
         .add("api.mybankone.com", "sha256/goId03pe7sxzYmTdNcd1vI+psOY/FX5YGYjkPeioB0w=")
         .build()
@@ -31,7 +31,7 @@ open class CreditClubClient {
         .build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("${BuildConfig.HOST}/CreditClubClient/HttpJavaClient/")
+        .baseUrl("${baseUrl}/CreditClubClient/HttpJavaClient/")
         .client(okHttpClient)
         .addConverterFactory(NullOnEmptyConverterFactory.create())
         .addConverterFactory(ScalarsConverterFactory.create())

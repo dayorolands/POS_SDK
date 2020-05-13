@@ -11,17 +11,10 @@ import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.loadPosModules
 import com.appzonegroup.creditclub.pos.startPosApp
 import com.creditclub.core.CreditClubApplication
-import com.creditclub.core.R
 import com.creditclub.core.config.IInstitutionConfig
-import com.creditclub.core.data.CreditClubMiddleWareAPI
-import com.creditclub.core.data.model.AppVersion
+import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.core.util.SafeRunResult
-import com.creditclub.core.util.appDataStorage
 import com.creditclub.core.util.localStorage
-import com.creditclub.core.util.safeRunIO
-import com.google.firebase.FirebaseApp
-import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
@@ -37,6 +30,12 @@ class BankOneApplication : CreditClubApplication() {
                 single<IInstitutionConfig> { LocalInstitutionConfig.create(androidContext()) }
                 factory<DialogProvider>(override = true) { (context: Context) ->
                     MyDialogProvider(context)
+                }
+                single<BackendConfig> {
+                    object : BackendConfig {
+                        override val apiHost = BuildConfig.API_HOST
+                        override val posNotificationToken = BuildConfig.NOTIFICATION_TOKEN
+                    }
                 }
             })
 

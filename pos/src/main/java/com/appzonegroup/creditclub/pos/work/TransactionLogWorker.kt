@@ -40,7 +40,7 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
                 val (response) = safeRunSuspend {
                     creditClubMiddleWareAPI.staticService.transactionLog(
                         requestBody,
-                        "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}",
+                        "iRestrict ${backendConfig.posNotificationToken}",
                         receipt.terminalId
                     )
                 }
