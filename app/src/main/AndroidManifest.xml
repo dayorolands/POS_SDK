@@ -32,6 +32,9 @@
             android:label="@string/title_activity_faq"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".BannerActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".HlaTaggingActivity"
             android:label="@string/title_activity_hla_tagging"
             android:theme="@style/AppTheme.NoActionBar" />

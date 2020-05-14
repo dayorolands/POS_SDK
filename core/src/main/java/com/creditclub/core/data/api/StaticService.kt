@@ -155,4 +155,7 @@ interface StaticService {
         @Header("Authorization") authToken: String,
         @Header("TerminalID") terminalID: String?
     ): ApiResponse<String>?
+
+    @POST("CreditClubStatic/SubmitSurvey")
+    suspend fun submitSurvey(@Body request: SubmitSurveyRequest)
 }

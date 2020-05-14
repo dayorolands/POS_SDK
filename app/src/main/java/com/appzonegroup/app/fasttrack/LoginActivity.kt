@@ -9,11 +9,19 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import com.appzonegroup.app.fasttrack.model.AppConstants
+import com.appzonegroup.app.fasttrack.ui.SurveyDialog
+import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.util.debugOnly
+import com.appzonegroup.creditclub.pos.Platform
+import com.appzonegroup.creditclub.pos.util.posConfig
+import com.appzonegroup.creditclub.pos.util.posParameters
+import com.creditclub.core.data.model.SurveyQuestion
+import com.creditclub.core.data.model.SurveyQuestionType
+import com.creditclub.core.data.request.SubmitSurveyRequest
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.safeRunIO
@@ -63,6 +71,44 @@ class LoginActivity : DialogProviderActivity() {
 
         if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
             showError("Timeout due to inactivity")
+        } else {
+            startActivity(Intent(this, BannerActivity::class.java))
+
+            val questions = listOf(
+                SurveyQuestion(
+                    "1",
+                    "How likely are you to recommend this app to someone",
+                    SurveyQuestionType.Rating
+                ),
+                SurveyQuestion("2", "Question 2", SurveyQuestionType.MultipleChoice).apply {
+                    options = listOf(
+                        SurveyQuestion.Option("1", "Option 1"),
+                        SurveyQuestion.Option("2", "Option 2"),
+                        SurveyQuestion.Option("3", "Option 3"),
+                        SurveyQuestion.Option("4", "Option 4")
+                    )
+                },
+                SurveyQuestion(
+                    "3",
+                    "Please rate your experience with our Funds Transfer",
+                    SurveyQuestionType.Rating
+                )
+            )
+
+            SurveyDialog.create(this, questions) {
+                onSubmit { data ->
+                    ioScope.launch {
+                        safeRunIO {
+                            creditClubMiddleWareAPI.staticService.submitSurvey(SubmitSurveyRequest().apply {
+                                answers = data
+                                institutionCode = localStorage.institutionCode
+                                agentPhoneNumber = localStorage.agent?.phoneNumber
+                                geoLocation = gps.geolocationString
+                            })
+                        }
+                    }
+                }
+            }.show()
         }
     }
 

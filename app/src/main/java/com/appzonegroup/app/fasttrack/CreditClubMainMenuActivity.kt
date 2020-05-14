@@ -15,6 +15,10 @@ import com.creditclub.core.AppFunctions
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.ui.UpdateActivity
+import com.creditclub.core.util.localStorage
+import com.creditclub.core.util.packageInfo
+import com.creditclub.core.util.safeRun
+import com.creditclub.core.util.safeRunIO
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.launch
 

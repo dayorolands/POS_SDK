@@ -12,10 +12,11 @@ import com.appzonegroup.creditclub.pos.loadPosModules
 import com.appzonegroup.creditclub.pos.startPosApp
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.config.IInstitutionConfig
-import com.creditclub.core.data.Encryption
 import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.localStorage
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.PicassoProvider
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
@@ -60,6 +61,10 @@ class BankOneApplication : CreditClubApplication() {
     override fun onCreate() {
         super.onCreate()
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
+
+        Picasso.setSingletonInstance(
+            Picasso.Builder(this).loggingEnabled(BuildConfig.DEBUG).build()
+        )
 
         registerAppFunctions()
         registerWorkers()
