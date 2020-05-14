@@ -7,6 +7,7 @@ import com.appzonegroup.app.fasttrack.databinding.ItemBannerImageBinding
 import com.creditclub.core.data.prefs.JsonStorage
 import com.creditclub.core.ui.SimpleBindingAdapter
 import com.creditclub.core.util.delegates.contentView
+import com.creditclub.core.util.safeRun
 import com.squareup.picasso.Picasso
 
 class BannerActivity : AppCompatActivity() {
@@ -32,7 +33,9 @@ class BannerActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             with(holder.binding) {
-                Picasso.get().load(values[position]).into(image)
+                safeRun {
+                    Picasso.get().load(values[position]).into(image)
+                }
             }
         }
     }

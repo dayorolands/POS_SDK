@@ -10,26 +10,18 @@ import android.view.View
 import android.widget.EditText
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.ui.SurveyDialog
-import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
 import com.creditclub.core.CreditClubApplication
-import com.creditclub.core.util.debugOnly
-import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.util.posConfig
-import com.appzonegroup.creditclub.pos.util.posParameters
 import com.creditclub.core.data.model.SurveyQuestion
 import com.creditclub.core.data.prefs.JsonStorage
 import com.creditclub.core.data.request.SubmitSurveyRequest
-import com.creditclub.core.util.localStorage
-import com.creditclub.core.util.packageInfo
-import com.creditclub.core.util.safeRunIO
-import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.coroutines.cancel
+import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.launch
 
 class LoginActivity : CreditClubActivity() {
