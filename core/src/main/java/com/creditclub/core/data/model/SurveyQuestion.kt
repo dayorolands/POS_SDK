@@ -27,5 +27,6 @@ class SurveyQuestion(
 
 enum class SurveyQuestionType {
     Rating,
-    MultipleChoice
+    MultipleChoice,
+    Boolean
 }

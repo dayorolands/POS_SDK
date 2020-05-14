@@ -13,6 +13,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.DialogSurveyBinding
+import com.appzonegroup.app.fasttrack.databinding.LayoutBooleanBinding
 import com.appzonegroup.app.fasttrack.databinding.LayoutMultipleChoiceBinding
 import com.appzonegroup.app.fasttrack.databinding.LayoutRatingBinding
 import com.creditclub.core.data.model.SurveyAnswer
@@ -29,7 +30,7 @@ class SurveyDialog private constructor(context: Context, questions: List<SurveyQ
     Dialog(context) {
 
     val answers: MutableList<SurveyAnswer> = MutableList(questions.size) {
-        SurveyAnswer(questionId = questions[it].id)
+        SurveyAnswer()
     }
 
     var listener: DialogListenerBlock<List<SurveyAnswer>>? = null
@@ -77,6 +78,7 @@ class SurveyDialog private constructor(context: Context, questions: List<SurveyQ
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SurveyDialog.ViewHolder {
             val layoutRes = run {
                 if (viewType == 1) R.layout.layout_multiple_choice
+                if (viewType == 2) R.layout.layout_boolean
                 else R.layout.layout_rating
             }
 
@@ -93,6 +95,7 @@ class SurveyDialog private constructor(context: Context, questions: List<SurveyQ
         override fun onBindViewHolder(holder: SurveyDialog.ViewHolder, position: Int) {
             val question = values[position]
             val answer = answers[position]
+            answer.questionId = question.id
 
             with(holder.binding) {
                 when (this) {
@@ -115,6 +118,20 @@ class SurveyDialog private constructor(context: Context, questions: List<SurveyQ
                             onNext()
                         })
                     }
+
+                    is LayoutBooleanBinding -> {
+                        title = question.name
+
+                        btnYes.setOnClickListener {
+                            answer.answerId = "1"
+                            onNext()
+                        }
+
+                        btnNo.setOnClickListener {
+                            answer.answerId = "0"
+                            onNext()
+                        }
+                    }
                 }
             }
         }
@@ -122,6 +139,7 @@ class SurveyDialog private constructor(context: Context, questions: List<SurveyQ
         override fun getItemViewType(position: Int): Int {
             return when (values[position].type) {
                 SurveyQuestionType.MultipleChoice -> 1
+                SurveyQuestionType.Boolean -> 2
                 else -> 0
             }
         }

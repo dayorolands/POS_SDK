@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.appzonegroup.app.fasttrack.databinding.ActivityBannerBinding
 import com.appzonegroup.app.fasttrack.databinding.ItemBannerImageBinding
+import com.creditclub.core.data.prefs.JsonStorage
 import com.creditclub.core.ui.SimpleBindingAdapter
 import com.creditclub.core.util.delegates.contentView
 import com.squareup.picasso.Picasso
@@ -11,17 +12,17 @@ import com.squareup.picasso.Picasso
 class BannerActivity : AppCompatActivity() {
 
     private val binding by contentView<BannerActivity, ActivityBannerBinding>(R.layout.activity_banner)
+    private val jsonStore by lazy { JsonStorage.getStore(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.btnSkip.setOnClickListener { finish() }
-        binding.viewPager.adapter = SurveyAdapter(
-            listOf(
-                "https://www.nairaland.com/attachments/4780893_firstdiasporasamplepost5_jpegedc0fafcbae1e363daa659878074460c",
-                "https://pbs.twimg.com/media/C1QYfkAW8AE6Q3V.jpg",
-                "https://www.bellanaija.com/wp-content/uploads/2016/09/instagram-1.jpg"
-            )
-        )
+
+        val bannerImageJson = jsonStore.get<List<String>>("BANNER_IMAGES")
+        val bannerImageList = bannerImageJson.data ?: return finish()
+        if (bannerImageList.isNullOrEmpty()) return finish()
+
+        binding.viewPager.adapter = SurveyAdapter(bannerImageList)
         binding.indicator.setViewPager(binding.viewPager)
         binding.viewPager.adapter?.registerAdapterDataObserver(binding.indicator.adapterDataObserver)
     }

@@ -158,4 +158,18 @@ interface StaticService {
 
     @POST("CreditClubStatic/SubmitSurvey")
     suspend fun submitSurvey(@Body request: SubmitSurveyRequest)
+
+    @GET("CreditClubStatic/GetBannerImages")
+    suspend fun getBannerImages(
+        @Query("InstitutionCode") institutionCode: String?,
+        @Query("AgentPhonNumber") agentPhoneNumber: String?,
+        @Query("AppVersionName") appVersionName: String?
+    ): ApiResponse<List<String>>
+
+    @GET("CreditClubStatic/GetSurveyQuestions")
+    suspend fun getSurveyQuestions(
+        @Query("InstitutionCode") institutionCode: String?,
+        @Query("AgentPhoneNumber") agentPhoneNumber: String?,
+        @Query("AppVersionName") appVersionName: String?
+    ): ApiResponse<List<SurveyQuestion>>
 }
