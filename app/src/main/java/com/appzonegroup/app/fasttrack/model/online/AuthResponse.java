@@ -1,5 +1,7 @@
 package com.appzonegroup.app.fasttrack.model.online;
 
+import com.google.gson.annotations.SerializedName;
+
 import org.json.JSONObject;
 
 /**
@@ -7,7 +9,15 @@ import org.json.JSONObject;
  * Contact fdamilola@gmail.com or fdamilola@hextremelabs.com or fdamilola@echurch.ng
  */
 public class AuthResponse {
-    private String phoneNumber, sessionId, activationCode;
+    @SerializedName("phone_number")
+    private String phoneNumber;
+
+    @SerializedName("session_id")
+    private String sessionId;
+
+    @SerializedName("activationCode")
+    private String activationCode;
+
     public AuthResponse(String phoneNumber, String activationCode)
     {
         setPhoneNumber(phoneNumber);

@@ -253,7 +253,7 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
 
         val middleName = middle_name_et.value
 
-        if (BuildConfig.FLAVOR == "access") {
+        if (BuildConfig.FLAVOR_flavor == "access") {
 
             if (middleName.isEmpty()) {
                 indicateError(
@@ -471,7 +471,7 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
             root.states_et.visibility = View.VISIBLE
 
 
-            if (BuildConfig.FLAVOR == "access") {
+            if (BuildConfig.FLAVOR_flavor == "access") {
                 root.middle_name_et.hint = "Enter middle name"
             }
 

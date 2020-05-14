@@ -7,6 +7,7 @@ import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.service.ConfigService
+import com.appzonegroup.creditclub.pos.work.BaseWorker
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.safeRunSuspend
@@ -21,12 +22,10 @@ import org.koin.core.inject
 
 
 class PosNotificationWorker(context: Context, params: WorkerParameters) :
-    CoroutineWorker(context, params), KoinComponent {
+    BaseWorker(context, params), KoinComponent {
 
-    private val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
     private val localStorage: LocalStorage by inject()
     private val configService: ConfigService by inject()
-    private val posDatabase: PosDatabase by inject()
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         if (Platform.isPOS) return@withContext Result.failure()
@@ -41,7 +40,7 @@ class PosNotificationWorker(context: Context, params: WorkerParameters) :
                 val (response) = safeRunSuspend {
                     creditClubMiddleWareAPI.staticService.posCashOutNotification(
                         requestBody,
-                        "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}",
+                        "iRestrict ${backendConfig.posNotificationToken}",
                         configService.terminalId
                     )
                 }

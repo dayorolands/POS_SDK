@@ -8,6 +8,7 @@ import com.android.volley.Response
 import com.appzonegroup.app.fasttrack.databinding.ActivityAgentActivationBinding
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
+import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.creditclub.pos.Platform
@@ -62,11 +63,12 @@ class AgentActivationActivity : BaseActivity() {
                     return@OnClickListener
                 }
 
-                localStorage.institutionCode = code.substring(0, 6)
+                localStorage.institutionCode = code
                 localStorage.agentPhone = phoneNumber
-                localStorage.cacheAuth = Gson().toJson(AuthResponse(phoneNumber, "1111"))
+                localStorage.cacheAuth = Gson().toJson(AuthResponse(phoneNumber, code))
                 localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
-                localStorage.putString(AppConstants.AGENT_CODE, "1111")
+                localStorage.putString(AppConstants.AGENT_CODE, code)
+                localStorage.putString(AppConstants.AGENT_PIN, "1111")
 
                 logout()
             })
@@ -175,7 +177,7 @@ class AgentActivationActivity : BaseActivity() {
         if (response.isSuccessful) {
             localStorage.institutionCode = institutionCode
             localStorage.agentPhone = phoneNumber
-            localStorage.agentPIN = pin
+//            localStorage.agentPIN = pin
             localStorage.cacheAuth = Gson().toJson(AuthResponse(phoneNumber, code))
             localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
             localStorage.putString(AppConstants.AGENT_CODE, code)

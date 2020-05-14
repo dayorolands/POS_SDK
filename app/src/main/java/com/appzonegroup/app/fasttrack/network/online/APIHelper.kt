@@ -209,7 +209,7 @@ class APIHelper(private val ctx: Context) {
 
     fun continueNextOperation(
         pNumber: String,
-        sessionId: String,
+        sessionId: String?,
         next: String,
         location: String,
         callback: VolleyCallback<String>
@@ -220,7 +220,7 @@ class APIHelper(private val ctx: Context) {
             Request.Method.GET,
             BankOneService.UrlGenerator.operationContinue(
                 pNumber,
-                sessionId,
+                sessionId ?: "nothing",
                 next,
                 location,
                 ctx.localStorage.institutionCode

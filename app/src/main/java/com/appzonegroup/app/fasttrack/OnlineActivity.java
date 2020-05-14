@@ -101,14 +101,14 @@ public class OnlineActivity extends BaseActivity {
                                         bankOneApplication.getAuthResponse().setSessionId(sessionId);
                                         if (resp.contains("MenuItem")) {
                                             JSONObject menuWrapper = response_base.getJSONObject("Menu").getJSONObject("Response").getJSONObject("Display");
-                                            getFragmentManager().beginTransaction()
+                                            getSupportFragmentManager().beginTransaction()
                                                     .replace(R.id.container, ListOptionsFragment.instantiate(menuWrapper, true))
                                                     .commitAllowingStateLoss();
                                         } else {
                                             Object menuWrapper = response_base.getJSONObject("Menu").getJSONObject("Response").get("Display");
                                             if (menuWrapper instanceof String && resp.contains("ShouldMask") && !resp.contains("Invalid Response")) {
                                                 JSONObject data = response_base.getJSONObject("Menu").getJSONObject("Response");
-                                                getFragmentManager().beginTransaction()
+                                                getSupportFragmentManager().beginTransaction()
                                                         .replace(R.id.container, EnterDetailFragment.instantiate(data, resp.contains("ACTIVATION CODE")))
                                                         .commit();
                                             } else {

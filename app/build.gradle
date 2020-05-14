@@ -60,6 +60,7 @@ android {
             buildConfigField("String", "API_HOST", '"https://api.mybankone.com"')
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "false"]
+            resValue "string", "app_name_suffix", ""
         }
 
         staging {
@@ -67,6 +68,7 @@ android {
             buildConfigField("String", "API_HOST", '"http://staging.mybankone.com"')
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
+            resValue "string", "app_name_suffix", " (Staging)"
         }
 
         ipnx {
@@ -74,6 +76,7 @@ android {
             buildConfigField("String", "API_HOST", '"http://62.173.32.17"')
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
+            resValue "string", "app_name_suffix", " (IPNX)"
         }
 
         creditclub {

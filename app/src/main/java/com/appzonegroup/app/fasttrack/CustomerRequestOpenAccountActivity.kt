@@ -352,7 +352,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
 
         val middleName = middle_name_et.value
 
-        if (BuildConfig.FLAVOR == "access") {
+        if (BuildConfig.FLAVOR_flavor == "access") {
 
             if (middleName.isEmpty()) {
                 indicateError(
@@ -607,7 +607,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
             rootView.email_et.hint = "Email"
             rootView.place_of_birth_et.visibility = View.GONE
 
-            if (BuildConfig.FLAVOR == "access") {
+            if (BuildConfig.FLAVOR_flavor == "access") {
                 rootView.middle_name_et.hint = "Enter middle name"
             }
 

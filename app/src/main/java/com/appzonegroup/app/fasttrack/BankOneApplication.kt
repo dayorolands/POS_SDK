@@ -12,6 +12,7 @@ import com.appzonegroup.creditclub.pos.loadPosModules
 import com.appzonegroup.creditclub.pos.startPosApp
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.config.IInstitutionConfig
+import com.creditclub.core.data.Encryption
 import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.localStorage
@@ -42,15 +43,19 @@ class BankOneApplication : CreditClubApplication() {
             if (Platform.isPOS) loadPosModules()
         }
 
-    val authResponse: AuthResponse
-        get() {
-            val defaults: AuthResponse.() -> Unit = { sessionId = sessionId ?: "nothing" }
+    val authResponse: AuthResponse by lazy {
+        val phoneNumber = "234${localStorage.agentPhone?.substring(1)}"
+        val newAuth = localStorage.authResponse
+            ?: return@lazy AuthResponse(
+                phoneNumber,
+                localStorage.getString("AGENT_CODE")
+            )
 
-            if (!localStorage.agentIsActivated) return AuthResponse("", "").apply(defaults)
-            val phoneNumber = "234${localStorage.agent?.phoneNumber?.substring(1)}"
-
-            return AuthResponse(phoneNumber, localStorage.agent?.agentCode).apply(defaults)
-        }
+        return@lazy AuthResponse(
+            newAuth.phoneNumber ?: phoneNumber,
+            newAuth.activationCode ?: localStorage.getString("AGENT_CODE")
+        )
+    }
 
     override fun onCreate() {
         super.onCreate()

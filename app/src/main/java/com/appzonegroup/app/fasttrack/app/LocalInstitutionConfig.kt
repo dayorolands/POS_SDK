@@ -62,7 +62,7 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
             }
 
             // Manual overrides for creditclub variant
-            if (BuildConfig.FLAVOR == "creditclub") {
+            if (BuildConfig.FLAVOR_flavor == "creditclub") {
                 val institutionCode = context.localStorage.institutionCode
 
                 config.name = when (institutionCode) {

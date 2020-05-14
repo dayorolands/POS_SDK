@@ -31,7 +31,7 @@ class LocalStorage private constructor(
 
     val isLoggedIn get() = cacheAuth != null
 
-    fun deleteCacheAuth() = edit { clear() }
+    fun deleteCacheAuth() = edit { remove(KEY_AUTH) }
 
     val authResponse: AuthResponse?
         get() {
