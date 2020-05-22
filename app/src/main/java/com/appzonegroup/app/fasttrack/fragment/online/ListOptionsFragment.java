@@ -1,13 +1,11 @@
 package com.appzonegroup.app.fasttrack.fragment.online;
 
 
-import androidx.fragment.app.Fragment;
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,8 +15,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.appzonegroup.app.fasttrack.OnlineActivity;
+import androidx.fragment.app.Fragment;
+
 import com.appzonegroup.app.fasttrack.BankOneApplication;
+import com.appzonegroup.app.fasttrack.OnlineActivity;
 import com.appzonegroup.app.fasttrack.R;
 import com.appzonegroup.app.fasttrack.adapter.online.OptionsAdapter;
 import com.appzonegroup.app.fasttrack.model.TransactionCountType;
@@ -29,9 +29,13 @@ import com.appzonegroup.app.fasttrack.network.online.APIHelper;
 import com.appzonegroup.app.fasttrack.utility.GPSTracker;
 import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.Misc;
-import com.creditclub.core.data.Encryption;
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages;
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson;
+import com.creditclub.core.data.Encryption;
+import com.creditclub.core.ui.CreditClubActivity;
+import com.creditclub.core.ui.CreditClubFragment;
+import com.creditclub.core.ui.widget.DialogListener;
+import com.creditclub.core.ui.widget.DialogProvider;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.json.JSONArray;
@@ -42,6 +46,10 @@ import java.util.concurrent.TimeoutException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.functions.Function2;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,9 +66,6 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
     private static ArrayList<Option> menuOptions;
     private static String title;
     private AuthResponse authResponse;
-
-
-    AlertDialog.Builder dialog;
 
     public static ListOptionsFragment instantiate(JSONObject menuWrapped, boolean isHome) throws Exception {
         if (menuWrapped.getJSONObject("Menu").get("MenuItem") instanceof JSONArray) {
@@ -125,19 +130,15 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
             OnlineActivity.isHome = savedInstanceState.getString("IsHome") != null;
         }*/
 
-        dialog = new AlertDialog.Builder(getActivity());
-        dialog.setPositiveButton("OK", null);
-        dialog.setCancelable(false);
-
         listView.setAdapter(new OptionsAdapter(getActivity(), R.layout.item_option, getMenuOptions()));
         listView.setOnItemClickListener(this);
-        view = getActivity().getCurrentFocus();
+        view = ((CreditClubActivity)getActivity()).getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) ((CreditClubActivity)getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
 
-      authResponse = ((BankOneApplication)getActivity().getApplication()).getAuthResponse();// LocalStorage.getCachedAuthResponse(getActivity());
+        authResponse = ((BankOneApplication) ((CreditClubActivity)getActivity()).getApplication()).getAuthResponse();// LocalStorage.getCachedAuthResponse(getActivity());
 
     }
 
@@ -147,13 +148,12 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         selectedOption = (Option) adapterView.getAdapter().getItem(i);
+        DialogProvider dialogProvider = ((CreditClubActivity)getActivity()).getDialogProvider();
+
         if (selectedOption.getName().equalsIgnoreCase("CANCEL")) {
             ((OnlineActivity) getActivity()).goHome();
         } else {
-            final ProgressDialog pdialog = new ProgressDialog(getActivity());
-            pdialog.setCancelable(false);
-            pdialog.setMessage("Loading...");
-            pdialog.show();
+            dialogProvider.showProgressBar("Loading");
             final APIHelper ah = new APIHelper(getActivity());
             finalLocation = "0.00;0.00";
             final GPSTracker gpsTracker = new GPSTracker(getActivity());
@@ -165,72 +165,90 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
                 Log.e("Location", finalLocation);
             }
 
-
-            ah.getNextOperation(authResponse.getPhoneNumber(), authResponse.getSessionId(), selectedOption.getIndex(), finalLocation,new APIHelper.VolleyCallback<String>() {
-                    @Override
-                    public void onCompleted(Exception e, String result,boolean status) {
-                pdialog.dismiss();
-                if (status) {
-                    processData(result);
-                } else {
-                    if (e != null) {
-                        FirebaseCrashlytics.getInstance().recordException(e);
-                        e.printStackTrace();
-                        if (e instanceof TimeoutException) {
-                            dialog.setMessage("Something went wrong! Please try again.")
-                                .setPositiveButton("CONTINUE", new DialogInterface.OnClickListener()
-                                {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i)
-                                    {
-                                        dialogInterface.dismiss();
-                                        pdialog.show();
-                                        ah.continueNextOperation(authResponse.getPhoneNumber(), authResponse.getSessionId(), selectedOption.getIndex(), finalLocation, new APIHelper.VolleyCallback<String>(){
-
-
-                                                    @Override
-                                                    public void onCompleted(Exception e, String result,boolean status) {
-                                            pdialog.dismiss();
-                                            if (status) {
-                                                processData(result);
-                                            } else {
-                                                Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_INTERNET_COUNT, authResponse.getSessionId());
-                                                dialog.setMessage("Connection lost").setPositiveButton("OK", null).create().setCanceledOnTouchOutside(false);
-                                                dialog.show();
-                                            }
-                                            }
-                                        });
-                                    }
-                                }).setCancelable(false).create()
-                            .setCanceledOnTouchOutside(false);
-                            dialog.show();
+            ah.getNextOperation(authResponse.getPhoneNumber(), authResponse.getSessionId(), selectedOption.getIndex(), finalLocation, new APIHelper.VolleyCallback<String>() {
+                @Override
+                public void onCompleted(Exception e, String result, boolean status) {
+                    dialogProvider.hideProgressBar();
+                    if (status) {
+                        processData(result);
+                    } else {
+                        if (e != null) {
+                            FirebaseCrashlytics.getInstance().recordException(e);
+                            e.printStackTrace();
+                            if (e instanceof TimeoutException) {
+                                handleException(false);
+                            } else {
+                                Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_INTERNET_COUNT, authResponse.getSessionId());
+                                dialogProvider.showError("Connection lost");
+                            }
                         } else {
                             Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_INTERNET_COUNT, authResponse.getSessionId());
-                            dialog.setMessage("Connection lost").setPositiveButton("OK", null).create().setCanceledOnTouchOutside(false);
-                            dialog.show();
+                            dialogProvider.showError("Connection lost");
                         }
-                    } else {
-                        Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_INTERNET_COUNT, authResponse.getSessionId());
-                        dialog.setMessage("Connection lost").setPositiveButton("OK", null).create().setCanceledOnTouchOutside(false);
-                        dialog.show();
                     }
-                }
                 }
             });
         }
     }
 
+    private void handleException(boolean goHomeOnClose) {
+        DialogProvider dialogProvider = ((CreditClubActivity)getActivity()).getDialogProvider();
+        dialogProvider.confirm("Something went wrong", "Please try again", new Function1<DialogListener<Boolean>, Unit>() {
+            @Override
+            public Unit invoke(DialogListener<Boolean> booleanDialogListener) {
+                booleanDialogListener.onSubmit(new Function2<Dialog, Boolean, Unit>() {
+                    @Override
+                    public Unit invoke(Dialog dialog, Boolean aBoolean) {
+                        dialogProvider.showProgressBar("Loading");
+                        final APIHelper ah = new APIHelper(getActivity());
+                        finalLocation = "0.00;0.00";
+                        final GPSTracker gpsTracker = new GPSTracker(getActivity());
+                        if (gpsTracker.getLocation() != null) {
+                            String longitude = String.valueOf(gpsTracker.getLocation().getLongitude());
+                            String latitude = String.valueOf(gpsTracker.getLocation().getLatitude());
+                            finalLocation = latitude + ";" + longitude;
+                        }
+
+                        AuthResponse authResponse = LocalStorage.getCachedAuthResponse(getActivity());
+                        ah.continueNextOperation(authResponse.getPhoneNumber(), authResponse.getSessionId(), selectedOption.getIndex(), finalLocation, new APIHelper.VolleyCallback<String>() {
+                            @Override
+                            public void onCompleted(Exception e, String result, boolean status) {
+                                if (status) {
+                                    processData(result);
+                                } else {
+                                    Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_INTERNET_COUNT, authResponse.getSessionId());
+                                    dialogProvider.showError("Connection lost");
+                                }
+                            }
+                        });
+                        return null;
+                    }
+                });
+
+                booleanDialogListener.onClose(new Function0<Unit>() {
+                    @Override
+                    public Unit invoke() {
+                        if (goHomeOnClose) {
+                            ((OnlineActivity) getActivity()).goHome();
+                        }
+                        return null;
+                    }
+                });
+
+                return null;
+            }
+        });
+    }
+
     private void processData(String result) {
+        DialogProvider dialogProvider = ((CreditClubActivity)getActivity()).getDialogProvider();
         try {
             String answer = Response.fixResponse(result);
             String decryptedAnswer = Encryption.decrypt(answer);
             JSONObject response = XmlToJson.convertXmlToJson(decryptedAnswer);
             if (response == null) {
                 Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_INTERNET_COUNT, authResponse.getSessionId());
-                dialog.setMessage("Connection lost")
-                        .setPositiveButton("OK", null)
-                        .create().setCanceledOnTouchOutside(false);
-                dialog.show();
+                dialogProvider.showError("Connection lost");
             } else {
 
                 Log.e("ResponseJsonList", response.toString());
@@ -257,29 +275,27 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
                             } else {
                                 Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.ERROR_RESPONSE_COUNT, authResponse.getSessionId());
                                 String message = response_base.getJSONObject("Menu").getJSONObject("Response").getString("Display");
-                                dialog.setMessage(Html.fromHtml(message)).create().setCanceledOnTouchOutside(false);
-                                dialog.show();
+                                dialogProvider.showError(Html.fromHtml(message).toString());
                             }
                         }
                     } else {
                         if (response_base.toString().contains("Display")) {
                             Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.ERROR_RESPONSE_COUNT, authResponse.getSessionId());
-                            dialog.setMessage(Html.fromHtml(response_base.getJSONObject("Menu")
-                                .getJSONObject("Response")
-                                .optString("Display", ErrorMessages.OPERATION_NOT_COMPLETED)))
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        ((OnlineActivity) getActivity()).goHome();
-                                    }
-                                }).create().setCanceledOnTouchOutside(false);
-                            dialog.show();
+                            Spanned span = Html.fromHtml(response_base.getJSONObject("Menu")
+                                    .getJSONObject("Response")
+                                    .optString("Display", ErrorMessages.OPERATION_NOT_COMPLETED));
+                            dialogProvider.showError(span.toString(), new Function1<DialogListener<? extends Object>, Unit>() {
+                                @Override
+                                public Unit invoke(DialogListener<?> dialogListener) {
+                                    ((OnlineActivity) getActivity()).goHome();
+                                    return null;
+                                }
+                            });
                         } else {
                             Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.ERROR_RESPONSE_COUNT, authResponse.getSessionId());
-                            dialog.setMessage(Html.fromHtml(response_base.
-                                    optString("Menu", ErrorMessages.PHONE_NOT_REGISTERED)))
-                                    .create().setCanceledOnTouchOutside(false);
-                            dialog.show();
+                            Spanned span = Html.fromHtml(response_base.
+                                    optString("Menu", ErrorMessages.PHONE_NOT_REGISTERED));
+                            dialogProvider.showError(span.toString());
                         }
                     }
                 }
@@ -287,55 +303,14 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
             }
         } catch (Exception c) {
             Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.NO_INTERNET_COUNT, authResponse.getSessionId());
-            dialog.setMessage("Something went wrong! Please try again.")
-                    .setPositiveButton("CONTINUE", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                            final ProgressDialog pdialog = new ProgressDialog(getActivity());
-                            pdialog.setCancelable(false);
-                            pdialog.setMessage("Loading...");
-                            pdialog.show();
-                            final APIHelper ah = new APIHelper(getActivity());
-                            finalLocation = "0.00;0.00";
-                            final GPSTracker gpsTracker = new GPSTracker(getActivity());
-                            if (gpsTracker.getLocation() != null) {
-                                String longitude = String.valueOf(gpsTracker.getLocation().getLongitude());
-                                String latitude = String.valueOf(gpsTracker.getLocation().getLatitude());
-                                finalLocation = latitude + ";" + longitude;
-                            }
-
-                            AuthResponse authResponse = LocalStorage.getCachedAuthResponse(getActivity());
-                            new APIHelper(getActivity()).continueNextOperation(authResponse.getPhoneNumber(), authResponse.getSessionId(), selectedOption.getIndex(), finalLocation,new APIHelper.VolleyCallback<String>() {
-                                    @Override
-                                    public void onCompleted(Exception e, String result,boolean status) {
-                                        if (status) {
-                                            processData(result);
-                                        } else {
-                                            dialog.setMessage("Connection lost")
-                                                .setPositiveButton("OK", null)
-                                                .create()
-                                                .setCanceledOnTouchOutside(false);
-                                            dialog.show();
-                                        }
-                                    }
-                                });
-                        }
-                    }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    ((OnlineActivity) getActivity()).goHome();
-                }
-            }).setCancelable(false).create().setCanceledOnTouchOutside(false);
-            dialog.show();
+            handleException(true);
         }
     }
 
     @Override
     public void onClick(View view) {
         if (view == optionName) {
-            dialog.setMessage(optionName.getText().toString()).show();
+            ((CreditClubActivity)getActivity()).getDialogProvider().showError(optionName.getText().toString());
         }
     }
 }

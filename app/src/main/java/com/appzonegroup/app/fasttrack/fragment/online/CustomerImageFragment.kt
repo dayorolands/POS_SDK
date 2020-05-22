@@ -14,7 +14,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.appzonegroup.app.fasttrack.BankOneApplication
 import com.appzonegroup.app.fasttrack.BaseActivity
@@ -32,6 +31,7 @@ import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson
 import com.creditclub.core.data.Encryption
 import com.creditclub.core.model.CreditClubImage
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.safeRunIO
 import com.esafirm.imagepicker.features.ImagePicker
 import com.esafirm.imagepicker.features.ReturnMode
@@ -59,7 +59,6 @@ class CustomerImageFragment : Fragment(),
     }
     var optionsText: OptionsText? = null
 
-    var dialog: AlertDialog.Builder? = null
     private val baseActivity: BaseActivity by lazy { activity as BaseActivity }
 
     override fun onCreateView(
@@ -79,7 +78,6 @@ class CustomerImageFragment : Fragment(),
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
-        dialog = AlertDialog.Builder(requireActivity()).setPositiveButton("OK", null)
         upperHint!!.text = if (optionsText == null) "" else optionsText!!.hintText
         fromGallery!!.setOnClickListener(this)
         takePhoto!!.setOnClickListener(this)
@@ -152,6 +150,7 @@ class CustomerImageFragment : Fragment(),
             finalFile,
             finalLocation ?: "",
             optionsText?.isShouldCompress ?: false,
+            baseActivity.mainScope,
             object : APIHelper.FutureCallback<String> {
                 override fun onCompleted(e: Exception?, result: String?) {
                     baseActivity.hideProgressBar()
@@ -199,12 +198,10 @@ class CustomerImageFragment : Fragment(),
                                     TransactionCountType.NO_INTERNET_COUNT,
                                     authResponse?.sessionId
                                 )
-                                dialog!!.setMessage("Connection lost")
-                                    .setPositiveButton("OK", null).show()
+                                baseActivity.showError("Connection lost")
                             }
                         } else {
-                            dialog!!.setMessage("Connection lost")
-                                .setPositiveButton("OK", null).show()
+                            baseActivity.showError("Connection lost")
                             Misc.increaseTransactionMonitorCounter(
                                 activity,
                                 TransactionCountType.NO_INTERNET_COUNT,
@@ -217,10 +214,11 @@ class CustomerImageFragment : Fragment(),
     }
 
     fun showDialogWithGoHomeAction(message: String?) {
-        dialog!!.setMessage(message)
-            .setPositiveButton("OK") { _, _ -> (activity as OnlineActivity?)!!.goHome() }
-            .setCancelable(false)
-            .show()
+        baseActivity.showError<Nothing>(message) {
+            onClose {
+                (activity as OnlineActivity?)?.goHome()
+            }
+        }
     }
 
     private fun moveToNext() {
@@ -255,8 +253,7 @@ class CustomerImageFragment : Fragment(),
                             val response =
                                 XmlToJson.convertXmlToJson(decryptedAnswer)
                             if (response == null) {
-                                dialog!!.setMessage("Connection lost").setPositiveButton("OK", null)
-                                    .show()
+                                baseActivity.showError("Connection lost")
                                 Misc.increaseTransactionMonitorCounter(
                                     activity,
                                     TransactionCountType.NO_INTERNET_COUNT,
@@ -342,7 +339,7 @@ class CustomerImageFragment : Fragment(),
                                                     responseBase.getJSONObject("Menu")
                                                         .getJSONObject("Response")
                                                         .getString("Display")
-                                                dialog!!.setMessage(message).show()
+                                                baseActivity.showError(message)
                                             }
                                         }
                                     } else {
@@ -361,12 +358,12 @@ class CustomerImageFragment : Fragment(),
                                                     )
                                             )
                                         } else {
-                                            dialog!!.setMessage(
+                                            baseActivity.showError(
                                                 responseBase.optString(
                                                     "Menu",
                                                     ErrorMessages.PHONE_NOT_REGISTERED
                                                 )
-                                            ).show()
+                                            )
                                         }
                                     }
                                 }
@@ -389,8 +386,7 @@ class CustomerImageFragment : Fragment(),
                                     authResponse.sessionId
                                 )
                             } else {
-                                dialog!!.setMessage("Connection lost").setPositiveButton("OK", null)
-                                    .show()
+                                baseActivity.showError("Connection lost")
                                 Misc.increaseTransactionMonitorCounter(
                                     activity,
                                     TransactionCountType.ERROR_RESPONSE_COUNT,
@@ -398,8 +394,7 @@ class CustomerImageFragment : Fragment(),
                                 )
                             }
                         } else {
-                            dialog!!.setMessage("Connection lost").setPositiveButton("OK", null)
-                                .show()
+                            baseActivity.showError("Connection lost")
                             Misc.increaseTransactionMonitorCounter(
                                 activity,
                                 TransactionCountType.ERROR_RESPONSE_COUNT,
@@ -423,7 +418,7 @@ class CustomerImageFragment : Fragment(),
                     tmpImage ?: return@run showError("An internal error occurred")
                     creditClubImage = CreditClubImage(tmpImage)
 
-                    GlobalScope.launch(Dispatchers.Main) {
+                    baseActivity.mainScope.launch {
                         showProgressBar("Processing image")
 
                         val (bitmap) = safeRunIO { creditClubImage?.bitmap }

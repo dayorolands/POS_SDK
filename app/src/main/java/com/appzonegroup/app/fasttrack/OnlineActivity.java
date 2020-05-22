@@ -57,10 +57,7 @@ public class OnlineActivity extends BaseActivity {
         isHome = true;
         //(isHome)
         {
-            final ProgressDialog loading = new ProgressDialog(this);
-            loading.setMessage("Loading...");
-            loading.setCanceledOnTouchOutside(false);
-            final AlertDialog.Builder dialog = new AlertDialog.Builder(this)
+          final AlertDialog.Builder dialog = new AlertDialog.Builder(this)
                     .setPositiveButton("OK", null);
 
             final String phoneNumber = bankOneApplication.getAuthResponse().getPhoneNumber();
@@ -73,12 +70,12 @@ public class OnlineActivity extends BaseActivity {
                 String latitude = String.valueOf(gpsTracker.getLocation().getLatitude());
                 finalLocation = latitude+";"+longitude;
             }
-            loading.show();
+            getDialogProvider().showProgressBar("Loading");
             Misc.resetTransactionMonitorCounter(getBaseContext());
             ah.attemptValidation(phoneNumber, sessionId, verificationCode, finalLocation, false, new APIHelper.VolleyCallback<String>() {
                 @Override
                 public void onCompleted(Exception e, String result, boolean status) {
-                    loading.dismiss();
+                    getDialogProvider().hideProgressBar();
                     if (e == null && result != null) {
                         try {
                             String answer = Response.fixResponse(result);
