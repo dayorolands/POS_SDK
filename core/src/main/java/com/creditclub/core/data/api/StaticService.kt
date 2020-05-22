@@ -162,7 +162,7 @@ interface StaticService {
     @GET("CreditClubStatic/GetBannerImages")
     suspend fun getBannerImages(
         @Query("InstitutionCode") institutionCode: String?,
-        @Query("AgentPhonNumber") agentPhoneNumber: String?,
+        @Query("AgentPhoneNumber") agentPhoneNumber: String?,
         @Query("AppVersionName") appVersionName: String?
     ): ApiResponse<List<String>>
 

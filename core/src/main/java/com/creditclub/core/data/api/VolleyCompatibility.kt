@@ -12,6 +12,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 
@@ -62,7 +63,7 @@ object VolleyCompatibility {
                 suspendCoroutine<Response> { continuation ->
                     client.newCall(request).enqueue(object : Callback {
                         override fun onFailure(call: Call, e: IOException) {
-                            throw e
+                            continuation.resumeWithException(e)
                         }
 
                         override fun onResponse(call: Call, response: Response) {
