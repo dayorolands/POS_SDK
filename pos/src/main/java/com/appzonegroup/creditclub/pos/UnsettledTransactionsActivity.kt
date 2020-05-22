@@ -31,7 +31,7 @@ class UnsettledTransactionsActivity : PosActivity(), Logger {
     private val rAdapter by lazy {
         PosNotificationAdapter(emptyList()) {
             onSettle { posNotification ->
-                GlobalScope.launch(Dispatchers.Main) {
+                mainScope.launch {
                     showProgressBar("Settling")
 
                     log("Running middleware notifications....")

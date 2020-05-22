@@ -2,6 +2,7 @@ package com.appzonegroup.app.fasttrack.network.online
 
 import android.content.Context
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import com.android.volley.AuthFailureError
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
@@ -16,6 +17,7 @@ import com.creditclub.core.data.api.BankOneService
 import com.creditclub.core.data.api.VolleyCompatibility
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -165,27 +167,18 @@ class APIHelper(private val ctx: Context) {
         image: File,
         location: String,
         isFullImage: Boolean,
+        scope: CoroutineScope,
         callback: FutureCallback<String>
     ) {
         Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId)
-//        Ion.with(ctx)
-//            .load(
-//                "POST",
-//                BankOneService.UrlGenerator.operationNextImage(
-//                    pNumber,
-//                    sessionId,
-//                    location,
-//                    ctx.localStorage.institutionCode,
-//                    isFullImage
-//                )
-//            )
-//            .setTimeout(180000)
-//            .setMultipartFile("file", image)
-//            .asString().setCallback(callback)
 
-        GlobalScope.launch(Dispatchers.Main) {
+        scope.launch {
+            val mimeTypeMap = MimeTypeMap.getSingleton()
+            val mimeType = mimeTypeMap.getMimeTypeFromExtension(
+                MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(image).toString())
+            )
             val requestFile: RequestBody = RequestBody.create(
-                MediaType.parse(ctx.contentResolver.getType(Uri.fromFile(image))),
+                MediaType.parse(mimeType ?: "image/jpeg"),
                 image
             )
 

@@ -31,10 +31,7 @@ class SplashScreenActivity : AppCompatActivity() {
             "agent_institution",
             localStorage.institutionCode ?: "none"
         )
-        firebaseCrashlytics.setCustomKey("environment", "Live")
-        debugOnly {
-            firebaseCrashlytics.setCustomKey("environment", "Staging")
-        }
+        firebaseCrashlytics.setCustomKey("environment", BuildConfig.API_HOST)
         setContentView(R.layout.activity_splashscreen)
         setPolicy()
 
@@ -46,11 +43,6 @@ class SplashScreenActivity : AppCompatActivity() {
             override fun run() {
                 try {
                     sleep(3000)
-                    LocalStorage.SaveValue(
-                        "test",
-                        "test",
-                        this@SplashScreenActivity
-                    )
                     if (LocalStorage.GetValueFor(
                             AppConstants.ACTIVATED,
                             baseContext

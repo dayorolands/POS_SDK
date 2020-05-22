@@ -2,6 +2,7 @@ package com.creditclub.core.data.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.util.Log
 import androidx.core.content.edit
 import com.creditclub.core.BuildConfig
@@ -88,10 +89,14 @@ object JsonStorage {
 
     @Suppress("UNCHECKED_CAST", "NO_REFLECTION_IN_CLASS_PATH")
     inline fun <reified T> getSerializer(): KSerializer<T> {
-        val key = typeTokenOf<T>().typeName
-        if (!serializerCache.containsKey(key)) {
-            serializerCache[key] = serializerByTypeToken(typeTokenOf<T>())
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val key = typeTokenOf<T>().typeName
+            if (!serializerCache.containsKey(key)) {
+                serializerCache[key] = serializerByTypeToken(typeTokenOf<T>())
+            }
+            serializerCache[key] as KSerializer<T>
+        } else {
+            serializerByTypeToken(typeTokenOf<T>()) as KSerializer<T>
         }
-        return serializerCache[key] as KSerializer<T>
     }
 }
