@@ -5,10 +5,7 @@ import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.util.Misc
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import java.io.IOException
@@ -57,8 +54,31 @@ object ApiService {
         }
     }
 
-    fun <T> getList(url: String, clazz: Class<T>): List<T>? {
-        return Gson().fromJson(getRaw(url), object : TypeToken<List<T>>() {}.type)
+    @JvmOverloads
+    suspend fun postAsync(url: String, body: String, headers: Headers = Headers.Builder().build()): Result<String> {
+        var response: String? = null
+        var error: java.lang.Exception? = null
+
+        try {
+            val mediaType = MediaType.parse("application/json")
+
+            val requestBody = RequestBody.create(mediaType, body)
+            val request = Request.Builder()
+                .url(url)
+                .headers(headers)
+                .post(requestBody)
+                .build()
+
+            response = suspendCancellableCoroutine {
+
+            }
+        } catch (ex: IOException) {
+            error = ex
+        } catch (ex: Exception) {
+            error = ex
+        } finally {
+            return Result(response, error)
+        }
     }
 
     fun <T> get(url: String, clazz: Class<T>): T {
@@ -79,53 +99,6 @@ object ApiService {
             } finally {
                 next(response)
             }
-        }
-    }
-
-    fun get(url: String, next: (Result<String>) -> Unit) {
-        GlobalScope.launch(Dispatchers.Main) {
-            val response = withContext(Dispatchers.Default) {
-                get(url)
-            }
-            next(response)
-        }
-    }
-
-    fun get(url: String): Result<String> {
-        var response: String? = null
-        var error: java.lang.Exception? = null
-
-        try {
-            Log.e("Call", url)
-
-            val request = Request.Builder().url(url)
-                .header("Accept", "application/json")
-                .header("Content-Type", "application/json")
-                .get()
-                .build()
-
-            Log.e("Call Made", Misc.getCurrentDateLongString())
-
-            response = client.newCall(request).execute().body()!!.string()
-
-            Log.e("RESPONSE:", response)
-        } catch (ex: IOException) {
-            Log.e("GetError", ex.toString())
-            error = ex
-            //  Misc.increaseTransactionMonitorCounter(context, AppConstants.getNoInternetCount());
-        } catch (ex: Exception) {
-            Log.e("GetError", ex.toString())
-            error = ex
-//            val exceptionMessage = ex.toString()
-//            if (exceptionMessage.contains("TimeOut")) {
-//                // Misc.increaseTransactionMonitorCounter(context, AppConstants.getNoResponseCount());
-//            } else if (exceptionMessage.contains("\"Status\":false")) {
-//                //Misc.increaseTransactionMonitorCounter(context, AppConstants.getErrorResponseCount());
-//            } else {
-//                //Misc.increaseTransactionMonitorCounter(context, AppConstants.getNoInternetCount());
-//            }
-        } finally {
-            return Result(response, error)
         }
     }
 

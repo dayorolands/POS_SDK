@@ -83,7 +83,7 @@ public class OnlineActivity extends BaseActivity {
                             JSONObject response = XmlToJson.convertXmlToJson(decryptedAnswer);
                             if (response == null) {
                                 Misc.increaseTransactionMonitorCounter(getBaseContext(), TransactionCountType.NO_INTERNET_COUNT, sessionId);
-                                dialog.setMessage("Connection lost").setPositiveButton("OK", null).show();
+                                getDialogProvider().showError("Connection lost");
                             } else {
                                 Misc.increaseTransactionMonitorCounter(getBaseContext(), TransactionCountType.SUCCESS_COUNT, sessionId);
                                 String resp = response.toString();
@@ -149,11 +149,11 @@ public class OnlineActivity extends BaseActivity {
                                         .show();
                             } else {
                                 Misc.increaseTransactionMonitorCounter(getBaseContext(), TransactionCountType.NO_INTERNET_COUNT, sessionId);
-                                dialog.setMessage("Connection lost").setPositiveButton("OK", null).show();
+                                getDialogProvider().showError("Connection lost");
                             }
                         } else {
                             Misc.increaseTransactionMonitorCounter(getBaseContext(), TransactionCountType.NO_INTERNET_COUNT, sessionId);
-                            dialog.setMessage("Connection lost").setPositiveButton("OK", null).show();
+                            getDialogProvider().showError("Connection lost");
                         }
                     }
                 }

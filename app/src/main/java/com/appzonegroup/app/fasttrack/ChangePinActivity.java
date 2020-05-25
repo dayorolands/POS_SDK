@@ -118,7 +118,7 @@ public class ChangePinActivity extends BaseActivity {
             //showProgressBar(null);
             String url = AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/PinChange";
 
-            new PostCallTask(getProgressDialog(), this, this).execute(url, data);
+            new PostCallTask(getDialogProvider(), this, this).execute(url, data);
             //sendPostRequest(url,data);
 
         }

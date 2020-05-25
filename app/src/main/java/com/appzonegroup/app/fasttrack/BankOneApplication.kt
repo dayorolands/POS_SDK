@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import com.appzonegroup.app.fasttrack.app.LocalInstitutionConfig
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
-import com.appzonegroup.app.fasttrack.ui.MyDialogProvider
+import com.appzonegroup.app.fasttrack.ui.CreditClubDialogProvider
 import com.appzonegroup.app.fasttrack.utility.extensions.registerWorkers
 import com.appzonegroup.app.fasttrack.utility.registerAppFunctions
 import com.appzonegroup.creditclub.pos.Platform
@@ -16,7 +16,6 @@ import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.localStorage
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.PicassoProvider
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
@@ -31,7 +30,7 @@ class BankOneApplication : CreditClubApplication() {
             modules(module {
                 single<IInstitutionConfig> { LocalInstitutionConfig.create(androidContext()) }
                 factory<DialogProvider>(override = true) { (context: Context) ->
-                    MyDialogProvider(context)
+                    CreditClubDialogProvider(context)
                 }
                 single<BackendConfig> {
                     object : BackendConfig {

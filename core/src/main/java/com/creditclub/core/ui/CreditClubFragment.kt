@@ -2,12 +2,12 @@ package com.creditclub.core.ui
 
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
@@ -31,4 +31,11 @@ open class CreditClubFragment : Fragment() {
         set(value) {
             text = value
         }
+
+    override fun onDestroy() {
+        mainScope.cancel()
+        ioScope.cancel()
+        defaultScope.cancel()
+        super.onDestroy()
+    }
 }

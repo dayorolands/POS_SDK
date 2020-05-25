@@ -3,6 +3,7 @@ package com.creditclub.core.data.api
 import android.util.Log
 import com.creditclub.core.data.Encryption
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import org.koin.core.KoinComponent
 import org.koin.core.get
 import retrofit2.http.*
@@ -31,6 +32,12 @@ interface BankOneService {
         @Query("FULL_IMAGE") isFullImage: Boolean,
         @Part file: MultipartBody.Part
     ): String?
+
+    @GET
+    suspend fun operationGet(@Url url: String): String?
+
+    @POST
+    fun operationPost(@Url url: String?, @Body requestBody: RequestBody): String?
 
     object UrlGenerator : KoinComponent {
         private val apiHost get() = get<BackendConfig>().apiHost

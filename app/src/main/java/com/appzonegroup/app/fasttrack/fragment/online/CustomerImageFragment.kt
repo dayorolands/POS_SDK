@@ -214,7 +214,7 @@ class CustomerImageFragment : Fragment(),
     }
 
     fun showDialogWithGoHomeAction(message: String?) {
-        baseActivity.showError<Nothing>(message) {
+        baseActivity.dialogProvider.showError<Nothing>(message) {
             onClose {
                 (activity as OnlineActivity?)?.goHome()
             }
@@ -222,7 +222,7 @@ class CustomerImageFragment : Fragment(),
     }
 
     private fun moveToNext() {
-        baseActivity.showProgressBar("Loading")
+        baseActivity.dialogProvider.showProgressBar("Loading")
         //final AuthResponse authResponse = bankOneApplication.getAuthResponse();// LocalStorage.getCachedAuthResponse(getActivity());
         val authResponse =
             (requireActivity().application as BankOneApplication).authResponse

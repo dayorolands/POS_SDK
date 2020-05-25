@@ -1,6 +1,7 @@
 package com.creditclub.core
 
 import com.creditclub.core.data.CoreDatabase
+import com.creditclub.core.data.CreditClubClient
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.data.prefs.AppDataStorage
@@ -57,4 +58,6 @@ val apiModule = module {
     }
 
     single { CreditClubMiddleWareAPI(get(named("middleware")), get<BackendConfig>().apiHost) }
+
+    single { CreditClubClient(get(named("middleware")), get<BackendConfig>().apiHost) }
 }

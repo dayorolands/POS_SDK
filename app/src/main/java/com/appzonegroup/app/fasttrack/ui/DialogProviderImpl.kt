@@ -18,6 +18,7 @@ import com.appzonegroup.app.fasttrack.databinding.PinpadBinding
 import com.appzonegroup.app.fasttrack.utility.CalendarDialog
 import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.ui.widget.*
+import com.creditclub.core.util.safeRun
 import com.creditclub.ui.adapter.DialogOptionAdapter
 import com.creditclub.ui.databinding.DialogOptionsBinding
 import kotlinx.android.synthetic.main.dialog_error.*
@@ -37,7 +38,7 @@ interface DialogProviderImpl : DialogProvider {
     override fun hideProgressBar() {
         activity.runOnUiThread {
             if (progressDialog.isShowing && !activity.isFinishing) {
-                progressDialog.dismiss()
+                safeRun { progressDialog.dismiss() }
             }
         }
     }
@@ -122,14 +123,14 @@ interface DialogProviderImpl : DialogProvider {
         isCancellable: Boolean = false,
         block: DialogListenerBlock<T>? = null
     ): Dialog {
-        activity.runOnUiThread {
+        if (!activity.isFinishing) activity.runOnUiThread {
             progressDialog.findViewById<TextView>(R.id.message_tv).text = message
             progressDialog.findViewById<TextView>(R.id.header_tv).text = title
 
             progressDialog.findViewById<View>(R.id.cancel_button).run {
                 visibility = if (isCancellable) View.VISIBLE else View.GONE
                 setOnClickListener {
-                    if (progressDialog.isShowing) progressDialog.dismiss()
+                    if (progressDialog.isShowing) hideProgressBar()
                 }
             }
 
@@ -137,7 +138,7 @@ interface DialogProviderImpl : DialogProvider {
                 val listener = DialogListener.create(block)
 
                 progressDialog.findViewById<View>(R.id.cancel_button).setOnClickListener {
-                    if (progressDialog.isShowing) progressDialog.hide()
+                    if (progressDialog.isShowing) hideProgressBar()
                     listener.close()
                 }
             } else progressDialog.setOnCancelListener { }

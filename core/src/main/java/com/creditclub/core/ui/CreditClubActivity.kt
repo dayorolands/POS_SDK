@@ -19,6 +19,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
@@ -76,6 +77,12 @@ abstract class CreditClubActivity : AppCompatActivity() {
             firebaseAnalytics.setUserProperty("agent_phone", agent.phoneNumber)
             firebaseAnalytics.setUserProperty("terminal_id", agent.terminalID)
         }
+    }
+
+    override fun onDestroy() {
+        mainScope.cancel()
+        ioScope.cancel()
+        super.onDestroy()
     }
 
     fun showNetworkError() = showNetworkError<Nothing>(null)

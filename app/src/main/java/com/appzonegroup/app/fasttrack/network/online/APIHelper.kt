@@ -3,12 +3,8 @@ package com.appzonegroup.app.fasttrack.network.online
 import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
-import com.android.volley.AuthFailureError
-import com.android.volley.DefaultRetryPolicy
-import com.android.volley.Request
-import com.android.volley.Response
+import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
-import com.appzonegroup.app.fasttrack.BuildConfig
 import com.appzonegroup.app.fasttrack.model.TransactionCountType
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.creditclub.core.data.CreditClubClient
@@ -19,11 +15,13 @@ import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeoutException
@@ -33,9 +31,12 @@ import java.util.concurrent.TimeoutException
  * @author fdamilola on 9/5/15.
  * @contact fdamilola@gmail.com +2348166200715
  */
-class APIHelper(private val ctx: Context) {
+class APIHelper @JvmOverloads constructor(
+    private val ctx: Context,
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+) : KoinComponent {
 
-    private val client by lazy { CreditClubClient(BuildConfig.API_HOST) }
+    private val client: CreditClubClient by inject()
 
     interface VolleyCallback<T> {
         fun onCompleted(e: Exception?, result: T?, status: Boolean)
@@ -79,7 +80,7 @@ class APIHelper(private val ctx: Context) {
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
 
-        VolleyCompatibility.processVolleyRequestWithOkHttp(
+        handleRequest(
             req,
             Response.Listener { response -> callback.onCompleted(null, response, true) })
     }
@@ -114,7 +115,7 @@ class APIHelper(private val ctx: Context) {
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
 
-        VolleyCompatibility.processVolleyRequestWithOkHttp(
+        handleRequest(
             req,
             Response.Listener { response -> callback.onCompleted(null, response, true) })
     }
@@ -156,7 +157,7 @@ class APIHelper(private val ctx: Context) {
         )
 
 
-        VolleyCompatibility.processVolleyRequestWithOkHttp(
+        handleRequest(
             req,
             Response.Listener { response -> callback.onCompleted(null, response, true) })
     }
@@ -200,6 +201,7 @@ class APIHelper(private val ctx: Context) {
         }
     }
 
+    @JvmOverloads
     fun continueNextOperation(
         pNumber: String,
         sessionId: String?,
@@ -237,7 +239,7 @@ class APIHelper(private val ctx: Context) {
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
 
-        VolleyCompatibility.processVolleyRequestWithOkHttp(
+        handleRequest(
             req,
             Response.Listener { response -> callback.onCompleted(null, response, true) })
     }
@@ -294,7 +296,7 @@ class APIHelper(private val ctx: Context) {
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
 
-        VolleyCompatibility.processVolleyRequestWithOkHttp(
+        handleRequest(
             req,
             Response.Listener { response -> callback.onCompleted(null, response, true) })
     }
@@ -336,9 +338,37 @@ class APIHelper(private val ctx: Context) {
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
 
-        VolleyCompatibility.processVolleyRequestWithOkHttp(
+        handleRequest(
             req,
             Response.Listener { response -> callback.onCompleted(null, response, true) })
+    }
+
+    private fun handleRequest(
+        req: StringRequest,
+        listener: Response.Listener<String>
+    ) {
+        val newHeaders = Headers.Builder()
+
+        req.headers.forEach { (name, value) -> newHeaders.add(name, value) }
+
+        val requestBody = if (req.body != null) {
+            RequestBody.create(null, req.body)
+        } else {
+            RequestBody.create(null, "{}")
+        }
+
+        scope.launch {
+            val (response, error) = safeRunIO {
+                if (req.method == Request.Method.POST) {
+                    client.bankOneService.operationPost(req.url, requestBody)
+                } else {
+                    client.bankOneService.operationGet(req.url)
+                }
+            }
+
+            if (error != null) req.errorListener.onErrorResponse(VolleyError(error))
+            else listener.onResponse(response)
+        }
     }
 
 

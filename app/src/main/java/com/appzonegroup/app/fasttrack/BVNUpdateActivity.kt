@@ -151,7 +151,7 @@ class BVNUpdateActivity : CustomerBaseActivity() {
                             response ?: return@launch activity.showInternalError()
 
                             if (response.isSuccessful) {
-                                activity.showSuccess<Unit>("BVN was updated successfully") {
+                                activity.dialogProvider.showSuccess<Unit>("BVN was updated successfully") {
                                     onClose {
                                         activity.finish()
                                     }

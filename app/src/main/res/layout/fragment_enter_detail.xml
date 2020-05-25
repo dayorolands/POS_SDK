@@ -1,48 +1,54 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
     tools:context=".fragment.online.EnterDetailFragment">
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:id="@+id/upperHint"
-        android:textColor="@color/blue"
-        android:textSize="24sp"
-        android:gravity="center" />
+        android:layout_gravity="center"
+        android:orientation="vertical">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tInput" >
-
-        <com.appzonegroup.app.fasttrack.ui.EditText
-            android:id="@+id/eText"
-            style="@style/defaultEditText"
+        <com.appzonegroup.app.fasttrack.ui.TextView
+            android:id="@+id/upperHint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColorHint="@android:color/transparent"
-            android:maxLines="1"
-            android:inputType="text" />
+            android:gravity="center"
+            android:padding="20dp"
+            android:textColor="@color/blue"
+            android:textSize="24sp" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <requestFocus/>
+            <com.appzonegroup.app.fasttrack.ui.EditText
+                android:id="@+id/eText"
+                style="@style/defaultEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textColorHint="@android:color/transparent" />
 
-    <com.appzonegroup.app.fasttrack.ui.CustomButton
-        android:id="@+id/btnActivate"
-        android:layout_width="match_parent"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_height="wrap_content"
-        style="@style/button_style"
-        android:text="@string/submit"
-        android:textStyle="bold" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <requestFocus />
+
+        <com.appzonegroup.app.fasttrack.ui.CustomButton
+            android:id="@+id/btnActivate"
+            style="@style/button_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:text="@string/submit"
+            android:textStyle="bold" />
 
 
-</LinearLayout>
+    </LinearLayout>
+
+</ScrollView>
