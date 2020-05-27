@@ -10,7 +10,6 @@ import com.appzonegroup.app.fasttrack.utility.Misc
 import com.creditclub.core.data.CreditClubClient
 import com.creditclub.core.data.Encryption
 import com.creditclub.core.data.api.BankOneService
-import com.creditclub.core.data.api.VolleyCompatibility
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
 import kotlinx.coroutines.CoroutineScope

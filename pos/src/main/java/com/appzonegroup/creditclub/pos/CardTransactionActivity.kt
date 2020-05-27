@@ -20,6 +20,7 @@ import com.appzonegroup.creditclub.pos.contract.Logger
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.data.create
 import com.appzonegroup.creditclub.pos.databinding.PageInputRrnBinding
+import com.appzonegroup.creditclub.pos.databinding.PageSelectAccountTypeBinding
 import com.appzonegroup.creditclub.pos.databinding.PageTransactionErrorBinding
 import com.appzonegroup.creditclub.pos.databinding.PageVerifyCashoutBinding
 import com.appzonegroup.creditclub.pos.extension.format
@@ -146,8 +147,12 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                         else -> {
                             cardReaderEvent = cardEvent
                             restartTimer()
-                            accountType = AccountType.Default
-                            onSelectAccountType()
+//                            accountType = AccountType.Default
+//                            onSelectAccountType()
+                            DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
+                                this@CardTransactionActivity,
+                                R.layout.page_select_account_type
+                            )
                         }
                     }
                 }
@@ -388,7 +393,8 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                             val posNotification = PosNotification.create(transaction)
                             db.posNotificationDao().save(posNotification)
 
-                            val url = "${backendConfig.apiHost}/CreditClubMiddlewareAPI/CreditClubStatic/POSCashOutNotification"
+                            val url =
+                                "${backendConfig.apiHost}/CreditClubMiddlewareAPI/CreditClubStatic/POSCashOutNotification"
 
                             val dataToSend = Gson().toJson(posNotification)
                             log("PosNotification request: $dataToSend")

@@ -2,7 +2,6 @@ package com.appzonegroup.app.fasttrack
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -21,8 +20,6 @@ import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.model.TokenRequest
 import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
-import com.appzonegroup.app.fasttrack.utility.LogOutTimerUtil
-import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.task.AsyncResponse
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask
 import com.appzonegroup.creditclub.pos.printer.PosPrinter
@@ -37,21 +34,10 @@ import org.json.JSONObject
  */
 
 @SuppressLint("Registered")
-open class BaseActivity : CreditClubActivity(), AsyncResponse, LogOutTimerUtil.LogOutListener {
+open class BaseActivity : CreditClubActivity(), AsyncResponse {
 
     val printer by lazy { PosPrinter(this, dialogProvider) }
     override val hasLogoutTimer get() = true
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        if (hasLogoutTimer) LogOutTimerUtil.startLogoutTimer(this, this)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (hasLogoutTimer) LogOutTimerUtil.startLogoutTimer(this, this)
-    }
 
     open fun showNotification(message: String) {
         //Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
@@ -230,17 +216,11 @@ open class BaseActivity : CreditClubActivity(), AsyncResponse, LogOutTimerUtil.L
         alertBuilder.show()
     }
 
-    override fun onUserInteraction() {
-        super.onUserInteraction()
-        LogOutTimerUtil.startLogoutTimer(this, this)
-        Log.e("TIMER", "User interacting with screen")
-    }
-
-    override fun doLogout() {
-        logout {
-            putExtra("SESSION_TIMEOUT", true)
-        }
-    }
+//    fun handleTimeout() {
+//        logout {
+//            putExtra("SESSION_TIMEOUT", true)
+//        }
+//    }
 
     fun <T> catchError(block: () -> T): T? {
         try {
