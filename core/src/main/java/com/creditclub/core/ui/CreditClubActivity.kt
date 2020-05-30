@@ -1,8 +1,12 @@
 package com.creditclub.core.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.creditclub.core.AppFunctions
 import com.creditclub.core.R
 import com.creditclub.core.config.IInstitutionConfig
@@ -15,6 +19,8 @@ import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.getMessage
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.logFunctionUsage
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.CoroutineScope
@@ -45,6 +51,10 @@ abstract class CreditClubActivity : AppCompatActivity() {
     open val mainScope by lazy { CoroutineScope(Dispatchers.Main) }
     open val ioScope by lazy { CoroutineScope(Dispatchers.IO) }
 
+    val fusedLocationClient: FusedLocationProviderClient by lazy {
+        LocationServices.getFusedLocationProviderClient(this)
+    }
+
     protected lateinit var firebaseAnalytics: FirebaseAnalytics
         private set
 
@@ -74,8 +84,32 @@ abstract class CreditClubActivity : AppCompatActivity() {
         localStorage.agent?.let { agent ->
             firebaseAnalytics.setUserId(agent.agentCode)
             firebaseAnalytics.setUserProperty("agent_name", agent.agentName)
+            firebaseAnalytics.setUserProperty("agent_code", agent.agentCode)
             firebaseAnalytics.setUserProperty("agent_phone", agent.phoneNumber)
             firebaseAnalytics.setUserProperty("terminal_id", agent.terminalID)
+        }
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+            if (location != null) {
+                localStorage.lastKnownLocation = "${location.latitude};${location.longitude}"
+            }
         }
     }
 

@@ -100,6 +100,7 @@ dependencies {
     api "com.google.firebase:firebase-analytics:${versions.firebase}"
     api 'com.google.firebase:firebase-perf:19.0.5'
     api "androidx.work:work-runtime-ktx:${versions.work}"
+    api "com.google.android.gms:play-services-location:17.0.0"
 }
 
 repositories {

@@ -386,7 +386,7 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
         return generateLog().apply {
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
-            gpsCoordinates = gps.geolocationString
+            gpsCoordinates = gps.geolocationString ?: "0.00;0.00"
         }
     }
 

@@ -26,6 +26,7 @@ class LocalStorage private constructor(
     var agentPIN: String? by valueStore(AGENT_PIN)
     var agentInfo: String? by valueStore(AGENT_INFO)
     var sessionID: String? by valueStore(SESSION_ID)
+    var lastKnownLocation: String? by valueStore("LAST_KNOWN_LOCATION")
     val agentIsActivated: Boolean
         get() = getString("ACTIVATED") != null
 

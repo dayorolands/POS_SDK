@@ -518,13 +518,7 @@ public class OpenAccountActivity extends AppCompatActivity {
             return;
         }
 */
-        Double templongitude = gps.getLongitude();
-        longitude = templongitude.toString();
-
-        Double templatitude = gps.getLatitude();
-        latitude = templatitude.toString();
-
-        String Coordinate = latitude + ";" + longitude;
+        String Coordinate = gps.getGeolocationString();
 
 
         tempaccount = new Account();

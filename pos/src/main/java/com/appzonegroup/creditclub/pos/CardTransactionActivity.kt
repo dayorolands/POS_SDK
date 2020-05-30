@@ -149,10 +149,17 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                             restartTimer()
 //                            accountType = AccountType.Default
 //                            onSelectAccountType()
-                            DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
+                            val binding = DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
                                 this@CardTransactionActivity,
                                 R.layout.page_select_account_type
                             )
+
+                            listOf(
+                                binding.creditRadioButton,
+                                binding.currentRadioButton,
+                                binding.defaultRadioButton,
+                                binding.savingsRadioButton
+                            ).forEach { it.root.setOnClickListener(this@CardTransactionActivity) }
                         }
                     }
                 }

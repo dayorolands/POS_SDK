@@ -171,7 +171,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
             return
         }
 
-        val location = String.format("%s;%s", gps.longitude.toString(), gps.latitude.toString())
+        val location = gps.geolocationString
 
         formData.customerLastName = surname_et.text.toString().trim { it <= ' ' }
         formData.customerFirstName = first_name_et.text.toString().trim { it <= ' ' }

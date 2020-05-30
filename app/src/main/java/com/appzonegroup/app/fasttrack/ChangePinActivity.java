@@ -68,7 +68,7 @@ public class ChangePinActivity extends BaseActivity {
 
     public void change_pin_button_click(View view) {
 
-        String location = String.format("%s;%s", String.valueOf(gps.getLongitude()), String.valueOf(gps.getLatitude()));
+        String location = gps.getGeolocationString();
 
         oldPin = oldPinET.getText().toString().trim();
 

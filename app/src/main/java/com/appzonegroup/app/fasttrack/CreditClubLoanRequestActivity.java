@@ -408,7 +408,7 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
         loanRequest.setMemberID(loanRequest_memberID_et.getText().toString());
         loanRequest.setAgentPhoneNumber(LocalStorage.getPhoneNumber(getBaseContext()));
         //loanRequest.setAssociationID(associationDAO.Get(selectedAssociationID).getId());
-        loanRequest.setGeoLocation(String.format(Locale.getDefault(), "%s:%s", String.valueOf(getGps().getLatitude()), String.valueOf(getGps().getLongitude())));
+        loanRequest.setGeoLocation(getGps().getGeolocationString());
         loanRequest.setAgentPin(agentPIN_et.getText().toString().trim());
 
         String data = new Gson().toJson(loanRequest);

@@ -181,7 +181,6 @@
             android:name=".AgentActivationActivity"
             android:label="@string/agentSetup" />
 
-        <service android:name=".utility.TrackGPS" />
         <service android:name=".LocationChangedService" />
 
         <activity

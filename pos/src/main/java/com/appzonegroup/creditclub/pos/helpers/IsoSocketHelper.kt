@@ -63,7 +63,7 @@ class IsoSocketHelper(
         val isoRequestLog = request.generateLog().apply {
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
-            gpsCoordinates = gps.geolocationString
+            gpsCoordinates = gps.geolocationString ?: "0.00;0.00"
         }
 
         val (response, error) = safeRun {
