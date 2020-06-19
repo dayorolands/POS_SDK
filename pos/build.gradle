@@ -47,6 +47,7 @@ android {
 dependencies {
     implementation project(path: ':core')
     implementation project(path: ':uicentral')
+    implementation project(path: ':sunmi')
     implementation fileTree(dir: 'jniLibs', include: ['*.so'])
 
     api files('libs/emv.jar')
@@ -54,11 +55,11 @@ dependencies {
     api files('libs/jpos-1.9.0.jar')
     api files('libs/SmartCardLib.jar')
     api files('libs/telpo_api.jar')
-    api files('libs/PayLib-release-1.4.17.aar')
+//    api files('libs/PayLib-release-1.4.17.aar')
     api files('libs/iBridge.jar')
     api files('libs/jhlblueconn.jar')
-    api files('libs/android-async-http-1.4.7.jar')
 
+    implementation 'com.loopj.android:android-async-http:1.4.10'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
