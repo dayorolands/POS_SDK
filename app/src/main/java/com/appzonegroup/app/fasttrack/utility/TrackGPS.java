@@ -1,23 +1,25 @@
 package com.appzonegroup.app.fasttrack.utility;
 
-import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.provider.Settings;
-import androidx.core.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-public class TrackGPS extends Service implements LocationListener {
+import com.creditclub.core.data.prefs.LocalStorage;
+import com.creditclub.core.util.ContextExtensionsKt;
+
+import java.util.Locale;
+
+import static android.content.Context.LOCATION_SERVICE;
+
+public class TrackGPS implements LocationListener {
 
     private final Context mContext;
 
@@ -30,16 +32,8 @@ public class TrackGPS extends Service implements LocationListener {
 
     LocationManager locationManager;
 
-
-    public TrackGPS(){
-        mContext = getApplicationContext();
-        getLocation();
-
-    }
-
-
     public TrackGPS(Context mContext) {
-        this.mContext = mContext;
+        this.mContext = mContext.getApplicationContext();
         getLocation();
     }
 
@@ -64,7 +58,7 @@ public class TrackGPS extends Service implements LocationListener {
                 this.canGetLocation = true;
                 // First get location from Network Provider
                 if (checkNetwork) {
-                   // Toast.makeText(mContext, "Network", Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(mContext, "Network", Toast.LENGTH_SHORT).show();
 
                     try {
                         locationManager.requestLocationUpdates(
@@ -103,6 +97,9 @@ public class TrackGPS extends Service implements LocationListener {
                             if (loc != null) {
                                 latitude = loc.getLatitude();
                                 longitude = loc.getLongitude();
+
+                                LocalStorage localStorage = ContextExtensionsKt.getLocalStorage(mContext);
+                                localStorage.setLastKnownLocation(String.format(Locale.getDefault(), "%.2f;%.2f", latitude, longitude));
                             }
                         }
                     } catch (SecurityException e) {
@@ -130,6 +127,13 @@ public class TrackGPS extends Service implements LocationListener {
             latitude = loc.getLatitude();
         }
         return latitude;
+    }
+
+    public String getGeolocationString() {
+        if (loc != null) {
+            return String.format(Locale.getDefault(), "%.2f;%.2f", latitude, longitude);
+        }
+        return ContextExtensionsKt.getLocalStorage(mContext).getLastKnownLocation();
     }
 
     public boolean canGetLocation() {
@@ -161,32 +165,6 @@ public class TrackGPS extends Service implements LocationListener {
 
 
         alertDialog.show();
-    }
-
-
-    public void stopUsingGPS() {
-        if (locationManager != null) {
-
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            locationManager.removeUpdates(TrackGPS.this);
-        }
-    }
-
-
-
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
     }
 
     @Override

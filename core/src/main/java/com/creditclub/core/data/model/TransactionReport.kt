@@ -37,7 +37,7 @@ class TransactionReport {
         var productCode: String? = null
 
         @SerialName("Amount")
-        var amount: Double = 0.toDouble()
+        var amount: Double? = null
 
         @SerialName("Date")
         var date: String? = null

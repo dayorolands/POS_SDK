@@ -16,14 +16,13 @@ import androidx.databinding.ViewDataBinding
 import com.appzonegroup.creditclub.pos.card.*
 import com.appzonegroup.creditclub.pos.contract.Logger
 import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.data.create
 import com.appzonegroup.creditclub.pos.databinding.PageInputRrnBinding
+import com.appzonegroup.creditclub.pos.databinding.PageSelectAccountTypeBinding
 import com.appzonegroup.creditclub.pos.databinding.PageTransactionErrorBinding
 import com.appzonegroup.creditclub.pos.databinding.PageVerifyCashoutBinding
 import com.appzonegroup.creditclub.pos.extension.format
-import com.appzonegroup.creditclub.pos.models.FinancialTransaction
-import com.appzonegroup.creditclub.pos.models.NotificationResponse
-import com.appzonegroup.creditclub.pos.models.PosNotification
-import com.appzonegroup.creditclub.pos.models.Reversal
+import com.appzonegroup.creditclub.pos.models.*
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
@@ -32,6 +31,7 @@ import com.appzonegroup.creditclub.pos.service.ApiService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.appzonegroup.creditclub.pos.util.PosType
 import com.creditclub.core.util.indicateError
+import com.creditclub.core.util.localStorage
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.page_input_amount.*
 import kotlinx.android.synthetic.main.page_input_rrn.*
@@ -126,8 +126,19 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                         else -> {
                             cardReaderEvent = cardEvent
                             restartTimer()
-                            accountType = AccountType.Default
-                            onSelectAccountType()
+//                            accountType = AccountType.Default
+//                            onSelectAccountType()
+                            val binding = DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
+                                this@CardTransactionActivity,
+                                R.layout.page_select_account_type
+                            )
+
+                            listOf(
+                                binding.creditRadioButton,
+                                binding.currentRadioButton,
+                                binding.defaultRadioButton,
+                                binding.savingsRadioButton
+                            ).forEach { it.root.setOnClickListener(this@CardTransactionActivity) }
                         }
                     }
                 }
@@ -217,6 +228,13 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
         try {
             stopTimer()
             posManager.sessionData.amount = amountText.toLong()
+
+            val cardLimit: Double = localStorage.agent?.cardLimit ?: 50000.0
+            if (cardLimit < posManager.sessionData.amount / 100) {
+                showError("The limit for this transaction is NGN${cardLimit}")
+                return
+            }
+
             val amountStr = format(amountText)
 
             posManager.cardReader.endWatch()
@@ -346,13 +364,21 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                     withContext(Dispatchers.IO) {
                         val db = PosDatabase.getInstance(this@CardTransactionActivity)
 
-                        db.financialTransactionDao().save(transaction)
+                        db.runInTransaction {
+                            db.financialTransactionDao().save(transaction)
+                            db.posTransactionDao().save(PosTransaction.create(response).apply {
+                                bankName = getString(R.string.pos_acquirer)
+                                cardHolder = cardData.holder
+                                cardType = cardData.type
+                            })
+                        }
 
                         if (response.isSuccessful) {
                             val posNotification = PosNotification.create(transaction)
                             db.posNotificationDao().save(posNotification)
 
-                            val url = "${ApiService.BASE_URL}/POSCashOutNotification"
+                            val url =
+                                "${backendConfig.apiHost}/CreditClubMiddlewareAPI/CreditClubStatic/POSCashOutNotification"
 
                             val dataToSend = Gson().toJson(posNotification)
                             log("PosNotification request: $dataToSend")
@@ -360,7 +386,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                             val headers = Headers.Builder()
                             headers.add(
                                 "Authorization",
-                                "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}"
+                                "iRestrict ${backendConfig.posNotificationToken}"
                             )
                             headers.add("TerminalID", config.terminalId)
 
@@ -474,7 +500,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
         }
 
         amountText = "$amountText$num".toLong().toString()
-        amountTv.text = format(amountText)
+        amountTv.text = format(amountText).replace("NGN", "")
     }
 
     fun onSelectPresetNumber(view: View?) {
@@ -486,7 +512,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
             else -> ""
         }
 
-        amountTv.text = format(amountText)
+        amountTv.text = format(amountText).replace("NGN", "")
     }
 
     fun onBackspacePressed(view: View?) {
@@ -495,7 +521,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
 //        amountText = amountText.substring(0, amountText.length - 1)
 //        if (amountText.isEmpty())
         amountText = "0"
-        amountTv.text = format(amountText)
+        amountTv.text = format(amountText).replace("NGN", "")
     }
 
     fun format(text: String): String = CurrencyFormatter.format(text)
@@ -522,7 +548,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
 
         title = "Amount"
         amountText = "0"
-        amountTv.text = format(amountText)
+        amountTv.text = format(amountText).replace("NGN", "")
     }
 
 

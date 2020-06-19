@@ -11,6 +11,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
 import com.appzonegroup.app.fasttrack.utility.Dialogs
@@ -97,6 +98,8 @@ class FundsTransferActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fundstransfer)
+
+        findViewById<TextView>(R.id.same_bank_tv).text = institutionConfig.name
 
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             // Call your Alert message

@@ -1,17 +1,19 @@
 package com.appzonegroup.creditclub.pos
 
 import android.app.Application
-import android.content.Intent
+import androidx.work.*
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
-import com.appzonegroup.creditclub.pos.service.SyncService
-import com.creditclub.core.util.isMyServiceRunning
+import com.appzonegroup.creditclub.pos.work.IsoRequestLogWorker
+import com.appzonegroup.creditclub.pos.work.ReversalWorker
+import com.appzonegroup.creditclub.pos.work.TransactionLogWorker
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -20,10 +22,38 @@ import org.koin.dsl.module
  */
 
 fun Application.startPosApp() {
+    val workManager = WorkManager.getInstance(this)
 
-    if (!isMyServiceRunning(SyncService::class.java)) {
-        startService(Intent(this, SyncService::class.java))
-    }
+    val constraints = Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED)
+        .build()
+
+    val transactionLogRequest =
+        PeriodicWorkRequestBuilder<TransactionLogWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+
+    workManager.enqueueUniquePeriodicWork(
+        "TRANSACTION_LOG",
+        ExistingPeriodicWorkPolicy.REPLACE,
+        transactionLogRequest
+    )
+
+    workManager.enqueueUniquePeriodicWork(
+        "ISO_REQUEST_LOG",
+        ExistingPeriodicWorkPolicy.REPLACE,
+        PeriodicWorkRequestBuilder<IsoRequestLogWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+    )
+
+    workManager.enqueueUniquePeriodicWork(
+        "REVERSAL",
+        ExistingPeriodicWorkPolicy.REPLACE,
+        PeriodicWorkRequestBuilder<ReversalWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+    )
 
     if (get<ConfigService>().terminalId.isNotEmpty()) {
         get<ParameterService>().downloadKeysAsync()

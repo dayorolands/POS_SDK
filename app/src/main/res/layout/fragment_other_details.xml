@@ -18,8 +18,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/product"/>
 
-            <EditText
-                android:layout_width="match_parent"
+            <com.creditclub.ui.widget.EditText                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/productsET"
                 android:inputType="number"
@@ -31,8 +30,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/referralname"/>
 
-            <EditText
-                android:id="@+id/otherInfo_referralname_et"
+            <com.creditclub.ui.widget.EditText                android:id="@+id/otherInfo_referralname_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/referalname_hint"
@@ -44,8 +42,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/referralnumber"/>
 
-            <EditText
-                android:id="@+id/otherInfo_referrralnumber_et"
+            <com.creditclub.ui.widget.EditText                android:id="@+id/otherInfo_referrralnumber_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/referralnumber_hint"
@@ -58,8 +55,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/officersCode"/>
 
-            <EditText
-                android:id="@+id/otherInfo_officerscode_et"
+            <com.creditclub.ui.widget.EditText                android:id="@+id/otherInfo_officerscode_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/agentCode_hint"
@@ -72,8 +68,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/nationalidentityno"/>
 
-            <EditText
-                android:id="@+id/otherInfo_nationalidentitynumber_et"
+            <com.creditclub.ui.widget.EditText                android:id="@+id/otherInfo_nationalidentitynumber_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/nationalIdentity_hint"
@@ -85,8 +80,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/customersBVN"/>
 
-            <EditText
-             android:id="@+id/otherInfo_customerBVN_et"
+            <com.creditclub.ui.widget.EditText             android:id="@+id/otherInfo_customerBVN_et"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:hint="@string/customersBVNHint"

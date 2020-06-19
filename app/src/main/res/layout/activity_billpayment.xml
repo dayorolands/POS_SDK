@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:text="Customer Name" />
 
-            <EditText
+            <com.creditclub.ui.widget.EditText
                 android:id="@+id/name_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:text="Customer Phone" />
 
-            <EditText
+            <com.creditclub.ui.widget.EditText
                 android:id="@+id/phone_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:text="Amount" />
 
-            <EditText
+            <com.creditclub.ui.widget.EditText
                 android:id="@+id/billpayment_amount_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:text="Field One" />
 
-            <EditText
+            <com.creditclub.ui.widget.EditText
                 android:id="@+id/billpayment_fieldone_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:text="Field Two" />
 
-            <EditText
+            <com.creditclub.ui.widget.EditText
                 android:id="@+id/billpayment_fieldtwo_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:text="Customer Email (optional)" />
 
-            <EditText
+            <com.creditclub.ui.widget.EditText
                 android:id="@+id/customer_email_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

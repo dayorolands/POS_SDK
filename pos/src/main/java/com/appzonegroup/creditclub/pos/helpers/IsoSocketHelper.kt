@@ -41,7 +41,7 @@ class IsoSocketHelper(
     @Throws(ISOException::class, IOException::class, ConnectException::class)
     inline fun sendAsync(isoMsg: BaseIsoMsg, crossinline next: (Result) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
-            val result = withContext(Dispatchers.Default) {
+            val result = withContext(Dispatchers.IO) {
                 send(isoMsg)
             }
             next(result)
@@ -63,7 +63,7 @@ class IsoSocketHelper(
         val isoRequestLog = request.generateLog().apply {
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
-            gpsCoordinates = gps.geolocationString
+            gpsCoordinates = gps.geolocationString ?: "0.00;0.00"
         }
 
         val (response, error) = safeRun {

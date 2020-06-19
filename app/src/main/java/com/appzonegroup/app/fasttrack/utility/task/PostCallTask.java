@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.os.AsyncTask;
 
 import com.appzonegroup.app.fasttrack.network.APICaller;
+import com.creditclub.core.ui.widget.DialogProvider;
 
 
 /**
@@ -14,12 +15,12 @@ import com.appzonegroup.app.fasttrack.network.APICaller;
 public class PostCallTask extends AsyncTask<String, Void, String>
 {
 
-    Dialog loadingDialog;
+    DialogProvider dialogProvider;
     public AsyncResponse delegate = null;
     private Activity activity;
-    public PostCallTask(Dialog loadingDialog, Activity activity, AsyncResponse asyncResponse)
+    public PostCallTask(DialogProvider dialogProvider, Activity activity, AsyncResponse asyncResponse)
     {
-        this.loadingDialog = loadingDialog;
+        this.dialogProvider = dialogProvider;
         this.activity = activity;
         delegate = asyncResponse;
     }
@@ -33,8 +34,8 @@ public class PostCallTask extends AsyncTask<String, Void, String>
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        if (loadingDialog != null)
-            loadingDialog.show();
+        if (dialogProvider != null)
+            dialogProvider.showProgressBar("Loading");
     }
 
     /**
@@ -46,15 +47,13 @@ public class PostCallTask extends AsyncTask<String, Void, String>
      * @param s The result of the operation computed by {@link #doInBackground}.
      * @see #onPreExecute
      * @see #doInBackground
-     * @see #onCancelled(Object)
      */
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
 
-        if (loadingDialog != null) {
-            if (loadingDialog.isShowing())
-                loadingDialog.dismiss();
+        if (dialogProvider != null) {
+            dialogProvider.hideProgressBar();
         }
 
         delegate.processFinished(s);

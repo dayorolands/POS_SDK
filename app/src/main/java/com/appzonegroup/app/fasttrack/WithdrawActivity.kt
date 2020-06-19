@@ -142,7 +142,7 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
         formData.institutionCode = localStorage.institutionCode
         formData.token = token
 
-        requestPIN("Enter agent PIN") {
+        dialogProvider.requestPIN("Enter agent PIN") {
             onSubmit { pin ->
                 formData.agentPin = pin
                 withdraw()

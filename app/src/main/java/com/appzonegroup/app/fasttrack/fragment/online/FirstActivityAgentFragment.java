@@ -1,6 +1,6 @@
 package com.appzonegroup.app.fasttrack.fragment.online;
 
-import android.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,19 +33,16 @@ import org.json.JSONObject;
 
 import java.util.concurrent.TimeoutException;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-
 /**
  * A placeholder fragment containing a simple view.
  */
 public class FirstActivityAgentFragment extends Fragment implements View.OnClickListener {
 
-    @Nullable @Bind(R.id.ePhone)
+    @Nullable
     EditText ePhone;
-    @Nullable @Bind(R.id.eVerificationCode)
+    @Nullable
     EditText eVerificationCode;
-    @Nullable @Bind(R.id.btnActivate)
+    @Nullable
     Button btnActivate;
 
     AlertDialog.Builder dialog;
@@ -61,7 +58,9 @@ public class FirstActivityAgentFragment extends Fragment implements View.OnClick
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_first, container, false);
         OnlineActivity.isHome = false;
-        ButterKnife.bind(this, view);
+        ePhone=view.findViewById(R.id.ePhone);
+        eVerificationCode=view.findViewById(R.id.eVerificationCode);
+        btnActivate=view.findViewById(R.id.btnActivate);
         return view;
     }
 
@@ -133,12 +132,12 @@ public class FirstActivityAgentFragment extends Fragment implements View.OnClick
                                         getActivity().startService(new Intent(getActivity(), LocationChangedService.class));
                                         if (resp.contains("MenuItem")) {
                                             JSONObject menuWrapper = response_base.getJSONObject("Menu").getJSONObject("Response").getJSONObject("Display");
-                                            getFragmentManager().beginTransaction().replace(R.id.container, ListOptionsFragment.instantiate(menuWrapper, false)).commit();
+                                            requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, ListOptionsFragment.instantiate(menuWrapper, false)).commit();
                                         } else {
                                             Object menuWrapper = response_base.getJSONObject("Menu").getJSONObject("Response").get("Display");
                                             if (menuWrapper instanceof String && resp.contains("ShouldMask") && !resp.contains("Invalid Response")) {
                                                 JSONObject data = response_base.getJSONObject("Menu").getJSONObject("Response");
-                                                getFragmentManager().beginTransaction().replace(R.id.container, EnterDetailFragment.instantiate(data, true)).commit();
+                                                requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, EnterDetailFragment.instantiate(data, true)).commit();
                                             } else {
                                                 String message = response_base.getJSONObject("Menu").getJSONObject("Response").getString("Display");
                                                 dialog.setMessage(Html.fromHtml(message)).show();
@@ -188,12 +187,12 @@ public class FirstActivityAgentFragment extends Fragment implements View.OnClick
                                                                             getActivity().startService(new Intent(getActivity(), LocationChangedService.class));
                                                                             if (resp.contains("MenuItem")) {
                                                                                 JSONObject menuWrapper = response_base.getJSONObject("Menu").getJSONObject("Response").getJSONObject("Display");
-                                                                                getFragmentManager().beginTransaction().replace(R.id.container, ListOptionsFragment.instantiate(menuWrapper, false)).commit();
+                                                                                requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, ListOptionsFragment.instantiate(menuWrapper, false)).commit();
                                                                             } else {
                                                                                 Object menuWrapper = response_base.getJSONObject("Menu").getJSONObject("Response").get("Display");
                                                                                 if (menuWrapper instanceof String && resp.contains("ShouldMask") && !resp.contains("Invalid Response")) {
                                                                                     JSONObject data = response_base.getJSONObject("Menu").getJSONObject("Response");
-                                                                                    getFragmentManager().beginTransaction().replace(R.id.container, EnterDetailFragment.instantiate(data, true)).commit();
+                                                                                    requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, EnterDetailFragment.instantiate(data, true)).commit();
                                                                                 } else {
                                                                                     String message = response_base.getJSONObject("Menu").getJSONObject("Response").getString("Display");
                                                                                     dialog.setMessage(Html.fromHtml(message)).show();

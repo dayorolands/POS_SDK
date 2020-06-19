@@ -19,7 +19,7 @@ import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import rx.Observable
@@ -93,7 +93,7 @@ class BillsCategoryActivity : BaseActivity(), View.OnClickListener {
                         Toast.LENGTH_LONG
                     ).show()
 
-                    Crashlytics.logException(Exception(e.message))
+                    FirebaseCrashlytics.getInstance().recordException(Exception(e.message))
                 }
 
                 override fun onNext(result: String) {
@@ -132,7 +132,10 @@ class BillsCategoryActivity : BaseActivity(), View.OnClickListener {
                                     this@BillsCategoryActivity,
                                     BillerActivity::class.java
                                 ).apply {
-                                    putExtra("categoryId", billCategory.id ?: billCategory.billerCategoryId)
+                                    putExtra(
+                                        "categoryId",
+                                        billCategory.id ?: billCategory.billerCategoryId
+                                    )
                                     LocalStorage.SaveValue(
                                         AppConstants.CATEGORYID,
                                         billCategory.id ?: billCategory.billerCategoryId,
@@ -189,7 +192,7 @@ class BillsCategoryActivity : BaseActivity(), View.OnClickListener {
             } catch (e: Exception) {
                 Log.e("Register", e.message)
 
-                Crashlytics.logException(Exception(e.message))
+                FirebaseCrashlytics.getInstance().recordException(Exception(e.message))
             }
 
             Observable.just(result)

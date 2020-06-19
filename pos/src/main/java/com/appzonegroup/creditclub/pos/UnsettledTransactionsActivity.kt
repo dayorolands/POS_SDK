@@ -31,19 +31,19 @@ class UnsettledTransactionsActivity : PosActivity(), Logger {
     private val rAdapter by lazy {
         PosNotificationAdapter(emptyList()) {
             onSettle { posNotification ->
-                GlobalScope.launch(Dispatchers.Main) {
+                mainScope.launch {
                     dialogProvider.showProgressBar("Settling")
 
                     log("Running middleware notifications....")
 
-                    val url = "${ApiService.BASE_URL}/POSCashOutNotification"
+                    val url = "${backendConfig.apiHost}/CreditClubMiddlewareAPI/CreditClubStatic/POSCashOutNotification"
                     val serializer = Gson()
 
                     val dataToSend = serializer.toJson(posNotification)
                     log("PosNotification request: $dataToSend")
 
                     val headers = Headers.Builder()
-                    headers.add("Authorization", "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}")
+                    headers.add("Authorization", "iRestrict ${backendConfig.posNotificationToken}")
                     headers.add("TerminalID", config.terminalId)
 
                     val (responseString, error) = withContext(Dispatchers.IO) {

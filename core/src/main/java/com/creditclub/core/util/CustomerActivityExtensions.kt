@@ -198,7 +198,7 @@ fun CreditClubActivity.sendToken(
     sendTokenRequest.customerPhoneNumber = accountInfo.phoneNumber
     sendTokenRequest.customerAccountNumber = accountInfo.number
     sendTokenRequest.agentPhoneNumber = localStorage.agentPhone
-    sendTokenRequest.agentPin = localStorage.agentPIN
+    sendTokenRequest.agentPin = "0000"
     sendTokenRequest.institutionCode = localStorage.institutionCode
     sendTokenRequest.amount = amount
 
@@ -253,7 +253,7 @@ fun CreditClubActivity.requireAndValidateToken(
     sendTokenRequest.customerPhoneNumber = accountInfo.phoneNumber
     sendTokenRequest.customerAccountNumber = accountInfo.number
     sendTokenRequest.agentPhoneNumber = localStorage.agentPhone
-    sendTokenRequest.agentPin = localStorage.agentPIN
+    sendTokenRequest.agentPin = "0000"
     sendTokenRequest.institutionCode = localStorage.institutionCode
     sendTokenRequest.amount = amount
     sendTokenRequest.referenceNumber = "$reference"
@@ -288,7 +288,7 @@ fun CreditClubActivity.requireAndValidateToken(
                 confirmTokenRequest.customerPhoneNumber = accountInfo.phoneNumber
                 confirmTokenRequest.customerAccountNumber = accountInfo.number
                 confirmTokenRequest.agentPhoneNumber = localStorage.agentPhone
-                confirmTokenRequest.agentPin = localStorage.agentPIN
+                confirmTokenRequest.agentPin = "0000"
                 confirmTokenRequest.institutionCode = localStorage.institutionCode
                 confirmTokenRequest.referenceNumber = "$reference"
                 confirmTokenRequest.token = token
@@ -325,11 +325,6 @@ fun CreditClubActivity.requireAndValidateToken(
             }
         }
     }
-}
-
-
-internal fun CreditClubActivity.customerMiniStatementEnquiry(account: AccountInfo?) {
-    TODO()
 }
 
 fun CreditClubActivity.selectAccountNumber(

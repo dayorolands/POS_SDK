@@ -1,5 +1,6 @@
 package com.creditclub.core.config
 
 class AccountOpeningConfig {
-    val middleName = false
+    var middleName = false
+    var products = false
 }

@@ -131,27 +131,6 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
         }
     }
 
-    private fun notifyForUpdates() {
-        val intent = Intent(this, UpdateActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.notification_icon)
-            .setContentTitle("Update Available for POS")
-            .setContentText("A new version is available")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            // Set the intent that will fire when the user taps the notification
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-
-        with(NotificationManagerCompat.from(this)) {
-            notify(1, builder.build())
-        }
-    }
-
     private fun updateProgressNotification() {
         val builder = NotificationCompat.Builder(this, CHANNEL_ID).apply {
             setContentTitle("Picture Download")

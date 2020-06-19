@@ -1,0 +1,159 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "a2382a4e1c1920de05ff7a3484654851",
+    "entities": [
+      {
+        "tableName": "DeviceTransactionInformation",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `dateReceived` TEXT, `dateEnded` TEXT, `sessionID` TEXT, `institutionCode` TEXT, `agentPhoneNumber` TEXT, `requestCount` INTEGER NOT NULL, `successCount` INTEGER NOT NULL, `noInternet` INTEGER NOT NULL, `noResponse` INTEGER NOT NULL, `errorResponse` INTEGER NOT NULL, `ramSize` TEXT, `percentageLeftOver` REAL NOT NULL, `memorySpace` TEXT, `memorySpaceLeft` TEXT, `appName` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateReceived",
+            "columnName": "dateReceived",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dateEnded",
+            "columnName": "dateEnded",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sessionID",
+            "columnName": "sessionID",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "institutionCode",
+            "columnName": "institutionCode",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "agentPhoneNumber",
+            "columnName": "agentPhoneNumber",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "requestCount",
+            "columnName": "requestCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "successCount",
+            "columnName": "successCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noInternet",
+            "columnName": "noInternet",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "noResponse",
+            "columnName": "noResponse",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "errorResponse",
+            "columnName": "errorResponse",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ramSize",
+            "columnName": "ramSize",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "percentageLeftOver",
+            "columnName": "percentageLeftOver",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "memorySpace",
+            "columnName": "memorySpace",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "memorySpaceLeft",
+            "columnName": "memorySpaceLeft",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "appName",
+            "columnName": "appName",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_DeviceTransactionInformation_sessionID",
+            "unique": false,
+            "columnNames": [
+              "sessionID"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DeviceTransactionInformation_sessionID` ON `${TABLE_NAME}` (`sessionID`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "app_function_usage",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`usage` INTEGER NOT NULL, `fid` INTEGER NOT NULL, PRIMARY KEY(`fid`))",
+        "fields": [
+          {
+            "fieldPath": "usage",
+            "columnName": "usage",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fid",
+            "columnName": "fid",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "fid"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a2382a4e1c1920de05ff7a3484654851')"
+    ]
+  }
+}

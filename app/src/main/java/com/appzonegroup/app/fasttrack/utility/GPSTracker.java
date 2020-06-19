@@ -100,34 +100,6 @@ public class GPSTracker implements LocationListener {
         return location;
     }
 
-    public void stopUsingGPS() {
-        try {
-            if (locationManager != null) {
-                locationManager.removeUpdates(GPSTracker.this);
-            }
-        }catch (SecurityException ex){}
-    }
-
-    public double getLatitude() {
-        if (location != null) {
-            latitude = location.getLatitude();
-        }
-
-        return latitude;
-    }
-
-    public double getLongitude() {
-        if (location != null) {
-            longitude = location.getLongitude();
-        }
-
-        return longitude;
-    }
-
-    public boolean canGetLocation() {
-        return this.canGetLocation;
-    }
-
     @Override
     public void onLocationChanged(Location arg0) {
         // TODO Auto-generated method stub

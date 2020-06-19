@@ -15,8 +15,7 @@
         android:layout_gravity="left"
         android:text="@string/phoneNumber_hint"/>
 
-    <EditText
-        android:id="@+id/ePhone"
+    <com.creditclub.ui.widget.EditText        android:id="@+id/ePhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColorHint="@android:color/black"
@@ -42,8 +41,7 @@
         android:layout_gravity="left"
         android:text="@string/verification_code_hint"/>
 
-    <EditText
-        android:layout_marginTop="@dimen/five_dp"
+    <com.creditclub.ui.widget.EditText        android:layout_marginTop="@dimen/five_dp"
         android:id="@+id/eVerificationCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

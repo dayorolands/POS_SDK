@@ -11,6 +11,8 @@ import android.os.Looper
 import android.widget.Toast
 import com.appzonegroup.creditclub.pos.R
 import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.getConfirmation
+import com.creditclub.core.util.showErrorAndWait
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
@@ -119,7 +121,28 @@ class PosPrinter(private val context: Context, private val dialogProvider: Dialo
         }
     }
 
-    fun print(printJob: PrintJob): PrinterStatus = print(printJob.nodes)
+    suspend fun print(
+        printJob: PrintJob,
+        message: String = "Printing...",
+        retryOnFail: Boolean = true
+    ): PrinterStatus {
+        dialogProvider.showProgressBar(message)
+        val status = withContext(Dispatchers.Default) {
+            Looper.myLooper() ?: Looper.prepare()
+            print(printJob.nodes)
+        }
+        dialogProvider.hideProgressBar()
+        if (status == PrinterStatus.READY) return status
+        if (!retryOnFail) {
+            dialogProvider.showErrorAndWait(status.message)
+            return status
+        }
+
+        val tryAgain = dialogProvider.getConfirmation(status.message, "Try again?")
+
+        return if (tryAgain) print(printJob, message, false)
+        else status
+    }
 
     fun print(nodes: List<PrintNode>): PrinterStatus {
         for (node in nodes) {

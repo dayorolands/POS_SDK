@@ -37,4 +37,7 @@ class PinChangeRequest {
 
     @SerialName("CustomerToken")
     var customerToken: String? = null
+
+    @SerialName("DeviceID")
+    var deviceId: String? = null
 }

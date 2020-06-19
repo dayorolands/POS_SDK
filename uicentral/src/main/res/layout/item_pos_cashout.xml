@@ -10,7 +10,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_margin="8dp"
             android:paddingLeft="16dp"
             android:paddingTop="5dp"
             android:paddingRight="16dp"
@@ -49,26 +48,31 @@
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/phone_no_tv"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:maxLines="1"
-                    android:paddingTop="5dp"
-                    android:text="08065708630"
-                    android:textColor="@color/black2"
-                    android:textSize="14sp" />
+                    android:layout_marginTop="5dp"
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/amount_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:maxLines="1"
-                    android:text="N2,000"
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
+                    <TextView
+                        android:id="@+id/amount_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:text="NGN2,000"
+                        android:textColor="#000000"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/dateSettledTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="2"
+                        android:text="Settled at ..."
+                        android:textStyle="italic"
+                        android:textColor="#333"
+                        android:textSize="15sp" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/direction_container"
@@ -104,6 +108,6 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/ef_grey" />
+            android:background="#ddd" />
     </LinearLayout>
 </layout>

@@ -68,7 +68,7 @@ class BalanceEnquiryActivity : BaseActivity() {
                 val balanceOut = "NGN${response.balance}"
                 val availableOut = "${getString(R.string.naira)}${response.availableBalance}"
 
-                localStorage.agentPIN = pin
+//                localStorage.agentPIN = pin
 
                 agents_bal_btn.visibility = View.VISIBLE
                 available_balance_label.visibility = View.VISIBLE

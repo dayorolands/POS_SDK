@@ -38,16 +38,16 @@
                     app:layout_maxWidth="300dp"
                     app:layout_minWidth="80dp">
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content">-->
 
                         <include
                             android:id="@+id/default_radio_button"
                             layout="@layout/card_menu_button"
                             app:src='@{@drawable/ic_default}'
                             app:text='@{"Default"}' />
-                    </LinearLayout>
+<!--                    </LinearLayout>-->
 
                     <!--<LinearLayout-->
                         <!--android:layout_width="wrap_content"-->
@@ -60,27 +60,27 @@
                             app:text='@{"Savings"}' />
                     <!--</LinearLayout>-->
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content">-->
 
                         <include
                             android:id="@+id/current_radio_button"
                             layout="@layout/card_menu_button"
                             app:src='@{@drawable/ic_current}'
                             app:text='@{"Current"}' />
-                    </LinearLayout>
+<!--                    </LinearLayout>-->
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content">-->
 
                         <include
                             android:id="@+id/credit_radio_button"
                             layout="@layout/card_menu_button"
                             app:src='@{@drawable/ic_credit}'
                             app:text='@{"Credit"}' />
-                    </LinearLayout>
+<!--                    </LinearLayout>-->
                 </com.google.android.flexbox.FlexboxLayout>
             </LinearLayout>
         </RelativeLayout>

@@ -7,20 +7,19 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.view.GravityCompat
 import com.appzonegroup.app.fasttrack.databinding.ActivityCreditClubMainMenuBinding
-import com.appzonegroup.app.fasttrack.model.AgentInfo
 import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.AppFunctions
-import com.creditclub.core.util.appDataStorage
+import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
+import com.creditclub.ui.UpdateActivity
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.packageInfo
+import com.creditclub.core.util.safeRun
 import com.creditclub.core.util.safeRunIO
-import com.creditclub.ui.UpdateActivity
 import com.google.android.material.navigation.NavigationView
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
 class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -58,14 +57,14 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
 
         binding.navView.setNavigationItemSelectedListener(this)
 
-        val environment = if (BuildConfig.DEBUG) ". Staging" else ""
+        binding.versionTv.value = "v${packageInfo?.versionName}. Powered by CreditClub"
+        debugOnly {
+            binding.versionTv.value = "v${packageInfo?.versionName}. Staging. Powered by CreditClub"
+        }
 
-        binding.versionTv.value = "v${packageInfo?.versionName}$environment. Powered by CreditClub"
         binding.logoutButton.setOnClickListener { logout() }
 
-        localStorage.agentInfo?.run {
-            val info = Gson().fromJson(this, AgentInfo::class.java)
-
+        localStorage.agent?.let { info ->
             binding.navView.getHeaderView(0).run {
                 findViewById<TextView>(R.id.username_tv).text = info.agentName
                 findViewById<TextView>(R.id.phone_no_tv).text = info.phoneNumber
@@ -78,9 +77,15 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
             isVisible = institutionConfig.hasOnlineFunctions
         }
 
-        binding.navView.menu.findItem(R.id.fn_update)?.isVisible = Platform.isPOS
+        val hasPosUpdateManager = Platform.isPOS
 
-        if (Platform.isPOS) {
+        binding.navView.menu.findItem(R.id.fn_update)?.isVisible = hasPosUpdateManager
+
+        binding.navView.menu.findItem(R.id.fn_hla_tagging)?.run {
+            isVisible = institutionConfig.hasHlaTagging
+        }
+
+        if (hasPosUpdateManager) {
             appDataStorage.latestVersion?.run {
                 val currentVersion = packageInfo?.versionName
                 if (currentVersion != null) {

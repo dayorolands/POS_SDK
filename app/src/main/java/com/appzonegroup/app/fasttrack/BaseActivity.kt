@@ -2,7 +2,6 @@ package com.appzonegroup.app.fasttrack
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -21,14 +20,12 @@ import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.model.TokenRequest
 import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
-import com.appzonegroup.app.fasttrack.utility.LogOutTimerUtil
-import com.appzonegroup.app.fasttrack.utility.SyncService
-import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.task.AsyncResponse
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask
 import com.appzonegroup.creditclub.pos.printer.PosPrinter
 import com.appzonegroup.creditclub.pos.service.ConfigService
-import com.creditclub.core.util.isMyServiceRunning
+import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.google.gson.Gson
 import org.json.JSONObject
 
@@ -37,34 +34,19 @@ import org.json.JSONObject
  */
 
 @SuppressLint("Registered")
-open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUtil.LogOutListener {
+open class BaseActivity : CreditClubActivity(), AsyncResponse {
 
     val printer by lazy { PosPrinter(this, dialogProvider) }
-    override val hasLogoutTimer = true
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        if (hasLogoutTimer) LogOutTimerUtil.startLogoutTimer(this, this)
-
-        if (!isMyServiceRunning(SyncService::class.java)) {
-            startService(Intent(this, SyncService::class.java))
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (hasLogoutTimer) LogOutTimerUtil.startLogoutTimer(this, this)
-    }
+    override val hasLogoutTimer get() = true
 
     open fun showNotification(message: String) {
         //Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
-        if (progressDialog.isShowing) progressDialog.dismiss()
+        dialogProvider.hideProgressBar()
         Dialogs.getInformationDialog(this, message, false).show()
     }
 
     fun showNotification(message: String, shouldClose: Boolean) {
-        if (progressDialog.isShowing) progressDialog.dismiss()
+        dialogProvider.hideProgressBar()
         Dialogs.getInformationDialog(this, message, shouldClose).show()
     }
 
@@ -90,7 +72,7 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUt
         var sucessCallback = sucessCallback
         var errorCallback = errorCallback
         val queue = Volley.newRequestQueue(this)
-        showProgressBar("loading...")
+        dialogProvider.showProgressBar("loading...")
         var convertedObject: JSONObject? = null
         if (sucessCallback == null) {
             sucessCallback = defaultResponseListener(view)
@@ -119,14 +101,14 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUt
     }
 
     fun openPage(clazz: Class<*>) {
-        activity.startActivity(Intent(activity, clazz))
+        startActivity(Intent(this, clazz))
     }
 
     fun renderSuccess(s: String?) {
-        activity.setContentView(R.layout.layout_success)
-        activity.findViewById<TextView>(R.id.success_message_tv).text = s
-        activity.findViewById<View>(R.id.success_close_button)
-            .setOnClickListener { activity.finish() }
+        setContentView(R.layout.layout_success)
+        findViewById<TextView>(R.id.success_message_tv).text = s
+        findViewById<View>(R.id.success_close_button)
+            .setOnClickListener { finish() }
     }
 
     fun addValidPhoneNumberListener(editText: EditText) {
@@ -169,7 +151,7 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUt
         editText.setSelection(accumulator.length)
     }
 
-    fun defaultResponseListener(view: View?): Response.Listener<JSONObject> {
+    private fun defaultResponseListener(view: View?): Response.Listener<JSONObject> {
         return Response.Listener { `object` ->
             if (view != null) {
                 view.isEnabled = true
@@ -179,20 +161,20 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUt
             val response =
                 Gson().fromJson(result, com.appzonegroup.app.fasttrack.model.Response::class.java)
             if (response.isSuccessful) {
-                showSuccess(response.reponseMessage)
+                dialogProvider.showSuccess(response.reponseMessage)
             } else {
-                showError(response.reponseMessage)
+                dialogProvider.showError(response.reponseMessage)
             }
         }
     }
 
-    fun defaultErrorCallback(view: View?): Response.ErrorListener {
+    private fun defaultErrorCallback(view: View?): Response.ErrorListener {
         return Response.ErrorListener {
             if (view != null) {
                 view.isEnabled = true
                 view.isClickable = true
             }
-            showError("A network-related error just occurred. Please try again later")
+            dialogProvider.showError("A network-related error just occurred. Please try again later")
         }
     }
 
@@ -207,7 +189,7 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUt
         tkRequest.amount = amount
         tkRequest.isPinChange = isPinChange
 
-        PostCallTask(progressDialog, this, this)
+        PostCallTask(dialogProvider, this, this)
             .execute(
                 AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/SendToken",
                 Gson().toJson(tkRequest)
@@ -234,17 +216,11 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUt
         alertBuilder.show()
     }
 
-    override fun onUserInteraction() {
-        super.onUserInteraction()
-        LogOutTimerUtil.startLogoutTimer(this, this)
-        Log.e("TIMER", "User interacting with screen")
-    }
-
-    override fun doLogout() {
-        logout {
-            putExtra("SESSION_TIMEOUT", true)
-        }
-    }
+//    fun handleTimeout() {
+//        logout {
+//            putExtra("SESSION_TIMEOUT", true)
+//        }
+//    }
 
     fun <T> catchError(block: () -> T): T? {
         try {
@@ -257,20 +233,20 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUt
         return null
     }
 
-    fun confirmAdminPassword(
+    private fun confirmAdminPassword(
         password: String,
         closeOnFail: Boolean = false,
         next: (Boolean) -> Unit
     ) {
         val status = password == ConfigService.getInstance(this).adminPin
         if (!status) {
-            if (closeOnFail) return showError<Nothing>("Incorrect Password") {
+            if (closeOnFail) return dialogProvider.showError<Nothing>("Incorrect Password") {
                 onClose {
                     finish()
                 }
             }
 
-            showError("Incorrect Password")
+            dialogProvider.showError("Incorrect Password")
         }
         next(status)
     }
@@ -301,4 +277,23 @@ open class BaseActivity : DialogProviderActivity(), AsyncResponse, LogOutTimerUt
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    fun showError(message: String?) = dialogProvider.showError(message)
+    fun <T> showError(message: String?, block: DialogListenerBlock<T>) =
+        dialogProvider.showError(message, block)
+
+    fun showSuccess(message: String?) = dialogProvider.showSuccess(message)
+    fun <T> showSuccess(message: String?, block: DialogListenerBlock<T>) =
+        dialogProvider.showSuccess(message, block)
+
+    open fun indicateError(message: String?, view: EditText?) =
+        dialogProvider.indicateError(message, view)
+
+    fun showProgressBar(title: String) = dialogProvider.showProgressBar(title)
+    fun showProgressBar(title: String, message: String?) =
+        dialogProvider.showProgressBar(title, message)
+
+    fun hideProgressBar() = dialogProvider.hideProgressBar()
+
+    fun requestPIN(title: String, block: DialogListenerBlock<String>) = dialogProvider.requestPIN(title, block)
 }

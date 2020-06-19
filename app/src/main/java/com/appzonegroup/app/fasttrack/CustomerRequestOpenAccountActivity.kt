@@ -14,13 +14,14 @@ import androidx.fragment.app.FragmentPagerAdapter
 import com.appzonegroup.app.fasttrack.dataaccess.ProductDAO
 import com.appzonegroup.app.fasttrack.databinding.ActivityOpenAccountBinding
 import com.appzonegroup.app.fasttrack.receipt.NewAccountReceipt
+import com.appzonegroup.app.fasttrack.ui.MySpinnerAdapter
 import com.appzonegroup.app.fasttrack.utility.CalendarDialog
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ImageUtils
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.model.Product
@@ -41,6 +42,7 @@ import kotlinx.android.synthetic.main.fragment_next_of_kin.*
 import kotlinx.android.synthetic.main.fragment_next_of_kin.view.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -98,6 +100,8 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
 
     private val receipt by lazy { NewAccountReceipt(this) }
 
+    private val config get() = institutionConfig.flows.accountOpening
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -137,7 +141,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
 
             newBitmap
         } catch (e: Exception) {
-            Crashlytics.logException(e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             e.printStackTrace()
             if (BuildConfig.DEBUG) Log.e("Image", "Save file error!$e")
 
@@ -168,7 +172,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
             return
         }
 
-        val location = String.format("%s;%s", gps.longitude.toString(), gps.latitude.toString())
+        val location = gps.geolocationString
 
         formData.customerLastName = surname_et.text.toString().trim { it <= ' ' }
         formData.customerFirstName = first_name_et.text.toString().trim { it <= ' ' }
@@ -202,7 +206,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
         //additionalInformation.setProvince(province);
 
         formData.additionalInformation =
-            Json.stringify(CustomerRequest.Additional.serializer(), additionalInformation)
+            Json(JsonConfiguration.Stable).stringify(CustomerRequest.Additional.serializer(), additionalInformation)
 
         mainScope.launch {
             showProgressBar("Creating customer account")
@@ -314,7 +318,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                Crashlytics.logException(Exception(e.message))
+                FirebaseCrashlytics.getInstance().recordException(Exception(e.message))
 
                 showError("An error occurred. Please try again")
             }
@@ -340,8 +344,8 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
                 surname_et
             )
 
-            Crashlytics.logException(Exception("incorrect user name"))
-            Crashlytics.log("this is a crash")
+            firebaseCrashlytics.recordException(Exception("incorrect user name"))
+            firebaseCrashlytics.log("this is a crash")
             return
         }
 
@@ -510,20 +514,22 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
             R.id.account_info_next_btn -> {
                 bvn = bvn_et.text.toString().trim { it <= ' ' }
 
-//                if (product_spinner.selectedItemPosition == 0) {
-//                    //    indicateError("Please select a product", Form.PHOTO_CAPTURE.ordinal(), productSpinner);
-//                    showError("Please select a product")
-//                    return
-//                }
-//
+                if (config.products && product_spinner.selectedItemPosition == 0) {
+                    //    indicateError("Please select a product", Form.PHOTO_CAPTURE.ordinal(), productSpinner);
+                    showError("Please select a product")
+                    return
+                }
+
                 if (bvn.length != 11) {
                     showError("Please enter the BVN")
                     return
                 }
-//
-//                val product = products[product_spinner.selectedItemPosition - 1]
-//                productName = product.name
-//                productCode = product.code
+
+                if (config.products) {
+                    val product = products[product_spinner.selectedItemPosition - 1]
+                    productName = product.name
+                    productCode = product.code
+                }
 
                 getCustomerBVN(bvn)
             }
@@ -644,50 +650,54 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
                     false
                 )
 
-//            val productAdapter = MySpinnerAdapter(
-//                context,
-//                android.R.layout.simple_spinner_item,
-//                activity.productNames
-//            )
-//            productAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//            rootView.product_spinner.adapter = productAdapter
-            rootView.product_spinner.visibility = View.GONE
+            if (activity.config.products) {
+                rootView.product_spinner.visibility = View.VISIBLE
+                val productAdapter = MySpinnerAdapter(
+                    context,
+                    android.R.layout.simple_spinner_item,
+                    activity.productNames
+                )
+                productAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                rootView.product_spinner.adapter = productAdapter
 
-//            activity.run {
-//
-//                mainScope.launch {
-//                    showProgressBar("Getting Products...")
-//
-//                    val (products) = safeRunIO {
-//                        creditClubMiddleWareAPI.staticService.getAllProducts(
-//                            localStorage.institutionCode,
-//                            localStorage.agentPhone
-//                        )
-//                    }
-//
-//                    hideProgressBar()
-//
-//                    products ?: return@launch showNetworkError()
-//
-//                    this@run.products = products
-//
-//                    val productDAO = ProductDAO(activity.baseContext)
-//                    productDAO.Insert(products)
-//
-//                    productNames = ArrayList()
-//                    productNames.add("Select product...")
-//                    for (product in products) {
-//                        productNames.add(product.name)
-//                    }
-//                    productDAO.close()
-//
-//                    Misc.populateSpinnerWithString(
-//                        activity,
-//                        productNames,
-//                        view?.product_spinner
-//                    )
-//                }
-//            }
+                activity.run {
+
+                    mainScope.launch {
+                        showProgressBar("Getting Products...")
+
+                        val (products) = safeRunIO {
+                            creditClubMiddleWareAPI.staticService.getAllProducts(
+                                localStorage.institutionCode,
+                                localStorage.agentPhone
+                            )
+                        }
+
+                        hideProgressBar()
+
+                        products ?: return@launch showNetworkError()
+
+                        this@run.products = products
+
+                        val productDAO = ProductDAO(activity.baseContext)
+                        productDAO.Insert(products)
+
+                        productNames = ArrayList()
+                        productNames.add("Select product...")
+                        for (product in products) {
+                            productNames.add(product.name)
+                        }
+                        productDAO.close()
+
+                        Misc.populateSpinnerWithString(
+                            activity,
+                            productNames,
+                            view?.product_spinner
+                        )
+                    }
+                }
+            } else {
+                rootView.product_spinner.visibility = View.GONE
+            }
 
             return rootView
         }

@@ -171,7 +171,7 @@ public class WithdrawalByAPITokenActivity extends BaseActivity {
         withdrawalRequest.setToken(customerTokenEt.getText().toString());
         withdrawalRequest.setCustomerPin(customerPINEt.getText().toString());
         withdrawalRequest.setAmount(amount);
-        withdrawalRequest.setGeoLocation(String.format(Locale.getDefault(), "%s;%s", String.valueOf(getGps().getLatitude()), String.valueOf(getGps().getLongitude())));
+        withdrawalRequest.setGeoLocation(getGps().getGeolocationString());
 
         showProgressBar("Sending withdrawal request...");
         internetAction = InternetAction.Withdraw;

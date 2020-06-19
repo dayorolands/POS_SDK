@@ -9,6 +9,7 @@ import org.jpos.transaction.TransactionManager
 import org.json.JSONException
 import java.io.IOException
 import java.security.NoSuchAlgorithmException
+import java.security.SecureRandom
 import java.util.*
 
 open class CardIsoMsg : BaseIsoMsg() {
@@ -124,7 +125,7 @@ open class CardIsoMsg : BaseIsoMsg() {
         set(value) = set(123, value)
 
     fun generateRRN() {
-        val rrn = Random().nextInt(1000000)
+        val rrn = SecureRandom().nextInt(1000000)
         val rrnString = String.format("%012d", rrn)
 
         retrievalReferenceNumber37 = rrnString
@@ -138,8 +139,8 @@ open class CardIsoMsg : BaseIsoMsg() {
     )
     open fun apply(data: CardData): CardIsoMsg = apply {
         val dateParams = TransmissionDateParams()
-        val stan = Random().nextInt(1000000)
-        val rrnPart = Random().nextInt(100000)
+        val stan = SecureRandom().nextInt(1000000)
+        val rrnPart = SecureRandom().nextInt(100000)
         val stanString = String.format("%06d", stan)
         val rrnString = String.format("1%05d", rrnPart) + stanString
 

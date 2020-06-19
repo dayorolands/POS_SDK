@@ -78,4 +78,6 @@ interface DialogProvider {
     fun showOptions(title: String, options: List<DialogOptionItem>, block: DialogListenerBlock<Int>) {
         showError("Option dialog not implemented", block)
     }
+
+    fun confirm(title: String, subtitle:String?, block: DialogListenerBlock<Boolean>)
 }

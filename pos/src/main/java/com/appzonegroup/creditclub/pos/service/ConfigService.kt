@@ -61,7 +61,7 @@ open class ConfigService protected constructor(
             prefs.edit().putString("ADMIN_PIN", value).apply()
         }
 
-    open var posModeStr: String? by valueStore("POS_MODE", "POSVAS")
+    open var posModeStr: String? by valueStore("POS_MODE", "EPMS")
 
     open var posMode: PosMode
         get() {

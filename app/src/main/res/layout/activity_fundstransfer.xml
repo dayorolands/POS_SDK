@@ -37,6 +37,7 @@
                     android:src="@drawable/funds_transfer_same_bank" />
 
                 <com.appzonegroup.app.fasttrack.ui.TextView
+                    android:id="@+id/same_bank_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -171,6 +172,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/twenty_five_dp"
                 android:hint="@string/narration_hint"
+                android:maxLength="40"
                 android:inputType="text" />
 
             <com.appzonegroup.app.fasttrack.ui.TextView

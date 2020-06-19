@@ -12,8 +12,6 @@ import com.appzonegroup.app.fasttrack.model.online.Option;
 
 import java.util.ArrayList;
 
-import butterknife.ButterKnife;
-
 /**
  * Created by fdamilola on 8/13/15.
  */
@@ -52,7 +50,7 @@ public class OptionsAdapter extends ArrayAdapter<Option> {
     private class ViewHolder {
         TextView optionName;
         public ViewHolder(View v){
-            optionName = ButterKnife.findById(v, R.id.optionName);
+            optionName = v.findViewById(R.id.optionName);
         }
     }
 }

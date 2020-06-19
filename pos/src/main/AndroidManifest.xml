@@ -44,31 +44,9 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name="com.appzonegroup.creditclub.pos.UpdateActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name="com.appzonegroup.creditclub.pos.TerminalOptionsActivity"
-            android:label="Settings"
+            android:label="Terminal Options"
             android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity" />
-        <activity
-            android:name="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.appzonegroup.creditclub.pos.CARD_MENU" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
         <activity
             android:name="com.appzonegroup.creditclub.pos.MenuActivity"
             android:configChanges="orientation|keyboardHidden"
@@ -161,19 +139,6 @@
             android:name="com.appzonegroup.creditclub.pos.ReprintAnyActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
-        <service
-            android:name="com.appzonegroup.creditclub.pos.service.DownloadService"
-            android:exported="false" />
-        <service
-            android:name="com.appzonegroup.creditclub.pos.service.SyncService"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </service>
     </application>
 
 </manifest>

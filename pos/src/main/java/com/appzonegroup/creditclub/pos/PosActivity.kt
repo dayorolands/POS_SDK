@@ -14,7 +14,6 @@ import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
-import com.appzonegroup.creditclub.pos.service.SyncService
 import com.appzonegroup.creditclub.pos.widget.Dialogs
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogListenerBlock
@@ -34,10 +33,6 @@ abstract class PosActivity : CreditClubActivity(), ServiceProvider {
 
         if (config.terminalId.isNotEmpty()) {
             callHomeService.startCallHomeTimer()
-        }
-
-        if (!isMyServiceRunning(SyncService::class.java)) {
-            startService(Intent(this, SyncService::class.java))
         }
     }
 

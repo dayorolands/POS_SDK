@@ -19,8 +19,7 @@
         android:textSize="15dp"
         android:textStyle="bold" />
 
-    <EditText
-        android:id="@+id/enter_bvnNumber_et"
+    <com.creditclub.ui.widget.EditText        android:id="@+id/enter_bvnNumber_et"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="5dp"

@@ -28,8 +28,7 @@
             android:layout_height="wrap_content"
             android:text="@string/phoneNo"/>
 
-        <EditText
-            android:id="@+id/airtime_phoneNumber"
+        <com.creditclub.ui.widget.EditText            android:id="@+id/airtime_phoneNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/phoneNumber_hint"
@@ -44,8 +43,7 @@
             android:layout_height="wrap_content"
             android:text="@string/transactionAmount"/>
 
-        <EditText
-            android:id="@+id/airtime_amount"
+        <com.creditclub.ui.widget.EditText            android:id="@+id/airtime_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/enter_amount"
@@ -57,8 +55,7 @@
             android:layout_height="wrap_content"
             android:text="@string/agentPIN"/>
 
-        <EditText
-            android:id="@+id/airtime_agentPin"
+        <com.creditclub.ui.widget.EditText            android:id="@+id/airtime_agentPin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/EnterAgentPin"

@@ -22,7 +22,7 @@ import com.appzonegroup.app.fasttrack.utility.Misc;
 import com.creditclub.core.data.Encryption;
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages;
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.json.JSONObject;
 
@@ -57,10 +57,7 @@ public class OnlineActivity extends BaseActivity {
         isHome = true;
         //(isHome)
         {
-            final ProgressDialog loading = new ProgressDialog(this);
-            loading.setMessage("Loading...");
-            loading.setCanceledOnTouchOutside(false);
-            final AlertDialog.Builder dialog = new AlertDialog.Builder(this)
+          final AlertDialog.Builder dialog = new AlertDialog.Builder(this)
                     .setPositiveButton("OK", null);
 
             final String phoneNumber = bankOneApplication.getAuthResponse().getPhoneNumber();
@@ -73,12 +70,12 @@ public class OnlineActivity extends BaseActivity {
                 String latitude = String.valueOf(gpsTracker.getLocation().getLatitude());
                 finalLocation = latitude+";"+longitude;
             }
-            loading.show();
+            getDialogProvider().showProgressBar("Loading");
             Misc.resetTransactionMonitorCounter(getBaseContext());
             ah.attemptValidation(phoneNumber, sessionId, verificationCode, finalLocation, false, new APIHelper.VolleyCallback<String>() {
                 @Override
                 public void onCompleted(Exception e, String result, boolean status) {
-                    loading.dismiss();
+                    getDialogProvider().hideProgressBar();
                     if (e == null && result != null) {
                         try {
                             String answer = Response.fixResponse(result);
@@ -86,7 +83,7 @@ public class OnlineActivity extends BaseActivity {
                             JSONObject response = XmlToJson.convertXmlToJson(decryptedAnswer);
                             if (response == null) {
                                 Misc.increaseTransactionMonitorCounter(getBaseContext(), TransactionCountType.NO_INTERNET_COUNT, sessionId);
-                                dialog.setMessage("Connection lost").setPositiveButton("OK", null).show();
+                                getDialogProvider().showError("Connection lost");
                             } else {
                                 Misc.increaseTransactionMonitorCounter(getBaseContext(), TransactionCountType.SUCCESS_COUNT, sessionId);
                                 String resp = response.toString();
@@ -101,14 +98,14 @@ public class OnlineActivity extends BaseActivity {
                                         bankOneApplication.getAuthResponse().setSessionId(sessionId);
                                         if (resp.contains("MenuItem")) {
                                             JSONObject menuWrapper = response_base.getJSONObject("Menu").getJSONObject("Response").getJSONObject("Display");
-                                            getFragmentManager().beginTransaction()
+                                            getSupportFragmentManager().beginTransaction()
                                                     .replace(R.id.container, ListOptionsFragment.instantiate(menuWrapper, true))
                                                     .commitAllowingStateLoss();
                                         } else {
                                             Object menuWrapper = response_base.getJSONObject("Menu").getJSONObject("Response").get("Display");
                                             if (menuWrapper instanceof String && resp.contains("ShouldMask") && !resp.contains("Invalid Response")) {
                                                 JSONObject data = response_base.getJSONObject("Menu").getJSONObject("Response");
-                                                getFragmentManager().beginTransaction()
+                                                getSupportFragmentManager().beginTransaction()
                                                         .replace(R.id.container, EnterDetailFragment.instantiate(data, resp.contains("ACTIVATION CODE")))
                                                         .commit();
                                             } else {
@@ -134,7 +131,7 @@ public class OnlineActivity extends BaseActivity {
                                 }
                             }
                         } catch (Exception c) {
-                            Crashlytics.logException(c);
+                            FirebaseCrashlytics.getInstance().recordException(c);
                             c.printStackTrace();
                         }
                     } else {
@@ -152,11 +149,11 @@ public class OnlineActivity extends BaseActivity {
                                         .show();
                             } else {
                                 Misc.increaseTransactionMonitorCounter(getBaseContext(), TransactionCountType.NO_INTERNET_COUNT, sessionId);
-                                dialog.setMessage("Connection lost").setPositiveButton("OK", null).show();
+                                getDialogProvider().showError("Connection lost");
                             }
                         } else {
                             Misc.increaseTransactionMonitorCounter(getBaseContext(), TransactionCountType.NO_INTERNET_COUNT, sessionId);
-                            dialog.setMessage("Connection lost").setPositiveButton("OK", null).show();
+                            getDialogProvider().showError("Connection lost");
                         }
                     }
                 }

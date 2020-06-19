@@ -11,19 +11,17 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.R
+import com.appzonegroup.app.fasttrack.databinding.DialogConfirmBinding
 import com.appzonegroup.app.fasttrack.databinding.DialogCustomerRequestOptionsBinding
 import com.appzonegroup.app.fasttrack.databinding.DialogInputBinding
 import com.appzonegroup.app.fasttrack.databinding.PinpadBinding
 import com.appzonegroup.app.fasttrack.utility.CalendarDialog
 import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.ui.widget.*
+import com.creditclub.core.util.safeRun
 import com.creditclub.ui.adapter.DialogOptionAdapter
 import com.creditclub.ui.databinding.DialogOptionsBinding
 import kotlinx.android.synthetic.main.dialog_error.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
 
@@ -39,8 +37,8 @@ interface DialogProviderImpl : DialogProvider {
 
     override fun hideProgressBar() {
         activity.runOnUiThread {
-            if (progressDialog.isShowing) {
-                progressDialog.dismiss()
+            if (progressDialog.isShowing && !activity.isFinishing) {
+                safeRun { progressDialog.dismiss() }
             }
         }
     }
@@ -124,14 +122,14 @@ interface DialogProviderImpl : DialogProvider {
         isCancellable: Boolean = false,
         block: DialogListenerBlock<T>? = null
     ): Dialog {
-        activity.runOnUiThread {
+        if (!activity.isFinishing) activity.runOnUiThread {
             progressDialog.findViewById<TextView>(R.id.message_tv).text = message
             progressDialog.findViewById<TextView>(R.id.header_tv).text = title
 
             progressDialog.findViewById<View>(R.id.cancel_button).run {
                 visibility = if (isCancellable) View.VISIBLE else View.GONE
                 setOnClickListener {
-                    if (progressDialog.isShowing) progressDialog.dismiss()
+                    if (progressDialog.isShowing) hideProgressBar()
                 }
             }
 
@@ -139,7 +137,7 @@ interface DialogProviderImpl : DialogProvider {
                 val listener = DialogListener.create(block)
 
                 progressDialog.findViewById<View>(R.id.cancel_button).setOnClickListener {
-                    if (progressDialog.isShowing) progressDialog.hide()
+                    if (progressDialog.isShowing) hideProgressBar()
                     listener.close()
                 }
             } else progressDialog.setOnCancelListener { }
@@ -178,7 +176,7 @@ interface DialogProviderImpl : DialogProvider {
     override fun requestPIN(title: String, block: DialogListenerBlock<String>) {
         val dialog = Dialogs.getDialog(activity)
         dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(true)
+        dialog.setCanceledOnTouchOutside(false)
 
         val listener = DialogListener.create(block)
         val inflater = LayoutInflater.from(activity)
@@ -196,19 +194,16 @@ interface DialogProviderImpl : DialogProvider {
 
                 pin.add(digit)
                 binding.pinTv.text = "*".repeat(pin.size)
-
-                if (pin.size == 4) {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        delay(500)
-                        dialog.dismiss()
-                        listener.submit(dialog, pin.joinToString(""))
-                    }
-                }
             }
 
             override fun onBackspacePressed(view: View) {
                 pin.clear()
                 binding.pinTv.text = ""
+            }
+
+            override fun onEnterPressed(view: View) {
+                dialog.dismiss()
+                listener.submit(dialog, pin.joinToString(""))
             }
         }
 
@@ -385,5 +380,33 @@ interface DialogProviderImpl : DialogProvider {
 
             dialog.show()
         }
+    }
+
+    override fun confirm(title: String, subtitle: String?, block: DialogListenerBlock<Boolean>) {
+        val dialog = Dialogs.getDialog(context)
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        val dialogConfig by lazy {
+            DialogListener.create(block)
+        }
+        val binding = DataBindingUtil.inflate<DialogConfirmBinding>(
+            LayoutInflater.from(context),
+            R.layout.dialog_confirm,
+            null,
+            false
+        )
+        dialog.setContentView(binding.root)
+        binding.title = title
+        binding.subtitle = subtitle ?: "Are you sure?"
+        binding.okButton.setOnClickListener {
+            dialog.dismiss()
+            dialogConfig.submit(dialog, true)
+        }
+        dialog.setOnCancelListener {
+            dialog.dismiss()
+            dialogConfig.close()
+        }
+        binding.cancelButton.setOnClickListener { dialog.cancel() }
+        dialog.show()
     }
 }

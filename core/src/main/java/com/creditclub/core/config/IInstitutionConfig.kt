@@ -4,6 +4,8 @@ import com.creditclub.core.type.TransactionType
 
 interface IInstitutionConfig {
 
+    var name: String
+
     var hasOnlineFunctions: Boolean
 
     var transactionTypes: List<TransactionType>
@@ -11,4 +13,6 @@ interface IInstitutionConfig {
     var flows: FlowConfig
 
     var categories: CategoryConfig
+
+    var hasHlaTagging: Boolean
 }

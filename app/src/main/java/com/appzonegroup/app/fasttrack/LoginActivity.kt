@@ -1,39 +1,42 @@
 package com.appzonegroup.app.fasttrack
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import com.appzonegroup.app.fasttrack.model.AppConstants
-import com.appzonegroup.app.fasttrack.utility.Dialogs
+import com.appzonegroup.app.fasttrack.ui.SurveyDialog
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
-import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.util.posConfig
-import com.appzonegroup.creditclub.pos.util.posParameters
+import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
 import com.creditclub.core.CreditClubApplication
+import com.creditclub.core.data.model.SurveyQuestion
+import com.creditclub.core.data.prefs.JsonStorage
+import com.creditclub.core.data.request.SubmitSurveyRequest
+import com.creditclub.core.data.response.isSuccessful
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.serializer
 
-class LoginActivity : DialogProviderActivity() {
+class LoginActivity : CreditClubActivity() {
+
+    private val jsonStore by lazy { JsonStorage.getStore(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val environment = if (BuildConfig.DEBUG) ". Staging" else ""
-        findViewById<TextView>(R.id.version_tv).text =
-            "Version ${packageInfo?.versionName}$environment"
-
-        if (BuildConfig.DEBUG) {
-            findViewById<EditText>(R.id.login_phoneNumber).setText(localStorage.agentPhone)
+        debugOnly {
+            version_tv.text = "Version ${packageInfo?.versionName}. Staging"
+            login_phoneNumber.setText(localStorage.agent?.phoneNumber)
         }
 
         findViewById<EditText>(R.id.login_phoneNumber).also {
@@ -60,37 +63,89 @@ class LoginActivity : DialogProviderActivity() {
         findViewById<View>(R.id.email_sign_in_button).setOnClickListener { attemptLogin() }
 
         mainScope.launch {
-            val (response, error) = safeRunIO {
-                creditClubMiddleWareAPI.staticService.getAgentInfoByPhoneNumber(
+            syncAgentInfo()
+            firebaseAnalytics.setUserId(localStorage.agent?.agentCode)
+        }
+        mainScope.launch { (application as CreditClubApplication).getLatestVersion() }
+
+        if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
+            dialogProvider.showError("Timeout due to inactivity")
+        } else {
+            val loggedOut = intent.getBooleanExtra("LOGGED_OUT", false)
+
+            if (!loggedOut && jsonStore.has("BANNER_IMAGES")) {
+                startActivity(Intent(this, BannerActivity::class.java))
+            }
+
+            checkLocalSurveyQuestions()
+        }
+
+        downloadBannerImages()
+        downloadSurveyQuestions()
+    }
+
+    private fun checkLocalSurveyQuestions() {
+        if (jsonStore.has("SURVEY_QUESTIONS")) {
+            val questionsJson = jsonStore.get("SURVEY_QUESTIONS", SurveyQuestion.serializer().list)
+            val questions = questionsJson.data ?: return
+            if (questions.isEmpty()) return
+
+            SurveyDialog.create(this, questions) {
+                onSubmit { data ->
+                    ioScope.launch {
+                        safeRunIO {
+                            val surveyData = SubmitSurveyRequest().apply {
+                                answers = data
+                                institutionCode = localStorage.institutionCode
+                                agentPhoneNumber = localStorage.agent?.phoneNumber
+                                geoLocation = gps.geolocationString
+                            }
+
+                            creditClubMiddleWareAPI.staticService.submitSurvey(surveyData)
+                        }
+                        jsonStore.delete("SURVEY_QUESTIONS")
+                    }
+                }
+            }.show()
+        }
+    }
+
+    private fun downloadBannerImages() {
+        ioScope.launch {
+            val (response) = safeRunIO {
+                creditClubMiddleWareAPI.staticService.getBannerImages(
                     localStorage.institutionCode,
-                    localStorage.agentPhone
+                    localStorage.agent?.phoneNumber,
+                    packageInfo?.versionName
                 )
             }
 
-            if (error != null) return@launch
             response ?: return@launch
+            val bannerImageList = response.data ?: return@launch
 
-            safeRun {
-                localStorage.agent = response
-
-                if (Platform.isPOS) {
-                    val configHasChanged =
-                        posConfig.terminalId != response.terminalID // || posConfig.posModeStr != response.posMode
-
-                    posConfig.terminalId = response.terminalID ?: ""
-//                    posConfig.posModeStr = response.posMode
-
-                    if (configHasChanged) {
-                        posParameters.reset()
-                    }
-                }
+            if (response.isSuccessful) {
+                bannerImageList.forEach { Picasso.get().load(it).fetch() }
+                jsonStore.save("BANNER_IMAGES", bannerImageList, String.serializer().list)
             }
         }
+    }
 
-        mainScope.launch { (application as CreditClubApplication).getLatestVersion () }
+    private fun downloadSurveyQuestions() {
+        ioScope.launch {
+            val (response) = safeRunIO {
+                creditClubMiddleWareAPI.staticService.getSurveyQuestions(
+                    localStorage.institutionCode,
+                    localStorage.agent?.phoneNumber,
+                    packageInfo?.versionName
+                )
+            }
 
-        if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
-            showError("Timeout due to inactivity")
+            response ?: return@launch
+            val surveyQuestions = response.data ?: return@launch
+
+            if (response.isSuccessful) {
+                jsonStore.save("SURVEY_QUESTIONS", surveyQuestions, SurveyQuestion.serializer().list)
+            }
         }
     }
 
@@ -123,21 +178,15 @@ class LoginActivity : DialogProviderActivity() {
     }
 
     override fun onBackPressed() {
-
-        val notification = Dialogs.getQuestionDialog(this@LoginActivity, "Do you want to exit? ")
-        val logoutNoButton = notification.findViewById<Button>(R.id.cancel_btn)
-        val logoutYesButton = notification.findViewById<Button>(R.id.ok_btn)
-
-        logoutNoButton.setOnClickListener { notification.dismiss() }
-
-        logoutYesButton.setOnClickListener {
-            notification.dismiss()
-            val intent = Intent(Intent.ACTION_MAIN)
-            intent.addCategory(Intent.CATEGORY_HOME)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
+        dialogProvider.confirm("Close Application", null) {
+            onSubmit {
+                val intent = Intent(Intent.ACTION_MAIN)
+                intent.addCategory(Intent.CATEGORY_HOME)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finish()
+            }
         }
-        notification.show()
     }
 
     private fun attemptLogin() {
@@ -160,12 +209,12 @@ class LoginActivity : DialogProviderActivity() {
         }
 
         if (pin.length != 4) {
-            showError("PIN must be 4 digits")
+            dialogProvider.showError("PIN must be 4 digits")
             return
         }
 
         mainScope.launch {
-            showProgressBar("Logging you in")
+            dialogProvider.showProgressBar("Logging you in")
             val (response, error) = safeRunIO {
                 creditClubMiddleWareAPI.staticService.confirmAgentInformation(
                     localStorage.institutionCode,
@@ -173,22 +222,22 @@ class LoginActivity : DialogProviderActivity() {
                     pin
                 )
             }
-            hideProgressBar()
+            dialogProvider.hideProgressBar()
 
-            if (error != null) return@launch showError(error)
-            if (response == null) return@launch showError("PIN is invalid")
-            if (!response.isSuccessful) return@launch showError(response.responseMessage)
+            if (error != null) return@launch dialogProvider.showError(error)
+            if (response == null) return@launch dialogProvider.showError("PIN is invalid")
+            if (!response.isSuccessful) return@launch dialogProvider.showError(response.responseMessage)
+
+            firebaseAnalytics.logEvent("login", Bundle().apply {
+                putString("agent_code", localStorage.agent?.agentCode)
+                putString("institution_code", localStorage.institutionCode)
+                putString("phone_number", phoneNumber)
+            })
 
             val lastLogin = "Last Login: " + Misc.dateToLongString(Misc.getCurrentDateTime())
             LocalStorage.SaveValue(AppConstants.LAST_LOGIN, lastLogin, baseContext)
 
-            val activityToOpen = when {
-                packageName.toLowerCase().contains("cashout") -> CashoutMainMenuActivity::class.java
-                packageName.toLowerCase().contains(".creditclub") -> CreditClubMainMenuActivity::class.java
-                else -> Menu3Activity::class.java
-            }
-
-            val intent = Intent(this@LoginActivity, activityToOpen)
+            val intent = Intent(this@LoginActivity, CreditClubMainMenuActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             startActivity(intent)
             finish()
@@ -196,7 +245,7 @@ class LoginActivity : DialogProviderActivity() {
     }
 
     private fun showError(message: String, viewId: Int) {
-        showError(message)
+        dialogProvider.showError(message)
         findViewById<View>(viewId).requestFocus()
     }
 
@@ -206,34 +255,22 @@ class LoginActivity : DialogProviderActivity() {
     }
 
     private fun ensureLocationEnabled() {
-        var locationMode = 0 // 0 == Settings.Secure.LOCATION_MODE_OFF
-        var locationProviders: String? = null
+        var locationMode = 0
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            try {
-                locationMode = Settings.Secure.getInt(
-                    applicationContext.contentResolver,
-                    Settings.Secure.LOCATION_MODE
-                )
-            } catch (e: Settings.SettingNotFoundException) {
-
-            }
-
-        } else {
-            locationProviders = Settings.Secure.getString(
+        try {
+            locationMode = Settings.Secure.getInt(
                 applicationContext.contentResolver,
-                Settings.Secure.LOCATION_PROVIDERS_ALLOWED
+                Settings.Secure.LOCATION_MODE
             )
+        } catch (e: Settings.SettingNotFoundException) {
+
         }
 
-        val locationEnabled = !TextUtils.isEmpty(locationProviders) || locationMode != 0
-        if (!locationEnabled) {
+        if (locationMode == 0) {
+            val title = "An active GPS service is needed for this application"
+            val subtitle = "Click 'OK' to activate it"
 
-            com.appzonegroup.app.fasttrack.ui.Dialogs.confirm(
-                this,
-                "An active GPS service is needed for this application",
-                "Click 'OK' to activate it"
-            ) {
+            dialogProvider.confirm(title, subtitle) {
                 onSubmit {
                     if (it) {
                         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)

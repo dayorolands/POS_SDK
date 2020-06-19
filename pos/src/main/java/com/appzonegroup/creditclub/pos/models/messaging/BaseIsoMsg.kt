@@ -7,6 +7,7 @@ import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
 import org.jpos.iso.ISOMsg
 import org.threeten.bp.Instant
 import java.io.ByteArrayOutputStream
+import java.security.SecureRandom
 import java.util.*
 
 open class BaseIsoMsg : ISOMsg() {
@@ -65,7 +66,7 @@ open class BaseIsoMsg : ISOMsg() {
     }
 
     open fun generateStan() {
-        val mStan = Random().nextInt(1000)
+        val mStan = SecureRandom().nextInt(1000)
         val mStanString = String.format("%06d", mStan)
 
         stan11 = mStanString

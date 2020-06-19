@@ -18,7 +18,7 @@ import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ImageUtils
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PrinterStatus
-import com.crashlytics.android.Crashlytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.request.CustomerRequest
 import com.creditclub.core.ui.CreditClubFragment
@@ -35,6 +35,8 @@ import kotlinx.android.synthetic.main.fragment_customer_request_general_info.vie
 import kotlinx.android.synthetic.main.fragment_next_of_kin.*
 import kotlinx.android.synthetic.main.fragment_next_of_kin.view.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import org.threeten.bp.LocalDate
 import java.io.File
 import java.io.FileOutputStream
@@ -116,7 +118,7 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
 
             newBitmap
         } catch (e: Exception) {
-            Crashlytics.logException(e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             e.printStackTrace()
             if (BuildConfig.DEBUG) Log.e("Image", "Save file error!$e")
 
@@ -174,7 +176,10 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
         //additionalInformation.setSignature(signatureString);
         //additionalInformation.setProvince(province);
 
-        customerRequest.additionalInformation = additionalInformation.toJson()
+        customerRequest.additionalInformation = Json(JsonConfiguration.Stable).stringify(
+            CustomerRequest.Additional.serializer(),
+            additionalInformation
+        )
 
         mainScope.launch {
             showProgressBar("Creating customer wallet")
@@ -244,8 +249,8 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
         if (surname.isEmpty()) {
             indicateError("Please enter customer's surname", Form.GENERAL_INFO.ordinal, surname_et)
 
-            Crashlytics.logException(Exception("incorrect user name"))
-            Crashlytics.log("this is a crash")
+            firebaseCrashlytics.recordException(Exception("incorrect user name"))
+            firebaseCrashlytics.log("this is a crash")
             return
         }
 

@@ -6,7 +6,7 @@ import androidx.databinding.DataBindingUtil;
 
 import com.appzonegroup.app.fasttrack.model.PolarisTransactionGroup;
 import com.creditclub.ui.databinding.ActivityReportBinding;
-import com.creditclub.ui.manager.ActivityReportManager;
+import com.appzonegroup.app.fasttrack.ui.ActivityReportManager;
 
 /**
  * Created by Oto-obong on 15/7/2017.

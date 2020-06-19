@@ -40,7 +40,7 @@ import java.util.UUID;
 /**
  * Created by Joseph on 7/19/2017.
  */
-public class Misc extends CardMisc {
+public class Misc {
 
     private static String HOST = BuildConfig.API_HOST;
     private static String BASE_URL = HOST + "/CreditClubMiddleWareAPI/api";
@@ -51,16 +51,6 @@ public class Misc extends CardMisc {
 
     private static boolean isRegexMatch(String regex, String string) {
         return string.matches(regex);
-    }
-
-    public static String getVersionName(Activity activity) {
-        try {
-            PackageInfo pInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
-            return pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        return "";
     }
 
     public static String getGUID() {
@@ -77,15 +67,6 @@ public class Misc extends CardMisc {
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, data);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(arrayAdapter);
-    }
-
-    public static File getAlbumStorageDir(String albumName) {
-        // Get the directory for the user's public pictures directory.
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), albumName);
-        if (!file.mkdirs()) {
-            Log.e("TakePicture", "Directory not created");
-        }
-        return file;
     }
 
     public static String bitmapToString(Bitmap bitmap) {
@@ -111,61 +92,14 @@ public class Misc extends CardMisc {
                 startIndex, maxSize);
     }
 
-    public static ArrayList<String> getScrambledPINPadText() {
-        ArrayList<String> pinPadText = new ArrayList<String>() {
-            {
-                add("1");
-                add("2");
-                add("3");
-                add("4");
-                add("5");
-                add("6");
-                add("7");
-                add("8");
-                add("9");
-                add("0");
-                add("x");
-                add("-");
-            }
-        };
-
-        ArrayList<String> outputList = new ArrayList<>();
-        Random random = new Random();
-        while (pinPadText.size() > 3) {
-            int index = random.nextInt(pinPadText.size() - 3);
-
-            outputList.add(pinPadText.get(index));
-            pinPadText.remove(index);
-        }
-
-        // 3 items should be left in the list -> 1 number, < and DONE
-        outputList.add(pinPadText.get(1));
-        pinPadText.remove(1);
-
-        outputList.addAll(pinPadText);
-
-        return outputList;
-    }
-
     public static String getCategoryURL() {
         return BASE_URL + "/PayBills/GetBillerCategories";
-    }
-
-    public static String getBillersURL(String categoryIdField) {
-
-        String url = BASE_URL + "/PayBills/GetBillers";
-
-        return String.format(url, categoryIdField);
     }
 
     public static String getBillerItemURL(String billerIdField) {
         String url = BASE_URL + "/PayBills/GetPaymentItems";
 
         return String.format(url, billerIdField);
-    }
-
-    public static String initiateBillsPayment() {
-        return BASE_URL + "/PayBills/RunTransaction";
     }
 
     public static String payBillItemUrl(PayBillItemModel model) {
@@ -178,37 +112,6 @@ public class Misc extends CardMisc {
                 model.getOtp(), model.getMerchantBillerIdField(), model.getBillItemID(), model.getBillCategoryID(),
                 model.getCustomerAccountNumber(), model.getAmount(), model.getEmail(), model.getCustomerPhoneNumber(),
                 model.getCustomerID());
-    }
-
-    public static String getPendingBeneficiaries(String institutionCode, String agentPhoneNumber) {
-
-        String url = BASE_URL + "/OfflineCashOut/GetPendingBeneficiaries?" + "institutionCode=%s"
-                + "&agentPhoneNumber=%s";
-
-        return String.format(url, institutionCode, agentPhoneNumber);
-    }
-
-    public static String syncBeneficiaryUrl(String institutionCode, String agentPhoneNumber, String trackingReference) {
-
-        String url = BASE_URL + "/OfflineCashOut/UpdatePaidBeneficiary?" + "institutionCode=%s" + "&agentPhoneNumber=%s"
-                + "&offlineBeneficiaryTrackingRef=%s";
-
-        return String.format(url, institutionCode, agentPhoneNumber, trackingReference);
-    }
-
-    public static String getAgentsAccountEnquiry(String agentPhoneNumber, String institutionCode, String agentPin) {
-        String url = BASE_URL + "/CoreBanking/AgentAccountEnquiry?" + "agentPhoneNumber=%s" + "&institutionCode=%s"
-                + "&agentPIn=%s";
-
-        return String.format(url, agentPhoneNumber, institutionCode, agentPin);
-    }
-
-    public static String getCustomerAccountEnquiry(String customerAccountNumber, String institutionCode,
-                                                   String agentsPhoneNo, String pin) {
-        String url = BASE_URL + "/CoreBanking/CustomerAccountEnquiry?" + "accountNo=%s" + "&institutionCode=%s"
-                + "&agentPhoneNumber=%s" + "&pin=%s";
-
-        return String.format(url, customerAccountNumber, institutionCode, agentsPhoneNo, pin);
     }
 
     public static String dateToShortString(Date date) {

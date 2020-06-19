@@ -2,5 +2,14 @@
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">52.224.166.115</domain>
+        <domain includeSubdomains="true">52.168.85.231</domain>
+        <domain includeSubdomains="true">62.173.32.17</domain>
+        <domain includeSubdomains="true">staging.mybankone.com</domain>
+    </domain-config>
+    <domain-config>
+        <domain includeSubdomains="true">api.mybankone.com</domain>
+        <pin-set>
+            <pin digest="SHA-256">goId03pe7sxzYmTdNcd1vI+psOY/FX5YGYjkPeioB0w=</pin>
+        </pin-set>
     </domain-config>
 </network-security-config>

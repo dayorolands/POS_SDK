@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.creditclub.ui">
-
-    <application>
-        <activity
-            android:name=".UpdateActivity"
-            android:label="@string/title_activity_update"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-    </application>
+<manifest package="com.creditclub.ui">
 
 </manifest>

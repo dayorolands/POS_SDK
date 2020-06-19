@@ -1,6 +1,7 @@
 package com.appzonegroup.creditclub.pos.card
 
-import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
+import com.appzonegroup.creditclub.pos.extension.processingCode3
+import org.jpos.iso.ISOMsg
 
 
 /**
@@ -17,7 +18,7 @@ fun <T : CardIsoMsg> cardIsoMsg(cardData: CardData, factory: () -> T, block: (T.
     }
 }
 
-fun cardTransactionType(msg: BaseIsoMsg) = when (msg.mti) {
+fun cardTransactionType(msg: ISOMsg) = when (msg.mti) {
     "0100", "0110" -> when (msg.processingCode3?.substring(0, 2)) {
         "31" -> TransactionType.Balance
         "60" -> TransactionType.PreAuth

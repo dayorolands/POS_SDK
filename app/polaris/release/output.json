@@ -1,0 +1,19 @@
+[
+  {
+    "outputType": {
+      "type": "APK"
+    },
+    "apkData": {
+      "type": "MAIN",
+      "splits": [],
+      "versionCode": 4,
+      "versionName": "1.2.1",
+      "enabled": true,
+      "outputFile": "app-polaris-release.apk",
+      "fullName": "polarisRelease",
+      "baseName": "polaris-release"
+    },
+    "path": "app-polaris-release.apk",
+    "properties": {}
+  }
+]
