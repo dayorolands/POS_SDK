@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/collectionPaymentFragment">
+    <fragment
+        android:id="@+id/collectionPaymentFragment"
+        android:name="com.appzonegroup.app.fasttrack.fragment.CollectionPaymentFragment"
+        android:label="Collection Payment"
+        tools:layout="@layout/collection_payment_fragment">
+        <action
+            android:id="@+id/action_collection_payment_to_reference_generation"
+            app:destination="@id/collectionReferenceGenerationFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/collectionReferenceGenerationFragment"
+        android:name="com.appzonegroup.app.fasttrack.fragment.CollectionReferenceGenerationFragment"
+        android:label="Generate Collection Reference"
+        tools:layout="@layout/fragment_collection_reference_generation">
+        <!--        <action android:id="@+id/action__to_b"-->
+        <!--            app:destination="@id/b"-->
+        <!--            app:enterAnim="@anim/nav_default_enter_anim"-->
+        <!--            app:exitAnim="@anim/nav_default_exit_anim"-->
+        <!--            app:popEnterAnim="@anim/nav_default_pop_enter_anim"-->
+        <!--            app:popExitAnim="@anim/nav_default_pop_exit_anim"/>-->
+    </fragment>
+</navigation>
