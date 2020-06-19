@@ -36,7 +36,10 @@ import org.koin.core.parameter.parametersOf
  * Appzone Ltd
  */
 
-abstract class CreditClubActivity : AppCompatActivity() {
+abstract class CreditClubActivity : AppCompatActivity {
+
+    constructor() : super()
+    constructor(layout: Int) : super(layout)
 
     open val gps: TrackGPS by inject()
     open val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
