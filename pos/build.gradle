@@ -4,12 +4,8 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
 
-def safeExtGet(prop, fallback) {
-    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
-}
-
 android {
-    compileSdkVersion safeExtGet("compileSdkVersion", 28)
+    compileSdkVersion versions.compileSdk
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
@@ -58,7 +54,7 @@ dependencies {
     api files('libs/SmartCardLib.jar')
     api files('libs/telpo_api.jar')
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
     implementation "com.google.android.material:material:${versions.material}"

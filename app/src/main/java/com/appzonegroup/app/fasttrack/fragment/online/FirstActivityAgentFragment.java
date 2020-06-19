@@ -33,19 +33,16 @@ import org.json.JSONObject;
 
 import java.util.concurrent.TimeoutException;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-
 /**
  * A placeholder fragment containing a simple view.
  */
 public class FirstActivityAgentFragment extends Fragment implements View.OnClickListener {
 
-    @Nullable @Bind(R.id.ePhone)
+    @Nullable
     EditText ePhone;
-    @Nullable @Bind(R.id.eVerificationCode)
+    @Nullable
     EditText eVerificationCode;
-    @Nullable @Bind(R.id.btnActivate)
+    @Nullable
     Button btnActivate;
 
     AlertDialog.Builder dialog;
@@ -61,7 +58,9 @@ public class FirstActivityAgentFragment extends Fragment implements View.OnClick
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_first, container, false);
         OnlineActivity.isHome = false;
-        ButterKnife.bind(this, view);
+        ePhone=view.findViewById(R.id.ePhone);
+        eVerificationCode=view.findViewById(R.id.eVerificationCode);
+        btnActivate=view.findViewById(R.id.btnActivate);
         return view;
     }
 

@@ -2,18 +2,14 @@ package com.creditclub.core.data.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
 import android.util.Log
 import androidx.core.content.edit
 import com.creditclub.core.BuildConfig
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.json.JsonDecodingException
-import kotlinx.serialization.serializerByTypeToken
-import kotlinx.serialization.typeTokenOf
 import org.threeten.bp.Instant
-import kotlin.collections.set
 
 
 /**
@@ -23,26 +19,29 @@ import kotlin.collections.set
 
 object JsonStorage {
 
-    val serializerCache = HashMap<String, KSerializer<*>>()
+    val json = Json(
+        JsonConfiguration.Stable.copy(
+            isLenient = true,
+            ignoreUnknownKeys = true,
+            serializeSpecialFloatingPointValues = true,
+            useArrayPolymorphism = true
+        )
+    )
 
     fun getStore(context: Context): Store {
         return Store(context.getSharedPreferences("JSON_STORAGE", Context.MODE_PRIVATE))
     }
 
-    data class JsonObject<T : Any>(
+    data class JsonObject<T>(
         val data: T? = null,
         val updatedAt: Instant? = null
-    ) {
-        val isValid get() = data != null
-    }
+    )
 
     class Store(pref: SharedPreferences) : SharedPreferences by pref {
 
-        @UnstableDefault
-        inline fun <reified T : Any> save(key: String, obj: T) {
-
+        fun <T> save(key: String, obj: T, serializer: KSerializer<T>) {
             val previousValue: String? = getString("DATA_${key}", null)
-            val newValue = Json.nonstrict.stringify(getSerializer(), obj)
+            val newValue = json.stringify(serializer, obj)
             if (BuildConfig.DEBUG) Log.d("JSONStorage", "Save $key: $newValue")
 
             if (previousValue != newValue) {
@@ -62,8 +61,7 @@ object JsonStorage {
             return contains("DATA_${key}") || contains("META_${key}_UPDATED_AT")
         }
 
-        @UnstableDefault
-        inline fun <reified T : Any> get(key: String): JsonObject<T> {
+        fun <T> get(key: String, serializer: KSerializer<T>): JsonObject<T> {
             try {
                 val data: String? = getString("DATA_${key}", null)
                 val updatedAt: String? = getString("META_${key}_UPDATED_AT", null)
@@ -77,26 +75,13 @@ object JsonStorage {
                     "GET $key: $data // updated at: $updatedAt"
                 )
 
-                val obj = Json.nonstrict.parse(getSerializer<T>(), data)
+                val obj = json.parse(serializer, data)
 
                 return JsonObject(obj, Instant.parse(updatedAt))
             } catch (ex: JsonDecodingException) {
                 if (BuildConfig.DEBUG) ex.printStackTrace()
                 return JsonObject()
             }
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST", "NO_REFLECTION_IN_CLASS_PATH")
-    inline fun <reified T> getSerializer(): KSerializer<T> {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val key = typeTokenOf<T>().typeName
-            if (!serializerCache.containsKey(key)) {
-                serializerCache[key] = serializerByTypeToken(typeTokenOf<T>())
-            }
-            serializerCache[key] as KSerializer<T>
-        } else {
-            serializerByTypeToken(typeTokenOf<T>()) as KSerializer<T>
         }
     }
 }

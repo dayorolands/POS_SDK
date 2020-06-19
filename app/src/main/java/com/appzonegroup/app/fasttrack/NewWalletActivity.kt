@@ -35,6 +35,8 @@ import kotlinx.android.synthetic.main.fragment_customer_request_general_info.vie
 import kotlinx.android.synthetic.main.fragment_next_of_kin.*
 import kotlinx.android.synthetic.main.fragment_next_of_kin.view.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import org.threeten.bp.LocalDate
 import java.io.File
 import java.io.FileOutputStream
@@ -174,7 +176,10 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
         //additionalInformation.setSignature(signatureString);
         //additionalInformation.setProvince(province);
 
-        customerRequest.additionalInformation = additionalInformation.toJson()
+        customerRequest.additionalInformation = Json(JsonConfiguration.Stable).stringify(
+            CustomerRequest.Additional.serializer(),
+            additionalInformation
+        )
 
         mainScope.launch {
             showProgressBar("Creating customer wallet")

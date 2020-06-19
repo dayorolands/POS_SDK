@@ -23,6 +23,8 @@ import com.creditclub.core.util.*
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.serializer
 
 class LoginActivity : CreditClubActivity() {
 
@@ -84,7 +86,7 @@ class LoginActivity : CreditClubActivity() {
 
     private fun checkLocalSurveyQuestions() {
         if (jsonStore.has("SURVEY_QUESTIONS")) {
-            val questionsJson = jsonStore.get<List<SurveyQuestion>>("SURVEY_QUESTIONS")
+            val questionsJson = jsonStore.get("SURVEY_QUESTIONS", SurveyQuestion.serializer().list)
             val questions = questionsJson.data ?: return
             if (questions.isEmpty()) return
 
@@ -123,7 +125,7 @@ class LoginActivity : CreditClubActivity() {
 
             if (response.isSuccessful) {
                 bannerImageList.forEach { Picasso.get().load(it).fetch() }
-                jsonStore.save("BANNER_IMAGES", bannerImageList)
+                jsonStore.save("BANNER_IMAGES", bannerImageList, String.serializer().list)
             }
         }
     }
@@ -142,7 +144,7 @@ class LoginActivity : CreditClubActivity() {
             val surveyQuestions = response.data ?: return@launch
 
             if (response.isSuccessful) {
-                jsonStore.save("SURVEY_QUESTIONS", surveyQuestions)
+                jsonStore.save("SURVEY_QUESTIONS", surveyQuestions, SurveyQuestion.serializer().list)
             }
         }
     }

@@ -192,6 +192,12 @@
                             app:src='@{@drawable/payday_loan}'
                             app:text='@{"Funds Transfer"}' />
 
+                        <include
+                            android:id="@+id/collection_payment_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/payday_loan}'
+                            app:text='@{"Collection Payment"}' />
+
                     </com.google.android.flexbox.FlexboxLayout>
 
                     <com.google.android.flexbox.FlexboxLayout

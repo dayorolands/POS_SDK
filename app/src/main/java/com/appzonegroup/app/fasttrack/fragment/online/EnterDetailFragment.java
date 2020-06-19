@@ -43,9 +43,6 @@ import org.json.JSONObject;
 
 import java.util.concurrent.TimeoutException;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-
 /**
  * Created by fdamilola on 8/14/15.
  * Contact fdamilola@gmail.com or fdamilola@hextremelabs.com or fdamilola@echurch.ng or fdamilola@cottacush.com
@@ -53,16 +50,9 @@ import butterknife.ButterKnife;
  */
 public class EnterDetailFragment extends Fragment implements View.OnClickListener {
 
-    @Bind(R.id.upperHint)
     TextView upperHint;
-
-    @Bind(R.id.eText)
     EditText textDetail;
-
-    @Bind(R.id.btnActivate)
     Button next;
-
-    @Bind(R.id.tInput)
     TextInputLayout tInput;
 
     AlertDialog.Builder dialog;
@@ -99,7 +89,10 @@ public class EnterDetailFragment extends Fragment implements View.OnClickListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_enter_detail, container, false);
         OnlineActivity.isHome = false;
-        ButterKnife.bind(this, view);
+        textDetail=view.findViewById(R.id.eText);
+        upperHint=view.findViewById(R.id.upperHint);
+        tInput=view.findViewById(R.id.tInput);
+        next=view.findViewById(R.id.btnActivate);
         return view;
     }
 
@@ -340,7 +333,7 @@ public class EnterDetailFragment extends Fragment implements View.OnClickListene
         LayoutInflater inflaterDialog = alertDialog.getLayoutInflater();
         View dialogView = inflaterDialog.inflate(R.layout.view_webview, fm);
 
-        final WebView webview = ButterKnife.findById(dialogView, R.id.webView);
+        final WebView webview = dialogView.findViewById(R.id.webView);
         WebSettings settings = webview.getSettings();
         settings.setSupportZoom(false);
         settings.setJavaScriptEnabled(false);

@@ -44,8 +44,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
@@ -57,10 +55,8 @@ import kotlin.jvm.functions.Function2;
 public class ListOptionsFragment extends Fragment implements AdapterView.OnItemClickListener,
         View.OnClickListener {
 
-    @Bind(R.id.listView)
     ListView listView;
 
-    @Bind(R.id.optionsName)
     TextView optionName;
 
     private static ArrayList<Option> menuOptions;
@@ -115,7 +111,8 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_listview, container, false);
-        ButterKnife.bind(this, view);
+        listView = view.findViewById(R.id.listView);
+        optionName = view.findViewById(R.id.optionsName);
         return view;
     }
 
@@ -132,13 +129,13 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
 
         listView.setAdapter(new OptionsAdapter(getActivity(), R.layout.item_option, getMenuOptions()));
         listView.setOnItemClickListener(this);
-        view = ((CreditClubActivity)getActivity()).getCurrentFocus();
+        view = ((CreditClubActivity) getActivity()).getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager) ((CreditClubActivity)getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) ((CreditClubActivity) getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
 
-        authResponse = ((BankOneApplication) ((CreditClubActivity)getActivity()).getApplication()).getAuthResponse();// LocalStorage.getCachedAuthResponse(getActivity());
+        authResponse = ((BankOneApplication) ((CreditClubActivity) getActivity()).getApplication()).getAuthResponse();// LocalStorage.getCachedAuthResponse(getActivity());
 
     }
 
@@ -148,7 +145,7 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         selectedOption = (Option) adapterView.getAdapter().getItem(i);
-        DialogProvider dialogProvider = ((CreditClubActivity)getActivity()).getDialogProvider();
+        DialogProvider dialogProvider = ((CreditClubActivity) getActivity()).getDialogProvider();
 
         if (selectedOption.getName().equalsIgnoreCase("CANCEL")) {
             ((OnlineActivity) getActivity()).goHome();
@@ -192,7 +189,7 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
     }
 
     private void handleException(boolean goHomeOnClose) {
-        DialogProvider dialogProvider = ((CreditClubActivity)getActivity()).getDialogProvider();
+        DialogProvider dialogProvider = ((CreditClubActivity) getActivity()).getDialogProvider();
         dialogProvider.confirm("Something went wrong", "Please try again", new Function1<DialogListener<Boolean>, Unit>() {
             @Override
             public Unit invoke(DialogListener<Boolean> booleanDialogListener) {
@@ -241,7 +238,7 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
     }
 
     private void processData(String result) {
-        DialogProvider dialogProvider = ((CreditClubActivity)getActivity()).getDialogProvider();
+        DialogProvider dialogProvider = ((CreditClubActivity) getActivity()).getDialogProvider();
         try {
             String answer = Response.fixResponse(result);
             String decryptedAnswer = Encryption.decrypt(answer);
@@ -310,7 +307,7 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
     @Override
     public void onClick(View view) {
         if (view == optionName) {
-            ((CreditClubActivity)getActivity()).getDialogProvider().showError(optionName.getText().toString());
+            ((CreditClubActivity) getActivity()).getDialogProvider().showError(optionName.getText().toString());
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.creditclub.core.util
 
+import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.BuildConfig
 
@@ -19,12 +20,11 @@ inline fun <T> safeRun(crossinline block: () -> T): SafeRunResult<T> {
         data = block()
     } catch (ex: Exception) {
         error = ex
-        try {
-            FirebaseCrashlytics.getInstance().recordException(ex)
-        } catch (ex: Exception) {
-            if (BuildConfig.DEBUG) ex.printStackTrace()
+        FirebaseCrashlytics.getInstance().recordException(ex)
+        debugOnly {
+            Log.e("safeRun", ex.message, ex)
+            ex.printStackTrace()
         }
-        if (BuildConfig.DEBUG) ex.printStackTrace()
     }
 
     return SafeRunResult(data, error)

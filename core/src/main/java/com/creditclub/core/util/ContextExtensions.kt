@@ -137,21 +137,6 @@ inline val Context.RAMInfo: LongArray
         return longArrayOf(memInfo.availMem, memInfo.totalMem)
     }
 
-inline val Context.isOnline: Boolean
-    get() {
-        return try {
-            val connectivityManager =
-                getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-            val networkInfo = connectivityManager.activeNetworkInfo
-            networkInfo != null && networkInfo.isAvailable && networkInfo.isConnected
-        } catch (e: Exception) {
-            println("CheckConnectivity Exception: " + e.message)
-            Log.v("connectivity", e.toString())
-            false
-        }
-    }
-
 suspend inline fun Context.logFunctionUsage(fid: Int) = safeRunIO {
     val count = run {
         val appFunctionUsageDao = coreDatabase.appFunctionUsageDao()

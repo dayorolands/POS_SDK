@@ -37,7 +37,7 @@ interface BankOneService {
     suspend fun operationGet(@Url url: String): String?
 
     @POST
-    fun operationPost(@Url url: String?, @Body requestBody: RequestBody): String?
+    suspend fun operationPost(@Url url: String?, @Body requestBody: RequestBody): String?
 
     object UrlGenerator : KoinComponent {
         private val apiHost get() = get<BackendConfig>().apiHost

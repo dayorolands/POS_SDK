@@ -33,6 +33,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 dependencies {
@@ -41,7 +44,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${versions.serialization}"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
@@ -93,14 +96,17 @@ dependencies {
     api 'com.github.esafirm.android-image-picker:rximagepicker:2.1.0'
     api "com.github.bumptech.glide:glide:${versions.glide}"
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    api 'com.google.android.play:core:1.7.1'
+    api 'com.google.android.play:core:1.7.3'
 
     implementation "com.google.firebase:firebase-crashlytics:${versions.firebaseCrashlytics}"
     api "com.google.firebase:firebase-core:${versions.firebase}"
     api "com.google.firebase:firebase-analytics:${versions.firebase}"
-    api 'com.google.firebase:firebase-perf:19.0.5'
+    api 'com.google.firebase:firebase-perf:19.0.7'
     api "androidx.work:work-runtime-ktx:${versions.work}"
     api "com.google.android.gms:play-services-location:17.0.0"
+
+    implementation "androidx.navigation:navigation-fragment-ktx:${versions.navigation}"
+    implementation "androidx.navigation:navigation-ui-ktx:${versions.navigation}"
 }
 
 repositories {

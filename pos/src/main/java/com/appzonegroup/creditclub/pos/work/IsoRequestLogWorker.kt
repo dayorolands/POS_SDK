@@ -12,6 +12,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 
 class IsoRequestLogWorker(context: Context, params: WorkerParameters) :
     BaseWorker(context, params) {
@@ -24,7 +25,7 @@ class IsoRequestLogWorker(context: Context, params: WorkerParameters) :
 
         val jobs = isoRequestLogDao.all().map { requestLog ->
             async {
-                val requestBody = Json.stringify(serializer, requestLog).toRequestBody()
+                val requestBody = Json(JsonConfiguration.Stable).stringify(serializer, requestLog).toRequestBody()
 
                 val (response) = safeRunSuspend {
                     creditClubMiddleWareAPI.staticService.logToGrafanaForPOSTransactions(

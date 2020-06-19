@@ -36,7 +36,7 @@ class PrintEOD(
 
     override fun run() {
         PosDatabase.open(context) { db ->
-            val transactions = withContext(Dispatchers.Default) {
+            val transactions = withContext(Dispatchers.IO) {
                 db.financialTransactionDao().byDate(localDate)
             }
 
