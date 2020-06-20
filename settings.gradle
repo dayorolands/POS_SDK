@@ -1,3 +1,5 @@
+include ':poscore'
+include ':smartpeak'
 include ':sunmi'
 include ':core'
 include ':uicentral'

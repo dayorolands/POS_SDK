@@ -46,8 +46,10 @@ android {
 
 dependencies {
     implementation project(path: ':core')
+    implementation project(path: ':poscore')
     implementation project(path: ':uicentral')
     implementation project(path: ':sunmi')
+    implementation project(path: ':smartpeak')
     implementation fileTree(dir: 'jniLibs', include: ['*.so'])
 
     api files('libs/emv.jar')
