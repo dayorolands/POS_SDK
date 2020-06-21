@@ -80,12 +80,8 @@ class CollectionReferenceGenerationFragment :
     }
 
     private inline fun AutoCompleteTextView.onItemClick(crossinline block: (position: Int) -> Unit) {
-        var oldValue = value
         setOnItemClickListener { _, _, position, _ ->
-            if (value != oldValue) {
-                oldValue = value
-                block(position)
-            }
+            block(position)
         }
     }
 
@@ -148,6 +144,22 @@ class CollectionReferenceGenerationFragment :
     }
 
     private suspend fun generateReference() {
+        if (viewModel.categoryType.value.isNullOrBlank()) {
+            return dialogProvider.showError("Please select a category type")
+        }
+
+        if (viewModel.categoryCode.value.isNullOrBlank()) {
+            return dialogProvider.showError("Please enter a category")
+        }
+
+        if (viewModel.itemCode.value.isNullOrBlank()) {
+            return dialogProvider.showError("Please select a payment item")
+        }
+
+        if (binding.amountInput.value.isBlank()) {
+            return dialogProvider.showError("Please enter an amount")
+        }
+
         val pin = dialogProvider.getPin("Agent PIN") ?: return
 
         val json = Json(JsonConfiguration.Stable)

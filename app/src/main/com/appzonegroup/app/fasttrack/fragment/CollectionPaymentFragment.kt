@@ -1,12 +1,13 @@
 package com.appzonegroup.app.fasttrack.fragment
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.CollectionPaymentFragmentBinding
@@ -18,6 +19,7 @@ import com.appzonegroup.creditclub.pos.printer.PosPrinter
 import com.creditclub.core.data.request.CollectionPaymentRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
+import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
@@ -38,10 +40,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.collectionReference.observe(viewLifecycleOwner, Observer {
-            binding.completePaymentButton.isEnabled = it != null
-        })
-
         (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
@@ -69,9 +67,12 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
         binding.regionInput.onItemClick {
             viewModel.region.postValue(binding.regionInput.value)
-            binding.customerIdInput.text?.clear()
             viewModel.customer.postValue(null)
-            viewModel.customerId.postValue(null)
+        }
+
+        binding.customerIdInput.onChange {
+            viewModel.customer.postValue(null)
+            viewModel.collectionReference.postValue(null)
         }
     }
 
@@ -85,6 +86,21 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
     }
 
+    private inline fun TextInputEditText.onChange(crossinline block: () -> Unit) {
+        var oldValue = value.trim()
+        addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (value.trim() != oldValue) {
+                    oldValue = value
+                    block()
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+    }
+
     private suspend fun loadRegions() = loadDependencies("regions", binding.regionInput) {
         creditClubMiddleWareAPI.collectionsService.getCollectionRegions(
             localStorage.institutionCode,
@@ -96,8 +112,9 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         if (viewModel.region.value.isNullOrBlank())
             return dialogProvider.showError("Please select a region")
 
+        viewModel.customer.value = null
         dialogProvider.showProgressBar("Loading customer")
-        val (response) = safeRunIO {
+        val (response, error) = safeRunIO {
             creditClubMiddleWareAPI.collectionsService.getCollectionCustomer(
                 localStorage.institutionCode,
                 viewModel.customerId.value,
@@ -107,6 +124,8 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
         dialogProvider.hideProgressBar()
 
+        if (error != null) return dialogProvider.showError(error)
+        response?.name ?: return dialogProvider.showError("Please enter a valid customer id")
         viewModel.customer.value = response
     }
 
@@ -114,8 +133,9 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         if (viewModel.region.value.isNullOrBlank())
             return dialogProvider.showError("Please select a region")
 
+        viewModel.collectionReference.value = null
         dialogProvider.showProgressBar("Loading reference")
-        val (response) = safeRunIO {
+        val (response, error) = safeRunIO {
             creditClubMiddleWareAPI.collectionsService.getCollectionReferenceByReference(
                 localStorage.institutionCode,
                 viewModel.reference.value,
@@ -125,7 +145,12 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
         dialogProvider.hideProgressBar()
 
-        viewModel.collectionReference.postValue(response)
+        if (error != null) return dialogProvider.showError(error)
+        response?.reference ?: return dialogProvider.showError("Please enter a valid reference")
+        if (response.isSuccessful != true) {
+            return dialogProvider.showError(response.responseMessage)
+        }
+        viewModel.collectionReference.value = response
     }
 
     private suspend inline fun loadDependencies(
@@ -151,19 +176,43 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     }
 
     private suspend fun onGenerateButtonClick() {
-        if (!viewModel.customerId.value.isNullOrBlank() && viewModel.customer.value == null) {
-            loadCustomer()
+        if (viewModel.region.value.isNullOrBlank()) {
+            return dialogProvider.showError("Please select a region")
         }
 
-        if (viewModel.region.value.isNullOrBlank())
-            return dialogProvider.showError("Please select a region")
-        if (viewModel.customer.value == null)
-            return dialogProvider.showError("Please enter a valid customer id")
+        if (viewModel.customerId.value.isNullOrBlank()) {
+            return dialogProvider.showError("Please enter a customer id")
+        } else if (viewModel.customer.value == null) {
+            loadCustomer()
+            viewModel.customer.value ?: return
+        }
+
+        if (viewModel.customerPhoneNumber.value.isNullOrBlank()) {
+            return dialogProvider.showError("Please enter a phone number")
+        }
 
         findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
     }
 
     private suspend fun completePayment() {
+        if (viewModel.customerId.value.isNullOrBlank()) {
+            return dialogProvider.showError("Please enter a customer id")
+        } else if (viewModel.customer.value == null) {
+            loadCustomer()
+            viewModel.customer.value ?: return
+        }
+
+        if (viewModel.customerPhoneNumber.value.isNullOrBlank()) {
+            return dialogProvider.showError("Please enter a phone number")
+        }
+
+        if (viewModel.reference.value.isNullOrBlank()) {
+            return dialogProvider.showError("Please enter a reference")
+        } else if (viewModel.collectionReference.value == null) {
+            loadReference()
+            viewModel.collectionReference.value ?: return
+        }
+
         val pin = dialogProvider.getPin("Agent PIN") ?: return
 
         val json = Json(JsonConfiguration.Stable)

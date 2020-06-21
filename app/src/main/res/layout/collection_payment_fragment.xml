@@ -70,7 +70,8 @@
                     android:hint="Customer ID"
                     app:endIconDrawable="@drawable/ic_baseline_search_24"
                     app:endIconMode="custom"
-                    app:helperText="@{viewModel.customerName}">
+                    app:helperText="@{viewModel.customerName}"
+                    app:showEndIconIfPresent="@{viewModel.customerId}">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/customer_id_input"
@@ -105,7 +106,8 @@
                     android:layout_height="wrap_content"
                     android:hint="Collection Reference"
                     app:endIconDrawable="@drawable/ic_baseline_search_24"
-                    app:endIconMode="custom">
+                    app:endIconMode="custom"
+                    app:showEndIconIfPresent="@{viewModel.reference}">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/collection_reference_input"
