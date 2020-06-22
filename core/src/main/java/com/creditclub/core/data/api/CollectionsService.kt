@@ -53,7 +53,7 @@ interface CollectionsService {
         @Query("reference") reference: String?,
         @Query("region") region: String?,
         @Query("collectionService") collectionService: String?,
-        @Query("collectiontype") categoryType: String?
+        @Query("collectiontype") collectionType: String?
     ): CollectionReference?
 
     @GET("api/Collections/GetCollectionRegions")

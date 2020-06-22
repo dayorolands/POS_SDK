@@ -26,7 +26,7 @@ import java.util.*
 
 class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment_fragment) {
     private var regions: List<String>? = null
-    private var categoryTypes: List<String>? = null
+    private var collectionTypes: List<String>? = null
     private val posPrinter: PosPrinter by lazy { PosPrinter(requireContext(), dialogProvider) }
     private val binding by dataBinding<CollectionPaymentFragmentBinding>()
     private val viewModel: CollectionPaymentViewModel by activityViewModels()
@@ -69,6 +69,10 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             }
         }
 
+        viewModel.collectionType.onChange {
+            viewModel.reference.postValue(null)
+        }
+
         if (viewModel.region.value != null) {
             mainScope.launch { loadCollectionTypes() }
         }
@@ -98,7 +102,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     }
 
     private suspend fun loadCollectionTypes() =
-        loadDependencies("collection types", categoryTypes, binding.categoryTypeInput) {
+        loadDependencies("collection types", collectionTypes, binding.collectionTypeInput) {
             creditClubMiddleWareAPI.collectionsService.getCollectionTypes(
                 localStorage.institutionCode,
                 viewModel.region.value,
@@ -131,8 +135,8 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         if (viewModel.region.value.isNullOrBlank())
             return dialogProvider.showErrorAndWait("Please select a region")
 
-        if (viewModel.categoryType.value.isNullOrBlank())
-            return dialogProvider.showErrorAndWait("Please select a category type")
+        if (viewModel.collectionType.value.isNullOrBlank())
+            return dialogProvider.showErrorAndWait("Please select a collection type")
 
         viewModel.collectionReference.value = null
         dialogProvider.showProgressBar("Loading reference")
@@ -142,7 +146,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
                 viewModel.reference.value,
                 viewModel.region.value,
                 viewModel.collectionService.value,
-                viewModel.categoryType.value
+                viewModel.collectionType.value
             )
         }
         dialogProvider.hideProgressBar()
@@ -208,8 +212,8 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             return dialogProvider.showErrorAndWait("Please enter a phone number")
         }
 
-        if (viewModel.categoryType.value.isNullOrBlank()) {
-            return dialogProvider.showErrorAndWait("Please enter a category type")
+        if (viewModel.collectionType.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter a collection type")
         }
 
         findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
@@ -253,7 +257,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value
-            categoryType = viewModel.categoryType.value
+            collectionType = viewModel.collectionType.value
             itemCode = viewModel.itemCode.value
             amount = viewModel.collectionReference.value?.amount
             geoLocation = gps.geolocationString

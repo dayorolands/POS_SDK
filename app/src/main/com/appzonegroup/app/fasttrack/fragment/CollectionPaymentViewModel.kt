@@ -25,7 +25,7 @@ class CollectionPaymentViewModel : ViewModel() {
     val itemName: MutableLiveData<String> = MutableLiveData()
     val itemCode: MutableLiveData<String> = MutableLiveData()
 
-    val categoryType: MutableLiveData<String> = MutableLiveData()
+    val collectionType: MutableLiveData<String> = MutableLiveData()
     val collectionService: MutableLiveData<String> = MutableLiveData()
     val customerId: MutableLiveData<String> = MutableLiveData()
     val reference: MutableLiveData<String> = MutableLiveData()

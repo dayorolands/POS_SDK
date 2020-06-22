@@ -107,7 +107,7 @@
                         android:layout_height="wrap_content"
                         android:editable="false"
                         android:inputType="none"
-                        android:text="@={viewModel.categoryType}" />
+                        android:text="@={viewModel.collectionType}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -116,7 +116,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
                     android:hint="Category"
-                    app:dependsOn="@{viewModel.categoryType}">
+                    app:dependsOn="@{viewModel.collectionType}">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/category_input"

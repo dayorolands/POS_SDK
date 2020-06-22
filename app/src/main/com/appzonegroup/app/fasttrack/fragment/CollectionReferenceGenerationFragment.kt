@@ -87,7 +87,7 @@ class CollectionReferenceGenerationFragment :
     private suspend fun loadCategories() = loadDependencies("categories", binding.categoryInput) {
         categories = creditClubMiddleWareAPI.collectionsService.getCollectionCategories(
             localStorage.institutionCode,
-            viewModel.categoryType.value,
+            viewModel.collectionType.value,
             viewModel.region.value,
             viewModel.collectionService.value
         )
@@ -128,10 +128,6 @@ class CollectionReferenceGenerationFragment :
     }
 
     private suspend fun generateReference() {
-        if (viewModel.categoryType.value.isNullOrBlank()) {
-            return dialogProvider.showError("Please select a category type")
-        }
-
         if (viewModel.categoryCode.value.isNullOrBlank()) {
             return dialogProvider.showError("Please enter a category")
         }
@@ -160,7 +156,7 @@ class CollectionReferenceGenerationFragment :
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value
-            categoryType = viewModel.categoryType.value
+            collectionType = viewModel.collectionType.value
             itemCode = viewModel.itemCode.value
             amount = binding.amountInput.value.toDoubleOrNull()
             geoLocation = gps.geolocationString

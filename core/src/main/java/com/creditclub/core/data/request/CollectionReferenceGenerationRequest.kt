@@ -23,8 +23,8 @@ class CollectionReferenceGenerationRequest {
     @SerialName("CategoryCode")
     var categoryCode: String? = null
 
-    @SerialName("CategoryType")
-    var categoryType: String? = null
+    @SerialName("CollectionType")
+    var collectionType: String? = null
 
     @SerialName("ItemCode")
     var itemCode: String? = null
