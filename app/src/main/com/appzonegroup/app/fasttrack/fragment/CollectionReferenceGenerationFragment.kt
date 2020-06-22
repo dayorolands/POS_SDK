@@ -54,14 +54,7 @@ class CollectionReferenceGenerationFragment :
 
         binding.viewModel = viewModel
 
-        mainScope.launch { loadCollectionTypes() }
-
-        binding.collectionTypeInput.onItemClick {
-            binding.categoryInput.clearSuggestions()
-            binding.paymentItemInput.clearSuggestions()
-
-            mainScope.launch { loadCategories() }
-        }
+        mainScope.launch { loadCategories() }
 
         binding.categoryInput.onItemClick { position ->
             viewModel.category.value = categories?.get(position)
@@ -94,7 +87,7 @@ class CollectionReferenceGenerationFragment :
     private suspend fun loadCategories() = loadDependencies("categories", binding.categoryInput) {
         categories = creditClubMiddleWareAPI.collectionsService.getCollectionCategories(
             localStorage.institutionCode,
-            binding.collectionTypeInput.value,
+            viewModel.categoryType.value,
             viewModel.region.value,
             viewModel.collectionService.value
         )
@@ -110,15 +103,6 @@ class CollectionReferenceGenerationFragment :
                 viewModel.collectionService.value
             )
             paymentItems?.map { it.name ?: "Unknown" }
-        }
-
-    private suspend fun loadCollectionTypes() =
-        loadDependencies("collection types", binding.collectionTypeInput) {
-            creditClubMiddleWareAPI.collectionsService.getCollectionTypes(
-                localStorage.institutionCode,
-                viewModel.region.value,
-                viewModel.collectionService.value
-            )
         }
 
     private suspend inline fun loadDependencies(
@@ -172,10 +156,11 @@ class CollectionReferenceGenerationFragment :
         request.apply {
             customerId = viewModel.customerId.value
             reference = viewModel.customerId.value
-            phoneNumber = binding.phoneNumberInput.value
+            phoneNumber = viewModel.customerPhoneNumber.value
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value
+            categoryType = viewModel.categoryType.value
             itemCode = viewModel.itemCode.value
             amount = binding.amountInput.value.toDoubleOrNull()
             geoLocation = gps.geolocationString

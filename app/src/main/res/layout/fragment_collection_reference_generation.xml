@@ -52,7 +52,6 @@
                     android:hint="Reference Name">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/customer_id_input"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -71,7 +70,6 @@
                     android:hint="Phone Number">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/phone_number_input"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -89,7 +87,6 @@
                     android:hint="Region">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/region_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:editable="false"
@@ -102,11 +99,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    android:hint="Collection Type"
-                    app:dependsOn="@{viewModel.region}">
+                    android:enabled="false"
+                    android:hint="Collection Type">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/collection_type_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:editable="false"

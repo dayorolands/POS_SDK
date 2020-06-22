@@ -11,6 +11,9 @@ class CollectionPaymentRequest {
     @SerialName("CategoryCode")
     var categoryCode: String? = null
 
+    @SerialName("CategoryType")
+    var categoryType: String? = null
+
     @SerialName("ItemCode")
     var itemCode: String? = null
 
@@ -25,6 +28,9 @@ class CollectionPaymentRequest {
 
     @SerialName("AgentPin")
     var agentPin: String? = null
+
+    @SerialName("AgentCode")
+    var agencyCode: String? = null
 
     @SerialName("InstitutionCode")
     var institutionCode: String? = null

@@ -3,6 +3,7 @@ package com.creditclub.core.util
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.ui.widget.TextFieldParams
+import java.lang.Exception
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -53,6 +54,13 @@ suspend inline fun DialogProvider.getConfirmation(title: String, subtitle: Strin
 suspend inline fun DialogProvider.showErrorAndWait(mesage: String) =
     suspendCoroutine<Unit> { continuation ->
         showError<Nothing>(mesage) {
+            onClose { continuation.resume(Unit) }
+        }
+    }
+
+suspend inline fun DialogProvider.showErrorAndWait(exception: Exception) =
+    suspendCoroutine<Unit> { continuation ->
+        showError<Nothing>(exception) {
             onClose { continuation.resume(Unit) }
         }
     }

@@ -23,6 +23,9 @@ class CollectionReferenceGenerationRequest {
     @SerialName("CategoryCode")
     var categoryCode: String? = null
 
+    @SerialName("CategoryType")
+    var categoryType: String? = null
+
     @SerialName("ItemCode")
     var itemCode: String? = null
 

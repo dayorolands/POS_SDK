@@ -69,8 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:inputType="numberDecimal"
-                android:maxLength="11" />
+                android:inputType="numberDecimal" />
 
             <TextView
                 android:id="@+id/fieldtwo_tv"

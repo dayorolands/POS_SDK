@@ -26,6 +26,7 @@ import java.util.*
 
 class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment_fragment) {
     private var regions: List<String>? = null
+    private var categoryTypes: List<String>? = null
     private val posPrinter: PosPrinter by lazy { PosPrinter(requireContext(), dialogProvider) }
     private val binding by dataBinding<CollectionPaymentFragmentBinding>()
     private val viewModel: CollectionPaymentViewModel by activityViewModels()
@@ -62,7 +63,14 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
 
         viewModel.region.onChange {
-            viewModel.customer.postValue(null)
+            mainScope.launch {
+                viewModel.customer.postValue(null)
+                loadCollectionTypes()
+            }
+        }
+
+        if (viewModel.region.value != null) {
+            mainScope.launch { loadCollectionTypes() }
         }
 
         viewModel.customerId.onChange {
@@ -89,9 +97,18 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         regions
     }
 
+    private suspend fun loadCollectionTypes() =
+        loadDependencies("collection types", categoryTypes, binding.categoryTypeInput) {
+            creditClubMiddleWareAPI.collectionsService.getCollectionTypes(
+                localStorage.institutionCode,
+                viewModel.region.value,
+                viewModel.collectionService.value
+            )
+        }
+
     private suspend fun loadCustomer() {
         if (viewModel.region.value.isNullOrBlank())
-            return dialogProvider.showError("Please select a region")
+            return dialogProvider.showErrorAndWait("Please select a region")
 
         viewModel.customer.value = null
         dialogProvider.showProgressBar("Loading customer")
@@ -105,14 +122,17 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
         dialogProvider.hideProgressBar()
 
-        if (error != null) return dialogProvider.showError(error)
-        response?.name ?: return dialogProvider.showError("Please enter a valid customer id")
+        if (error != null) return dialogProvider.showErrorAndWait(error)
+        response?.name ?: return dialogProvider.showErrorAndWait("Please enter a valid customer id")
         viewModel.customer.value = response
     }
 
     private suspend fun loadReference() {
         if (viewModel.region.value.isNullOrBlank())
-            return dialogProvider.showError("Please select a region")
+            return dialogProvider.showErrorAndWait("Please select a region")
+
+        if (viewModel.categoryType.value.isNullOrBlank())
+            return dialogProvider.showErrorAndWait("Please select a category type")
 
         viewModel.collectionReference.value = null
         dialogProvider.showProgressBar("Loading reference")
@@ -121,13 +141,15 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
                 localStorage.institutionCode,
                 viewModel.reference.value,
                 viewModel.region.value,
-                viewModel.collectionService.value
+                viewModel.collectionService.value,
+                viewModel.categoryType.value
             )
         }
         dialogProvider.hideProgressBar()
 
-        if (error != null) return dialogProvider.showError(error)
-        response?.reference ?: return dialogProvider.showError("Please enter a valid reference")
+        if (error != null) return dialogProvider.showErrorAndWait(error)
+        response?.reference
+            ?: return dialogProvider.showErrorAndWait("Please enter a valid reference")
         if (response.isSuccessful != true) {
             return dialogProvider.showError(response.responseMessage)
         }
@@ -150,11 +172,8 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
 
         if (items == null) {
-            dialogProvider.showError<Nothing>("An error occurred while loading $dependencyName") {
-                onClose {
-//                    findNavController().popBackStack()
-                }
-            }
+            dialogProvider.showErrorAndWait("An error occurred while loading $dependencyName")
+//            findNavController().popBackStack()
             return
         }
 
@@ -168,7 +187,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
                 item,
                 itemCode,
                 category,
-                categoryType,
                 categoryName,
                 reference,
                 collectionReference
@@ -176,18 +194,22 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
 
         if (viewModel.region.value.isNullOrBlank()) {
-            return dialogProvider.showError("Please select a region")
+            return dialogProvider.showErrorAndWait("Please select a region")
         }
 
         if (viewModel.customerId.value.isNullOrBlank()) {
-            return dialogProvider.showError("Please enter a customer id")
+            return dialogProvider.showErrorAndWait("Please enter a customer id")
         } else if (viewModel.customer.value == null) {
             loadCustomer()
             viewModel.customer.value ?: return
         }
 
         if (viewModel.customerPhoneNumber.value.isNullOrBlank()) {
-            return dialogProvider.showError("Please enter a phone number")
+            return dialogProvider.showErrorAndWait("Please enter a phone number")
+        }
+
+        if (viewModel.categoryType.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter a category type")
         }
 
         findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
@@ -201,18 +223,18 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
     private suspend fun completePayment() {
         if (viewModel.customerId.value.isNullOrBlank()) {
-            return dialogProvider.showError("Please enter a customer id")
+            return dialogProvider.showErrorAndWait("Please enter a customer id")
         } else if (viewModel.customer.value == null) {
             loadCustomer()
             viewModel.customer.value ?: return
         }
 
         if (viewModel.customerPhoneNumber.value.isNullOrBlank()) {
-            return dialogProvider.showError("Please enter a phone number")
+            return dialogProvider.showErrorAndWait("Please enter a phone number")
         }
 
         if (viewModel.reference.value.isNullOrBlank()) {
-            return dialogProvider.showError("Please enter a reference")
+            return dialogProvider.showErrorAndWait("Please enter a reference")
         } else if (viewModel.collectionReference.value == null) {
             loadReference()
             viewModel.collectionReference.value ?: return
@@ -231,6 +253,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value
+            categoryType = viewModel.categoryType.value
             itemCode = viewModel.itemCode.value
             amount = viewModel.collectionReference.value?.amount
             geoLocation = gps.geolocationString
@@ -239,6 +262,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             agentPhoneNumber = localStorage.agentPhone
             collectionService = viewModel.collectionService.value
             requestReference = uniqueReference
+            agencyCode = "425"
             additionalInformation = json.stringify(serializer, additional)
         }
         dialogProvider.showProgressBar("Processing request")
@@ -246,8 +270,11 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             creditClubMiddleWareAPI.collectionsService.collectionPayment(request)
         }
         dialogProvider.hideProgressBar()
-        if (error != null) return dialogProvider.showError(error)
-        response ?: return dialogProvider.showError("An error occurred. Please try again later")
+        if (error != null) return dialogProvider.showErrorAndWait(error)
+        if (response == null) {
+            dialogProvider.showErrorAndWait("An error occurred. Please try again later")
+            return
+        }
 
         if (response.isSuccessful == true) {
             dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
