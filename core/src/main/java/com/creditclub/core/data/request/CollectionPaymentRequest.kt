@@ -29,9 +29,6 @@ class CollectionPaymentRequest {
     @SerialName("AgentPin")
     var agentPin: String? = null
 
-    @SerialName("AgencyCode")
-    var agencyCode: String? = null
-
     @SerialName("InstitutionCode")
     var institutionCode: String? = null
 

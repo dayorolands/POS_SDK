@@ -105,8 +105,6 @@
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:editable="false"
-                        android:inputType="none"
                         android:text="@={viewModel.collectionType}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -122,7 +120,6 @@
                         android:id="@+id/category_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="none"
                         android:text="@{viewModel.categoryName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -138,7 +135,6 @@
                         android:id="@+id/payment_item_input"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:editable="false"
                         android:text="@={viewModel.itemName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 

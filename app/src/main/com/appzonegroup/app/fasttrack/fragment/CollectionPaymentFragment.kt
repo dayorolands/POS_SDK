@@ -65,6 +65,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         viewModel.region.onChange {
             mainScope.launch {
                 viewModel.customer.postValue(null)
+                collectionTypes = null
                 loadCollectionTypes()
             }
         }
@@ -103,11 +104,12 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
     private suspend fun loadCollectionTypes() =
         loadDependencies("collection types", collectionTypes, binding.collectionTypeInput) {
-            creditClubMiddleWareAPI.collectionsService.getCollectionTypes(
+            collectionTypes = creditClubMiddleWareAPI.collectionsService.getCollectionTypes(
                 localStorage.institutionCode,
                 viewModel.region.value,
                 viewModel.collectionService.value
             )
+            collectionTypes
         }
 
     private suspend fun loadCustomer() {
@@ -190,6 +192,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             clearData(
                 item,
                 itemCode,
+                itemName,
                 category,
                 categoryName,
                 reference,
@@ -266,7 +269,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             agentPhoneNumber = localStorage.agentPhone
             collectionService = viewModel.collectionService.value
             requestReference = uniqueReference
-            agencyCode = "425"
             additionalInformation = json.stringify(serializer, additional)
         }
         dialogProvider.showProgressBar("Processing request")

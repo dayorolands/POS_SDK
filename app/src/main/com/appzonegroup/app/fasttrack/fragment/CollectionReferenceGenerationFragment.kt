@@ -91,7 +91,7 @@ class CollectionReferenceGenerationFragment :
             viewModel.region.value,
             viewModel.collectionService.value
         )
-        categories?.map { it.name ?: "Unknown" }
+        categories?.map { "${it.name} - ${it.code}" }
     }
 
     private suspend fun loadPaymentItems() =
@@ -102,7 +102,7 @@ class CollectionReferenceGenerationFragment :
                 viewModel.region.value,
                 viewModel.collectionService.value
             )
-            paymentItems?.map { it.name ?: "Unknown" }
+            paymentItems?.map { "${it.name} - ${it.code}" }
         }
 
     private suspend inline fun loadDependencies(
@@ -129,11 +129,11 @@ class CollectionReferenceGenerationFragment :
 
     private suspend fun generateReference() {
         if (viewModel.categoryCode.value.isNullOrBlank()) {
-            return dialogProvider.showError("Please enter a category")
+            return dialogProvider.showError("Please select a valid category")
         }
 
         if (viewModel.itemCode.value.isNullOrBlank()) {
-            return dialogProvider.showError("Please select a payment item")
+            return dialogProvider.showError("Please select a valid payment item")
         }
 
         if (binding.amountInput.value.isBlank()) {
