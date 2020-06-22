@@ -22,6 +22,7 @@ import com.creditclub.core.util.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import org.threeten.bp.Instant
 import java.util.*
 
 class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment_fragment) {
@@ -279,8 +280,17 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         if (error != null) return dialogProvider.showErrorAndWait(error)
         if (response == null) {
             dialogProvider.showErrorAndWait("An error occurred. Please try again later")
+            activity?.onBackPressed()
             return
         }
+
+        response.date = Instant.now()
+        response.collectionPaymentItemName =
+            response.collectionPaymentItemName
+                ?: "${viewModel.itemName.value} (${viewModel.itemCode.value})"
+        response.collectionCategoryName =
+            response.collectionCategoryName
+                ?: "${viewModel.categoryName.value} (${viewModel.categoryCode.value})"
 
         if (response.isSuccessful == true) {
             dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")

@@ -68,13 +68,17 @@ fun serverTimetoDate(time: String): Date {
     return Date()
 }
 
-fun Instant.toString(pattern: String, zoneID: String = defaultZone): String {
+fun Instant.format(pattern: String, zoneID: String = defaultZone): String {
     return formatter(pattern, zoneID).format(this)
 }
 
-fun LocalDate.toString(pattern: String, zoneID: String = defaultZone): String {
+fun Instant.toString(pattern: String, zoneID: String = defaultZone) = format(pattern, zoneID)
+
+fun LocalDate.format(pattern: String, zoneID: String = defaultZone): String {
     return formatter(pattern, zoneID).format(this)
 }
+
+fun LocalDate.toString(pattern: String, zoneID: String = defaultZone) = format(pattern, zoneID)
 
 fun String.toLocalDate() = LocalDate.parse(this)
 

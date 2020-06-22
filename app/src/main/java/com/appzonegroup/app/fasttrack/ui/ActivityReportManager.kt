@@ -265,7 +265,7 @@ class ActivityReportManager(
                 if (response == null) {
                     return dialogProvider.showError("An error occurred. Please try again later")
                 }
-
+                response.date = item.date?.toInstant(CREDIT_CLUB_DATE_PATTERN)
                 if (response.isSuccessful == true) {
                     dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
                 } else {

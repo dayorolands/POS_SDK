@@ -3,35 +3,35 @@ package com.appzonegroup.app.fasttrack.receipt
 import android.content.Context
 import com.appzonegroup.creditclub.pos.printer.LogoNode
 import com.appzonegroup.creditclub.pos.printer.PrintNode
+import com.appzonegroup.creditclub.pos.printer.TextNode
 import com.appzonegroup.creditclub.pos.printer.footerNodes
 import com.appzonegroup.creditclub.pos.receipt.TransactionReceipt
 import com.creditclub.core.data.response.CollectionPaymentResponse
+import com.creditclub.core.util.format
+import com.creditclub.core.util.localStorage
 
 class CollectionPaymentReceipt(context: Context, val response: CollectionPaymentResponse) :
     TransactionReceipt(context) {
 
     override val nodes: List<PrintNode>
         get() {
-            return mutableListOf<PrintNode>(
-                LogoNode()
+            return mutableListOf(
+                LogoNode(),
 
-//                TextNode(
-//                    """
-//Agent Code: ${context.localStorage.agent?.agentCode}
-//Agent Phone: ${context.localStorage.agentPhone}
-//--------------------------
-//Amount NGN${response.amount}
-//
-//Payment Item: ${response.paymentItemName}
-//Collection Type ${response.billerName}
-//
-//Customer ID: ${response.customerId}
-//Reference Name: ${response.referenceName}
-//
-//Reference: ${response.collectionReference}
-//Transaction Date: ${response.date.toString("dd-MM-YYYY hh:mm")}
-//"""
-//                )
+                TextNode(
+                    """
+Agent Code: ${context.localStorage.agent?.agentCode}
+Agent Phone: ${context.localStorage.agentPhone}
+--------------------------
+Amount NGN${response.amount}
+
+Category ${response.collectionCategoryName}
+Payment Item: ${response.collectionPaymentItemName}
+
+Reference: ${response.collectionReference}
+Transaction Date: ${response.date?.format("dd-MM-YYYY hh:mm")}
+"""
+                )
             ).apply { addTransactionStatus(); addAll(footerNodes) }.toList()
         }
 }
