@@ -138,6 +138,8 @@ fun BaseActivity.openPageById(id: Int) {
 
         R.id.fn_faq -> startActivity(FaqActivity::class.java)
 
+        R.id.collection_payment_button, R.id.fn_collections_payment -> startActivity(MainActivity::class.java)
+
         else -> showNotification(
             "This function is not available at the moment. Please look out for it in our next update.",
             false

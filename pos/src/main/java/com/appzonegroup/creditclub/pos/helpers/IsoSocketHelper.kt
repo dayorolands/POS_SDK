@@ -41,7 +41,7 @@ class IsoSocketHelper(
     @Throws(ISOException::class, IOException::class, ConnectException::class)
     inline fun sendAsync(isoMsg: BaseIsoMsg, crossinline next: (Result) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
-            val result = withContext(Dispatchers.Default) {
+            val result = withContext(Dispatchers.IO) {
                 send(isoMsg)
             }
             next(result)

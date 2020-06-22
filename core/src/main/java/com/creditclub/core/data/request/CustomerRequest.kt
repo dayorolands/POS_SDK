@@ -2,8 +2,6 @@ package com.creditclub.core.data.request
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UnstableDefault
-import kotlinx.serialization.json.Json
 
 @Serializable
 class CustomerRequest {
@@ -107,8 +105,5 @@ class CustomerRequest {
 
         @SerialName("State")
         var state: String? = null
-
-        @UnstableDefault
-        fun toJson(): String = Json.nonstrict.stringify(serializer(), this)
     }
 }

@@ -72,6 +72,7 @@ class CreditClubSubMenuActivity : BaseActivity(), View.OnClickListener {
                 binding.payBillButton.button.setOnClickListener(this)
                 binding.airtimeButton.button.setOnClickListener(this)
                 binding.fundsTransferButton.button.setOnClickListener(this)
+                binding.collectionPaymentButton.button.setOnClickListener(this)
 
                 if (Platform.isPOS) {
                     binding.cardWithdrawalButton.button.setOnClickListener(this)
@@ -92,7 +93,7 @@ class CreditClubSubMenuActivity : BaseActivity(), View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
-        v?.apply { openPageById(id) }
+        v?.run { openPageById(id) }
     }
 
     fun onBackPressed(v: View?) {

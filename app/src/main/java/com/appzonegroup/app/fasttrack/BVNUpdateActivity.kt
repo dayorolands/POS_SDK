@@ -75,7 +75,7 @@ class BVNUpdateActivity : CustomerBaseActivity() {
     }
 
     class AuthorizationFragment : CreditClubFragment() {
-        override val activity get() = getActivity() as BVNUpdateActivity
+        val activity get() = getActivity() as BVNUpdateActivity
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             val rootView = inflater.inflate(R.layout.fragment_authorization, container, false)
@@ -169,7 +169,7 @@ class BVNUpdateActivity : CustomerBaseActivity() {
     }
 
     class AccountDetailsFragment : CreditClubFragment() {
-        override val activity get() = getActivity() as BVNUpdateActivity
+        val activity get() = getActivity() as BVNUpdateActivity
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             val rootView = inflater.inflate(R.layout.fragment_account_details, container, false)

@@ -42,6 +42,7 @@ import kotlinx.android.synthetic.main.fragment_next_of_kin.*
 import kotlinx.android.synthetic.main.fragment_next_of_kin.view.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -205,7 +206,7 @@ class CustomerRequestOpenAccountActivity : BaseActivity(), FormDataHolder<Custom
         //additionalInformation.setProvince(province);
 
         formData.additionalInformation =
-            Json.stringify(CustomerRequest.Additional.serializer(), additionalInformation)
+            Json(JsonConfiguration.Stable).stringify(CustomerRequest.Additional.serializer(), additionalInformation)
 
         mainScope.launch {
             showProgressBar("Creating customer account")

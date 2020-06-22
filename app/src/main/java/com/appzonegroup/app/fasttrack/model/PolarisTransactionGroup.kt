@@ -17,6 +17,7 @@ object PolarisTransactionGroup : TransactionGroup(
         TransactionType.BillsPayment,
         TransactionType.Registration,
         TransactionType.FundsTransferCommercialBank,
-        TransactionType.LocalFundsTransfer
+        TransactionType.LocalFundsTransfer,
+        TransactionType.CollectionPayment
     )
 )

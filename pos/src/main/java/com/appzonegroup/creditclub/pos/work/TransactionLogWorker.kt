@@ -12,6 +12,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import okhttp3.MediaType
 import okhttp3.RequestBody
 
@@ -34,7 +35,7 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
             async {
                 val requestBody = RequestBody.create(
                     mediaType,
-                    Json.stringify(serializer, receipt)
+                    Json(JsonConfiguration.Stable).stringify(serializer, receipt)
                 )
 
                 val (response) = safeRunSuspend {

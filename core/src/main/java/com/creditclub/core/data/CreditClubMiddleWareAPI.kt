@@ -4,6 +4,7 @@ import com.creditclub.core.data.api.*
 import com.creditclub.core.util.delegates.service
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -22,7 +23,16 @@ open class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) 
         .client(okHttpClient)
         .addConverterFactory(NullOnEmptyConverterFactory.create())
         .addConverterFactory(ScalarsConverterFactory.create())
-        .addConverterFactory(Json.nonstrict.asConverterFactory(contentType))
+        .addConverterFactory(
+            Json(
+                JsonConfiguration.Stable.copy(
+                    isLenient = true,
+                    ignoreUnknownKeys = true,
+                    serializeSpecialFloatingPointValues = true,
+                    useArrayPolymorphism = true
+                )
+            ).asConverterFactory(contentType)
+        )
         .build()
 
     val staticService by retrofit.service(StaticService::class)
@@ -44,4 +54,6 @@ open class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) 
     val offlineHlaTaggingService by retrofit.service(OfflineHlaTaggingService::class)
 
     val versionService by retrofit.service(VersionService::class)
+
+    val collectionsService by retrofit.service(CollectionsService::class)
 }

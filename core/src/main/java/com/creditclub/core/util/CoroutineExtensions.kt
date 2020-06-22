@@ -1,5 +1,6 @@
 package com.creditclub.core.util
 
+import android.util.Log
 import com.creditclub.core.BuildConfig
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +26,10 @@ suspend inline fun <T> safeRunIO(crossinline block: suspend CoroutineScope.() ->
         } catch (ex: Exception) {
             error = ex
             FirebaseCrashlytics.getInstance().recordException(ex)
-            if (BuildConfig.DEBUG) ex.printStackTrace()
+            debugOnly {
+                Log.e("safeRunIO", ex.message, ex)
+                ex.printStackTrace()
+            }
         }
 
         SafeRunResult(data, error)
@@ -40,7 +44,10 @@ suspend inline fun <T> safeRunSuspend(crossinline block: suspend () -> T): SafeR
     } catch (ex: Exception) {
         error = ex
         FirebaseCrashlytics.getInstance().recordException(ex)
-        if (BuildConfig.DEBUG) ex.printStackTrace()
+        debugOnly {
+            Log.e("safeRun", ex.message, ex)
+            ex.printStackTrace()
+        }
     }
 
     return SafeRunResult(data, error)
