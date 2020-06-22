@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.R
@@ -24,6 +25,8 @@ import kotlinx.serialization.json.JsonConfiguration
 import java.util.*
 
 class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment_fragment) {
+    private var regions: List<String>? = null
+    private var collectionTypes: List<String>? = null
     private val posPrinter: PosPrinter by lazy { PosPrinter(requireContext(), dialogProvider) }
     private val binding by dataBinding<CollectionPaymentFragmentBinding>()
     private val viewModel: CollectionPaymentViewModel by activityViewModels()
@@ -31,17 +34,8 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     private val request = CollectionPaymentRequest()
     private val uniqueReference = UUID.randomUUID().toString()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mainScope.launch { loadRegions() }
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.collectionReference.observe(viewLifecycleOwner, Observer {
-            binding.completePaymentButton.isEnabled = it != null
-        })
-
         (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
@@ -51,6 +45,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
         binding.viewModel = viewModel
         binding.toolbar.title = "Collection Payment"
+        mainScope.launch { loadRegions() }
         binding.completePaymentButton.setOnClickListener {
             mainScope.launch { completePayment() }
         }
@@ -67,37 +62,63 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             mainScope.launch { loadReference() }
         }
 
-        binding.regionInput.onItemClick {
-            viewModel.region.postValue(binding.regionInput.value)
-            binding.customerIdInput.text?.clear()
-            viewModel.customer.postValue(null)
-            viewModel.customerId.postValue(null)
-        }
-    }
-
-    private inline fun AutoCompleteTextView.onItemClick(crossinline block: (position: Int) -> Unit) {
-        var oldValue = value
-        setOnItemClickListener { _, _, position, _ ->
-            if (value != oldValue) {
-                oldValue = value
-                block(position)
+        viewModel.region.onChange {
+            mainScope.launch {
+                viewModel.customer.postValue(null)
+                collectionTypes = null
+                loadCollectionTypes()
             }
         }
+
+        viewModel.collectionType.onChange {
+            viewModel.reference.postValue(null)
+        }
+
+        if (viewModel.region.value != null) {
+            mainScope.launch { loadCollectionTypes() }
+        }
+
+        viewModel.customerId.onChange {
+            viewModel.customer.postValue(null)
+            viewModel.collectionReference.postValue(null)
+        }
     }
 
-    private suspend fun loadRegions() = loadDependencies("regions", binding.regionInput) {
-        creditClubMiddleWareAPI.collectionsService.getCollectionRegions(
+    private inline fun <T> MutableLiveData<T>.onChange(crossinline block: () -> Unit) {
+        var oldValue = value
+        observe(viewLifecycleOwner, Observer {
+            if (value != oldValue) {
+                oldValue = value
+                block()
+            }
+        })
+    }
+
+    private suspend fun loadRegions() = loadDependencies("regions", regions, binding.regionInput) {
+        regions = creditClubMiddleWareAPI.collectionsService.getCollectionRegions(
             localStorage.institutionCode,
             viewModel.collectionService.value
         )
+        regions
     }
+
+    private suspend fun loadCollectionTypes() =
+        loadDependencies("collection types", collectionTypes, binding.collectionTypeInput) {
+            collectionTypes = creditClubMiddleWareAPI.collectionsService.getCollectionTypes(
+                localStorage.institutionCode,
+                viewModel.region.value,
+                viewModel.collectionService.value
+            )
+            collectionTypes
+        }
 
     private suspend fun loadCustomer() {
         if (viewModel.region.value.isNullOrBlank())
-            return dialogProvider.showError("Please select a region")
+            return dialogProvider.showErrorAndWait("Please select a region")
 
+        viewModel.customer.value = null
         dialogProvider.showProgressBar("Loading customer")
-        val (response) = safeRunIO {
+        val (response, error) = safeRunIO {
             creditClubMiddleWareAPI.collectionsService.getCollectionCustomer(
                 localStorage.institutionCode,
                 viewModel.customerId.value,
@@ -107,42 +128,58 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
         dialogProvider.hideProgressBar()
 
+        if (error != null) return dialogProvider.showErrorAndWait(error)
+        response?.name ?: return dialogProvider.showErrorAndWait("Please enter a valid customer id")
         viewModel.customer.value = response
     }
 
     private suspend fun loadReference() {
         if (viewModel.region.value.isNullOrBlank())
-            return dialogProvider.showError("Please select a region")
+            return dialogProvider.showErrorAndWait("Please select a region")
 
+        if (viewModel.collectionType.value.isNullOrBlank())
+            return dialogProvider.showErrorAndWait("Please select a collection type")
+
+        viewModel.collectionReference.value = null
         dialogProvider.showProgressBar("Loading reference")
-        val (response) = safeRunIO {
+        val (response, error) = safeRunIO {
             creditClubMiddleWareAPI.collectionsService.getCollectionReferenceByReference(
                 localStorage.institutionCode,
                 viewModel.reference.value,
                 viewModel.region.value,
-                viewModel.collectionService.value
+                viewModel.collectionService.value,
+                viewModel.collectionType.value
             )
         }
         dialogProvider.hideProgressBar()
 
-        viewModel.collectionReference.postValue(response)
+        if (error != null) return dialogProvider.showErrorAndWait(error)
+        response?.reference
+            ?: return dialogProvider.showErrorAndWait("Please enter a valid reference")
+        if (response.isSuccessful != true) {
+            return dialogProvider.showError(response.responseMessage)
+        }
+        viewModel.collectionReference.value = response
     }
 
     private suspend inline fun loadDependencies(
         dependencyName: String,
+        currentValue: List<String>?,
         autoCompleteTextView: AutoCompleteTextView,
-        crossinline block: suspend () -> List<String>?
+        crossinline fetcher: suspend () -> List<String>?
     ) {
-        dialogProvider.showProgressBar("Loading $dependencyName")
-        val (items) = safeRunIO { block() }
-        dialogProvider.hideProgressBar()
+        val items = if (currentValue == null) {
+            dialogProvider.showProgressBar("Loading $dependencyName")
+            val (items) = safeRunIO { fetcher() }
+            dialogProvider.hideProgressBar()
+            items
+        } else {
+            currentValue
+        }
 
         if (items == null) {
-            dialogProvider.showError<Nothing>("An error occurred while loading $dependencyName") {
-                onClose {
-//                    findNavController().popBackStack()
-                }
-            }
+            dialogProvider.showErrorAndWait("An error occurred while loading $dependencyName")
+//            findNavController().popBackStack()
             return
         }
 
@@ -151,19 +188,65 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     }
 
     private suspend fun onGenerateButtonClick() {
-        if (!viewModel.customerId.value.isNullOrBlank() && viewModel.customer.value == null) {
-            loadCustomer()
+        viewModel.run {
+            clearData(
+                item,
+                itemCode,
+                itemName,
+                category,
+                categoryName,
+                reference,
+                collectionReference
+            )
         }
 
-        if (viewModel.region.value.isNullOrBlank())
-            return dialogProvider.showError("Please select a region")
-        if (viewModel.customer.value == null)
-            return dialogProvider.showError("Please enter a valid customer id")
+        if (viewModel.region.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please select a region")
+        }
+
+        if (viewModel.customerId.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter a customer id")
+        } else if (viewModel.customer.value == null) {
+            loadCustomer()
+            viewModel.customer.value ?: return
+        }
+
+        if (viewModel.customerPhoneNumber.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter a phone number")
+        }
+
+        if (viewModel.collectionType.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter a collection type")
+        }
 
         findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
     }
 
+    private fun clearData(vararg liveData: MutableLiveData<*>) {
+        for (liveDatum in liveData) {
+            liveDatum.value = null
+        }
+    }
+
     private suspend fun completePayment() {
+        if (viewModel.customerId.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter a customer id")
+        } else if (viewModel.customer.value == null) {
+            loadCustomer()
+            viewModel.customer.value ?: return
+        }
+
+        if (viewModel.customerPhoneNumber.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter a phone number")
+        }
+
+        if (viewModel.reference.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter a reference")
+        } else if (viewModel.collectionReference.value == null) {
+            loadReference()
+            viewModel.collectionReference.value ?: return
+        }
+
         val pin = dialogProvider.getPin("Agent PIN") ?: return
 
         val json = Json(JsonConfiguration.Stable)
@@ -177,6 +260,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value
+            collectionType = viewModel.collectionType.value
             itemCode = viewModel.itemCode.value
             amount = viewModel.collectionReference.value?.amount
             geoLocation = gps.geolocationString
@@ -192,8 +276,11 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             creditClubMiddleWareAPI.collectionsService.collectionPayment(request)
         }
         dialogProvider.hideProgressBar()
-        if (error != null) return dialogProvider.showError(error)
-        response ?: return dialogProvider.showError("An error occurred. Please try again later")
+        if (error != null) return dialogProvider.showErrorAndWait(error)
+        if (response == null) {
+            dialogProvider.showErrorAndWait("An error occurred. Please try again later")
+            return
+        }
 
         if (response.isSuccessful == true) {
             dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")

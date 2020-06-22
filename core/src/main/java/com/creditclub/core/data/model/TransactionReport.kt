@@ -66,6 +66,9 @@ class TransactionReport {
         @SerialName("DisplayMessage")
         var displayMessage: String? = null
 
+        @SerialName("UniqueReference")
+        var uniqueReference: String? = null
+
         @SerialName("ID")
         var id: Long = 0
     }

@@ -14,6 +14,7 @@ import com.creditclub.ui.adapter.PosReportAdapter
 import com.appzonegroup.app.fasttrack.adapter.TransactionReportAdapter
 import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
 import com.appzonegroup.creditclub.pos.Platform
+import com.appzonegroup.creditclub.pos.printer.PosPrinter
 import com.creditclub.core.data.model.TransactionReport
 import com.creditclub.core.util.*
 import com.creditclub.ui.databinding.ActivityReportBinding
@@ -36,7 +37,8 @@ class ActivityReportManager(
     private var startIndex = 0
     private val maxSize = 20
     private var totalCount = 0
-
+    private val dialogProvider = activity.dialogProvider
+    private val posPrinter by lazy { PosPrinter(context, dialogProvider) }
     private var selectedTransactionType = transactionGroup.first()
     private var selectedTransactionStatus = TransactionStatus.Successful
     private var transactionAdapter =
@@ -234,45 +236,48 @@ class ActivityReportManager(
                     selectedTransactionType
                 )
             binding.content.container.adapter = transactionAdapter
-            transactionAdapter.setOnPrintClickListener(object :TransactionReportAdapter.OnPrintClickListener{
+            transactionAdapter.setOnPrintClickListener(object :
+                TransactionReportAdapter.OnPrintClickListener {
                 override fun onClick(item: TransactionReport.ReportItem, type: TransactionType) {
                     activity.mainScope.launch {
-                        printReceipt(item,type)
+                        printReceipt(item, type)
                     }
                 }
             })
         }
     }
 
-    private suspend fun printReceipt(
-        item: TransactionReport.ReportItem,
-        type: TransactionType
-    ) {
-//        when(type) {
-//            TransactionType.CollectionPayment->{
-//                val dialogProvider=activity.dialogProvider
-//                dialogProvider.showProgressBar("Loading collection reference")
-//                val (response, error) = safeRunIO {
-//                    creditClubMiddleWareAPI.collectionsService.verifyCollectionPayment(
-//
-//                    )
-//                }
-//                dialogProvider.hideProgressBar()
-//
-//                if (error != null) return dialogProvider.showError(error)
-//                response ?: return dialogProvider.showError("An error occurred. Please try again later")
-//
-//                if (response.isSuccessful == true) {
-//                    dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
-//                } else {
-//                    dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
-//                }
-//
-//                if (Platform.hasPrinter) {
-//                    posPrinter.print(CollectionPaymentReceipt(activity, response))
-//                }
-//            }
-//            else -> {}
-//        }
+    private suspend fun printReceipt(item: TransactionReport.ReportItem, type: TransactionType) {
+        when (type) {
+            TransactionType.CollectionPayment -> {
+                dialogProvider.showProgressBar("Loading collection reference")
+                val (response, error) = safeRunIO {
+                    creditClubMiddleWareAPI.collectionsService.verifyCollectionPayment(
+                        context.localStorage.institutionCode,
+                        item.uniqueReference,
+                        null,
+                        null
+                    )
+                }
+                dialogProvider.hideProgressBar()
+
+                if (error != null) return dialogProvider.showError(error)
+                if (response == null) {
+                    return dialogProvider.showError("An error occurred. Please try again later")
+                }
+
+                if (response.isSuccessful == true) {
+                    dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
+                } else {
+                    dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
+                }
+
+                if (Platform.hasPrinter) {
+                    posPrinter.print(CollectionPaymentReceipt(activity, response))
+                }
+            }
+            else -> {
+            }
+        }
     }
 }

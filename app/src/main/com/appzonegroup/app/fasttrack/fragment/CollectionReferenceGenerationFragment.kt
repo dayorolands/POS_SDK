@@ -54,14 +54,7 @@ class CollectionReferenceGenerationFragment :
 
         binding.viewModel = viewModel
 
-        mainScope.launch { loadCollectionTypes() }
-
-        binding.collectionTypeInput.onItemClick {
-            binding.categoryInput.clearSuggestions()
-            binding.paymentItemInput.clearSuggestions()
-
-            mainScope.launch { loadCategories() }
-        }
+        mainScope.launch { loadCategories() }
 
         binding.categoryInput.onItemClick { position ->
             viewModel.category.value = categories?.get(position)
@@ -80,12 +73,8 @@ class CollectionReferenceGenerationFragment :
     }
 
     private inline fun AutoCompleteTextView.onItemClick(crossinline block: (position: Int) -> Unit) {
-        var oldValue = value
         setOnItemClickListener { _, _, position, _ ->
-            if (value != oldValue) {
-                oldValue = value
-                block(position)
-            }
+            block(position)
         }
     }
 
@@ -98,11 +87,11 @@ class CollectionReferenceGenerationFragment :
     private suspend fun loadCategories() = loadDependencies("categories", binding.categoryInput) {
         categories = creditClubMiddleWareAPI.collectionsService.getCollectionCategories(
             localStorage.institutionCode,
-            binding.collectionTypeInput.value,
+            viewModel.collectionType.value,
             viewModel.region.value,
             viewModel.collectionService.value
         )
-        categories?.map { it.name ?: "Unknown" }
+        categories?.map { "${it.name} - ${it.code}" }
     }
 
     private suspend fun loadPaymentItems() =
@@ -113,16 +102,7 @@ class CollectionReferenceGenerationFragment :
                 viewModel.region.value,
                 viewModel.collectionService.value
             )
-            paymentItems?.map { it.name ?: "Unknown" }
-        }
-
-    private suspend fun loadCollectionTypes() =
-        loadDependencies("collection types", binding.collectionTypeInput) {
-            creditClubMiddleWareAPI.collectionsService.getCollectionTypes(
-                localStorage.institutionCode,
-                viewModel.region.value,
-                viewModel.collectionService.value
-            )
+            paymentItems?.map { "${it.name} - ${it.code}" }
         }
 
     private suspend inline fun loadDependencies(
@@ -148,6 +128,18 @@ class CollectionReferenceGenerationFragment :
     }
 
     private suspend fun generateReference() {
+        if (viewModel.categoryCode.value.isNullOrBlank()) {
+            return dialogProvider.showError("Please select a valid category")
+        }
+
+        if (viewModel.itemCode.value.isNullOrBlank()) {
+            return dialogProvider.showError("Please select a valid payment item")
+        }
+
+        if (binding.amountInput.value.isBlank()) {
+            return dialogProvider.showError("Please enter an amount")
+        }
+
         val pin = dialogProvider.getPin("Agent PIN") ?: return
 
         val json = Json(JsonConfiguration.Stable)
@@ -160,10 +152,11 @@ class CollectionReferenceGenerationFragment :
         request.apply {
             customerId = viewModel.customerId.value
             reference = viewModel.customerId.value
-            phoneNumber = binding.phoneNumberInput.value
+            phoneNumber = viewModel.customerPhoneNumber.value
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value
+            collectionType = viewModel.collectionType.value
             itemCode = viewModel.itemCode.value
             amount = binding.amountInput.value.toDoubleOrNull()
             geoLocation = gps.geolocationString

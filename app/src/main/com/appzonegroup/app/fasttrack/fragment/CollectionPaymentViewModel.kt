@@ -6,11 +6,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.appzonegroup.app.fasttrack.R
 import com.creditclub.core.data.model.CollectionCategory
 import com.creditclub.core.data.model.CollectionCustomer
 import com.creditclub.core.data.model.CollectionPaymentItem
 import com.creditclub.core.data.model.CollectionReference
 import com.creditclub.core.util.toCurrencyFormat
+import com.google.android.material.textfield.TextInputLayout
 
 class CollectionPaymentViewModel : ViewModel() {
     val collectionReference: MutableLiveData<CollectionReference> = MutableLiveData()
@@ -23,7 +25,7 @@ class CollectionPaymentViewModel : ViewModel() {
     val itemName: MutableLiveData<String> = MutableLiveData()
     val itemCode: MutableLiveData<String> = MutableLiveData()
 
-    val categoryType: MutableLiveData<String> = MutableLiveData()
+    val collectionType: MutableLiveData<String> = MutableLiveData()
     val collectionService: MutableLiveData<String> = MutableLiveData()
     val customerId: MutableLiveData<String> = MutableLiveData()
     val reference: MutableLiveData<String> = MutableLiveData()
@@ -33,7 +35,7 @@ class CollectionPaymentViewModel : ViewModel() {
     val customerPhoneNumber: MutableLiveData<String> = MutableLiveData()
     val customerName = Transformations.map(customer) { it?.name }
     val amountString = Transformations.map(collectionReference) {
-        it.amount?.toCurrencyFormat(it?.currency ?: "NGN")
+        it?.amount?.toCurrencyFormat(it.currency ?: "NGN")
     }
     val validReference = Transformations.map(collectionReference) { it != null }
 
@@ -51,11 +53,20 @@ class CollectionPaymentViewModel : ViewModel() {
         }
 
         @JvmStatic
-        @BindingAdapter("app:disabledIf")
+        @BindingAdapter("app:disabledIfPresent")
         fun disabledIfPresent(view: View, data: LiveData<*>) {
-            when (data.value) {
-                is String? -> view.isEnabled = !(data.value as? String).isNullOrBlank()
-                else -> view.isEnabled = data.value != null
+            view.isEnabled = when (data.value) {
+                is String? -> !(data.value as? String).isNullOrBlank()
+                else -> data.value != null
+            }
+        }
+
+        @JvmStatic
+        @BindingAdapter("app:showEndIconIfPresent")
+        fun showEndIconIfPresent(textInputLayout: TextInputLayout, data: LiveData<*>) {
+            textInputLayout.isEndIconVisible = when (data.value) {
+                is String? -> !(data.value as? String).isNullOrBlank()
+                else -> data.value != null
             }
         }
     }

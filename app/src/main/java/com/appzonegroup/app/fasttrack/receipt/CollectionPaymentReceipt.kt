@@ -23,7 +23,7 @@ class CollectionPaymentReceipt(context: Context, val response: CollectionPayment
 //Amount NGN${response.amount}
 //
 //Payment Item: ${response.paymentItemName}
-//Category Type ${response.billerName}
+//Collection Type ${response.billerName}
 //
 //Customer ID: ${response.customerId}
 //Reference Name: ${response.referenceName}
