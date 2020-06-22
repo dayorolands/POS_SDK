@@ -8,6 +8,7 @@ import com.appzonegroup.creditclub.pos.provider.mpos.MPosManager
 import com.appzonegroup.creditclub.pos.provider.sunmi.SunmiPosManager
 import com.appzonegroup.creditclub.pos.provider.telpo.TelpoPosManager
 import com.appzonegroup.creditclub.pos.util.PosType
+import com.creditclub.pos.PosProviders
 import com.telpo.tps550.api.util.StringUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -61,15 +62,30 @@ object Platform : KoinComponent {
     }
 
     fun test(application: Application) {
-        if (SunmiPosManager.isCompatible(application)) {
-            posType = PosType.SUNMI
-            loadKoinModules(SunmiPosManager.module)
-        } else if (TelpoPosManager.isCompatible()) {
-            posType = PosType.TELPO
-            loadKoinModules(TelpoPosManager.module)
-        } else if (MPosManager.isCompatible()) {
-            posType = PosType.MPOS
-            loadKoinModules(MPosManager.module)
+        for (posManagerCompanion in PosProviders.registered) {
+            if (posManagerCompanion.isCompatible()) {
+                posType = PosType.OTHER
+                posManagerCompanion.setup(application)
+                loadKoinModules(posManagerCompanion.module)
+                loadPosModules()
+                application.startPosApp()
+                return
+            }
+        }
+
+        when {
+            SunmiPosManager.isCompatible(application) -> {
+                posType = PosType.SUNMI
+                loadKoinModules(SunmiPosManager.module)
+            }
+            TelpoPosManager.isCompatible() -> {
+                posType = PosType.TELPO
+                loadKoinModules(TelpoPosManager.module)
+            }
+            MPosManager.isCompatible() -> {
+                posType = PosType.MPOS
+                loadKoinModules(MPosManager.module)
+            }
         }
 
         if (isPOS) {
