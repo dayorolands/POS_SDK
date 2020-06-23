@@ -38,6 +38,7 @@ class CollectionPaymentViewModel : ViewModel() {
         it?.amount?.toCurrencyFormat(it.currency ?: "NGN")
     }
     val validReference = Transformations.map(collectionReference) { it != null }
+    val collectionTypeIsWebGuid = Transformations.map(collectionType) { it == "WEBGUID" }
 
     companion object {
         @JvmStatic
