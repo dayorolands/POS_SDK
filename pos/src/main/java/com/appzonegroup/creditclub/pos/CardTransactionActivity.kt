@@ -147,8 +147,6 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                         else -> {
                             cardReaderEvent = cardEvent
                             restartTimer()
-//                            accountType = AccountType.Default
-//                            onSelectAccountType()
                             val binding = DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
                                 this@CardTransactionActivity,
                                 R.layout.page_select_account_type
@@ -285,6 +283,12 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                         }
 
                         cardData.pinBlock = emvListener.pinBlock ?: cardData.pinBlock
+                        if(cardData.pinBlock.isBlank()) {
+                            hideProgressBar()
+                            renderTransactionFailure("Could not validate PIN")
+                            return@read
+                        }
+
                         onReadCard(cardData)
                     }
                     EmvService.ERR_USERCANCEL -> renderTransactionFailure("Transaction Cancelled")
