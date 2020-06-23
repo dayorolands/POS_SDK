@@ -1,10 +1,9 @@
 package com.appzonegroup.creditclub.pos.provider.mpos
 
-import com.appzonegroup.creditclub.pos.card.CardDataListener
-import com.appzonegroup.creditclub.pos.card.CardReader
-import com.appzonegroup.creditclub.pos.card.CardReaderEvent
-import com.appzonegroup.creditclub.pos.card.CardReaderEventListener
+import com.appzonegroup.creditclub.pos.card.*
 import com.creditclub.core.ui.widget.DialogProvider
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 /**
@@ -14,13 +13,13 @@ import com.creditclub.core.ui.widget.DialogProvider
 class MPosCardReader(private val posManager: MPosManager, dialogProvider: DialogProvider) :
     CardReader, DialogProvider by dialogProvider {
 
-    override fun waitForCard(onEventChange: CardReaderEventListener) {
-        requireDevice(onEventChange) {
+    override suspend fun waitForCard(): CardReaderEvent {
+        return requireDevice {
             posManager.connectionManager.swipeCard(4000, 0)
         }
     }
 
-    override fun read(amountStr: String, onReadCard: CardDataListener) {
+    override suspend fun read(amountStr: String): CardData? = suspendCoroutine { continuation ->
 //        if (posManager.connectionManager.isBTConnected) {
 //            posManager.connectionManager.swipeCard(0, amountStr.toAmountLong())
 //        } else {
@@ -34,37 +33,33 @@ class MPosCardReader(private val posManager: MPosManager, dialogProvider: Dialog
 //                }
 //            }
 //        }
-        posManager.readCard(onReadCard)
+        posManager.readCard {
+            continuation.resume(it)
+        }
     }
 
     override fun endWatch() {
 
     }
 
-    override suspend fun startWatch(onEventChange: CardReaderEventListener) {
+    override suspend fun onRemoveCard(onEventChange: CardReaderEventListener) {
 
     }
 
-    private inline fun requireDevice(
-        crossinline onEventChange: CardReaderEventListener,
-        crossinline block: () -> Unit
-    ) {
-        if (posManager.connectionManager.isBTConnected) {
-            block()
-        } else {
-            posManager.findDevice {
-                onSubmit {
-                    block()
-                }
+    private suspend inline fun requireDevice(crossinline block: () -> Unit): CardReaderEvent =
+        suspendCoroutine {
+            if (posManager.connectionManager.isBTConnected) {
+                block()
+            } else {
+                posManager.findDevice {
+                    onSubmit {
+                        block()
+                    }
 
-                onClose {
-                    onEventChange(CardReaderEvent.CANCELLED)
+                    onClose {
+                        it.resume(CardReaderEvent.CANCELLED)
+                    }
                 }
             }
         }
-    }
-
-    private fun String.toAmountLong(): Long {
-        return (substring(3).toDouble() * 100).toLong()
-    }
 }

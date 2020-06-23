@@ -10,11 +10,11 @@ typealias CardReaderEventListener = (CardReaderEvent) -> Unit
 typealias CardDataListener = (CardData?) -> Unit
 
 interface CardReader {
-    fun waitForCard(onEventChange: CardReaderEventListener)
+    suspend fun waitForCard(): CardReaderEvent
 
-    fun read(amountStr: String, onReadCard: CardDataListener)
+    suspend fun read(amountStr: String): CardData?
 
     fun endWatch()
 
-    suspend fun startWatch(onEventChange: CardReaderEventListener)
+    suspend fun onRemoveCard(onEventChange: CardReaderEventListener)
 }

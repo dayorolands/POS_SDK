@@ -1,8 +1,7 @@
 package com.appzonegroup.creditclub.pos.provider.sunmi
 
-import com.appzonegroup.creditclub.pos.card.CardDataListener
-import com.appzonegroup.creditclub.pos.card.CardReader
-import com.appzonegroup.creditclub.pos.card.CardReaderEventListener
+import com.appzonegroup.creditclub.pos.card.*
+import kotlinx.coroutines.delay
 
 
 /**
@@ -10,19 +9,20 @@ import com.appzonegroup.creditclub.pos.card.CardReaderEventListener
  * Appzone Ltd
  */
 class SunmiCardReader : CardReader {
-    override fun waitForCard(onEventChange: CardReaderEventListener) {
-
+    override suspend fun waitForCard(): CardReaderEvent {
+        delay(3000)
+        return CardReaderEvent.CANCELLED
     }
 
-    override fun read(amountStr: String, onReadCard: CardDataListener) {
-
+    override suspend fun read(amountStr: String): CardData? {
+        return null
     }
 
     override fun endWatch() {
 
     }
 
-    override suspend fun startWatch(onEventChange: CardReaderEventListener) {
+    override suspend fun onRemoveCard(onEventChange: CardReaderEventListener) {
 
     }
 }

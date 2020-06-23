@@ -1,9 +1,7 @@
 package com.appzonegroup.creditclub.pos.provider.telpo
 
-import android.app.Dialog
 import android.util.Log
-import com.appzonegroup.creditclub.pos.BuildConfig
-import com.appzonegroup.creditclub.pos.card.CardDataListener
+import com.appzonegroup.creditclub.pos.card.CardData
 import com.appzonegroup.creditclub.pos.card.CardReader
 import com.appzonegroup.creditclub.pos.card.CardReaderEvent
 import com.appzonegroup.creditclub.pos.card.CardReaderEventListener
@@ -11,6 +9,7 @@ import com.appzonegroup.creditclub.pos.command.WakeUpAndUnlock
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.hideProgressBar
 import com.creditclub.core.util.showProgressBar
 import com.telpo.emv.EmvParam
@@ -18,7 +17,9 @@ import com.telpo.emv.EmvService
 import com.telpo.emv.util.StringUtil
 import com.telpo.pinpad.PinParam
 import com.telpo.pinpad.PinpadService
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
 import org.koin.core.get
 
@@ -26,233 +27,159 @@ class TelpoCardReader(
     private val flow: CreditClubActivity,
     private val emvListener: TelpoEmvListener
 ) : CardReader, KoinComponent {
-
     private val emvService: EmvService = emvListener.emvService
-    private var readJob: Job? = null
-    private var watchJob: Job? = null
-
-    internal var data = arrayOfNulls<String>(3)
-
-    internal var event: CardReaderEvent =
-        CardReaderEvent.CANCELLED
+    private var data = arrayOfNulls<String>(3)
+    private var event: CardReaderEvent = CardReaderEvent.CANCELLED
 
     private var userCancel = false
-
     private var isSessionOver = false
 
-    private var isSupportIC = true
-    private var isSupportMag = true
-    //    private var isSupportNfc = true
-    private var startMs: Long = 0
-    //    private var ret: Int = 0
-    var dialog: Dialog? = null
+    private var supportsChip = true
+    private var supportsMagStripe = true
 
     private fun publishProgress(vararg values: String) {
-        flow.runOnUiThread {
-            flow.showProgressBar("Processing...", values[0])
-//                , true) {
-//                onClose {
-//                    userCancel = true
-//                    deviceClose()
-//                }
-//            }
-        }
+        flow.showProgressBar("Processing...", values[0])
     }
 
-    override fun waitForCard(onEventChange: CardReaderEventListener) {
-        watchJob = GlobalScope.launch(Dispatchers.Main) {
-            flow.showProgressBar("Opening device", "Please wait...", true) {
-                onClose {
-                    userCancel = true
-                    deviceClose()
-                    onEventChange(CardReaderEvent.CANCELLED)
-                }
-            }
-            withContext(Dispatchers.Default) {
-                openDevice()
-            }
-            delay(500)
-            updateCardWaitingProgress("Insert or swipe card")
-            event = withContext(Dispatchers.Default) {
-                detectCard()
-            }
-
-            if (event == CardReaderEvent.CANCELLED) return@launch
-
-            if (event == CardReaderEvent.MAG_STRIPE) {
-                data[0] = EmvService.MagStripeReadStripeData(1)
-                data[1] = EmvService.MagStripeReadStripeData(2)
-                data[2] = EmvService.MagStripeReadStripeData(3)
-            }
-
-            flow.runOnUiThread {
-                dialog?.dismiss()
-                onEventChange(event)
-            }
-
-            if (event == CardReaderEvent.CHIP) {
-                startWatch(onEventChange)
+    override suspend fun waitForCard(): CardReaderEvent {
+        flow.showProgressBar("Opening device", "Please wait...", true) {
+            onClose {
+                userCancel = true
+                deviceClose()
             }
         }
+        withContext(Dispatchers.Default) { openDevice() }
+        delay(500)
+        updateCardWaitingProgress("Insert or swipe card")
+        event = withContext(Dispatchers.Default) { detectCard() }
+
+        if (event == CardReaderEvent.MAG_STRIPE) {
+            data[0] = EmvService.MagStripeReadStripeData(1)
+            data[1] = EmvService.MagStripeReadStripeData(2)
+            data[2] = EmvService.MagStripeReadStripeData(3)
+        }
+
+        flow.hideProgressBar()
+
+        return event
     }
 
-    override suspend fun startWatch(onEventChange: CardReaderEventListener) {
+    override suspend fun onRemoveCard(onEventChange: CardReaderEventListener) {
         withContext(Dispatchers.Default) {
             while (true) {
                 if (userCancel) break
                 if (isSessionOver) break
-
-                val ret = EmvService.IccCheckCard(300)
-                appendDis("IccCheckCard:$ret")
-                if (ret != 0) break
+                if (EmvService.IccCheckCard(300) != 0) break
             }
         }
 
         if (!userCancel && !isSessionOver) {
             userCancel = true
             deviceClose()
-            flow.runOnUiThread {
-                onEventChange(CardReaderEvent.REMOVED)
-            }
-        }
-    }
-
-    private fun cancelWatchJob() {
-        try {
-            watchJob?.cancel()
-            watchJob = null
-        } catch (ex: Exception) {
-            ex.printStackTrace()
+            onEventChange(CardReaderEvent.REMOVED)
         }
     }
 
     override fun endWatch() {
         isSessionOver = true
-
-        cancelWatchJob()
-
-        try {
-            readJob?.cancel()
-            readJob = null
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-        }
     }
 
-    override fun read(amountStr: String, onReadCard: CardDataListener) {
+    override suspend fun read(amountStr: String): CardData? {
         try {
-            readJob = GlobalScope.launch(Dispatchers.Main) {
-                when (event) {
-                    CardReaderEvent.MAG_STRIPE -> {
-                        publishProgress("Please wait")
+            when (event) {
+                CardReaderEvent.MAG_STRIPE -> {
+                    publishProgress("Please wait")
 
-                        val cardData = withContext(Dispatchers.Default) {
-                            val param = PinParam(flow)
+                    val cardData = withContext(Dispatchers.Default) {
+                        val param = PinParam(flow)
 
-                            param.KeyIndex = 0
-                            param.WaitSec = 60
-                            param.MaxPinLen = 4
-                            param.MinPinLen = 4
-                            param.IsShowCardNo = 0
-                            param.Amount = amountStr
+                        param.KeyIndex = 0
+                        param.WaitSec = 60
+                        param.MaxPinLen = 4
+                        param.MinPinLen = 4
+                        param.IsShowCardNo = 0
+                        param.Amount = amountStr
 
-                            PinpadService.Open(flow)
-                            WakeUpAndUnlock(flow).run()
+                        PinpadService.Open(flow)
+                        WakeUpAndUnlock(flow).run()
 
-                            val pinStatusCode = PinpadService.TP_PinpadGetPin(param)
-                            val pinBlock = StringUtil.bytesToHexString(param.Pin_Block)
-                            log("TP_PinpadGetPin: $pinStatusCode\nPinBlock: $pinBlock")
-                            emvListener.pinBlock = pinBlock
+                        val pinStatusCode = PinpadService.TP_PinpadGetPin(param)
+                        val pinBlock = StringUtil.bytesToHexString(param.Pin_Block)
+                        log("TP_PinpadGetPin: $pinStatusCode\nPinBlock: $pinBlock")
+                        emvListener.pinBlock = pinBlock
 
-                            val emvResponse = when {
-                                pinStatusCode == PinpadService.PIN_ERROR_CANCEL -> {
-                                    log("get pin : user cancel")
-                                    EmvService.ERR_USERCANCEL
-                                }
-                                pinStatusCode == PinpadService.PIN_OK && pinBlock == "00000000" -> {
-                                    log("get pin : no pin")
-                                    EmvService.ERR_NOPIN
-                                }
-                                pinStatusCode == PinpadService.PIN_OK -> {
-                                    log("get pin success: " + StringUtil.bytesToHexString(param.Pin_Block))
-                                    EmvService.EMV_TRUE
-                                }
-                                pinStatusCode == PinpadService.PIN_ERROR_TIMEOUT -> {
-                                    log("get pin : timeout")
-                                    EmvService.ERR_TIMEOUT
-                                }
-                                else -> {
-                                    log("get pin error: $pinStatusCode")
-                                    EmvService.EMV_FALSE
-                                }
+                        val emvResponse = when {
+                            pinStatusCode == PinpadService.PIN_ERROR_CANCEL -> {
+                                log("get pin : user cancel")
+                                EmvService.ERR_USERCANCEL
                             }
-
-                            TelpoEmvCardData(magStripData = data).apply {
-                                ret = emvResponse
-                                this.pinBlock = pinBlock
+                            pinStatusCode == PinpadService.PIN_OK && pinBlock == "00000000" -> {
+                                log("get pin : no pin")
+                                EmvService.ERR_NOPIN
+                            }
+                            pinStatusCode == PinpadService.PIN_OK -> {
+                                log("get pin success: " + StringUtil.bytesToHexString(param.Pin_Block))
+                                EmvService.EMV_TRUE
+                            }
+                            pinStatusCode == PinpadService.PIN_ERROR_TIMEOUT -> {
+                                log("get pin : timeout")
+                                EmvService.ERR_TIMEOUT
+                            }
+                            else -> {
+                                log("get pin error: $pinStatusCode")
+                                EmvService.EMV_FALSE
                             }
                         }
 
-                        deviceClose()
-                        flow.hideProgressBar()
-
-                        flow.runOnUiThread {
-                            onReadCard(cardData)
+                        TelpoEmvCardData(magStripData = data).apply {
+                            ret = emvResponse
+                            this.pinBlock = pinBlock
                         }
                     }
 
-                    CardReaderEvent.CHIP -> {
-                        var ret = 0
-                        if (userCancel) {
-                            flow.runOnUiThread {
-                                onReadCard(null)
-                            }
+                    deviceClose()
+                    flow.hideProgressBar()
 
-                            return@launch
-                        }
-
-                        publishProgress("IC card detected...")
-                        withContext(Dispatchers.Default) {
-                            ret = EmvService.IccCard_Poweron()
-                            Log.w("readcard", "IccCard_Poweron: $ret")
-                            ret = emvService.Emv_TransInit()
-                            Log.w("readcard", "Emv_TransInit: $ret")
-
-                            setEmvParams()
-                            startMs = System.currentTimeMillis()
-
-                            cancelWatchJob()
-
-                            ret = emvService.Emv_StartApp(EmvService.EMV_FALSE)
-                            Log.w("readcard", "Emv_StartApp: $ret")
-                        }
-
-                        deviceClose()
-                        flow.hideProgressBar()
-
-                        val cardData = withContext(Dispatchers.Default) {
-                            TelpoEmvCardData(if (ret == EmvService.EMV_TRUE) emvService else null)
-                        }
-                        cardData.ret = ret
-                        cardData.pinBlock = emvListener.pinBlock ?: ""
-
-                        flow.runOnUiThread {
-                            onReadCard(cardData)
-                        }
-                    }
-
-                    else -> flow.runOnUiThread {
-                        onReadCard(null)
-                    }
+                    return cardData
                 }
+
+                CardReaderEvent.CHIP -> {
+                    if (userCancel) {
+                        return null
+                    }
+
+                    publishProgress("IC card detected...")
+                    val ret = withContext(Dispatchers.Default) {
+                        EmvService.IccCard_Poweron()
+                        emvService.Emv_TransInit()
+                        setEmvParams()
+
+                        emvService.Emv_StartApp(EmvService.EMV_FALSE)
+                    }
+
+                    deviceClose()
+                    flow.hideProgressBar()
+
+                    val cardData = withContext(Dispatchers.Default) {
+                        TelpoEmvCardData(if (ret == EmvService.EMV_TRUE) emvService else null)
+                    }
+                    cardData.ret = ret
+                    cardData.pinBlock = emvListener.pinBlock ?: ""
+
+                    return cardData
+                }
+
+                else -> return null
             }
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
+
+        return null
     }
 
     private fun log(s: String) {
-        if (BuildConfig.DEBUG) Log.d("CardReader", s)
+        debugOnly { Log.d("CardReader", s) }
     }
 
     private fun setEmvParams() {
@@ -272,51 +199,22 @@ class TelpoCardReader(
     }
 
     private fun openDevice() {
-        var ret: Int
-        if (isSupportMag) {
-            ret = EmvService.MagStripeOpenReader()
-            appendDis("MagStripeOpenReader:$ret")
-        }
-
-        if (isSupportIC) {
-            ret = EmvService.IccOpenReader()
-            appendDis("IccOpenReader:$ret")
-        }
-
-//        if (isSupportNfc) {
-//            ret = EmvService.NfcOpenReader(1000)
-//            appendDis("NfcOpenReader:$ret")
-//        }
+        if (supportsMagStripe) EmvService.MagStripeOpenReader()
+        if (supportsChip) EmvService.IccOpenReader()
+//        if (isSupportNfc) EmvService.NfcOpenReader(1000)
     }
 
     private fun deviceClose() {
-        var ret: Int
-        if (isSupportMag) {
-            ret = EmvService.MagStripeCloseReader()
-            appendDis("MagStripeCloseReader:$ret")
-        }
+        if (supportsMagStripe) EmvService.MagStripeCloseReader()
 
-        if (isSupportIC) {
-            if (event == CardReaderEvent.CHIP) {
-                ret = EmvService.IccCard_Poweroff()
-                appendDis("IccCard_Poweroff:$ret")
-            }
-            ret = EmvService.IccCloseReader()
-            appendDis("IccCloseReader:$ret")
+        if (supportsChip) {
+            if (event == CardReaderEvent.CHIP) EmvService.IccCard_Poweroff()
+            EmvService.IccCloseReader()
         }
 
 //        if (isSupportNfc) {
-//            ret = EmvService.NfcCloseReader()
-//            appendDis("NfcCloseReader:$ret")
+//            EmvService.NfcCloseReader()
 //        }
-    }
-
-    private fun checkForHybrid(cardData: Array<String?>): Boolean {
-        return true
-    }
-
-    private fun appendDis(msg: String) {
-        Log.d("MyEMV", msg)
     }
 
     private fun powerOnIcc(): Boolean {
@@ -327,19 +225,16 @@ class TelpoCardReader(
     }
 
     private fun updateCardWaitingProgress(text: String = "Please insert card") {
-        flow.runOnUiThread {
-            dialog = flow.showProgressBar(text, "Waiting...", isCancellable = true) {
-                onClose {
-                    userCancel = true
-                    deviceClose()
-                    if (!flow.isFinishing) flow.finish()
-                }
+        flow.showProgressBar(text, "Waiting...", isCancellable = true) {
+            onClose {
+                userCancel = true
+                deviceClose()
+                if (!flow.isFinishing) flow.finish()
             }
         }
     }
 
     private fun detectCard(): CardReaderEvent {
-        var ret: Int
         var hybridDetected = false
         var chipFailure = false
 
@@ -348,11 +243,10 @@ class TelpoCardReader(
                 return CardReaderEvent.CANCELLED
             }
 
-            if (isSupportMag) {
-                ret = EmvService.MagStripeCheckCard(1000)
-                appendDis("MagStripeCheckCard:$ret")
+            if (supportsMagStripe) {
+                val ret = EmvService.MagStripeCheckCard(1000)
                 if (ret == 0) {
-                    if (!chipFailure && checkForHybrid(data)) {
+                    if (!chipFailure) {
                         hybridDetected = true
 
                         updateCardWaitingProgress("Card is chip card. Please Insert Card")
@@ -360,9 +254,8 @@ class TelpoCardReader(
                 }
             }
 
-            if (isSupportIC) {
-                ret = EmvService.IccCheckCard(300)
-                appendDis("IccCheckCard:$ret")
+            if (supportsChip) {
+                val ret = EmvService.IccCheckCard(300)
 
                 if (ret == 0) {
                     val powerOn = powerOnIcc()

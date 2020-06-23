@@ -31,7 +31,7 @@
             android:required="false" />
         <provider
             android:name=".p1000.SmartPeakPosManagerProvider"
-            android:authorities="${applicationId}.p1000.PosManagerProvider"
+            android:authorities="${applicationId}.p1000.SmartPeakPosManagerProvider"
             android:enabled="true"
             android:exported="false" />
     </application>

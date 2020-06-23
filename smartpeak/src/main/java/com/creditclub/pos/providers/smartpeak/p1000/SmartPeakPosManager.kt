@@ -1,6 +1,7 @@
 package com.creditclub.pos.providers.smartpeak.p1000
 
 import android.content.Context
+import androidx.lifecycle.MutableLiveData
 import com.appzonegroup.creditclub.pos.card.*
 import com.basewin.database.DataBaseManager
 import com.basewin.services.ServiceManager
@@ -22,20 +23,19 @@ class SmartPeakPosManager(val context: Context) : PosManager {
     }
 
     inner class SmartPeakCardReader : CardReader {
-
-        override fun waitForCard(onEventChange: CardReaderEventListener) {
-            TODO("Not yet implemented")
+        override suspend fun waitForCard(): CardReaderEvent {
+            return CardReaderEvent.CHIP
         }
 
-        override fun read(amountStr: String, onReadCard: CardDataListener) {
-            TODO("Not yet implemented")
+        override suspend fun read(amountStr: String): CardData? {
+            return null
         }
 
         override fun endWatch() {
             TODO("Not yet implemented")
         }
 
-        override suspend fun startWatch(onEventChange: CardReaderEventListener) {
+        override suspend fun onRemoveCard(onEventChange: CardReaderEventListener) {
             TODO("Not yet implemented")
         }
     }
@@ -56,7 +56,7 @@ class SmartPeakPosManager(val context: Context) : PosManager {
         }
 
         override fun isCompatible(): Boolean {
-            return false
+            return true
         }
     }
 }

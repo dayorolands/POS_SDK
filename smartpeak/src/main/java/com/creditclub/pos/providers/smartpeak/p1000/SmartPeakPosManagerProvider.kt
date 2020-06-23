@@ -56,8 +56,9 @@ class SmartPeakPosManagerProvider : ContentProvider() {
         if (providerInfo == null) {
             throw NullPointerException("SmartPeakPosManagerProvider ProviderInfo cannot be null.")
         }
+        val packageName = "com.creditclub.pos.providers.smartpeak"
         // So if the authorities equal the library internal ones, the developer forgot to set his applicationId
-        check("com.creditclub.pos.providers.smartpeak.p1000.PosManagerProvider" != providerInfo.authority) {
+        check("$packageName.p1000.PosManagerProvider" != providerInfo.authority) {
             ("Incorrect provider authority in manifest. Most likely due to a "
                     + "missing applicationId variable in application\'s build.gradle.")
         }
