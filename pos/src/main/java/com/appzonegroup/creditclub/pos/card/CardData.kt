@@ -8,7 +8,10 @@ import com.telpo.emv.util.StringUtil
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 4/15/2019.
  * Appzone Ltd
  */
-class CardData constructor(private val emvService: EmvService? = null, magStripData: Array<String?>? = null) {
+class CardData constructor(
+    private val emvService: EmvService? = null,
+    magStripData: Array<String?>? = null
+) {
     // Fields required for all card transactions
     var pan = ""
     var holder = ""
@@ -22,7 +25,7 @@ class CardData constructor(private val emvService: EmvService? = null, magStripD
     var transactionAmount = ""
     var cardSequenceNumber = ""
     var src = "226"
-    var pinBlock = ""
+    var pinBlock: String? = null
     var cardMethod: CardReaderEvent = CardReaderEvent.CHIP
 
     // Fields required by ICC transactions

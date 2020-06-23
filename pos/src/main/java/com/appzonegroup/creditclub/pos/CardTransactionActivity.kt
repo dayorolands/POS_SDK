@@ -147,10 +147,11 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                         else -> {
                             cardReaderEvent = cardEvent
                             restartTimer()
-                            val binding = DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
-                                this@CardTransactionActivity,
-                                R.layout.page_select_account_type
-                            )
+                            val binding =
+                                DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
+                                    this@CardTransactionActivity,
+                                    R.layout.page_select_account_type
+                                )
 
                             listOf(
                                 binding.creditRadioButton,
@@ -282,8 +283,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                             return@read
                         }
 
-                        cardData.pinBlock = emvListener.pinBlock ?: cardData.pinBlock
-                        if(cardData.pinBlock.isBlank()) {
+                        if (cardData.pinBlock.isNullOrBlank()) {
                             hideProgressBar()
                             renderTransactionFailure("Could not validate PIN")
                             return@read
@@ -309,16 +309,6 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
         stopTimer()
 
         GlobalScope.launch(Dispatchers.Main) {
-            if (cardData.pinBlock.isEmpty()) {
-                showProgressBar("Pin Ok")
-                delay(1000)
-            }
-//            else {
-//                request.apply {
-//                    withPinData(cardData.pinBlock, parameters)
-//                }
-//            }
-
             showProgressBar("Receiving...")
             try {
                 callHomeService.stopCallHomeTimer()

@@ -13,7 +13,10 @@ import kotlinx.coroutines.*
 typealias CardReaderEventListener = (CardReaderEvent) -> Unit
 typealias CardDataListener = (CardData?) -> Unit
 
-class CardReader(private val flow: PosActivity, private val emvServiceListener: CustomEmvServiceListener) {
+class CardReader(
+    private val flow: PosActivity,
+    private val emvServiceListener: CustomEmvServiceListener
+) {
     private val emvService: EmvService = emvServiceListener.emvService
     private var readJob: Job? = null
     private var watchJob: Job? = null
@@ -28,8 +31,10 @@ class CardReader(private val flow: PosActivity, private val emvServiceListener: 
 
     private var isSupportIC = true
     private var isSupportMag = true
+
     //    private var isSupportNfc = true
     private var startMs: Long = 0
+
     //    private var ret: Int = 0
     var dialog: Dialog? = null
 
@@ -148,8 +153,9 @@ class CardReader(private val flow: PosActivity, private val emvServiceListener: 
                             val pinStatusCode = PinpadService.TP_PinpadGetPin(param)
                             val pinBlock = StringUtil.bytesToHexString(param.Pin_Block)
                             log("TP_PinpadGetPin: $pinStatusCode\nPinBlock: $pinBlock")
-                            emvServiceListener.pinBlock = pinBlock
-
+                            if (pinBlock.isNotBlank()) {
+                                emvServiceListener.pinBlock = pinBlock
+                            }
                             val emvResponse = when {
                                 pinStatusCode == PinpadService.PIN_ERROR_CANCEL -> {
                                     log("get pin : user cancel")
@@ -207,7 +213,7 @@ class CardReader(private val flow: PosActivity, private val emvServiceListener: 
 
                             cancelWatchJob()
 
-                            ret = emvService.Emv_StartApp(EmvService.EMV_FALSE)
+                            ret = emvService.Emv_StartApp(EmvService.EMV_TRUE)
                         }
 
                         deviceClose()
@@ -217,7 +223,7 @@ class CardReader(private val flow: PosActivity, private val emvServiceListener: 
                             CardData(if (ret == EmvService.EMV_TRUE) emvService else null)
                         }
                         cardData.ret = ret
-                        cardData.pinBlock = emvServiceListener.pinBlock ?: ""
+                        cardData.pinBlock = emvServiceListener.pinBlock
 
                         flow.runOnUiThread {
                             onReadCard(cardData)
