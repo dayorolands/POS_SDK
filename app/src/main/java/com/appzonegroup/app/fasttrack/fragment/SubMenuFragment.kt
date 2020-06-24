@@ -4,17 +4,17 @@ import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.navArgs
 import com.appzonegroup.app.fasttrack.R
-import com.appzonegroup.app.fasttrack.databinding.ActivityCreditClubSubMenuBinding
+import com.appzonegroup.app.fasttrack.databinding.SubMenuFragmentBinding
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.openPageById
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.AppFunctions
 import com.creditclub.core.ui.CreditClubFragment
 
-class SubMenuFragment : CreditClubFragment(R.layout.activity_credit_club_sub_menu),
+class SubMenuFragment : CreditClubFragment(R.layout.sub_menu_fragment),
     View.OnClickListener {
 
-    private val binding by dataBinding<ActivityCreditClubSubMenuBinding>()
+    private val binding by dataBinding<SubMenuFragmentBinding>()
     private val args by navArgs<SubMenuFragmentArgs>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

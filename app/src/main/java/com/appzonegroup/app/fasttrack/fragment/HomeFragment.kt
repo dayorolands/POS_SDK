@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.core.view.GravityCompat
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.*
-import com.appzonegroup.app.fasttrack.databinding.ActivityCreditClubMainMenuBinding
+import com.appzonegroup.app.fasttrack.databinding.HomeFragmentBinding
 import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.logout
@@ -24,11 +24,11 @@ import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.launch
 
 
-class HomeFragment : CreditClubFragment(R.layout.activity_credit_club_main_menu),
+class HomeFragment : CreditClubFragment(R.layout.home_fragment),
     NavigationView.OnNavigationItemSelectedListener {
 
     private val packageInfo get() = requireContext().packageInfo
-    private val binding by dataBinding<ActivityCreditClubMainMenuBinding>()
+    private val binding by dataBinding<HomeFragmentBinding>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

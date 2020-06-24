@@ -106,7 +106,7 @@ class CollectionReferenceGenerationFragment :
         val (response, error) = safeRunIO {
             creditClubMiddleWareAPI.collectionsService.getCollectionCustomer(
                 localStorage.institutionCode,
-                viewModel.customerId.value,
+                viewModel.customerId.value?.trim(),
                 viewModel.region.value,
                 viewModel.collectionService.value
             )
@@ -174,9 +174,9 @@ class CollectionReferenceGenerationFragment :
         }
 
         request.apply {
-            customerId = viewModel.customerId.value
-            reference = viewModel.customerId.value
-            phoneNumber = viewModel.customerPhoneNumber.value
+            customerId = viewModel.customerId.value?.trim()
+            reference = viewModel.customerId.value?.trim()
+            phoneNumber = viewModel.customerPhoneNumber.value?.trim()
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value

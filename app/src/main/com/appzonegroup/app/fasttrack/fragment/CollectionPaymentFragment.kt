@@ -68,7 +68,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
 
         viewModel.collectionType.onChange {
-            viewModel.reference.postValue(null)
+            viewModel.collectionReference.postValue(null)
         }
 
         if (viewModel.region.value != null) {
@@ -121,7 +121,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         val (response, error) = safeRunIO {
             creditClubMiddleWareAPI.collectionsService.getCollectionReferenceByReference(
                 localStorage.institutionCode,
-                viewModel.reference.value,
+                viewModel.reference.value?.trim(),
                 viewModel.region.value,
                 viewModel.collectionService.value,
                 viewModel.collectionType.value

@@ -15,7 +15,7 @@
         android:id="@+id/homeFragment"
         android:name="com.appzonegroup.app.fasttrack.fragment.HomeFragment"
         android:label="Home"
-        tools:layout="@layout/activity_credit_club_main_menu">
+        tools:layout="@layout/home_fragment">
         <action
             android:id="@+id/action_home_to_sub_menu"
             app:destination="@id/subMenuFragment">
@@ -36,7 +36,7 @@
         android:id="@+id/subMenuFragment"
         android:name="com.appzonegroup.app.fasttrack.fragment.SubMenuFragment"
         android:label="Home"
-        tools:layout="@layout/activity_credit_club_sub_menu">
+        tools:layout="@layout/sub_menu_fragment">
         <action
             android:id="@+id/action_menu_to_bill_payment"
             app:destination="@id/billPaymentFragment" />
