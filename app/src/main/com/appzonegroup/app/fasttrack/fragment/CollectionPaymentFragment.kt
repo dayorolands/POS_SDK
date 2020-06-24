@@ -45,7 +45,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         super.onViewCreated(view, savedInstanceState)
 
         binding.viewModel = viewModel
-        binding.toolbar.title = "Collection Payment"
+        binding.toolbar.title = "IGR Collections"
         mainScope.launch { loadRegions() }
         binding.completePaymentButton.setOnClickListener {
             mainScope.launch { completePayment() }
@@ -53,10 +53,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
         binding.generateReferenceButton.setOnClickListener {
             mainScope.launch { onGenerateButtonClick() }
-        }
-
-        binding.customerIdInputLayout.setEndIconOnClickListener {
-            mainScope.launch { loadCustomer() }
         }
 
         binding.collectionReferenceInputLayout.setEndIconOnClickListener {
@@ -112,27 +108,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             )
             collectionTypes
         }
-
-    private suspend fun loadCustomer() {
-        if (viewModel.region.value.isNullOrBlank())
-            return dialogProvider.showErrorAndWait("Please select a region")
-
-        viewModel.customer.value = null
-        dialogProvider.showProgressBar("Loading customer")
-        val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.collectionsService.getCollectionCustomer(
-                localStorage.institutionCode,
-                viewModel.customerId.value,
-                viewModel.region.value,
-                viewModel.collectionService.value
-            )
-        }
-        dialogProvider.hideProgressBar()
-
-        if (error != null) return dialogProvider.showErrorAndWait(error)
-        response?.name ?: return dialogProvider.showErrorAndWait("Please enter a valid customer id")
-        viewModel.customer.value = response
-    }
 
     private suspend fun loadReference() {
         if (viewModel.region.value.isNullOrBlank())
@@ -205,17 +180,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             return dialogProvider.showErrorAndWait("Please select a region")
         }
 
-        if (viewModel.customerId.value.isNullOrBlank()) {
-            return dialogProvider.showErrorAndWait("Please enter a customer id")
-        } else if (viewModel.customer.value == null) {
-            loadCustomer()
-            viewModel.customer.value ?: return
-        }
-
-        if (viewModel.customerPhoneNumber.value.isNullOrBlank()) {
-            return dialogProvider.showErrorAndWait("Please enter a phone number")
-        }
-
         if (viewModel.collectionType.value.isNullOrBlank()) {
             return dialogProvider.showErrorAndWait("Please enter a collection type")
         }
@@ -230,17 +194,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     }
 
     private suspend fun completePayment() {
-        if (viewModel.customerId.value.isNullOrBlank()) {
-            return dialogProvider.showErrorAndWait("Please enter a customer id")
-        } else if (viewModel.customer.value == null) {
-            loadCustomer()
-            viewModel.customer.value ?: return
-        }
-
-        if (viewModel.customerPhoneNumber.value.isNullOrBlank()) {
-            return dialogProvider.showErrorAndWait("Please enter a phone number")
-        }
-
         if (viewModel.reference.value.isNullOrBlank()) {
             return dialogProvider.showErrorAndWait("Please enter a reference")
         } else if (viewModel.collectionReference.value == null) {

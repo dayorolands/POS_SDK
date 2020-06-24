@@ -20,18 +20,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import java.util.*
 
-//{
-//    "Reference": "string",
-//    "ReferenceName": "string",
-//    "viewModel.collectionService.value": "string",
-//    "AdditionalInformation": "string",
-//    "RequestReference": "string",
-//    "ApplyFee": true,
-//    "FeeAmount": 0,
-//    "FeeBearerAccount": "string",
-//    "FeeSuspenseAccount": "string"
-//}
-
 class CollectionReferenceGenerationFragment :
     CreditClubFragment(R.layout.fragment_collection_reference_generation) {
 
@@ -70,6 +58,10 @@ class CollectionReferenceGenerationFragment :
         binding.generateReferenceButton.setOnClickListener {
             mainScope.launch { generateReference() }
         }
+
+        binding.customerIdInputLayout.setEndIconOnClickListener {
+            mainScope.launch { loadCustomer() }
+        }
     }
 
     private inline fun AutoCompleteTextView.onItemClick(crossinline block: (position: Int) -> Unit) {
@@ -105,6 +97,27 @@ class CollectionReferenceGenerationFragment :
             paymentItems?.map { "${it.name} - ${it.code}" }
         }
 
+    private suspend fun loadCustomer() {
+        if (viewModel.region.value.isNullOrBlank())
+            return dialogProvider.showErrorAndWait("Please select a region")
+
+        viewModel.customer.value = null
+        dialogProvider.showProgressBar("Loading customer")
+        val (response, error) = safeRunIO {
+            creditClubMiddleWareAPI.collectionsService.getCollectionCustomer(
+                localStorage.institutionCode,
+                viewModel.customerId.value,
+                viewModel.region.value,
+                viewModel.collectionService.value
+            )
+        }
+        dialogProvider.hideProgressBar()
+
+        if (error != null) return dialogProvider.showErrorAndWait(error)
+        response?.name ?: return dialogProvider.showErrorAndWait("Please enter a valid customer id")
+        viewModel.customer.value = response
+    }
+
     private suspend inline fun loadDependencies(
         dependencyName: String,
         autoCompleteTextView: AutoCompleteTextView,
@@ -128,6 +141,17 @@ class CollectionReferenceGenerationFragment :
     }
 
     private suspend fun generateReference() {
+        if (viewModel.customerId.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter a customer id")
+        } else if (viewModel.customer.value == null) {
+            loadCustomer()
+            viewModel.customer.value ?: return
+        }
+
+        if (viewModel.customerPhoneNumber.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter a phone number")
+        }
+
         if (viewModel.categoryCode.value.isNullOrBlank()) {
             return dialogProvider.showError("Please select a valid category")
         }

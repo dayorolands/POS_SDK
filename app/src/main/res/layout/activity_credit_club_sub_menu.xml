@@ -196,7 +196,7 @@
                             android:id="@+id/collection_payment_button"
                             layout="@layout/button"
                             app:src='@{@drawable/payday_loan}'
-                            app:text='@{"Collection Payment"}' />
+                            app:text='@{"IGR Collections"}' />
 
                     </com.google.android.flexbox.FlexboxLayout>
 

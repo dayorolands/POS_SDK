@@ -56,7 +56,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:inputType="text" />
+                android:inputType="numberDecimal" />
 
             <TextView
                 android:id="@+id/fieldone_tv"
@@ -68,8 +68,7 @@
                 android:id="@+id/billpayment_fieldone_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:inputType="numberDecimal" />
+                android:layout_marginBottom="10dp" />
 
             <TextView
                 android:id="@+id/fieldtwo_tv"

@@ -167,7 +167,7 @@ open class CardIsoMsg : BaseIsoMsg() {
         retrievalReferenceNumber37 = rrnString
         serviceRestrictionCode40 = data.src
         iccData55 = data.spitIccString()
-        if (data.pinBlock.isNotEmpty()) pinData = data.pinBlock
+        if (!data.pinBlock.isNullOrBlank()) pinData = data.pinBlock
 
         run {
             //            val tmpPosDataCode = StringBuilder("511501513344101")

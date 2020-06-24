@@ -3,11 +3,56 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/collectionPaymentFragment">
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/billPaymentFragment"
+        android:name="com.appzonegroup.app.fasttrack.fragment.BillPaymentFragment"
+        android:label="Bill Payment"
+        tools:layout="@layout/bill_payment_fragment" />
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.appzonegroup.app.fasttrack.fragment.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/activity_credit_club_main_menu">
+        <action
+            android:id="@+id/action_home_to_sub_menu"
+            app:destination="@id/subMenuFragment">
+            <argument
+                android:name="category"
+                android:defaultValue="0"
+                app:argType="integer" />
+        </action>
+        <action
+            android:id="@+id/action_home_to_bill_payment"
+            app:destination="@id/billPaymentFragment" />
+        <action
+            android:id="@+id/action_home_to_collection_payment"
+            app:destination="@id/collectionPaymentFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/subMenuFragment"
+        android:name="com.appzonegroup.app.fasttrack.fragment.SubMenuFragment"
+        android:label="Home"
+        tools:layout="@layout/activity_credit_club_sub_menu">
+        <action
+            android:id="@+id/action_menu_to_bill_payment"
+            app:destination="@id/billPaymentFragment" />
+        <action
+            android:id="@+id/action_menu_to_collection_payment"
+            app:destination="@id/collectionPaymentFragment" />
+        <argument
+            android:name="category"
+            android:defaultValue="0"
+            app:argType="integer" />
+    </fragment>
+
     <fragment
         android:id="@+id/collectionPaymentFragment"
         android:name="com.appzonegroup.app.fasttrack.fragment.CollectionPaymentFragment"
-        android:label="Collection Payment"
+        android:label="IGR Collections"
         tools:layout="@layout/collection_payment_fragment">
         <action
             android:id="@+id/action_collection_payment_to_reference_generation"

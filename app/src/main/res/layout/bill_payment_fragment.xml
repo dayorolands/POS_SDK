@@ -7,13 +7,13 @@
 
         <variable
             name="viewModel"
-            type="com.appzonegroup.app.fasttrack.fragment.CollectionPaymentViewModel" />
+            type="com.appzonegroup.app.fasttrack.fragment.BillPaymentViewModel" />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".fragment.CollectionReferenceGenerationFragment">
+        tools:context=".fragment.CollectionPaymentFragment">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBar"
@@ -24,8 +24,9 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:elevation="0dp"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark"
-                app:title="Generate Reference" />
+                app:title="IGR Collections" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -33,7 +34,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/appBar"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -44,19 +46,17 @@
                 android:paddingBottom="80dp">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    android:enabled="false"
-                    android:hint="Region">
+                    android:hint="Category">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/category_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:editable="false"
-                        android:inputType="none"
-                        android:text="@{viewModel.region}" />
+                        android:text="@={viewModel.categoryName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -64,36 +64,29 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    android:enabled="false"
-                    android:hint="Collection Type">
+                    android:hint="Biller"
+                    app:dependsOn="@{viewModel.categoryName}">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/biller_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@={viewModel.collectionType}" />
+                        android:text="@={viewModel.billerName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/customer_id_input_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Customer ID"
-                    app:counterEnabled="true"
-                    app:counterMaxLength="9"
-                    app:endIconDrawable="@drawable/ic_baseline_search_24"
-                    app:endIconMode="custom"
-                    app:showEndIconIfPresent="@{viewModel.customerId}">
+                    android:layout_marginBottom="15dp"
+                    android:hint="Payment Item"
+                    app:dependsOn="@{viewModel.billerName}">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/customer_id_input"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/payment_item_input"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:maxLength="9"
-                        android:singleLine="true"
-                        android:text="@={viewModel.customerId}"
-                        android:textAllCaps="true" />
+                        android:layout_height="wrap_content"
+                        android:text="@={viewModel.itemName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -107,11 +100,8 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:editable="false"
-                        android:inputType="none"
                         android:singleLine="true"
-                        android:text="@{viewModel.customerName}"
-                        android:textAllCaps="true" />
+                        android:text="@={viewModel.customerName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -130,37 +120,7 @@
                         android:inputType="phone"
                         android:maxLength="11"
                         android:singleLine="true"
-                        android:text="@={viewModel.customerPhoneNumber}" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
-                    android:hint="Category"
-                    app:dependsOn="@{viewModel.collectionType}">
-
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/category_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@{viewModel.categoryName}" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
-                    android:hint="Payment Item"
-                    app:dependsOn="@{viewModel.categoryCode}">
-
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/payment_item_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text="@={viewModel.itemName}" />
+                        android:text="@={viewModel.customerPhone}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -168,30 +128,81 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
+                    app:disableUnless="@{viewModel.amountIsNeeded}"
                     android:hint="Amount">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/amount_input"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:singleLine="true"
                         android:inputType="numberDecimal"
-                        android:maxLength="10"
-                        android:singleLine="true" />
+                        android:text="@={viewModel.amountString}" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    app:goneUnless="@{viewModel.fieldOneIsNeeded}"
+                    android:hint="@{viewModel.fieldOneLabel}">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:singleLine="true"
+                        android:text="@={viewModel.fieldOne}" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:goneUnless="@{viewModel.fieldTwoIsNeeded}"
+                    android:layout_marginBottom="15dp"
+                    android:hint="@{viewModel.fieldTwoLabel}">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:singleLine="true"
+                        android:text="@={viewModel.fieldTwo}" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:hint="Customer Email (optional)">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:singleLine="true"
+                        android:inputType="textEmailAddress"
+                        android:text="@={viewModel.customerEmail}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
         </ScrollView>
 
         <Button
-            android:id="@+id/generate_reference_button"
-            android:layout_width="220dp"
+            android:id="@+id/complete_payment_button"
+            android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_gravity="bottom|end"
             android:layout_margin="20dp"
+            android:width="180dp"
             android:gravity="center"
-            android:text="Generate Reference" />
+            android:text="Complete Payment"
+            android:textColor="#fff" />
 
     </RelativeLayout>
 </layout>
