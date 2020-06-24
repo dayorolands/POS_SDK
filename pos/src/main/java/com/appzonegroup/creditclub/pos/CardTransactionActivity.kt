@@ -283,11 +283,11 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                             return@read
                         }
 
-                        if (cardData.pinBlock.isNullOrBlank()) {
-                            hideProgressBar()
-                            renderTransactionFailure("Could not validate PIN")
-                            return@read
-                        }
+//                        if (cardData.pinBlock.isNullOrBlank()) {
+//                            hideProgressBar()
+//                            renderTransactionFailure("Could not validate PIN")
+//                            return@read
+//                        }
 
                         onReadCard(cardData)
                     }
