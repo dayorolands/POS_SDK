@@ -1,7 +1,6 @@
 package com.creditclub.pos.providers.telpo
 
 import android.content.Context
-import com.appzonegroup.creditclub.pos.BuildConfig
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosManagerCompanion
 import com.creditclub.pos.printer.PosPrinter

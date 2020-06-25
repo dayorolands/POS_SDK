@@ -34,7 +34,7 @@ dependencies {
     implementation files('libs/emv.jar')
     implementation files('libs/core-3.1.0.jar')
     implementation files('libs/SmartCardLib.jar')
-    implementation files('libs/telpo_implementation.jar')
+    implementation files('libs/telpo_api.jar')
     
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"

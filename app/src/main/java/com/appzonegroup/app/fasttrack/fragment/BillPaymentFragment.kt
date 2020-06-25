@@ -14,11 +14,13 @@ import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
+import com.creditclub.pos.printer.PosPrinter
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 import java.util.*
 
 class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
@@ -28,7 +30,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     override val functionId = FunctionIds.PAY_BILL
     private val request = PayBillRequest()
     private val uniqueReference = UUID.randomUUID().toString()
-    private val posPrinter: PosPrinter by lazy { PosPrinter(requireContext(), dialogProvider) }
+    private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)

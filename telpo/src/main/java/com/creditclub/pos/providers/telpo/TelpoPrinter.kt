@@ -9,8 +9,6 @@ import android.graphics.BitmapFactory
 import android.os.BatteryManager
 import android.os.Looper
 import android.widget.Toast
-import com.appzonegroup.creditclub.pos.R
-import com.appzonegroup.creditclub.pos.printer.*
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.getConfirmation
 import com.creditclub.core.util.showErrorAndWait

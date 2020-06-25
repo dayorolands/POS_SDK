@@ -272,7 +272,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
 
                         cardData.pinBlock = posManager.sessionData.pinBlock ?: cardData.pinBlock
                         if (cardData.pinBlock.isNullOrBlank()) {
-                            hideProgressBar()
+                            dialogProvider.hideProgressBar()
                             renderTransactionFailure("Could not validate PIN")
                             return@launch
                         }

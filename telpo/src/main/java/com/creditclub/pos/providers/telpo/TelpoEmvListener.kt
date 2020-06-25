@@ -4,8 +4,8 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.os.PowerManager
 import android.util.Log
+import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.pos.PosManager
-import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.telpo.emv.*
 import com.telpo.emv.util.StringUtil
 import com.telpo.pinpad.PinParam
@@ -63,7 +63,7 @@ class TelpoEmvListener(
             param.MaxPinLen = 4
             param.MinPinLen = 4
             param.IsShowCardNo = 0
-            param.Amount = CurrencyFormatter.format("${sessionData.amount}")
+            param.Amount = sessionData.amount.toCurrencyFormat()
             PinpadService.Open(context)
             wakeUpAndUnlock(context)
             ret = PinpadService.TP_PinpadGetPin(param)

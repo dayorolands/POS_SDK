@@ -2,13 +2,13 @@ package com.appzonegroup.app.fasttrack.receipt
 
 import android.content.Context
 import com.appzonegroup.creditclub.pos.printer.LogoNode
-import com.appzonegroup.creditclub.pos.printer.PrintNode
-import com.appzonegroup.creditclub.pos.printer.TextNode
 import com.appzonegroup.creditclub.pos.printer.footerNodes
 import com.appzonegroup.creditclub.pos.receipt.TransactionReceipt
 import com.creditclub.core.data.response.CollectionPaymentResponse
 import com.creditclub.core.util.format
 import com.creditclub.core.util.localStorage
+import com.creditclub.pos.printer.PrintNode
+import com.creditclub.pos.printer.TextNode
 
 class CollectionPaymentReceipt(context: Context, val response: CollectionPaymentResponse) :
     TransactionReceipt(context) {
