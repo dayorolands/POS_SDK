@@ -10,10 +10,10 @@ class Biller {
     var description: String? = null
 
     @SerialName("IsAirtime")
-    var isAirtime = true
+    var isAirtime: Boolean? = null
 
     @SerialName("BillerCategoryID")
-    var billerCategoryID = 0
+    var billerCategoryId: Int? = null
 
     @SerialName("ID")
     var id: String? = null
@@ -22,7 +22,7 @@ class Biller {
     var name: String? = null
 
     @SerialName("Status")
-    var status = true
+    var status: Boolean? = null
 
     @SerialName("StatusDetails")
     var statusDetails: String? = null
@@ -38,4 +38,10 @@ class Biller {
 
     @SerialName("Amount")
     var amount: String? = null
+
+    @SerialName("CustomerField1")
+    var customerField1: String? = null
+
+    @SerialName("CustomerField2")
+    var customerField2: String? = null
 }

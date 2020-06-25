@@ -42,7 +42,7 @@ fun registerAppFunctions() {
     AppFunctions.register(FunctionIds.BVN_UPDATE, AppFunction(R.id.bvn_update_button, R.string.title_activity_bvnUpdate, R.drawable.secured_loan))
     AppFunctions.register(FunctionIds.CUSTOMER_BALANCE_ENQUIRY, AppFunction(R.id.customer_balance_enquiry_button, R.string.customer_balance, R.drawable.income))
     AppFunctions.register(FunctionIds.AGENT_BALANCE_ENQUIRY, AppFunction(R.id.agent_balance_enquiry_button, R.string.agent_s_balance, R.drawable.income))
-    AppFunctions.register(FunctionIds.PAY_BILL, AppFunction(R.id.pay_bill_button, R.string.pay_a_bill, R.drawable.payday_loan))
+    AppFunctions.register(FunctionIds.PAY_BILL, AppFunction(R.id.fn_bill_payment, R.string.pay_a_bill, R.drawable.payday_loan))
     AppFunctions.register(FunctionIds.CUSTOMER_CHANGE_PIN, AppFunction(R.id.customer_change_pin_button, R.string.change_customer_pin, R.drawable.login_password))
     AppFunctions.register(FunctionIds.AGENT_CHANGE_PIN, AppFunction(R.id.agent_change_pin_button, R.string.pin_change, R.drawable.login_password))
     AppFunctions.register(FunctionIds.CUSTOMER_MINI_STATEMENT, AppFunction(R.id.customer_mini_statement_button, R.string.title_activity_basic_mini_statement, R.drawable.deposit))

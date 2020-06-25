@@ -1,9 +1,14 @@
 package com.creditclub.core.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.creditclub.core.config.IInstitutionConfig
+import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.api.BackendConfig
+import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
@@ -31,6 +36,10 @@ open class CreditClubFragment : Fragment {
     open val functionId: Int? = null
 
     open val localStorage: LocalStorage by inject()
+    open val appDataStorage: AppDataStorage by inject()
+    open val institutionConfig: IInstitutionConfig by inject()
+    open val backendConfig: BackendConfig by inject()
+    open val coreDatabase: CoreDatabase by inject()
 
     open val mainScope by lazy { CoroutineScope(Dispatchers.Main) }
     open val ioScope by lazy { CoroutineScope(Dispatchers.IO) }
@@ -56,5 +65,13 @@ open class CreditClubFragment : Fragment {
         ioScope.cancel()
         defaultScope.cancel()
         super.onDestroy()
+    }
+
+    fun startActivity(classToStart: Class<*>) {
+        startActivity(Intent(requireActivity(), classToStart))
+    }
+
+    open fun onBackPressed(): Boolean {
+        return false
     }
 }

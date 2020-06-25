@@ -2,14 +2,11 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-
-    </data>
-
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/credit_club_main_menu_coordinator"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
         android:background="@color/menuBackground">
 
 
@@ -46,11 +43,11 @@
                         android:tint="@color/toolbarLogoTint" />
 
                     <ImageButton
+                        android:id="@+id/drawer_toggle"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_centerVertical="true"
                         android:background="#0000"
-                        android:onClick="openDrawer"
                         android:padding="20dp"
                         app:srcCompat="@drawable/ic_menu" />
 

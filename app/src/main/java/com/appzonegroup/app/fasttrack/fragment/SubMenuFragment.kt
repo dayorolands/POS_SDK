@@ -1,31 +1,26 @@
-package com.appzonegroup.app.fasttrack
+package com.appzonegroup.app.fasttrack.fragment
 
 import android.os.Bundle
 import android.view.View
-import androidx.databinding.DataBindingUtil
-import com.appzonegroup.app.fasttrack.databinding.ActivityCreditClubSubMenuBinding
-import com.appzonegroup.app.fasttrack.network.online.APIHelper
+import androidx.navigation.fragment.navArgs
+import com.appzonegroup.app.fasttrack.R
+import com.appzonegroup.app.fasttrack.databinding.SubMenuFragmentBinding
+import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.openPageById
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.AppFunctions
+import com.creditclub.core.ui.CreditClubFragment
 
-class CreditClubSubMenuActivity : BaseActivity(), View.OnClickListener {
+class SubMenuFragment : CreditClubFragment(R.layout.sub_menu_fragment),
+    View.OnClickListener {
 
-    private val category: Int
-        get() = intent.getIntExtra(CATEGORY_TYPE, 0)
+    private val binding by dataBinding<SubMenuFragmentBinding>()
+    private val args by navArgs<SubMenuFragmentArgs>()
 
-    private lateinit var ah: APIHelper
-    private lateinit var bankOneApplication: BankOneApplication
-    private lateinit var binding: ActivityCreditClubSubMenuBinding
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_credit_club_sub_menu)
-        bankOneApplication = application as BankOneApplication
-
-        ah = APIHelper(baseContext)
-
-        render(category)
+        render(args.category)
     }
 
     private fun render(category: Int) {
@@ -94,13 +89,5 @@ class CreditClubSubMenuActivity : BaseActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         v?.run { openPageById(id) }
-    }
-
-    fun onBackPressed(v: View?) {
-        onBackPressed()
-    }
-
-    companion object {
-        const val CATEGORY_TYPE = "CATEGORY_TYPE"
     }
 }

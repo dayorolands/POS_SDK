@@ -1,4 +1,4 @@
-package com.appzonegroup.app.fasttrack
+package com.appzonegroup.app.fasttrack.fragment
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,34 +6,32 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import androidx.core.view.GravityCompat
-import com.appzonegroup.app.fasttrack.databinding.ActivityCreditClubMainMenuBinding
+import androidx.navigation.fragment.findNavController
+import com.appzonegroup.app.fasttrack.*
+import com.appzonegroup.app.fasttrack.databinding.HomeFragmentBinding
 import com.appzonegroup.app.fasttrack.ui.Dialogs
+import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.AppFunctions
-import com.creditclub.core.util.*
-import com.creditclub.core.util.delegates.contentView
-import com.creditclub.ui.UpdateActivity
-import com.creditclub.core.util.localStorage
+import com.creditclub.core.ui.CreditClubFragment
+import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.packageInfo
-import com.creditclub.core.util.safeRun
 import com.creditclub.core.util.safeRunIO
+import com.creditclub.ui.UpdateActivity
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.launch
 
-class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private val binding by contentView<CreditClubMainMenuActivity, ActivityCreditClubMainMenuBinding>(
-        R.layout.activity_credit_club_main_menu
-    )
+class HomeFragment : CreditClubFragment(R.layout.home_fragment),
+    NavigationView.OnNavigationItemSelectedListener {
 
-    private val frequentBindings by lazy {
-        listOf(binding.frequent.fn1, binding.frequent.fn2, binding.frequent.fn3)
-    }
+    private val packageInfo get() = requireContext().packageInfo
+    private val binding by dataBinding<HomeFragmentBinding>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.agentCategoryButton.button.setOnClickListener(categoryClickListener(AppFunctions.Categories.AGENT_CATEGORY))
         binding.customerCategoryButton.button.setOnClickListener(categoryClickListener(AppFunctions.Categories.CUSTOMER_CATEGORY))
@@ -62,7 +60,7 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
             binding.versionTv.value = "v${packageInfo?.versionName}. Staging. Powered by CreditClub"
         }
 
-        binding.logoutButton.setOnClickListener { logout() }
+        binding.logoutButton.setOnClickListener { requireActivity().logout() }
 
         localStorage.agent?.let { info ->
             binding.navView.getHeaderView(0).run {
@@ -99,14 +97,19 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
                             else "Please update"
 
                         val dialog =
-                            Dialogs.confirm(this@CreditClubMainMenuActivity, message, subtitle) {
+                            Dialogs.confirm(requireContext(), message, subtitle) {
                                 onSubmit {
-                                    if (it) startActivity(UpdateActivity::class.java)
-                                    else if (mustUpdate) finish()
+                                    if (it) startActivity(
+                                        Intent(
+                                            requireContext(),
+                                            UpdateActivity::class.java
+                                        )
+                                    )
+                                    else if (mustUpdate) requireActivity().finish()
                                 }
 
                                 onClose {
-                                    if (mustUpdate) finish()
+                                    if (mustUpdate) requireActivity().finish()
                                 }
                             }
                         dialog.setCancelable(!mustUpdate)
@@ -115,14 +118,14 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
                 }
             }
         }
-    }
 
-    override fun onResume() {
-        super.onResume()
-        getFavorites()
+        binding.drawerToggle.setOnClickListener { openDrawer() }
     }
 
     private fun getFavorites() {
+        val frequentBindings =
+            listOf(binding.frequent.fn1, binding.frequent.fn2, binding.frequent.fn3)
+
         binding.frequent.root.visibility = View.GONE
         frequentBindings.forEach { it.root.visibility = View.GONE }
 
@@ -153,42 +156,45 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
         }
     }
 
-    override fun onBackPressed() {
+    override fun onBackPressed(): Boolean {
         try {
-            if (binding.creditClubMainMenuCoordinator.isDrawerOpen(GravityCompat.START)) {
+            return if (binding.creditClubMainMenuCoordinator.isDrawerOpen(GravityCompat.START)) {
                 binding.creditClubMainMenuCoordinator.closeDrawer(GravityCompat.START)
+                true
             } else {
                 super.onBackPressed()
             }
         } catch (ex: Exception) {
-            finish()
+//            requireActivity().finish()
         }
+
+        return super.onBackPressed()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.logout -> logout()
+            R.id.logout -> requireActivity().logout()
             R.id.online_functions -> startActivity(
                 Intent(
-                    this@CreditClubMainMenuActivity,
+                    requireContext(),
                     OnlineActivity::class.java
                 )
             )
             R.id.reports -> startActivity(
                 Intent(
-                    this@CreditClubMainMenuActivity,
+                    requireContext(),
                     ReportActivity::class.java
                 )
             )
             R.id.commissions -> startActivity(
                 Intent(
-                    this@CreditClubMainMenuActivity,
+                    requireContext(),
                     CommissionsActivity::class.java
                 )
             )
             R.id.support -> startActivity(
                 Intent(
-                    this@CreditClubMainMenuActivity,
+                    requireContext(),
                     SupportActivity::class.java
                 )
             )
@@ -200,7 +206,7 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
         return true
     }
 
-    fun openDrawer(view: View) {
+    fun openDrawer() {
         binding.creditClubMainMenuCoordinator.run {
             if (isDrawerOpen(GravityCompat.START)) {
                 closeDrawer(GravityCompat.START)
@@ -212,10 +218,7 @@ class CreditClubMainMenuActivity : BaseActivity(), NavigationView.OnNavigationIt
 
     private fun categoryClickListener(category: Int): View.OnClickListener? {
         return View.OnClickListener {
-            val intent =
-                Intent(this@CreditClubMainMenuActivity, CreditClubSubMenuActivity::class.java)
-            intent.putExtra(CreditClubSubMenuActivity.CATEGORY_TYPE, category)
-            startActivity(intent)
+            findNavController().navigate(HomeFragmentDirections.actionHomeToSubMenu(category))
         }
     }
 }

@@ -237,7 +237,7 @@ class LoginActivity : CreditClubActivity() {
             val lastLogin = "Last Login: " + Misc.dateToLongString(Misc.getCurrentDateTime())
             LocalStorage.SaveValue(AppConstants.LAST_LOGIN, lastLogin, baseContext)
 
-            val intent = Intent(this@LoginActivity, CreditClubMainMenuActivity::class.java)
+            val intent = Intent(this@LoginActivity, MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             startActivity(intent)
             finish()

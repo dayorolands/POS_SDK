@@ -23,12 +23,12 @@ class CollectionPaymentViewModel : ViewModel() {
 
     val item: MutableLiveData<CollectionPaymentItem> = MutableLiveData()
     val itemName: MutableLiveData<String> = MutableLiveData()
-    val itemCode: MutableLiveData<String> = MutableLiveData()
+    val itemCode = Transformations.map(item) { it?.code }
 
     val collectionType: MutableLiveData<String> = MutableLiveData()
     val collectionService: MutableLiveData<String> = MutableLiveData()
     val customerId: MutableLiveData<String> = MutableLiveData()
-    val reference: MutableLiveData<String> = MutableLiveData()
+    val referenceString: MutableLiveData<String> = MutableLiveData()
     val customer: MutableLiveData<CollectionCustomer> = MutableLiveData()
 
     val referenceName = Transformations.map(collectionReference) { it?.referenceName }
@@ -38,6 +38,7 @@ class CollectionPaymentViewModel : ViewModel() {
         it?.amount?.toCurrencyFormat(it.currency ?: "NGN")
     }
     val validReference = Transformations.map(collectionReference) { it != null }
+    val collectionTypeIsWebGuid = Transformations.map(collectionType) { it == "WEBGUID" }
 
     companion object {
         @JvmStatic

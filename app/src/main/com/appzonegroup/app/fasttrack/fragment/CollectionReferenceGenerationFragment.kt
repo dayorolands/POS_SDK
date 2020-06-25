@@ -5,8 +5,8 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.FragmentCollectionReferenceGenerationBinding
 import com.appzonegroup.app.fasttrack.ui.dataBinding
@@ -20,18 +20,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import java.util.*
 
-//{
-//    "Reference": "string",
-//    "ReferenceName": "string",
-//    "viewModel.collectionService.value": "string",
-//    "AdditionalInformation": "string",
-//    "RequestReference": "string",
-//    "ApplyFee": true,
-//    "FeeAmount": 0,
-//    "FeeBearerAccount": "string",
-//    "FeeSuspenseAccount": "string"
-//}
-
 class CollectionReferenceGenerationFragment :
     CreditClubFragment(R.layout.fragment_collection_reference_generation) {
 
@@ -40,7 +28,7 @@ class CollectionReferenceGenerationFragment :
     private var paymentItems: List<CollectionPaymentItem>? = null
     private var categories: List<CollectionCategory>? = null
     private val binding by dataBinding<FragmentCollectionReferenceGenerationBinding>()
-    private val viewModel: CollectionPaymentViewModel by activityViewModels()
+    private val viewModel: CollectionPaymentViewModel by navGraphViewModels(R.id.collectionGraph)
     private val uniqueReference = UUID.randomUUID().toString()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -64,11 +52,15 @@ class CollectionReferenceGenerationFragment :
         }
 
         binding.paymentItemInput.onItemClick { position ->
-            viewModel.itemCode.value = paymentItems?.get(position)?.code
+            viewModel.item.value = paymentItems?.get(position)
         }
 
         binding.generateReferenceButton.setOnClickListener {
             mainScope.launch { generateReference() }
+        }
+
+        binding.customerIdInputLayout.setEndIconOnClickListener {
+            mainScope.launch { loadCustomer() }
         }
     }
 
@@ -105,6 +97,27 @@ class CollectionReferenceGenerationFragment :
             paymentItems?.map { "${it.name} - ${it.code}" }
         }
 
+    private suspend fun loadCustomer() {
+        if (viewModel.region.value.isNullOrBlank())
+            return dialogProvider.showErrorAndWait("Please select a region")
+
+        viewModel.customer.value = null
+        dialogProvider.showProgressBar("Loading customer")
+        val (response, error) = safeRunIO {
+            creditClubMiddleWareAPI.collectionsService.getCollectionCustomer(
+                localStorage.institutionCode,
+                viewModel.customerId.value?.trim(),
+                viewModel.region.value,
+                viewModel.collectionService.value
+            )
+        }
+        dialogProvider.hideProgressBar()
+
+        if (error != null) return dialogProvider.showErrorAndWait(error)
+        response?.name ?: return dialogProvider.showErrorAndWait("Please enter a valid customer id")
+        viewModel.customer.value = response
+    }
+
     private suspend inline fun loadDependencies(
         dependencyName: String,
         autoCompleteTextView: AutoCompleteTextView,
@@ -128,6 +141,17 @@ class CollectionReferenceGenerationFragment :
     }
 
     private suspend fun generateReference() {
+        if (viewModel.customerId.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter a customer id")
+        } else if (viewModel.customer.value == null) {
+            loadCustomer()
+            viewModel.customer.value ?: return
+        }
+
+        if (viewModel.customerPhoneNumber.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter a phone number")
+        }
+
         if (viewModel.categoryCode.value.isNullOrBlank()) {
             return dialogProvider.showError("Please select a valid category")
         }
@@ -150,9 +174,9 @@ class CollectionReferenceGenerationFragment :
         }
 
         request.apply {
-            customerId = viewModel.customerId.value
-            reference = viewModel.customerId.value
-            phoneNumber = viewModel.customerPhoneNumber.value
+            customerId = viewModel.customerId.value?.trim()
+            reference = viewModel.customerId.value?.trim()
+            phoneNumber = viewModel.customerPhoneNumber.value?.trim()
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value
@@ -191,7 +215,7 @@ class CollectionReferenceGenerationFragment :
             referenceName = request.referenceName
             customerId = request.customerId
         }
-        viewModel.reference.value = response.reference
+        viewModel.referenceString.value = response.reference
         viewModel.collectionReference.value = response
         findNavController().popBackStack()
     }
