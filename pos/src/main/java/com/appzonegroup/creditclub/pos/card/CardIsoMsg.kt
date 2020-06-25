@@ -4,6 +4,8 @@ import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
 import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
+import com.creditclub.pos.card.CardData
+import com.creditclub.pos.card.CardReaderEvent
 import org.jpos.iso.ISOException
 import org.jpos.transaction.TransactionManager
 import org.json.JSONException

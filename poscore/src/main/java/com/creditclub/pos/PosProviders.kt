@@ -1,7 +1,7 @@
 package com.creditclub.pos
 
 import android.content.Context
-import com.appzonegroup.creditclub.pos.PosManagerCompanion
+import com.creditclub.pos.PosManagerCompanion
 
 object PosProviders {
     val registered = mutableListOf<PosManagerCompanion>()

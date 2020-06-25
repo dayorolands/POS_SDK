@@ -48,15 +48,11 @@ dependencies {
     implementation project(path: ':core')
     implementation project(path: ':poscore')
     implementation project(path: ':uicentral')
-    implementation project(path: ':paylib')
+    implementation project(path: ':telpo')
     implementation project(path: ':smartpeak')
     implementation fileTree(dir: 'jniLibs', include: ['*.so'])
 
-    api files('libs/emv.jar')
-    api files('libs/core-3.1.0.jar')
-    api files('libs/jpos-1.9.0.jar')
-    api files('libs/SmartCardLib.jar')
-    api files('libs/telpo_api.jar')
+    implementation files('libs/jpos-1.9.0.jar')
 
     implementation 'com.loopj.android:android-async-http:1.4.10'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"

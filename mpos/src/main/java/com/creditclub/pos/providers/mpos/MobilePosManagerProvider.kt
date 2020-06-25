@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.pm.ProviderInfo
 import android.database.Cursor
 import android.net.Uri
-import com.appzonegroup.creditclub.pos.provider.mpos.MPosManager
 import com.creditclub.pos.PosProviders
 
 class MobilePosManagerProvider : ContentProvider() {

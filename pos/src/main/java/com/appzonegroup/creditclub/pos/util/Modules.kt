@@ -6,7 +6,7 @@ import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.command.PrintEOD
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.widget.Dialogs
 import kotlinx.coroutines.Dispatchers

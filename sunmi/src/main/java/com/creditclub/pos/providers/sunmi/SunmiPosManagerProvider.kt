@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.pm.ProviderInfo
 import android.database.Cursor
 import android.net.Uri
-import com.appzonegroup.creditclub.pos.provider.sunmi.SunmiPosManager
 import com.creditclub.pos.PosProviders
 
 class SunmiPosManagerProvider : ContentProvider() {

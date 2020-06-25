@@ -14,7 +14,7 @@ import com.creditclub.ui.adapter.PosReportAdapter
 import com.appzonegroup.app.fasttrack.adapter.TransactionReportAdapter
 import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
+import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.core.data.model.TransactionReport
 import com.creditclub.core.util.*
 import com.creditclub.ui.databinding.ActivityReportBinding
@@ -40,7 +40,7 @@ class ActivityReportManager(
     private val maxSize = 20
     private var totalCount = 0
     private val dialogProvider = activity.dialogProvider
-    private val posPrinter: com.appzonegroup.creditclub.pos.printer.PosPrinter by inject { parametersOf(context, dialogProvider) }
+    private val posPrinter: PosPrinter by inject { parametersOf(context, dialogProvider) }
     private var selectedTransactionType = transactionGroup.first()
     private var selectedTransactionStatus = TransactionStatus.Successful
     private var transactionAdapter =

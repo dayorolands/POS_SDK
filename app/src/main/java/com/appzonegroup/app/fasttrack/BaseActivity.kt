@@ -22,7 +22,7 @@ import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.task.AsyncResponse
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
+import com.creditclub.pos.printer.PosPrinter
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogListenerBlock
@@ -38,7 +38,7 @@ import org.koin.core.parameter.parametersOf
 @SuppressLint("Registered")
 open class BaseActivity : CreditClubActivity(), AsyncResponse {
 
-    val printer: com.appzonegroup.creditclub.pos.printer.PosPrinter by inject { parametersOf(this, dialogProvider) }
+    val printer: PosPrinter by inject { parametersOf(this, dialogProvider) }
     override val hasLogoutTimer get() = true
 
     open fun showNotification(message: String) {

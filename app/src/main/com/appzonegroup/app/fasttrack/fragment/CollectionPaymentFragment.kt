@@ -15,7 +15,7 @@ import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
+import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.core.data.request.CollectionPaymentRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
@@ -29,7 +29,7 @@ import java.util.*
 class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment_fragment) {
     private var regions: List<String>? = null
     private var collectionTypes: List<String>? = null
-    private val posPrinter: com.appzonegroup.creditclub.pos.printer.PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
+    private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
     private val binding by dataBinding<CollectionPaymentFragmentBinding>()
     private val viewModel: CollectionPaymentViewModel by activityViewModels()
     override val functionId = FunctionIds.COLLECTION_PAYMENT

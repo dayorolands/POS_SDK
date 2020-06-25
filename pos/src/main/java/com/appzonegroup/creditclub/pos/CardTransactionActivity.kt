@@ -14,7 +14,6 @@ import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.appzonegroup.creditclub.pos.card.*
-import com.appzonegroup.creditclub.pos.contract.Logger
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.data.create
 import com.appzonegroup.creditclub.pos.databinding.PageInputRrnBinding
@@ -25,13 +24,17 @@ import com.appzonegroup.creditclub.pos.extension.format
 import com.appzonegroup.creditclub.pos.models.*
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.service.ApiService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.util.indicateError
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.showErrorAndWait
+import com.creditclub.pos.PosManager
+import com.creditclub.pos.card.CardData
+import com.creditclub.pos.card.CardReaderEvent
+import com.creditclub.pos.card.CardTransactionStatus
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.page_input_amount.*
 import kotlinx.android.synthetic.main.page_input_rrn.*
@@ -45,10 +48,8 @@ import java.util.*
 import kotlin.concurrent.schedule
 
 @SuppressLint("Registered")
-abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickListener {
+abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
     private val posManager: PosManager by inject { parametersOf(this) }
-
-    override val tag: String = "CardTrans"
 
     private var amountText = "0"
     protected var previousMessage: CardIsoMsg? = null
@@ -389,7 +390,6 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                                 "${backendConfig.apiHost}/CreditClubMiddlewareAPI/CreditClubStatic/POSCashOutNotification"
 
                             val dataToSend = Gson().toJson(posNotification)
-                            log("PosNotification request: $dataToSend")
 
                             val headers = Headers.Builder()
                             headers.add(

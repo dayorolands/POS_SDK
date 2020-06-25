@@ -2,9 +2,9 @@ package com.appzonegroup.creditclub.pos.util
 
 import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
-import com.appzonegroup.creditclub.pos.printer.TextNode
-import com.appzonegroup.creditclub.pos.printer.WalkPaper
+import com.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.TextNode
+import com.creditclub.pos.printer.WalkPaper
 import com.appzonegroup.creditclub.pos.service.ParameterService
 
 

@@ -9,8 +9,8 @@ import android.text.InputType
 import android.view.WindowManager
 import com.appzonegroup.creditclub.pos.contract.ServiceProvider
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.PosPrinter
+import com.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService

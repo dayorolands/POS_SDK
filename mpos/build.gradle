@@ -45,7 +45,4 @@ dependencies {
     implementation "androidx.cardview:cardview:1.0.0"
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation "com.google.android.material:material:${versions.material}"
-
-    compileOnly files('extern_libs/classes_2.1.45_20181115.jar')
-    implementation files('libs/bw_pos_sdk2.0.23.jar')
 }

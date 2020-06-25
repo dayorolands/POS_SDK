@@ -1,6 +1,7 @@
 package com.appzonegroup.creditclub.pos.printer
 
 import com.appzonegroup.creditclub.pos.R
+import com.creditclub.pos.printer.ImageNode
 
 
 /**

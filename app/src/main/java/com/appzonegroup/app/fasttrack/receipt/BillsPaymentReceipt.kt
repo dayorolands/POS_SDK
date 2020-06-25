@@ -8,6 +8,9 @@ import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
 import com.creditclub.core.util.toString
+import com.creditclub.pos.printer.Alignment
+import com.creditclub.pos.printer.PrintNode
+import com.creditclub.pos.printer.TextNode
 import org.threeten.bp.Instant
 
 
@@ -24,7 +27,8 @@ class BillsPaymentReceipt(context: Context, val request: PayBillRequest) :
             return mutableListOf(
                 LogoNode(),
 
-                TextNode(if (request.isRecharge) "Airtime Recharge" else "Bills Payment").apply {
+                TextNode(if (request.isRecharge) "Airtime Recharge" else "Bills Payment")
+                    .apply {
                     align = Alignment.MIDDLE
                     wordFont = 35
                 },

@@ -34,7 +34,4 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
-
-    compileOnly files('extern_libs/classes_2.1.45_20181115.jar')
-    implementation files('libs/bw_pos_sdk2.0.23.jar')
 }

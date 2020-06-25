@@ -2,10 +2,13 @@ package com.creditclub.pos.providers.smartpeak.p1000
 
 import android.content.Context
 import android.content.Intent
-import com.appzonegroup.creditclub.pos.PosManager
-import com.appzonegroup.creditclub.pos.PosManagerCompanion
-import com.appzonegroup.creditclub.pos.card.*
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
+import com.creditclub.pos.PosManager
+import com.creditclub.pos.PosManagerCompanion
+import com.creditclub.pos.card.CardData
+import com.creditclub.pos.card.CardReader
+import com.creditclub.pos.card.CardReaderEvent
+import com.creditclub.pos.card.CardReaderEventListener
+import com.creditclub.pos.printer.PosPrinter
 import com.basewin.database.DataBaseManager
 import com.basewin.define.InputPBOCInitData
 import com.basewin.define.KeyType
@@ -18,6 +21,8 @@ import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.providers.smartpeak.p1000.pboc.utils.OfflineTransactionListener
 import com.creditclub.pos.providers.smartpeak.p1000.utils.GlobalData
+import com.pos.sdk.card.PosCardInfo
+import com.pos.sdk.printer.PosPrinterInfo
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.koin.dsl.module
@@ -37,7 +42,7 @@ class SmartPeakPosManager(val activity: CreditClubActivity) : PosManager, KoinCo
         pinpad.loadMainKeyByArea(area, tmkindex, posParameter.masterKey)
         pinpad.loadPinKeyByArea(area, tmkindex, posParameter.pinKey, null)
 
-        val globalData= GlobalData.getInstance()
+        val globalData = GlobalData.getInstance()
         globalData.tmkId = tmkindex
         globalData.area = area
     }
@@ -102,7 +107,13 @@ class SmartPeakPosManager(val activity: CreditClubActivity) : PosManager, KoinCo
         }
 
         override fun isCompatible(context: Context): Boolean {
-            return true
+            return try {
+                PosCardInfo()
+                PosPrinterInfo()
+                true
+            } catch (ignored: NoClassDefFoundError) {
+                false
+            }
         }
     }
 }

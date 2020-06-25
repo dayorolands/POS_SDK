@@ -3,12 +3,13 @@ package com.appzonegroup.creditclub.pos.command
 import android.content.Context
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
-import com.appzonegroup.creditclub.pos.printer.TextNode
+import com.creditclub.pos.printer.PosPrinter
+import com.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.TextNode
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.ui.widget.DialogProvider
 import kotlinx.coroutines.*
+import org.koin.core.KoinComponent
 import org.koin.core.get
 import org.koin.core.parameter.parametersOf
 
@@ -34,7 +35,7 @@ class PrintEOD(
     private val isoSocketHelper: IsoSocketHelper,
     private val dialogProvider: DialogProvider,
     private val localDate: String
-) : PosCommand() {
+) : Runnable, KoinComponent {
 
     override fun run() {
         PosDatabase.open(context) { db ->
