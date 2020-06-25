@@ -1,8 +1,12 @@
 package com.appzonegroup.creditclub.pos.provider.telpo
 
+import android.content.Context
 import com.appzonegroup.creditclub.pos.BuildConfig
-import com.appzonegroup.creditclub.pos.card.PosManager
+import com.appzonegroup.creditclub.pos.PosManager
+import com.appzonegroup.creditclub.pos.PosManagerCompanion
+import com.appzonegroup.creditclub.pos.printer.PosPrinter
 import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.safeRun
 import com.telpo.emv.EmvService
 import com.telpo.pinpad.PinpadService
@@ -26,7 +30,7 @@ class TelpoPosManager(val activity: CreditClubActivity) : PosManager, KoinCompon
     private val emvService by lazy { EmvService.getInstance() }
     override val sessionData = PosManager.SessionData()
 
-    override fun loadEmv() {
+    override suspend fun loadEmv() {
         safeRun { PinpadService.Close() }
 
         emvService.setListener(emvListener)
@@ -48,17 +52,20 @@ class TelpoPosManager(val activity: CreditClubActivity) : PosManager, KoinCompon
         EmvService.deviceClose()
     }
 
-    companion object {
+    companion object : PosManagerCompanion {
         var deviceType = -1
             private set
 
-        val module = module {
+        override val module = module {
             factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
                 TelpoPosManager(activity)
             }
+            factory<PosPrinter>(override = true) { (context: Context, dialogProvider: DialogProvider) ->
+                TelpoPrinter(context, dialogProvider)
+            }
         }
 
-        fun isCompatible(): Boolean {
+        override fun isCompatible(context: Context): Boolean {
             try {
                 deviceType = SystemUtil.getDeviceType()
             } catch (ex: Exception) {
@@ -69,5 +76,7 @@ class TelpoPosManager(val activity: CreditClubActivity) : PosManager, KoinCompon
 
             return false
         }
+
+        override fun setup(context: Context) {}
     }
 }

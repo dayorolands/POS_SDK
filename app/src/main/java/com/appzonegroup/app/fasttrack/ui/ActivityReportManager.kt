@@ -20,6 +20,8 @@ import com.creditclub.core.util.*
 import com.creditclub.ui.databinding.ActivityReportBinding
 import com.creditclub.ui.manager.DataBindingActivityManager
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 import org.threeten.bp.LocalDate
 import org.threeten.bp.Period
 
@@ -38,7 +40,7 @@ class ActivityReportManager(
     private val maxSize = 20
     private var totalCount = 0
     private val dialogProvider = activity.dialogProvider
-    private val posPrinter by lazy { PosPrinter(context, dialogProvider) }
+    private val posPrinter: com.appzonegroup.creditclub.pos.printer.PosPrinter by inject { parametersOf(context, dialogProvider) }
     private var selectedTransactionType = transactionGroup.first()
     private var selectedTransactionStatus = TransactionStatus.Successful
     private var transactionAdapter =

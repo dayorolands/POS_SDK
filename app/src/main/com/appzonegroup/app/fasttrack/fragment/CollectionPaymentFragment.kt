@@ -22,12 +22,14 @@ import com.creditclub.core.util.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 import java.util.*
 
 class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment_fragment) {
     private var regions: List<String>? = null
     private var collectionTypes: List<String>? = null
-    private val posPrinter: PosPrinter by lazy { PosPrinter(requireContext(), dialogProvider) }
+    private val posPrinter: com.appzonegroup.creditclub.pos.printer.PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
     private val binding by dataBinding<CollectionPaymentFragmentBinding>()
     private val viewModel: CollectionPaymentViewModel by activityViewModels()
     override val functionId = FunctionIds.COLLECTION_PAYMENT

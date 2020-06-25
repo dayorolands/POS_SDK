@@ -4,7 +4,7 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.os.PowerManager
 import android.util.Log
-import com.appzonegroup.creditclub.pos.card.PosManager
+import com.appzonegroup.creditclub.pos.PosManager
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.telpo.emv.*
 import com.telpo.emv.util.StringUtil

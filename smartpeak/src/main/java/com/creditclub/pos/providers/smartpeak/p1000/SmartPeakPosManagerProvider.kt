@@ -10,7 +10,7 @@ import com.creditclub.pos.PosProviders
 
 class SmartPeakPosManagerProvider : ContentProvider() {
     override fun onCreate(): Boolean {
-        PosProviders.register(context!!, SmartPeakPosManager)
+        PosProviders.registerFirst(context!!, SmartPeakPosManager)
         return true
     }
 
@@ -58,7 +58,7 @@ class SmartPeakPosManagerProvider : ContentProvider() {
         }
         val packageName = "com.creditclub.pos.providers.smartpeak"
         // So if the authorities equal the library internal ones, the developer forgot to set his applicationId
-        check("$packageName.p1000.PosManagerProvider" != providerInfo.authority) {
+        check("$packageName.p1000.SmartPeakPosManagerProvider" != providerInfo.authority) {
             ("Incorrect provider authority in manifest. Most likely due to a "
                     + "missing applicationId variable in application\'s build.gradle.")
         }

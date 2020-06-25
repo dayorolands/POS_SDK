@@ -12,6 +12,8 @@ import android.widget.Toast
 import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.printer.*
 import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.getConfirmation
+import com.creditclub.core.util.showErrorAndWait
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
@@ -30,12 +32,18 @@ import java.util.*
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 1/14/2019.
  * Appzone Ltd
  */
-class TelpoPrinter(private val context: Context, private val dialogProvider: DialogProvider) :
-    UsbThermalPrinter(context) {
+class TelpoPrinter(override val context: Context, override val dialogProvider: DialogProvider) :
+    UsbThermalPrinter(context),
+    PosPrinter {
     private var lowBattery = false
 
     @Throws(WriterException::class)
-    fun createCode(str: String, type: BarcodeFormat, bmpWidth: Int, bmpHeight: Int): Bitmap {
+    fun createCode(
+        str: String,
+        type: BarcodeFormat,
+        bmpWidth: Int,
+        bmpHeight: Int
+    ): Bitmap {
         val mHashTable = Hashtable<EncodeHintType, String>()
         mHashTable[EncodeHintType.CHARACTER_SET] = "UTF-8"
 
@@ -61,17 +69,7 @@ class TelpoPrinter(private val context: Context, private val dialogProvider: Dia
 
     private val printReceive: BroadcastReceiver
 
-    fun checkAsync(block: (PrinterStatus) -> Unit) {
-        GlobalScope.launch(Dispatchers.Main) {
-            val status = withContext(Dispatchers.Default) {
-                check()
-            }
-
-            block(status)
-        }
-    }
-
-    fun check(): PrinterStatus {
+    override fun check(): PrinterStatus {
         return try {
             start(0)
             reset()
@@ -83,27 +81,10 @@ class TelpoPrinter(private val context: Context, private val dialogProvider: Dia
         }
     }
 
-
-    fun printAsync(
-        printJob: PrintJob,
-        message: String = "Printing...",
-        block: ((PrinterStatus) -> Unit)? = null
-    ) {
-        printAsync(printJob.nodes, message, block)
-    }
-
-    fun printAsync(
-        vararg nodes: PrintNode,
-        message: String = "Printing...",
-        block: ((PrinterStatus) -> Unit)? = null
-    ) {
-        printAsync(nodes.asList(), message, block)
-    }
-
-    fun printAsync(
+    override fun printAsync(
         nodes: List<PrintNode>,
-        message: String = "Printing...",
-        block: ((PrinterStatus) -> Unit)? = null
+        message: String,
+        block: ((PrinterStatus) -> Unit)?
     ) {
         GlobalScope.launch(Dispatchers.Main) {
 
@@ -120,9 +101,30 @@ class TelpoPrinter(private val context: Context, private val dialogProvider: Dia
         }
     }
 
-    fun print(printJob: PrintJob): PrinterStatus = print(printJob.nodes)
+    override suspend fun print(
+        printJob: PrintJob,
+        message: String,
+        retryOnFail: Boolean
+    ): PrinterStatus {
+        dialogProvider.showProgressBar(message)
+        val status = withContext(Dispatchers.Default) {
+            Looper.myLooper() ?: Looper.prepare()
+            print(printJob.nodes)
+        }
+        dialogProvider.hideProgressBar()
+        if (status == PrinterStatus.READY) return status
+        if (!retryOnFail) {
+            dialogProvider.showErrorAndWait(status.message)
+            return status
+        }
 
-    fun print(nodes: List<PrintNode>): PrinterStatus {
+        val tryAgain = dialogProvider.getConfirmation(status.message, "Try again?")
+
+        return if (tryAgain) print(printJob, message, false)
+        else status
+    }
+
+    override fun print(nodes: List<PrintNode>): PrinterStatus {
         for (node in nodes) {
             val status: PrinterStatus = when (node) {
                 is TextNode -> print(node)
@@ -205,7 +207,7 @@ class TelpoPrinter(private val context: Context, private val dialogProvider: Dia
         }
     }
 
-//    fun marker(node: SearchMark): PrinterStatus {
+//    override fun marker(node: SearchMark): PrinterStatus {
 //        return try {
 //            reset()
 //            searchMark(

@@ -17,6 +17,8 @@ import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.widget.Dialogs
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogListenerBlock
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 @SuppressLint("Registered")
 abstract class PosActivity : CreditClubActivity(), ServiceProvider {
@@ -25,7 +27,7 @@ abstract class PosActivity : CreditClubActivity(), ServiceProvider {
     override val callHomeService by lazy { CallHomeService.getInstance(config, parameters, this) }
     override val isoSocketHelper by lazy { IsoSocketHelper(config, parameters, this) }
 
-    val printer by lazy { PosPrinter(this, dialogProvider) }
+    val printer: PosPrinter by inject { parametersOf(this, dialogProvider) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,7 +1,5 @@
 package com.appzonegroup.creditclub.pos.printer
 
-import com.appzonegroup.creditclub.pos.BuildConfig
-
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 02/10/2019.

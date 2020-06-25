@@ -29,7 +29,6 @@ import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.service.ApiService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
-import com.appzonegroup.creditclub.pos.util.PosType
 import com.creditclub.core.util.indicateError
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.showErrorAndWait
@@ -105,15 +104,13 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
             delay(1000)
             dialogProvider.hideProgressBar()
 
-            val printerStatus = withContext(Dispatchers.Default) { printer.check() }
-            if (printerStatus != PrinterStatus.READY) {
-                dialogProvider.showErrorAndWait(printerStatus.message)
-                finish()
-                return@launch
-            }
-
-            if (Platform.posType == PosType.MPOS) {
-                return@launch readCard()
+            if (Platform.hasPrinter) {
+                val printerStatus = withContext(Dispatchers.Default) { printer.check() }
+                if (printerStatus != PrinterStatus.READY) {
+                    dialogProvider.showErrorAndWait(printerStatus.message)
+                    finish()
+                    return@launch
+                }
             }
 
             when (val cardEvent = posManager.cardReader.waitForCard()) {
@@ -567,11 +564,13 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
         if (!canPerformTransaction) return
 
         mainScope.launch {
-            val printerStatus = withContext(Dispatchers.Default) { printer.check() }
-            if (printerStatus != PrinterStatus.READY) {
-                dialogProvider.showErrorAndWait(printerStatus.message)
-                finish()
-                return@launch
+            if (Platform.hasPrinter) {
+                val printerStatus = withContext(Dispatchers.Default) { printer.check() }
+                if (printerStatus != PrinterStatus.READY) {
+                    dialogProvider.showErrorAndWait(printerStatus.message)
+                    finish()
+                    return@launch
+                }
             }
             val binding = DataBindingUtil.setContentView<PageInputRrnBinding>(
                 this@CardTransactionActivity,

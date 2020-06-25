@@ -9,6 +9,8 @@ import com.appzonegroup.creditclub.pos.printer.TextNode
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.ui.widget.DialogProvider
 import kotlinx.coroutines.*
+import org.koin.core.get
+import org.koin.core.parameter.parametersOf
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 6/26/2019.
@@ -67,7 +69,7 @@ class PrintEOD(
             val node = TextNode(text.toString())
             node.walkPaperAfterPrint = 20
 
-            PosPrinter(context, dialogProvider).printAsync(
+            get<PosPrinter> { parametersOf(context, dialogProvider) }.printAsync(
                 node,
                 message = "Printing Report"
             ) { printerStatus ->

@@ -9,6 +9,8 @@ import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.work.IsoRequestLogWorker
 import com.appzonegroup.creditclub.pos.work.ReversalWorker
 import com.appzonegroup.creditclub.pos.work.TransactionLogWorker
+import com.creditclub.pos.PosConfig
+import com.creditclub.pos.PosParameter
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
@@ -64,8 +66,10 @@ fun Application.startPosApp() {
 fun loadPosModules() {
 
     loadKoinModules(module {
+        single<PosConfig> { ConfigService.getInstance(androidContext()) }
         single { ConfigService.getInstance(androidContext()) }
         single { PosDatabase.getInstance(androidContext()) }
+        single<PosParameter> { ParameterService.getInstance(androidContext()) }
         single { ParameterService.getInstance(androidContext()) }
         single { CallHomeService.getInstance(get(), get(), androidContext()) }
     })

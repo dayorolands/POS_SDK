@@ -14,6 +14,7 @@ import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.safeRun
+import com.creditclub.pos.PosParameter
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +34,7 @@ import java.util.*
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/27/2019.
  * Appzone Ltd
  */
-open class ParameterService protected constructor(context: Context) : KoinComponent {
+open class ParameterService protected constructor(context: Context) : PosParameter, KoinComponent {
     private val prefs by lazy { context.getSharedPreferences("Parameters", 0) }
     internal open val config by lazy {
         ConfigService.getInstance(context)
@@ -43,22 +44,31 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
     private val localStorage: LocalStorage by inject()
     private val gps: TrackGPS by inject()
 
-    open var masterKey = prefs.getString("MasterKey", "") as String
+    override var masterKey = prefs.getString("MasterKey", "") as String
         set(value) {
             field = value
             prefs.edit().putString("MasterKey", value).apply()
         }
 
-    open var sessionKey = prefs.getString("SessionKey", "") as String
+    override var sessionKey = prefs.getString("SessionKey", "") as String
         set(value) {
             field = value
             prefs.edit().putString("SessionKey", value).apply()
         }
 
-    open var pinKey = prefs.getString("PinKey", "") as String
+    override var pinKey = prefs.getString("PinKey", "") as String
         set(value) {
             field = value
             prefs.edit().putString("PinKey", value).apply()
+        }
+
+    override val managementData: PosParameter.ManagementData
+        get() = parameters
+
+    override var managementDataString: String
+        get() = pfmd
+        set(value) {
+            pfmd = value
         }
 
     open var pfmd = prefs.getString("PFMD", "{}") as String
@@ -181,7 +191,7 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
         }
 
-        println("MESSAGE: " + String(output!!))
+        println("MESSAGE: " + String(output))
         isoMsg.unpack(output)
 
         TerminalUtils.logISOMsg(isoMsg)
@@ -231,7 +241,7 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
         }
 
-        println("MESSAGE: " + String(output!!))
+        println("MESSAGE: " + String(output))
         isoMsg.unpack(output)
         TerminalUtils.logISOMsg(isoMsg)
 
@@ -404,21 +414,21 @@ open class ParameterService protected constructor(context: Context) : KoinCompon
     class ParameterDownloadException(message: String) :
         Exception("Parameter Download Failed. $message")
 
-    class ParameterObject {
+    class ParameterObject : PosParameter.ManagementData {
         @SerializedName("03")
-        var cardAcceptorId = ""
+        override var cardAcceptorId = ""
 
         @SerializedName("05")
-        var currencyCode = ""
+        override var currencyCode = ""
 
         @SerializedName("06")
-        var countryCode = ""
+        override var countryCode = ""
 
         @SerializedName("08")
-        var merchantCategoryCode = ""
+        override var merchantCategoryCode = ""
 
         @SerializedName("52")
-        var cardAcceptorLocation = ""
+        override var cardAcceptorLocation = ""
     }
 
     companion object {

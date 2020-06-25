@@ -1,2 +1,40 @@
-configurations.maybeCreate("default")
-artifacts.add("default", file('PayLib-release-1.4.17.aar'))
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion versions.compileSdk
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.tagetSdk
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+dependencies {
+    implementation project(path: ':core')
+    implementation project(path: ':paylib')
+    implementation project(path: ':poscore')
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
+    implementation "androidx.core:core-ktx:${versions.coreKtx}"
+    implementation "androidx.appcompat:appcompat:${versions.appcompat}"
+
+    compileOnly files('extern_libs/classes_2.1.45_20181115.jar')
+    implementation files('libs/bw_pos_sdk2.0.23.jar')
+}

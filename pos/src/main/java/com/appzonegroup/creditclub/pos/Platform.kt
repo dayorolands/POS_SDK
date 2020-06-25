@@ -4,10 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Environment
-import com.appzonegroup.creditclub.pos.provider.mpos.MPosManager
-import com.appzonegroup.creditclub.pos.provider.sunmi.SunmiPosManager
 import com.appzonegroup.creditclub.pos.provider.telpo.TelpoPosManager
-import com.appzonegroup.creditclub.pos.util.PosType
 import com.creditclub.pos.PosProviders
 import com.telpo.tps550.api.util.StringUtil
 import kotlinx.coroutines.CoroutineScope
@@ -25,16 +22,12 @@ import java.io.FileOutputStream
 object Platform : KoinComponent {
 
     @JvmStatic
-    val isPOS
-        get() = posType != PosType.NONE
+    var isPOS = false
+        private set
 
     @JvmStatic
     val hasPrinter
         get() = supportsPrinter()
-
-    @JvmStatic
-    var posType = PosType.NONE
-        private set
 
     @JvmStatic
     fun supportsPrinter(): Boolean {
@@ -63,8 +56,8 @@ object Platform : KoinComponent {
 
     fun test(application: Application) {
         for (posManagerCompanion in PosProviders.registered) {
-            if (posManagerCompanion.isCompatible()) {
-                posType = PosType.OTHER
+            if (posManagerCompanion.isCompatible(application)) {
+                isPOS = true
                 posManagerCompanion.setup(application)
                 loadKoinModules(posManagerCompanion.module)
                 loadPosModules()
@@ -73,19 +66,9 @@ object Platform : KoinComponent {
             }
         }
 
-        when {
-            SunmiPosManager.isCompatible(application) -> {
-                posType = PosType.SUNMI
-                loadKoinModules(SunmiPosManager.module)
-            }
-            TelpoPosManager.isCompatible() -> {
-                posType = PosType.TELPO
-                loadKoinModules(TelpoPosManager.module)
-            }
-            MPosManager.isCompatible() -> {
-                posType = PosType.MPOS
-                loadKoinModules(MPosManager.module)
-            }
+        if (TelpoPosManager.isCompatible(application)) {
+            isPOS = true
+            loadKoinModules(TelpoPosManager.module)
         }
 
         if (isPOS) {

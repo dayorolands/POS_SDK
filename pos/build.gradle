@@ -48,7 +48,7 @@ dependencies {
     implementation project(path: ':core')
     implementation project(path: ':poscore')
     implementation project(path: ':uicentral')
-    implementation project(path: ':sunmi')
+    implementation project(path: ':paylib')
     implementation project(path: ':smartpeak')
     implementation fileTree(dir: 'jniLibs', include: ['*.so'])
 
@@ -57,9 +57,6 @@ dependencies {
     api files('libs/jpos-1.9.0.jar')
     api files('libs/SmartCardLib.jar')
     api files('libs/telpo_api.jar')
-//    api files('libs/PayLib-release-1.4.17.aar')
-    api files('libs/iBridge.jar')
-    api files('libs/jhlblueconn.jar')
 
     implementation 'com.loopj.android:android-async-http:1.4.10'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
@@ -67,7 +64,6 @@ dependencies {
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
     implementation "com.google.android.material:material:${versions.material}"
     implementation "androidx.cardview:cardview:1.0.0"
-//    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation "androidx.recyclerview:recyclerview:1.1.0"
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"

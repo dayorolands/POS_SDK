@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.*
 import android.util.Log
-import com.appzonegroup.creditclub.pos.card.PosManager.SessionData
+import com.appzonegroup.creditclub.pos.PosManager.SessionData
 import com.basewin.aidl.OnPBOCListener
 import com.basewin.aidl.OnPinInputListener
 import com.basewin.commu.Commu
