@@ -18,7 +18,7 @@ import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.PrinterStatus
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.data.response.NameEnquiryResponse
@@ -39,7 +39,7 @@ class FundsTransferActivity : BaseActivity() {
     private val destinationAccountNumber_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_accountnumber) as EditText }
     private val amount_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_amount) as EditText }
     private val agentPin_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_agentpin) as EditText }
-    private val narrationEt: EditText by lazy { findViewById(R.id.fundstransfer_narration_et) as EditText }
+    private val narrationEt: EditText by lazy { findViewById<EditText>(R.id.fundstransfer_narration_et) }
 
     private var destinationBank: String = ""
     internal var accountNumber: String = ""
@@ -216,7 +216,7 @@ class FundsTransferActivity : BaseActivity() {
         val amountDouble: Double
 
         try {
-            amountDouble = java.lang.Double.parseDouble(amount!!)
+            amountDouble = java.lang.Double.parseDouble(amount)
         } catch (ex: Exception) {
             indicateError("Please enter a valid amount", amount_et as View)
             return

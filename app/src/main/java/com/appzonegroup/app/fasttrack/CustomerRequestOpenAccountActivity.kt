@@ -20,7 +20,7 @@ import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ImageUtils
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.PrinterStatus
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.model.AccountInfo

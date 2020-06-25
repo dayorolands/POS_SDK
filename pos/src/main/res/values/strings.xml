@@ -171,4 +171,6 @@
     <string name="pos_transaction_approved">Transaction Approved</string>
     <string name="pos_terminal_id_required">You need a terminal ID to access card functions. Please contact your administrator for assistance</string>
     <string name="pos_card_transactions">Card Transactions</string>
+    <string name="pos_select_mpos_device">Select mPOS device</string>
+    <string name="pos_searching_for_mpos_devices">Searching for mPOS devices</string>
 </resources>

@@ -5,13 +5,18 @@ import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.util.localStorage
+import com.creditclub.pos.printer.Alignment
+import com.creditclub.pos.printer.PrintJob
+import com.creditclub.pos.printer.PrintNode
+import com.creditclub.pos.printer.TextNode
 
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 6/20/2019.
  * Appzone Ltd
  */
-class Receipt(val context: Context, val transaction: FinancialTransaction) : PrintJob {
+class Receipt(val context: Context, val transaction: FinancialTransaction) :
+    PrintJob {
     var isCustomerCopy = true
     var isReprint = false
 
@@ -36,11 +41,14 @@ class Receipt(val context: Context, val transaction: FinancialTransaction) : Pri
         get() {
             val nodes = arrayListOf<PrintNode>(LogoNode())
 
-            if (isReprint) nodes.add(TextNode("***REPRINT***").apply {
+            if (isReprint) nodes.add(
+                TextNode("***REPRINT***").apply {
                 align = Alignment.MIDDLE
             })
 
-            nodes.add(TextNode(if (isCustomerCopy) "***CUSTOMER COPY***" else "***MERCHANT COPY***").apply {
+            nodes.add(
+                TextNode(if (isCustomerCopy) "***CUSTOMER COPY***" else "***MERCHANT COPY***")
+                    .apply {
                 align = Alignment.MIDDLE
             })
 
@@ -78,12 +86,17 @@ RRN: $rrn"""
                 )
             )
 
-            nodes.add(TextNode(if (successful) "TRANSACTION APPROVED" else "TRANSACTION DECLINED").apply {
+            nodes.add(
+                TextNode(if (successful) "TRANSACTION APPROVED" else "TRANSACTION DECLINED")
+                    .apply {
                 align = Alignment.MIDDLE
                 wordFont = 25
             })
 
-            if (!successful) nodes.add(TextNode(transaction.isoMsg.responseMessage).apply {
+            if (!successful) nodes.add(
+                TextNode(
+                    transaction.isoMsg.responseMessage
+                ).apply {
                 align = Alignment.MIDDLE
             })
 

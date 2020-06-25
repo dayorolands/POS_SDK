@@ -62,7 +62,7 @@ class ReprintMenuActivity : PosActivity(), View.OnClickListener {
                             }
 
                             dismiss()
-                            showSuccess("All transactions deleted")
+                            dialogProvider.showSuccess("All transactions deleted")
                         }
                     }
                 }.show()

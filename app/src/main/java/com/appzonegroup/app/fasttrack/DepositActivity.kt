@@ -5,7 +5,7 @@ import android.widget.EditText
 import com.appzonegroup.app.fasttrack.databinding.ActivityDepositBinding
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.request.DepositRequest

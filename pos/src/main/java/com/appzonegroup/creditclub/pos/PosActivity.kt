@@ -3,23 +3,22 @@ package com.appzonegroup.creditclub.pos
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Application
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.view.WindowManager
-import android.widget.EditText
-import android.widget.Toast
 import com.appzonegroup.creditclub.pos.contract.ServiceProvider
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.PosPrinter
+import com.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.widget.Dialogs
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogListenerBlock
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 @SuppressLint("Registered")
 abstract class PosActivity : CreditClubActivity(), ServiceProvider {
@@ -28,7 +27,7 @@ abstract class PosActivity : CreditClubActivity(), ServiceProvider {
     override val callHomeService by lazy { CallHomeService.getInstance(config, parameters, this) }
     override val isoSocketHelper by lazy { IsoSocketHelper(config, parameters, this) }
 
-    val printer by lazy { PosPrinter(this, dialogProvider) }
+    val printer: PosPrinter by inject { parametersOf(this, dialogProvider) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,6 +81,8 @@ abstract class PosActivity : CreditClubActivity(), ServiceProvider {
     }
 
     fun printerDependentAction(closeOnFail: Boolean = false, block: () -> Unit) {
+        return block()
+
         printer.checkAsync { printerStatus ->
             if (printerStatus != PrinterStatus.READY) {
                 if (closeOnFail) {
@@ -138,38 +139,9 @@ abstract class PosActivity : CreditClubActivity(), ServiceProvider {
         startActivity(Intent(this, clazz))
     }
 
-    fun indicateError(message: String, view: EditText?) {
-        hideProgressBar()
-        view?.also {
-            view.isFocusable = true
-            view.isEnabled = true
-            view.error = message
-            view.requestFocus()
-        }
-
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-    }
-
     fun showError(message: String?) = dialogProvider.showError(message)
 
     fun showError(message: String?, block: DialogListenerBlock<Nothing>) {
         dialogProvider.showError(message, block)
-    }
-
-    fun showSuccess(message: String?) = dialogProvider.showError(message)
-
-    fun showSuccess(message: String?, block: DialogListenerBlock<Nothing>) {
-        dialogProvider.showError(message, block)
-    }
-
-    fun hideProgressBar() = dialogProvider.hideProgressBar()
-
-    fun showProgressBar(
-        title: String,
-        subtitle: String = "Please wait...",
-        isCancellable: Boolean = false,
-        block: DialogListenerBlock<Nothing>? = null
-    ): Dialog {
-        return dialogProvider.showProgressBar(title, subtitle, isCancellable, block)
     }
 }

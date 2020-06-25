@@ -7,6 +7,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
@@ -90,6 +91,7 @@ class TrackGPS(mContext: Context) : LocationListener, KoinComponent {
                 if (checkGPS) {
                     if (loc == null) {
                         try {
+                            Looper.myLooper() ?: Looper.prepare()
                             locationManager!!.requestLocationUpdates(
                                 LocationManager.GPS_PROVIDER,
                                 MIN_TIME_BW_UPDATES,

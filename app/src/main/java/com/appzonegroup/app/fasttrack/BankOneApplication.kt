@@ -39,8 +39,6 @@ class BankOneApplication : CreditClubApplication() {
                     }
                 }
             })
-
-            if (Platform.isPOS) loadPosModules()
         }
 
     val authResponse: AuthResponse by lazy {
@@ -66,10 +64,7 @@ class BankOneApplication : CreditClubApplication() {
         )
 
         registerAppFunctions()
+        Platform.test(this)
         registerWorkers()
-
-        if (Platform.isPOS) {
-            startPosApp()
-        }
     }
 }

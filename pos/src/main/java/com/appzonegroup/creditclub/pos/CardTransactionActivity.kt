@@ -14,9 +14,6 @@ import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.appzonegroup.creditclub.pos.card.*
-import com.appzonegroup.creditclub.pos.command.StartEmvService
-import com.appzonegroup.creditclub.pos.command.StartPinPadService
-import com.appzonegroup.creditclub.pos.contract.Logger
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.data.create
 import com.appzonegroup.creditclub.pos.databinding.PageInputRrnBinding
@@ -27,31 +24,32 @@ import com.appzonegroup.creditclub.pos.extension.format
 import com.appzonegroup.creditclub.pos.models.*
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.service.ApiService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
-import com.appzonegroup.creditclub.pos.util.StableAPPCAPK
+import com.creditclub.core.util.indicateError
 import com.creditclub.core.util.localStorage
+import com.creditclub.core.util.showErrorAndWait
+import com.creditclub.pos.PosManager
+import com.creditclub.pos.card.CardData
+import com.creditclub.pos.card.CardReaderEvent
+import com.creditclub.pos.card.CardTransactionStatus
 import com.google.gson.Gson
-import com.telpo.emv.EmvService
-import com.telpo.pinpad.PinpadService
 import kotlinx.android.synthetic.main.page_input_amount.*
 import kotlinx.android.synthetic.main.page_input_rrn.*
 import kotlinx.android.synthetic.main.text_field.view.*
 import kotlinx.coroutines.*
 import okhttp3.Headers
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 import org.threeten.bp.Instant
 import java.util.*
 import kotlin.concurrent.schedule
 
 @SuppressLint("Registered")
-abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickListener {
-    private val cardReader by lazy { CardReader(this, emvListener) }
-    private val emvService by lazy { EmvService.getInstance() }
-    private val emvListener by lazy { CustomEmvServiceListener(this, emvService) }
-
-    override val tag: String = "CardTrans"
+abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
+    private val posManager: PosManager by inject { parametersOf(this) }
 
     private var amountText = "0"
     protected var previousMessage: CardIsoMsg? = null
@@ -98,67 +96,57 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
         registerReceiver(mBatInfoReceiver, filter)
     }
 
-    private suspend fun loadEmv() = withContext(Dispatchers.Default) {
-        try {
-            PinpadService.Close()
-        } catch (ex: Exception) {
-//            analyticsHelper.logException(ex)
-            ex.printStackTrace()
-        }
-
-        emvService.setListener(emvListener)
-
-        EmvService.Emv_SetDebugOn(if (BuildConfig.DEBUG) 1 else 0)
-
-        StartEmvService(this@CardTransactionActivity).run()
-        StartPinPadService(this@CardTransactionActivity, parameters).run()
-
-        EmvService.Emv_RemoveAllApp()
-        EmvService.Emv_RemoveAllCapk()
-
-        StableAPPCAPK.Add_All_APP()
-        StableAPPCAPK.Add_All_CAPK()
-    }
-
     fun requestCard() {
         if (!canPerformTransaction) return
 
         mainScope.launch {
             dialogProvider.showProgressBar("Loading card functions")
-            loadEmv()
+            posManager.loadEmv()
             delay(1000)
             dialogProvider.hideProgressBar()
 
-            printerDependentAction(true) {
-                cardReader.waitForCard { cardEvent ->
-                    when (cardEvent) {
-                        CardReaderEvent.REMOVED, CardReaderEvent.CANCELLED -> {
-                            stopTimer()
-                            finish()
-                            return@waitForCard
-                        }
+            if (Platform.hasPrinter) {
+                val printerStatus = withContext(Dispatchers.Default) { printer.check() }
+                if (printerStatus != PrinterStatus.READY) {
+                    dialogProvider.showErrorAndWait(printerStatus.message)
+                    finish()
+                    return@launch
+                }
+            }
 
-                        CardReaderEvent.CHIP_FAILURE -> {
-                            stopTimer()
-                            renderTransactionFailure("Please Remove Card", "")
-                            return@waitForCard
-                        }
+            when (val cardEvent = posManager.cardReader.waitForCard()) {
+                CardReaderEvent.REMOVED, CardReaderEvent.CANCELLED -> {
+                    stopTimer()
+                    finish()
+                    return@launch
+                }
 
-                        else -> {
-                            cardReaderEvent = cardEvent
-                            restartTimer()
-                            val binding =
-                                DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
-                                    this@CardTransactionActivity,
-                                    R.layout.page_select_account_type
-                                )
+                CardReaderEvent.CHIP_FAILURE -> {
+                    stopTimer()
+                    renderTransactionFailure("Please Remove Card", "")
+                    return@launch
+                }
 
-                            listOf(
-                                binding.creditRadioButton,
-                                binding.currentRadioButton,
-                                binding.defaultRadioButton,
-                                binding.savingsRadioButton
-                            ).forEach { it.root.setOnClickListener(this@CardTransactionActivity) }
+                else -> {
+                    cardReaderEvent = cardEvent
+                    restartTimer()
+//                            accountType = AccountType.Default
+//                            onSelectAccountType()
+                    val binding = DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
+                        this@CardTransactionActivity,
+                        R.layout.page_select_account_type
+                    )
+
+                    listOf(
+                        binding.creditRadioButton,
+                        binding.currentRadioButton,
+                        binding.defaultRadioButton,
+                        binding.savingsRadioButton
+                    ).forEach { it.root.setOnClickListener(this@CardTransactionActivity) }
+
+                    if (cardEvent == CardReaderEvent.CHIP) {
+                        mainScope.launch {
+                            posManager.cardReader.onRemoveCard { finish() }
                         }
                     }
                 }
@@ -202,10 +190,8 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
         try {
             stopTimer()
             unregisterReceiver(mBatInfoReceiver)
-            cardReader.endWatch()
-            PinpadService.Close()
-            EmvService.deviceClose()
-
+            posManager.cardReader.endWatch()
+            posManager.cleanUpEmv()
         } catch (e: Exception) {
 //            analyticsHelper.logException(e)
             e.printStackTrace()
@@ -249,52 +235,54 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
     fun readCard() {
         try {
             stopTimer()
-            emvListener.amount = amountText.toLong()
+            posManager.sessionData.amount = amountText.toLong()
 
             val cardLimit: Double = localStorage.agent?.cardLimit ?: 50000.0
-            if (cardLimit < emvListener.amount / 100) {
+            if (cardLimit < posManager.sessionData.amount / 100) {
                 showError("The limit for this transaction is NGN${cardLimit}")
                 return
             }
 
             val amountStr = format(amountText)
 
-            cardReader.endWatch()
-            cardReader.read(amountStr) { cardData ->
-                cardData ?: return@read renderTransactionFailure("Transaction Cancelled", "")
+            mainScope.launch {
+                posManager.cardReader.endWatch()
+                val cardData = posManager.cardReader.read(amountStr)
+                cardData ?: return@launch renderTransactionFailure("Transaction Cancelled", "")
                 this@CardTransactionActivity.cardData = cardData
 
-                when (cardData.ret) {
-                    EmvService.EMV_TRUE -> {
+                when (CardTransactionStatus.find(cardData.ret)) {
+                    CardTransactionStatus.Success -> {
 
                         if (cardData.pan.isEmpty()) {
-                            hideProgressBar()
+                            dialogProvider.hideProgressBar()
                             renderTransactionFailure("Could not read card")
 
-                            return@read
+                            return@launch
                         }
 
                         val thisMonth = Instant.now().format("YYMM").toInt()
 
                         if (cardData.exp.substring(0, 4).toInt() < thisMonth) {
-                            hideProgressBar()
+                            dialogProvider.hideProgressBar()
                             renderTransactionFailure("Invalid Card")
 
-                            return@read
+                            return@launch
                         }
 
+                        cardData.pinBlock = posManager.sessionData.pinBlock ?: cardData.pinBlock
                         if (cardData.pinBlock.isNullOrBlank()) {
                             hideProgressBar()
                             renderTransactionFailure("Could not validate PIN")
-                            return@read
+                            return@launch
                         }
 
                         onReadCard(cardData)
                     }
-                    EmvService.ERR_USERCANCEL -> renderTransactionFailure("Transaction Cancelled")
-                    EmvService.EMV_FALSE -> renderTransactionFailure("Wrong PIN. Card Restricted")
-                    EmvService.ERR_TIMEOUT -> renderTransactionFailure("Timeout while reading card")
-                    EmvService.ERR_OFFLINE_PIN_VERIFY_ERROR -> renderTransactionFailure("Wrong PIN. Card Restricted")
+                    CardTransactionStatus.UserCancel -> renderTransactionFailure("Transaction Cancelled")
+                    CardTransactionStatus.Failure -> renderTransactionFailure("Wrong PIN. Card Restricted")
+                    CardTransactionStatus.Timeout -> renderTransactionFailure("Timeout while reading card")
+                    CardTransactionStatus.OfflinePinVerifyError -> renderTransactionFailure("Wrong PIN. Card Restricted")
                     else -> renderTransactionFailure(EmvErrorMessage[cardData.ret])
                 }
             }
@@ -309,7 +297,17 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
         stopTimer()
 
         GlobalScope.launch(Dispatchers.Main) {
-            showProgressBar("Receiving...")
+            if (cardData.pinBlock.isEmpty()) {
+                dialogProvider.showProgressBar("Pin Ok")
+                delay(1000)
+            }
+//            else {
+//                request.apply {
+//                    withPinData(cardData.pinBlock, parameters)
+//                }
+//            }
+
+            dialogProvider.showProgressBar("Receiving...")
             try {
                 callHomeService.stopCallHomeTimer()
 
@@ -398,7 +396,6 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                                 "${backendConfig.apiHost}/CreditClubMiddlewareAPI/CreditClubStatic/POSCashOutNotification"
 
                             val dataToSend = Gson().toJson(posNotification)
-                            log("PosNotification request: $dataToSend")
 
                             val headers = Headers.Builder()
                             headers.add(
@@ -456,7 +453,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
 
                 attemptReversal(request)
             } finally {
-                hideProgressBar()
+                dialogProvider.hideProgressBar()
             }
         }
     }
@@ -464,7 +461,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
     private suspend fun attemptReversal(request: BaseIsoMsg) {
         if (request.mti == "0200") withContext(Dispatchers.Default) {
             runOnUiThread {
-                showProgressBar("Transmission Error \nReversing...")
+                dialogProvider.showProgressBar("Transmission Error \nReversing...")
             }
 
             delay(1000)
@@ -477,7 +474,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
 
             val success = isoSocketHelper.attempt(reversal, 4, onReattempt = {
                 runOnUiThread {
-                    showProgressBar("Reversing...$it")
+                    dialogProvider.showProgressBar("Reversing...$it")
                 }
 
                 delay(1000)
@@ -572,19 +569,19 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
     fun showReferencePage(pageTitle: String = "Enter RRN") {
         if (!canPerformTransaction) return
 
-        printer.checkAsync { printerStatus ->
-            if (printerStatus != PrinterStatus.READY) {
-                showError(printerStatus.message) {
-                    onClose {
-                        finish()
-                    }
+        mainScope.launch {
+            if (Platform.hasPrinter) {
+                val printerStatus = withContext(Dispatchers.Default) { printer.check() }
+                if (printerStatus != PrinterStatus.READY) {
+                    dialogProvider.showErrorAndWait(printerStatus.message)
+                    finish()
+                    return@launch
                 }
-
-                return@checkAsync
             }
-
-            val binding =
-                DataBindingUtil.setContentView<PageInputRrnBinding>(this, R.layout.page_input_rrn)
+            val binding = DataBindingUtil.setContentView<PageInputRrnBinding>(
+                this@CardTransactionActivity,
+                R.layout.page_input_rrn
+            )
 
             title = pageTitle
             binding.title = pageTitle
@@ -615,11 +612,11 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
     }
 
     private fun onTransactionDidFinish() {
-        cardReader.endWatch()
+        posManager.cardReader.endWatch()
 
         if (cardReaderEvent == CardReaderEvent.CHIP || cardReaderEvent == CardReaderEvent.CHIP_FAILURE) {
             GlobalScope.launch {
-                cardReader.startWatch {
+                posManager.cardReader.onRemoveCard {
                     if (it == CardReaderEvent.REMOVED || it == CardReaderEvent.CANCELLED) {
                         finish()
                     }
@@ -632,18 +629,9 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
             if (Intent.ACTION_SCREEN_ON == action) {
-                log("-----------------screen is on...")
             } else if (Intent.ACTION_SCREEN_OFF == action) {
-                cardReader.endWatch()
+                posManager.cardReader.endWatch()
                 finish()
-                log("----------------- screen is off...")
-                //wakeLock.acquire();
-                log("acquire ?")
-                //wakeScreen(EmvActivity.this);
-                log("wakeScreen ?")
-
-                //wakeUpAndUnlock(context);
-                log("wakeUpAndUnlock ?")
             }
         }
     }

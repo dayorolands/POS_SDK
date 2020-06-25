@@ -1,6 +1,7 @@
 package com.appzonegroup.creditclub.pos.card
 
 import com.appzonegroup.creditclub.pos.extension.processingCode3
+import com.creditclub.pos.card.CardData
 import org.jpos.iso.ISOMsg
 
 
