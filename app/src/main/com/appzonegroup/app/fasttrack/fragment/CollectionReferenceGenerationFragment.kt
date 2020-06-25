@@ -5,8 +5,8 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.FragmentCollectionReferenceGenerationBinding
 import com.appzonegroup.app.fasttrack.ui.dataBinding
@@ -28,7 +28,7 @@ class CollectionReferenceGenerationFragment :
     private var paymentItems: List<CollectionPaymentItem>? = null
     private var categories: List<CollectionCategory>? = null
     private val binding by dataBinding<FragmentCollectionReferenceGenerationBinding>()
-    private val viewModel: CollectionPaymentViewModel by activityViewModels()
+    private val viewModel: CollectionPaymentViewModel by navGraphViewModels(R.id.collectionGraph)
     private val uniqueReference = UUID.randomUUID().toString()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -52,7 +52,7 @@ class CollectionReferenceGenerationFragment :
         }
 
         binding.paymentItemInput.onItemClick { position ->
-            viewModel.itemCode.value = paymentItems?.get(position)?.code
+            viewModel.item.value = paymentItems?.get(position)
         }
 
         binding.generateReferenceButton.setOnClickListener {
@@ -215,7 +215,7 @@ class CollectionReferenceGenerationFragment :
             referenceName = request.referenceName
             customerId = request.customerId
         }
-        viewModel.reference.value = response.reference
+        viewModel.referenceString.value = response.reference
         viewModel.collectionReference.value = response
         findNavController().popBackStack()
     }

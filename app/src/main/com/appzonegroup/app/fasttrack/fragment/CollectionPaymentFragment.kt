@@ -5,10 +5,10 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.CollectionPaymentFragmentBinding
 import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
@@ -18,7 +18,10 @@ import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.printer.PosPrinter
 import com.creditclub.core.data.request.CollectionPaymentRequest
 import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.*
+import com.creditclub.core.util.getPin
+import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.showErrorAndWait
+import com.creditclub.core.util.showSuccessAndWait
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
@@ -30,7 +33,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     private var collectionTypes: List<String>? = null
     private val posPrinter: PosPrinter by lazy { PosPrinter(requireContext(), dialogProvider) }
     private val binding by dataBinding<CollectionPaymentFragmentBinding>()
-    private val viewModel: CollectionPaymentViewModel by activityViewModels()
+    private val viewModel: CollectionPaymentViewModel by navGraphViewModels(R.id.collectionGraph)
     override val functionId = FunctionIds.COLLECTION_PAYMENT
     private val request = CollectionPaymentRequest()
     private val uniqueReference = UUID.randomUUID().toString()
@@ -121,7 +124,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         val (response, error) = safeRunIO {
             creditClubMiddleWareAPI.collectionsService.getCollectionReferenceByReference(
                 localStorage.institutionCode,
-                viewModel.reference.value?.trim(),
+                viewModel.referenceString.value?.trim(),
                 viewModel.region.value,
                 viewModel.collectionService.value,
                 viewModel.collectionType.value
@@ -167,11 +170,10 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         viewModel.run {
             clearData(
                 item,
-                itemCode,
                 itemName,
                 category,
                 categoryName,
-                reference,
+                referenceString,
                 collectionReference
             )
         }
@@ -194,7 +196,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     }
 
     private suspend fun completePayment() {
-        if (viewModel.reference.value.isNullOrBlank()) {
+        if (viewModel.referenceString.value.isNullOrBlank()) {
             return dialogProvider.showErrorAndWait("Please enter a reference")
         } else if (viewModel.collectionReference.value == null) {
             loadReference()

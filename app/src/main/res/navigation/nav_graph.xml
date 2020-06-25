@@ -29,7 +29,7 @@
             app:destination="@id/billPaymentFragment" />
         <action
             android:id="@+id/action_home_to_collection_payment"
-            app:destination="@id/collectionPaymentFragment" />
+            app:destination="@id/collectionGraph" />
     </fragment>
 
     <fragment
@@ -42,33 +42,37 @@
             app:destination="@id/billPaymentFragment" />
         <action
             android:id="@+id/action_menu_to_collection_payment"
-            app:destination="@id/collectionPaymentFragment" />
+            app:destination="@id/collectionGraph" />
         <argument
             android:name="category"
             android:defaultValue="0"
             app:argType="integer" />
     </fragment>
 
-    <fragment
-        android:id="@+id/collectionPaymentFragment"
-        android:name="com.appzonegroup.app.fasttrack.fragment.CollectionPaymentFragment"
-        android:label="IGR Collections"
-        tools:layout="@layout/collection_payment_fragment">
-        <action
-            android:id="@+id/action_collection_payment_to_reference_generation"
-            app:destination="@id/collectionReferenceGenerationFragment" />
-    </fragment>
+    <navigation
+        android:id="@+id/collectionGraph"
+        app:startDestination="@id/collectionPaymentFragment">
+        <fragment
+            android:id="@+id/collectionPaymentFragment"
+            android:name="com.appzonegroup.app.fasttrack.fragment.CollectionPaymentFragment"
+            android:label="IGR Collections"
+            tools:layout="@layout/collection_payment_fragment">
+            <action
+                android:id="@+id/action_collection_payment_to_reference_generation"
+                app:destination="@id/collectionReferenceGenerationFragment" />
+        </fragment>
 
-    <fragment
-        android:id="@+id/collectionReferenceGenerationFragment"
-        android:name="com.appzonegroup.app.fasttrack.fragment.CollectionReferenceGenerationFragment"
-        android:label="Generate Collection Reference"
-        tools:layout="@layout/fragment_collection_reference_generation">
-        <!--        <action android:id="@+id/action__to_b"-->
-        <!--            app:destination="@id/b"-->
-        <!--            app:enterAnim="@anim/nav_default_enter_anim"-->
-        <!--            app:exitAnim="@anim/nav_default_exit_anim"-->
-        <!--            app:popEnterAnim="@anim/nav_default_pop_enter_anim"-->
-        <!--            app:popExitAnim="@anim/nav_default_pop_exit_anim"/>-->
-    </fragment>
+        <fragment
+            android:id="@+id/collectionReferenceGenerationFragment"
+            android:name="com.appzonegroup.app.fasttrack.fragment.CollectionReferenceGenerationFragment"
+            android:label="Generate Collection Reference"
+            tools:layout="@layout/fragment_collection_reference_generation">
+            <!--        <action android:id="@+id/action__to_b"-->
+            <!--            app:destination="@id/b"-->
+            <!--            app:enterAnim="@anim/nav_default_enter_anim"-->
+            <!--            app:exitAnim="@anim/nav_default_exit_anim"-->
+            <!--            app:popEnterAnim="@anim/nav_default_pop_enter_anim"-->
+            <!--            app:popExitAnim="@anim/nav_default_pop_exit_anim"/>-->
+        </fragment>
+    </navigation>
 </navigation>

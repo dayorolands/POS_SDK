@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.appzonegroup.app.fasttrack.R
@@ -23,7 +23,7 @@ import java.util.*
 
 class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
-    private val viewModel by activityViewModels<BillPaymentViewModel>()
+    private val viewModel by viewModels<BillPaymentViewModel>()
     private val binding by dataBinding<BillPaymentFragmentBinding>()
     override val functionId = FunctionIds.PAY_BILL
     private val request = PayBillRequest()
