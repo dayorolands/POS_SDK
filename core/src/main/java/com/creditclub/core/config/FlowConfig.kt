@@ -6,4 +6,5 @@ class FlowConfig {
     var tokenWithdrawal: TokenWithdrawalConfig = TokenWithdrawalConfig()
     var customerPinChange: Any? = Any()
     var bvnUpdate: Any? = Any()
+    var collectionPayment: Any? = Any()
 }

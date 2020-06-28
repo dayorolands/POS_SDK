@@ -26,6 +26,8 @@ class SubMenuFragment : CreditClubFragment(R.layout.sub_menu_fragment),
     private fun render(category: Int) {
         binding.title = AppFunctions.Categories[category]
 
+
+        val flows = institutionConfig.flows
         when (category) {
             AppFunctions.Categories.CUSTOMER_CATEGORY -> {
                 binding.customerCategory.visibility = View.VISIBLE
@@ -37,8 +39,6 @@ class SubMenuFragment : CreditClubFragment(R.layout.sub_menu_fragment),
                 binding.bvnUpdateButton.button.setOnClickListener(this)
                 binding.registerButton.button.setOnClickListener(this)
                 binding.newWalletButton.button.setOnClickListener(this)
-
-                val flows = institutionConfig.flows
 
                 if (flows.walletOpening == null) {
                     binding.newWalletButton.root.visibility = View.GONE
@@ -73,6 +73,10 @@ class SubMenuFragment : CreditClubFragment(R.layout.sub_menu_fragment),
                     binding.cardWithdrawalButton.button.setOnClickListener(this)
                 } else {
                     binding.cardWithdrawalButton.button.visibility = View.GONE
+                }
+
+                if (flows.collectionPayment == null) {
+                    binding.collectionPaymentButton.root.visibility = View.GONE
                 }
             }
 
