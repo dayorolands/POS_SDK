@@ -81,7 +81,9 @@ var ISOMsg.posPinCaptureCode26 by isoMsgField(26)
 
 var ISOMsg.transportData by isoMsgField(59)
 
-var ISOMsg.managementDataOne by isoMsgField(62)
+var ISOMsg.managementDataOne62 by isoMsgField(62)
+
+var ISOMsg.managementDataTwo63 by isoMsgField(63)
 
 var ISOMsg.posDataCode123 by isoMsgField(123)
 

@@ -1,20 +1,26 @@
 package com.creditclub.pos.providers.telpo
 
 import android.content.Context
-import com.creditclub.pos.PosManager
-import com.creditclub.pos.PosManagerCompanion
-import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.safeRun
+import com.creditclub.pos.PosManager
+import com.creditclub.pos.PosManagerCompanion
+import com.creditclub.pos.PosParameter
+import com.creditclub.pos.extensions.*
+import com.creditclub.pos.printer.PosPrinter
+import com.telpo.emv.EmvApp
+import com.telpo.emv.EmvCAPK
 import com.telpo.emv.EmvService
 import com.telpo.pinpad.PinpadService
 import com.telpo.tps550.api.util.SystemUtil
 import org.koin.core.KoinComponent
 import org.koin.core.get
+import org.koin.core.inject
 import org.koin.dsl.module
 import java.io.File
 import java.io.FileOutputStream
+import java.nio.charset.StandardCharsets
 
 
 /**
@@ -23,7 +29,7 @@ import java.io.FileOutputStream
  */
 class TelpoPosManager(val activity: CreditClubActivity) : PosManager, KoinComponent {
     override val cardReader by lazy { TelpoCardReader(activity, emvListener) }
-
+    private val posParameter: PosParameter by inject()
     private val emvListener by lazy {
         TelpoEmvListener(activity, emvService, sessionData)
     }
@@ -44,8 +50,10 @@ class TelpoPosManager(val activity: CreditClubActivity) : PosManager, KoinCompon
         EmvService.Emv_RemoveAllApp()
         EmvService.Emv_RemoveAllCapk()
 
-        StableAPPCAPK.Add_All_APP()
-        StableAPPCAPK.Add_All_CAPK()
+//        StableAPPCAPK.Add_All_APP()
+//        StableAPPCAPK.Add_All_CAPK()
+        injectAid()
+        injectCapk()
     }
 
     override fun cleanUpEmv() {
@@ -53,9 +61,58 @@ class TelpoPosManager(val activity: CreditClubActivity) : PosManager, KoinCompon
         EmvService.deviceClose()
     }
 
+    private fun injectAid() {
+        val jsonArray = posParameter.emvAidList ?: return
+        val arrayLength = jsonArray.length()
+        for (i in 0 until arrayLength) {
+            val jsonObject = jsonArray.getJSONObject(i)
+            val emvApp = EmvApp()
+            emvApp.AppName = jsonObject.appName17.toByteArray(StandardCharsets.US_ASCII)
+            emvApp.AID = jsonObject.aid15.hexBytes
+            emvApp.SelFlag = 0
+            emvApp.Priority = jsonObject.selectionPriority19.hexByte
+            emvApp.TargetPer = jsonObject.targetPercentageDomestic27.hexByte
+            emvApp.MaxTargetPer = jsonObject.maxTargetDomestic25.hexByte
+            emvApp.FloorLimitCheck = 1
+            emvApp.RandTransSel = 1
+            emvApp.VelocityCheck = 1
+            emvApp.FloorLimit = jsonObject.tflDomestic22.hexBytes
+            emvApp.Threshold = jsonObject.offlineThresholdDomestic24.hexBytes
+            emvApp.TACDenial = jsonObject.tacDenial30.hexBytes
+            emvApp.TACOnline = jsonObject.tacOnline31.hexBytes
+            emvApp.TACDefault = jsonObject.defaultTacValue29.hexBytes
+            emvApp.AcquierId = byteArrayOf(1, 35, 69, 103, -119, 16)
+            emvApp.DDOL = jsonObject.ddol20.prependLength.hexBytes
+            emvApp.TDOL = jsonObject.tdol21.prependLength.hexBytes
+            emvApp.Version = jsonObject.appVersion18.hexBytes
+            emvApp.RiskManData =
+                byteArrayOf(0x6C, 0xFF.toByte(), 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
+            EmvService.Emv_AddApp(emvApp)
+        }
+    }
+
+    private inline val String.prependLength get() = "${length / 2}${this}"
+
+    private fun injectCapk() {
+        val jsonArray = posParameter.capkList ?: return
+        val arrayLength = jsonArray.length()
+        for (i in 0 until arrayLength) {
+            val jsonObject = jsonArray.getJSONObject(i)
+            val capk = EmvCAPK()
+            capk.RID = jsonObject.rid35.hexBytes
+            capk.KeyID = jsonObject.keyIndex32.hexByte
+            capk.HashInd = jsonObject.hashAlgorithm36.hexByte
+            capk.ArithInd = jsonObject.keyAlgorithm40.hexByte
+            capk.Modul = jsonObject.modulus37.hexBytes
+            capk.Exponent = jsonObject.exponent38.hexBytes
+//            capk.ExpDate = byteArrayOf(37, 18, EmvService.TYPE_BALANCE_INQUIRY)
+            capk.CheckSum = jsonObject.hash39.hexBytes
+            EmvService.Emv_AddCapk(capk)
+        }
+    }
+
     companion object : PosManagerCompanion {
-        var deviceType = -1
-            private set
+        private var deviceType = -1
 
         override val module = module {
             factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
@@ -69,6 +126,7 @@ class TelpoPosManager(val activity: CreditClubActivity) : PosManager, KoinCompon
         override fun isCompatible(context: Context): Boolean {
             try {
                 deviceType = SystemUtil.getDeviceType()
+                return true
             } catch (ex: Exception) {
                 if (BuildConfig.DEBUG) ex.printStackTrace()
             } catch (err: UnsatisfiedLinkError) {

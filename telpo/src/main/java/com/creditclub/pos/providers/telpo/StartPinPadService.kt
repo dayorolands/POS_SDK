@@ -2,6 +2,7 @@ package com.creditclub.pos.providers.telpo
 
 import android.content.Context
 import com.creditclub.pos.PosParameter
+import com.creditclub.pos.extensions.hexBytes
 import com.telpo.pinpad.PinpadService
 import java.util.*
 
@@ -29,18 +30,4 @@ class StartPinPadService(private val context: Context, private val parameters: P
             PinpadService.TP_WritePinKey(1, masterKey, PinpadService.KEY_WRITE_DECRYPT, 0)
         }
     }
-
-    private inline val String.hexBytes: ByteArray? get() {
-        if (isBlank()) return null
-        val len = length / 2
-        val result = ByteArray(len)
-        val achar = toUpperCase(Locale.getDefault()).toCharArray()
-        for (i in 0 until len) {
-            val pos = i * 2
-            result[i] = (achar[pos].index shl 4 or achar[pos + 1].index).toByte()
-        }
-        return result
-    }
-
-    private inline val Char.index: Int get() = "0123456789ABCDEF".indexOf(this)
 }

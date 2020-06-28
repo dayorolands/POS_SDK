@@ -1,17 +1,16 @@
 package com.appzonegroup.creditclub.pos
 
-import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import com.appzonegroup.creditclub.pos.databinding.ActivityCardMainMenuBinding
-import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.MenuPage
 import com.appzonegroup.creditclub.pos.util.MenuPages
+import com.appzonegroup.creditclub.pos.util.posParameters
 import com.appzonegroup.creditclub.pos.widget.Dialogs
+import com.creditclub.core.util.showError
+import kotlinx.coroutines.launch
 
 
 class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
@@ -54,6 +53,8 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                     binding.unsettledButton.button.setOnClickListener(this)
                     binding.keyDownloadButton.button.setOnClickListener(this)
                     binding.parameterDownloadButton.button.setOnClickListener(this)
+                    binding.capkDownloadButton.button.setOnClickListener(this)
+                    binding.emvAidDownloadButton.button.setOnClickListener(this)
 
                     parameters.downloadAsync(dialogProvider)
                 }
@@ -116,14 +117,30 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
 //                    Modules[Modules.PRINT_EOD].click(this)
                 }
                 R.id.key_download_button -> {
-                    try {
-                        ParameterService.getInstance(this).downloadKeysAsync(dialogProvider, true)
-                    } catch (ex: Exception) {
-                        ex.printStackTrace()
-                    }
+                    posParameters.downloadKeysAsync(dialogProvider, true)
                 }
                 R.id.parameter_download_button -> {
-                    ParameterService.getInstance(this).downloadParametersAsync(dialogProvider)
+                    posParameters.downloadParametersAsync(dialogProvider)
+                }
+                R.id.capk_download_button -> {
+                    mainScope.launch {
+                        dialogProvider.showProgressBar("Downloading CAPK")
+                        val (response, error) = posParameters.downloadCapk()
+                        dialogProvider.hideProgressBar()
+                        if (error != null) return@launch dialogProvider.showError(error)
+                        dialogProvider.showSuccess("CAPK Download successful")
+                        posParameters.capkList = response
+                    }
+                }
+                R.id.emv_aid_download_button -> {
+                    mainScope.launch {
+                        dialogProvider.showProgressBar("Downloading EMV AID")
+                        val (response, error) = posParameters.downloadAid()
+                        dialogProvider.hideProgressBar()
+                        if (error != null) return@launch dialogProvider.showError(error)
+                        dialogProvider.showSuccess("EMV AID Download successful")
+                        posParameters.emvAidList = response
+                    }
                 }
 
                 else -> showError("This function is disabled.")
@@ -131,39 +148,7 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
         }
     }
 
-    private fun updateProgressNotification() {
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID).apply {
-            setContentTitle("Picture Download")
-            setContentText("Download in progress")
-            setSmallIcon(R.drawable.notification_icon)
-            priority = NotificationCompat.PRIORITY_LOW
-        }
-        val PROGRESS_MAX = 100
-        val PROGRESS_CURRENT = 0
-        NotificationManagerCompat.from(this).apply {
-            // Issue the initial notification with zero progress
-            builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false)
-            notify(1, builder.build())
-
-            // Do the job here that tracks the progress.
-            // Usually, this should be in a
-            // worker thread
-            // To show progress, update PROGRESS_CURRENT and update the notification with:
-            // builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false);
-            // notificationManager.notify(notificationId, builder.build());
-
-            // When done, update the notification one more time to remove the progress bar
-            builder.setContentText("Download complete")
-                .setProgress(0, 0, false)
-            notify(1, builder.build())
-        }
-    }
-
     override fun goBack(v: View) {
         if (intent.getBooleanExtra("SHOW_BACK_BUTTON", false)) onBackPressed()
-    }
-
-    companion object {
-        const val CHANNEL_ID = "update"
     }
 }

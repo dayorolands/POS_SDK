@@ -70,21 +70,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (parameters.pinKey.isEmpty() || parameters.masterKey.isEmpty() || parameters.sessionKey.isEmpty()) {
-            return showError("Please perform key download before proceeding") {
-                onClose {
-                    finish()
-                }
-            }
-        }
-
-        if (parameters.pfmd.isEmpty()) {
-            return showError("Please perform parameter download before proceeding") {
-                onClose {
-                    finish()
-                }
-            }
-        }
+        checkParameters()
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
 
@@ -94,6 +80,34 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         }
 
         registerReceiver(mBatInfoReceiver, filter)
+    }
+
+    private fun checkParameters() {
+        val noKeysPresent =
+            parameters.pinKey.isEmpty() || parameters.masterKey.isEmpty() || parameters.sessionKey.isEmpty()
+
+        when {
+            noKeysPresent -> {
+                finishWithError("Please perform key download before proceeding")
+            }
+            parameters.pfmd.isEmpty() -> {
+                finishWithError("Please perform parameter download before proceeding")
+            }
+            parameters.capkList == null -> {
+                finishWithError("Please perform CAPK download before proceeding")
+            }
+            parameters.emvAidList == null -> {
+                finishWithError("Please perform EMV AID download before proceeding")
+            }
+        }
+    }
+
+    private fun finishWithError(message: String) {
+        dialogProvider.showError<Nothing>(message) {
+            onClose {
+                finish()
+            }
+        }
     }
 
     fun requestCard() {
@@ -271,11 +285,11 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                         }
 
                         cardData.pinBlock = posManager.sessionData.pinBlock ?: cardData.pinBlock
-                        if (cardData.pinBlock.isNullOrBlank()) {
-                            dialogProvider.hideProgressBar()
-                            renderTransactionFailure("Could not validate PIN")
-                            return@launch
-                        }
+//                        if (cardData.pinBlock.isNullOrBlank()) {
+//                            dialogProvider.hideProgressBar()
+//                            renderTransactionFailure("Could not validate PIN")
+//                            return@launch
+//                        }
 
                         onReadCard(cardData)
                     }

@@ -7,7 +7,7 @@ import org.jpos.iso.*;
  */
 
 public class ISO87Packager extends ISOBasePackager {
-    protected ISOFieldPackager fld[] = {
+    protected ISOFieldPackager[] fld = {
             /*000*/ new IFA_NUMERIC (  4, "MESSAGE TYPE INDICATOR"),
             /*001*/ new IFA_BITMAP  ( 16, "BIT MAP"),
             /*002*/ new IFA_LLNUM   ( 19, "PAN - PRIMARY ACCOUNT NUMBER"),
@@ -71,7 +71,7 @@ public class ISO87Packager extends ISOBasePackager {
             /*060*/ new IFA_LLLCHAR (999, "RESERVED PRIVATE"),
             /*061*/ new IFA_LLLCHAR (999, "RESERVED PRIVATE"),
             /*062*/ new IFA_LLLCHAR (999, "RESERVED PRIVATE"),
-            /*063*/ new IFA_LLLCHAR (999, "RESERVED PRIVATE"),
+            /*063*/ new IFA_LLLLCHAR (9999, "RESERVED PRIVATE"),
             /*064*/ new IFA_BINARY  (  32, "MESSAGE AUTHENTICATION CODE FIELD"),
             /*065*/ new IFA_BINARY  (  1, "BITMAP, EXTENDED"),
             /*066*/ new IFA_NUMERIC (  1, "SETTLEMENT CODE"),

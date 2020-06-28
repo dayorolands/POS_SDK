@@ -153,7 +153,7 @@ class TelpoCardReader(
                         emvService.Emv_TransInit()
                         setEmvParams()
 
-                        emvService.Emv_StartApp(EmvService.EMV_FALSE)
+                        emvService.Emv_StartApp(EmvService.EMV_TRUE)
                     }
 
                     deviceClose()
@@ -182,9 +182,11 @@ class TelpoCardReader(
     }
 
     private fun setEmvParams() {
+        val managementData = get<PosParameter>().managementData
         val emvParam = EmvParam().apply {
             MerchName = "AppZone".toByteArray()
-            MerchId = get<PosParameter>().managementData.cardAcceptorId.toByteArray()
+            MerchId = managementData.cardAcceptorId.toByteArray()
+            MerchCateCode = managementData.merchantCategoryCode.toByteArray()
             TermId = get<PosConfig>().terminalId.toByteArray()
             TerminalType = 0x22
             Capability = byteArrayOf(0xE0.toByte(), 0xF9.toByte(), 0xC8.toByte())
