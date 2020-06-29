@@ -46,11 +46,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/twenty_dp"
+            android:layout_marginEnd="6dp"
             android:orientation="vertical"
-            android:layout_marginStart="26dp"
-            android:layout_marginLeft="26dp"
-            android:layout_marginRight="@dimen/twenty_dp">
+            android:layout_marginStart="6dp">
 
             <!--<TextView-->
             <!--android:layout_width="match_parent"-->
@@ -62,7 +60,7 @@
                 android:id="@+id/input_layout"
                 android:layout_width="match_parent"
                 android:hint="@{hint, default=FIELD}"
-                style="@style/TextField"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.textfield.TextInputEditText
