@@ -24,6 +24,10 @@ android {
         release {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        releaseStaging {
+            debuggable true
+            matchingFallbacks = ['release', 'debug']
+        }
     }
     kapt {
         arguments {

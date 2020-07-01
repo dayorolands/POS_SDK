@@ -54,6 +54,7 @@
             <com.creditclub.ui.widget.EditText
                 android:id="@+id/billpayment_amount_et"
                 android:layout_width="match_parent"
+                android:maxLength="7"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:inputType="numberDecimal" />

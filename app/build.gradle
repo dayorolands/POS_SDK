@@ -77,7 +77,7 @@ android {
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (IPNX)"
-            matchingFallbacks = ['release', 'debug']
+            matchingFallbacks = ['releaseStaging', 'release', 'debug']
         }
 
         debug {
@@ -86,7 +86,7 @@ android {
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (Staging)"
-            ext.enableCrashlytics=false
+            ext.enableCrashlytics = false
         }
 
         debugIpnx {

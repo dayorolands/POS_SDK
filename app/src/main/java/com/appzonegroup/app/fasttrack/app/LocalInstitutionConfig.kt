@@ -55,6 +55,10 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
                 if (!resources.getBoolean(R.bool.flow_wallet_opening)) {
                     walletOpening = null
                 }
+
+                if (!resources.getBoolean(R.bool.collections_enabled)) {
+                    collectionPayment = null
+                }
             }
 
             config.categories.run {

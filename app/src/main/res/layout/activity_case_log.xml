@@ -72,8 +72,6 @@
                     android:id="@+id/categories"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginEnd="20dp"
                     android:layout_marginBottom="20dp"
                     app:label='@{"Categories"}' />
 
@@ -81,8 +79,6 @@
                     android:id="@+id/products"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginEnd="20dp"
                     android:layout_marginBottom="20dp"
                     app:label='@{"Products"}' />
 

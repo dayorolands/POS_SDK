@@ -15,6 +15,9 @@ class Biller {
     @SerialName("BillerCategoryID")
     var billerCategoryId: Int? = null
 
+    @SerialName("CategoryId")
+    var categoryId: String? = null
+
     @SerialName("ID")
     var id: String? = null
 
