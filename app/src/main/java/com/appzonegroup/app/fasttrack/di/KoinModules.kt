@@ -1,11 +1,17 @@
-package com.creditclub.core
+package com.appzonegroup.app.fasttrack.di
 
+import android.content.Context
+import com.appzonegroup.app.fasttrack.BuildConfig
+import com.appzonegroup.app.fasttrack.app.LocalInstitutionConfig
+import com.appzonegroup.app.fasttrack.ui.CreditClubDialogProvider
+import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubClient
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
+import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.debugOnly
 import okhttp3.Cache
@@ -60,4 +66,20 @@ val apiModule = module {
     single { CreditClubMiddleWareAPI(get(named("middleware")), get<BackendConfig>().apiHost) }
 
     single { CreditClubClient(get(named("middleware")), get<BackendConfig>().apiHost) }
+}
+
+val uiModule = module {
+    factory<DialogProvider>(override = true) { (context: Context) ->
+        CreditClubDialogProvider(context)
+    }
+}
+
+val configModule = module {
+    single<IInstitutionConfig> { LocalInstitutionConfig.create(androidContext()) }
+    single<BackendConfig> {
+        object : BackendConfig {
+            override val apiHost = BuildConfig.API_HOST
+            override val posNotificationToken = BuildConfig.NOTIFICATION_TOKEN
+        }
+    }
 }

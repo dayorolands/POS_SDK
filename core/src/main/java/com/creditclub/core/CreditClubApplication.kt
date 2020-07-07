@@ -26,8 +26,6 @@ open class CreditClubApplication : Application(), Configuration.Provider {
             .setMinimumLoggingLevel(if (BuildConfig.DEBUG) android.util.Log.DEBUG else android.util.Log.INFO)
             .build()
 
-    private lateinit var koinApp: KoinApplication
-    protected open val modules: KoinAppDeclaration? = null
     open val otaAppName: String get() = getString(R.string.ota_app_name)
 
     override fun onCreate() {
@@ -38,14 +36,6 @@ open class CreditClubApplication : Application(), Configuration.Provider {
         }
 
         AndroidThreeTen.init(this)
-
-        koinApp = startKoin {
-            androidLogger()
-            androidContext(this@CreditClubApplication)
-
-            modules(listOf(apiModule, locationModule, dataModule))
-            modules?.invoke(this)
-        }
 
         val myConfig = Configuration.Builder()
             .setMinimumLoggingLevel(if (BuildConfig.DEBUG) android.util.Log.DEBUG else android.util.Log.INFO)
