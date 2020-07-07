@@ -8,6 +8,7 @@ import com.appzonegroup.app.fasttrack.utility.registerAppFunctions
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.loadPosModules
 import com.appzonegroup.creditclub.pos.startPosApp
+import com.creditclub.analytics.loadAnalyticsModules
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.util.localStorage
 import com.squareup.picasso.Picasso
@@ -54,6 +55,7 @@ class BankOneApplication : CreditClubApplication() {
                 configModule
             ))
 
+            loadAnalyticsModules()
             if (Platform.isPOS) loadPosModules()
         }
 

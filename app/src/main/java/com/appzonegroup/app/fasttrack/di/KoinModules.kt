@@ -4,6 +4,7 @@ import android.content.Context
 import com.appzonegroup.app.fasttrack.BuildConfig
 import com.appzonegroup.app.fasttrack.app.LocalInstitutionConfig
 import com.appzonegroup.app.fasttrack.ui.CreditClubDialogProvider
+import com.creditclub.analytics.NetworkMetricsInterceptor
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubClient
@@ -53,6 +54,7 @@ val apiModule = module {
             .readTimeout(2, TimeUnit.MINUTES)
             .writeTimeout(2, TimeUnit.MINUTES)
             .cache(cache)
+            .addInterceptor(NetworkMetricsInterceptor())
 
         debugOnly {
             val interceptor = HttpLoggingInterceptor()
