@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.appzonegroup.app.fasttrack.R
 import com.creditclub.core.data.model.CollectionCategory
 import com.creditclub.core.data.model.CollectionCustomer
 import com.creditclub.core.data.model.CollectionPaymentItem
@@ -39,6 +38,8 @@ class CollectionPaymentViewModel : ViewModel() {
     }
     val validReference = Transformations.map(collectionReference) { it != null }
     val collectionTypeIsWebGuid = Transformations.map(collectionType) { it == "WEBGUID" }
+    val isOffline: MutableLiveData<Boolean> = MutableLiveData()
+    val invoiceNumber: MutableLiveData<String> = MutableLiveData()
 
     companion object {
         @JvmStatic

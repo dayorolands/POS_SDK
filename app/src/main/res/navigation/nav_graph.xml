@@ -59,7 +59,12 @@
             tools:layout="@layout/collection_payment_fragment">
             <action
                 android:id="@+id/action_collection_payment_to_reference_generation"
-                app:destination="@id/collectionReferenceGenerationFragment" />
+                app:destination="@id/collectionReferenceGenerationFragment">
+                <argument
+                    android:name="offline"
+                    android:defaultValue="false"
+                    app:argType="boolean" />
+            </action>
         </fragment>
 
         <fragment
@@ -67,12 +72,10 @@
             android:name="com.appzonegroup.app.fasttrack.fragment.CollectionReferenceGenerationFragment"
             android:label="Generate Collection Reference"
             tools:layout="@layout/fragment_collection_reference_generation">
-            <!--        <action android:id="@+id/action__to_b"-->
-            <!--            app:destination="@id/b"-->
-            <!--            app:enterAnim="@anim/nav_default_enter_anim"-->
-            <!--            app:exitAnim="@anim/nav_default_exit_anim"-->
-            <!--            app:popEnterAnim="@anim/nav_default_pop_enter_anim"-->
-            <!--            app:popExitAnim="@anim/nav_default_pop_exit_anim"/>-->
+            <argument
+                android:name="offline"
+                android:defaultValue="false"
+                app:argType="boolean" />
         </fragment>
     </navigation>
 </navigation>

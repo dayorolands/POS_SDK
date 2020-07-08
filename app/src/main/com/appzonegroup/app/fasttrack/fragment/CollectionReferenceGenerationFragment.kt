@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.FragmentCollectionReferenceGenerationBinding
@@ -23,6 +24,7 @@ import java.util.*
 class CollectionReferenceGenerationFragment :
     CreditClubFragment(R.layout.fragment_collection_reference_generation) {
 
+    private val args by navArgs<CollectionReferenceGenerationFragmentArgs>()
     private val request = CollectionReferenceGenerationRequest()
 
     private var paymentItems: List<CollectionPaymentItem>? = null
@@ -40,15 +42,19 @@ class CollectionReferenceGenerationFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.isOffline.value = args.offline
+
         binding.viewModel = viewModel
 
         mainScope.launch { loadCategories() }
 
         binding.categoryInput.onItemClick { position ->
             viewModel.category.value = categories?.get(position)
-            binding.paymentItemInput.clearSuggestions()
+            if (!args.offline) {
+                binding.paymentItemInput.clearSuggestions()
 
-            mainScope.launch { loadPaymentItems() }
+                mainScope.launch { loadPaymentItems() }
+            }
         }
 
         binding.paymentItemInput.onItemClick { position ->
@@ -152,11 +158,15 @@ class CollectionReferenceGenerationFragment :
             return dialogProvider.showErrorAndWait("Please enter a phone number")
         }
 
+        if (args.offline && viewModel.invoiceNumber.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter an invoice number")
+        }
+
         if (viewModel.categoryCode.value.isNullOrBlank()) {
             return dialogProvider.showError("Please select a valid category")
         }
 
-        if (viewModel.itemCode.value.isNullOrBlank()) {
+        if (!args.offline && viewModel.itemCode.value.isNullOrBlank()) {
             return dialogProvider.showError("Please select a valid payment item")
         }
 
@@ -175,13 +185,16 @@ class CollectionReferenceGenerationFragment :
 
         request.apply {
             customerId = viewModel.customerId.value?.trim()
-            reference = viewModel.customerId.value?.trim()
+            if (args.offline) reference = viewModel.invoiceNumber.value?.trim()
             phoneNumber = viewModel.customerPhoneNumber.value?.trim()
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value
             collectionType = viewModel.collectionType.value
-            itemCode = viewModel.itemCode.value
+
+            itemCode = if (args.offline) "4000000 / 32672 / LASG BILL - Harmonised Revenue"
+            else viewModel.itemCode.value
+
             amount = binding.amountInput.value.toDoubleOrNull()
             geoLocation = gps.geolocationString
             currency = "NGN"

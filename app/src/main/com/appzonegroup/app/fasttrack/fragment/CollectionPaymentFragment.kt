@@ -55,7 +55,11 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
 
         binding.generateReferenceButton.setOnClickListener {
-            mainScope.launch { onGenerateButtonClick() }
+            mainScope.launch { onGenerateButtonClick(false) }
+        }
+
+        binding.generateOfflineBillButton.setOnClickListener {
+            mainScope.launch { onGenerateButtonClick(true) }
         }
 
         binding.collectionReferenceInputLayout.setEndIconOnClickListener {
@@ -166,7 +170,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         autoCompleteTextView.setAdapter(adapter)
     }
 
-    private suspend fun onGenerateButtonClick() {
+    private suspend fun onGenerateButtonClick(offline: Boolean) {
         viewModel.run {
             clearData(
                 item,
@@ -186,7 +190,9 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             return dialogProvider.showErrorAndWait("Please enter a collection type")
         }
 
-        findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
+        findNavController().navigate(
+            CollectionPaymentFragmentDirections.actionCollectionPaymentToReferenceGeneration(offline)
+        )
     }
 
     private fun clearData(vararg liveData: MutableLiveData<*>) {
