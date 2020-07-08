@@ -49,10 +49,6 @@ interface BankOneService {
             "${apiHost}/CreditClubClient/HttpJavaClient/BankOneImageUploadService.aspx"
 
         @JvmStatic
-        val BASE_URL_LOCATION =
-            "${apiHost}/CreditClub/HttpJavaClient/MobileService.aspx"
-
-        @JvmStatic
         fun operationInit(
             msisdn: String,
             sessionId: String,

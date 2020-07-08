@@ -52,12 +52,6 @@ class SplashScreenActivity : AppCompatActivity() {
                             Intent(this@SplashScreenActivity, AgentActivationActivity::class.java)
                         startActivity(intent)
                     } else {
-                        startService(
-                            Intent(
-                                this@SplashScreenActivity,
-                                LocationChangedService::class.java
-                            )
-                        )
                         val intent =
                             Intent(this@SplashScreenActivity, LoginActivity::class.java)
                         startActivity(intent)
