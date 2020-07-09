@@ -442,4 +442,14 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_fragment_collection_payment">IGR Collections</string>
+    <string-array name="transaction_types">
+        <item>CashIn</item>
+        <item>CashOut</item>
+        <item>POSCashOut</item>
+        <item>Recharge</item>
+        <item>BillsPayment</item>
+        <item>Registration</item>
+        <item>FundsTransferCommercialBank</item>
+        <item>LocalFundsTransfer</item>
+    </string-array>
 </resources>
