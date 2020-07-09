@@ -81,11 +81,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         if (viewModel.region.value != null) {
             mainScope.launch { loadCollectionTypes() }
         }
-
-        viewModel.customerId.onChange {
-            viewModel.customer.postValue(null)
-            viewModel.collectionReference.postValue(null)
-        }
     }
 
     private inline fun <T> MutableLiveData<T>.onChange(crossinline block: () -> Unit) {
@@ -173,7 +168,11 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     private suspend fun onGenerateButtonClick(offline: Boolean) {
         viewModel.run {
             clearData(
+                customerId,
+                customer,
+                customerPhoneNumber,
                 item,
+                itemCode,
                 itemName,
                 category,
                 categoryName,

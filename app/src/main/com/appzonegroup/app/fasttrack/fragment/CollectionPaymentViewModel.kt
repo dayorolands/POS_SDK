@@ -22,7 +22,7 @@ class CollectionPaymentViewModel : ViewModel() {
 
     val item: MutableLiveData<CollectionPaymentItem> = MutableLiveData()
     val itemName: MutableLiveData<String> = MutableLiveData()
-    val itemCode = Transformations.map(item) { it?.code }
+    val itemCode: MutableLiveData<String> = MutableLiveData()
 
     val collectionType: MutableLiveData<String> = MutableLiveData()
     val collectionService: MutableLiveData<String> = MutableLiveData()
