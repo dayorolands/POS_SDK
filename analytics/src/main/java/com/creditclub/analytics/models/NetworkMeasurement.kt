@@ -40,7 +40,6 @@ class NetworkMeasurement {
     @SerialName("StatusCode")
     var statusCode: Int = 0
 
-    @Serializable(with = TimeInstantSerializer::class)
     @SerialName("Duration")
     var duration = 0.0
 
