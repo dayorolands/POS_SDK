@@ -5,6 +5,8 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
@@ -75,6 +77,15 @@ class CollectionReferenceGenerationFragment :
         }
     }
 
+    private inline fun <T> MutableLiveData<T>.onChange(crossinline block: () -> Unit) {
+        var oldValue = value
+        observe(viewLifecycleOwner, Observer {
+            if (value != oldValue) {
+                oldValue = value
+                block()
+            }
+        })
+    }
 
     private inline fun AutoCompleteTextView.onItemClick(crossinline block: (position: Int) -> Unit) {
         setOnItemClickListener { _, _, position, _ ->
