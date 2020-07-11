@@ -209,7 +209,7 @@ class CollectionReferenceGenerationFragment :
             categoryCode = viewModel.categoryCode.value
             collectionType = viewModel.collectionType.value
 
-            itemCode = if (args.offline) "4000000 / 32672 / LASG BILL - Harmonised Revenue"
+            itemCode = if (args.offline) "4000000"
             else viewModel.itemCode.value
 
             amount = binding.amountInput.value.toDoubleOrNull()
