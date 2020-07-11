@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import com.appzonegroup.app.fasttrack.BuildConfig
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.FragmentCustomerRequestGeneralInfoBinding
@@ -23,11 +24,14 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
-        binding.emailEt.hint = "Email"
+        viewModel.requiresEmail.observe(viewLifecycleOwner, Observer { requiresEmail ->
+            binding.emailInputLayout.hint =
+                if (requiresEmail == true) "Email" else "Email (optional)"
+        })
         binding.placeOfBirthInputLayout.visibility = View.GONE
 
         if (BuildConfig.FLAVOR == "access") {
-            binding.middleNameEt.hint = "Enter middle name"
+            binding.middleNameInputLayout.hint = "Middle name"
         }
 
         binding.dobInput.setOnClickListener {
@@ -53,6 +57,21 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
             viewModel.gender.value = genderList[position]
         }
 
+        viewModel.requiresState.observe(viewLifecycleOwner, Observer { requiresState ->
+            if (requiresState == true) {
+                val stateArray = resources.getStringArray(R.array.States)
+                val options = stateArray.map {
+                    val stateInfo = it.split(",")
+                    stateInfo[1]
+                }
+                val stateAdapter = ArrayAdapter(requireContext(), R.layout.list_item, options)
+                binding.stateInput.setAdapter(stateAdapter)
+                binding.stateInput.onItemClick { position ->
+                    viewModel.stateCode.value = stateArray[position].split(",")[0]
+                }
+            }
+        })
+
         binding.basicInfoNextBtn.setOnClickListener { next() }
     }
 
@@ -63,42 +82,11 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
     }
 
     private fun next() {
-        val surname = viewModel.surname.value
-        if (surname.isNullOrBlank()) {
-            indicateError(
-                "Please enter customer's surname",
-                binding.surnameEt
-            )
-            return
-        }
+        if (!validate("Customer's surname", binding.surnameEt)) return
+        if (!validate("Customer's first name", binding.firstNameEt)) return
 
-        if (!validate("Last name", surname)) return
-
-        val middleName = viewModel.middleName.value
-
-        if (BuildConfig.FLAVOR == "access") {
-
-            if (middleName.isNullOrBlank()) {
-                indicateError(
-                    "Please enter customer's middle name",
-                    binding.middleNameEt
-                )
-                return
-            }
-        }
-
-        if (!validate("Middle name", middleName, required = false)) return
-
-        val firstName = viewModel.firstName.value
-        if (firstName.isNullOrBlank()) {
-            indicateError(
-                "Please enter customer's first name",
-                binding.firstNameEt
-            )
-            return
-        }
-
-        if (!validate("First name", firstName)) return
+        val requiresMiddleName = BuildConfig.FLAVOR == "access"
+        if (!validate("Middle name", binding.middleNameEt, required = requiresMiddleName)) return
 
         if (viewModel.gender.value.isNullOrBlank()) {
             dialogProvider.showError("Please select a gender")
@@ -147,21 +135,29 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
 //            )
 //            return
 //        }
+//        if (!validate("Place of birth", placeOfBirth)) return
+
+        if (viewModel.isWalletAccount.value == true && viewModel.stateCode.value.isNullOrBlank()) {
+            dialogProvider.showError("Please select a state")
+            return
+        }
+
         val email = viewModel.email.value
-        if (email.isNullOrBlank()) {
-            return dialogProvider.showError(
+        val requiresEmail = viewModel.requiresEmail.value == true
+        if (requiresEmail && email.isNullOrBlank()) {
+            return indicateError(
                 resources.getString(
                     R.string.field_is_required,
                     "Email"
-                )
+                ),
+                binding.emailInput
             )
         }
 
-        if (email.isNotEmpty() && !email.isValidEmail()) {
-            return dialogProvider.showError(getString(R.string.email_is_invalid))
+        if (!email.isNullOrBlank() && !email.isValidEmail()) {
+            return indicateError(getString(R.string.email_is_invalid), binding.emailInput)
         }
 
-//        if (!validate("Place of birth", placeOfBirth)) return
 
         if (viewModel.dob.value?.contains("Click") == true) {
             dialogProvider.showError("Please enter customer's date of birth")
@@ -171,19 +167,20 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
         viewModel.afterGeneralInfo.value?.invoke()
     }
 
-    private fun validate(name: String, value: String?, required: Boolean = true): Boolean {
-        if (required && value.isNullOrBlank()) {
-            dialogProvider.showError(resources.getString(R.string.field_is_required, name))
+    private fun validate(name: String, editText: EditText, required: Boolean = true): Boolean {
+        val value = editText.value
+        if (required && value.isBlank()) {
+            indicateError(resources.getString(R.string.field_is_required, name), editText)
             return false
         }
 
-        if (value == null) return true
         if (value.includesSpecialCharacters() || value.includesNumbers()) {
-            dialogProvider.showError(
+            indicateError(
                 resources.getString(
                     R.string.special_characters_not_permitted,
                     name
-                )
+                ),
+                editText
             )
             return false
         }

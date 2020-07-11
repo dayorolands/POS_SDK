@@ -16,25 +16,21 @@ import com.creditclub.core.util.isKotlinNPE
 import com.creditclub.core.util.requireAndValidateToken
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.showError
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.launch
 
 class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_request_account_info) {
     private val activity get() = getActivity() as CustomerRequestOpenAccountActivity
     private val binding by dataBinding<FragmentCustomerRequestAccountInfoBinding>()
     private val viewModel by activityViewModels<OpenAccountViewModel>()
-    private val requiresProducts = institutionConfig.flows.accountOpening.products
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
         binding.accountInfoNextBtn.setOnClickListener { next() }
-
+        val requiresProducts = institutionConfig.flows.accountOpening.products
+        viewModel.requiresProduct.value = requiresProducts
         if (requiresProducts) {
-            binding.productInputLayout.visibility = View.VISIBLE
             mainScope.launch { loadProducts() }
-        } else {
-            binding.productInputLayout.visibility = View.GONE
         }
     }
 
@@ -79,7 +75,7 @@ class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
             return
         }
 
-        if (requiresProducts && viewModel.productName.value.isNullOrBlank()) {
+        if (viewModel.requiresProduct.value == true && viewModel.productName.value.isNullOrBlank()) {
             dialogProvider.showError("Please select a product")
             return
         }
@@ -104,31 +100,21 @@ class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
             return
         }
 
-        try {
-            viewModel.run {
-                phoneNumber.value = result.phoneNumber
-                firstName.value = result.firstName
-                surname.value = result.lastName
-                dob.value = result.dob
-                middleName.value = result.otherNames
+        viewModel.run {
+            phoneNumber.value = result.phoneNumber
+            firstName.value = result.firstName
+            surname.value = result.lastName
+            dob.value = result.dob
+            middleName.value = result.otherNames
+        }
+
+        val accountInfo = AccountInfo()
+        accountInfo.phoneNumber = result.phoneNumber
+
+        activity.requireAndValidateToken(accountInfo, operationType = TokenType.AccountOpening) {
+            onSubmit {
+                viewModel.afterAccountInfo.value?.invoke()
             }
-
-            val accountInfo = AccountInfo()
-            accountInfo.phoneNumber = result.phoneNumber
-
-            activity.requireAndValidateToken(
-                accountInfo,
-                operationType = TokenType.AccountOpening
-            ) {
-                onSubmit {
-                    viewModel.afterAccountInfo.value?.invoke()
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            FirebaseCrashlytics.getInstance().recordException(Exception(e.message))
-
-            dialogProvider.showError("An error occurred. Please try again")
         }
     }
 }

@@ -46,6 +46,10 @@ class NewWalletActivity : CreditClubActivity(R.layout.activity_open_account) {
         binding.tabs.clearOnTabSelectedListeners()
         binding.container.offscreenPageLimit = adapter.count
 
+        viewModel.isWalletAccount.value = true
+        viewModel.requiresEmail.value = false
+        viewModel.requiresState.value = true
+
         viewModel.afterGeneralInfo.postValue {
             binding.container.setCurrentItem(
                 binding.container.currentItem + 1,

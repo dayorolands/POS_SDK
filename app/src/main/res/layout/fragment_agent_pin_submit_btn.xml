@@ -11,19 +11,18 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="@dimen/activity_horizontal_margin">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="20dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
                 android:hint="@string/cardSerialNumber"
                 app:counterEnabled="true"
                 app:counterMaxLength="8"
@@ -41,7 +40,6 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
                 android:layout_marginBottom="10dp"
                 android:hint="@string/agent_pin"
                 app:counterEnabled="true"
@@ -62,8 +60,7 @@
                 style="@style/button_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/form_margin_horizontal"
-                android:layout_marginRight="@dimen/form_margin_horizontal"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/gradient_warning"
                 android:text="@string/submit" />
 

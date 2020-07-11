@@ -143,6 +143,13 @@
                         android:text="@={viewModel.customerPhoneNumber}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <View
+                    android:layout_width="50dp"
+                    android:layout_height="1dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="15dp"
+                    android:background="#ddd" />
+
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"

@@ -43,6 +43,8 @@ class CustomerRequestOpenAccountActivity : CreditClubActivity(R.layout.activity_
         binding.tabs.clearOnTabSelectedListeners()
         binding.container.offscreenPageLimit = adapter.count
 
+        viewModel.requiresEmail.value = true
+
         viewModel.afterAccountInfo.postValue {
             binding.container.setCurrentItem(
                 binding.container.currentItem + 1,

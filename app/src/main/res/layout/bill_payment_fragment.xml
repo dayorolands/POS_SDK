@@ -56,6 +56,7 @@
                         android:id="@+id/category_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:singleLine="true"
                         android:text="@={viewModel.categoryName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -71,6 +72,7 @@
                         android:id="@+id/biller_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:singleLine="true"
                         android:text="@={viewModel.billerName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -86,6 +88,7 @@
                         android:id="@+id/payment_item_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:singleLine="true"
                         android:text="@={viewModel.itemName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -121,6 +124,13 @@
                         android:text="@={viewModel.fieldTwo}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <View
+                    android:layout_width="50dp"
+                    android:layout_height="1dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="15dp"
+                    android:background="#ddd" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
