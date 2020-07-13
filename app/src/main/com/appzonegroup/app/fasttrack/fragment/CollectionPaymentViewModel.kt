@@ -10,7 +10,6 @@ import com.creditclub.core.data.model.CollectionCategory
 import com.creditclub.core.data.model.CollectionCustomer
 import com.creditclub.core.data.model.CollectionPaymentItem
 import com.creditclub.core.data.model.CollectionReference
-import com.creditclub.core.util.toCurrencyFormat
 import com.google.android.material.textfield.TextInputLayout
 
 class CollectionPaymentViewModel : ViewModel() {
@@ -33,9 +32,7 @@ class CollectionPaymentViewModel : ViewModel() {
     val referenceName = Transformations.map(collectionReference) { it?.referenceName }
     val customerPhoneNumber: MutableLiveData<String> = MutableLiveData()
     val customerName = Transformations.map(customer) { it?.name }
-    val amountString = Transformations.map(collectionReference) {
-        it?.amount?.toCurrencyFormat(it.currency ?: "NGN")
-    }
+    val amountString = MutableLiveData<String>()
     val validReference = Transformations.map(collectionReference) { it != null }
     val collectionTypeIsWebGuid = Transformations.map(collectionType) { it == "WEBGUID" }
     val isOffline: MutableLiveData<Boolean> = MutableLiveData()

@@ -247,6 +247,7 @@ class CollectionReferenceGenerationFragment :
         }
         viewModel.referenceString.value = response.reference
         viewModel.collectionReference.value = response
+        viewModel.amountString.value = response.amount?.toString()
         findNavController().popBackStack()
     }
 }

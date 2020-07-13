@@ -138,6 +138,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             return dialogProvider.showError(response.responseMessage)
         }
         viewModel.collectionReference.value = response
+        viewModel.amountString.value = response.amount?.toString()
     }
 
     private suspend inline fun loadDependencies(
@@ -223,7 +224,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             categoryCode = viewModel.categoryCode.value
             collectionType = viewModel.collectionType.value
             itemCode = viewModel.itemCode.value
-            amount = viewModel.collectionReference.value?.amount
+            amount = viewModel.amountString.value?.toDouble()
             geoLocation = gps.geolocationString
             currency = "NGN"
             institutionCode = localStorage.institutionCode
