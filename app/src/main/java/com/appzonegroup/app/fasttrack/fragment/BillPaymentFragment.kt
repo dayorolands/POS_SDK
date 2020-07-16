@@ -49,9 +49,19 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         }
 
         viewModel.run {
-            categoryList.bindDropDown(category, binding.categoryInput) { it.name ?: "Unknown" }
-            billerList.bindDropDown(biller, binding.billerInput) { it.name ?: "Unknown" }
-            itemList.bindDropDown(item, binding.paymentItemInput) { it.name ?: "Unknown" }
+            categoryList.bindDropDown(category, binding.categoryInput) {
+                map { it.name ?: "Unknown" }
+            }
+            billerList.bindDropDown(biller, binding.billerInput) {
+                val categoryId = viewModel.category.value?.id
+                filter { b ->
+                    b.categoryId == categoryId || "${b.billerCategoryId}" == categoryId
+                }.map { it.name ?: "Unknown" }
+            }
+            itemList.bindDropDown(item, binding.paymentItemInput) {
+                filter { b -> "${b.billerId}" == viewModel.biller.value?.id }
+                    .map { it.name ?: "Unknown" }
+            }
 
             category.onChange { newCategory ->
                 mainScope.launch {
@@ -99,10 +109,10 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     private inline fun <T> MutableLiveData<List<T>>.bindDropDown(
         selectedItemLiveData: MutableLiveData<T>,
         autoCompleteTextView: AutoCompleteTextView,
-        crossinline mapFunction: (T) -> String
+        crossinline mapFunction: List<T>.() -> List<String>
     ) {
         observe(viewLifecycleOwner, Observer { list ->
-            val items = list?.map(mapFunction) ?: emptyList()
+            val items = list?.mapFunction() ?: emptyList()
             val adapter = ArrayAdapter(requireContext(), R.layout.list_item, items)
             autoCompleteTextView.setAdapter(adapter)
             if (list != null) {
@@ -272,27 +282,6 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             posPrinter.print(receipt)
         }
 
-        viewModel.run {
-            clearData(
-                item,
-                itemName,
-                this.category,
-                categoryName,
-                this.biller,
-                billerName,
-                customerName,
-                customerPhone,
-                customerEmail,
-                customerPhone,
-                amountString
-            )
-        }
         activity?.onBackPressed()
-    }
-
-    private fun clearData(vararg liveData: MutableLiveData<*>) {
-        for (liveDatum in liveData) {
-            liveDatum.value = null
-        }
     }
 }

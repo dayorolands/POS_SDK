@@ -1,45 +1,24 @@
 package com.appzonegroup.app.fasttrack
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import com.appzonegroup.app.fasttrack.app.LocalInstitutionConfig
+import com.appzonegroup.app.fasttrack.di.*
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
-import com.appzonegroup.app.fasttrack.ui.CreditClubDialogProvider
 import com.appzonegroup.app.fasttrack.utility.extensions.registerWorkers
 import com.appzonegroup.app.fasttrack.utility.registerAppFunctions
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.loadPosModules
 import com.appzonegroup.creditclub.pos.startPosApp
 import com.creditclub.core.CreditClubApplication
-import com.creditclub.core.config.IInstitutionConfig
-import com.creditclub.core.data.api.BackendConfig
-import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.localStorage
 import com.squareup.picasso.Picasso
 import org.koin.android.ext.koin.androidContext
-import org.koin.dsl.KoinAppDeclaration
-import org.koin.dsl.module
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 
 class BankOneApplication : CreditClubApplication() {
 
     override val otaAppName: String
         get() = if (Platform.isPOS) "${super.otaAppName}POS" else super.otaAppName
-
-    override val modules: KoinAppDeclaration?
-        get() = {
-            modules(module {
-                single<IInstitutionConfig> { LocalInstitutionConfig.create(androidContext()) }
-                factory<DialogProvider>(override = true) { (context: Context) ->
-                    CreditClubDialogProvider(context)
-                }
-                single<BackendConfig> {
-                    object : BackendConfig {
-                        override val apiHost = BuildConfig.API_HOST
-                        override val posNotificationToken = BuildConfig.NOTIFICATION_TOKEN
-                    }
-                }
-            })
-        }
 
     val authResponse: AuthResponse by lazy {
         val phoneNumber = "234${localStorage.agentPhone?.substring(1)}"
@@ -62,6 +41,19 @@ class BankOneApplication : CreditClubApplication() {
         Picasso.setSingletonInstance(
             Picasso.Builder(this).loggingEnabled(BuildConfig.DEBUG).build()
         )
+
+        startKoin {
+            androidLogger()
+            androidContext(this@BankOneApplication)
+
+            modules(listOf(
+                apiModule,
+                locationModule,
+                dataModule,
+                uiModule,
+                configModule
+            ))
+        }
 
         registerAppFunctions()
         Platform.test(this)

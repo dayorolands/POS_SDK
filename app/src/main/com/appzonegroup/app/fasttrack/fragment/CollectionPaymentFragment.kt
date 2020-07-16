@@ -57,7 +57,11 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
 
         binding.generateReferenceButton.setOnClickListener {
-            mainScope.launch { onGenerateButtonClick() }
+            mainScope.launch { onGenerateButtonClick(false) }
+        }
+
+        binding.generateOfflineBillButton.setOnClickListener {
+            mainScope.launch { onGenerateButtonClick(true) }
         }
 
         binding.collectionReferenceInputLayout.setEndIconOnClickListener {
@@ -78,11 +82,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
         if (viewModel.region.value != null) {
             mainScope.launch { loadCollectionTypes() }
-        }
-
-        viewModel.customerId.onChange {
-            viewModel.customer.postValue(null)
-            viewModel.collectionReference.postValue(null)
         }
     }
 
@@ -141,6 +140,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             return dialogProvider.showError(response.responseMessage)
         }
         viewModel.collectionReference.value = response
+        viewModel.amountString.value = response.amount?.toString()
     }
 
     private suspend inline fun loadDependencies(
@@ -168,10 +168,14 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         autoCompleteTextView.setAdapter(adapter)
     }
 
-    private suspend fun onGenerateButtonClick() {
+    private suspend fun onGenerateButtonClick(offline: Boolean) {
         viewModel.run {
             clearData(
+                customerId,
+                customer,
+                customerPhoneNumber,
                 item,
+                itemCode,
                 itemName,
                 category,
                 categoryName,
@@ -188,7 +192,9 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             return dialogProvider.showErrorAndWait("Please enter a collection type")
         }
 
-        findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
+        findNavController().navigate(
+            CollectionPaymentFragmentDirections.actionCollectionPaymentToReferenceGeneration(offline)
+        )
     }
 
     private fun clearData(vararg liveData: MutableLiveData<*>) {
@@ -220,7 +226,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             categoryCode = viewModel.categoryCode.value
             collectionType = viewModel.collectionType.value
             itemCode = viewModel.itemCode.value
-            amount = viewModel.collectionReference.value?.amount
+            amount = viewModel.amountString.value?.toDouble()
             geoLocation = gps.geolocationString
             currency = "NGN"
             institutionCode = localStorage.institutionCode

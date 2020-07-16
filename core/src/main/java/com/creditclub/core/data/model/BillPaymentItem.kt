@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class BillPaymentItem {
     @SerialName("BillerId")
-    var billerId = 0
+    var billerId: Int? = null
 
     @SerialName("ID")
     var id: String? = null

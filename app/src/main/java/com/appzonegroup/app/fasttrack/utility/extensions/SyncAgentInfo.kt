@@ -38,10 +38,9 @@ suspend fun ComponentCallbacks.syncAgentInfo(): Boolean {
         val configHasChanged =
             posConfig.terminalId != agent.terminalID // || posConfig.posModeStr != agent.posMode
 
-        posConfig.terminalId = agent.terminalID ?: ""
-//                    posConfig.posModeStr = agent.posMode
-
         if (configHasChanged) {
+//                    posConfig.posModeStr = agent.posMode
+            posConfig.terminalId = agent.terminalID ?: ""
             posParameters.reset()
         }
     }

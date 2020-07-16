@@ -99,13 +99,15 @@ class HomeFragment : CreditClubFragment(R.layout.home_fragment),
                         val dialog =
                             Dialogs.confirm(requireContext(), message, subtitle) {
                                 onSubmit {
-                                    if (it) startActivity(
-                                        Intent(
-                                            requireContext(),
-                                            UpdateActivity::class.java
+                                    if (it) {
+                                        startActivity(
+                                            Intent(
+                                                requireContext(),
+                                                UpdateActivity::class.java
+                                            )
                                         )
-                                    )
-                                    else if (mustUpdate) requireActivity().finish()
+                                        requireActivity().finish()
+                                    } else if (mustUpdate) requireActivity().finish()
                                 }
 
                                 onClose {

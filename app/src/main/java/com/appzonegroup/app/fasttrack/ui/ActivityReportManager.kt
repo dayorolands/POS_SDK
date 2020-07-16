@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.creditclub.core.data.request.POSTransactionReportRequest
-import com.creditclub.core.type.TransactionGroup
 import com.creditclub.core.type.TransactionStatus
 import com.creditclub.core.type.TransactionType
 import com.creditclub.core.ui.CreditClubActivity
@@ -33,7 +32,7 @@ import org.threeten.bp.Period
 class ActivityReportManager(
     override val activity: CreditClubActivity,
     override val binding: ActivityReportBinding,
-    private val transactionGroup: TransactionGroup
+    private val transactionGroup: List<TransactionType>
 ) : DataBindingActivityManager<ActivityReportBinding>(activity) {
 
     private var startIndex = 0

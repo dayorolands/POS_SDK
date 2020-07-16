@@ -6,20 +6,20 @@ import kotlinx.serialization.Serializable
 @Serializable
 class CollectionPaymentItem {
     @SerialName("ID")
-    val id: String? = null
+    var id: String? = null
 
     @SerialName("Name")
-    val name: String? = null
+    var name: String? = null
 
     @SerialName("Code")
-    val code: String? = null
+    var code: String? = null
 
     @SerialName("Amount")
-    val amount: String? = null
+    var amount: String? = null
 
     @SerialName("Currency")
-    val currency: String? = null
+    var currency: String? = null
 
     @SerialName("CollectionAccount")
-    val collectionAccount: String? = null
+    var collectionAccount: String? = null
 }

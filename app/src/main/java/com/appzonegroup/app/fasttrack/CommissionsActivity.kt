@@ -1,7 +1,6 @@
 package com.appzonegroup.app.fasttrack
 
 import android.os.Bundle
-import com.appzonegroup.app.fasttrack.model.PolarisTransactionGroup
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.ui.databinding.ActivityCommissionsBinding
 import com.creditclub.ui.manager.ActivityCommissionsManager
@@ -12,7 +11,7 @@ class CommissionsActivity : BaseActivity() {
         ActivityCommissionsManager(
             this,
             binding,
-            PolarisTransactionGroup
+            institutionConfig.transactionTypes
         )
     }
 
