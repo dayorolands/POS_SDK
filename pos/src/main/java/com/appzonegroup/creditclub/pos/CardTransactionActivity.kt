@@ -12,29 +12,30 @@ import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
-import com.appzonegroup.creditclub.pos.card.*
+import com.appzonegroup.creditclub.pos.card.AccountType
+import com.appzonegroup.creditclub.pos.card.CardIsoMsg
+import com.appzonegroup.creditclub.pos.card.EmvErrorMessage
+import com.appzonegroup.creditclub.pos.card.cardTransactionType
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.data.create
-import com.appzonegroup.creditclub.pos.databinding.PageInputRrnBinding
-import com.appzonegroup.creditclub.pos.databinding.PageSelectAccountTypeBinding
-import com.appzonegroup.creditclub.pos.databinding.PageTransactionErrorBinding
-import com.appzonegroup.creditclub.pos.databinding.PageVerifyCashoutBinding
+import com.appzonegroup.creditclub.pos.databinding.*
 import com.appzonegroup.creditclub.pos.extension.format
 import com.appzonegroup.creditclub.pos.models.*
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
-import com.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.service.ApiService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.util.indicateError
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.showErrorAndWait
+import com.creditclub.core.util.showSuccessAndWait
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
 import com.creditclub.pos.card.CardTransactionStatus
+import com.creditclub.pos.card.TransactionType
+import com.creditclub.pos.printer.PrinterStatus
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.page_input_amount.*
 import kotlinx.android.synthetic.main.page_input_rrn.*
@@ -50,11 +51,12 @@ import kotlin.concurrent.schedule
 @SuppressLint("Registered")
 abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
     private val posManager: PosManager by inject { parametersOf(this) }
-
+    internal val sessionData: PosManager.SessionData get() = posManager.sessionData
     private var amountText = "0"
     protected var previousMessage: CardIsoMsg? = null
     private var pendingRequest: CardIsoMsg? = null
     private var accountType: AccountType? = null
+    abstract var transactionType: TransactionType
 
     private lateinit var cardData: CardData
     private var cardReaderEvent: CardReaderEvent = CardReaderEvent.CANCELLED
@@ -62,7 +64,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
     internal val canPerformTransaction: Boolean
         get() {
             return parameters.run {
-                pinKey.isNotEmpty() && masterKey.isNotEmpty() && sessionKey.isNotEmpty() && pfmd.isNotEmpty()
+                pinKey.isNotEmpty() && masterKey.isNotEmpty() && sessionKey.isNotEmpty() && managementDataString.isNotEmpty()
             }
         }
 
@@ -90,7 +92,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
             noKeysPresent -> {
                 finishWithError("Please perform key download before proceeding")
             }
-            parameters.pfmd.isEmpty() -> {
+            parameters.managementDataString.isEmpty() -> {
                 finishWithError("Please perform parameter download before proceeding")
             }
             parameters.capkList == null -> {
@@ -216,13 +218,6 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
 
     fun next(view: View?) {
         when (view?.id) {
-            R.id.select_amount_button -> {
-                if (amountText.toLong() == 0L) return indicateError("Amount cannot be zero", null)
-                if (amountText.isEmpty()) return indicateError("Please specify amount", null)
-
-                readCard()
-            }
-
             R.id.confirm_cashout_button -> {
                 finish()
             }
@@ -531,18 +526,6 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         amountTv.text = format(amountText).replace("NGN", "")
     }
 
-    fun onSelectPresetNumber(view: View?) {
-        restartTimer()
-        amountText = when (view?.id) {
-            R.id.number2000 -> "200000"
-            R.id.number5000 -> "500000"
-            R.id.number10000 -> "1000000"
-            else -> ""
-        }
-
-        amountTv.text = format(amountText).replace("NGN", "")
-    }
-
     fun onBackspacePressed(view: View?) {
         restartTimer()
 //        if (amountText.isEmpty()) return
@@ -572,11 +555,56 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
 
     fun showAmountPage() {
         restartTimer()
-        DataBindingUtil.setContentView<ViewDataBinding>(this, R.layout.page_input_amount)
+        val binding =
+            DataBindingUtil.setContentView<PageInputAmountBinding>(this, R.layout.page_input_amount)
 
         title = "Amount"
         amountText = "0"
-        amountTv.text = format(amountText).replace("NGN", "")
+        binding.amountTv.text = format(amountText).replace("NGN", "")
+        binding.cancelButton.setOnClickListener {
+            if (amountText.isNotEmpty() && amountText.toLong() > 0) finish()
+            else renderTransactionFailure("Please Remove Card", "")
+        }
+        binding.selectAmountButton.setOnClickListener {
+            sessionData.amount = amountText.toLong()
+            sessionData.transactionType = transactionType
+            if (sessionData.amount == 0L) {
+                indicateError("Amount cannot be zero", null)
+                return@setOnClickListener
+            }
+            if (amountText.isEmpty()) {
+                indicateError("Please specify amount", null)
+                return@setOnClickListener
+            }
+
+            if (sessionData.canRunTransaction) {
+                mainScope.launch {
+                    val response = posManager.startTransaction()
+                    if (response.code == "00") {
+                        dialogProvider.showSuccessAndWait("Transaction approved")
+                    } else {
+                        renderTransactionFailure(response.responseMessage)
+                    }
+                }
+                return@setOnClickListener
+            }
+
+            readCard()
+        }
+        val presetNumberClickListener = View.OnClickListener { v ->
+            restartTimer()
+            amountText = when (v?.id) {
+                R.id.number2000 -> "200000"
+                R.id.number5000 -> "500000"
+                R.id.number10000 -> "1000000"
+                else -> ""
+            }
+
+            amountTv.text = format(amountText).replace("NGN", "")
+        }
+        binding.number2000.setOnClickListener(presetNumberClickListener)
+        binding.number5000.setOnClickListener(presetNumberClickListener)
+        binding.number10000.setOnClickListener(presetNumberClickListener)
     }
 
 

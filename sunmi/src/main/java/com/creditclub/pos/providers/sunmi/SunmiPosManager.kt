@@ -5,16 +5,17 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.util.Log
-import com.creditclub.pos.card.CardReader
+import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosManagerCompanion
+import com.creditclub.pos.TransactionResponse
+import com.creditclub.pos.card.CardReader
 import com.creditclub.pos.printer.MockPosPrinter
 import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.pos.providers.sunmi.emv.EmvUtil
 import com.creditclub.pos.providers.sunmi.utils.ThreadPoolUtil
-import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.core.util.safeRun
 import org.koin.dsl.module
 import sunmi.paylib.SunmiPayKernel
 import sunmi.paylib.SunmiPayKernel.ConnectCallback
@@ -47,6 +48,10 @@ class SunmiPosManager(private val context: Context) :
 
     override fun cleanUpEmv() {
         payKernel.destroyPaySDK()
+    }
+
+    override suspend fun startTransaction(): TransactionResponse {
+        throw NotImplementedError("An operation is not implemented")
     }
 
     private val connectCallback: ConnectCallback = object : ConnectCallback {

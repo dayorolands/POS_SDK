@@ -3,25 +3,22 @@ package com.appzonegroup.creditclub.pos.service
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Looper
+import androidx.activity.ComponentActivity
 import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.util.*
 import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.delegates.jsonArrayStore
 import com.creditclub.core.util.delegates.stringStore
 import com.creditclub.core.util.safeRun
-import com.creditclub.core.util.safeRunIO
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jpos.iso.ISOMsg
 import org.jpos.iso.ISOUtil
@@ -39,7 +36,7 @@ import java.util.*
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/27/2019.
  * Appzone Ltd
  */
-open class ParameterService protected constructor(context: Context) : PosParameter, KoinComponent {
+open class ParameterService(context: Context) : PosParameter, KoinComponent {
     private val prefs: SharedPreferences = context.getSharedPreferences("Parameters", 0)
     private val config: PosConfig by inject()
     private val database: PosDatabase by inject()
@@ -79,92 +76,32 @@ open class ParameterService protected constructor(context: Context) : PosParamet
             prefs.edit().putString("PFMD", value).apply()
         }
 
-    open var updatedAt by prefs.stringStore("UpdatedAt")
-
-    val parameters: ParameterObject
-        get() = try {
-            Gson().fromJson(pfmd, ParameterObject::class.java)
-        } catch (ex: java.lang.Exception) {
-            ex.printStackTrace()
-            ParameterObject()
-        }
+    override var updatedAt by prefs.stringStore("UpdatedAt")
 
     override var capkList by prefs.jsonArrayStore("CAPK_ARRAY")
 
     override var emvAidList by prefs.jsonArrayStore("EMV_APP_ARRAY")
 
-    fun downloadAsync(dialogProvider: DialogProvider? = null, force: Boolean = false) {
-        val localDate = TransmissionDateParams().localDate
-        if (updatedAt == localDate && !force) return
-
-        GlobalScope.launch(Dispatchers.Main) {
-            dialogProvider?.showProgressBar("Downloading Keys and Parameters")
-
-            try {
-                masterKey = withContext(Dispatchers.Default) {
-                    downloadMasterKey()
-                }
-
-                sessionKey = withContext(Dispatchers.Default) {
-                    downloadSessionKey()
-                }
-
-                pinKey = withContext(Dispatchers.Default) {
-                    downloadPinKey()
-                }
-
-                pfmd = withContext(Dispatchers.Default) {
-                    downloadParameters()
-                }
-
-                updatedAt = localDate
-
-                dialogProvider?.hideProgressBar()
-                dialogProvider?.showSuccess("Download successful")
-            } catch (ex: Exception) {
-                dialogProvider?.hideProgressBar()
-                dialogProvider?.showError("Download Failed. ${ex.message}")
-            }
+    val parameters: ParameterObject
+        get() = try {
+            Gson().fromJson(managementDataString, ParameterObject::class.java)
+        } catch (ex: java.lang.Exception) {
+            ex.printStackTrace()
+            ParameterObject()
         }
-    }
 
-    fun downloadKeysAsync(dialogProvider: DialogProvider? = null, force: Boolean = false) {
-        val localDate = TransmissionDateParams().localDate
-        if (updatedAt == localDate && !force) return
-
-        GlobalScope.launch(Dispatchers.Main) {
-            dialogProvider?.showProgressBar("Downloading Keys")
-            try {
-                masterKey = withContext(Dispatchers.Default) {
-                    downloadMasterKey()
-                }
-
-                sessionKey = withContext(Dispatchers.Default) {
-                    downloadSessionKey()
-                }
-
-                pinKey = withContext(Dispatchers.Default) {
-                    downloadPinKey()
-                }
-
-                updatedAt = localDate
-
-                dialogProvider?.hideProgressBar()
-                dialogProvider?.showSuccess("Download successful")
-            } catch (ex: Exception) {
-                masterKey = ""
-                sessionKey = ""
-                pinKey = ""
-                updatedAt = ""
-
-                dialogProvider?.hideProgressBar()
-                dialogProvider?.showError(ex.message ?: "Key Download Failed.")
-            }
+    override suspend fun downloadKeys(activity: ComponentActivity) {
+        withContext(Dispatchers.Default) {
+            downloadMasterKey()
+            downloadSessionKey()
+            downloadPinKey()
         }
+
+        updatedAt = Instant.now().format("MMdd")
     }
 
     @Throws(KeyDownloadException::class)
-    fun downloadMasterKey(): String {
+    private fun downloadMasterKey() {
         val dateParams = TransmissionDateParams()
         val packager = ISO87Packager()
 
@@ -211,11 +148,11 @@ open class ParameterService protected constructor(context: Context) : PosParamet
         val cryptData = TerminalUtils.hexStringToByteArray(isoMsg.getString(53).substring(0, 32))
 
         val tripleDesCipher = TripleDesCipher(cryptKey)
-        return TerminalUtils.byteArrayToHex(tripleDesCipher.decrypt(cryptData).copyOf(16))
+        masterKey = TerminalUtils.byteArrayToHex(tripleDesCipher.decrypt(cryptData).copyOf(16))
     }
 
     @Throws(KeyDownloadException::class)
-    fun downloadSessionKey(): String {
+    private fun downloadSessionKey() {
         val dateParams = TransmissionDateParams()
         val packager = ISO87Packager()
 
@@ -264,11 +201,11 @@ open class ParameterService protected constructor(context: Context) : PosParamet
         val cryptData = TerminalUtils.hexStringToByteArray(isoMsg.getString(53).substring(0, 32))
 
         val tripleDesCipher = TripleDesCipher(cryptKey)
-        return TerminalUtils.byteArrayToHex(tripleDesCipher.decrypt(cryptData).copyOf(16))
+        sessionKey = TerminalUtils.byteArrayToHex(tripleDesCipher.decrypt(cryptData).copyOf(16))
     }
 
     @Throws(KeyDownloadException::class)
-    fun downloadPinKey(): String {
+    private fun downloadPinKey() {
         val dateParams = TransmissionDateParams()
         val packager = ISO87Packager()
 
@@ -318,11 +255,11 @@ open class ParameterService protected constructor(context: Context) : PosParamet
         val cryptData = TerminalUtils.hexStringToByteArray(isoMsg.getString(53).substring(0, 32))
 
         val tripleDesCipher = TripleDesCipher(cryptKey)
-        return TerminalUtils.byteArrayToHex(tripleDesCipher.decrypt(cryptData).copyOf(16))
+        pinKey = TerminalUtils.byteArrayToHex(tripleDesCipher.decrypt(cryptData).copyOf(16))
     }
 
     @Throws(ParameterDownloadException::class)
-    fun downloadParameters(): String {
+    override suspend fun downloadParameters(activity: ComponentActivity) {
         val dateParams = TransmissionDateParams()
 
         val isoMsg = ISOMsg().apply {
@@ -379,11 +316,11 @@ open class ParameterService protected constructor(context: Context) : PosParamet
 
         println("Secured connection performed successfully")
 
-        return TerminalUtils.parsePrivateFieldData(isoMsg.getString(62))
+        pfmd = TerminalUtils.parsePrivateFieldData(isoMsg.getString(62))
             ?: throw ParameterDownloadException("")
     }
 
-    suspend fun downloadCapk() = safeRunIO {
+    override suspend fun downloadCapk(activity: ComponentActivity) {
         val dateParams = TransmissionDateParams()
 
         val isoMsg = ISOMsg().apply {
@@ -440,11 +377,11 @@ open class ParameterService protected constructor(context: Context) : PosParamet
 
         val capk = isoMsg.managementDataTwo63?.parsePrivateFieldData()
 
-        return@safeRunIO capk ?: throw PublicKeyDownloadException("")
+        capkList = capk ?: throw PublicKeyDownloadException("")
     }
 
     @Throws(EmvAidDownloadException::class)
-    suspend fun downloadAid() = safeRunIO {
+    override suspend fun downloadAid(activity: ComponentActivity) {
         val dateParams = TransmissionDateParams()
 
         val isoMsg = ISOMsg().apply {
@@ -500,29 +437,10 @@ open class ParameterService protected constructor(context: Context) : PosParamet
         }
 
         val aids = isoMsg.managementDataTwo63?.parsePrivateFieldData()
-        return@safeRunIO aids ?: throw EmvAidDownloadException("")
+        emvAidList = aids ?: throw EmvAidDownloadException("")
     }
 
-
-    fun downloadParametersAsync(dialogProvider: DialogProvider) {
-        GlobalScope.launch(Dispatchers.Main) {
-            dialogProvider.showProgressBar("Downloading Parameters")
-            try {
-                pfmd = withContext(Dispatchers.Default) {
-                    downloadParameters()
-                }
-
-                dialogProvider.hideProgressBar()
-                dialogProvider.showSuccess("Download successful")
-            } catch (ex: Exception) {
-                if (BuildConfig.DEBUG) ex.printStackTrace()
-                dialogProvider.hideProgressBar()
-                dialogProvider.showError(ex.message ?: "Parameter Download Failed")
-            }
-        }
-    }
-
-    fun reset() {
+    override fun reset() {
         masterKey = ""
         sessionKey = ""
         pinKey = ""
@@ -600,15 +518,5 @@ open class ParameterService protected constructor(context: Context) : PosParamet
 
         @SerializedName("52")
         override var cardAcceptorLocation = ""
-    }
-
-    companion object {
-        private var INSTANCE: ParameterService? = null
-
-        fun getInstance(context: Context): ParameterService {
-            if (INSTANCE == null) INSTANCE =
-                ParameterService(context.applicationContext)
-            return INSTANCE as ParameterService
-        }
     }
 }

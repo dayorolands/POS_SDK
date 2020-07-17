@@ -1,12 +1,9 @@
 package com.appzonegroup.creditclub.pos
 
 import android.app.Application
-import android.content.Context
 import com.creditclub.pos.PosProviders
 import org.koin.core.KoinComponent
 import org.koin.core.context.loadKoinModules
-import java.io.File
-import java.io.FileOutputStream
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 6/29/2019.
@@ -27,8 +24,8 @@ object Platform : KoinComponent {
             if (posManagerCompanion.isCompatible(application)) {
                 isPOS = true
                 posManagerCompanion.setup(application)
-                loadKoinModules(posManagerCompanion.module)
                 loadPosModules()
+                loadKoinModules(posManagerCompanion.module)
                 application.startPosApp()
                 return
             }

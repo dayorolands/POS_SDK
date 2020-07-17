@@ -2,8 +2,8 @@ package com.appzonegroup.app.fasttrack.utility.extensions
 
 import android.content.ComponentCallbacks
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.service.ConfigService
-import com.appzonegroup.creditclub.pos.service.ParameterService
+import com.appzonegroup.creditclub.pos.extension.posConfig
+import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.safeRunIO
@@ -32,16 +32,13 @@ suspend fun ComponentCallbacks.syncAgentInfo(): Boolean {
     firebaseCrashlytics.setCustomKey("terminal_id", agent.terminalID ?: "")
 
     if (Platform.isPOS) {
-        val posConfig: ConfigService = get()
-        val posParameters: ParameterService = get()
-
         val configHasChanged =
             posConfig.terminalId != agent.terminalID // || posConfig.posModeStr != agent.posMode
 
         if (configHasChanged) {
 //                    posConfig.posModeStr = agent.posMode
             posConfig.terminalId = agent.terminalID ?: ""
-            posParameters.reset()
+            posParameter.reset()
         }
     }
 
