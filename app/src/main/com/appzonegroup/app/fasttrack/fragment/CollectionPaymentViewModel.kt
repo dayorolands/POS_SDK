@@ -26,6 +26,7 @@ class CollectionPaymentViewModel : ViewModel() {
     val collectionType: MutableLiveData<String> = MutableLiveData()
     val collectionService: MutableLiveData<String> = MutableLiveData()
     val customerId: MutableLiveData<String> = MutableLiveData()
+    val customerType: MutableLiveData<String> = MutableLiveData()
     val referenceString: MutableLiveData<String> = MutableLiveData()
     val customer: MutableLiveData<CollectionCustomer> = MutableLiveData()
 
@@ -35,8 +36,12 @@ class CollectionPaymentViewModel : ViewModel() {
     val amountString = MutableLiveData<String>()
     val validReference = Transformations.map(collectionReference) { it != null }
     val collectionTypeIsWebGuid = Transformations.map(collectionType) { it == "WEBGUID" }
+    val collectionTypeIsCbs = Transformations.map(collectionType) { it == "CBS" }
     val isOffline: MutableLiveData<Boolean> = MutableLiveData()
     val invoiceNumber: MutableLiveData<String> = MutableLiveData()
+
+    val itemList = MutableLiveData<List<CollectionPaymentItem>>()
+    val categoryList = MutableLiveData<List<CollectionCategory>>()
 
     companion object {
         @JvmStatic

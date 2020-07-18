@@ -47,4 +47,6 @@ class Biller {
 
     @SerialName("CustomerField2")
     var customerField2: String? = null
+
+    override fun toString() = name ?: "Biller $id"
 }

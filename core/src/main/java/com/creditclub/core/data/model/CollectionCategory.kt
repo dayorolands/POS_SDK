@@ -13,4 +13,6 @@ class CollectionCategory {
 
     @SerialName("Code")
     val code: String? = null
+
+    override fun toString() = "$name - $code"
 }

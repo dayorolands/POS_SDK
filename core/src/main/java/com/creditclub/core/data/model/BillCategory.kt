@@ -20,5 +20,7 @@ class BillCategory {
 
     @SerialName("IsAirtime")
     var isAirtime: Boolean = false
+
+    override fun toString() = name ?: "Category $id"
 }
 

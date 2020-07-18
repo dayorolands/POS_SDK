@@ -22,4 +22,6 @@ class CollectionPaymentItem {
 
     @SerialName("CollectionAccount")
     var collectionAccount: String? = null
+
+    override fun toString() = "$name - $code"
 }
