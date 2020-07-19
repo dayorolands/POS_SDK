@@ -210,6 +210,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
 
         val pin = dialogProvider.getPin("Agent PIN") ?: return
+        if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
         val json = Json(JsonConfiguration.Stable)
         val serializer = CollectionPaymentRequest.Additional.serializer()
