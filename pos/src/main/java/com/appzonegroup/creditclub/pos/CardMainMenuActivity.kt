@@ -12,14 +12,19 @@ import com.creditclub.core.util.format
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.showError
+import com.creditclub.pos.PosManager
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 import org.threeten.bp.Instant
 
 
 class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
     override val pageNumber = MenuPages.MAIN_MENU
     override val title = MenuPages[MenuPages.MAIN_MENU]?.name ?: "Welcome"
-//    override val functionId = FunctionIds.CARD_TRANSACTIONS
+
+    //    override val functionId = FunctionIds.CARD_TRANSACTIONS
+    private val posManager: PosManager by inject { parametersOf(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,17 +78,25 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                 R.id.purchase_button -> {
                     startActivity(CardWithdrawalActivity::class.java)
                 }
-                R.id.admin_button -> {
-                    adminAction {
-                        startActivity(Intent(this, MenuActivity::class.java).apply {
-                            putExtra(MenuPage.TITLE, MenuPages[MenuPages.ADMIN]?.name)
-                            putExtra(MenuPage.PAGE_NUMBER, MenuPages.ADMIN)
-                        })
+                R.id.admin_button -> mainScope.launch {
+                    if (!posManager.openSettings()) {
+                        adminAction {
+                            val intent = Intent(this@CardMainMenuActivity, MenuActivity::class.java)
+                            intent.apply {
+                                putExtra(MenuPage.TITLE, MenuPages[MenuPages.ADMIN]?.name)
+                                putExtra(MenuPage.PAGE_NUMBER, MenuPages.ADMIN)
+                            }
+                            startActivity(intent)
+                        }
                     }
                 }
-                R.id.reprint_button -> supervisorAction {
-                    //                    Modules[Modules.REPRINT_LAST].click(this)
-                    startActivity(ReprintMenuActivity::class.java)
+                R.id.reprint_button -> mainScope.launch {
+                    if (!posManager.openReprint()) {
+                        supervisorAction {
+                            //                    Modules[Modules.REPRINT_LAST].click(this)
+                            startActivity(ReprintMenuActivity::class.java)
+                        }
+                    }
                 }
 //                R.id.balance_button -> {
 //                    startActivity(BalanceInquiryActivity::class.java)

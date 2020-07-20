@@ -123,7 +123,7 @@ class TelpoPrinter(override val context: Context, override val dialogProvider: D
         else status
     }
 
-    override fun print(nodes: List<PrintNode>): PrinterStatus {
+    private fun print(nodes: List<PrintNode>): PrinterStatus {
         for (node in nodes) {
             val status: PrinterStatus = when (node) {
                 is TextNode -> print(node)
@@ -138,7 +138,7 @@ class TelpoPrinter(override val context: Context, override val dialogProvider: D
         return PrinterStatus.READY
     }
 
-    fun print(node: ImageNode): PrinterStatus {
+    private fun print(node: ImageNode): PrinterStatus {
         return try {
             reset()
             setGray(node.printGray)
@@ -157,7 +157,7 @@ class TelpoPrinter(override val context: Context, override val dialogProvider: D
         }
     }
 
-    fun print(node: WalkPaper): PrinterStatus {
+    private fun print(node: WalkPaper): PrinterStatus {
         return try {
             reset()
             walkPaper(node.walkPaperAfterPrint)

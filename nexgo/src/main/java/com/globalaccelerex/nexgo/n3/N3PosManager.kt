@@ -3,6 +3,7 @@ package com.globalaccelerex.nexgo.n3
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.pos.PosManager
@@ -16,15 +17,39 @@ import org.koin.core.KoinComponent
 import org.koin.dsl.module
 
 class N3PosManager(val activity: CreditClubActivity) : PosManager, KoinComponent {
-    override val cardReader by lazy { SmartPeakCardReader() }
+    override val cardReader = NexgoCardReader()
     override val sessionData = N3SessionData()
 
     override suspend fun loadEmv() {
-
+        sessionData.reset()
     }
 
     override fun cleanUpEmv() {
+        sessionData.reset()
+    }
 
+    override suspend fun openSettings(): Boolean {
+        return try {
+            val request = Intent("com.globalaccelerex.settings")
+            val result = activity.getActivityResult(request)
+            val status = result.data?.getStringExtra("status")
+            true
+        } catch (ex: Exception) {
+            Log.e("PosManager", ex.message, ex)
+            false
+        }
+    }
+
+    override suspend fun openReprint(): Boolean {
+        return try {
+            val request = Intent("com.globalaccelerex.reprint")
+            val result = activity.getActivityResult(request)
+            val status = result.data?.getStringExtra("status")
+            true
+        } catch (ex: Exception) {
+            Log.e("PosManager", ex.message, ex)
+            false
+        }
     }
 
     override suspend fun startTransaction(): TransactionResponse {
@@ -52,7 +77,7 @@ class N3PosManager(val activity: CreditClubActivity) : PosManager, KoinComponent
             }
     }
 
-    inner class SmartPeakCardReader : CardReader {
+    inner class NexgoCardReader : CardReader {
         override suspend fun waitForCard(): CardReaderEvent {
             return CardReaderEvent.CHIP
         }
@@ -84,6 +109,14 @@ class N3PosManager(val activity: CreditClubActivity) : PosManager, KoinComponent
             else -> false
         }
 
+    private fun PosManager.SessionData.reset() {
+        amount = 0L
+        pinBlock = null
+        canRunTransaction = true
+        canManageParameters = false
+        transactionType = TransactionType.Unknown
+    }
+
     companion object : PosManagerCompanion {
         override fun setup(context: Context) {
 
@@ -100,11 +133,8 @@ class N3PosManager(val activity: CreditClubActivity) : PosManager, KoinComponent
         }
 
         override fun isCompatible(context: Context): Boolean {
-            return try {
-                true
-            } catch (ignored: NoClassDefFoundError) {
-                false
-            }
+            val intent = Intent("com.globalaccelerex.transaction")
+            return intent.resolveActivity(context.packageManager) != null
         }
     }
 }

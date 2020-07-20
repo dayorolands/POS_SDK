@@ -16,6 +16,8 @@ interface PosManager {
     suspend fun startTransaction(): TransactionResponse
 
     fun cleanUpEmv()
+    suspend fun openSettings() = false
+    suspend fun openReprint() = false
 
     open class SessionData {
         open var amount = 0L

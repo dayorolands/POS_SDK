@@ -6,10 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResult
 import androidx.fragment.app.Fragment
 import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.pos.printer.PosPrinter
-import com.creditclub.pos.printer.PrintJob
-import com.creditclub.pos.printer.PrintNode
-import com.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,77 +14,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
-
-private const val JSON_DATA = """
-    {
- "Receipt": [{
- "Bitmap": "filename",
- "letterSpacing": 5,
- "String": [{
- "isMultiline": true,
- "header": {
- "text": "Merchant Name",
- "align": "centre",
- "size": "large",
- "isBold": true
- },
- "body": {
- "text": "Global Accelerex",
- "alignment": "centre",
- "size": "normal",
- "isBold": false
- }
- },
- {
- "isMultiline": false,
- "header": {
- "text": "Reference Number",
- "align": "left",
- "size": "large",
- "isBold": true
- },
- "body": {
- "text": "123456789"
- }
- }
- ]
- },
- {
- "Bitmap": "filename",
- "letterSpacing": 5,
- "String": [{
- "isMultiline": true,
- "header": {
- "text": "Merchant Name",
- "align": "centre",
- "size": "large",
- "isBold": true
- },
- "body": {
- "text": "Allen Tobi",
- "alignment": "centre",
- "size": "normal",
- "isBold": false
- }
- },
- {
- "isMultiline": false,
- "header": {
- "text": "Reference Number",
- "align": "left",
- "size": "large",
- "isBold": true
- },
- "body": {
- "text": "abcd1234"
- }
- }
- ]
- }
- ]
-}
-
-"""
 
 class N3Printer(override val context: Context, override val dialogProvider: DialogProvider) :
     PosPrinter {
@@ -104,8 +30,10 @@ class N3Printer(override val context: Context, override val dialogProvider: Dial
         block: ((PrinterStatus) -> Unit)?
     ) {
         mainScope.launch {
-            print(JSON_DATA)
-            block?.invoke(PrinterStatus.READY)
+            block?.invoke(print(object : PrintJob {
+                override val nodes: List<PrintNode>
+                    get() = nodes
+            }))
         }
     }
 
@@ -114,14 +42,28 @@ class N3Printer(override val context: Context, override val dialogProvider: Dial
         message: String,
         retryOnFail: Boolean
     ): PrinterStatus {
-        print(JSON_DATA)
-        return PrinterStatus.READY
-    }
-
-    override fun print(nodes: List<PrintNode>): PrinterStatus {
-        mainScope.launch {
-            print(JSON_DATA)
+        val stringFields = mutableListOf<StringField>()
+        for (node in printJob.nodes) {
+            if (node is TextNode) {
+                val align = when (node.align) {
+                    Alignment.LEFT -> "left"
+                    Alignment.MIDDLE -> "center"
+                    Alignment.RIGHT -> "right"
+                }
+                stringFields.add(
+                    StringField(
+                        false,
+                        TextField(node.text, align, "medium", false),
+                        TextField("", align, "medium", false)
+                    )
+                )
+            }
         }
+
+        val printFields = listOf(PrintField("", 1, stringFields))
+        val printObject = PrintObject(printFields)
+
+        print(printObject)
         return PrinterStatus.READY
     }
 
@@ -133,6 +75,10 @@ class N3Printer(override val context: Context, override val dialogProvider: Dial
             is Fragment -> context.getActivityResult(intent)
             else -> null
         }
+    }
+
+    private suspend fun print(printObject: PrintObject): ActivityResult? {
+        return print(json.stringify(PrintObject.serializer(), printObject))
     }
 
     @Serializable

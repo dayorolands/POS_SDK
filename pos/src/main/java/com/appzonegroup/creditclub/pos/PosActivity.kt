@@ -38,7 +38,11 @@ abstract class PosActivity : CreditClubActivity() {
         }
     }
 
-    fun confirmSupervisorPin(pin: String, closeOnFail: Boolean = false, next: (Boolean) -> Unit) {
+    inline fun confirmSupervisorPin(
+        pin: String,
+        closeOnFail: Boolean = false,
+        crossinline next: (Boolean) -> Unit
+    ) {
         val status = pin == config.supervisorPin
         if (!status) {
             if (closeOnFail) return dialogProvider.showError<Nothing>("Authentication Failed") {
@@ -52,10 +56,10 @@ abstract class PosActivity : CreditClubActivity() {
         next(status)
     }
 
-    private fun confirmAdminPassword(
+    inline fun confirmAdminPassword(
         password: String,
         closeOnFail: Boolean = false,
-        next: (Boolean) -> Unit
+        crossinline next: (Boolean) -> Unit
     ) {
         val status = password == config.adminPin
         if (!status) {
@@ -70,7 +74,7 @@ abstract class PosActivity : CreditClubActivity() {
         next(status)
     }
 
-    fun supervisorAction(next: () -> Unit) {
+    inline fun supervisorAction(crossinline next: () -> Unit) {
         Dialogs.requestPin(this, getString(R.string.pos_enter_supervisor_pin)) { pin ->
             if (pin == null) return@requestPin
             confirmSupervisorPin(pin) { passed ->
@@ -79,7 +83,7 @@ abstract class PosActivity : CreditClubActivity() {
         }
     }
 
-    fun printerDependentAction(closeOnFail: Boolean = false, block: () -> Unit) {
+    inline fun printerDependentAction(closeOnFail: Boolean = false, crossinline block: () -> Unit) {
         return block()
 
         printer.checkAsync { printerStatus ->
@@ -99,7 +103,7 @@ abstract class PosActivity : CreditClubActivity() {
         }
     }
 
-    fun adminAction(next: () -> Unit) {
+    inline fun adminAction(crossinline next: () -> Unit) {
         val passwordType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
 
         Dialogs.input(this, "Administrator password", passwordType) {
