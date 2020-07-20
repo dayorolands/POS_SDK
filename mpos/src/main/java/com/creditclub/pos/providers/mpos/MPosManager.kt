@@ -3,13 +3,14 @@ package com.creditclub.pos.providers.mpos
 import android.app.Dialog
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
-import com.creditclub.pos.PosManager
-import com.creditclub.pos.PosManagerCompanion
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.ui.widget.build
+import com.creditclub.pos.PosManager
+import com.creditclub.pos.PosManagerCompanion
 import com.creditclub.pos.PosParameter
+import com.creditclub.pos.TransactionResponse
 import com.creditclub.pos.card.CardDataListener
 import com.creditclub.pos.card.CardReader
 import com.creditclub.pos.card.CardTransactionStatus
@@ -52,6 +53,10 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
 
     override fun cleanUpEmv() {
         connectionManager.closeResource()
+    }
+
+    override suspend fun startTransaction(): TransactionResponse {
+        throw NotImplementedError("An operation is not implemented")
     }
 
     override fun onDeviceInfo(p0: MutableMap<String, String>?) {

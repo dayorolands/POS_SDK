@@ -7,20 +7,30 @@ import androidx.databinding.DataBindingUtil
 import com.appzonegroup.creditclub.pos.databinding.ActivityCardMainMenuBinding
 import com.appzonegroup.creditclub.pos.util.MenuPage
 import com.appzonegroup.creditclub.pos.util.MenuPages
-import com.appzonegroup.creditclub.pos.util.posParameters
 import com.appzonegroup.creditclub.pos.widget.Dialogs
+import com.creditclub.core.util.format
+import com.creditclub.core.util.localStorage
+import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.showError
+import com.creditclub.pos.PosManager
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
+import org.threeten.bp.Instant
 
 
 class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
     override val pageNumber = MenuPages.MAIN_MENU
     override val title = MenuPages[MenuPages.MAIN_MENU]?.name ?: "Welcome"
-//    override val functionId = FunctionIds.CARD_TRANSACTIONS
+
+    //    override val functionId = FunctionIds.CARD_TRANSACTIONS
+    private val posManager: PosManager by inject { parametersOf(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.empty)
+
+        localStorage.agent ?: return finish()
 
         if (config.terminalId.isEmpty()) {
             return showError(getString(R.string.pos_terminal_id_required)) {
@@ -56,7 +66,7 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                     binding.capkDownloadButton.button.setOnClickListener(this)
                     binding.emvAidDownloadButton.button.setOnClickListener(this)
 
-                    parameters.downloadAsync(dialogProvider)
+                    mainScope.launch { checkKeysAndParameters() }
                 }
             }
         }
@@ -68,17 +78,25 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                 R.id.purchase_button -> {
                     startActivity(CardWithdrawalActivity::class.java)
                 }
-                R.id.admin_button -> {
-                    adminAction {
-                        startActivity(Intent(this, MenuActivity::class.java).apply {
-                            putExtra(MenuPage.TITLE, MenuPages[MenuPages.ADMIN]?.name)
-                            putExtra(MenuPage.PAGE_NUMBER, MenuPages.ADMIN)
-                        })
+                R.id.admin_button -> mainScope.launch {
+                    if (!posManager.openSettings()) {
+                        adminAction {
+                            val intent = Intent(this@CardMainMenuActivity, MenuActivity::class.java)
+                            intent.apply {
+                                putExtra(MenuPage.TITLE, MenuPages[MenuPages.ADMIN]?.name)
+                                putExtra(MenuPage.PAGE_NUMBER, MenuPages.ADMIN)
+                            }
+                            startActivity(intent)
+                        }
                     }
                 }
-                R.id.reprint_button -> supervisorAction {
-                    //                    Modules[Modules.REPRINT_LAST].click(this)
-                    startActivity(ReprintMenuActivity::class.java)
+                R.id.reprint_button -> mainScope.launch {
+                    if (!posManager.openReprint()) {
+                        supervisorAction {
+                            //                    Modules[Modules.REPRINT_LAST].click(this)
+                            startActivity(ReprintMenuActivity::class.java)
+                        }
+                    }
                 }
 //                R.id.balance_button -> {
 //                    startActivity(BalanceInquiryActivity::class.java)
@@ -114,38 +132,88 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                         putExtra(MenuPage.TITLE, MenuPages[MenuPages.REPRINT_EODS]?.name)
                         putExtra(MenuPage.PAGE_NUMBER, MenuPages.REPRINT_EODS)
                     })
-//                    Modules[Modules.PRINT_EOD].click(this)
                 }
                 R.id.key_download_button -> {
-                    posParameters.downloadKeysAsync(dialogProvider, true)
+                    mainScope.launch { downloadKeys() }
                 }
                 R.id.parameter_download_button -> {
-                    posParameters.downloadParametersAsync(dialogProvider)
+                    mainScope.launch { downloadParameters() }
                 }
                 R.id.capk_download_button -> {
                     mainScope.launch {
                         dialogProvider.showProgressBar("Downloading CAPK")
-                        val (response, error) = posParameters.downloadCapk()
+                        val (_, error) = safeRunIO {
+                            parameters.downloadCapk(this@CardMainMenuActivity)
+                        }
                         dialogProvider.hideProgressBar()
                         if (error != null) return@launch dialogProvider.showError(error)
                         dialogProvider.showSuccess("CAPK Download successful")
-                        posParameters.capkList = response
                     }
                 }
                 R.id.emv_aid_download_button -> {
                     mainScope.launch {
                         dialogProvider.showProgressBar("Downloading EMV AID")
-                        val (response, error) = posParameters.downloadAid()
+                        val (_, error) = safeRunIO {
+                            parameters.downloadAid(this@CardMainMenuActivity)
+                        }
                         dialogProvider.hideProgressBar()
                         if (error != null) return@launch dialogProvider.showError(error)
                         dialogProvider.showSuccess("EMV AID Download successful")
-                        posParameters.emvAidList = response
                     }
                 }
 
                 else -> showError("This function is disabled.")
             }
         }
+    }
+
+    private suspend fun checkKeysAndParameters() {
+        val localDate = Instant.now().format("MMdd")
+        if (localDate == parameters.updatedAt) return
+
+        dialogProvider.showProgressBar("Downloading Keys and Parameters")
+        val (_, error) = safeRunIO {
+            parameters.downloadKeys(this@CardMainMenuActivity)
+            parameters.downloadParameters(this@CardMainMenuActivity)
+        }
+        dialogProvider.hideProgressBar()
+        if (error != null) {
+            dialogProvider.showError("Download Failed. ${error.message}")
+            return
+        }
+
+        parameters.updatedAt = localDate
+        dialogProvider.showSuccess("Download successful")
+    }
+
+    private suspend fun downloadKeys() {
+        dialogProvider.showProgressBar("Downloading Keys")
+        val (_, error) = safeRunIO {
+            parameters.downloadKeys(this@CardMainMenuActivity)
+        }
+        dialogProvider.hideProgressBar()
+        if (error != null) {
+            dialogProvider.showError("Download Failed. ${error.message}")
+            return
+        }
+
+        parameters.updatedAt = Instant.now().format("MMdd")
+        dialogProvider.showSuccess("Download successful")
+    }
+
+    private suspend fun downloadParameters() {
+        dialogProvider.showProgressBar("Downloading Parameters")
+        val (_, error) = safeRunIO {
+            parameters.downloadParameters(this@CardMainMenuActivity)
+        }
+        dialogProvider.hideProgressBar()
+        if (error != null) {
+            dialogProvider.showError("Download Failed. ${error.message}")
+            return
+        }
+
+        parameters.updatedAt = Instant.now().format("MMdd")
+        dialogProvider.showSuccess("Download successful")
     }
 
     override fun goBack(v: View) {

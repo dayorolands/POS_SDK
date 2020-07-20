@@ -1,9 +1,9 @@
 package com.appzonegroup.creditclub.pos.card
 
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
-import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
+import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
 import org.jpos.iso.ISOException
@@ -12,7 +12,6 @@ import org.json.JSONException
 import java.io.IOException
 import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
-import java.util.*
 
 open class CardIsoMsg : BaseIsoMsg() {
     var acquiringInstIdCode32: String?
@@ -180,7 +179,7 @@ open class CardIsoMsg : BaseIsoMsg() {
         }
     }
 
-    fun withParameters(params: ParameterService.ParameterObject) {
+    fun withParameters(params: PosParameter.ManagementData) {
         cardAcceptorIdCode42 = params.cardAcceptorId
         cardAcceptorNameLocation43 = params.cardAcceptorLocation
         currencyCode49 = params.countryCode

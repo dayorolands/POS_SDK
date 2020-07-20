@@ -3,6 +3,7 @@ package com.appzonegroup.creditclub.pos
 import android.app.Application
 import androidx.work.*
 import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
@@ -11,7 +12,6 @@ import com.appzonegroup.creditclub.pos.work.ReversalWorker
 import com.appzonegroup.creditclub.pos.work.TransactionLogWorker
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
-import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
@@ -57,10 +57,12 @@ fun Application.startPosApp() {
             .build()
     )
 
-    if (get<ConfigService>().terminalId.isNotEmpty()) {
-        get<ParameterService>().downloadKeysAsync()
-        get<CallHomeService>().startCallHomeTimer()
-    }
+//    if (get<ConfigService>().terminalId.isNotEmpty()) {
+//        GlobalScope.launch(Dispatchers.Main) {
+//            safeRunIO { get<PosParameter>().downloadKeys() }
+//        }
+//        get<CallHomeService>().startCallHomeTimer()
+//    }
 }
 
 fun loadPosModules() {
@@ -69,8 +71,8 @@ fun loadPosModules() {
         single<PosConfig> { ConfigService.getInstance(androidContext()) }
         single { ConfigService.getInstance(androidContext()) }
         single { PosDatabase.getInstance(androidContext()) }
-        single<PosParameter> { ParameterService.getInstance(androidContext()) }
-        single { ParameterService.getInstance(androidContext()) }
-        single { CallHomeService.getInstance(get(), get(), androidContext()) }
+        single<PosParameter>(override = true) { ParameterService(androidContext()) }
+        single { CallHomeService() }
+        single { IsoSocketHelper(get(), get(), androidContext()) }
     })
 }

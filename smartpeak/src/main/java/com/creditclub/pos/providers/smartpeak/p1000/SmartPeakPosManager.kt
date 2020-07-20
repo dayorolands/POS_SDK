@@ -2,13 +2,6 @@ package com.creditclub.pos.providers.smartpeak.p1000
 
 import android.content.Context
 import android.content.Intent
-import com.creditclub.pos.PosManager
-import com.creditclub.pos.PosManagerCompanion
-import com.creditclub.pos.card.CardData
-import com.creditclub.pos.card.CardReader
-import com.creditclub.pos.card.CardReaderEvent
-import com.creditclub.pos.card.CardReaderEventListener
-import com.creditclub.pos.printer.PosPrinter
 import com.basewin.database.DataBaseManager
 import com.basewin.define.InputPBOCInitData
 import com.basewin.define.KeyType
@@ -17,8 +10,12 @@ import com.basewin.log.LogUtil
 import com.basewin.services.ServiceManager
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.pos.PosConfig
-import com.creditclub.pos.PosParameter
+import com.creditclub.pos.*
+import com.creditclub.pos.card.CardData
+import com.creditclub.pos.card.CardReader
+import com.creditclub.pos.card.CardReaderEvent
+import com.creditclub.pos.card.CardReaderEventListener
+import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.pos.providers.smartpeak.p1000.pboc.utils.OfflineTransactionListener
 import com.creditclub.pos.providers.smartpeak.p1000.utils.GlobalData
 import com.pos.sdk.card.PosCardInfo
@@ -49,6 +46,10 @@ class SmartPeakPosManager(val activity: CreditClubActivity) : PosManager, KoinCo
 
     override fun cleanUpEmv() {
 
+    }
+
+    override suspend fun startTransaction(): TransactionResponse {
+        throw NotImplementedError("An operation is not implemented")
     }
 
     inner class SmartPeakCardReader : CardReader {

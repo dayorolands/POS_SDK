@@ -1,10 +1,12 @@
 package com.appzonegroup.creditclub.pos
 
 import android.os.Bundle
+import com.appzonegroup.creditclub.pos.models.messaging.FinancialAdviceMessage
 import com.creditclub.pos.card.CardData
-import com.appzonegroup.creditclub.pos.models.messaging.*
+import com.creditclub.pos.card.TransactionType
 
 class SalesCompleteActivity : CardTransactionActivity() {
+    override var transactionType = TransactionType.SalesComplete
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

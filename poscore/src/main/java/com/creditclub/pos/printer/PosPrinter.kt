@@ -55,6 +55,4 @@ interface PosPrinter {
         message: String = "Printing...",
         retryOnFail: Boolean = true
     ): PrinterStatus
-
-    fun print(nodes: List<PrintNode>): PrinterStatus
 }

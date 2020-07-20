@@ -2,7 +2,6 @@ package com.appzonegroup.creditclub.pos.service
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.net.ConnectivityManager
 import com.appzonegroup.creditclub.pos.util.AppConstants
 import com.appzonegroup.creditclub.pos.util.PosMode
 import com.creditclub.core.util.delegates.valueStore
@@ -83,27 +82,6 @@ open class ConfigService protected constructor(
         set(value) {
             posModeStr = value.id
         }
-
-    fun resetNetwork() {
-        apn = AppConstants.APN
-        host = AppConstants.HOST
-        terminalId = AppConstants.TID
-        port = AppConstants.PORT
-        ip = AppConstants.IP
-        callHome = AppConstants.CALL_HOME
-    }
-
-    fun getApnInfo(context: Context): String {
-        val mag = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        try {
-            val mobInfo = mag.activeNetworkInfo
-            return mobInfo?.extraInfo ?: "No active network. Turn on mobile data"
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-        }
-
-        return "No active network. Turn on mobile data"
-    }
 
     companion object {
         private var INSTANCE: ConfigService? = null

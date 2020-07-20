@@ -26,11 +26,12 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 import java.util.*
 
 class NewWalletActivity : CreditClubActivity(R.layout.activity_open_account) {
     private val binding by dataBinding<ActivityOpenAccountBinding>()
-    private val printer: PosPrinter by inject()
+    private val printer: PosPrinter by inject { parametersOf(this, dialogProvider) }
     private val viewModel by viewModels<OpenAccountViewModel>()
     private val receipt by lazy { NewAccountReceipt(this) }
     private val request by lazy { CustomerRequest().apply { uniqueReferenceID = Misc.getGUID() } }
