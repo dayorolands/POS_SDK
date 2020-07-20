@@ -16,20 +16,21 @@ import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
 import com.creditclub.core.data.request.CustomerRequest
 import com.creditclub.core.data.response.BackendResponse
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
+import com.creditclub.pos.printer.PosPrinter
+import com.creditclub.pos.printer.PrinterStatus
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import org.koin.android.ext.android.inject
 import java.util.*
 
 class NewWalletActivity : CreditClubActivity(R.layout.activity_open_account) {
     private val binding by dataBinding<ActivityOpenAccountBinding>()
-    private val printer by lazy { PosPrinter(this, dialogProvider) }
+    private val printer: PosPrinter by inject()
     private val viewModel by viewModels<OpenAccountViewModel>()
     private val receipt by lazy { NewAccountReceipt(this) }
     private val request by lazy { CustomerRequest().apply { uniqueReferenceID = Misc.getGUID() } }
