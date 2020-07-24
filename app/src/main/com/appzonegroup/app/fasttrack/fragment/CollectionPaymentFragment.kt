@@ -223,7 +223,10 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value
-            collectionType = viewModel.collectionType.value
+            collectionType = viewModel.run {
+                if (collectionTypeIsCbs.value == true && isOffline.value == true) "WEBGUID"
+                else collectionType.value
+            }
             itemCode = viewModel.itemCode.value
             amount = viewModel.amountString.value?.toDouble()
             geoLocation = gps.geolocationString

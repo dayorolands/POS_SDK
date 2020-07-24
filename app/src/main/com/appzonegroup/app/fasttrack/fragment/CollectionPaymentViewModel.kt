@@ -31,6 +31,7 @@ class CollectionPaymentViewModel : ViewModel() {
     val customer: MutableLiveData<CollectionCustomer> = MutableLiveData()
 
     val referenceName = Transformations.map(collectionReference) { it?.referenceName }
+    val paymentReferenceName: MutableLiveData<String> = MutableLiveData()
     val customerPhoneNumber: MutableLiveData<String> = MutableLiveData()
     val customerName = Transformations.map(customer) { it?.name }
     val amountString = MutableLiveData<String>()

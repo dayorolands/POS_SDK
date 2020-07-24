@@ -226,7 +226,7 @@ class CollectionReferenceGenerationFragment :
             amount = binding.amountInput.value.toDoubleOrNull()
             geoLocation = gps.geolocationString
             currency = "NGN"
-            referenceName = viewModel.customer.value?.name
+            referenceName = viewModel.paymentReferenceName.value
             institutionCode = localStorage.institutionCode
             agentPhoneNumber = localStorage.agentPhone
             collectionService = viewModel.collectionService.value
