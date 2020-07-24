@@ -172,4 +172,10 @@ interface StaticService {
         @Query("AgentPhoneNumber") agentPhoneNumber: String?,
         @Query("AppVersionName") appVersionName: String?
     ): ApiResponse<List<SurveyQuestion>>
+
+    @GET("CreditClubStatic/GetBINRoutes")
+    suspend fun getBinRoutes(
+        @Query("InstitutionCode") institutionCode: String?,
+        @Query("AgentPhoneNumber") agentPhoneNumber: String?
+    ): ApiResponse<List<BinRoutes>>
 }

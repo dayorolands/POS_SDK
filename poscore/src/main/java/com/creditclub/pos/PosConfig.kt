@@ -10,4 +10,5 @@ interface PosConfig {
      var supervisorPin: String
      var adminPin: String
      var remoteConnectionInfo: RemoteConnectionInfo
+     var sslEnabled: Boolean
 }

@@ -150,6 +150,11 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
         binding.portItem.cont.setOnClickListener(this)
         binding.terminalIdItem.cont.setOnClickListener(this)
         binding.callHomeItem.cont.setOnClickListener(this)
+        binding.sslEnabledItem.setOnClickListener {
+            val isChecked = !binding.sslEnabledCheck.isChecked
+            config.sslEnabled = isChecked
+            binding.sslEnabledCheck.isChecked = isChecked
+        }
 
         binding.posModeItem.run {
             val posModeOptions = PosMode.values().map { DialogOptionItem(it.label) }
@@ -223,6 +228,7 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
         binding.callHome = "Call Home interval in seconds: " + config.callHome
         binding.terminalId = config.terminalId
         binding.posMode = config.remoteConnectionInfo.label
+        binding.sslEnabledCheck.isChecked = config.sslEnabled
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -24,7 +24,7 @@ class ReversalWorker(context: Context, params: WorkerParameters) :
         val config: PosConfig by inject()
         val parameters: PosParameter by inject()
         val firebaseAnalytics by lazy { FirebaseAnalytics.getInstance(applicationContext) }
-        val isoSocketHelper by lazy { IsoSocketHelper(config, parameters, applicationContext) }
+        val isoSocketHelper by lazy { IsoSocketHelper(config, parameters) }
         val localStorage: LocalStorage by inject()
 
         val reversalDao = posDatabase.reversalDao()

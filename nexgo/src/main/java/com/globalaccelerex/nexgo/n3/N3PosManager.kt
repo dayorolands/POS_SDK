@@ -129,7 +129,7 @@ class N3PosManager(val activity: CreditClubActivity) : PosManager, KoinComponent
             factory<PosPrinter>(override = true) { (activity: Activity, dialogProvider: DialogProvider) ->
                 N3Printer(activity, dialogProvider)
             }
-            factory<PosParameter>(override = true) { N3ParameterStore(androidContext()) }
+            single<PosParameter>(override = true) { N3ParameterStore(androidContext()) }
         }
 
         override fun isCompatible(context: Context): Boolean {

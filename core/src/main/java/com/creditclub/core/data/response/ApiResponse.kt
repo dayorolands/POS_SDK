@@ -18,6 +18,8 @@ open class ApiResponse<T> {
 
     @SerialName("Data")
     var data: T? = null
+
+    fun isSuccessful() = status == "00"
 }
 
 val ApiResponse<*>?.isSuccessful: Boolean get() = this?.status == "00"

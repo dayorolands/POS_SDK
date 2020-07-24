@@ -1,11 +1,11 @@
 package com.creditclub.pos.providers.smartpeak.p1000
 
 import android.content.Context
+import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.pos.printer.PrintJob
 import com.creditclub.pos.printer.PrintNode
 import com.creditclub.pos.printer.PrinterStatus
-import com.creditclub.core.ui.widget.DialogProvider
 
 class SmartPeakPrinter(override val context: Context, override val dialogProvider: DialogProvider) :
     PosPrinter {
@@ -26,10 +26,6 @@ class SmartPeakPrinter(override val context: Context, override val dialogProvide
         message: String,
         retryOnFail: Boolean
     ): PrinterStatus {
-        return PrinterStatus.READY
-    }
-
-    override fun print(nodes: List<PrintNode>): PrinterStatus {
         return PrinterStatus.READY
     }
 }

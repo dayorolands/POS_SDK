@@ -1,10 +1,6 @@
 package com.creditclub.pos.printer
 
 import android.content.Context
-import com.creditclub.pos.printer.PosPrinter
-import com.creditclub.pos.printer.PrintJob
-import com.creditclub.pos.printer.PrintNode
-import com.creditclub.pos.printer.PrinterStatus
 import com.creditclub.core.ui.widget.DialogProvider
 
 class MockPosPrinter(override val context: Context, override val dialogProvider: DialogProvider) :
@@ -26,10 +22,6 @@ class MockPosPrinter(override val context: Context, override val dialogProvider:
         message: String,
         retryOnFail: Boolean
     ): PrinterStatus {
-        return PrinterStatus.READY
-    }
-
-    override fun print(nodes: List<PrintNode>): PrinterStatus {
         return PrinterStatus.READY
     }
 }

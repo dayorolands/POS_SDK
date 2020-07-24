@@ -71,6 +71,7 @@ class LoginActivity : CreditClubActivity() {
             firebaseAnalytics.setUserId(localStorage.agent?.agentCode)
         }
         mainScope.launch { (application as CreditClubApplication).getLatestVersion() }
+        mainScope.launch { updateBinRoutes() }
 
         if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
             dialogProvider.showError("Timeout due to inactivity")
@@ -86,6 +87,18 @@ class LoginActivity : CreditClubActivity() {
 
         downloadBannerImages()
         downloadSurveyQuestions()
+    }
+
+    private suspend fun updateBinRoutes() {
+        val (response) = safeRunIO {
+            creditClubMiddleWareAPI.staticService.getBinRoutes(
+                localStorage.institutionCode,
+                localStorage.agentPhone
+            )
+        }
+        if (response?.isSuccessful() == true) {
+            localStorage.binRoutes = response.data
+        }
     }
 
     private fun checkLocalSurveyQuestions() {

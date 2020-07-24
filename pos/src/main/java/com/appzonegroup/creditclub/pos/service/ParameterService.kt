@@ -13,13 +13,18 @@ import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.delegates.jsonArrayStore
 import com.creditclub.core.util.delegates.stringStore
+import com.creditclub.core.util.format
 import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
-import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
+import com.creditclub.pos.RemoteConnectionInfo
+import com.creditclub.pos.utils.nonNullStringStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import org.jpos.iso.ISOMsg
 import org.jpos.iso.ISOUtil
 import org.json.JSONArray
@@ -36,59 +41,38 @@ import java.util.*
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/27/2019.
  * Appzone Ltd
  */
-open class ParameterService(context: Context) : PosParameter, KoinComponent {
-    private val prefs: SharedPreferences = context.getSharedPreferences("Parameters", 0)
+class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) : PosParameter,
+    KoinComponent {
+    private val prefs: SharedPreferences = run {
+        val route = posMode?.id ?: config.remoteConnectionInfo.id
+        context.getSharedPreferences("Parameters~${route}", 0)
+    }
     private val config: PosConfig by inject()
     private val database: PosDatabase by inject()
     private val localStorage: LocalStorage by inject()
     private val gps: TrackGPS by inject()
+    private val json = Json(
+        JsonConfiguration.Stable.copy(
+            isLenient = true,
+            ignoreUnknownKeys = true,
+            serializeSpecialFloatingPointValues = true,
+            useArrayPolymorphism = true
+        )
+    )
 
-    override var masterKey = prefs.getString("MasterKey", "") as String
-        set(value) {
-            field = value
-            prefs.edit().putString("MasterKey", value).apply()
-        }
+    override var masterKey by prefs.nonNullStringStore("MasterKey")
+    override var sessionKey by prefs.nonNullStringStore("SessionKey")
+    override var pinKey by prefs.nonNullStringStore("PinKey")
 
-    override var sessionKey = prefs.getString("SessionKey", "") as String
-        set(value) {
-            field = value
-            prefs.edit().putString("SessionKey", value).apply()
-        }
-
-    override var pinKey = prefs.getString("PinKey", "") as String
-        set(value) {
-            field = value
-            prefs.edit().putString("PinKey", value).apply()
-        }
-
-    override val managementData: PosParameter.ManagementData
-        get() = parameters
-
-    override var managementDataString: String
-        get() = pfmd
-        set(value) {
-            pfmd = value
-        }
-
-    open var pfmd = prefs.getString("PFMD", "{}") as String
-        set(value) {
-            field = value
-            prefs.edit().putString("PFMD", value).apply()
-        }
-
+    override var managementDataString by prefs.nonNullStringStore("PFMD", "{}")
     override var updatedAt by prefs.stringStore("UpdatedAt")
-
     override var capkList by prefs.jsonArrayStore("CAPK_ARRAY")
-
     override var emvAidList by prefs.jsonArrayStore("EMV_APP_ARRAY")
 
-    val parameters: ParameterObject
-        get() = try {
-            Gson().fromJson(managementDataString, ParameterObject::class.java)
-        } catch (ex: java.lang.Exception) {
-            ex.printStackTrace()
-            ParameterObject()
-        }
+    override val managementData
+        get() = safeRun {
+            json.parse(ParameterObject.serializer(), managementDataString)
+        }.data ?: ParameterObject()
 
     override suspend fun downloadKeys(activity: ComponentActivity) {
         withContext(Dispatchers.Default) {
@@ -316,7 +300,7 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
 
         println("Secured connection performed successfully")
 
-        pfmd = TerminalUtils.parsePrivateFieldData(isoMsg.getString(62))
+        managementDataString = TerminalUtils.parsePrivateFieldData(isoMsg.getString(62))
             ?: throw ParameterDownloadException("")
     }
 
@@ -503,20 +487,21 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
     class EmvAidDownloadException(message: String) :
         Exception("EMV Application AID Download Failed. $message")
 
+    @Serializable
     class ParameterObject : PosParameter.ManagementData {
-        @SerializedName("03")
+        @SerialName("03")
         override var cardAcceptorId = ""
 
-        @SerializedName("05")
+        @SerialName("05")
         override var currencyCode = ""
 
-        @SerializedName("06")
+        @SerialName("06")
         override var countryCode = ""
 
-        @SerializedName("08")
+        @SerialName("08")
         override var merchantCategoryCode = ""
 
-        @SerializedName("52")
+        @SerialName("52")
         override var cardAcceptorLocation = ""
     }
 }

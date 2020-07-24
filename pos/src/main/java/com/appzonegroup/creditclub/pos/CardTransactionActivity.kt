@@ -19,17 +19,17 @@ import com.appzonegroup.creditclub.pos.card.cardTransactionType
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.data.create
 import com.appzonegroup.creditclub.pos.databinding.*
-import com.appzonegroup.creditclub.pos.extension.format
+import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.models.*
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
 import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.service.ApiService
+import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
-import com.creditclub.core.util.indicateError
-import com.creditclub.core.util.localStorage
-import com.creditclub.core.util.showErrorAndWait
-import com.creditclub.core.util.showSuccessAndWait
+import com.appzonegroup.creditclub.pos.util.PosMode
+import com.creditclub.core.data.model.getSupportedRoute
+import com.creditclub.core.util.*
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
@@ -304,7 +304,13 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
     fun makeRequest(request: CardIsoMsg) {
         pendingRequest = request
         stopTimer()
+        val amount = amountText.toDouble() / 100
+        val supportedRoute = localStorage.binRoutes?.getSupportedRoute(request.pan!!, amount)
+        val remoteConnectionInfo = if (supportedRoute != null) PosMode.valueOf(supportedRoute)
+        else config.remoteConnectionInfo
 
+        val posParameter = ParameterService(this, remoteConnectionInfo)
+        val isoSocketHelper = IsoSocketHelper(config, posParameter)
         GlobalScope.launch(Dispatchers.Main) {
             if (cardData.pinBlock.isEmpty()) {
                 dialogProvider.showProgressBar("Pin Ok")

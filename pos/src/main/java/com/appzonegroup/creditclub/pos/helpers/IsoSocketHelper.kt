@@ -1,6 +1,5 @@
 package com.appzonegroup.creditclub.pos.helpers
 
-import android.content.Context
 import android.os.Looper
 import android.util.Log
 import com.appzonegroup.creditclub.pos.card.CardIsoMsg
@@ -29,8 +28,7 @@ import java.net.ConnectException
  */
 class IsoSocketHelper(
     val config: PosConfig,
-    val parameters: PosParameter,
-    context: Context
+    val parameters: PosParameter
 ) : KoinComponent {
     private val tag = IsoSocketHelper::class.java.simpleName
 
