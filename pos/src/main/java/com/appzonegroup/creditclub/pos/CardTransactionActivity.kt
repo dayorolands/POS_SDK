@@ -95,11 +95,14 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
             parameters.managementDataString.isEmpty() -> {
                 finishWithError("Please perform parameter download before proceeding")
             }
-            parameters.capkList == null -> {
-                finishWithError("Please perform CAPK download before proceeding")
-            }
-            parameters.emvAidList == null -> {
-                finishWithError("Please perform EMV AID download before proceeding")
+//            parameters.capkList == null -> {
+//                finishWithError("Please perform CAPK download before proceeding")
+//            }
+//            parameters.emvAidList == null -> {
+//                finishWithError("Please perform EMV AID download before proceeding")
+//            }
+            else -> {
+
             }
         }
     }

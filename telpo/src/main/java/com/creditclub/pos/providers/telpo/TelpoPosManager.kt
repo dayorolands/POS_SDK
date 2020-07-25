@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 04/12/2019.
  * Appzone Ltd
  */
-class TelpoPosManager(val activity: CreditClubActivity) : PosManager, KoinComponent {
+class TelpoPosManager(private val activity: CreditClubActivity) : PosManager, KoinComponent {
     override val cardReader by lazy { TelpoCardReader(activity, emvListener) }
     private val posParameter: PosParameter by inject()
     private val emvListener by lazy {
@@ -51,10 +51,10 @@ class TelpoPosManager(val activity: CreditClubActivity) : PosManager, KoinCompon
         EmvService.Emv_RemoveAllApp()
         EmvService.Emv_RemoveAllCapk()
 
-//        StableAPPCAPK.Add_All_APP()
-//        StableAPPCAPK.Add_All_CAPK()
-        injectAid()
-        injectCapk()
+        StableAPPCAPK.Add_All_APP()
+        StableAPPCAPK.Add_All_CAPK()
+//        injectAid()
+//        injectCapk()
     }
 
     override fun cleanUpEmv() {

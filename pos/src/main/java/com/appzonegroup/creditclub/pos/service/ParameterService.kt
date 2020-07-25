@@ -44,7 +44,7 @@ import java.util.*
 class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) : PosParameter,
     KoinComponent {
     private val prefs: SharedPreferences = run {
-        val route = posMode?.id ?: config.remoteConnectionInfo.id
+        val route = posMode?.id ?: "Default"
         context.getSharedPreferences("Parameters~${route}", 0)
     }
     private val config: PosConfig by inject()
