@@ -29,8 +29,9 @@ android {
 dependencies {
     implementation project(path: ':core')
     implementation project(path: ':poscore')
+    implementation fileTree(dir: 'jniLibs', include: ['*.so'])
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    
+
     implementation files('libs/emv.jar')
     implementation files('libs/core-3.1.0.jar')
     implementation files('libs/SmartCardLib.jar')
