@@ -121,17 +121,26 @@
                     android:orientation="horizontal"
                     app:goneUnless="@{viewModel.collectionTypeIsCbs}">
 
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="@={viewModel.isOffline}"
+                        android:text="Offline Bill"
+                        app:goneUnlessPresent="@{viewModel.referenceString}" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Don't have a reference yet? " />
+                        android:text="Don't have a reference yet? "
+                        app:goneIfPresent="@{viewModel.referenceString}" />
 
                     <Button
                         android:id="@+id/generate_offline_bill_button"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Generate Offline Bill" />
+                        android:text="Generate Offline Bill"
+                        app:goneIfPresent="@{viewModel.referenceString}" />
                 </LinearLayout>
 
                 <LinearLayout

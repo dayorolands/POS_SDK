@@ -67,6 +67,26 @@ class CollectionPaymentViewModel : ViewModel() {
         }
 
         @JvmStatic
+        @BindingAdapter("app:goneIfPresent")
+        fun goneIfPresent(view: View, data: LiveData<*>) {
+            val visible = when (data.value) {
+                is String? -> (data.value as? String).isNullOrBlank()
+                else -> data.value == null
+            }
+            view.visibility = if (visible) View.VISIBLE else View.GONE
+        }
+
+        @JvmStatic
+        @BindingAdapter("app:goneUnlessPresent")
+        fun goneUnlessPresent(view: View, data: LiveData<*>) {
+            val visible = when (data.value) {
+                is String? -> !(data.value as? String).isNullOrBlank()
+                else -> data.value != null
+            }
+            view.visibility = if (visible) View.VISIBLE else View.GONE
+        }
+
+        @JvmStatic
         @BindingAdapter("app:showEndIconIfPresent")
         fun showEndIconIfPresent(textInputLayout: TextInputLayout, data: LiveData<*>) {
             textInputLayout.isEndIconVisible = when (data.value) {

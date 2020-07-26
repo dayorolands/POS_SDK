@@ -109,10 +109,7 @@ class CollectionReferenceGenerationFragment :
     private suspend fun loadCategories() = viewModel.categoryList.download("categories") {
         creditClubMiddleWareAPI.collectionsService.getCollectionCategories(
             localStorage.institutionCode,
-            viewModel.run {
-                if (collectionTypeIsCbs.value == true && args.offline) "WEBGUID"
-                else collectionType.value
-            },
+            derivedCollectionType,
             viewModel.region.value,
             viewModel.collectionService.value
         )
@@ -215,11 +212,7 @@ class CollectionReferenceGenerationFragment :
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value
-            collectionType = viewModel.run {
-                if (collectionTypeIsCbs.value == true && args.offline) "WEBGUID"
-                else collectionType.value
-            }
-
+            collectionType = derivedCollectionType
             itemCode = if (args.offline) "4000000"
             else viewModel.itemCode.value
 
@@ -261,4 +254,10 @@ class CollectionReferenceGenerationFragment :
         viewModel.amountString.value = response.amount?.toString()
         findNavController().popBackStack()
     }
+
+    private inline val derivedCollectionType
+        get() = viewModel.run {
+            if (collectionTypeIsCbs.value == true && args.offline) "WEBGUID"
+            else collectionType.value
+        }
 }
