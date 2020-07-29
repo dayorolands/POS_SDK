@@ -4,4 +4,15 @@
     <string name="institution_name">Polaris Bank</string>
     <string name="institution_website">https://www.polarisbanklimited.com</string>
     <string name="funds_transfer_same_bank">Polaris Bank</string>
+    <string-array name="transaction_types">
+        <item>CashIn</item>
+        <item>CashOut</item>
+        <item>POSCashOut</item>
+        <item>Recharge</item>
+        <item>BillsPayment</item>
+        <item>Registration</item>
+        <item>FundsTransferCommercialBank</item>
+        <item>LocalFundsTransfer</item>
+        <item>CollectionPayment</item>
+    </string-array>
 </resources>

@@ -21,7 +21,7 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
 
     override var hasHlaTagging: Boolean = false
 
-    override var transactionTypes: List<TransactionType> = TransactionType.values().toList()
+    override var transactionTypes: List<TransactionType> = emptyList()
 
     override var flows: FlowConfig = FlowConfig()
 
@@ -41,6 +41,9 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
                 tokenWithdrawal.customerPin =
                     resources.getBoolean(R.bool.token_withdrawal_customer_pin)
 
+                accountOpening.products =
+                    resources.getBoolean(R.bool.account_opening_products)
+
                 if (!resources.getBoolean(R.bool.flow_bvn_update)) {
                     bvnUpdate = null
                 }
@@ -52,10 +55,18 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
                 if (!resources.getBoolean(R.bool.flow_wallet_opening)) {
                     walletOpening = null
                 }
+
+                if (!resources.getBoolean(R.bool.collections_enabled)) {
+                    collectionPayment = null
+                }
             }
 
             config.categories.run {
                 loans = resources.getBoolean(R.bool.category_loan)
+            }
+
+            config.transactionTypes = resources.getStringArray(R.array.transaction_types).map {
+                TransactionType.valueOf(it)
             }
 
             // Manual overrides for creditclub variant
@@ -64,13 +75,17 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
 
                 config.name = when (institutionCode) {
                     "100567" -> "Sterling Bank"
-                    "100568" -> "TCF MFB"
+                    "100568", "100309" -> "TCF MFB"
                     else -> "My Bank"
                 }
 
-                if (institutionCode == "100568") {
+                val isTcfBank = institutionCode == "100568" || institutionCode == "100309"
+
+                if (isTcfBank) {
                     config.categories.loans = false
                     config.hasHlaTagging = false
+                    config.hasOnlineFunctions = false
+                    config.flows.bvnUpdate = null
                 }
             }
 

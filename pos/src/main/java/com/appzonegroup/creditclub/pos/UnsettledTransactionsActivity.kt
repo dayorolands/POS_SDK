@@ -6,7 +6,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.creditclub.pos.adapter.PosNotificationAdapter
-import com.appzonegroup.creditclub.pos.contract.Logger
 import com.appzonegroup.creditclub.pos.models.NotificationResponse
 import com.appzonegroup.creditclub.pos.models.PosNotification
 import com.appzonegroup.creditclub.pos.models.view.NotificationViewModel
@@ -14,16 +13,11 @@ import com.appzonegroup.creditclub.pos.service.ApiService
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_pending_confirmation.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.Headers
 
-class UnsettledTransactionsActivity : PosActivity(), Logger {
-
-    override val tag: String
-        get() = "Unsettled Transactions"
-
+class UnsettledTransactionsActivity : PosActivity() {
     private val viewModel by lazy {
         ViewModelProviders.of(this).get(NotificationViewModel::class.java)
     }
@@ -31,19 +25,17 @@ class UnsettledTransactionsActivity : PosActivity(), Logger {
     private val rAdapter by lazy {
         PosNotificationAdapter(emptyList()) {
             onSettle { posNotification ->
-                GlobalScope.launch(Dispatchers.Main) {
+                mainScope.launch {
                     dialogProvider.showProgressBar("Settling")
 
-                    log("Running middleware notifications....")
-
-                    val url = "${ApiService.BASE_URL}/POSCashOutNotification"
+                    val url =
+                        "${backendConfig.apiHost}/CreditClubMiddlewareAPI/CreditClubStatic/POSCashOutNotification"
                     val serializer = Gson()
 
                     val dataToSend = serializer.toJson(posNotification)
-                    log("PosNotification request: $dataToSend")
 
                     val headers = Headers.Builder()
-                    headers.add("Authorization", "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}")
+                    headers.add("Authorization", "iRestrict ${backendConfig.posNotificationToken}")
                     headers.add("TerminalID", config.terminalId)
 
                     val (responseString, error) = withContext(Dispatchers.IO) {
@@ -51,11 +43,10 @@ class UnsettledTransactionsActivity : PosActivity(), Logger {
                     }
                     dialogProvider.hideProgressBar()
 
-                    responseString ?: return@launch showError("A network error occurred. Please try again later")
+                    responseString
+                        ?: return@launch showError("A network error occurred. Please try again later")
 
                     error?.printStackTrace()
-
-                    log("PosNotification response: $responseString")
 
                     try {
                         val notificationResponse =
@@ -87,7 +78,10 @@ class UnsettledTransactionsActivity : PosActivity(), Logger {
             layoutManager = LinearLayoutManager(this@UnsettledTransactionsActivity)
         }
 
-        viewModel.unsettledTransactions.observe(this, Observer<List<PosNotification>>(rAdapter::setData))
+        viewModel.unsettledTransactions.observe(
+            this,
+            Observer<List<PosNotification>>(rAdapter::setData)
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

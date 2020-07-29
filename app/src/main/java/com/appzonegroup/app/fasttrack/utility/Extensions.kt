@@ -2,13 +2,19 @@ package com.appzonegroup.app.fasttrack.utility
 
 import android.app.Activity
 import android.content.Intent
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.*
+import com.appzonegroup.app.fasttrack.fragment.HomeFragmentDirections
+import com.appzonegroup.app.fasttrack.fragment.SubMenuFragmentDirections
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.model.CustomerAccount
 import com.appzonegroup.creditclub.pos.CardMainMenuActivity
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.model.BillCategory
 import com.creditclub.core.type.CustomerRequestOption
+import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.customerBalanceEnquiry
 import com.creditclub.core.util.logFunctionUsage
 import com.creditclub.core.util.requireAccountInfo
@@ -26,13 +32,18 @@ fun Activity.logout(block: (Intent.() -> Unit)? = null) {
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
+    intent.putExtra("LOGGED_OUT", true)
+
     if (block != null) intent.apply(block)
 
     finish()
     startActivity(intent)
 }
 
-fun BaseActivity.openPageById(id: Int) {
+private val Fragment.baseContext get() = requireContext()
+private suspend fun Fragment.logFunctionUsage(fid: Int) = requireContext().logFunctionUsage(fid)
+
+fun CreditClubFragment.openPageById(id: Int) {
     when (id) {
         R.id.register_button -> startActivity(CustomerRequestOpenAccountActivity::class.java)
 
@@ -46,7 +57,7 @@ fun BaseActivity.openPageById(id: Int) {
             if (Platform.isPOS) {
                 ioScope.launch { logFunctionUsage(FunctionIds.CARD_TRANSACTIONS) }
 
-                val intent = Intent(this, CardMainMenuActivity::class.java)
+                val intent = Intent(requireContext(), CardMainMenuActivity::class.java)
                 intent.putExtra("SHOW_BACK_BUTTON", true)
                 startActivity(intent)
             }
@@ -74,7 +85,7 @@ fun BaseActivity.openPageById(id: Int) {
                 description = "Recharge your phone"
             }
 
-            val i = Intent(this, BillerActivity::class.java).apply {
+            val i = Intent(requireContext(), BillerActivity::class.java).apply {
                 putExtra("categoryId", billCategory.id)
                 LocalStorage.SaveValue(AppConstants.CATEGORYID, billCategory.id, baseContext)
 
@@ -91,8 +102,6 @@ fun BaseActivity.openPageById(id: Int) {
                     billCategory.propertyChanged,
                     baseContext
                 )
-
-                putExtra("customer", intent.getSerializableExtra("customer"))
                 putExtra("isAirtime", true)
             }
 
@@ -100,24 +109,23 @@ fun BaseActivity.openPageById(id: Int) {
         }
 
         R.id.pay_bill_button -> {
-//                getCustomer {
-//                    onSubmit { (customer) ->
-            startActivity(
-                Intent(
-                    this, BillsCategoryActivity::class.java
-                ).apply {
-                    putExtra("customer", CustomerAccount())
-                })
-//                    }
-//                }
+            findNavController().navigate(SubMenuFragmentDirections.actionMenuToBillPayment())
+        }
+
+        R.id.fn_bill_payment -> {
+            findNavController().navigate(HomeFragmentDirections.actionHomeToBillPayment())
         }
 
         R.id.customer_balance_enquiry_button -> {
             ioScope.launch { logFunctionUsage(FunctionIds.CUSTOMER_BALANCE_ENQUIRY) }
 //                startActivity(AccountDetailsActivity::class.java)
-            requireAccountInfo(options = arrayOf(CustomerRequestOption.AccountNumber)) {
+            (requireActivity() as CreditClubActivity).requireAccountInfo(
+                options = arrayOf(
+                    CustomerRequestOption.AccountNumber
+                )
+            ) {
                 onSubmit { accountInfo ->
-                    customerBalanceEnquiry(accountInfo)
+                    (requireActivity() as CreditClubActivity).customerBalanceEnquiry(accountInfo)
                 }
             }
         }
@@ -136,9 +144,16 @@ fun BaseActivity.openPageById(id: Int) {
 
         R.id.fn_faq -> startActivity(FaqActivity::class.java)
 
-        else -> showNotification(
-            "This function is not available at the moment. Please look out for it in our next update.",
-            false
+        R.id.collection_payment_button -> {
+            findNavController().navigate(R.id.action_menu_to_collection_payment)
+        }
+
+        R.id.fn_collections_payment -> {
+            findNavController().navigate(R.id.action_home_to_collection_payment)
+        }
+
+        else -> dialogProvider.showError(
+            "This function is not available at the moment. Please look out for it in our next update."
         )
     }
 }

@@ -5,4 +5,6 @@
     <item name="fn_support" type="id" />
     <item name="fn_faq" type="id" />
     <item name="fn_update" type="id" />
+    <item name="fn_collections_payment" type="id" />
+    <item name="fn_bill_payment" type="id" />
 </resources>

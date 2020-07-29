@@ -172,6 +172,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/twenty_five_dp"
                 android:hint="@string/narration_hint"
+                android:maxLength="40"
                 android:inputType="text" />
 
             <com.appzonegroup.app.fasttrack.ui.TextView

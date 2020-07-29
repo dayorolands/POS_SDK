@@ -26,7 +26,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/header"
-            android:background="#fff"
             tools:context=".CardMainMenuActivity">
 
             <LinearLayout
@@ -47,8 +46,8 @@
                     <include
                         android:id="@+id/cash_back_button"
                         layout="@layout/card_menu_button"
-                        app:src='@{@drawable/ic_purchase}'
                         android:visibility="gone"
+                        app:src='@{@drawable/ic_purchase}'
                         app:text='@{"Purchase with CashBack"}' />
 
                     <include
@@ -65,22 +64,22 @@
 
                     <include
                         android:id="@+id/auth_button"
-                        android:visibility="gone"
                         layout="@layout/card_menu_button"
+                        android:visibility="gone"
                         app:src='@{@drawable/ic_auth}'
                         app:text='@{"Pre auth"}' />
 
                     <include
                         android:id="@+id/sales_completion_button"
                         layout="@layout/card_menu_button"
-                        app:src='@{@drawable/ic_auth}'
                         android:visibility="gone"
+                        app:src='@{@drawable/ic_auth}'
                         app:text='@{"Sales Completion"}' />
 
                     <include
                         android:id="@+id/deposit_button"
-                        android:visibility="gone"
                         layout="@layout/card_menu_button"
+                        android:visibility="gone"
                         app:src='@{@drawable/ic_reversal}'
                         app:text='@{"deposit"}' />
 
@@ -101,8 +100,8 @@
                     <include
                         android:id="@+id/cash_adv_button"
                         layout="@layout/card_menu_button"
-                        app:src='@{@drawable/ic_cash_out}'
                         android:visibility="gone"
+                        app:src='@{@drawable/ic_cash_out}'
                         app:text='@{"cash adv"}' />
 
                     <include
@@ -138,8 +137,20 @@
                     <include
                         android:id="@+id/parameter_download_button"
                         layout="@layout/card_menu_button"
-                        app:src='@{@drawable/ic_schedule}'
+                        app:src='@{@drawable/ic_reprint}'
                         app:text='@{"Download Parameters"}' />
+
+                    <include
+                        android:id="@+id/capk_download_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_reprint}'
+                        app:text='@{"Download CAPK"}' />
+
+                    <include
+                        android:id="@+id/emv_aid_download_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_reprint}'
+                        app:text='@{"Download EMV AID"}' />
                 </com.google.android.flexbox.FlexboxLayout>
 
             </LinearLayout>

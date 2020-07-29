@@ -34,14 +34,18 @@
 
         </androidx.recyclerview.widget.RecyclerView>
 
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        <Button
             android:id="@+id/fab"
             style="@style/AppButton.RoundBlueButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/fab_margin"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="20dp"
+            android:width="130dp"
+            android:drawableStart="@drawable/ic_add_black"
+            android:drawableTint="@color/white"
             android:text="Log Case"
-            app:icon="@drawable/ic_add_black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

@@ -7,14 +7,14 @@ import com.appzonegroup.creditclub.pos.card.CardIsoMsg
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.extension.generateLog
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
-import com.appzonegroup.creditclub.pos.service.ConfigService
-import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.SocketJob
 import com.appzonegroup.creditclub.pos.util.TerminalUtils
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.safeRun
+import com.creditclub.pos.PosConfig
+import com.creditclub.pos.PosParameter
 import kotlinx.coroutines.*
 import org.jpos.iso.ISOException
 import org.koin.core.KoinComponent
@@ -28,8 +28,8 @@ import java.net.ConnectException
  * Appzone Ltd
  */
 class IsoSocketHelper(
-    val config: ConfigService,
-    val parameters: ParameterService,
+    val config: PosConfig,
+    val parameters: PosParameter,
     context: Context
 ) : KoinComponent {
     private val tag = IsoSocketHelper::class.java.simpleName
@@ -41,7 +41,7 @@ class IsoSocketHelper(
     @Throws(ISOException::class, IOException::class, ConnectException::class)
     inline fun sendAsync(isoMsg: BaseIsoMsg, crossinline next: (Result) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
-            val result = withContext(Dispatchers.Default) {
+            val result = withContext(Dispatchers.IO) {
                 send(isoMsg)
             }
             next(result)
@@ -63,7 +63,7 @@ class IsoSocketHelper(
         val isoRequestLog = request.generateLog().apply {
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
-            gpsCoordinates = gps.geolocationString
+            gpsCoordinates = gps.geolocationString ?: "0.00;0.00"
         }
 
         val (response, error) = safeRun {
@@ -72,7 +72,11 @@ class IsoSocketHelper(
             request.dump(System.out, "REQUEST")
             Log.d(tag, "RESULT : " + String(outputData))
             val output =
-                SocketJob.sslSocketConnectionJob(config.posMode.ip, config.posMode.port, outputData)
+                SocketJob.sslSocketConnectionJob(
+                    config.remoteConnectionInfo.ip,
+                    config.remoteConnectionInfo.port,
+                    outputData
+                )
 
             println("MESSAGE: " + String(output!!))
 

@@ -9,6 +9,8 @@ import android.view.View
 import androidx.databinding.DataBindingUtil
 import com.appzonegroup.creditclub.pos.databinding.ActivityNetworkParametersBinding
 import com.appzonegroup.creditclub.pos.databinding.NetworkSettingsItemBinding
+import com.appzonegroup.creditclub.pos.extension.apnInfo
+import com.appzonegroup.creditclub.pos.util.AppConstants
 import com.appzonegroup.creditclub.pos.util.PosMode
 import com.appzonegroup.creditclub.pos.widget.Dialogs
 import com.creditclub.core.ui.widget.DialogOptionItem
@@ -115,7 +117,14 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
     }
 
     fun resetNetwork(view: View?) {
-        config.resetNetwork()
+        config.run {
+            apn = AppConstants.APN
+            host = AppConstants.HOST
+            terminalId = AppConstants.TID
+            port = AppConstants.PORT
+            ip = AppConstants.IP
+            callHome = AppConstants.CALL_HOME
+        }
         refresh()
     }
 
@@ -125,7 +134,7 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
         binding.apn = "Retrieving..."
         GlobalScope.launch(Dispatchers.Main) {
             delay(5000)
-            binding.apn = config.getApnInfo(this@TerminalOptionsActivity)
+            binding.apn = apnInfo
         }
     }
 
@@ -148,7 +157,7 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
                 dialogProvider.showOptions("Select POS mode", posModeOptions) {
                     onSubmit { position ->
                         val newPosMode = PosMode.values()[position]
-                        config.posMode = newPosMode
+                        config.remoteConnectionInfo = newPosMode
                         binding.posMode = newPosMode.label
                     }
                 }
@@ -207,13 +216,13 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
     }
 
     private fun refresh() {
-        binding.apn = config.getApnInfo(this)
+        binding.apn = apnInfo
         binding.host = config.host
         binding.ip = config.ip
         binding.port = config.port.toString()
         binding.callHome = "Call Home interval in seconds: " + config.callHome
         binding.terminalId = config.terminalId
-        binding.posMode = config.posMode.label
+        binding.posMode = config.remoteConnectionInfo.label
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

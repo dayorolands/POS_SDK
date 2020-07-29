@@ -6,6 +6,8 @@ import android.os.Bundle;
 import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AlertDialog;
 import android.view.View;
+
+import com.appzonegroup.creditclub.pos.CardMainMenuActivity;
 import com.google.android.material.navigation.NavigationView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -213,7 +215,7 @@ public class Menu3Activity extends AppCompatActivity implements NavigationView.O
                                 public void onClick(View view) {
 
                                     infoDialog.dismiss();
-                                    startActivity(CardBasedWithdrawalActivity2.class);
+                                    startActivity(CardMainMenuActivity.class);
                                 }
                             });
                             infoDialog.show();

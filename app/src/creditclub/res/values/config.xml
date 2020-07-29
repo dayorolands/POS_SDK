@@ -7,4 +7,5 @@
         <item>2,Account Number</item>
     </string-array>
     <bool name="category_loan">true</bool>
+    <bool name="account_opening_products">true</bool>
 </resources>

@@ -1,15 +1,16 @@
 package com.appzonegroup.app.fasttrack.ui
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.Typeface
-import com.google.android.material.textfield.TextInputEditText
 import android.text.InputType
 import android.util.AttributeSet
 import android.util.Log
-
+import android.view.ActionMode
+import android.view.Menu
+import android.view.MenuItem
 import com.appzonegroup.app.fasttrack.R
-import java.util.HashMap
+import com.google.android.material.textfield.TextInputEditText
+import java.util.*
 
 /**
  * Created by Joseph on 1/14/2017.
@@ -73,6 +74,24 @@ class EditText : TextInputEditText {
 
         typeface = tf
         return true
+    }
+
+    init {
+        customSelectionActionModeCallback = object : ActionMode.Callback {
+            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                return false
+            }
+
+            override fun onDestroyActionMode(mode: ActionMode?) {}
+
+            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                return false
+            }
+
+            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+                return false
+            }
+        }
     }
 
     companion object {

@@ -75,7 +75,7 @@ class BVNUpdateActivity : CustomerBaseActivity() {
     }
 
     class AuthorizationFragment : CreditClubFragment() {
-        override val activity get() = getActivity() as BVNUpdateActivity
+        val activity get() = getActivity() as BVNUpdateActivity
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             val rootView = inflater.inflate(R.layout.fragment_authorization, container, false)
@@ -151,7 +151,7 @@ class BVNUpdateActivity : CustomerBaseActivity() {
                             response ?: return@launch activity.showInternalError()
 
                             if (response.isSuccessful) {
-                                activity.showSuccess<Unit>("BVN was updated successfully") {
+                                activity.dialogProvider.showSuccess<Unit>("BVN was updated successfully") {
                                     onClose {
                                         activity.finish()
                                     }
@@ -169,7 +169,7 @@ class BVNUpdateActivity : CustomerBaseActivity() {
     }
 
     class AccountDetailsFragment : CreditClubFragment() {
-        override val activity get() = getActivity() as BVNUpdateActivity
+        val activity get() = getActivity() as BVNUpdateActivity
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             val rootView = inflater.inflate(R.layout.fragment_account_details, container, false)

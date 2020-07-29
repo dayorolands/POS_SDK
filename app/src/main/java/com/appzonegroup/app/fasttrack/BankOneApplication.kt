@@ -1,59 +1,62 @@
 package com.appzonegroup.app.fasttrack
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import com.appzonegroup.app.fasttrack.app.LocalInstitutionConfig
+import com.appzonegroup.app.fasttrack.di.*
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
-import com.appzonegroup.app.fasttrack.ui.MyDialogProvider
+import com.appzonegroup.app.fasttrack.utility.extensions.registerWorkers
 import com.appzonegroup.app.fasttrack.utility.registerAppFunctions
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.loadPosModules
 import com.appzonegroup.creditclub.pos.startPosApp
 import com.creditclub.core.CreditClubApplication
-import com.creditclub.core.R
-import com.creditclub.core.config.IInstitutionConfig
-import com.creditclub.core.data.CreditClubMiddleWareAPI
-import com.creditclub.core.data.model.AppVersion
-import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.core.util.SafeRunResult
-import com.creditclub.core.util.appDataStorage
 import com.creditclub.core.util.localStorage
-import com.creditclub.core.util.safeRunIO
-import org.koin.android.ext.android.get
+import com.squareup.picasso.Picasso
 import org.koin.android.ext.koin.androidContext
-import org.koin.dsl.KoinAppDeclaration
-import org.koin.dsl.module
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 
 class BankOneApplication : CreditClubApplication() {
 
     override val otaAppName: String
         get() = if (Platform.isPOS) "${super.otaAppName}POS" else super.otaAppName
 
-    override val modules: KoinAppDeclaration?
-        get() = {
-            modules(module {
-                single<IInstitutionConfig> { LocalInstitutionConfig.create(androidContext()) }
-                factory<DialogProvider>(override = true) { (context: Context) ->
-                    MyDialogProvider(context)
-                }
-            })
-        }
+    val authResponse: AuthResponse by lazy {
+        val phoneNumber = "234${localStorage.agentPhone?.substring(1)}"
+        val newAuth = localStorage.authResponse
+            ?: return@lazy AuthResponse(
+                phoneNumber,
+                localStorage.getString("AGENT_CODE")
+            )
 
-    val authResponse: AuthResponse
-        get() {
-            val defaults: AuthResponse.() -> Unit = { sessionId = sessionId ?: "nothing" }
-
-            if (!localStorage.agentIsActivated) return AuthResponse("", "").apply(defaults)
-            val phoneNumber = "234${localStorage.agent?.phoneNumber?.substring(1)}"
-
-            return AuthResponse(phoneNumber, localStorage.agent?.agentCode).apply(defaults)
-        }
+        return@lazy AuthResponse(
+            newAuth.phoneNumber ?: phoneNumber,
+            newAuth.activationCode ?: localStorage.getString("AGENT_CODE")
+        )
+    }
 
     override fun onCreate() {
         super.onCreate()
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 
+        Picasso.setSingletonInstance(
+            Picasso.Builder(this).loggingEnabled(BuildConfig.DEBUG).build()
+        )
+
+        startKoin {
+            androidLogger()
+            androidContext(this@BankOneApplication)
+
+            modules(listOf(
+                apiModule,
+                locationModule,
+                dataModule,
+                uiModule,
+                configModule
+            ))
+        }
+
         registerAppFunctions()
         Platform.test(this)
+        registerWorkers()
     }
 }

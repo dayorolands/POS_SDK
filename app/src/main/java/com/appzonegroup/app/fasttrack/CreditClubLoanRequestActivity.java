@@ -23,7 +23,7 @@ import com.appzonegroup.app.fasttrack.utility.CustomAutoCompleteAdapter;
 import com.appzonegroup.app.fasttrack.utility.FunctionIds;
 import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.Misc;
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -168,7 +168,7 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
 
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                Crashlytics.logException(new Exception(e.getMessage()));
+                                FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                                 showError(e.getMessage());
                             }
                         } else {
@@ -213,7 +213,7 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
 
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Crashlytics.logException(new Exception(e.getMessage()));
+                        FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                         showError(e.getMessage());
                     }
                 } else {
@@ -280,7 +280,7 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
                                 mViewPager.setCurrentItem(1, true);
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                Crashlytics.logException(new Exception(e.getMessage()));
+                                FirebaseCrashlytics.getInstance().recordException(new Exception(e.getMessage()));
                                 showError(e.getMessage());
                             }
                         } else {
@@ -408,7 +408,7 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
         loanRequest.setMemberID(loanRequest_memberID_et.getText().toString());
         loanRequest.setAgentPhoneNumber(LocalStorage.getPhoneNumber(getBaseContext()));
         //loanRequest.setAssociationID(associationDAO.Get(selectedAssociationID).getId());
-        loanRequest.setGeoLocation(String.format(Locale.getDefault(), "%s:%s", String.valueOf(getGps().getLatitude()), String.valueOf(getGps().getLongitude())));
+        loanRequest.setGeoLocation(getGps().getGeolocationString());
         loanRequest.setAgentPin(agentPIN_et.getText().toString().trim());
 
         String data = new Gson().toJson(loanRequest);

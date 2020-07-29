@@ -1,27 +1,36 @@
 package com.appzonegroup.creditclub.pos
 
-import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import com.appzonegroup.creditclub.pos.databinding.ActivityCardMainMenuBinding
-import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.MenuPage
 import com.appzonegroup.creditclub.pos.util.MenuPages
 import com.appzonegroup.creditclub.pos.widget.Dialogs
+import com.creditclub.core.util.format
+import com.creditclub.core.util.localStorage
+import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.showError
+import com.creditclub.pos.PosManager
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
+import org.threeten.bp.Instant
 
 
 class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
     override val pageNumber = MenuPages.MAIN_MENU
     override val title = MenuPages[MenuPages.MAIN_MENU]?.name ?: "Welcome"
-//    override val functionId = FunctionIds.CARD_TRANSACTIONS
+
+    //    override val functionId = FunctionIds.CARD_TRANSACTIONS
+    private val posManager: PosManager by inject { parametersOf(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.empty)
+
+        localStorage.agent ?: return finish()
 
         if (config.terminalId.isEmpty()) {
             return showError(getString(R.string.pos_terminal_id_required)) {
@@ -54,8 +63,10 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                     binding.unsettledButton.button.setOnClickListener(this)
                     binding.keyDownloadButton.button.setOnClickListener(this)
                     binding.parameterDownloadButton.button.setOnClickListener(this)
+                    binding.capkDownloadButton.button.setOnClickListener(this)
+                    binding.emvAidDownloadButton.button.setOnClickListener(this)
 
-                    parameters.downloadAsync(dialogProvider)
+                    mainScope.launch { checkKeysAndParameters() }
                 }
             }
         }
@@ -67,17 +78,25 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                 R.id.purchase_button -> {
                     startActivity(CardWithdrawalActivity::class.java)
                 }
-                R.id.admin_button -> {
-                    adminAction {
-                        startActivity(Intent(this, MenuActivity::class.java).apply {
-                            putExtra(MenuPage.TITLE, MenuPages[MenuPages.ADMIN]?.name)
-                            putExtra(MenuPage.PAGE_NUMBER, MenuPages.ADMIN)
-                        })
+                R.id.admin_button -> mainScope.launch {
+                    if (!posManager.openSettings()) {
+                        adminAction {
+                            val intent = Intent(this@CardMainMenuActivity, MenuActivity::class.java)
+                            intent.apply {
+                                putExtra(MenuPage.TITLE, MenuPages[MenuPages.ADMIN]?.name)
+                                putExtra(MenuPage.PAGE_NUMBER, MenuPages.ADMIN)
+                            }
+                            startActivity(intent)
+                        }
                     }
                 }
-                R.id.reprint_button -> supervisorAction {
-                    //                    Modules[Modules.REPRINT_LAST].click(this)
-                    startActivity(ReprintMenuActivity::class.java)
+                R.id.reprint_button -> mainScope.launch {
+                    if (!posManager.openReprint()) {
+                        supervisorAction {
+                            //                    Modules[Modules.REPRINT_LAST].click(this)
+                            startActivity(ReprintMenuActivity::class.java)
+                        }
+                    }
                 }
 //                R.id.balance_button -> {
 //                    startActivity(BalanceInquiryActivity::class.java)
@@ -113,17 +132,34 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                         putExtra(MenuPage.TITLE, MenuPages[MenuPages.REPRINT_EODS]?.name)
                         putExtra(MenuPage.PAGE_NUMBER, MenuPages.REPRINT_EODS)
                     })
-//                    Modules[Modules.PRINT_EOD].click(this)
                 }
                 R.id.key_download_button -> {
-                    try {
-                        ParameterService.getInstance(this).downloadKeysAsync(dialogProvider, true)
-                    } catch (ex: Exception) {
-                        ex.printStackTrace()
-                    }
+                    mainScope.launch { downloadKeys() }
                 }
                 R.id.parameter_download_button -> {
-                    ParameterService.getInstance(this).downloadParametersAsync(dialogProvider)
+                    mainScope.launch { downloadParameters() }
+                }
+                R.id.capk_download_button -> {
+                    mainScope.launch {
+                        dialogProvider.showProgressBar("Downloading CAPK")
+                        val (_, error) = safeRunIO {
+                            parameters.downloadCapk(this@CardMainMenuActivity)
+                        }
+                        dialogProvider.hideProgressBar()
+                        if (error != null) return@launch dialogProvider.showError(error)
+                        dialogProvider.showSuccess("CAPK Download successful")
+                    }
+                }
+                R.id.emv_aid_download_button -> {
+                    mainScope.launch {
+                        dialogProvider.showProgressBar("Downloading EMV AID")
+                        val (_, error) = safeRunIO {
+                            parameters.downloadAid(this@CardMainMenuActivity)
+                        }
+                        dialogProvider.hideProgressBar()
+                        if (error != null) return@launch dialogProvider.showError(error)
+                        dialogProvider.showSuccess("EMV AID Download successful")
+                    }
                 }
 
                 else -> showError("This function is disabled.")
@@ -131,60 +167,56 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
         }
     }
 
-    private fun notifyForUpdates() {
-        val intent = Intent(this, UpdateActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    private suspend fun checkKeysAndParameters() {
+        val localDate = Instant.now().format("MMdd")
+        if (localDate == parameters.updatedAt) return
+
+        dialogProvider.showProgressBar("Downloading Keys and Parameters")
+        val (_, error) = safeRunIO {
+            parameters.downloadKeys(this@CardMainMenuActivity)
+            parameters.downloadParameters(this@CardMainMenuActivity)
+        }
+        dialogProvider.hideProgressBar()
+        if (error != null) {
+            dialogProvider.showError("Download Failed. ${error.message}")
+            return
         }
 
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.notification_icon)
-            .setContentTitle("Update Available for POS")
-            .setContentText("A new version is available")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            // Set the intent that will fire when the user taps the notification
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-
-        with(NotificationManagerCompat.from(this)) {
-            notify(1, builder.build())
-        }
+        parameters.updatedAt = localDate
+        dialogProvider.showSuccess("Download successful")
     }
 
-    private fun updateProgressNotification() {
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID).apply {
-            setContentTitle("Picture Download")
-            setContentText("Download in progress")
-            setSmallIcon(R.drawable.notification_icon)
-            priority = NotificationCompat.PRIORITY_LOW
+    private suspend fun downloadKeys() {
+        dialogProvider.showProgressBar("Downloading Keys")
+        val (_, error) = safeRunIO {
+            parameters.downloadKeys(this@CardMainMenuActivity)
         }
-        val PROGRESS_MAX = 100
-        val PROGRESS_CURRENT = 0
-        NotificationManagerCompat.from(this).apply {
-            // Issue the initial notification with zero progress
-            builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false)
-            notify(1, builder.build())
-
-            // Do the job here that tracks the progress.
-            // Usually, this should be in a
-            // worker thread
-            // To show progress, update PROGRESS_CURRENT and update the notification with:
-            // builder.setProgress(PROGRESS_MAX, PROGRESS_CURRENT, false);
-            // notificationManager.notify(notificationId, builder.build());
-
-            // When done, update the notification one more time to remove the progress bar
-            builder.setContentText("Download complete")
-                .setProgress(0, 0, false)
-            notify(1, builder.build())
+        dialogProvider.hideProgressBar()
+        if (error != null) {
+            dialogProvider.showError("Download Failed. ${error.message}")
+            return
         }
+
+        parameters.updatedAt = Instant.now().format("MMdd")
+        dialogProvider.showSuccess("Download successful")
+    }
+
+    private suspend fun downloadParameters() {
+        dialogProvider.showProgressBar("Downloading Parameters")
+        val (_, error) = safeRunIO {
+            parameters.downloadParameters(this@CardMainMenuActivity)
+        }
+        dialogProvider.hideProgressBar()
+        if (error != null) {
+            dialogProvider.showError("Download Failed. ${error.message}")
+            return
+        }
+
+        parameters.updatedAt = Instant.now().format("MMdd")
+        dialogProvider.showSuccess("Download successful")
     }
 
     override fun goBack(v: View) {
         if (intent.getBooleanExtra("SHOW_BACK_BUTTON", false)) onBackPressed()
-    }
-
-    companion object {
-        const val CHANNEL_ID = "update"
     }
 }

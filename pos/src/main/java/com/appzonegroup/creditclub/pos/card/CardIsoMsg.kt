@@ -1,15 +1,17 @@
 package com.appzonegroup.creditclub.pos.card
 
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
-import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
+import com.creditclub.pos.PosParameter
+import com.creditclub.pos.card.CardData
+import com.creditclub.pos.card.CardReaderEvent
 import org.jpos.iso.ISOException
 import org.jpos.transaction.TransactionManager
 import org.json.JSONException
 import java.io.IOException
 import java.security.NoSuchAlgorithmException
-import java.util.*
+import java.security.SecureRandom
 
 open class CardIsoMsg : BaseIsoMsg() {
     var acquiringInstIdCode32: String?
@@ -124,7 +126,7 @@ open class CardIsoMsg : BaseIsoMsg() {
         set(value) = set(123, value)
 
     fun generateRRN() {
-        val rrn = Random().nextInt(1000000)
+        val rrn = SecureRandom().nextInt(1000000)
         val rrnString = String.format("%012d", rrn)
 
         retrievalReferenceNumber37 = rrnString
@@ -138,8 +140,8 @@ open class CardIsoMsg : BaseIsoMsg() {
     )
     open fun apply(data: CardData): CardIsoMsg = apply {
         val dateParams = TransmissionDateParams()
-        val stan = Random().nextInt(1000000)
-        val rrnPart = Random().nextInt(100000)
+        val stan = SecureRandom().nextInt(1000000)
+        val rrnPart = SecureRandom().nextInt(100000)
         val stanString = String.format("%06d", stan)
         val rrnString = String.format("1%05d", rrnPart) + stanString
 
@@ -166,7 +168,7 @@ open class CardIsoMsg : BaseIsoMsg() {
         retrievalReferenceNumber37 = rrnString
         serviceRestrictionCode40 = data.src
         iccData55 = data.iccString
-        if (data.pinBlock.isNotEmpty()) pinData = data.pinBlock
+        if (!data.pinBlock.isNullOrBlank()) pinData = data.pinBlock
 
         run {
             //            val tmpPosDataCode = StringBuilder("511501513344101")
@@ -177,7 +179,7 @@ open class CardIsoMsg : BaseIsoMsg() {
         }
     }
 
-    fun withParameters(params: ParameterService.ParameterObject) {
+    fun withParameters(params: PosParameter.ManagementData) {
         cardAcceptorIdCode42 = params.cardAcceptorId
         cardAcceptorNameLocation43 = params.cardAcceptorLocation
         currencyCode49 = params.countryCode

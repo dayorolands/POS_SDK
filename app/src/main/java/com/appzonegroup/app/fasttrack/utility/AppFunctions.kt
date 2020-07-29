@@ -30,6 +30,7 @@ object FunctionIds {
     const val FUNDS_TRANSFER = 17
     const val HLA_TAGGING = 18
     const val FAQS = 19
+    const val COLLECTION_PAYMENT = 20
 }
 
 fun registerAppFunctions() {
@@ -41,7 +42,7 @@ fun registerAppFunctions() {
     AppFunctions.register(FunctionIds.BVN_UPDATE, AppFunction(R.id.bvn_update_button, R.string.title_activity_bvnUpdate, R.drawable.secured_loan))
     AppFunctions.register(FunctionIds.CUSTOMER_BALANCE_ENQUIRY, AppFunction(R.id.customer_balance_enquiry_button, R.string.customer_balance, R.drawable.income))
     AppFunctions.register(FunctionIds.AGENT_BALANCE_ENQUIRY, AppFunction(R.id.agent_balance_enquiry_button, R.string.agent_s_balance, R.drawable.income))
-    AppFunctions.register(FunctionIds.PAY_BILL, AppFunction(R.id.pay_bill_button, R.string.pay_a_bill, R.drawable.payday_loan))
+    AppFunctions.register(FunctionIds.PAY_BILL, AppFunction(R.id.fn_bill_payment, R.string.pay_a_bill, R.drawable.payday_loan))
     AppFunctions.register(FunctionIds.CUSTOMER_CHANGE_PIN, AppFunction(R.id.customer_change_pin_button, R.string.change_customer_pin, R.drawable.login_password))
     AppFunctions.register(FunctionIds.AGENT_CHANGE_PIN, AppFunction(R.id.agent_change_pin_button, R.string.pin_change, R.drawable.login_password))
     AppFunctions.register(FunctionIds.CUSTOMER_MINI_STATEMENT, AppFunction(R.id.customer_mini_statement_button, R.string.title_activity_basic_mini_statement, R.drawable.deposit))
@@ -52,4 +53,5 @@ fun registerAppFunctions() {
     AppFunctions.register(FunctionIds.FUNDS_TRANSFER, AppFunction(R.id.funds_transfer_button, R.string.fund_stransfer, R.drawable.deposit))
     AppFunctions.register(FunctionIds.HLA_TAGGING, AppFunction(R.id.fn_hla_tagging, R.string.hla_tagging, R.drawable.ic_maps_and_flags))
     AppFunctions.register(FunctionIds.FAQS, AppFunction(R.id.fn_faq, R.string.title_activity_faq, R.drawable.ic_help))
+    AppFunctions.register(FunctionIds.COLLECTION_PAYMENT, AppFunction(R.id.fn_collections_payment, R.string.title_fragment_collection_payment, R.drawable.payday_loan))
 }

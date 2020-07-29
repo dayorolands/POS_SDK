@@ -7,7 +7,7 @@ import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
 import com.appzonegroup.app.fasttrack.ui.EditText
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.PrinterStatus
 import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.request.WithdrawalRequest
 import com.creditclub.core.type.TokenType
@@ -142,7 +142,7 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
         formData.institutionCode = localStorage.institutionCode
         formData.token = token
 
-        requestPIN("Enter agent PIN") {
+        dialogProvider.requestPIN("Enter agent PIN") {
             onSubmit { pin ->
                 formData.agentPin = pin
                 withdraw()

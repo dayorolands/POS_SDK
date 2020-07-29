@@ -4,10 +4,6 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
 
-kapt {
-    generateStubs = true
-}
-
 android {
     compileSdkVersion versions.compileSdk
 
@@ -19,47 +15,30 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    dataBinding {
-        enabled = true
+    buildFeatures{
+        dataBinding = true
     }
 
     buildTypes {
         release {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "API_HOST", '"https://api.mybankone.com"')
-            buildConfigField("String", "HOST", '"https://mybankone.com"')
-            manifestPlaceholders = [usesCleartextTraffic: "false"]
         }
-
         releaseStaging {
             debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "API_HOST", '"http://52.224.166.115"')
-            buildConfigField("String", "HOST", '"http://52.224.166.115"')
-            manifestPlaceholders = [usesCleartextTraffic: "true"]
             matchingFallbacks = ['release', 'debug']
         }
-
-        debug {
-            debuggable true
-            buildConfigField("String", "API_HOST", '"http://52.224.166.115"')
-            buildConfigField("String", "HOST", '"http://52.224.166.115"')
-            manifestPlaceholders = [usesCleartextTraffic: "true"]
-        }
-
-        debugLive {
-            debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "API_HOST", '"https://api.mybankone.com"')
-            buildConfigField("String", "HOST", '"https://mybankone.com"')
-            manifestPlaceholders = [usesCleartextTraffic: "false"]
-            matchingFallbacks = ['debug', 'release']
+    }
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas".toString())
         }
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }
 
@@ -71,7 +50,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${versions.serialization}"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
@@ -110,7 +89,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     // Co-routine Tests
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.0'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7'
 
     // For api backward compatibility
     implementation 'com.android.volley:volley:1.1.0'
@@ -119,15 +98,21 @@ dependencies {
     api "org.koin:koin-androidx-scope:${versions.koin}"
     api "org.koin:koin-androidx-viewmodel:${versions.koin}"
 
-    api 'com.github.esafirm.android-image-picker:imagepicker:2.1.0'
-    api 'com.github.esafirm.android-image-picker:rximagepicker:2.1.0'
+    api 'com.github.esafirm.android-image-picker:imagepicker:2.3.0'
+    api 'com.github.esafirm.android-image-picker:rximagepicker:2.3.0'
     api "com.github.bumptech.glide:glide:${versions.glide}"
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    api 'com.google.android.play:core:1.6.4'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    api 'com.google.android.play:core:1.7.3'
 
-    implementation("com.crashlytics.sdk.android:crashlytics:${versions.crashlytics}@aar") {
-        transitive = true
-    }
+    implementation "com.google.firebase:firebase-crashlytics:${versions.firebaseCrashlytics}"
+    api "com.google.firebase:firebase-core:${versions.firebase}"
+    api "com.google.firebase:firebase-analytics:${versions.firebase}"
+    api 'com.google.firebase:firebase-perf:19.0.7'
+    api "androidx.work:work-runtime-ktx:${versions.work}"
+    api "com.google.android.gms:play-services-location:17.0.0"
+
+    implementation "androidx.navigation:navigation-fragment-ktx:${versions.navigation}"
+    implementation "androidx.navigation:navigation-ui-ktx:${versions.navigation}"
 }
 
 repositories {

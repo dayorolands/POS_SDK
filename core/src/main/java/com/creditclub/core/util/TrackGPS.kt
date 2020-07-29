@@ -1,29 +1,33 @@
 package com.creditclub.core.util
 
-import android.Manifest
 import android.app.AlertDialog
-import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.os.IBinder
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
+import com.creditclub.core.data.prefs.LocalStorage
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
-class TrackGPS : Service, LocationListener {
-    private val mContext: Context
+class TrackGPS(mContext: Context) : LocationListener, KoinComponent {
+    private val localStorage: LocalStorage by inject()
+    private val mContext: Context = mContext.applicationContext
 
     private var checkGPS = false
     private var checkNetwork = false
     internal var canGetLocation = false
 
     private var loc: Location? = null
+
+    init {
+        location
+    }
 
     var latitude: Double = 0.toDouble()
         get() {
@@ -41,47 +45,42 @@ class TrackGPS : Service, LocationListener {
             return field
         }
 
-    val geolocationString: String get() = "$latitude;$longitude"
+    val geolocationString: String?
+        get() = if (loc == null) localStorage.lastKnownLocation
+        else "$latitude;$longitude"
 
     private var locationManager: LocationManager? = null
 
-    private// getting GPS status
-    // getting network status
-    // First get location from Network Provider
-    // Toast.makeText(mContext, "Network", Toast.LENGTH_SHORT).show();
-    // if GPS Enabled get lat/long using GPS Services
-    //Toast.makeText(mContext, "GPS", Toast.LENGTH_SHORT).show();
-    val location: Location?
+    private val location: Location?
         get() {
             try {
-                locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                locationManager =
+                    mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
                 checkGPS = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 checkNetwork = locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
-                val MIN_DISTANCE_CHANGE_FOR_UPDATES: Long = 10
-                val MIN_TIME_BW_UPDATES: Long = 3000
-
                 if (!checkGPS && !checkNetwork) {
-                    Toast.makeText(mContext, "No Service Provider Available", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(mContext, "No Service Provider Available", Toast.LENGTH_SHORT)
+                        .show()
                 } else {
                     this.canGetLocation = true
                     if (checkNetwork) {
                         try {
-                            locationManager!!.requestLocationUpdates(
+                            locationManager?.requestLocationUpdates(
                                 LocationManager.NETWORK_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
                                 MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this
                             )
                             Log.d("Network", "Network")
-                            if (locationManager != null) {
-                                loc = locationManager!!
-                                    .getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-
-                            }
+                            loc =
+                                locationManager?.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                                    ?: loc
 
                             if (loc != null) {
                                 latitude = loc!!.latitude
                                 longitude = loc!!.longitude
+                                localStorage.lastKnownLocation =
+                                    "${loc?.latitude};${loc?.longitude}"
                             }
                         } catch (e: SecurityException) {
 
@@ -92,6 +91,7 @@ class TrackGPS : Service, LocationListener {
                 if (checkGPS) {
                     if (loc == null) {
                         try {
+                            Looper.myLooper() ?: Looper.prepare()
                             locationManager!!.requestLocationUpdates(
                                 LocationManager.GPS_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
@@ -120,17 +120,6 @@ class TrackGPS : Service, LocationListener {
             return loc
         }
 
-
-    constructor() {
-        mContext = applicationContext
-        location
-    }
-
-    constructor(mContext: Context) {
-        this.mContext = mContext.applicationContext
-        location
-    }
-
     fun canGetLocation(): Boolean {
         return this.canGetLocation
     }
@@ -150,36 +139,8 @@ class TrackGPS : Service, LocationListener {
         alertDialog.show()
     }
 
-    fun stopUsingGPS() {
-        if (locationManager != null) {
-
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return
-            }
-            locationManager!!.removeUpdates(this@TrackGPS)
-        }
-    }
-
-    override fun onBind(intent: Intent): IBinder? {
-        return null
-    }
-
-    override fun onLocationChanged(location: Location) {
-
+    override fun onLocationChanged(location: Location?) {
+        loc = location ?: loc
     }
 
     override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
@@ -192,5 +153,10 @@ class TrackGPS : Service, LocationListener {
 
     override fun onProviderDisabled(provider: String) {
 
+    }
+
+    companion object {
+        const val MIN_DISTANCE_CHANGE_FOR_UPDATES: Long = 10
+        const val MIN_TIME_BW_UPDATES: Long = 3000
     }
 }

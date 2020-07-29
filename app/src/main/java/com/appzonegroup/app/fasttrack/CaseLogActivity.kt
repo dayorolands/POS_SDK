@@ -115,7 +115,7 @@ class CaseLogActivity : BaseActivity() {
                     description = caseDescription
                 }
 
-                val responseString = withContext(Dispatchers.Default) {
+                val responseString = withContext(Dispatchers.IO) {
                     ApiServiceObject.run {
                         post("$BASE_URL/$CASE_LOG/LogCase", "$request")
                     }

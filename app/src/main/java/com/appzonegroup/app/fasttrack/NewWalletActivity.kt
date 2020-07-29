@@ -1,92 +1,42 @@
 package com.appzonegroup.app.fasttrack
 
-import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
-import android.view.*
-import android.widget.EditText
-import android.widget.ImageView
+import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.appzonegroup.app.fasttrack.databinding.ActivityOpenAccountBinding
+import com.appzonegroup.app.fasttrack.fragment.AgentPINFragment
+import com.appzonegroup.app.fasttrack.fragment.DocumentUploadFragment
+import com.appzonegroup.app.fasttrack.fragment.GeneralInfoFragment
+import com.appzonegroup.app.fasttrack.fragment.OpenAccountViewModel
 import com.appzonegroup.app.fasttrack.receipt.NewAccountReceipt
+import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.Misc
-import com.appzonegroup.app.fasttrack.utility.online.ImageUtils
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
-import com.crashlytics.android.Crashlytics
-import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.request.CustomerRequest
-import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.ui.widget.DateInputParams
-import com.creditclub.core.ui.widget.DialogOptionItem
+import com.creditclub.core.data.response.BackendResponse
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
-import com.creditclub.core.util.delegates.contentView
-import com.esafirm.imagepicker.features.ImagePicker
-import com.esafirm.imagepicker.features.ReturnMode
-import com.esafirm.imagepicker.model.Image
-import kotlinx.android.synthetic.main.fragment_agent_pin_submit_btn.*
-import kotlinx.android.synthetic.main.fragment_customer_request_general_info.*
-import kotlinx.android.synthetic.main.fragment_customer_request_general_info.view.*
-import kotlinx.android.synthetic.main.fragment_next_of_kin.*
-import kotlinx.android.synthetic.main.fragment_next_of_kin.view.*
+import com.creditclub.pos.printer.PosPrinter
+import com.creditclub.pos.printer.PrinterStatus
 import kotlinx.coroutines.launch
-import org.threeten.bp.LocalDate
-import java.io.File
-import java.io.FileOutputStream
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
+import java.util.*
 
-class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
-    private val binding by contentView<NewWalletActivity, ActivityOpenAccountBinding>(
-        R.layout.activity_open_account
-    )
-    override val functionId = FunctionIds.NEW_WALLET
-
-    private var dob: String = ""
-    private var agentPIN = ""
-
-    private var surname: String = ""
-    private var firstName: String = ""
-    private var phoneNumber: String = ""
-    private var gender: String = ""
-    private var address: String = ""
-    private var placeOfBirth: String = ""
-    private var starterPackNo: String = ""
-
-    private var imageType: ImageType = ImageType.Passport
-
-    private var passportString: String? = null
-
-    private val customerRequest by lazy {
-        CustomerRequest().apply {
-            uniqueReferenceID = Misc.getGUID()
-        }
-    }
-
+class NewWalletActivity : CreditClubActivity(R.layout.activity_open_account) {
+    private val binding by dataBinding<ActivityOpenAccountBinding>()
+    private val printer: PosPrinter by inject { parametersOf(this, dialogProvider) }
+    private val viewModel by viewModels<OpenAccountViewModel>()
     private val receipt by lazy { NewAccountReceipt(this) }
+    private val request by lazy { CustomerRequest().apply { uniqueReferenceID = Misc.getGUID() } }
 
-    override val formData: CustomerRequest
-        get() = customerRequest
-
-    private var im: ImageView? = null
-
-    private var bitmap: Bitmap? = null
-
-    internal enum class ImageType {
-        //        IDCard,
-        Passport,
-//        Signature
-    }
-
-    internal enum class Form {
-        GENERAL_INFO,
-        CONTACT_DETAILS,
-        //        PHOTO_CAPTURE,
-        OTHER_DETAILS
-    }
+    override val functionId = FunctionIds.NEW_WALLET
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,135 +47,120 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
         binding.tabs.setupWithViewPager(binding.container)
         binding.tabs.clearOnTabSelectedListeners()
         binding.container.offscreenPageLimit = adapter.count
-    }
 
-    internal fun indicateError(message: String, position: Int, view: EditText?) {
-        view?.error = message
-        view?.requestFocus()
-    }
+        viewModel.isWalletAccount.value = true
+        viewModel.requiresEmail.value = false
+        viewModel.requiresState.value = true
 
-    private fun compressImage(imageFile: File): Bitmap? {
-        return try {
-            val file = File(imageFile.absolutePath)
+        viewModel.afterGeneralInfo.postValue {
+            binding.container.setCurrentItem(
+                binding.container.currentItem + 1,
+                true
+            )
+        }
 
-            val fOut = FileOutputStream(file)
-            val newBitmap = ImageUtils.getResizedBitmap(bitmap!!, 400)
-            newBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut)
-            fOut.flush()
-            fOut.close()
+        viewModel.afterDocumentUpload.postValue {
+            binding.container.setCurrentItem(
+                binding.container.currentItem + 1,
+                true
+            )
+        }
 
-            newBitmap
-        } catch (e: Exception) {
-            Crashlytics.logException(e)
-            e.printStackTrace()
-            if (BuildConfig.DEBUG) Log.e("Image", "Save file error!$e")
-
-            null
+        viewModel.afterAgentPin.postValue {
+            mainScope.launch { createCustomer() }
         }
     }
 
-    fun createAccount_click(view: View) {
-//        if (starter_pack_number_et.value.isEmpty()) {
-//            indicateError(
-//                "Please enter the card serial number",
-//                Form.PHOTO_CAPTURE.ordinal,
-//                starter_pack_number_et
-//            )
-//            return
-//        }
+    private suspend fun createCustomer() {
+        val location = gps.geolocationString
+        val gender = viewModel.gender.value
 
-        starterPackNo = starter_pack_number_et.value
-
-        agentPIN = agent_pin_et.value
-        if (agentPIN.isEmpty()) {
-            indicateError("Please enter your PIN", Form.OTHER_DETAILS.ordinal, agent_pin_et)
-            return
-        }
-
-        if (agentPIN.length != 4) {
-            indicateError("Please enter the correct PIN", Form.OTHER_DETAILS.ordinal, agent_pin_et)
-            return
-        }
-
-        customerRequest.customerLastName = surname_et.value
-        customerRequest.customerFirstName = first_name_et.value
-        customerRequest.dateOfBirth = dob
-        customerRequest.placeOfBirth = place_of_birth_et.value
-        customerRequest.customerPhoneNumber = phone_et.value
-        customerRequest.gender = gender.substring(0, 1).toLowerCase()
-        customerRequest.geoLocation = gps.geolocationString
-        customerRequest.starterPackNumber = starter_pack_number_et.value
-        customerRequest.address = address_et.value
-        customerRequest.agentPhoneNumber = localStorage.agentPhone
-        customerRequest.agentPin = agentPIN
-        customerRequest.institutionCode = localStorage.institutionCode
+        request.customerLastName = viewModel.surname.value?.trim()
+        request.customerFirstName = viewModel.firstName.value?.trim()
+        request.dateOfBirth = viewModel.dob.value
+        request.placeOfBirth = viewModel.placeOfBirth.value?.trim()
+        request.customerPhoneNumber = viewModel.phoneNumber.value?.trim()
+        request.gender = gender?.substring(0, 1)?.toLowerCase(Locale.getDefault())
+        request.geoLocation = location
+        request.starterPackNumber = viewModel.starterPackNo.value?.trim()
+        request.address = viewModel.address.value?.trim()
+        request.productCode = viewModel.productCode.value
+        request.productName = viewModel.productName.value
+        request.bvn = viewModel.bvn.value
+        request.agentPhoneNumber = localStorage.agentPhone
+        request.agentPin = viewModel.agentPIN.value
+        request.institutionCode = localStorage.institutionCode
 
         val additionalInformation = CustomerRequest.Additional()
-        additionalInformation.passport = passportString
-        additionalInformation.email = email_et.value
-        additionalInformation.middleName = middle_name_et.value
+        additionalInformation.passport = viewModel.passportString.value
+        additionalInformation.email = viewModel.email.value?.trim()
+        additionalInformation.middleName = viewModel.middleName.value?.trim()
         additionalInformation.title = if (gender == "female") "Ms" else "Mr"
         additionalInformation.country = "NGN"
-        additionalInformation.state = states_et.value
+        additionalInformation.state = viewModel.state.value
 
         //additionalInformation.setIDCard(idCardString);
-        /*additionalInformation.setOccupation(occupation);*/
+        //additionalInformation.setOccupation(occupation);
 
         //additionalInformation.setSignature(signatureString);
         //additionalInformation.setProvince(province);
 
-        customerRequest.additionalInformation = additionalInformation.toJson()
+        request.additionalInformation =
+            Json(JsonConfiguration.Stable).stringify(
+                CustomerRequest.Additional.serializer(),
+                additionalInformation
+            )
 
-        mainScope.launch {
-            showProgressBar("Creating customer wallet")
+        dialogProvider.showProgressBar("Creating customer wallet")
+        val service = creditClubMiddleWareAPI.staticService
+        val (response, error) = safeRunIO {
+            service.register(request)
+        }
+        dialogProvider.hideProgressBar()
 
-            val service = creditClubMiddleWareAPI.staticService
+        if (error.hasOccurred) return dialogProvider.showError(error!!)
+        response ?: return dialogProvider.showNetworkError()
 
-            val (response, error) = safeRunIO {
-                service.register(customerRequest)
+        if (response.isSuccessful) {
+            dialogProvider.showSuccess<Unit>(getString(R.string.customer_was_created_successfully)) {
+                onClose {
+                    finish()
+                }
             }
-            hideProgressBar()
+        } else {
+            dialogProvider.showError(
+                response.responseMessage
+                    ?: getString(R.string.an_error_occurred_please_try_again_later)
+            )
+        }
 
-            if (error.hasOccurred) return@launch showError(error!!)
-            response ?: return@launch showNetworkError()
+        if (Platform.hasPrinter) {
+            printReceipt(response)
+        }
+    }
+
+    private fun printReceipt(response: BackendResponse) {
+        receipt.apply {
+            isSuccessful = response.isSuccessful
+            reason = response.responseMessage
+
+            bvn = request.bvn
+            institutionCode = localStorage.institutionCode!!
+            agentPhoneNumber = localStorage.agentPhone!!
+            uniqueReferenceID = request.uniqueReferenceID!!
 
             if (response.isSuccessful) {
-                showSuccess<Unit>(getString(R.string.customer_was_created_successfully)) {
-                    onClose {
-                        finish()
-                    }
-                }
-            } else {
-                showError(
-                    response.responseMessage
-                        ?: getString(R.string.an_error_occurred_please_try_again_later)
-                )
-            }
+                accountName =
+                    "${request.customerFirstName} ${viewModel.middleName.value} ${request.customerLastName}"
 
-            if (Platform.hasPrinter) {
-                receipt.apply {
-                    isSuccessful = response.isSuccessful
-                    reason = response.responseMessage
-
-                    bvn = customerRequest.bvn
-                    institutionCode = localStorage.institutionCode!!
-                    agentPhoneNumber = localStorage.agentPhone!!
-                    uniqueReferenceID = customerRequest.uniqueReferenceID!!
-
-                    if (response.isSuccessful) {
-                        accountName =
-                            "${customerRequest.customerFirstName} ${additionalInformation.middleName} ${customerRequest.customerLastName}"
-
-                        response.responseMessage?.run {
-                            accountNumber = this
-                        }
-                    }
-                }
-
-                printer.printAsync(receipt) { printerStatus ->
-                    if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
+                response.responseMessage?.run {
+                    accountNumber = this
                 }
             }
+        }
+
+        printer.printAsync(receipt) { printerStatus ->
+            if (printerStatus != PrinterStatus.READY) dialogProvider.showError(printerStatus.message)
         }
     }
 
@@ -235,199 +170,6 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
         } else {
             super.onBackPressed()
         }
-    }
-
-    fun next_button_click1(view: View) {
-
-        surname = surname_et.value
-
-        if (surname.isEmpty()) {
-            indicateError("Please enter customer's surname", Form.GENERAL_INFO.ordinal, surname_et)
-
-            Crashlytics.logException(Exception("incorrect user name"))
-            Crashlytics.log("this is a crash")
-            return
-        }
-
-        if (!validate("Last name", surname)) return
-
-        val middleName = middle_name_et.value
-
-        if (BuildConfig.FLAVOR == "access") {
-
-            if (middleName.isEmpty()) {
-                indicateError(
-                    "Please enter customer's middle name",
-                    Form.GENERAL_INFO.ordinal,
-                    middle_name_et
-                )
-                return
-            }
-        }
-
-        if (!validate("Middle name", middleName, required = false)) return
-
-        firstName = first_name_et.value
-        if (firstName.isEmpty()) {
-            indicateError(
-                "Please enter customer's first name",
-                Form.GENERAL_INFO.ordinal,
-                first_name_et
-            )
-            return
-        }
-
-        if (!validate("First name", firstName)) return
-
-        if (gender_spinner.selectedItemPosition == 0) {
-            showError("Please select a gender")
-            // indicateError("Please select a gender", Form.GENERAL_INFO.ordinal(), genderSpinner);
-            return
-        }
-
-        gender = gender_spinner.selectedItem.toString()
-
-        phoneNumber = phone_et.value
-        if (phoneNumber.isEmpty()) {
-            indicateError(
-                "Please enter customer's phone number",
-                Form.GENERAL_INFO.ordinal,
-                phone_et
-            )
-            return
-        }
-
-        if (phoneNumber.length != 11) {
-            indicateError(
-                "Customer's phone number must be 11 digits",
-                Form.GENERAL_INFO.ordinal,
-                phone_et
-            )
-            return
-        }
-
-        address = address_et.value
-
-        if (address.isEmpty()) {
-            indicateError(
-                "Please enter customer's address",
-                Form.CONTACT_DETAILS.ordinal,
-                address_et
-            )
-            return
-        }
-
-        if (TextPatterns.invalidAddress.matcher(address).find()) {
-            indicateError(
-                getString(R.string.please_enter_a_valid_customer_address),
-                Form.CONTACT_DETAILS.ordinal,
-                address_et
-            )
-            return
-        }
-
-        placeOfBirth = place_of_birth_et.value
-//        if (placeOfBirth.isEmpty()) {
-//            indicateError(
-//                "Please enter customer's place of birth",
-//                Form.CONTACT_DETAILS.ordinal,
-//                place_of_birth_et
-//            )
-//            return
-//        }
-
-        if (states_et.value.isEmpty()) {
-            indicateError(
-                "Please select a state",
-                Form.CONTACT_DETAILS.ordinal,
-                states_et
-            )
-            return
-        }
-
-        val email = email_et.value
-
-        if (email.isNotEmpty() && !email.isValidEmail()) {
-            return showError(getString(R.string.email_is_invalid))
-        }
-
-        if (!validate("Place of birth", placeOfBirth, required = false)) return
-
-        dob = dob_tv.value
-        if (dob.contains("Click")) {
-            showError("Please enter customer's date of birth")
-            return
-        }
-
-        binding.container.setCurrentItem(binding.container.currentItem + 1, true)
-    }
-
-    fun next_button_click2(view: View) {
-
-        if (nok_name_et.value.isEmpty()) {
-            indicateError(
-                "Please enter the name of your next of kin",
-                Form.CONTACT_DETAILS.ordinal,
-                nok_name_et
-            )
-            return
-        }
-
-        if (!validate("Next of kin name", "${nok_name_et.text}")) return
-
-        if (nok_phone_et.value.isEmpty()) {
-            indicateError(
-                "Please enter the phone number of the next of kin",
-                Form.CONTACT_DETAILS.ordinal,
-                nok_phone_et
-            )
-            return
-        }
-
-        if (nok_phone_et.value.length != 9 && nok_phone_et.value.length != 11) {
-            indicateError(
-                "Please enter the correct phone number of the next of kin",
-                Form.CONTACT_DETAILS.ordinal,
-                nok_phone_et
-            )
-            return
-        }
-
-        customerRequest.nokName = nok_name_et.value
-        customerRequest.nokPhone = nok_phone_et.value
-
-        binding.container.setCurrentItem(binding.container.currentItem + 1, true)
-    }
-
-    private fun validate(name: String, value: String, required: Boolean = true): Boolean {
-        if (required && value.isEmpty()) {
-            showError(resources.getString(R.string.field_is_required, name))
-            return false
-        }
-
-        if (value.includesSpecialCharacters() || value.includesNumbers()) {
-            showError(resources.getString(R.string.special_characters_not_permitted, name))
-            return false
-        }
-
-        return true
-    }
-
-    fun image_upload_next_clicked(view: View) {
-        if (passportString == null) {
-            showError(getString(R.string.please_upload_customer_passport_photo))
-            return
-        }
-
-        binding.container.setCurrentItem(binding.container.currentItem + 1, true)
-    }
-
-    fun show_calendar(view: View) {}
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_open_account, menu);
-        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -440,156 +182,6 @@ class NewWalletActivity : BaseActivity(), FormDataHolder<CustomerRequest> {
                 super.onOptionsItemSelected(item)
             }
             else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    class GeneralInfoFragment : CreditClubFragment() {
-
-        private val dateInputParams: DateInputParams by lazy {
-            DateInputParams("Date of birth", maxDate = LocalDate.now().minusYears(18))
-        }
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-
-            val root = inflater.inflate(
-                R.layout.fragment_customer_request_general_info,
-                container,
-                false
-            )
-
-            root.surname_et.isEnabled = true
-            root.first_name_et.isEnabled = true
-            root.phone_et.isEnabled = true
-            root.address_et.isEnabled = true
-            root.dob_tv.isEnabled = true
-            root.email_et.isEnabled = true
-            root.place_of_birth_et.visibility = View.GONE
-            root.states_et.visibility = View.VISIBLE
-
-
-            if (BuildConfig.FLAVOR == "access") {
-                root.middle_name_et.hint = "Enter middle name"
-            }
-
-            root.states_et.setOnFocusChangeListener { v, hasFocus ->
-
-                if (hasFocus) {
-                    val stateArray = resources.getStringArray(R.array.States)
-                    val options = stateArray.map {
-                        val stateInfo = it.split(",")
-                        DialogOptionItem(stateInfo[1])
-                    }
-
-                    dialogProvider.showOptions(getString(R.string.state_hint), options) {
-                        onSubmit {
-                            root.states_et.value = stateArray[it].split(",").first()
-                            root.states_et.clearFocus()
-                        }
-
-                        onClose {
-                            root.states_et.clearFocus()
-                        }
-                    }
-                }
-            }
-
-            root.dob_tv.setOnClickListener {
-
-                dialogProvider.showDateInput(dateInputParams) {
-                    onSubmit { date ->
-                        root.dob_tv.value = date.toString("uuuu-MM-dd")
-                        root.dob_tv.gravity = Gravity.START
-                    }
-                }
-            }
-
-            return root
-        }
-    }
-
-    class NextOfKINFragment : Fragment() {
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-            val rootView = inflater.inflate(R.layout.fragment_next_of_kin, container, false)
-
-            (activity as NewWalletActivity).addValidPhoneNumberListener(rootView.nok_phone_et)
-
-            return rootView
-        }
-    }
-
-    class DocumentUploadFragment : Fragment() {
-        val activity get() = getActivity() as NewWalletActivity
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-
-            val rootView = inflater.inflate(R.layout.fragment_document_upload, container, false)
-
-            rootView.findViewById<View>(R.id.passport_gallery_btn).setOnClickListener {
-                activity.imageType = ImageType.Passport
-                ImagePicker.create(this).returnMode(ReturnMode.ALL)
-                    .folderMode(true)
-                    .single().single().showCamera(false).start()
-            }
-
-            rootView.findViewById<View>(R.id.passport_takePhoto_btn).setOnClickListener {
-                activity.imageType = ImageType.Passport
-                ImagePicker.cameraOnly().start(this)
-            }
-
-            return rootView
-        }
-
-        override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-            if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
-                activity.run {
-                    try {
-                        val image: Image? = ImagePicker.getFirstImageOrNull(data)
-                        im = view?.findViewById(R.id.passport_image_view)
-
-                        image ?: return@run showInternalError()
-
-                        mainScope.launch {
-                            showProgressBar("Processing image")
-                            safeRunIO {
-                                val imageFile = File(image.path)
-                                bitmap = BitmapFactory.decodeFile(image.path)
-
-                                bitmap = compressImage(imageFile)
-                                passportString = Misc.bitmapToString(bitmap!!)
-                            }
-                            im?.setImageBitmap(bitmap)
-                            hideProgressBar()
-                        }
-                    } catch (ex: Exception) {
-                        ex.printStackTrace()
-                        showInternalError()
-                    }
-                }
-            } else
-                super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    class AgentPINFragment : Fragment() {
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-            return inflater.inflate(R.layout.fragment_agent_pin_submit_btn, container, false)
         }
     }
 

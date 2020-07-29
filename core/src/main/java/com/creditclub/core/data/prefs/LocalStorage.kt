@@ -8,6 +8,7 @@ import com.creditclub.core.data.model.AgentInfo
 import com.creditclub.core.data.model.AuthResponse
 import com.creditclub.core.util.delegates.valueStore
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
@@ -20,25 +21,34 @@ class LocalStorage private constructor(
         Context.MODE_PRIVATE
     )
 ) : SharedPreferences by pref {
+    private val json = Json(
+        JsonConfiguration.Stable.copy(
+            isLenient = true,
+            ignoreUnknownKeys = true,
+            serializeSpecialFloatingPointValues = true,
+            useArrayPolymorphism = true
+        )
+    )
+
     var cacheAuth: String? by valueStore(KEY_AUTH)
     var institutionCode: String? by valueStore(INSTITUTION_CODE)
     var agentPhone: String? by valueStore(AGENT_PHONE)
-    var agentPIN: String? by valueStore(AGENT_PIN)
     var agentInfo: String? by valueStore(AGENT_INFO)
     var sessionID: String? by valueStore(SESSION_ID)
+    var lastKnownLocation: String? by valueStore("LAST_KNOWN_LOCATION")
     val agentIsActivated: Boolean
         get() = getString("ACTIVATED") != null
 
     val isLoggedIn get() = cacheAuth != null
 
-    fun deleteCacheAuth() = edit { clear() }
+    fun deleteCacheAuth() = edit { remove(KEY_AUTH) }
 
     val authResponse: AuthResponse?
         get() {
             val cacheAuth = cacheAuth ?: return null
 
             return try {
-                Json.parse(AuthResponse.serializer(), cacheAuth)
+                json.parse(AuthResponse.serializer(), cacheAuth)
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
@@ -52,7 +62,7 @@ class LocalStorage private constructor(
             val agentInfo = agentInfo ?: return null
 
             return try {
-                Json.nonstrict.parse(AgentInfo.serializer(), agentInfo)
+                json.parse(AgentInfo.serializer(), agentInfo)
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
@@ -65,7 +75,7 @@ class LocalStorage private constructor(
             }
 
             try {
-                agentInfo = Json.nonstrict.stringify(AgentInfo.serializer(), value)
+                agentInfo = json.stringify(AgentInfo.serializer(), value)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

@@ -68,7 +68,7 @@ public class ChangePinActivity extends BaseActivity {
 
     public void change_pin_button_click(View view) {
 
-        String location = String.format("%s;%s", String.valueOf(gps.getLongitude()), String.valueOf(gps.getLatitude()));
+        String location = gps.getGeolocationString();
 
         oldPin = oldPinET.getText().toString().trim();
 
@@ -118,7 +118,7 @@ public class ChangePinActivity extends BaseActivity {
             //showProgressBar(null);
             String url = AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/PinChange";
 
-            new PostCallTask(getProgressDialog(), this, this).execute(url, data);
+            new PostCallTask(getDialogProvider(), this, this).execute(url, data);
             //sendPostRequest(url,data);
 
         }

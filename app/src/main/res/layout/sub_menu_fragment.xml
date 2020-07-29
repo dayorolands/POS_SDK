@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="title"
+            type="String" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/menuBackground"
+        android:orientation="vertical"
+        tools:context=".fragment.SubMenuFragment">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="0dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="140dp"
+                    android:layout_height="50dp"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:text='@{title, default=CreditClub}'
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <ImageButton
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_centerVertical="true"
+                    android:background="#0000"
+                    android:contentDescription="@string/go_back"
+                    android:onClick="onBackPressed"
+                    android:padding="20dp"
+                    android:tint="@color/white"
+                    app:srcCompat="@drawable/ic_arrow_back" />
+
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                android:scaleType="centerCrop"
+                android:src="@drawable/card_background" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#DFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/five_dp"
+                    android:paddingBottom="@dimen/ten_dp">
+
+                    <com.google.android.flexbox.FlexboxLayout
+                        android:id="@+id/customer_category"
+                        style="@style/AppTheme.MenuFlexLayout"
+                        android:visibility="gone">
+
+                        <include
+                            android:id="@+id/register_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/payday_loan}'
+                            app:text='@{@string/register_customer}' />
+
+                        <include
+                            android:id="@+id/new_wallet_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/payday_loan}'
+                            app:text='@{"Open Wallet"}' />
+
+                        <include
+                            android:id="@+id/customer_balance_enquiry_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/income}'
+                            app:text='@{"Balance Enquiry"}' />
+
+                        <include
+                            android:id="@+id/customer_mini_statement_button"
+                            layout="@layout/button"
+                            android:visibility="gone"
+                            app:src='@{@drawable/deposit}'
+                            app:text='@{"Mini Statement"}' />
+
+                        <include
+                            android:id="@+id/customer_change_pin_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/login_password}'
+                            app:text='@{"Change Pin"}' />
+
+                        <include
+                            android:id="@+id/bvn_update_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/secured_loan}'
+                            app:text='@{"Bvn Update"}' />
+
+                    </com.google.android.flexbox.FlexboxLayout>
+
+                    <com.google.android.flexbox.FlexboxLayout
+                        android:id="@+id/agent_category"
+                        style="@style/AppTheme.MenuFlexLayout"
+                        android:visibility="gone">
+
+                        <include
+                            android:id="@+id/agent_mini_statement_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/deposit}'
+                            app:text='@{"Mini Statement"}' />
+
+                        <include
+                            android:id="@+id/agent_change_pin_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/login_password}'
+                            app:text='@{"Change Pin"}' />
+
+                        <include
+                            android:id="@+id/agent_balance_enquiry_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/income}'
+                            app:text='@{"Balance Enquiry"}' />
+
+                        <include
+                            android:id="@+id/case_logging_button"
+                            layout="@layout/button"
+                            android:visibility="gone"
+                            app:src='@{@drawable/income}'
+                            app:text='@{"Case Logging"}' />
+
+                    </com.google.android.flexbox.FlexboxLayout>
+
+                    <com.google.android.flexbox.FlexboxLayout
+                        android:id="@+id/transactions_category"
+                        style="@style/AppTheme.MenuFlexLayout"
+                        android:visibility="gone">
+
+                        <include
+                            android:id="@+id/deposit_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/deposit}'
+                            app:text='@{"Deposit"}' />
+
+                        <include
+                            android:id="@+id/token_withdrawal_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/withdrawal}'
+                            app:text='@{"Token Withdrawal"}' />
+
+                        <include
+                            android:id="@+id/card_withdrawal_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/withdrawal}'
+                            app:text='@{"Card Transactions"}' />
+
+                        <include
+                            android:id="@+id/pay_bill_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/payday_loan}'
+                            app:text='@{"Bills Payment"}' />
+
+                        <include
+                            android:id="@+id/airtime_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/payday_loan}'
+                            app:text='@{"Airtime Top-Up"}' />
+
+                        <include
+                            android:id="@+id/funds_transfer_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/payday_loan}'
+                            app:text='@{"Funds Transfer"}' />
+
+                        <include
+                            android:id="@+id/collection_payment_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/payday_loan}'
+                            app:text='@{"IGR Collections"}' />
+
+                    </com.google.android.flexbox.FlexboxLayout>
+
+                    <com.google.android.flexbox.FlexboxLayout
+                        android:id="@+id/loan_category"
+                        style="@style/AppTheme.MenuFlexLayout"
+                        android:visibility="gone"
+                        app:flexWrap="nowrap">
+
+                        <include
+                            android:id="@+id/loan_request_button"
+                            layout="@layout/button"
+                            app:src='@{@drawable/personal_income}'
+                            app:text='@{"Loan Request"}' />
+
+                    </com.google.android.flexbox.FlexboxLayout>
+                </LinearLayout>
+            </ScrollView>
+        </RelativeLayout>
+    </LinearLayout>
+
+</layout>

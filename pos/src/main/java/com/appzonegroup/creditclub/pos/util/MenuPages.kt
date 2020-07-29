@@ -2,11 +2,13 @@ package com.appzonegroup.creditclub.pos.util
 
 import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
-import com.appzonegroup.creditclub.pos.printer.TextNode
-import com.appzonegroup.creditclub.pos.printer.WalkPaper
-import com.appzonegroup.creditclub.pos.service.ParameterService
+import com.appzonegroup.creditclub.pos.extension.apnInfo
+import com.creditclub.pos.PosParameter
+import com.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.TextNode
+import com.creditclub.pos.printer.WalkPaper
+import org.koin.core.KoinComponent
+import org.koin.core.get
 
 
 /**
@@ -14,7 +16,7 @@ import com.appzonegroup.creditclub.pos.service.ParameterService
  * Appzone Ltd
  */
 
-object MenuPages {
+object MenuPages : KoinComponent {
     const val MAIN_MENU = 0
     const val REPRINT_EODS = 100
     const val REPRINT_ANY = 101
@@ -83,18 +85,18 @@ object MenuPages {
 
                         onClick {
                             it.config.run {
-                                PosPrinter(it, it.dialogProvider).printAsync(
+                                it.printer.printAsync(
                                     TextNode(
                                         """
 POS Configuration
 -----------------
 
-POS Mode: ${posMode.label}
-APN: ${getApnInfo(it)}
+POS Mode: ${remoteConnectionInfo.label}
+APN: ${it.apnInfo}
 Host Name: $host
 Terminal ID: $terminalId
-IP: ${posMode.ip}
-Port: ${posMode.port}
+IP: ${remoteConnectionInfo.ip}
+Port: ${remoteConnectionInfo.port}
 Keep Alive (Call Home) in seconds: $callHome
                             """.trimIndent()
                                     ),
@@ -112,9 +114,9 @@ Keep Alive (Call Home) in seconds: $callHome
                         name = "PRINT PARAMETER"
                         onClick {
                             try {
-                                val parameters = ParameterService.getInstance(it).parameters
+                                val parameters = get<PosParameter>().managementData
 
-                                PosPrinter(it, it.dialogProvider).printAsync(
+                                it.printer.printAsync(
                                     TextNode(
                                         """
 POS Parameters
@@ -136,10 +138,6 @@ Country Code: ${parameters.countryCode}
                                 it.showError("An error occurred")
                             }
                         }
-                    },
-//
-                    Modules.DOWN_CAPK to actionButton {
-                        name = "DOWN CAPK"
                     }
                 )
             }

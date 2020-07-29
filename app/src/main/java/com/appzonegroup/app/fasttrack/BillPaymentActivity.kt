@@ -8,11 +8,10 @@ import android.widget.TextView
 import com.appzonegroup.app.fasttrack.databinding.ActivityBillpaymentBinding
 import com.appzonegroup.app.fasttrack.model.Biller
 import com.appzonegroup.app.fasttrack.model.BillerItem
-import com.appzonegroup.app.fasttrack.model.CustomerAccount
 import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.PrinterStatus
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.util.*
@@ -32,7 +31,6 @@ class BillPaymentActivity : BaseActivity() {
     private var fieldOneIsNeeded: Boolean? = false
     private var fieldTwoIsNeeded: Boolean? = false
     private val billerItem: BillerItem by lazy { intent.getSerializableExtra("billeritem") as BillerItem }
-    private val customer by lazy { intent.getSerializableExtra("customer") as CustomerAccount }
     private var extras: Bundle? = null
     private val biller by lazy { intent.getSerializableExtra("biller") as Biller }
 
@@ -136,7 +134,7 @@ class BillPaymentActivity : BaseActivity() {
             if (amountET.text.toString().isEmpty()) {
                 return showNotification("Please enter an amount")
             } else {
-                billerItem.amountField = Integer.parseInt(amountET.text.toString()).toDouble()
+                billerItem.amountField = amountET.value.toDouble()
             }
         }
 

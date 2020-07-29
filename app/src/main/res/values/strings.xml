@@ -188,8 +188,7 @@
         <item>ZM,ZAMFARA,Gusau</item>
     </string-array>
 
-    <string-array name="lgas">
-    </string-array>
+    <string-array name="lgas"></string-array>
 
     <string name="title_activity_loan_request">Loan Request</string>
     <string name="loan_request">Loan Request</string>
@@ -439,4 +438,19 @@
     <string name="hla_tagging">HLA Tagging</string>
     <string name="lga_hint">Select LGA</string>
     <string name="title_activity_faq">FAQs</string>
+    <string name="please_confirm">Please Confirm</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_fragment_collection_payment">IGR Collections</string>
+    <string name="state_of_origin">State of Origin</string>
+    <string-array name="transaction_types">
+        <item>CashIn</item>
+        <item>CashOut</item>
+        <item>POSCashOut</item>
+        <item>Recharge</item>
+        <item>BillsPayment</item>
+        <item>Registration</item>
+        <item>FundsTransferCommercialBank</item>
+        <item>LocalFundsTransfer</item>
+    </string-array>
 </resources>
