@@ -1,14 +1,10 @@
 package com.appzonegroup.app.fasttrack.work
 
 import android.content.Context
-import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.work.BaseWorker
-import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.safeRunSuspend
 import com.creditclub.core.util.toRequestBody
@@ -28,7 +24,7 @@ class PosNotificationWorker(context: Context, params: WorkerParameters) :
     private val configService: ConfigService by inject()
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        if (Platform.isPOS) return@withContext Result.failure()
+        if (!Platform.isPOS) return@withContext Result.failure()
 
         val gson = Gson()
         val posNotificationDao = posDatabase.posNotificationDao()

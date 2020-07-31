@@ -246,7 +246,7 @@ class CollectionReferenceGenerationFragment :
 
         response.apply {
             amount = request.amount
-            referenceName = request.referenceName
+            referenceName = viewModel.customerName.value
             customerId = request.customerId
         }
         viewModel.referenceString.value = response.reference

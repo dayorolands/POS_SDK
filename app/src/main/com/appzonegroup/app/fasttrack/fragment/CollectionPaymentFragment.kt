@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -64,6 +65,12 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
         binding.collectionReferenceInputLayout.setEndIconOnClickListener {
             mainScope.launch { loadReference() }
+        }
+
+        binding.collectionReferenceInput.doOnTextChanged { _, _, _, _ ->
+            if (viewModel.collectionReference.value == null) {
+                viewModel.collectionReference.postValue(null)
+            }
         }
 
         viewModel.region.onChange {
@@ -209,6 +216,16 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             viewModel.collectionReference.value ?: return
         }
 
+        val amountDouble = viewModel.amountString.value?.toDouble()
+        amountDouble ?: return dialogProvider.showErrorAndWait("Please enter a reference")
+        if (amountDouble == 0.0) return dialogProvider.showErrorAndWait("Amount cannot be zero")
+
+        if (viewModel.collectionTypeIsCbs.value == true || viewModel.collectionTypeIsWebGuid.value == true) {
+            if (amountDouble > viewModel.collectionReference.value?.amount ?: 0.0) {
+                return dialogProvider.showErrorAndWait("You cannot pay above the amount of bill generated")
+            }
+        }
+
         val pin = dialogProvider.getPin("Agent PIN") ?: return
         if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
@@ -225,7 +242,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             categoryCode = viewModel.categoryCode.value
             collectionType = derivedCollectionType
             itemCode = viewModel.itemCode.value
-            amount = viewModel.amountString.value?.toDouble()
+            amount = amountDouble
             geoLocation = gps.geolocationString
             currency = "NGN"
             institutionCode = localStorage.institutionCode
@@ -256,15 +273,13 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
         if (response.isSuccessful == true) {
             dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
+            if (Platform.hasPrinter) {
+                posPrinter.print(CollectionPaymentReceipt(requireContext(), response))
+            }
+            activity?.onBackPressed()
         } else {
             dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
         }
-
-        if (Platform.hasPrinter) {
-            posPrinter.print(CollectionPaymentReceipt(requireContext(), response))
-        }
-
-        activity?.onBackPressed()
     }
 
     private inline val derivedCollectionType

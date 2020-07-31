@@ -2,7 +2,6 @@ package com.appzonegroup.creditclub.pos.work
 
 import android.content.Context
 import androidx.work.WorkerParameters
-import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.models.PosTransaction
 import com.creditclub.core.data.response.isSuccessful
@@ -25,7 +24,7 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
     BaseWorker(context, params) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        if (!Platform.isPOS) Result.failure()
+        if (!Platform.isPOS) return@withContext Result.failure()
 
         val posTransactionDao = posDatabase.posTransactionDao()
         val mediaType = MediaType.parse("application/json")

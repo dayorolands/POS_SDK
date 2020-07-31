@@ -105,14 +105,16 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Don't have a reference yet? " />
+                        android:text="Unable to validate reference? "
+                        app:goneIf="@{viewModel.validReference}" />
 
                     <Button
                         android:id="@+id/generate_reference_button"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Generate One" />
+                        android:text="Register the reference"
+                        app:goneIf="@{viewModel.validReference}" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -127,11 +129,18 @@
                         android:checked="@={viewModel.isOffline}"
                         android:text="Offline Bill"
                         app:goneUnlessPresent="@{viewModel.referenceString}" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:goneUnless="@{viewModel.collectionTypeIsCbs}">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Don't have a reference yet? "
+                        android:text="Unable to validate reference? "
                         app:goneIfPresent="@{viewModel.referenceString}" />
 
                     <Button
@@ -139,7 +148,7 @@
                         style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Generate Offline Bill"
+                        android:text="Register the offline reference"
                         app:goneIfPresent="@{viewModel.referenceString}" />
                 </LinearLayout>
 
@@ -149,6 +158,46 @@
                     android:layout_marginTop="15dp"
                     android:orientation="vertical"
                     app:goneUnless="@{viewModel.validReference}">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginBottom="15dp"
+                            android:layout_weight="1"
+                            android:enabled="false"
+                            android:hint="Category">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:editable="false"
+                                android:inputType="none"
+                                android:text="@{viewModel.collectionReferenceCategoryCode}" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginBottom="15dp"
+                            android:layout_weight="1"
+                            android:enabled="false"
+                            android:hint="Item">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@{viewModel.collectionReferenceItemCode}" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

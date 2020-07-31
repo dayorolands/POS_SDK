@@ -14,6 +14,10 @@ import com.google.android.material.textfield.TextInputLayout
 
 class CollectionPaymentViewModel : ViewModel() {
     val collectionReference: MutableLiveData<CollectionReference> = MutableLiveData()
+    val collectionReferenceItemCode = Transformations.map(collectionReference) { it?.itemCode }
+    val collectionReferenceCategoryCode =
+        Transformations.map(collectionReference) { it?.categoryCode }
+
     val region: MutableLiveData<String> = MutableLiveData()
     val category: MutableLiveData<CollectionCategory> = MutableLiveData()
     val categoryCode = Transformations.map(category) { it?.code }
