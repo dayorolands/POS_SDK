@@ -6,8 +6,6 @@ import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.utility.extensions.registerWorkers
 import com.appzonegroup.app.fasttrack.utility.registerAppFunctions
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.loadPosModules
-import com.appzonegroup.creditclub.pos.startPosApp
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.util.localStorage
 import com.squareup.picasso.Picasso

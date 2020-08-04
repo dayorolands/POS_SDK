@@ -142,6 +142,9 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         response?.reference
             ?: return dialogProvider.showErrorAndWait("Please enter a valid reference")
         if (response.isSuccessful != true) {
+            if (response.responseMessage?.contains("invoice not found", true) == true) {
+                viewModel.referenceString.value = ""
+            }
             return dialogProvider.showError(response.responseMessage)
         }
         viewModel.collectionReference.value = response
@@ -279,9 +282,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             activity?.onBackPressed()
         } else {
             dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
-            if (response.responseMessage?.contains("Invoice not found", true) == true) {
-                viewModel.referenceString.value = ""
-            }
         }
     }
 
