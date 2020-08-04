@@ -279,6 +279,9 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             activity?.onBackPressed()
         } else {
             dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
+            if (response.responseMessage?.contains("Invoice not found", true) == true) {
+                viewModel.referenceString.value = ""
+            }
         }
     }
 
