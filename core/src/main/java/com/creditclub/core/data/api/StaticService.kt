@@ -92,7 +92,9 @@ interface StaticService {
     suspend fun confirmAgentInformation(
         @Query("institutionCode") institutionCode: String?,
         @Query("agentPhoneNumber") agentPhoneNumber: String,
-        @Query("agentPIN") verificationCode: String
+        @Query("agentPIN") agentPin: String,
+        @Query("AppVersion") appVersion: String,
+        @Query("DeviceType") deviceType: String
     ): BackendResponse?
 
     @GET("CreditClubStatic/GetAssociations")

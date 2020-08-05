@@ -14,6 +14,7 @@ import com.appzonegroup.app.fasttrack.ui.SurveyDialog
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
+import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.data.model.SurveyQuestion
 import com.creditclub.core.data.prefs.JsonStorage
@@ -148,7 +149,11 @@ class LoginActivity : CreditClubActivity() {
             val surveyQuestions = response.data ?: return@launch
 
             if (response.isSuccessful) {
-                jsonStore.save("SURVEY_QUESTIONS", surveyQuestions, SurveyQuestion.serializer().list)
+                jsonStore.save(
+                    "SURVEY_QUESTIONS",
+                    surveyQuestions,
+                    SurveyQuestion.serializer().list
+                )
             }
         }
     }
@@ -223,7 +228,9 @@ class LoginActivity : CreditClubActivity() {
                 creditClubMiddleWareAPI.staticService.confirmAgentInformation(
                     localStorage.institutionCode,
                     phoneNumber,
-                    pin
+                    pin,
+                    appVersionName,
+                    if (Platform.isPOS) "TelpoPOS" else "Mobile"
                 )
             }
             dialogProvider.hideProgressBar()
