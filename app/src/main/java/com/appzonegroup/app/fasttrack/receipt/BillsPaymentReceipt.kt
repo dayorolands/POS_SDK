@@ -8,6 +8,8 @@ import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
 import com.creditclub.core.util.toString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import org.threeten.bp.Instant
 
 
@@ -19,9 +21,11 @@ import org.threeten.bp.Instant
 class BillsPaymentReceipt(context: Context, val request: PayBillRequest) :
     TransactionReceipt(context) {
 
+    private var additionalInformation: PayBillResponse.AdditionalInformation? = null
+
     override val nodes: List<PrintNode>
         get() {
-            return mutableListOf(
+            val nodes = mutableListOf(
                 LogoNode(),
 
                 TextNode(if (request.isRecharge) "Airtime Recharge" else "Bills Payment").apply {
@@ -50,12 +54,31 @@ Customer Name: ${request.customerName}
 RRN: ${request.retrievalReferenceNumber}
 Transaction ID: ${request.customerDepositSlipNumber}"""
                 )
-            ).apply { addTransactionStatus(); addAll(footerNodes) }.toList()
+            )
+
+            additionalInformation?.customerAddress?.run {
+                nodes.add(TextNode("Customer Address: $this"))
+            }
+
+            additionalInformation?.customerToken?.run {
+                nodes.add(TextNode("Customer Token: $this"))
+            }
+
+            nodes.addTransactionStatus()
+            nodes.addAll(footerNodes)
+            return nodes.toList()
         }
 
     fun withResponse(response: PayBillResponse?): BillsPaymentReceipt {
-        isSuccessful = response?.isSuccessFul == true
-        reason = response?.responseMessage
+        response ?: return this
+
+        isSuccessful = response.isSuccessFul == true
+        reason = response.responseMessage
+        response.additionalInformation?.run {
+            val json = Json(JsonConfiguration.Stable)
+            val serializer = PayBillResponse.AdditionalInformation.serializer()
+            additionalInformation = json.parse(serializer, this)
+        }
 
         return this
     }

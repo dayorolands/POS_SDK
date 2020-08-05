@@ -26,7 +26,7 @@ class PosNotificationWorker(context: Context, params: WorkerParameters) :
         val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
         val posDatabase: PosDatabase by inject()
         val backendConfig: BackendConfig by inject()
-        val configService = ConfigService.getInstance(applicationContext)
+        val configService: ConfigService by inject()
         val posNotificationDao = posDatabase.posNotificationDao()
 
         val jobs = posNotificationDao.all().map { notification ->
