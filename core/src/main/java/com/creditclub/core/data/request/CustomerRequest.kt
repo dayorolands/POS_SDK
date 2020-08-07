@@ -105,5 +105,8 @@ class CustomerRequest {
 
         @SerialName("State")
         var state: String? = null
+
+        @SerialName("City")
+        var lga: String? = null
     }
 }

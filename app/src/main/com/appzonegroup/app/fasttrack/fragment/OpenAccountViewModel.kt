@@ -2,9 +2,12 @@ package com.appzonegroup.app.fasttrack.fragment
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.creditclub.core.data.model.Lga
+import com.creditclub.core.data.model.State
 
 class OpenAccountViewModel : ViewModel() {
     val passportString = MutableLiveData<String>()
+    val signatureString = MutableLiveData<String>()
     val bvn = MutableLiveData<String>()
     val dob = MutableLiveData<String>()
     val agentPIN = MutableLiveData<String>()
@@ -18,6 +21,10 @@ class OpenAccountViewModel : ViewModel() {
     val address = MutableLiveData<String>()
     val state = MutableLiveData<String>()
     val stateCode = MutableLiveData<String>()
+    val addressState = MutableLiveData<State>()
+    val stateList = MutableLiveData<List<State>>()
+    val addressLga = MutableLiveData<Lga>()
+    val lgaList = MutableLiveData<List<Lga>>()
     val placeOfBirth = MutableLiveData<String>()
     val starterPackNo = MutableLiveData<String>()
     val productName = MutableLiveData<String>()
