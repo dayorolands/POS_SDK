@@ -44,8 +44,8 @@ import java.util.*
 class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) : PosParameter,
     KoinComponent {
     private val prefs: SharedPreferences = run {
-        val route = posMode?.id ?: "Default"
-        context.getSharedPreferences("Parameters~${route}", 0)
+        val suffix = posMode?.run { "$ip~$port" } ?: "Default"
+        context.getSharedPreferences("Parameters~$suffix", 0)
     }
     private val config: PosConfig by inject()
     private val database: PosDatabase by inject()
@@ -104,11 +104,7 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
         TerminalUtils.logISOMsg(isoMsg)
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(
-                config.remoteConnectionInfo.ip,
-                config.remoteConnectionInfo.port,
-                isoMsg.pack()
-            )
+            SocketJob.execute(config.remoteConnectionInfo, isoMsg.pack())
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -158,11 +154,7 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(
-                config.remoteConnectionInfo.ip,
-                config.remoteConnectionInfo.port,
-                isoMsg.pack()
-            )
+            SocketJob.execute(config.remoteConnectionInfo, isoMsg.pack())
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -211,11 +203,7 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(
-                config.remoteConnectionInfo.ip,
-                config.remoteConnectionInfo.port,
-                isoMsg.pack()
-            )
+            SocketJob.execute(config.remoteConnectionInfo, isoMsg.pack())
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -277,11 +265,7 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(
-                config.remoteConnectionInfo.ip,
-                config.remoteConnectionInfo.port,
-                finalMsgBytes
-            )
+            SocketJob.execute(config.remoteConnectionInfo, finalMsgBytes)
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -338,11 +322,7 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(
-                config.remoteConnectionInfo.ip,
-                config.remoteConnectionInfo.port,
-                finalMsgBytes
-            )
+            SocketJob.execute(config.remoteConnectionInfo, finalMsgBytes)
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -399,11 +379,7 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(
-                config.remoteConnectionInfo.ip,
-                config.remoteConnectionInfo.port,
-                finalMsgBytes
-            )
+            SocketJob.execute(config.remoteConnectionInfo, finalMsgBytes)
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")

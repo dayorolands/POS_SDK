@@ -1,9 +1,7 @@
 package com.appzonegroup.creditclub.pos.util
 
 import android.util.Log
-import com.creditclub.pos.PosConfig
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import com.creditclub.pos.RemoteConnectionInfo
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -21,21 +19,21 @@ import javax.net.ssl.SSLSocket
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
-object SocketJob : KoinComponent {
+object SocketJob {
     private val TAG = SocketJob::class.java.simpleName
-    private val configService: PosConfig by inject()
 
     @Throws(
         NoSuchAlgorithmException::class,
         KeyManagementException::class,
         IOException::class
     )
-    fun sslSocketConnectionJob(
-        host: String?,
-        port: Int,
+    fun execute(
+        connectionInfo: RemoteConnectionInfo,
         data: ByteArray
     ): ByteArray? {
-        if (!configService.sslEnabled) return socketConnectionJob(host, port, data)
+        val host = connectionInfo.ip
+        val port = connectionInfo.port
+        if (!connectionInfo.ssl) return socketConnectionJob(host, port, data)
 
         val messageByte = ByteArray(1000)
         var end = false

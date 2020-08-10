@@ -69,12 +69,7 @@ class IsoSocketHelper(
             val outputData = request.prepare(sessionKey)
             request.dump(System.out, "REQUEST")
             Log.d(tag, "RESULT : " + String(outputData))
-            val output =
-                SocketJob.sslSocketConnectionJob(
-                    config.remoteConnectionInfo.ip,
-                    config.remoteConnectionInfo.port,
-                    outputData
-                )
+            val output = SocketJob.execute(config.remoteConnectionInfo, outputData)
 
             println("MESSAGE: " + String(output!!))
 

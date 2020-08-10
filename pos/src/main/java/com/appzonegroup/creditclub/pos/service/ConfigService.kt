@@ -27,7 +27,6 @@ open class ConfigService(context: Context) : PosConfig {
     override var terminalId by prefs.nonNullStringStore("TERMINAL_ID", "")
     override var supervisorPin by prefs.nonNullStringStore("SUPERVISOR_PIN", "1111")
     override var adminPin by prefs.nonNullStringStore("ADMIN_PIN", "asdfg")
-    override var sslEnabled by prefs.booleanStore("SSL_ENABLED", true)
 
     override var remoteConnectionInfo: RemoteConnectionInfo
         get() = PosMode.values().find { it.id == posModeStr } ?: PosMode.Zone

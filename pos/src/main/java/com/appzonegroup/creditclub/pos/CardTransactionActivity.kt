@@ -19,6 +19,7 @@ import com.appzonegroup.creditclub.pos.card.cardTransactionType
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.data.create
 import com.appzonegroup.creditclub.pos.databinding.*
+import com.appzonegroup.creditclub.pos.extension.toRemoteConnectionInfo
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.models.*
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
@@ -309,8 +310,8 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         stopTimer()
         val amount = amountText.toDouble() / 100
         val supportedRoute = localStorage.binRoutes?.getSupportedRoute(request.pan!!, amount)
-        val remoteConnectionInfo = if (supportedRoute != null) PosMode.valueOf(supportedRoute)
-        else config.remoteConnectionInfo
+        val remoteConnectionInfo =
+            supportedRoute?.toRemoteConnectionInfo() ?: config.remoteConnectionInfo
 
         val posParameter = ParameterService(this, remoteConnectionInfo)
         val isoSocketHelper = IsoSocketHelper(config, posParameter)

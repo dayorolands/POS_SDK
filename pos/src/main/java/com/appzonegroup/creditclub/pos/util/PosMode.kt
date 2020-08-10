@@ -8,7 +8,8 @@ enum class PosMode(
     override val key1: String,
     override val key2: String,
     override val ip: String,
-    override val port: Int
+    override val port: Int,
+    override val ssl: Boolean = true
 ) : RemoteConnectionInfo {
 
     EPMS(
