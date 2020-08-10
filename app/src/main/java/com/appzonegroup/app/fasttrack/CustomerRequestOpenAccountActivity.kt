@@ -97,7 +97,8 @@ class CustomerRequestOpenAccountActivity : CreditClubActivity(R.layout.activity_
         additionalInformation.middleName = viewModel.middleName.value?.trim()
         additionalInformation.title = if (gender == "female") "Ms" else "Mr"
         additionalInformation.country = "NGN"
-        additionalInformation.state = viewModel.state.value
+        additionalInformation.state = viewModel.addressState.value?.name
+        additionalInformation.lga = viewModel.addressLga.value?.name
 
         //additionalInformation.setIDCard(idCardString);
         //additionalInformation.setOccupation(occupation);

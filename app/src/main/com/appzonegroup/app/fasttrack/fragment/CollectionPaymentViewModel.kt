@@ -62,15 +62,6 @@ class CollectionPaymentViewModel : ViewModel() {
         }
 
         @JvmStatic
-        @BindingAdapter("app:disabledIfPresent")
-        fun disabledIfPresent(view: View, data: LiveData<*>) {
-            view.isEnabled = when (data.value) {
-                is String? -> !(data.value as? String).isNullOrBlank()
-                else -> data.value != null
-            }
-        }
-
-        @JvmStatic
         @BindingAdapter("app:goneIfPresent")
         fun goneIfPresent(view: View, data: LiveData<*>) {
             val visible = when (data.value) {
