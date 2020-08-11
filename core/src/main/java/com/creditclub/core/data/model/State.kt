@@ -14,4 +14,6 @@ class State {
 
     @SerialName("LGAs")
     var lgas: List<Lga>? = null
+
+    override fun toString() = name
 }
