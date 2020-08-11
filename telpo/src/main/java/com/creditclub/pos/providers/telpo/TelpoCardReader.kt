@@ -189,7 +189,7 @@ class TelpoCardReader(
             MerchCateCode = managementData.merchantCategoryCode.toByteArray()
             TermId = get<PosConfig>().terminalId.toByteArray()
             TerminalType = 0x22
-            Capability = byteArrayOf(0xE0.toByte(), 0xF9.toByte(), 0xC8.toByte())
+            Capability = byteArrayOf(0xE0.toByte(), 0xF8.toByte(), 0xC8.toByte())
             ExCapability = byteArrayOf(0xE0.toByte(), 0x00, 0xF0.toByte(), 0xA0.toByte(), 0x01)
             CountryCode = byteArrayOf(5, 66)
 
