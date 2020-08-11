@@ -1,5 +1,7 @@
 package com.creditclub.pos.providers.telpo
 
+import android.util.Log
+import com.creditclub.core.util.debugOnly
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
 import com.telpo.emv.EmvService
@@ -52,6 +54,7 @@ class TelpoEmvCardData constructor(
         emvService?.run {
             authRequest = getValue(0x9F26)
             cryptogram = getValue(0x9F27)
+            debugOnly { Log.d("TelpoEmvCardData", "Cryptogram: $cryptogram") }
             iad = getValue(0x9F10)
             unpredictedNumber = getValue(0x9F37)
             atc = getValue(0x9F36)
