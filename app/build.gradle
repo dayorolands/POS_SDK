@@ -63,7 +63,7 @@ android {
 
         releaseStaging {
             debuggable true
-            buildConfigField("String", "API_HOST", '"http://staging.mybankone.com"')
+            buildConfigField("String", "API_HOST", '"https://staging.mybankone.com"')
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (Staging)"
@@ -81,7 +81,7 @@ android {
 
         debug {
             debuggable true
-            buildConfigField("String", "API_HOST", '"http://staging.mybankone.com"')
+            buildConfigField("String", "API_HOST", '"https://staging.mybankone.com"')
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (Staging)"
