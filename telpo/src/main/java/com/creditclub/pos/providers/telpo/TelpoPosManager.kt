@@ -1,8 +1,10 @@
 package com.creditclub.pos.providers.telpo
 
 import android.content.Context
+import android.util.Log
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosManagerCompanion
@@ -29,19 +31,14 @@ import java.nio.charset.StandardCharsets
  * Appzone Ltd
  */
 class TelpoPosManager(private val activity: CreditClubActivity) : PosManager, KoinComponent {
-    override val cardReader by lazy { TelpoCardReader(activity, emvListener) }
+    override val cardReader by lazy { TelpoCardReader(activity, this) }
     private val posParameter: PosParameter by inject()
-    private val emvListener by lazy {
-        TelpoEmvListener(activity, emvService, sessionData)
-    }
 
-    private val emvService by lazy { EmvService.getInstance() }
+    internal val emvService by lazy { EmvService.getInstance() }
     override val sessionData = PosManager.SessionData()
 
     override suspend fun loadEmv() {
         safeRun { PinpadService.Close() }
-
-        emvService.setListener(emvListener)
 
         EmvService.Emv_SetDebugOn(if (BuildConfig.DEBUG) 1 else 0)
 
@@ -51,10 +48,10 @@ class TelpoPosManager(private val activity: CreditClubActivity) : PosManager, Ko
         EmvService.Emv_RemoveAllApp()
         EmvService.Emv_RemoveAllCapk()
 
+        injectAid()
         StableAPPCAPK.Add_All_APP()
+        injectCapk()
         StableAPPCAPK.Add_All_CAPK()
-//        injectAid()
-//        injectCapk()
     }
 
     override fun cleanUpEmv() {
@@ -108,9 +105,9 @@ class TelpoPosManager(private val activity: CreditClubActivity) : PosManager, Ko
             capk.KeyID = jsonObject.keyIndex32.hexByte
             capk.HashInd = jsonObject.hashAlgorithm36.hexByte
             capk.ArithInd = jsonObject.keyAlgorithm40.hexByte
-            capk.Modul = jsonObject.modulus37.hexBytes
+            capk.Modul = jsonObject.modulus37.replace("\n", "").hexBytes
             capk.Exponent = jsonObject.exponent38.hexBytes
-//            capk.ExpDate = byteArrayOf(37, 18, EmvService.TYPE_BALANCE_INQUIRY)
+            capk.ExpDate = byteArrayOf(37, 18, EmvService.TYPE_BALANCE_INQUIRY)
             capk.CheckSum = jsonObject.hash39.hexBytes
             EmvService.Emv_AddCapk(capk)
         }
@@ -133,9 +130,9 @@ class TelpoPosManager(private val activity: CreditClubActivity) : PosManager, Ko
                 deviceType = SystemUtil.getDeviceType()
                 return true
             } catch (ex: Exception) {
-                if (BuildConfig.DEBUG) ex.printStackTrace()
+                debugOnly { Log.e("TelpoPosManager", ex.message, ex) }
             } catch (err: UnsatisfiedLinkError) {
-                if (BuildConfig.DEBUG) err.printStackTrace()
+                debugOnly { Log.e("TelpoPosManager", err.message, err) }
             }
 
             return false

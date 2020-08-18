@@ -6,10 +6,8 @@ import androidx.core.content.edit
 import com.creditclub.core.R
 import com.creditclub.core.data.model.AgentInfo
 import com.creditclub.core.data.model.AuthResponse
-import com.creditclub.core.data.model.BinRoutes
 import com.creditclub.core.util.delegates.jsonStore
 import com.creditclub.core.util.delegates.valueStore
-import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 
@@ -48,7 +46,6 @@ class LocalStorage private constructor(
 
     val authResponse: AuthResponse? by jsonStore(KEY_AUTH, AuthResponse.serializer())
     var agent: AgentInfo? by jsonStore(AGENT_INFO, AgentInfo.serializer())
-    var binRoutes: List<BinRoutes>? by jsonStore("BIN_ROUTES", BinRoutes.serializer().list)
 
     fun getString(key: String): String? = getString(key, null)
 

@@ -7,42 +7,40 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
-import com.appzonegroup.creditclub.pos.card.AccountType
-import com.appzonegroup.creditclub.pos.card.CardIsoMsg
-import com.appzonegroup.creditclub.pos.card.EmvErrorMessage
-import com.appzonegroup.creditclub.pos.card.cardTransactionType
+import com.appzonegroup.creditclub.pos.card.*
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.data.create
+import com.appzonegroup.creditclub.pos.data.posPreferences
 import com.appzonegroup.creditclub.pos.databinding.*
-import com.appzonegroup.creditclub.pos.extension.toRemoteConnectionInfo
+import com.appzonegroup.creditclub.pos.extension.isSuccessful
+import com.appzonegroup.creditclub.pos.extension.posConfig
+import com.appzonegroup.creditclub.pos.extension.responseMessage
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.models.*
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
 import com.appzonegroup.creditclub.pos.printer.Receipt
-import com.appzonegroup.creditclub.pos.service.ApiService
 import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
-import com.appzonegroup.creditclub.pos.util.PosMode
-import com.creditclub.core.data.model.getSupportedRoute
+import com.creditclub.pos.model.getSupportedRoute
 import com.creditclub.core.util.*
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
 import com.creditclub.pos.card.CardTransactionStatus
 import com.creditclub.pos.card.TransactionType
+import com.creditclub.pos.model.ConnectionInfo
 import com.creditclub.pos.printer.PrinterStatus
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.page_input_amount.*
 import kotlinx.android.synthetic.main.page_input_rrn.*
 import kotlinx.android.synthetic.main.text_field.view.*
 import kotlinx.coroutines.*
-import okhttp3.Headers
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import org.threeten.bp.Instant
@@ -255,7 +253,9 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                 showError("The limit for this transaction is NGN${cardLimit}")
                 return
             }
-
+            sessionData.getDukptConfig = { pan, amount ->
+                posPreferences.binRoutes?.getSupportedRoute(pan, amount)?.dukptConfig
+            }
             val amountStr = format(amountText)
 
             mainScope.launch {
@@ -309,42 +309,46 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         pendingRequest = request
         stopTimer()
         val amount = amountText.toDouble() / 100
-        val supportedRoute = localStorage.binRoutes?.getSupportedRoute(request.pan!!, amount)
-        val remoteConnectionInfo =
-            supportedRoute?.toRemoteConnectionInfo() ?: config.remoteConnectionInfo
+        val supportedRoute = posPreferences.binRoutes?.getSupportedRoute(request.pan!!, amount)
+        val remoteConnectionInfo = supportedRoute ?: config.remoteConnectionInfo
 
         val posParameter = ParameterService(this, remoteConnectionInfo)
-        val isoSocketHelper = IsoSocketHelper(config, posParameter)
-        GlobalScope.launch(Dispatchers.Main) {
+        val isoSocketHelper = IsoSocketHelper(config, posParameter, remoteConnectionInfo)
+        mainScope.launch {
             if (cardData.pinBlock.isEmpty()) {
                 dialogProvider.showProgressBar("Pin Ok")
                 delay(1000)
             }
-//            else {
-//                request.apply {
-//                    withPinData(cardData.pinBlock, parameters)
-//                }
-//            }
 
             dialogProvider.showProgressBar("Receiving...")
             try {
                 callHomeService.stopCallHomeTimer()
 
-                val (response) = withContext(Dispatchers.Default) {
-                    isoSocketHelper.send(request)
+                val (response, error) = withContext(Dispatchers.IO) {
+                    if (request.mti == "0200" && remoteConnectionInfo.maxAttempts > 1) {
+                        isoSocketHelper.send(
+                            request,
+                            remoteConnectionInfo.maxAttempts,
+                            onReattempt = {
+                                delay(5000)
+                                request.mti = if (it > 2) "0221" else "0220"
+                                runOnUiThread { dialogProvider.showProgressBar("Retrying...$it") }
+                            }
+                        )
+                    } else {
+                        isoSocketHelper.send(request)
+                    }
                 }
 
                 callHomeService.startCallHomeTimer()
 
+                if (error != null) firebaseCrashlytics.recordException(error)
                 if (response == null) {
-//                    analyticsHelper.logException(error)
                     renderTransactionFailure("Transmission Error")
-                    attemptReversal(request)
+                    isoSocketHelper.attemptReversal(request)
 
                     return@launch
                 }
-
-                response.dump(System.out, "response:")
 
                 response.set(4, request.transactionAmount4)
 
@@ -353,10 +357,13 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                     cardHolder = cardData.holder
                     aid = cardData.aid
                     cardType = cardData.type
+                    nodeName = remoteConnectionInfo.id
+                    if (remoteConnectionInfo is ConnectionInfo) {
+                        connectionInfo = remoteConnectionInfo
+                    }
                 }
 
                 val receipt = Receipt(this@CardTransactionActivity, transaction)
-
 
                 onTransactionDidFinish()
 
@@ -396,57 +403,25 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                     binding.amountText.text = format(amountText)
 
                     withContext(Dispatchers.IO) {
-                        val db = PosDatabase.getInstance(this@CardTransactionActivity)
-
-                        db.runInTransaction {
-                            db.financialTransactionDao().save(transaction)
-                            db.posTransactionDao().save(PosTransaction.create(response).apply {
+                        posDatabase.runInTransaction {
+                            val posTransaction = PosTransaction.create(response).apply {
                                 bankName = getString(R.string.pos_acquirer)
                                 cardHolder = cardData.holder
                                 cardType = cardData.type
-                            })
-                        }
-
-                        if (response.isSuccessful) {
-                            val posNotification = PosNotification.create(transaction)
-                            db.posNotificationDao().save(posNotification)
-
-                            val url =
-                                "${backendConfig.apiHost}/CreditClubMiddlewareAPI/CreditClubStatic/POSCashOutNotification"
-
-                            val dataToSend = Gson().toJson(posNotification)
-
-                            val headers = Headers.Builder()
-                            headers.add(
-                                "Authorization",
-                                "iRestrict ${backendConfig.posNotificationToken}"
-                            )
-                            headers.add("TerminalID", config.terminalId)
-
-                            val (responseString, error) = ApiService.post(
-                                url,
-                                dataToSend,
-                                headers.build()
-                            )
-
-                            responseString ?: return@withContext
-                            error?.printStackTrace()
-
-                            try {
-                                val notificationResponse =
-                                    Gson().fromJson(
-                                        responseString,
-                                        NotificationResponse::class.java
-                                    )
-                                if (notificationResponse != null) {
-                                    if (notificationResponse.billerReference != null && notificationResponse.billerReference!!.isNotEmpty()) {
-                                        db.posNotificationDao().delete(posNotification.id)
-                                    }
-                                }
-                            } catch (ex: Exception) {
-                                ex.printStackTrace()
                             }
+                            posDatabase.financialTransactionDao().save(transaction)
+                            posDatabase.posTransactionDao().save(posTransaction)
                         }
+                    }
+
+                    if (response.isSuccessful) {
+                        val posNotification = PosNotification.create(transaction)
+                        posNotification.nodeName = remoteConnectionInfo.id
+                        if (remoteConnectionInfo is ConnectionInfo) {
+                            posNotification.connectionInfo = remoteConnectionInfo
+                        }
+
+                        logPosNotification(posDatabase, backendConfig, posConfig, posNotification)
                     }
                 }
 
@@ -466,19 +441,19 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                     isCustomerCopy = true
                 })
             } catch (ex: Exception) {
-//                analyticsHelper.logException(ex)
-                ex.printStackTrace()
+                firebaseCrashlytics.recordException(ex)
+                debugOnly { Log.e("CardTrans", ex.message, ex) }
                 renderTransactionFailure("Transmission Error")
 
-                attemptReversal(request)
+                isoSocketHelper.attemptReversal(request)
             } finally {
                 dialogProvider.hideProgressBar()
             }
         }
     }
 
-    private suspend fun attemptReversal(request: BaseIsoMsg) {
-        if (request.mti == "0200") withContext(Dispatchers.Default) {
+    private suspend fun IsoSocketHelper.attemptReversal(request: BaseIsoMsg) {
+        if (request.mti == "0200") withContext(Dispatchers.IO) {
             runOnUiThread {
                 dialogProvider.showProgressBar("Transmission Error \nReversing...")
             }
@@ -491,23 +466,24 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                 withParameters(parameters.parameters)
             }
 
-            val success = isoSocketHelper.attempt(reversal, 4, onReattempt = {
+            val success = attempt(reversal, 4, onReattempt = {
                 runOnUiThread {
                     dialogProvider.showProgressBar("Reversing...$it")
                 }
 
                 delay(1000)
 
-                reversal.mti = "421"
+                reversal.mti = "0421"
             })
 
-//            if (success) analyticsHelper.logTransaction(TransactionType.Reversal.type, request, "Manual")
-
             if (!success) {
-                PosDatabase
-                    .getInstance(this@CardTransactionActivity)
-                    .reversalDao()
-                    .save(Reversal(reversal))
+                val reversalRecord = Reversal(reversal).apply {
+                    nodeName = remoteConnectionInfo.id
+                    if (remoteConnectionInfo is ConnectionInfo) {
+                        connectionInfo = remoteConnectionInfo
+                    }
+                }
+                posDatabase.reversalDao().save(reversalRecord)
             }
         }
     }
@@ -667,7 +643,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         posManager.cardReader.endWatch()
 
         if (cardReaderEvent == CardReaderEvent.CHIP || cardReaderEvent == CardReaderEvent.CHIP_FAILURE) {
-            GlobalScope.launch {
+            mainScope.launch {
                 posManager.cardReader.onRemoveCard {
                     if (it == CardReaderEvent.REMOVED || it == CardReaderEvent.CANCELLED) {
                         finish()

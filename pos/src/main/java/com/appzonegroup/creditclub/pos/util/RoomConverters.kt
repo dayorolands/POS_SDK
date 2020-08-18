@@ -1,6 +1,9 @@
 package com.appzonegroup.creditclub.pos.util
 
 import androidx.room.TypeConverter
+import com.creditclub.pos.model.ConnectionInfo
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import org.threeten.bp.Instant
 import org.threeten.bp.format.DateTimeFormatter
 
@@ -12,6 +15,14 @@ import org.threeten.bp.format.DateTimeFormatter
 
 object RoomConverters {
     private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+    private val json = Json(
+        JsonConfiguration.Stable.copy(
+            isLenient = true,
+            ignoreUnknownKeys = true,
+            serializeSpecialFloatingPointValues = true,
+            useArrayPolymorphism = true
+        )
+    )
 
     @TypeConverter
     @JvmStatic
@@ -25,5 +36,21 @@ object RoomConverters {
     @JvmStatic
     fun fromOffsetDateTime(date: Instant?): String? {
         return date?.toString()
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toConnectionInfo(value: String?): ConnectionInfo? {
+        return value?.run {
+            return json.parse(ConnectionInfo.serializer(), this)
+        }
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromConnectionInfo(connectionInfo: ConnectionInfo?): String? {
+        return connectionInfo?.run {
+            json.stringify(ConnectionInfo.serializer(), this)
+        }
     }
 }

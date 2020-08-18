@@ -16,18 +16,15 @@ class StartPinPadService(private val context: Context, private val parameters: P
 
     override fun run() {
         val ret = PinpadService.Open(context)
-
         if (ret == PinpadService.PIN_ERROR_NEED_TO_FOMRAT) {
             PinpadService.TP_PinpadFormat(context)
             PinpadService.Open(context)
         }
 
         val pinKey = parameters.pinKey.hexBytes
-        val i = PinpadService.TP_WriteMasterKey(0, pinKey, PinpadService.KEY_WRITE_DIRECT)
+        PinpadService.TP_WriteMasterKey(0, pinKey, PinpadService.KEY_WRITE_DIRECT)
 
-        if (i == 0) {
-            val masterKey = parameters.masterKey.hexBytes
-            PinpadService.TP_WritePinKey(1, masterKey, PinpadService.KEY_WRITE_DECRYPT, 0)
-        }
+        val masterKey = parameters.masterKey.hexBytes
+        PinpadService.TP_WritePinKey(1, masterKey, PinpadService.KEY_WRITE_DECRYPT, 0)
     }
 }

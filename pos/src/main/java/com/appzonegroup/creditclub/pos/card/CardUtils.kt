@@ -37,7 +37,7 @@ fun cardTransactionType(msg: ISOMsg) = when (msg.mti) {
         "61" -> TransactionType.SalesComplete
         else -> TransactionType.Unknown
     }
-    "0420", "421", "0430" -> TransactionType.Reversal
+    "0420", "0421", "0430" -> TransactionType.Reversal
     else -> TransactionType.Unknown
 }
 

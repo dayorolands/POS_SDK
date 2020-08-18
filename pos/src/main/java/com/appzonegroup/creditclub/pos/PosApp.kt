@@ -70,7 +70,12 @@ fun loadPosModules() {
     loadKoinModules(module {
         single<PosConfig> { ConfigService(androidContext()) }
         single { PosDatabase.getInstance(androidContext()) }
-        single<PosParameter>(override = true) { ParameterService(androidContext()) }
+        single<PosParameter>(override = true) {
+            ParameterService(
+                androidContext(),
+                get<PosConfig>().remoteConnectionInfo
+            )
+        }
         single { CallHomeService() }
         single { IsoSocketHelper(get(), get()) }
     })

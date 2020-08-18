@@ -14,13 +14,16 @@ import com.appzonegroup.app.fasttrack.ui.SurveyDialog
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
+import com.appzonegroup.creditclub.pos.data.posPreferences
 import com.creditclub.core.CreditClubApplication
+import com.creditclub.core.data.model.AgentInfo
 import com.creditclub.core.data.model.SurveyQuestion
 import com.creditclub.core.data.prefs.JsonStorage
 import com.creditclub.core.data.request.SubmitSurveyRequest
 import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
+import com.creditclub.pos.api.posApiService
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.launch
@@ -91,13 +94,13 @@ class LoginActivity : CreditClubActivity() {
 
     private suspend fun updateBinRoutes() {
         val (response) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.getBinRoutes(
+            creditClubMiddleWareAPI.posApiService.getBinRoutes(
                 localStorage.institutionCode,
                 localStorage.agentPhone
             )
         }
         if (response?.isSuccessful() == true) {
-            localStorage.binRoutes = response.data
+            posPreferences.binRoutes = response.data
         }
     }
 

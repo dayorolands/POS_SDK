@@ -65,7 +65,7 @@ object SocketJob {
         //dialog.setMessage("Sending......");
         Log.d(TAG, "Sending......")
         Log.d(TAG, "Length to send " + data.size)
-        val outputInfo = TerminalUtils.appendLengthBytes(data)
+        val outputInfo = appendLengthBytes(data)
         Log.d(TAG, "Bytes written to output " + String(outputInfo))
         out.write(outputInfo)
         out.flush()
@@ -116,7 +116,7 @@ object SocketJob {
         //dialog.setMessage("Sending......");
         Log.d(TAG, "Sending......")
         Log.d(TAG, "Length to send " + data.size)
-        out.write(TerminalUtils.appendLengthBytes(data))
+        out.write(appendLengthBytes(data))
         //dialog.setMessage("Receiving....");
         Log.d(TAG, "Receiving....")
         var bytesRead: Int
@@ -136,5 +136,14 @@ object SocketJob {
             }
         }
         return baos.toByteArray()
+    }
+
+    private fun appendLengthBytes(data: ByteArray): ByteArray {
+        val dataLength = data.size.toShort()
+        val destination = ByteArray(2 + dataLength)
+        destination[0] = (dataLength.toInt() shr 8).toByte()
+        destination[1] = dataLength /*>> 0*/.toByte()
+        System.arraycopy(data, 0, destination, 2, dataLength.toInt())
+        return destination
     }
 }

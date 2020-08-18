@@ -85,6 +85,10 @@ var ISOMsg.managementDataOne62 by isoMsgField(62)
 
 var ISOMsg.managementDataTwo63 by isoMsgField(63)
 
+var ISOMsg.originalDataElements90 by isoMsgField(90)
+
+var ISOMsg.replacementAmounts95 by isoMsgField(95)
+
 var ISOMsg.posDataCode123 by isoMsgField(123)
 
 var ISOMsg.secondaryHashValue by isoMsgField(128)

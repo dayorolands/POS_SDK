@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.view.WindowManager
+import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.widget.Dialogs
@@ -20,11 +21,14 @@ import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
 @SuppressLint("Registered")
-abstract class PosActivity : CreditClubActivity() {
+abstract class PosActivity : CreditClubActivity {
+    constructor() : super()
+    constructor(layout: Int) : super(layout)
     val config: PosConfig by inject()
     val parameters: PosParameter by inject()
     val callHomeService: CallHomeService by inject()
     val isoSocketHelper: IsoSocketHelper by inject()
+    val posDatabase: PosDatabase by inject()
 
     val printer: PosPrinter by inject { parametersOf(this, dialogProvider) }
     val PosParameter.parameters get() = managementData

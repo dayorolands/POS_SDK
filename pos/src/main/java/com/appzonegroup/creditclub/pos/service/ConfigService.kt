@@ -8,8 +8,12 @@ import com.creditclub.core.util.delegates.booleanStore
 import com.creditclub.core.util.delegates.intStore
 import com.creditclub.core.util.delegates.stringStore
 import com.creditclub.pos.PosConfig
+import com.creditclub.pos.PosParameter
 import com.creditclub.pos.RemoteConnectionInfo
 import com.creditclub.pos.utils.nonNullStringStore
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 
 
 /**
@@ -29,10 +33,15 @@ open class ConfigService(context: Context) : PosConfig {
     override var adminPin by prefs.nonNullStringStore("ADMIN_PIN", "asdfg")
 
     override var remoteConnectionInfo: RemoteConnectionInfo
-        get() = PosMode.values().find { it.id == posModeStr } ?: PosMode.Zone
+        get() = PosMode.values().find { it.id == posModeStr } ?: PosMode.EPMS
         set(value) {
             posModeStr = value.id
+            loadKoinModules(module {
+                single<PosParameter>(override = true) {
+                    ParameterService(androidContext(), value)
+                }
+            })
         }
 
-    private var posModeStr: String? by prefs.stringStore("POS_MODE", "Zone")
+    private var posModeStr: String? by prefs.stringStore("POS_MODE", "EPMS")
 }

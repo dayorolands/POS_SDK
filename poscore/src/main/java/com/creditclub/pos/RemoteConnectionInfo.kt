@@ -8,4 +8,6 @@ interface RemoteConnectionInfo {
     val ip: String
     val port: Int
     val ssl: Boolean
+    val dukptConfig: DukptConfig?
+    val maxAttempts: Int
 }

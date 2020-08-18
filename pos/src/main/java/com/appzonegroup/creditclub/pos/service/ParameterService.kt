@@ -4,20 +4,20 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Looper
 import androidx.activity.ComponentActivity
-import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.util.*
 import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.util.TrackGPS
+import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.jsonArrayStore
 import com.creditclub.core.util.delegates.stringStore
-import com.creditclub.core.util.format
-import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.RemoteConnectionInfo
+import com.creditclub.pos.extensions.hexBytes
+import com.creditclub.pos.model.ConnectionInfo
+import com.creditclub.pos.utils.TripleDesCipher
 import com.creditclub.pos.utils.nonNullStringStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,7 +26,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.jpos.iso.ISOMsg
-import org.jpos.iso.ISOUtil
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -41,10 +40,10 @@ import java.util.*
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/27/2019.
  * Appzone Ltd
  */
-class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) : PosParameter,
+class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : PosParameter,
     KoinComponent {
     private val prefs: SharedPreferences = run {
-        val suffix = posMode?.run { "$ip~$port" } ?: "Default"
+        val suffix = "${posMode.ip}~${posMode.port}"
         context.getSharedPreferences("Parameters~$suffix", 0)
     }
     private val config: PosConfig by inject()
@@ -101,10 +100,10 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
         isoMsg.set(41, config.terminalId)
         isoMsg.packager = packager
 
-        TerminalUtils.logISOMsg(isoMsg)
+        isoMsg.log()
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.execute(config.remoteConnectionInfo, isoMsg.pack())
+            SocketJob.execute(posMode, isoMsg.pack())
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -117,18 +116,17 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
         println("MESSAGE: " + String(output))
         isoMsg.unpack(output)
 
-        TerminalUtils.logISOMsg(isoMsg)
+        isoMsg.log()
 
         if (isoMsg.hasFailed) {
-            println("Error contacting Nibss server")
+            println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw KeyDownloadException(isoMsg.responseMessage)
         }
-        val posMode = config.remoteConnectionInfo
-        val cryptKey = ISOUtil.xor(Misc.toByteArray(posMode.key1), Misc.toByteArray(posMode.key2))
-        val cryptData = TerminalUtils.hexStringToByteArray(isoMsg.getString(53).substring(0, 32))
+        val cryptKey = posMode.key1.hexBytes xor posMode.key2.hexBytes
+        val cryptData = isoMsg.getString(53).substring(0, 32).hexBytes
 
         val tripleDesCipher = TripleDesCipher(cryptKey)
-        masterKey = TerminalUtils.byteArrayToHex(tripleDesCipher.decrypt(cryptData).copyOf(16))
+        masterKey = tripleDesCipher.decrypt(cryptData).copyOf(16).hexString
     }
 
     @Throws(KeyDownloadException::class)
@@ -150,11 +148,11 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
 
         isoMsg.packager = packager
 
-        TerminalUtils.logISOMsg(isoMsg)
+        isoMsg.log()
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.execute(config.remoteConnectionInfo, isoMsg.pack())
+            SocketJob.execute(posMode, isoMsg.pack())
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -166,18 +164,17 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
 
         println("MESSAGE: " + String(output))
         isoMsg.unpack(output)
-        TerminalUtils.logISOMsg(isoMsg)
+        isoMsg.log()
 
         if (isoMsg.hasFailed) {
-            println("Error contacting Nibss server")
+            println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw KeyDownloadException(isoMsg.responseMessage)
         }
-        val cryptKey = TerminalUtils.hexStringToByteArray(masterKey)
-
-        val cryptData = TerminalUtils.hexStringToByteArray(isoMsg.getString(53).substring(0, 32))
+        val cryptKey = masterKey.hexBytes
+        val cryptData = isoMsg.getString(53).substring(0, 32).hexBytes
 
         val tripleDesCipher = TripleDesCipher(cryptKey)
-        sessionKey = TerminalUtils.byteArrayToHex(tripleDesCipher.decrypt(cryptData).copyOf(16))
+        sessionKey = tripleDesCipher.decrypt(cryptData).copyOf(16).hexString
     }
 
     @Throws(KeyDownloadException::class)
@@ -196,14 +193,13 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
         isoMsg.set(13, dateParams.localDate)
         isoMsg.set(41, config.terminalId)
 
-
         isoMsg.packager = packager
 
-        TerminalUtils.logISOMsg(isoMsg)
+        isoMsg.log()
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.execute(config.remoteConnectionInfo, isoMsg.pack())
+            SocketJob.execute(posMode, isoMsg.pack())
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -216,18 +212,17 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
         println("MESSAGE: " + String(output))
         isoMsg.unpack(output)
 
-        TerminalUtils.logISOMsg(isoMsg)
-
+        isoMsg.log()
         if (isoMsg.hasFailed) {
-            println("Error contacting Nibss server")
+            println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw KeyDownloadException(isoMsg.responseMessage)
         }
 
-        val cryptKey = TerminalUtils.hexStringToByteArray(masterKey)
-        val cryptData = TerminalUtils.hexStringToByteArray(isoMsg.getString(53).substring(0, 32))
+        val cryptKey = masterKey.hexBytes
+        val cryptData = isoMsg.getString(53).substring(0, 32).hexBytes
 
         val tripleDesCipher = TripleDesCipher(cryptKey)
-        pinKey = TerminalUtils.byteArrayToHex(tripleDesCipher.decrypt(cryptData).copyOf(16))
+        pinKey = tripleDesCipher.decrypt(cryptData).copyOf(16).hexString
     }
 
     @Throws(ParameterDownloadException::class)
@@ -251,21 +246,17 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
         val packedMsg = isoMsg.pack()
         packedMsg[19]++
 
-        val baos = ByteArrayOutputStream().apply {
-            write(TerminalUtils.hexStringToByteArray(sessionKey))
-            write(packedMsg)
-        }
-
-        val field64 = TerminalUtils.sha256(baos.toByteArray()).toUpperCase(Locale.getDefault())
+        val baos = sessionKey.hexBytes + packedMsg
+        val field64 = baos.sha256String.toUpperCase(Locale.getDefault())
         isoMsg.set(64, field64)
 
-        val finalMsgBytes = TerminalUtils.constructField64_128(packedMsg, field64.toByteArray())
+        val finalMsgBytes = packedMsg + field64.toByteArray()
 
-        if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
+        debugOnly { isoMsg.log() }
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.execute(config.remoteConnectionInfo, finalMsgBytes)
+            SocketJob.execute(posMode, finalMsgBytes)
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -275,16 +266,16 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
         }
 
-        if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
+        debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
-            if (BuildConfig.DEBUG) println("Error contacting Nibss server")
+            debugOnly { println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}") }
             throw ParameterDownloadException(isoMsg.responseMessage)
         }
 
         println("Secured connection performed successfully")
 
-        managementDataString = TerminalUtils.parsePrivateFieldData(isoMsg.getString(62))
+        managementDataString = isoMsg.getString(62)?.parsePrivateFieldDataBlock()?.toString()
             ?: throw ParameterDownloadException("")
     }
 
@@ -308,21 +299,17 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
         val packedMsg = isoMsg.pack()
         packedMsg[19]++
 
-        val baos = ByteArrayOutputStream().apply {
-            write(TerminalUtils.hexStringToByteArray(sessionKey))
-            write(packedMsg)
-        }
-
-        val field64 = TerminalUtils.sha256(baos.toByteArray()).toUpperCase(Locale.getDefault())
+        val baos = sessionKey.hexBytes + packedMsg
+        val field64 = baos.sha256String.toUpperCase(Locale.getDefault())
         isoMsg.set(64, field64)
 
-        val finalMsgBytes = TerminalUtils.constructField64_128(packedMsg, field64.toByteArray())
+        val finalMsgBytes = packedMsg + field64.toByteArray()
 
-        if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
+        debugOnly { isoMsg.log() }
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.execute(config.remoteConnectionInfo, finalMsgBytes)
+            SocketJob.execute(posMode, finalMsgBytes)
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -332,10 +319,10 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
         }
 
-        if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
+        debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
-            if (BuildConfig.DEBUG) println("Error contacting Nibss server")
+            debugOnly { println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}") }
             throw PublicKeyDownloadException(isoMsg.responseMessage)
         }
 
@@ -365,21 +352,16 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
         val packedMsg = isoMsg.pack()
         packedMsg[19]++
 
-        val baos = ByteArrayOutputStream().apply {
-            write(TerminalUtils.hexStringToByteArray(sessionKey))
-            write(packedMsg)
-        }
-
-        val field64 = TerminalUtils.sha256(baos.toByteArray()).toUpperCase(Locale.getDefault())
+        val baos = sessionKey.hexBytes + packedMsg
+        val field64 = baos.sha256String.toUpperCase(Locale.getDefault())
         isoMsg.set(64, field64)
 
-        val finalMsgBytes = TerminalUtils.constructField64_128(packedMsg, field64.toByteArray())
-
-        if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
+        val finalMsgBytes = packedMsg + field64.toByteArray()
+        debugOnly { isoMsg.log() }
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.execute(config.remoteConnectionInfo, finalMsgBytes)
+            SocketJob.execute(posMode, finalMsgBytes)
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -389,10 +371,12 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
         }
 
-        if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
+        debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
-            if (BuildConfig.DEBUG) println("Error contacting Nibss server")
+            debugOnly {
+                println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
+            }
             throw EmvAidDownloadException(isoMsg.responseMessage)
         }
 
@@ -413,6 +397,10 @@ class ParameterService(context: Context, posMode: RemoteConnectionInfo? = null) 
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
             gpsCoordinates = gps.geolocationString ?: "0.00;0.00"
+            nodeName = posMode.id
+            if (posMode is ConnectionInfo) {
+                connectionInfo = posMode
+            }
         }
     }
 
