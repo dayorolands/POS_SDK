@@ -29,8 +29,9 @@ class TelpoEmvListener(
     private val emvService: EmvService,
     private val sessionData: PosManager.SessionData
 ) : EmvServiceListener(), KoinComponent {
+    internal var ksnData: String? = null
     internal var cardData: TelpoEmvCardData? = null
-    var pinBlock: String? = null
+    internal var pinBlock: String? = null
     private var bUIThreadisRunning = true
 
     private fun wakeUpAndUnlock(context: Context) {
@@ -70,22 +71,22 @@ class TelpoEmvListener(
             wakeUpAndUnlock(context)
             if (dukptConfig != null) {
                 PinpadService.TP_PinpadWriteDukptIPEK(
-                    ByteArray(8) { 0 } + dukptConfig.ipek.hexBytes,
+                    dukptConfig.ipek.hexBytes,
                     dukptConfig.ksn.hexBytes,
                     0,
                     PinpadService.KEY_WRITE_DIRECT,
                     0
                 )
-                PinpadService.TP_PinpadDukptSessionStart(1)
+                PinpadService.TP_PinpadDukptSessionStart(0)
             }
             val ret: Int
             val pinText = PinData.getPinTextInfo(param)
             if (PinData.type.toInt() == 0) {
-                ret = if (dukptConfig == null) {
-                    PinpadService.TP_PinpadGetPin(param)
-                } else PinpadService.TP_PinpadDukptGetPin(param)
-                debugOnly {
-                    Log.e("Tag", "PinData.type:" + PinData.type + "   ret: " + ret)
+                if (dukptConfig == null) {
+                    ret = PinpadService.TP_PinpadGetPin(param)
+                } else {
+                    ret = PinpadService.TP_PinpadDukptGetPin(param)
+                    ksnData = param.Curr_KSN.hexString
                 }
                 pinBlock = param.Pin_Block.hexString
             } else {
@@ -96,11 +97,11 @@ class TelpoEmvListener(
                         PinData.Pin = param.Pin_Block
                     }
                 } else {
-//                    PinData.type = 0
                     ret = PinpadService.TP_PinpadDukptGetPin(param)
                     if (ret == PinpadService.PIN_OK) {
                         PinData.type = 0
                         pinBlock = param.Pin_Block.hexString
+                        ksnData = param.Curr_KSN.hexString
 //                        PinData.Pin = ByteArray(4) { it.toByte() }
                     }
                 }
@@ -169,6 +170,7 @@ class TelpoEmvListener(
             onInputPin(EmvPinData())
         } else EmvService.EMV_TRUE
         cardData = TelpoEmvCardData(emvService)
+        cardData?.ksnData = ksnData
         return ret
     }
 

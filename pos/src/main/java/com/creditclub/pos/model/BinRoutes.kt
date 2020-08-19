@@ -31,8 +31,8 @@ data class ConnectionInfo(
     override val key2: String get() = "0234E39861D3405E7A6B3185BA675873"
     override val dukptConfig: DukptConfigImpl?
         get() = DukptConfigImpl(
-            "9F8011E7E71E483B",
-            "0000000006DDDDE00000"
+            "3F2216D8297BCE9C",
+            "0000000002DDDDE00001"
         )
 }
 

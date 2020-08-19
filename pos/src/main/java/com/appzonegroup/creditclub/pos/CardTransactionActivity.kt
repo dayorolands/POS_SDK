@@ -18,17 +18,16 @@ import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.data.create
 import com.appzonegroup.creditclub.pos.data.posPreferences
 import com.appzonegroup.creditclub.pos.databinding.*
-import com.appzonegroup.creditclub.pos.extension.isSuccessful
-import com.appzonegroup.creditclub.pos.extension.posConfig
-import com.appzonegroup.creditclub.pos.extension.responseMessage
+import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
-import com.appzonegroup.creditclub.pos.models.*
-import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
+import com.appzonegroup.creditclub.pos.models.FinancialTransaction
+import com.appzonegroup.creditclub.pos.models.PosNotification
+import com.appzonegroup.creditclub.pos.models.PosTransaction
+import com.appzonegroup.creditclub.pos.models.Reversal
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
 import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
-import com.creditclub.pos.model.getSupportedRoute
 import com.creditclub.core.util.*
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.card.CardData
@@ -36,11 +35,16 @@ import com.creditclub.pos.card.CardReaderEvent
 import com.creditclub.pos.card.CardTransactionStatus
 import com.creditclub.pos.card.TransactionType
 import com.creditclub.pos.model.ConnectionInfo
+import com.creditclub.pos.model.getSupportedRoute
 import com.creditclub.pos.printer.PrinterStatus
 import kotlinx.android.synthetic.main.page_input_amount.*
 import kotlinx.android.synthetic.main.page_input_rrn.*
 import kotlinx.android.synthetic.main.text_field.view.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.jpos.iso.ISOMsg
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import org.threeten.bp.Instant
@@ -53,7 +57,6 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
     internal val sessionData: PosManager.SessionData get() = posManager.sessionData
     private var amountText = "0"
     protected var previousMessage: CardIsoMsg? = null
-    private var pendingRequest: CardIsoMsg? = null
     private var accountType: AccountType? = null
     abstract var transactionType: TransactionType
 
@@ -305,14 +308,14 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         }
     }
 
-    fun makeRequest(request: CardIsoMsg) {
-        pendingRequest = request
+    fun makeRequest(request: ISOMsg) {
         stopTimer()
         val amount = amountText.toDouble() / 100
         val supportedRoute = posPreferences.binRoutes?.getSupportedRoute(request.pan!!, amount)
         val remoteConnectionInfo = supportedRoute ?: config.remoteConnectionInfo
 
         val posParameter = ParameterService(this, remoteConnectionInfo)
+        request.applyManagementData(posParameter.managementData)
         val isoSocketHelper = IsoSocketHelper(config, posParameter, remoteConnectionInfo)
         mainScope.launch {
             if (cardData.pinBlock.isEmpty()) {
@@ -452,7 +455,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         }
     }
 
-    private suspend fun IsoSocketHelper.attemptReversal(request: BaseIsoMsg) {
+    private suspend fun IsoSocketHelper.attemptReversal(request: ISOMsg) {
         if (request.mti == "0200") withContext(Dispatchers.IO) {
             runOnUiThread {
                 dialogProvider.showProgressBar("Transmission Error \nReversing...")

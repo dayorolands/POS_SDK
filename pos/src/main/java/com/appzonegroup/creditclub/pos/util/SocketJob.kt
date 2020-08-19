@@ -1,6 +1,7 @@
 package com.appzonegroup.creditclub.pos.util
 
 import android.util.Log
+import com.creditclub.core.util.debugOnly
 import com.creditclub.pos.RemoteConnectionInfo
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -33,6 +34,7 @@ object SocketJob {
     ): ByteArray? {
         val host = connectionInfo.ip
         val port = connectionInfo.port
+        debugOnly { println("[remote environment]: $host:$port") }
         if (!connectionInfo.ssl) return socketConnectionJob(host, port, data)
 
         val messageByte = ByteArray(1000)
@@ -96,7 +98,7 @@ object SocketJob {
     }
 
     @Throws(IOException::class)
-    fun socketConnectionJob(
+    private fun socketConnectionJob(
         host: String?,
         port: Int,
         data: ByteArray

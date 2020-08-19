@@ -5,6 +5,7 @@ import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
+import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +44,10 @@ fun ISOMsg.applyCardData(data: CardData): ISOMsg = apply {
     retrievalReferenceNumber37 = rrnString
     serviceRestrictionCode40 = data.src
     iccData55 = data.iccString
-    if (!data.pinBlock.isNullOrBlank()) pinData = data.pinBlock
+    if (!data.pinBlock.isNullOrBlank()) {
+        pinData = data.pinBlock
+        ksnData120 = data.ksnData
+    }
 
     run {
         //            val tmpPosDataCode = StringBuilder("511501513344101")
@@ -84,4 +88,11 @@ fun ISOMsg.generateReversal(cardData: CardData): ISOMsg {
         currencyCode49 = financialMessage.currencyCode49
         merchantType18 = financialMessage.merchantType18
     }
+}
+
+fun ISOMsg.applyManagementData(params: PosParameter.ManagementData) {
+    cardAcceptorIdCode42 = params.cardAcceptorId
+    cardAcceptorNameLocation43 = params.cardAcceptorLocation
+    currencyCode49 = params.countryCode
+    merchantType18 = params.merchantCategoryCode
 }

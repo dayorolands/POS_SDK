@@ -155,9 +155,9 @@ class TelpoCardReader(
                         emvService.Emv_TransInit()
                         setEmvParams()
 
-                        emvService.Emv_SetOfflinePiDisplayPan(0)
-                        emvService.Emv_SetOfflinePinCBenable(1)
-                        emvService.Emv_StartApp(EmvService.EMV_TRUE)
+//                        emvService.Emv_SetOfflinePiDisplayPan(0)
+//                        emvService.Emv_SetOfflinePinCBenable(1)
+                        emvService.Emv_StartApp(EmvService.EMV_FALSE)
                     }
 
                     deviceClose()
@@ -193,7 +193,7 @@ class TelpoCardReader(
             MerchCateCode = managementData.merchantCategoryCode.toByteArray()
             TermId = get<PosConfig>().terminalId.toByteArray()
             TerminalType = 0x22
-            Capability = byteArrayOf(0xE0.toByte(), 0xF8.toByte(), 0xC8.toByte())
+            Capability = byteArrayOf(0xE0.toByte(), 0x40.toByte(), 0xC8.toByte())
             ExCapability = byteArrayOf(0xE0.toByte(), 0x00, 0xF0.toByte(), 0xA0.toByte(), 0x01)
             CountryCode = byteArrayOf(0x5, 0x66)
 

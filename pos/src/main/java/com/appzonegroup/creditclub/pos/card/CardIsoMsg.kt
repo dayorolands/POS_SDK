@@ -138,53 +138,9 @@ open class CardIsoMsg : BaseIsoMsg() {
         NoSuchAlgorithmException::class,
         JSONException::class
     )
-    open fun apply(data: CardData): CardIsoMsg = apply {
-        val dateParams = TransmissionDateParams()
-        val stan = SecureRandom().nextInt(1000000)
-        val rrnPart = SecureRandom().nextInt(100000)
-        val stanString = String.format("%06d", stan)
-        val rrnString = String.format("1%05d", rrnPart) + stanString
+    open fun apply(data: CardData) = applyCardData(data)
 
-        packager = ISO87Packager()
-
-        pan = data.pan.trim { it <= ' ' }
-        transactionAmount4 = data.transactionAmount
-        transmissionDateTime7 = dateParams.transmissionDateTime
-        stan11 = stanString
-        localTransactionTime12 = dateParams.localTime
-        localTransactionDate13 = dateParams.localDate
-        cardExpirationDate14 = data.exp.substring(0, 4)
-        posEntryMode22 = if (data.cardMethod == CardReaderEvent.MAG_STRIPE) "021" else "051"
-
-        cardSequenceNumber23 = if (data.cardSequenceNumber.isNotEmpty()) {
-            String.format("%03d", Integer.parseInt(data.cardSequenceNumber))
-        } else ""
-
-        posConditionCode25 = "00"
-        posPinCaptureCode26 = "04"
-        transactionFee28 = "C00000000"
-        acquiringInstIdCode32 = "636092"//"111129"
-        track2Data35 = data.track2
-        retrievalReferenceNumber37 = rrnString
-        serviceRestrictionCode40 = data.src
-        iccData55 = data.iccString
-        if (!data.pinBlock.isNullOrBlank()) pinData = data.pinBlock
-
-        run {
-            //            val tmpPosDataCode = StringBuilder("511501513344101")
-            val tmpPosDataCode = StringBuilder("510101511344101")
-            if (data.holder.isNotEmpty()) tmpPosDataCode[4] = '0'
-            if (data.cardMethod == CardReaderEvent.MAG_STRIPE) tmpPosDataCode[6] = '2'
-            posDataCode123 = tmpPosDataCode.toString()
-        }
-    }
-
-    fun withParameters(params: PosParameter.ManagementData) {
-        cardAcceptorIdCode42 = params.cardAcceptorId
-        cardAcceptorNameLocation43 = params.cardAcceptorLocation
-        currencyCode49 = params.countryCode
-        merchantType18 = params.merchantCategoryCode
-    }
+    fun withParameters(params: PosParameter.ManagementData) = applyManagementData(params)
 
 //    fun withPinData(pinBlock:String, parameterService: ParameterService) {
 //        if (pinBlock.isNotEmpty()) {

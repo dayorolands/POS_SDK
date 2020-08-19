@@ -40,6 +40,7 @@ abstract class CardData {
 
     // Status fields
     var aid: String = ""
+    var ksnData: String? = null
     open var ret: Int = -1
 
     val type: String
