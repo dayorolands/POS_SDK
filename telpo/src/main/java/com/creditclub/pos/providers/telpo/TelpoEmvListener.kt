@@ -4,6 +4,7 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.os.PowerManager
 import android.util.Log
+import androidx.core.content.edit
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.format
 import com.creditclub.core.util.toCurrencyFormat
@@ -33,6 +34,7 @@ class TelpoEmvListener(
     internal var cardData: TelpoEmvCardData? = null
     internal var pinBlock: String? = null
     private var bUIThreadisRunning = true
+    private val prefs = context.getSharedPreferences("TelpoPosManager", 0)
 
     private fun wakeUpAndUnlock(context: Context) {
         val km = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
@@ -54,12 +56,12 @@ class TelpoEmvListener(
         }
         bUIThreadisRunning = true
         var result = 0
-        Thread(Runnable {
+        Thread {
             val amount = sessionData.amount / 100.0
             val param = PinParam(context).apply {
                 CardNo = emvService.getValue(0x5A, hex = false, padded = true)
                 PinBlockFormat = 0
-                KeyIndex = 3
+                KeyIndex = 0
                 WaitSec = 60
                 MaxPinLen = 6
                 MinPinLen = 4
@@ -70,13 +72,21 @@ class TelpoEmvListener(
             PinpadService.Open(context)
             wakeUpAndUnlock(context)
             if (dukptConfig != null) {
-                PinpadService.TP_PinpadWriteDukptIPEK(
-                    dukptConfig.ipek.hexBytes,
-                    dukptConfig.ksn.hexBytes,
-                    0,
-                    PinpadService.KEY_WRITE_DIRECT,
-                    0
-                )
+                param.KeyIndex = 3
+                val paddedIpek = dukptConfig.ipek.padStart(20, '0')
+                val paddedKsn = dukptConfig.ksn.padStart(20, '0')
+                val xorValue = paddedIpek.hexBytes xor paddedKsn.hexBytes
+                val kcv = xorValue.hexString.takeLast(6)
+                if (prefs.getString("kcv", null) != kcv) {
+                    PinpadService.TP_PinpadWriteDukptIPEK(
+                        dukptConfig.ipek.hexBytes,
+                        dukptConfig.ksn.hexBytes,
+                        0,
+                        PinpadService.KEY_WRITE_DIRECT,
+                        0
+                    )
+                    prefs.edit { putString("kcv", kcv) }
+                }
                 PinpadService.TP_PinpadDukptSessionStart(0)
             }
             val ret: Int
@@ -118,7 +128,7 @@ class TelpoEmvListener(
 
             if (dukptConfig != null) PinpadService.TP_PinpadDukptSessionEnd()
             bUIThreadisRunning = false
-        }).start()
+        }.start()
 
         while (bUIThreadisRunning) {
             try {

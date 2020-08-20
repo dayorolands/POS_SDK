@@ -155,7 +155,7 @@ class TelpoCardReader(
                         emvService.Emv_TransInit()
                         setEmvParams()
 
-//                        emvService.Emv_SetOfflinePiDisplayPan(0)
+                        emvService.Emv_SetOfflinePiDisplayPan(0)
 //                        emvService.Emv_SetOfflinePinCBenable(1)
                         emvService.Emv_StartApp(EmvService.EMV_FALSE)
                     }
@@ -197,7 +197,7 @@ class TelpoCardReader(
             ExCapability = byteArrayOf(0xE0.toByte(), 0x00, 0xF0.toByte(), 0xA0.toByte(), 0x01)
             CountryCode = byteArrayOf(0x5, 0x66)
 
-            TransType = 0x00 //0x31
+            TransType = 0x00
         }
 
         emvService.Emv_SetParam(emvParam)

@@ -46,6 +46,8 @@ fun ISOMsg.applyCardData(data: CardData): ISOMsg = apply {
     iccData55 = data.iccString
     if (!data.pinBlock.isNullOrBlank()) {
         pinData = data.pinBlock
+    }
+    if(!data.ksnData.isNullOrBlank()){
         ksnData120 = data.ksnData
     }
 
