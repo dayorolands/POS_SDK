@@ -3,7 +3,9 @@ package com.appzonegroup.creditclub.pos.models.messaging
 import com.creditclub.pos.card.CardData
 import com.appzonegroup.creditclub.pos.card.CardIsoMsg
 import com.appzonegroup.creditclub.pos.card.cardIsoMsg
+import com.appzonegroup.creditclub.pos.extension.*
 import org.jpos.iso.ISOException
+import org.jpos.iso.ISOMsg
 import org.json.JSONException
 import java.io.IOException
 import java.security.NoSuchAlgorithmException
@@ -32,11 +34,7 @@ class ReversalRequest : CardIsoMsg() {
     }
 
     companion object {
-        fun generate(financialResponse: BaseIsoMsg, cardData: CardData): ReversalRequest {
-            return generate(financialResponse.convert(::FinancialMessage), cardData)
-        }
-
-        fun generate(financialMessage: FinancialMessage, cardData: CardData): ReversalRequest {
+        fun generate(financialMessage: ISOMsg, cardData: CardData): ReversalRequest {
             val elements = financialMessage.run {
                 "0200$stan11$transmissionDateTime7${padZeros(acquiringInstIdCode32, 11)}${padZeros(
                     forwardingInstIdCode33,
@@ -45,6 +43,8 @@ class ReversalRequest : CardIsoMsg() {
             }
 
             return cardIsoMsg(cardData, ::ReversalRequest) {
+                mti = "0420"
+                processingCode3 = "000000"
                 transactionAmount4 = financialMessage.transactionAmount4
                 replacementAmounts =
                     "${padZeros(transactionAmount4, 12)}000000000000${padZeros(transactionFee28, 9)}000000000"

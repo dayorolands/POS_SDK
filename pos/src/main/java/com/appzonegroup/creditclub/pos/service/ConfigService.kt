@@ -2,114 +2,46 @@ package com.appzonegroup.creditclub.pos.service
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.net.ConnectivityManager
 import com.appzonegroup.creditclub.pos.util.AppConstants
 import com.appzonegroup.creditclub.pos.util.PosMode
-import com.creditclub.core.util.delegates.valueStore
+import com.creditclub.core.util.delegates.booleanStore
+import com.creditclub.core.util.delegates.intStore
+import com.creditclub.core.util.delegates.stringStore
+import com.creditclub.pos.PosConfig
+import com.creditclub.pos.PosParameter
+import com.creditclub.pos.RemoteConnectionInfo
+import com.creditclub.pos.utils.nonNullStringStore
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/27/2019.
  * Appzone Ltd
  */
-open class ConfigService protected constructor(
-    context: Context,
-    private val prefs: SharedPreferences
-) : SharedPreferences by prefs {
+open class ConfigService(context: Context) : PosConfig {
+    private val prefs: SharedPreferences = context.getSharedPreferences("Config", 0)
+    override var apn by prefs.nonNullStringStore("APN", AppConstants.APN)
+    override var host by prefs.nonNullStringStore("HOST", AppConstants.HOST)
+    override var ip by prefs.nonNullStringStore("IP", AppConstants.IP)
+    override var port by prefs.intStore("PORT", AppConstants.PORT)
 
-    open var apn = prefs.getString("APN", AppConstants.APN) as String
+    override var callHome by prefs.nonNullStringStore("CALL_HOME", AppConstants.CALL_HOME)
+    override var terminalId by prefs.nonNullStringStore("TERMINAL_ID", "")
+    override var supervisorPin by prefs.nonNullStringStore("SUPERVISOR_PIN", "1111")
+    override var adminPin by prefs.nonNullStringStore("ADMIN_PIN", "asdfg")
+
+    override var remoteConnectionInfo: RemoteConnectionInfo
+        get() = PosMode.values().find { it.id == posModeStr } ?: PosMode.EPMS
         set(value) {
-            field = value
-            prefs.edit().putString("APN", value).apply()
+            posModeStr = value.id
+            loadKoinModules(module {
+                single<PosParameter>(override = true) {
+                    ParameterService(androidContext(), value)
+                }
+            })
         }
 
-    open var host = prefs.getString("HOST", AppConstants.HOST) as String
-        set(value) {
-            field = value
-            prefs.edit().putString("HOST", value).apply()
-        }
-
-    open var ip = prefs.getString("IP", AppConstants.IP) as String
-        set(value) {
-            field = value
-            prefs.edit().putString("IP", value).apply()
-        }
-
-    open var port = prefs.getInt("PORT", AppConstants.PORT)
-        set(value) {
-            field = value
-            prefs.edit().putInt("PORT", value).apply()
-        }
-
-    open var callHome = prefs.getString("CALL_HOME", AppConstants.CALL_HOME) as String
-        set(value) {
-            field = value
-            prefs.edit().putString("CALL_HOME", value).apply()
-        }
-
-    open var terminalId = prefs.getString("TERMINAL_ID", "") as String
-        set(value) {
-            field = value
-            prefs.edit().putString("TERMINAL_ID", value).apply()
-        }
-
-    open var supervisorPin = prefs.getString("SUPERVISOR_PIN", "1111") as String
-        set(value) {
-            field = value
-            prefs.edit().putString("SUPERVISOR_PIN", value).apply()
-        }
-
-    open var adminPin = prefs.getString("ADMIN_PIN", "asdfg") as String
-        set(value) {
-            field = value
-            prefs.edit().putString("ADMIN_PIN", value).apply()
-        }
-
-    open var posModeStr: String? by valueStore("POS_MODE", "EPMS")
-
-    open var posMode: PosMode
-        get() {
-            return when (posModeStr) {
-                "EPMS" -> PosMode.EPMS
-                "EPMS_TEST" -> PosMode.EPMS_TEST
-                "POSVAS_TEST" -> PosMode.POSVAS_TEST
-                else -> PosMode.POSVAS
-            }
-        }
-        set(value) {
-            posModeStr = value.name
-        }
-
-    fun resetNetwork() {
-        apn = AppConstants.APN
-        host = AppConstants.HOST
-        terminalId = AppConstants.TID
-        port = AppConstants.PORT
-        ip = AppConstants.IP
-        callHome = AppConstants.CALL_HOME
-    }
-
-    fun getApnInfo(context: Context): String {
-        val mag = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        try {
-            val mobInfo = mag.activeNetworkInfo
-            return mobInfo?.extraInfo ?: "No active network. Turn on mobile data"
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-        }
-
-        return "No active network. Turn on mobile data"
-    }
-
-    companion object {
-        private var INSTANCE: ConfigService? = null
-
-        fun getInstance(context: Context): ConfigService {
-            if (INSTANCE == null) INSTANCE = ConfigService(
-                context.applicationContext,
-                context.getSharedPreferences("Config", 0)
-            )
-            return INSTANCE as ConfigService
-        }
-    }
+    private var posModeStr: String? by prefs.stringStore("POS_MODE", "EPMS")
 }

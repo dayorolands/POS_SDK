@@ -22,10 +22,10 @@ import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.task.AsyncResponse
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask
-import com.creditclub.pos.printer.PosPrinter
-import com.appzonegroup.creditclub.pos.service.ConfigService
+import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogListenerBlock
+import com.creditclub.pos.printer.PosPrinter
 import com.google.gson.Gson
 import org.json.JSONObject
 import org.koin.android.ext.android.inject
@@ -240,7 +240,7 @@ open class BaseActivity : CreditClubActivity(), AsyncResponse {
         closeOnFail: Boolean = false,
         next: (Boolean) -> Unit
     ) {
-        val status = password == ConfigService.getInstance(this).adminPin
+        val status = password == posConfig.adminPin
         if (!status) {
             if (closeOnFail) return dialogProvider.showError<Nothing>("Incorrect Password") {
                 onClose {

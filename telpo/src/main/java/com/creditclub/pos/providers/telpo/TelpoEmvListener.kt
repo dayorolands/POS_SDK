@@ -4,25 +4,37 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.os.PowerManager
 import android.util.Log
+import androidx.core.content.edit
+import com.creditclub.core.util.debugOnly
+import com.creditclub.core.util.format
 import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.pos.PosManager
+import com.creditclub.pos.PosParameter
+import com.creditclub.pos.extensions.hexBytes
+import com.creditclub.pos.utils.TripleDesCipher
 import com.telpo.emv.*
-import com.telpo.emv.util.StringUtil
+import com.telpo.emv.util.getPinTextInfo
+import com.telpo.emv.util.getValue
+import com.telpo.emv.util.hexString
+import com.telpo.emv.util.xor
 import com.telpo.pinpad.PinParam
 import com.telpo.pinpad.PinpadService
+import org.koin.core.KoinComponent
+import org.koin.core.get
+import org.threeten.bp.Instant
 import java.io.UnsupportedEncodingException
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 class TelpoEmvListener(
     private val context: Context,
-    val emvService: EmvService,
+    private val emvService: EmvService,
     private val sessionData: PosManager.SessionData
-) : EmvServiceListener() {
-    var pinBlock: String? = null
-    var mResult: Int = 0
+) : EmvServiceListener(), KoinComponent {
+    internal var ksnData: String? = null
+    internal var cardData: TelpoEmvCardData? = null
+    internal var pinBlock: String? = null
     private var bUIThreadisRunning = true
+    private val prefs = context.getSharedPreferences("TelpoPosManager", 0)
 
     private fun wakeUpAndUnlock(context: Context) {
         val km = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
@@ -39,55 +51,84 @@ class TelpoEmvListener(
     }
 
     override fun onInputPin(PinData: EmvPinData): Int {
-        Log.w("input pin", "onInputPin: " + "callback [onInputPIN]:" + PinData.type)
+        debugOnly {
+            Log.w("input pin", "onInputPin: " + "callback [onInputPIN]:" + PinData.type)
+        }
         bUIThreadisRunning = true
-
-        Thread(Runnable {
-            var ret: Int
-            val param = PinParam(context)
-            val pan = EmvTLV(0x5A)
-
-            ret = emvService.Emv_GetTLV(pan)
-            if (ret == EmvService.EMV_TRUE) {
-                val p = StringBuffer(StringUtil.bytesToHexString(pan.Value))
-                if (p[p.toString().length - 1] == 'F') {
-                    p.deleteCharAt(p.toString().length - 1)
-                }
-                param.CardNo = p.toString()
-                Log.w("listener", "CardNo: " + param.CardNo)
-                log("PAN: " + param.CardNo)
+        var result = 0
+        Thread {
+            val amount = sessionData.amount / 100.0
+            val param = PinParam(context).apply {
+                CardNo = emvService.getValue(0x5A, hex = false, padded = true)
+                PinBlockFormat = 0
+                KeyIndex = 0
+                WaitSec = 60
+                MaxPinLen = 6
+                MinPinLen = 4
+                IsShowCardNo = 0
+                Amount = amount.toCurrencyFormat()
             }
-
-            param.KeyIndex = 0
-            param.WaitSec = 60
-            param.MaxPinLen = 4
-            param.MinPinLen = 4
-            param.IsShowCardNo = 0
-            param.Amount = sessionData.amount.toCurrencyFormat()
+            val dukptConfig = sessionData.getDukptConfig?.invoke(param.CardNo, amount)
             PinpadService.Open(context)
             wakeUpAndUnlock(context)
-            ret = PinpadService.TP_PinpadGetPin(param)
-            pinBlock = StringUtil.bytesToHexString(param.Pin_Block)
-            log("TP_PinpadGetPin: " + ret + "\nPinblock: " + StringUtil.bytesToHexString(param.Pin_Block))
-            if (ret == PinpadService.PIN_ERROR_CANCEL) {
-                mResult = EmvService.ERR_USERCANCEL
-                log("get pin : user cancel")
-            } else if (ret == PinpadService.PIN_OK && StringUtil.bytesToHexString(param.Pin_Block) == "00000000") {
-                mResult = EmvService.ERR_NOPIN
-                log("get pin : no pin")
-            } else if (ret == PinpadService.PIN_OK) {
-                mResult = EmvService.EMV_TRUE
-                log("get pin success: " + StringUtil.bytesToHexString(param.Pin_Block))
-            } else if (ret == PinpadService.PIN_ERROR_TIMEOUT) {
-                mResult = EmvService.ERR_TIMEOUT
-                log("get pin : timeout")
+            if (dukptConfig != null) {
+                param.KeyIndex = 3
+                val paddedIpek = dukptConfig.ipek.padStart(20, '0')
+                val paddedKsn = dukptConfig.ksn.padStart(20, '0')
+                val xorValue = paddedIpek.hexBytes xor paddedKsn.hexBytes
+                val kcv = xorValue.hexString.takeLast(6)
+                if (prefs.getString("kcv", null) != kcv) {
+                    PinpadService.TP_PinpadWriteDukptIPEK(
+                        dukptConfig.ipek.hexBytes,
+                        dukptConfig.ksn.hexBytes,
+                        0,
+                        PinpadService.KEY_WRITE_DIRECT,
+                        0
+                    )
+                    prefs.edit { putString("kcv", kcv) }
+                }
+                PinpadService.TP_PinpadDukptSessionStart(0)
+            }
+            val ret: Int
+            val pinText = PinData.getPinTextInfo(param)
+            if (PinData.type.toInt() == 0) {
+                if (dukptConfig == null) {
+                    ret = PinpadService.TP_PinpadGetPin(param)
+                } else {
+                    ret = PinpadService.TP_PinpadDukptGetPin(param)
+                    ksnData = param.Curr_KSN.hexString
+                }
+                pinBlock = param.Pin_Block.hexString
             } else {
-                mResult = EmvService.EMV_FALSE
-                log("get pin error: $ret")
+                if (dukptConfig == null) {
+                    ret = PinpadService.TP_PinpadGetPlainPin(param, 0, 0, 0)
+                    if (ret == PinpadService.PIN_OK) {
+                        pinBlock = param.Pin_Block.encryptedPinBlock.hexString
+                        PinData.Pin = param.Pin_Block
+                    }
+                } else {
+                    ret = PinpadService.TP_PinpadDukptGetPin(param)
+                    if (ret == PinpadService.PIN_OK) {
+                        PinData.type = 0
+                        pinBlock = param.Pin_Block.hexString
+                        ksnData = param.Curr_KSN.hexString
+//                        PinData.Pin = ByteArray(4) { it.toByte() }
+                    }
+                }
+            }
+            result = when {
+                ret == PinpadService.PIN_ERROR_CANCEL -> EmvService.ERR_USERCANCEL
+                ret == PinpadService.PIN_OK && param.Pin_Block.hexString == "00000000" -> {
+                    EmvService.ERR_NOPIN
+                }
+                ret == PinpadService.PIN_OK -> EmvService.EMV_TRUE
+                ret == PinpadService.PIN_ERROR_TIMEOUT -> EmvService.ERR_TIMEOUT
+                else -> EmvService.EMV_FALSE
             }
 
+            if (dukptConfig != null) PinpadService.TP_PinpadDukptSessionEnd()
             bUIThreadisRunning = false
-        }).start()
+        }.start()
 
         while (bUIThreadisRunning) {
             try {
@@ -97,15 +138,23 @@ class TelpoEmvListener(
             }
         }
 
-        Log.w("listener", "onInputPIN callback result: $mResult")
-        return if (mResult != EmvService.EMV_TRUE) {
-            mResult
-        } else EmvService.EMV_TRUE
+        debugOnly {
+            Log.w("listener", "onInputPIN callback result: $result")
+        }
+        return result
+    }
+
+    override fun onMir_DataExchange(): Int {
+        TODO("Not yet implemented")
     }
 
     override fun onSelectApp(appList: Array<out EmvCandidateApp>): Int {
         //return appList[0].index.toInt()
         return appList[0].index.toInt()
+    }
+
+    override fun onMir_FinishReadAppData(): Int {
+        TODO("Not yet implemented")
     }
 
     override fun onSelectAppFail(ErrCode: Int): Int {
@@ -127,76 +176,22 @@ class TelpoEmvListener(
             e.printStackTrace()
         }
 
-
-        //paywave
-        //-------------------------------------------------------------------------------------------------------
-        val param = PinParam(context)
-
-        var pan = EmvTLV(0x5A)
-        var ret = emvService.Emv_GetTLV(pan)
-        if (ret == EmvService.EMV_TRUE) {
-            val p = StringBuffer(StringUtil.bytesToHexString(pan.Value))
-            if (p[p.toString().length - 1] == 'F') {
-                p.deleteCharAt(p.toString().length - 1)
-            }
-            param.CardNo = p.toString()
-            Log.w("listener", "CardNo: " + param.CardNo)
-        } else {
-            pan = EmvTLV(0x57)
-            if (emvService.Emv_GetTLV(pan) == EmvService.EMV_TRUE) {
-                val panstr = StringUtil.bytesToHexString(pan.Value)
-                Log.w("pan", "panstr: $panstr")
-                val index = panstr.indexOf("D")
-                Log.w("pan", "index: $index")
-                param.CardNo = panstr.substring(0, index)
-            }
-        }
-        log("PAN: " + param.CardNo)
-        //paywave
-        //-------------------------------------------------------------------------------------------------------
-
-        return EmvService.EMV_TRUE
-
+        val ret = if (pinBlock.isNullOrBlank()) {
+            onInputPin(EmvPinData())
+        } else EmvService.EMV_TRUE
+        cardData = TelpoEmvCardData(emvService)
+        cardData?.ksnData = ksnData
+        return ret
     }
 
     override fun onRequireTagValue(tag: Int, len: Int, value: ByteArray?): Int {
-        //paypass——————————-----------------------------------
-
-        Log.e("yw", "onRequireTagValue:")
-        val param = PinParam(context)
-        val ret: Int
-        var pan = EmvTLV(0x5A)
-        ret = emvService.Emv_GetTLV(pan)
-        if (ret == EmvService.EMV_TRUE) {
-            val p = StringBuffer(StringUtil.bytesToHexString(pan.Value))
-            if (p[p.toString().length - 1] == 'F') {
-                p.deleteCharAt(p.toString().length - 1)
-            }
-            param.CardNo = p.toString()
-            Log.w("listener", "CardNo: " + param.CardNo)
-        } else {
-            pan = EmvTLV(0x57)
-            if (emvService.Emv_GetTLV(pan) == EmvService.EMV_TRUE) {
-                val panstr = StringUtil.bytesToHexString(pan.Value)
-                Log.w("pan", "panstr: $panstr")
-                val index = panstr.indexOf("D")
-                Log.w("pan", "index: $index")
-                param.CardNo = panstr.substring(0, index)
-            }
-        }
-        log("PAN: " + param.CardNo)
-
-
         return EmvService.EMV_TRUE
-
     }
 
     override fun onRequireDatetime(datetime: ByteArray): Int {
-        val formatter = SimpleDateFormat("yyyyMMddHHmmss")
-        val curDate = Date(System.currentTimeMillis())
-        val str = formatter.format(curDate)
-        val time: ByteArray
         return try {
+            val str = Instant.now().format("yyyyMMddHHmmss")
+            val time: ByteArray
             time = str.toByteArray(charset("ascii"))
             System.arraycopy(time, 0, datetime, 0, datetime.size)
             EmvService.EMV_TRUE
@@ -219,6 +214,10 @@ class TelpoEmvListener(
         return EmvService.EMV_TRUE
     }
 
+    override fun onMir_Hint(): Int {
+        TODO("Not yet implemented")
+    }
+
     override fun onInputAmount(AmountData: EmvAmountData): Int {
         AmountData.TransCurrCode = 566.toShort()
         AmountData.ReferCurrCode = 566.toShort()
@@ -231,4 +230,16 @@ class TelpoEmvListener(
     private fun log(msg: String) {
         Log.d("MyEMV", msg)
     }
+
+    private inline val ByteArray.encryptedPinBlock: ByteArray
+        get() {
+            val pin = String(this)
+            val pan = emvService.getValue(0x5A, hex = false, padded = true)
+            val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
+            val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
+            val cipherKey = get<PosParameter>().pinKey.hexBytes
+            val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
+            val tripleDesCipher = TripleDesCipher(cipherKey)
+            return tripleDesCipher.encrypt(cryptData).copyOf(8)
+        }
 }

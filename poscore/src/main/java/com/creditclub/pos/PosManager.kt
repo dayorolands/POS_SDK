@@ -25,5 +25,6 @@ interface PosManager {
         open var canRunTransaction = false
         open var canManageParameters = false
         open var transactionType: TransactionType = TransactionType.Unknown
+        open var getDukptConfig: ((pan: String, amount: Double) -> DukptConfig?)? = null
     }
 }

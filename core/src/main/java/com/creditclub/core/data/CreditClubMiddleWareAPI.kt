@@ -18,7 +18,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 open class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) {
     private val contentType = MediaType.get("application/json")
 
-    private val retrofit = Retrofit.Builder()
+    val retrofit = Retrofit.Builder()
         .baseUrl("${apiHost}/CreditClubMiddlewareAPI/")
         .client(okHttpClient)
         .addConverterFactory(NullOnEmptyConverterFactory.create())

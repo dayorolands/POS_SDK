@@ -53,12 +53,14 @@
                     <include
                         android:id="@+id/refund_button"
                         layout="@layout/card_menu_button"
+                        android:visibility="gone"
                         app:src='@{@drawable/ic_purchase}'
                         app:text='@{"Refund"}' />
 
                     <include
                         android:id="@+id/reversal_button"
                         layout="@layout/card_menu_button"
+                        android:visibility="gone"
                         app:src='@{@drawable/ic_reversal}'
                         app:text='@{"Reversal"}' />
 

@@ -1,19 +1,19 @@
 package com.creditclub.pos.providers.telpo
 
 import android.util.Log
-import com.creditclub.pos.card.CardData
-import com.creditclub.pos.card.CardReader
-import com.creditclub.pos.card.CardReaderEvent
-import com.creditclub.pos.card.CardReaderEventListener
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.hideProgressBar
 import com.creditclub.core.util.showProgressBar
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
+import com.creditclub.pos.card.CardData
+import com.creditclub.pos.card.CardReader
+import com.creditclub.pos.card.CardReaderEvent
+import com.creditclub.pos.card.CardReaderEventListener
 import com.telpo.emv.EmvParam
 import com.telpo.emv.EmvService
-import com.telpo.emv.util.StringUtil
+import com.telpo.emv.util.*
 import com.telpo.pinpad.PinParam
 import com.telpo.pinpad.PinpadService
 import kotlinx.coroutines.Dispatchers
@@ -24,9 +24,9 @@ import org.koin.core.get
 
 class TelpoCardReader(
     private val flow: CreditClubActivity,
-    private val emvListener: TelpoEmvListener
+    private val posManager: TelpoPosManager
 ) : CardReader, KoinComponent {
-    private val emvService: EmvService = emvListener.emvService
+    private val emvService: EmvService = posManager.emvService
     private var data = arrayOfNulls<String>(3)
     private var event: CardReaderEvent = CardReaderEvent.CANCELLED
 
@@ -84,6 +84,8 @@ class TelpoCardReader(
     }
 
     override suspend fun read(amountStr: String): CardData? {
+        val emvListener = TelpoEmvListener(flow, emvService, posManager.sessionData)
+        emvService.setListener(emvListener)
         try {
             when (event) {
                 CardReaderEvent.MAG_STRIPE -> {
@@ -153,13 +155,15 @@ class TelpoCardReader(
                         emvService.Emv_TransInit()
                         setEmvParams()
 
-                        emvService.Emv_StartApp(EmvService.EMV_TRUE)
+                        emvService.Emv_SetOfflinePiDisplayPan(0)
+//                        emvService.Emv_SetOfflinePinCBenable(1)
+                        emvService.Emv_StartApp(EmvService.EMV_FALSE)
                     }
 
                     deviceClose()
                     flow.hideProgressBar()
 
-                    val cardData = withContext(Dispatchers.Default) {
+                    val cardData = emvListener.cardData ?: withContext(Dispatchers.Default) {
                         TelpoEmvCardData(if (ret == EmvService.EMV_TRUE) emvService else null)
                     }
                     cardData.ret = ret
@@ -189,11 +193,11 @@ class TelpoCardReader(
             MerchCateCode = managementData.merchantCategoryCode.toByteArray()
             TermId = get<PosConfig>().terminalId.toByteArray()
             TerminalType = 0x22
-            Capability = byteArrayOf(0xE0.toByte(), 0xF9.toByte(), 0xC8.toByte())
+            Capability = byteArrayOf(0xE0.toByte(), 0x40.toByte(), 0xC8.toByte())
             ExCapability = byteArrayOf(0xE0.toByte(), 0x00, 0xF0.toByte(), 0xA0.toByte(), 0x01)
-            CountryCode = byteArrayOf(5, 66)
+            CountryCode = byteArrayOf(0x5, 0x66)
 
-            TransType = 0x00 //0x31
+            TransType = 0x00
         }
 
         emvService.Emv_SetParam(emvParam)

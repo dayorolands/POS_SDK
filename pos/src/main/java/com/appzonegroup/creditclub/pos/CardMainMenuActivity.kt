@@ -3,33 +3,34 @@ package com.appzonegroup.creditclub.pos
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.databinding.DataBindingUtil
+import com.appzonegroup.creditclub.pos.data.posPreferences
 import com.appzonegroup.creditclub.pos.databinding.ActivityCardMainMenuBinding
+import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.MenuPage
 import com.appzonegroup.creditclub.pos.util.MenuPages
-import com.appzonegroup.creditclub.pos.widget.Dialogs
 import com.creditclub.core.util.format
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.showError
 import com.creditclub.pos.PosManager
+import com.creditclub.pos.PosParameter
+import com.creditclub.pos.RemoteConnectionInfo
+import com.creditclub.ui.dataBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import org.threeten.bp.Instant
 
 
-class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
-    override val pageNumber = MenuPages.MAIN_MENU
-    override val title = MenuPages[MenuPages.MAIN_MENU]?.name ?: "Welcome"
+class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu), View.OnClickListener {
+    private val binding by dataBinding<ActivityCardMainMenuBinding>()
 
     //    override val functionId = FunctionIds.CARD_TRANSACTIONS
     private val posManager: PosManager by inject { parametersOf(this) }
+    private val defaultParameterStore: PosParameter by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.empty)
-
         localStorage.agent ?: return finish()
 
         if (config.terminalId.isEmpty()) {
@@ -40,36 +41,27 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
             }
         }
 
-        Dialogs.requestPin(this, getString(R.string.pos_enter_supervisor_pin), timeout = 0) { pin ->
-            if (pin == null) return@requestPin super.onBackPressed()
-            confirmSupervisorPin(pin, closeOnFail = true) { passed ->
-                if (passed) {
-                    val binding: ActivityCardMainMenuBinding =
-                        DataBindingUtil.setContentView(this, R.layout.activity_card_main_menu)
-                    binding.hideBackButton = !intent.getBooleanExtra("SHOW_BACK_BUTTON", false)
-                    binding.purchaseButton.button.setOnClickListener(this)
-                    binding.adminButton.button.setOnClickListener(this)
-                    binding.reprintButton.button.setOnClickListener(this)
-                    binding.authButton.button.setOnClickListener(this)
-                    binding.depositButton.button.setOnClickListener(this)
-                    binding.billPayButton.button.setOnClickListener(this)
-                    binding.cashAdvButton.button.setOnClickListener(this)
-                    binding.reversalButton.button.setOnClickListener(this)
-                    binding.balanceButton.button.setOnClickListener(this)
-                    binding.cashBackButton.button.setOnClickListener(this)
-                    binding.refundButton.button.setOnClickListener(this)
-                    binding.salesCompletionButton.button.setOnClickListener(this)
-                    binding.eodButton.button.setOnClickListener(this)
-                    binding.unsettledButton.button.setOnClickListener(this)
-                    binding.keyDownloadButton.button.setOnClickListener(this)
-                    binding.parameterDownloadButton.button.setOnClickListener(this)
-                    binding.capkDownloadButton.button.setOnClickListener(this)
-                    binding.emvAidDownloadButton.button.setOnClickListener(this)
+        binding.hideBackButton = !intent.getBooleanExtra("SHOW_BACK_BUTTON", false)
+        binding.purchaseButton.button.setOnClickListener(this)
+        binding.adminButton.button.setOnClickListener(this)
+        binding.reprintButton.button.setOnClickListener(this)
+        binding.authButton.button.setOnClickListener(this)
+        binding.depositButton.button.setOnClickListener(this)
+        binding.billPayButton.button.setOnClickListener(this)
+        binding.cashAdvButton.button.setOnClickListener(this)
+        binding.reversalButton.button.setOnClickListener(this)
+        binding.balanceButton.button.setOnClickListener(this)
+        binding.cashBackButton.button.setOnClickListener(this)
+        binding.refundButton.button.setOnClickListener(this)
+        binding.salesCompletionButton.button.setOnClickListener(this)
+        binding.eodButton.button.setOnClickListener(this)
+        binding.unsettledButton.button.setOnClickListener(this)
+        binding.keyDownloadButton.button.setOnClickListener(this)
+        binding.parameterDownloadButton.button.setOnClickListener(this)
+        binding.capkDownloadButton.button.setOnClickListener(this)
+        binding.emvAidDownloadButton.button.setOnClickListener(this)
 
-                    mainScope.launch { checkKeysAndParameters() }
-                }
-            }
-        }
+        mainScope.launch { checkKeysAndParameters() }
     }
 
     override fun onClick(v: View?) {
@@ -143,7 +135,7 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                     mainScope.launch {
                         dialogProvider.showProgressBar("Downloading CAPK")
                         val (_, error) = safeRunIO {
-                            parameters.downloadCapk(this@CardMainMenuActivity)
+                            defaultParameterStore.downloadCapk(this@CardMainMenuActivity)
                         }
                         dialogProvider.hideProgressBar()
                         if (error != null) return@launch dialogProvider.showError(error)
@@ -154,7 +146,7 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
                     mainScope.launch {
                         dialogProvider.showProgressBar("Downloading EMV AID")
                         val (_, error) = safeRunIO {
-                            parameters.downloadAid(this@CardMainMenuActivity)
+                            defaultParameterStore.downloadAid(this@CardMainMenuActivity)
                         }
                         dialogProvider.hideProgressBar()
                         if (error != null) return@launch dialogProvider.showError(error)
@@ -172,15 +164,19 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
         if (localDate == parameters.updatedAt) return
 
         dialogProvider.showProgressBar("Downloading Keys and Parameters")
-        val (_, error) = safeRunIO {
-            parameters.downloadKeys(this@CardMainMenuActivity)
-            parameters.downloadParameters(this@CardMainMenuActivity)
+        for (parameterStore in parameterStores) {
+            val (_, error) = safeRunIO {
+                parameters.downloadKeys(this@CardMainMenuActivity)
+                parameters.downloadParameters(this@CardMainMenuActivity)
+            }
+            if (error != null) {
+                dialogProvider.hideProgressBar()
+                dialogProvider.showError("Download Failed. ${error.message}")
+                parameters.updatedAt = ""
+                return
+            }
         }
         dialogProvider.hideProgressBar()
-        if (error != null) {
-            dialogProvider.showError("Download Failed. ${error.message}")
-            return
-        }
 
         parameters.updatedAt = localDate
         dialogProvider.showSuccess("Download successful")
@@ -188,14 +184,18 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
 
     private suspend fun downloadKeys() {
         dialogProvider.showProgressBar("Downloading Keys")
-        val (_, error) = safeRunIO {
-            parameters.downloadKeys(this@CardMainMenuActivity)
+        for (parameterStore in parameterStores) {
+            val (_, error) = safeRunIO {
+                parameterStore.downloadKeys(this@CardMainMenuActivity)
+            }
+            if (error != null) {
+                dialogProvider.hideProgressBar()
+                dialogProvider.showError("Download Failed. ${error.message}")
+                parameters.updatedAt = ""
+                return
+            }
         }
         dialogProvider.hideProgressBar()
-        if (error != null) {
-            dialogProvider.showError("Download Failed. ${error.message}")
-            return
-        }
 
         parameters.updatedAt = Instant.now().format("MMdd")
         dialogProvider.showSuccess("Download successful")
@@ -203,20 +203,47 @@ class CardMainMenuActivity : MenuActivity(), View.OnClickListener {
 
     private suspend fun downloadParameters() {
         dialogProvider.showProgressBar("Downloading Parameters")
-        val (_, error) = safeRunIO {
-            parameters.downloadParameters(this@CardMainMenuActivity)
+        for (parameterStore in parameterStores) {
+            val (_, error) = safeRunIO {
+                parameterStore.downloadParameters(this@CardMainMenuActivity)
+            }
+            if (error != null) {
+                dialogProvider.hideProgressBar()
+                dialogProvider.showError("Download Failed. ${error.message}")
+                return
+            }
         }
         dialogProvider.hideProgressBar()
-        if (error != null) {
-            dialogProvider.showError("Download Failed. ${error.message}")
-            return
-        }
 
         parameters.updatedAt = Instant.now().format("MMdd")
         dialogProvider.showSuccess("Download successful")
     }
 
-    override fun goBack(v: View) {
+    fun goBack(v: View) {
         if (intent.getBooleanExtra("SHOW_BACK_BUTTON", false)) onBackPressed()
     }
+
+    private inline val parameterStores: Sequence<PosParameter>
+        get() {
+            val connectionSequence = sequence {
+                yield(config.remoteConnectionInfo)
+                posPreferences.binRoutes?.run {
+                    for (binRoutes in this) {
+                        for (route in binRoutes.routes) {
+                            yield(route.connectionInfo)
+                        }
+                    }
+                }
+            }
+
+            return connectionSequence
+                .distinctBy { "${it.ip}:${it.port}" }
+                .map { it.parameterStore }
+        }
+
+    private inline val RemoteConnectionInfo.parameterStore
+        get() = ParameterService(
+            this@CardMainMenuActivity,
+            this
+        )
 }

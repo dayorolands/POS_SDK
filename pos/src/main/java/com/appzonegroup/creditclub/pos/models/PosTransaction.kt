@@ -3,6 +3,7 @@ package com.appzonegroup.creditclub.pos.models
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.creditclub.core.serializer.TimeInstantSerializer
+import com.creditclub.pos.model.ConnectionInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.koin.core.KoinComponent
@@ -86,6 +87,12 @@ class PosTransaction {
 
     @SerialName("IsASystemChange")
     var isASystemChange = true
+
+    @SerialName("NodeName")
+    var nodeName: String? = null
+
+    @kotlinx.serialization.Transient
+    var connectionInfo: ConnectionInfo? = null
 
     companion object : KoinComponent
 }
