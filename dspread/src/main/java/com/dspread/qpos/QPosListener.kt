@@ -1,10 +1,7 @@
 package com.dspread.qpos
 
 import Decoder.BASE64Encoder
-import android.app.AlertDialog
-import android.app.Dialog
 import android.app.PendingIntent
-import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -20,6 +17,8 @@ import com.creditclub.pos.card.CardReaderEvent
 import com.dspread.R
 import com.dspread.qpos.utils.DUKPK2009_CBC
 import com.dspread.qpos.utils.QPOSUtil
+import com.dspread.qpos.utils.TLV
+import com.dspread.qpos.utils.TLVParser
 import com.dspread.xpos.CQPOSService
 import com.dspread.xpos.QPOSService
 import org.threeten.bp.Instant
@@ -242,7 +241,6 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
 
     override fun onRequestTransactionLog(tlv: String) {
         TRACE.d("onRequestTransactionLog(String tlv):$tlv")
-        dismissDialog()
         var content: String = getString(R.string.transaction_log)
         content += tlv
         statusEditText.setText(content)
@@ -292,8 +290,6 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
     }
 
     override fun onRequestOnlineProcess(tlv: String) {
-        dismissDialog()
-
         try { //                    analyData(tlv);// analy tlv ,get the tag you need
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
@@ -318,7 +314,6 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
     }
 
     override fun onRequestTime() {
-        dismissDialog()
         val terminalTime = Instant.now().format("yyyyMMddHHmmss")
         pos.sendTime(terminalTime)
         statusEditText.setText(getString(R.string.request_terminal_time) + " " + terminalTime)
@@ -326,17 +321,9 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
 
     override fun onRequestDisplay(displayMsg: QPOSService.Display) {
         TRACE.d("onRequestDisplay(Display displayMsg):$displayMsg")
-        dismissDialog()
         var msg = ""
         if (displayMsg == QPOSService.Display.CLEAR_DISPLAY_MSG) {
             msg = ""
-        } else if (displayMsg == QPOSService.Display.MSR_DATA_READY) {
-            val builder =
-                AlertDialog.Builder(activity)
-            builder.setTitle("音频")
-            builder.setMessage("Success,Contine ready")
-            builder.setPositiveButton("确定", null)
-            builder.show()
         } else if (displayMsg == QPOSService.Display.PLEASE_WAIT) {
             msg = getString(R.string.wait)
         } else if (displayMsg == QPOSService.Display.REMOVE_CARD) {
@@ -354,13 +341,10 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
         } else if (displayMsg == QPOSService.Display.CARD_REMOVED) {
             msg = "card removed"
         }
-        qPosManager.showProgressBar(msg)
-
-//        statusEditText.setText(msg)
+        if (msg.isNotBlank()) qPosManager.showProgressBar(msg)
     }
 
     override fun onRequestFinalConfirm() {
-        dismissDialog()
         if (!isPinCanceled) {
             var message: String = getString(R.string.amount) + ": $" + sessionData.amount
             if (sessionData.cashBackAmount != 0L) {
@@ -399,7 +383,7 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
     override fun onError(errorState: QPOSService.Error) {
         updateThread?.concelSelf()
         TRACE.d("onError$errorState")
-        dismissDialog()
+        qPosManager.hideProgressBar()
         when (errorState) {
             QPOSService.Error.CMD_NOT_AVAILABLE -> {
                 statusEditText.setText(getString(R.string.command_not_available))
@@ -474,11 +458,7 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
         TRACE.i(content)
     }
 
-    override fun onReturnApduResult(
-        arg0: Boolean,
-        arg1: String,
-        arg2: Int
-    ) { // TODO Auto-generated method stub
+    override fun onReturnApduResult(arg0: Boolean, arg1: String, arg2: Int) {
         TRACE.d("onReturnApduResult(boolean arg0, String arg1, int arg2):" + arg0 + TRACE.NEW_LINE + arg1 + TRACE.NEW_LINE + arg2)
     }
 
@@ -486,12 +466,7 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
         TRACE.d("onReturnPowerOffIccResult(boolean arg0):$arg0")
     }
 
-    override fun onReturnPowerOnIccResult(
-        arg0: Boolean,
-        arg1: String,
-        arg2: String,
-        arg3: Int
-    ) { // TODO Auto-generated method stub
+    override fun onReturnPowerOnIccResult(arg0: Boolean, arg1: String, arg2: String, arg3: Int) {
         TRACE.d("onReturnPowerOnIccResult(boolean arg0, String arg1, String arg2, int arg3) :" + arg0 + TRACE.NEW_LINE + arg1 + TRACE.NEW_LINE + arg2 + TRACE.NEW_LINE + arg3)
         if (arg0) {
             pos.sendApdu("123456")
@@ -543,7 +518,6 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
 
     override fun onRequestSetPin() {
         TRACE.d("onRequestSetPin()")
-        dismissDialog()
 
         qPosManager.requestPIN("Enter PIN") {
             onSubmit { pin ->
@@ -754,10 +728,6 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
         TRACE.d("onBluetoothBoardStateResult(boolean arg0):$arg0")
     }
 
-    override fun onDeviceFound(device: BluetoothDevice?) {
-        println()
-    }
-
     override fun onRequestUpdateKey(arg0: String) { // TODO Auto-generated method stub
         TRACE.d("onRequestUpdateKey(String arg0):$arg0")
         statusEditText.setText("update checkvalue : $arg0")
@@ -767,7 +737,6 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
         TRACE.d("onReturnGetQuickEmvResult(boolean arg0):$arg0")
         if (arg0) {
             statusEditText.setText("emv已配置")
-            //				isQuickEmv=true;
             pos.isQuickEmv = true
         } else {
             statusEditText.setText("emv未配置")
@@ -902,7 +871,7 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
 
     override fun onTradeCancelled() {
         TRACE.d("onTradeCancelled")
-        dismissDialog()
+        qPosManager.hideProgressBar()
     }
 
     override fun onReturnSetAESResult(
@@ -990,20 +959,10 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
     private val activity get() = qPosManager.activity
     private val sessionData get() = qPosManager.sessionData
     private val pos get() = qPosManager.pos
-    private var dialog: Dialog = Dialog(activity)
     private val statusEditText = object {
         fun setText(string: String?) {
             TRACE.d(string)
         }
     }
     private val updateThread: UpdateThread? = UpdateThread(qPosManager)
-
-    private fun dismissDialog() {
-        dialog.dismiss()
-        qPosManager.hideProgressBar()
-    }
-
-    private fun clearDisplay() {
-
-    }
 }
