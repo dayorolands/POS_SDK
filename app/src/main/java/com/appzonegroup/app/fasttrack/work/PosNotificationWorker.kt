@@ -34,6 +34,7 @@ class PosNotificationWorker(context: Context, params: WorkerParameters) :
         val posNotificationDao = posDatabase.posNotificationDao()
 
         val jobs = posNotificationDao.all().map { notification ->
+            if (notification.nodeName == "EPMS") notification.nodeName = null
             async {
                 val requestBody = gson.toJson(notification).toRequestBody()
 

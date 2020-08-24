@@ -59,7 +59,7 @@ class IsoSocketHelper(
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
             gpsCoordinates = gps.geolocationString ?: "0.00;0.00"
-            nodeName = remoteConnectionInfo.id
+            nodeName = remoteConnectionInfo.nodeName
             if (remoteConnectionInfo is ConnectionInfo) {
                 connectionInfo = remoteConnectionInfo
             }

@@ -360,7 +360,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                     cardHolder = cardData.holder
                     aid = cardData.aid
                     cardType = cardData.type
-                    nodeName = remoteConnectionInfo.id
+                    nodeName = remoteConnectionInfo.nodeName
                     if (remoteConnectionInfo is ConnectionInfo) {
                         connectionInfo = remoteConnectionInfo
                     }
@@ -419,7 +419,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
 
                     if (response.isSuccessful) {
                         val posNotification = PosNotification.create(transaction)
-                        posNotification.nodeName = remoteConnectionInfo.id
+                        posNotification.nodeName = remoteConnectionInfo.nodeName
                         if (remoteConnectionInfo is ConnectionInfo) {
                             posNotification.connectionInfo = remoteConnectionInfo
                         }
@@ -481,7 +481,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
 
             if (!success) {
                 val reversalRecord = Reversal(reversal).apply {
-                    nodeName = remoteConnectionInfo.id
+                    nodeName = remoteConnectionInfo.nodeName
                     if (remoteConnectionInfo is ConnectionInfo) {
                         connectionInfo = remoteConnectionInfo
                     }

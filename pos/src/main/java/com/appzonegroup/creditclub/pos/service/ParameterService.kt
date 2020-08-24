@@ -397,7 +397,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
             gpsCoordinates = gps.geolocationString ?: "0.00;0.00"
-            nodeName = posMode.id
+            nodeName = posMode.nodeName
             if (posMode is ConnectionInfo) {
                 connectionInfo = posMode
             }

@@ -20,14 +20,15 @@ data class Route(
 
 @Serializable
 data class ConnectionInfo(
-    @SerialName("Name") override val id: String,
+    @SerialName("Name") override val nodeName: String,
     @SerialName("IPAddress") override val ip: String,
     @SerialName("Port") override val port: Int,
     @SerialName("EnableSSL") override val ssl: Boolean,
     @SerialName("Dukpt") override val dukptConfig: DukptConfigImpl?,
     @SerialName("MaxAttempts") override val maxAttempts: Int = 3
 ) : RemoteConnectionInfo {
-    override val label: String get() = id
+    override val id: String get() = nodeName
+    override val label: String get() = nodeName
     override val key1: String get() = "3DFB3802940E8A546B3D38610852BA7A"
     override val key2: String get() = "0234E39861D3405E7A6B3185BA675873"
 }
