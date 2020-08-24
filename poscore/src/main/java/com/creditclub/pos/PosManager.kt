@@ -13,7 +13,7 @@ interface PosManager {
     val sessionData: SessionData
 
     suspend fun loadEmv()
-    suspend fun startTransaction(): TransactionResponse
+    suspend fun startTransaction(): TransactionResponse = throw NotImplementedError("Not yet implemented")
 
     fun cleanUpEmv()
     suspend fun openSettings() = false
@@ -21,6 +21,7 @@ interface PosManager {
 
     open class SessionData {
         open var amount = 0L
+        open var cashBackAmount = 0L
         open var pinBlock: String? = null
         open var canRunTransaction = false
         open var canManageParameters = false

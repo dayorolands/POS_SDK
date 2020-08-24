@@ -1,17 +1,19 @@
-package com.appzonegroup.creditclub.pos.provider.mpos
+package com.creditclub.pos.providers.mpos
 
 import android.app.Dialog
 import android.bluetooth.BluetoothAdapter
-import com.appzonegroup.creditclub.pos.card.CardDataListener
-import com.appzonegroup.creditclub.pos.card.CardReader
-import com.appzonegroup.creditclub.pos.card.CardTransactionStatus
-import com.appzonegroup.creditclub.pos.card.PosManager
-import com.appzonegroup.creditclub.pos.service.ParameterService
-import com.appzonegroup.creditclub.pos.util.Misc
+import android.content.Context
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.ui.widget.build
+import com.creditclub.pos.PosManager
+import com.creditclub.pos.PosManagerCompanion
+import com.creditclub.pos.PosParameter
+import com.creditclub.pos.card.CardDataListener
+import com.creditclub.pos.card.CardReader
+import com.creditclub.pos.card.CardTransactionStatus
+import com.creditclub.pos.extensions.hexBytes
 import com.jhl.bluetooth.ibridge.BluetoothIBridgeDevice
 import com.jhl.jhlblueconn.BlueStateListenerCallback
 import com.jhl.jhlblueconn.BluetoothCommmanager
@@ -29,7 +31,7 @@ import java.util.*
 class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerCallback,
     DialogProvider by activity.dialogProvider, KoinComponent {
 
-    private val parameters: ParameterService by inject()
+    private val parameters: PosParameter by inject()
 
     private var scanDeviceListenerBlock: DialogListenerBlock<Unit>? = null
     private var readCardBlock: CardDataListener? = null
@@ -49,7 +51,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
 
     private val activeJobs = mutableListOf<Job?>()
 
-    override fun loadEmv() {
+    override suspend fun loadEmv() {
         println("...")
     }
 
@@ -89,7 +91,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
 
     override fun onLoadMasterKeySuccess(bool: Boolean?) {
         print("...")
-        connectionManager.writeWorkKey(Misc.hexStringToByte(parameters.pinKey))
+        connectionManager.writeWorkKey(parameters.pinKey.hexBytes)
     }
 
     override fun onGetCAPublicKeyListFailure(i: Int, str: String?) {
@@ -131,7 +133,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
 
     override fun onBluetoothConnected() {
         hideProgressBar()
-        connectionManager.writeMainKey(Misc.hexStringToByte(parameters.masterKey))
+        connectionManager.writeMainKey(parameters.masterKey.hexBytes)
     }
 
     override fun onGetCAPublicKeyParamsSuccess(str: String?) {
@@ -273,19 +275,23 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
         }
     }
 
-    companion object {
-        val module = module {
+    companion object : PosManagerCompanion {
+        override val module = module {
             factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
                 MPosManager(activity)
             }
         }
 
-        fun isCompatible(): Boolean {
+        override fun isCompatible(context: Context): Boolean {
             return try {
                 BluetoothAdapter.getDefaultAdapter() != null
             } catch (ex: Exception) {
                 false
             }
+        }
+
+        override fun setup(context: Context) {
+
         }
     }
 }

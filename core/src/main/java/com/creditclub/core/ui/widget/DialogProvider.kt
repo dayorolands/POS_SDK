@@ -88,4 +88,8 @@ interface DialogProvider {
     fun confirm(params: DialogConfirmParams, block: DialogListenerBlock<Boolean>?) {
         showError("Confirmation dialog not implemented", block)
     }
+
+    fun confirm(title: String, subtitle: String?, block: DialogListenerBlock<Boolean>?) {
+        confirm(DialogConfirmParams(title, subtitle ?: ""), block)
+    }
 }

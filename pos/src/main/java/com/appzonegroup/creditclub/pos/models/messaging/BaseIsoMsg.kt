@@ -3,6 +3,7 @@ package com.appzonegroup.creditclub.pos.models.messaging
 import com.appzonegroup.creditclub.pos.extension.generateStan
 import com.appzonegroup.creditclub.pos.extension.setTransactionTime
 import com.appzonegroup.creditclub.pos.util.*
+import com.creditclub.pos.extensions.hexBytes
 import org.jpos.iso.ISOMsg
 import org.threeten.bp.Instant
 import java.io.ByteArrayOutputStream
@@ -54,7 +55,7 @@ open class BaseIsoMsg : ISOMsg() {
     }
 
     fun unpack(msg: String) {
-        unpack(Misc.toByteArray(msg))
+        unpack(msg.hexBytes)
     }
 
     fun prepare(sessionKeyString: String): ByteArray {

@@ -6,7 +6,7 @@ import com.appzonegroup.creditclub.pos.card.CardIsoMsg
 import com.appzonegroup.creditclub.pos.card.cardTransactionType
 import com.appzonegroup.creditclub.pos.card.maskPan
 import com.appzonegroup.creditclub.pos.extension.*
-import com.appzonegroup.creditclub.pos.util.Misc
+import com.appzonegroup.creditclub.pos.util.hexString
 import com.creditclub.pos.model.ConnectionInfo
 import org.jpos.iso.ISOMsg
 import org.threeten.bp.Instant
@@ -93,7 +93,7 @@ open class FinancialTransaction {
     constructor(msg: ISOMsg) {
         stan = msg.stan11 ?: ""
         date = msg.localTransactionDate13 ?: ""
-        content = Misc.toHexString(msg.pack())
+        content = msg.pack().hexString
         type = cardTransactionType(msg).type
         pan = maskPan(msg.pan)
         rrn = msg.retrievalReferenceNumber37 ?: ""

@@ -1,10 +1,7 @@
 package com.appzonegroup.creditclub.pos.service
 
-import android.util.Log
 import com.appzonegroup.creditclub.pos.BuildConfig
-import com.appzonegroup.creditclub.pos.util.Misc
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
@@ -113,8 +110,6 @@ object ApiService {
             .header("Content-Type", "application/json")
             .get()
             .build()
-
-        Log.e("Call Made", Misc.getCurrentDateLongString())
 
         return client.newCall(request).execute().body()!!.string()
     }

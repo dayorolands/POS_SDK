@@ -148,6 +148,12 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                     return@launch
                 }
 
+                CardReaderEvent.Timeout -> {
+                    stopTimer()
+                    renderTransactionFailure("Device timeout due to inactivity", "")
+                    return@launch
+                }
+
                 else -> {
                     cardReaderEvent = cardEvent
                     restartTimer()

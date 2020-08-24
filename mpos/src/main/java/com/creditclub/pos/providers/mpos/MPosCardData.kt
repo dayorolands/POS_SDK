@@ -1,8 +1,8 @@
-package com.appzonegroup.creditclub.pos.provider.mpos
+package com.creditclub.pos.providers.mpos
 
-import com.appzonegroup.creditclub.pos.card.CardData
-import com.appzonegroup.creditclub.pos.card.CardReaderEvent
-import com.appzonegroup.creditclub.pos.util.TerminalUtils
+import com.creditclub.pos.card.CardData
+import com.creditclub.pos.card.CardReaderEvent
+import com.creditclub.pos.extensions.hexBytes
 
 
 /**
@@ -41,8 +41,7 @@ class MPosCardData internal constructor(
     }
 
     private fun KeyController.decrypt(encryptedValue: String?): String? {
-        val byteArray = TerminalUtils.hexStringToByteArray(encryptedValue)
-        return decrypt(byteArray)
+        return decrypt(encryptedValue?.hexBytes)
     }
 
     private fun populateFromTrack2() {
