@@ -96,6 +96,10 @@ class IsoSocketHelper(
         maxAttempts: Int,
         crossinline onReattempt: suspend (attempt: Int) -> Unit
     ): Boolean {
+        if (maxAttempts < 2) {
+            send(request).error ?: return true
+            return false
+        }
         for (attempt in 1..maxAttempts) {
             if (attempt > 1) onReattempt(attempt)
 
@@ -113,6 +117,7 @@ class IsoSocketHelper(
         maxAttempts: Int,
         crossinline onReattempt: suspend (attempt: Int) -> Unit
     ): Result {
+        if (maxAttempts < 2) return send(request)
         for (attempt in 1..maxAttempts) {
             if (attempt > 1) onReattempt(attempt)
 
@@ -123,6 +128,16 @@ class IsoSocketHelper(
         }
 
         return Result(null, null)
+    }
+
+    fun send(request: ISOMsg, maxAttempts: Int): Result {
+        if (maxAttempts < 2) return send(request)
+        var result = Result(null, null)
+        for (attempt in 1..maxAttempts) {
+            result = send(request)
+            if (result.error !is ConnectException) break
+        }
+        return result
     }
 
     data class Result(val response: ISOMsg?, val error: java.lang.Exception?)
