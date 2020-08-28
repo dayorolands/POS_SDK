@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="hla_enabled">false</bool>
+    <string-array name="customer_request_options">
+        <item>1,Phone Number</item>
+        <item>2,Account Number</item>
+    </string-array>
+</resources>

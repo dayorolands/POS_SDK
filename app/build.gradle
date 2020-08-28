@@ -115,6 +115,11 @@ android {
             dimension "flavor"
             applicationId "com.creditclub.access"
         }
+
+        gtbank {
+            dimension "flavor"
+            applicationId "com.creditclub.gtbank"
+        }
     }
     sourceSets {
         main {
