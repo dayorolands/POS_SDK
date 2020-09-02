@@ -30,6 +30,7 @@ import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.util.*
 import com.creditclub.pos.PosManager
+import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
 import com.creditclub.pos.card.CardTransactionStatus
@@ -48,6 +49,7 @@ import org.jpos.iso.ISOMsg
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import org.threeten.bp.Instant
+import retrofit2.create
 import java.net.ConnectException
 import java.util.*
 import kotlin.concurrent.schedule
@@ -60,7 +62,6 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
     protected var previousMessage: CardIsoMsg? = null
     private var accountType: AccountType? = null
     abstract var transactionType: TransactionType
-
     private lateinit var cardData: CardData
     private var cardReaderEvent: CardReaderEvent = CardReaderEvent.CANCELLED
 
@@ -429,8 +430,11 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                         if (remoteConnectionInfo is ConnectionInfo) {
                             posNotification.connectionInfo = remoteConnectionInfo
                         }
-
-                        logPosNotification(posDatabase, backendConfig, posConfig, posNotification)
+                        withContext(Dispatchers.IO) {
+                            posDatabase.posNotificationDao().save(posNotification)
+                        }
+                        val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
+                        posApiService.logPosNotification(posDatabase, backendConfig, posConfig, posNotification)
                     }
                 }
 

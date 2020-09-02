@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.creditclub.core.util.format
 import com.creditclub.pos.model.ConnectionInfo
-import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
 /**
@@ -14,50 +14,51 @@ import kotlinx.serialization.SerialName
  */
 
 @Entity
+@Serializable
 class PosNotification {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
 
-    @SerializedName("TransactionReference")
+    @SerialName("TransactionReference")
     var transactionReference: String? = "2058HK58-00022224148-1031170618"
 
-    @SerializedName("Amount")
+    @SerialName("Amount")
     var amount: Double? = 0.00
 
-    @SerializedName("Reference")
+    @SerialName("Reference")
     var reference: String? = ""
 
-    @SerializedName("Currency")
+    @SerialName("Currency")
     var currency: String? = "NGN"
 
-    @SerializedName("Type")
+    @SerialName("Type")
     var type: String? = "Invoice"
 
-    @SerializedName("CardScheme")
+    @SerialName("CardScheme")
     var cardScheme: String? = "Debit MasterCard"
 
-    @SerializedName("StatusCode")
+    @SerialName("StatusCode")
     var statusCode: String? = "00"
 
-    @SerializedName("PaymentDate")
+    @SerialName("PaymentDate")
     var paymentDate: String? = "2018-10-31 17:06:18"
 
-    @SerializedName("RetrievalReferenceNumber")
+    @SerialName("RetrievalReferenceNumber")
     var retrievalReferenceNumber: String? = "000220000148"
 
-    @SerializedName("MaskedPAN")
+    @SerialName("MaskedPAN")
     var maskedPAN: String? = "539983******9569"
 
-    @SerializedName("Nuban")
+    @SerialName("Nuban")
     var nuban: String? = ""
 
-    @SerializedName("CustomerName")
+    @SerialName("CustomerName")
     var customerName: String? = "SAIDU/M"
 
-    @SerializedName("StatusDescription")
+    @SerialName("StatusDescription")
     var statusDescription: String? = "Approved or completed successfully"
 
-    @SerializedName("AdditionalInformation")
+    @SerialName("AdditionalInformation")
     var additionalInformation: String? = ""
 
     @SerialName("NodeName")
