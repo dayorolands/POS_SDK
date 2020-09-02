@@ -17,7 +17,7 @@ import com.creditclub.core.util.requireAccountInfo
 abstract class CustomerBaseActivity : BaseActivity() {
     protected var accountInfo = AccountInfo()
 
-    val customerRequestOptions: Array<CustomerRequestOption>
+    inline val customerRequestOptions: Array<CustomerRequestOption>
         get() = resources.getStringArray(R.array.customer_request_options).map {
             val indexAndLabel = it.split(",")
             CustomerRequestOption.values()[indexAndLabel.first().toInt()]

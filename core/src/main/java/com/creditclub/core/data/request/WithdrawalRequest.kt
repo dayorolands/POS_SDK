@@ -41,5 +41,8 @@ class WithdrawalRequest {
     class Additional {
         @SerialName("Currency")
         var currency = ""
+
+        @SerialName("CustomerPhoneNumber")
+        var customerPhoneNumber: String? = null
     }
 }

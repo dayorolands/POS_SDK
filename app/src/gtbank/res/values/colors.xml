@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#4f3272</color>
-    <color name="colorPrimaryTransparent">#DD4f3272</color>
-    <color name="colorPrimaryDark">#2F1E44</color>
-    <color name="colorAccent">#DFA226</color>
-    <color name="colorAccentDark">#8B6518</color>
-    <color name="colorAccentTransparent">#DDDFA226</color>
+    <color name="colorPrimary">#631B15</color>
+    <color name="colorPrimaryTransparent">#DD631B15</color>
+    <color name="colorPrimaryDark">#2E0D0A</color>
     <color name="fundsTransferSameBankTint">#0000</color>
+    <color name="colorAccent">#F17C1C</color>
+    <color name="colorAccentDark">#B15B15</color>
+    <color name="colorAccentTransparent">#DDF17C1C</color>
+    <color name="colorSplashBg">#FFF</color>
+    <color name="colorLoginBg">#D000</color>
+    <color name="toolbarLogoTint">#FFF</color>
+    <color name="menuBackground">#110A3060</color>
     <color name="navHeaderLogoTint">#0000</color>
-    <color name="menuBackground">#114f3272</color>
 </resources>

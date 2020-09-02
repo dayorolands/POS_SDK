@@ -8,4 +8,5 @@
     </string-array>
     <bool name="category_loan">false</bool>
     <bool name="account_opening_products">false</bool>
+    <bool name="token_withdrawal_external_token">false</bool>
 </resources>
