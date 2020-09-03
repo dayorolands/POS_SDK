@@ -16,7 +16,6 @@ import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
 import com.appzonegroup.creditclub.pos.data.posPreferences
 import com.creditclub.core.CreditClubApplication
-import com.creditclub.core.data.model.AgentInfo
 import com.creditclub.core.data.model.SurveyQuestion
 import com.creditclub.core.data.prefs.JsonStorage
 import com.creditclub.core.data.request.SubmitSurveyRequest
@@ -42,7 +41,8 @@ class LoginActivity : CreditClubActivity() {
         }
 
         debugOnly {
-            version_tv.text = "Version ${packageInfo?.versionName}. Staging"
+            val debugInfo = "Version ${packageInfo?.versionName}. ${BuildConfig.BUILD_TYPE}"
+            version_tv.text = debugInfo
             login_phoneNumber.setText(localStorage.agent?.phoneNumber)
         }
 
@@ -164,7 +164,11 @@ class LoginActivity : CreditClubActivity() {
             val surveyQuestions = response.data ?: return@launch
 
             if (response.isSuccessful) {
-                jsonStore.save("SURVEY_QUESTIONS", surveyQuestions, SurveyQuestion.serializer().list)
+                jsonStore.save(
+                    "SURVEY_QUESTIONS",
+                    surveyQuestions,
+                    SurveyQuestion.serializer().list
+                )
             }
         }
     }
