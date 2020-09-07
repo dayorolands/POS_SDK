@@ -43,9 +43,6 @@ dependencies {
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${versions.serialization}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
-
-    debugImplementation "io.objectbox:objectbox-android-objectbrowser:${versions.objectBox}"
-    releaseImplementation "io.objectbox:objectbox-android:${versions.objectBox}"
     implementation "io.objectbox:objectbox-kotlin:${versions.objectBox}"
 }
 

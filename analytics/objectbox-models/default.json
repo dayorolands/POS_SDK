@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:5761920719266012762",
-      "lastPropertyId": "4:7453503750613910945",
+      "lastPropertyId": "14:2790518971275482384",
       "name": "NetworkMeasurement",
       "properties": [
         {
@@ -15,19 +15,56 @@
           "flags": 1
         },
         {
-          "id": "2:4660447320361124302",
-          "name": "text",
+          "id": "5:5912843763235183283",
+          "name": "agentCode",
           "type": 9
         },
         {
-          "id": "3:2181047505308306484",
-          "name": "comment",
+          "id": "6:8630390068015597052",
+          "name": "agentPhoneNumber",
           "type": 9
         },
         {
-          "id": "4:7453503750613910945",
-          "name": "date",
-          "type": 10
+          "id": "7:2366722702196447915",
+          "name": "institutionCode",
+          "type": 9
+        },
+        {
+          "id": "8:4483291717038723119",
+          "name": "url",
+          "type": 9
+        },
+        {
+          "id": "9:3529523061544069111",
+          "name": "method",
+          "type": 9
+        },
+        {
+          "id": "10:5720325925497149998",
+          "name": "gpsCoordinates",
+          "type": 9
+        },
+        {
+          "id": "11:3602580083113715491",
+          "name": "statusCode",
+          "type": 5,
+          "flags": 4
+        },
+        {
+          "id": "12:7327346849125271323",
+          "name": "duration",
+          "type": 6,
+          "flags": 4
+        },
+        {
+          "id": "13:5690835953227128207",
+          "name": "requestTime",
+          "type": 9
+        },
+        {
+          "id": "14:2790518971275482384",
+          "name": "responseTime",
+          "type": 9
         }
       ],
       "relations": []
@@ -41,7 +78,11 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    4660447320361124302,
+    2181047505308306484,
+    7453503750613910945
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

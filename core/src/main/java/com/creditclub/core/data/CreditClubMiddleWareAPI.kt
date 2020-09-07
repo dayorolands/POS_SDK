@@ -37,8 +37,6 @@ open class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) 
 
     val staticService by retrofit.service(StaticService::class)
 
-    val mobileTrackingService by retrofit.service(MobileTrackingService::class)
-
     val billsPaymentService by retrofit.service(BillsPaymentService::class)
 
     val caseLogService by retrofit.service(CaseLogService::class)

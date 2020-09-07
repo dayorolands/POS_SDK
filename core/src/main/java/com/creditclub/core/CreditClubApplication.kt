@@ -9,11 +9,6 @@ import com.creditclub.core.util.safeRunIO
 import com.google.android.play.core.missingsplits.MissingSplitsManagerFactory
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.koin.android.ext.android.get
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.KoinApplication
-import org.koin.core.context.startKoin
-import org.koin.dsl.KoinAppDeclaration
 
 
 /**

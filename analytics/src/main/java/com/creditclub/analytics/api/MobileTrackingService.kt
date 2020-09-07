@@ -1,6 +1,8 @@
-package com.creditclub.core.data.api
+package com.creditclub.analytics.api
 
+import com.creditclub.analytics.models.NetworkMeasurement
 import com.creditclub.core.data.model.DeviceTransactionInformation
+import com.creditclub.core.data.response.BackendResponse
 import com.creditclub.core.data.response.MobileTrackingResponse
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -20,4 +22,7 @@ interface MobileTrackingService {
 
     @POST("api/MobileTracking/SaveAgentMobileTrackingDetails")
     suspend fun saveAgentMobileTrackingDetails(@Body body: RequestBody): MobileTrackingResponse?
+
+    @POST("api/MobileTracking/LogNetworkMetrics")
+    suspend fun logNetworkMetrics(@Body request: NetworkMeasurement): BackendResponse?
 }

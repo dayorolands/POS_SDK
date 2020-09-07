@@ -232,5 +232,18 @@
             </LinearLayout>
         </ScrollView>
 
+        <Button
+            android:id="@+id/complete_payment_button"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="20dp"
+            android:width="180dp"
+            android:gravity="center"
+            android:text="Complete Payment"
+            android:textColor="#fff" />
+
     </RelativeLayout>
 </layout>

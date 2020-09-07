@@ -10,13 +10,13 @@ import io.objectbox.android.AndroidObjectBrowser
 /**
  * Singleton to keep BoxStore reference.
  */
-object ObjectBox {
+object AnalyticsObjectBox {
 
     lateinit var boxStore: BoxStore
         private set
 
     fun init(context: Context): BoxStore {
-        if (::boxStore.isInitialized && !boxStore.isClosed) {
+        if (AnalyticsObjectBox::boxStore.isInitialized && !boxStore.isClosed) {
             return boxStore
         }
 

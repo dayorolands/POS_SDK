@@ -1,6 +1,8 @@
 package com.creditclub.analytics.models
 
+import com.creditclub.core.serializer.TimeInstantConverter
 import com.creditclub.core.serializer.TimeInstantSerializer
+import io.objectbox.annotation.Convert
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
 import kotlinx.serialization.SerialName
@@ -8,6 +10,7 @@ import kotlinx.serialization.Serializable
 import org.threeten.bp.Instant
 
 @Entity
+@Serializable
 class NetworkMeasurement {
     @Id
     @SerialName("ID")
@@ -22,14 +25,8 @@ class NetworkMeasurement {
     @SerialName("InstitutionCode")
     var institutionCode: String? = null
 
-    @SerialName("Path")
-    var path: String? = null
-
-    @SerialName("Host")
-    var host: String? = null
-
-    @SerialName("Scheme")
-    var scheme: String? = null
+    @SerialName("Url")
+    var url: String? = null
 
     @SerialName("Method")
     var method: String? = null
@@ -41,13 +38,15 @@ class NetworkMeasurement {
     var statusCode: Int = 0
 
     @SerialName("Duration")
-    var duration = 0.0
+    var duration: Long = 0
 
     @Serializable(with = TimeInstantSerializer::class)
+    @Convert(converter = TimeInstantConverter::class, dbType = String::class)
     @SerialName("RequestTime")
-    var requestTime: Instant = Instant.now()
+    var requestTime: Instant? = null
 
     @Serializable(with = TimeInstantSerializer::class)
+    @Convert(converter = TimeInstantConverter::class, dbType = String::class)
     @SerialName("ResponseTime")
     var responseTime: Instant? = null
 }

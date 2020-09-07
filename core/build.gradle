@@ -3,7 +3,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
-apply plugin: 'io.objectbox'
 
 android {
     compileSdkVersion versions.compileSdk
@@ -112,8 +111,7 @@ dependencies {
 
     implementation "androidx.navigation:navigation-fragment-ktx:${versions.navigation}"
     implementation "androidx.navigation:navigation-ui-ktx:${versions.navigation}"
+    implementation "io.objectbox:objectbox-kotlin:${versions.objectBox}"
 }
 
-repositories {
-    mavenCentral()
-}
+apply plugin: 'io.objectbox'
