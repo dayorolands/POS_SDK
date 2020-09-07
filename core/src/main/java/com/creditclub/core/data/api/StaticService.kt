@@ -14,7 +14,10 @@ import retrofit2.http.*
 interface StaticService {
 
     @GET("CreditClubStatic/Status")
-    suspend fun status(@Query("reference") reference: String, @Query("type") type: Int): BackendResponse?
+    suspend fun status(
+        @Query("reference") reference: String,
+        @Query("type") type: Int
+    ): BackendResponse?
 
     @POST("CreditClubStatic/BalanceEnquiry")
     suspend fun balanceEnquiry(@Body request: BalanceEnquiryRequest): Balance?
@@ -35,7 +38,10 @@ interface StaticService {
     suspend fun bVNUpdate(@Body request: BVNRequest): BackendResponse?
 
     @POST("CreditClubStatic/Register")
-    suspend fun register(@Body request: CustomerRequest, @Query("IsRetrial") isRetrial: Boolean = false): BackendResponse?
+    suspend fun register(
+        @Body request: CustomerRequest,
+        @Query("IsRetrial") isRetrial: Boolean = false
+    ): BackendResponse?
 
     @POST("CreditClubStatic/CompleteActivationWithPinChange")
     suspend fun completeActivationWithPinChange(@Body request: PinChangeRequest): BackendResponse?
@@ -92,7 +98,9 @@ interface StaticService {
     suspend fun confirmAgentInformation(
         @Query("institutionCode") institutionCode: String?,
         @Query("agentPhoneNumber") agentPhoneNumber: String,
-        @Query("agentPIN") verificationCode: String
+        @Query("agentPIN") agentPin: String,
+        @Query("AppVersion") appVersion: String,
+        @Query("DeviceType") deviceType: String
     ): BackendResponse?
 
     @GET("CreditClubStatic/GetAssociations")
@@ -172,4 +180,13 @@ interface StaticService {
         @Query("AgentPhoneNumber") agentPhoneNumber: String?,
         @Query("AppVersionName") appVersionName: String?
     ): ApiResponse<List<SurveyQuestion>>
+
+    @GET("CreditClubStatic/GetStates")
+    suspend fun getStates(@Query("institutionCode") institutionCode: String?): ApiResponse<List<State>?>?
+
+    @GET("CreditClubStatic/GetLGAs")
+    suspend fun getLgas(
+        @Query("institutionCode") institutionCode: String?,
+        @Query("stateID") stateId: String?
+    ): ApiResponse<List<Lga>?>?
 }

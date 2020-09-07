@@ -21,7 +21,7 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
 
     override var hasHlaTagging: Boolean = false
 
-    override var transactionTypes: List<TransactionType> = TransactionType.values().toList()
+    override var transactionTypes: List<TransactionType> = emptyList()
 
     override var flows: FlowConfig = FlowConfig()
 
@@ -63,6 +63,10 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
 
             config.categories.run {
                 loans = resources.getBoolean(R.bool.category_loan)
+            }
+
+            config.transactionTypes = resources.getStringArray(R.array.transaction_types).map {
+                TransactionType.valueOf(it)
             }
 
             // Manual overrides for creditclub variant

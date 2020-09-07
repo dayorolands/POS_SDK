@@ -11,6 +11,12 @@ class CollectionReference {
     @SerialName("Reference")
     var reference: String? = null
 
+    @SerialName("CategoryCode")
+    var categoryCode: String? = null
+
+    @SerialName("ItemCode")
+    var itemCode: String? = null
+
     @SerialName("CollectionAccount")
     var collectionAccount: String? = null
 

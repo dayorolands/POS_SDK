@@ -3,7 +3,6 @@ package com.appzonegroup.app.fasttrack.fragment.online;
 import androidx.fragment.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -17,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.appzonegroup.app.fasttrack.OnlineActivity;
-import com.appzonegroup.app.fasttrack.LocationChangedService;
 import com.appzonegroup.app.fasttrack.R;
 import com.appzonegroup.app.fasttrack.model.TransactionCountType;
 import com.appzonegroup.app.fasttrack.model.online.Response;
@@ -129,7 +127,6 @@ public class FirstActivityAgentFragment extends Fragment implements View.OnClick
                                         auth.put("phone_number", phoneNumber);
                                         auth.put("session_id", sessionId);
                                         LocalStorage.saveCacheAuth(auth.toString(), getActivity());
-                                        getActivity().startService(new Intent(getActivity(), LocationChangedService.class));
                                         if (resp.contains("MenuItem")) {
                                             JSONObject menuWrapper = response_base.getJSONObject("Menu").getJSONObject("Response").getJSONObject("Display");
                                             requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, ListOptionsFragment.instantiate(menuWrapper, false)).commit();
@@ -184,7 +181,6 @@ public class FirstActivityAgentFragment extends Fragment implements View.OnClick
                                                                             auth.put("phone_number", phoneNumber);
                                                                             auth.put("session_id", sessionId);
                                                                             LocalStorage.saveCacheAuth(auth.toString(), getActivity());
-                                                                            getActivity().startService(new Intent(getActivity(), LocationChangedService.class));
                                                                             if (resp.contains("MenuItem")) {
                                                                                 JSONObject menuWrapper = response_base.getJSONObject("Menu").getJSONObject("Response").getJSONObject("Display");
                                                                                 requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, ListOptionsFragment.instantiate(menuWrapper, false)).commit();

@@ -5,13 +5,14 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.FragmentCollectionReferenceGenerationBinding
 import com.appzonegroup.app.fasttrack.ui.dataBinding
-import com.creditclub.core.data.model.CollectionCategory
-import com.creditclub.core.data.model.CollectionPaymentItem
 import com.creditclub.core.data.request.CollectionReferenceGenerationRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
@@ -23,10 +24,9 @@ import java.util.*
 class CollectionReferenceGenerationFragment :
     CreditClubFragment(R.layout.fragment_collection_reference_generation) {
 
+    private val args by navArgs<CollectionReferenceGenerationFragmentArgs>()
     private val request = CollectionReferenceGenerationRequest()
 
-    private var paymentItems: List<CollectionPaymentItem>? = null
-    private var categories: List<CollectionCategory>? = null
     private val binding by dataBinding<FragmentCollectionReferenceGenerationBinding>()
     private val viewModel: CollectionPaymentViewModel by navGraphViewModels(R.id.collectionGraph)
     private val uniqueReference = UUID.randomUUID().toString()
@@ -40,20 +40,23 @@ class CollectionReferenceGenerationFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.run {
+            isOffline.value = args.offline
+            categoryList.bindDropDown(category, binding.categoryInput)
+            itemList.bindDropDown(item, binding.paymentItemInput)
+
+            customerId.onChange { customer.postValue(null) }
+            customerType.onChange { customer.postValue(null) }
+            item.onChange { itemCode.postValue(item.value?.code) }
+            category.onChange {
+                if (!args.offline) {
+                    binding.paymentItemInput.clearSuggestions()
+
+                    mainScope.launch { loadPaymentItems() }
+                }
+            }
+        }
         binding.viewModel = viewModel
-
-        mainScope.launch { loadCategories() }
-
-        binding.categoryInput.onItemClick { position ->
-            viewModel.category.value = categories?.get(position)
-            binding.paymentItemInput.clearSuggestions()
-
-            mainScope.launch { loadPaymentItems() }
-        }
-
-        binding.paymentItemInput.onItemClick { position ->
-            viewModel.item.value = paymentItems?.get(position)
-        }
 
         binding.generateReferenceButton.setOnClickListener {
             mainScope.launch { generateReference() }
@@ -62,12 +65,22 @@ class CollectionReferenceGenerationFragment :
         binding.customerIdInputLayout.setEndIconOnClickListener {
             mainScope.launch { loadCustomer() }
         }
+
+        val customerTypes = listOf("N-", "C-")
+        val adapter = ArrayAdapter(requireContext(), R.layout.list_item, customerTypes)
+        binding.customerTypeInput.setAdapter(adapter)
+
+        mainScope.launch { loadCategories() }
     }
 
-    private inline fun AutoCompleteTextView.onItemClick(crossinline block: (position: Int) -> Unit) {
-        setOnItemClickListener { _, _, position, _ ->
-            block(position)
-        }
+    private inline fun <T> MutableLiveData<T>.onChange(crossinline block: () -> Unit) {
+        var oldValue = value
+        observe(viewLifecycleOwner, Observer {
+            if (value != oldValue) {
+                oldValue = value
+                block()
+            }
+        })
     }
 
     private fun AutoCompleteTextView.clearSuggestions() {
@@ -76,37 +89,56 @@ class CollectionReferenceGenerationFragment :
         setAdapter(adapter)
     }
 
-    private suspend fun loadCategories() = loadDependencies("categories", binding.categoryInput) {
-        categories = creditClubMiddleWareAPI.collectionsService.getCollectionCategories(
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> MutableLiveData<List<T>>.bindDropDown(
+        selectedItemLiveData: MutableLiveData<T>,
+        autoCompleteTextView: AutoCompleteTextView
+    ) {
+        observe(viewLifecycleOwner, Observer { list ->
+            val items = list ?: emptyList()
+            val adapter = ArrayAdapter(requireContext(), R.layout.list_item, items)
+            autoCompleteTextView.setAdapter(adapter)
+            if (list != null) {
+                autoCompleteTextView.setOnItemClickListener { parent, _, position, _ ->
+                    selectedItemLiveData.postValue(parent.getItemAtPosition(position) as T)
+                }
+            }
+        })
+    }
+
+    private suspend fun loadCategories() = viewModel.categoryList.download("categories") {
+        creditClubMiddleWareAPI.collectionsService.getCollectionCategories(
             localStorage.institutionCode,
-            viewModel.collectionType.value,
+            derivedCollectionType,
             viewModel.region.value,
             viewModel.collectionService.value
         )
-        categories?.map { "${it.name} - ${it.code}" }
     }
 
     private suspend fun loadPaymentItems() =
-        loadDependencies("payment items", binding.paymentItemInput) {
-            paymentItems = creditClubMiddleWareAPI.collectionsService.getCollectionPaymentItems(
+        viewModel.itemList.download("payment items") {
+            creditClubMiddleWareAPI.collectionsService.getCollectionPaymentItems(
                 localStorage.institutionCode,
                 viewModel.categoryCode.value,
                 viewModel.region.value,
                 viewModel.collectionService.value
             )
-            paymentItems?.map { "${it.name} - ${it.code}" }
         }
 
     private suspend fun loadCustomer() {
-        if (viewModel.region.value.isNullOrBlank())
-            return dialogProvider.showErrorAndWait("Please select a region")
-
+        if (viewModel.customerType.value == null) {
+            dialogProvider.showErrorAndWait(
+                "Please select a customer ID type " +
+                        "\n(N- for individuals and C- for companies)"
+            )
+            return
+        }
         viewModel.customer.value = null
         dialogProvider.showProgressBar("Loading customer")
         val (response, error) = safeRunIO {
             creditClubMiddleWareAPI.collectionsService.getCollectionCustomer(
                 localStorage.institutionCode,
-                viewModel.customerId.value?.trim(),
+                "${viewModel.customerType.value}${viewModel.customerId.value?.trim()}",
                 viewModel.region.value,
                 viewModel.collectionService.value
             )
@@ -118,26 +150,20 @@ class CollectionReferenceGenerationFragment :
         viewModel.customer.value = response
     }
 
-    private suspend inline fun loadDependencies(
+    private suspend inline fun <T> MutableLiveData<T>.download(
         dependencyName: String,
-        autoCompleteTextView: AutoCompleteTextView,
-        crossinline block: suspend () -> List<String>?
+        crossinline fetcher: suspend () -> T?
     ) {
         dialogProvider.showProgressBar("Loading $dependencyName")
-        val (items) = safeRunIO { block() }
+        val (data) = safeRunIO { fetcher() }
         dialogProvider.hideProgressBar()
 
-        if (items == null) {
-            dialogProvider.showError<Nothing>("An error occurred while loading $dependencyName") {
-                onClose {
-//                    findNavController().popBackStack()
-                }
-            }
+        if (data == null) {
+            dialogProvider.showErrorAndWait("An error occurred while loading $dependencyName")
             return
         }
 
-        val adapter = ArrayAdapter(requireContext(), R.layout.list_item, items)
-        autoCompleteTextView.setAdapter(adapter)
+        postValue(data)
     }
 
     private suspend fun generateReference() {
@@ -152,11 +178,15 @@ class CollectionReferenceGenerationFragment :
             return dialogProvider.showErrorAndWait("Please enter a phone number")
         }
 
+        if (args.offline && viewModel.invoiceNumber.value.isNullOrBlank()) {
+            return dialogProvider.showErrorAndWait("Please enter an invoice number")
+        }
+
         if (viewModel.categoryCode.value.isNullOrBlank()) {
             return dialogProvider.showError("Please select a valid category")
         }
 
-        if (viewModel.itemCode.value.isNullOrBlank()) {
+        if (!args.offline && viewModel.itemCode.value.isNullOrBlank()) {
             return dialogProvider.showError("Please select a valid payment item")
         }
 
@@ -165,6 +195,7 @@ class CollectionReferenceGenerationFragment :
         }
 
         val pin = dialogProvider.getPin("Agent PIN") ?: return
+        if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
         val json = Json(JsonConfiguration.Stable)
         val serializer = CollectionReferenceGenerationRequest.Additional.serializer()
@@ -174,18 +205,21 @@ class CollectionReferenceGenerationFragment :
         }
 
         request.apply {
-            customerId = viewModel.customerId.value?.trim()
-            reference = viewModel.customerId.value?.trim()
+            customerId =
+                "${viewModel.customerType.value}${viewModel.customerId.value?.trim()}"
+            if (args.offline) reference = viewModel.invoiceNumber.value?.trim()
             phoneNumber = viewModel.customerPhoneNumber.value?.trim()
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value
-            collectionType = viewModel.collectionType.value
-            itemCode = viewModel.itemCode.value
+            collectionType = derivedCollectionType
+            itemCode = if (args.offline) "4000000"
+            else viewModel.itemCode.value
+
             amount = binding.amountInput.value.toDoubleOrNull()
             geoLocation = gps.geolocationString
             currency = "NGN"
-            referenceName = viewModel.customer.value?.name
+            referenceName = viewModel.paymentReferenceName.value
             institutionCode = localStorage.institutionCode
             agentPhoneNumber = localStorage.agentPhone
             collectionService = viewModel.collectionService.value
@@ -212,11 +246,18 @@ class CollectionReferenceGenerationFragment :
 
         response.apply {
             amount = request.amount
-            referenceName = request.referenceName
+            referenceName = viewModel.customerName.value
             customerId = request.customerId
         }
         viewModel.referenceString.value = response.reference
         viewModel.collectionReference.value = response
+        viewModel.amountString.value = response.amount?.toString()
         findNavController().popBackStack()
     }
+
+    private inline val derivedCollectionType
+        get() = viewModel.run {
+            if (collectionTypeIsCbs.value == true && args.offline) "WEBGUID"
+            else collectionType.value
+        }
 }

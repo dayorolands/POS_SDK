@@ -252,7 +252,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
             emvListener.amount = amountText.toLong()
 
             val cardLimit: Double = localStorage.agent?.cardLimit ?: 50000.0
-            if (cardLimit < emvListener.amount / 100) {
+            if (cardLimit < emvListener.amount.toDouble() / 100.0) {
                 showError("The limit for this transaction is NGN${cardLimit}")
                 return
             }
@@ -385,45 +385,7 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
                         }
 
                         if (response.isSuccessful) {
-                            val posNotification = PosNotification.create(transaction)
-                            db.posNotificationDao().save(posNotification)
-
-                            val url =
-                                "${backendConfig.apiHost}/CreditClubMiddlewareAPI/CreditClubStatic/POSCashOutNotification"
-
-                            val dataToSend = Gson().toJson(posNotification)
-                            log("PosNotification request: $dataToSend")
-
-                            val headers = Headers.Builder()
-                            headers.add(
-                                "Authorization",
-                                "iRestrict ${backendConfig.posNotificationToken}"
-                            )
-                            headers.add("TerminalID", config.terminalId)
-
-                            val (responseString, error) = ApiService.post(
-                                url,
-                                dataToSend,
-                                headers.build()
-                            )
-
-                            responseString ?: return@withContext
-                            error?.printStackTrace()
-
-                            try {
-                                val notificationResponse =
-                                    Gson().fromJson(
-                                        responseString,
-                                        NotificationResponse::class.java
-                                    )
-                                if (notificationResponse != null) {
-                                    if (notificationResponse.billerReference != null && notificationResponse.billerReference!!.isNotEmpty()) {
-                                        db.posNotificationDao().delete(posNotification.id)
-                                    }
-                                }
-                            } catch (ex: Exception) {
-                                ex.printStackTrace()
-                            }
+                            handleSettlement(db, transaction)
                         }
                     }
                 }
@@ -452,6 +414,46 @@ abstract class CardTransactionActivity : PosActivity(), Logger, View.OnClickList
             } finally {
                 hideProgressBar()
             }
+        }
+    }
+
+    private fun handleSettlement(db: PosDatabase, transaction: FinancialTransaction) {
+        val posNotification = PosNotification.create(transaction)
+        db.posNotificationDao().save(posNotification)
+        // TODO: Remove this return statement
+        return
+        val url =
+            "${backendConfig.apiHost}/CreditClubMiddlewareAPI/CreditClubStatic/POSCashOutNotification"
+
+        val dataToSend = Gson().toJson(posNotification)
+        log("PosNotification request: $dataToSend")
+
+        val headers = Headers.Builder()
+        headers.add("Authorization", "iRestrict ${backendConfig.posNotificationToken}")
+        headers.add("TerminalID", config.terminalId)
+
+        val (responseString, error) = ApiService.post(
+            url,
+            dataToSend,
+            headers.build()
+        )
+
+        responseString ?: return
+        error?.printStackTrace()
+
+        try {
+            val notificationResponse =
+                Gson().fromJson(
+                    responseString,
+                    NotificationResponse::class.java
+                )
+            if (notificationResponse != null) {
+                if (notificationResponse.billerReference != null && notificationResponse.billerReference!!.isNotEmpty()) {
+                    db.posNotificationDao().delete(posNotification.id)
+                }
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
         }
     }
 

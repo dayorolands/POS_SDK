@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.creditclub.core.type.PaymentStatus
-import com.creditclub.core.type.TransactionGroup
+import com.creditclub.core.type.TransactionType
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DateInputParams
 import com.creditclub.core.ui.widget.DialogOptionItem
@@ -25,7 +25,7 @@ import org.threeten.bp.Period
 class ActivityCommissionsManager(
     override val activity: CreditClubActivity,
     override val binding: ActivityCommissionsBinding,
-    private val transactionGroup: TransactionGroup
+    private val transactionGroup: List<TransactionType>
 ) : DataBindingActivityManager<ActivityCommissionsBinding>(activity) {
 
     private var startIndex = 0

@@ -122,5 +122,5 @@ interface PosNotificationDao {
     fun allAsync(): LiveData<List<PosNotification>>
 
     @Query("SELECT * FROM PosNotification")
-    fun all(): List<PosNotification>
+    suspend fun all(): List<PosNotification>
 }

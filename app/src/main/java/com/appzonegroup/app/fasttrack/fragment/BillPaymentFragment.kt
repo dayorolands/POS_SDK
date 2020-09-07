@@ -47,18 +47,15 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         }
 
         viewModel.run {
-            categoryList.bindDropDown(category, binding.categoryInput) {
-                map { it.name ?: "Unknown" }
-            }
+            categoryList.bindDropDown(category, binding.categoryInput) { this }
             billerList.bindDropDown(biller, binding.billerInput) {
                 val categoryId = viewModel.category.value?.id
                 filter { b ->
                     b.categoryId == categoryId || "${b.billerCategoryId}" == categoryId
-                }.map { it.name ?: "Unknown" }
+                }
             }
             itemList.bindDropDown(item, binding.paymentItemInput) {
                 filter { b -> "${b.billerId}" == viewModel.biller.value?.id }
-                    .map { it.name ?: "Unknown" }
             }
 
             category.onChange { newCategory ->
@@ -104,18 +101,19 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         })
     }
 
+    @Suppress("UNCHECKED_CAST")
     private inline fun <T> MutableLiveData<List<T>>.bindDropDown(
         selectedItemLiveData: MutableLiveData<T>,
         autoCompleteTextView: AutoCompleteTextView,
-        crossinline mapFunction: List<T>.() -> List<String>
+        crossinline mapFunction: List<T>.() -> List<Any>
     ) {
         observe(viewLifecycleOwner, Observer { list ->
             val items = list?.mapFunction() ?: emptyList()
             val adapter = ArrayAdapter(requireContext(), R.layout.list_item, items)
             autoCompleteTextView.setAdapter(adapter)
             if (list != null) {
-                autoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
-                    selectedItemLiveData.postValue(list[position])
+                autoCompleteTextView.setOnItemClickListener { parent, _, position, _ ->
+                    selectedItemLiveData.postValue(parent.getItemAtPosition(position) as T)
                 }
             }
         })
@@ -229,6 +227,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         }
 
         val pin = dialogProvider.getPin("Agent PIN") ?: return
+        if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
         request.apply {
             agentPin = pin

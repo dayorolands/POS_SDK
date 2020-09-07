@@ -1,6 +1,7 @@
 package com.appzonegroup.app.fasttrack
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
@@ -13,18 +14,25 @@ import com.appzonegroup.app.fasttrack.ui.SurveyDialog
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
+import com.appzonegroup.creditclub.pos.Platform
+import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.creditclub.core.CreditClubApplication
+import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.data.model.SurveyQuestion
 import com.creditclub.core.data.prefs.JsonStorage
 import com.creditclub.core.data.request.SubmitSurveyRequest
 import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
+import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.serialization.builtins.list
 import kotlinx.serialization.builtins.serializer
+import org.koin.android.ext.android.inject
 
 class LoginActivity : CreditClubActivity() {
 
@@ -33,6 +41,9 @@ class LoginActivity : CreditClubActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.navigationBarColor = getColor(R.color.colorPrimary)
+        }
 
         debugOnly {
             version_tv.text = "Version ${packageInfo?.versionName}. Staging"
@@ -82,6 +93,9 @@ class LoginActivity : CreditClubActivity() {
 
         downloadBannerImages()
         downloadSurveyQuestions()
+        if (Platform.isPOS) {
+            mainScope.launch { settle() }
+        }
     }
 
     private fun checkLocalSurveyQuestions() {
@@ -144,7 +158,11 @@ class LoginActivity : CreditClubActivity() {
             val surveyQuestions = response.data ?: return@launch
 
             if (response.isSuccessful) {
-                jsonStore.save("SURVEY_QUESTIONS", surveyQuestions, SurveyQuestion.serializer().list)
+                jsonStore.save(
+                    "SURVEY_QUESTIONS",
+                    surveyQuestions,
+                    SurveyQuestion.serializer().list
+                )
             }
         }
     }
@@ -219,7 +237,9 @@ class LoginActivity : CreditClubActivity() {
                 creditClubMiddleWareAPI.staticService.confirmAgentInformation(
                     localStorage.institutionCode,
                     phoneNumber,
-                    pin
+                    pin,
+                    appVersionName,
+                    if (Platform.isPOS) "TelpoPOS" else "Mobile"
                 )
             }
             dialogProvider.hideProgressBar()
@@ -252,6 +272,36 @@ class LoginActivity : CreditClubActivity() {
     private fun isPhoneValid(phoneNumber: String): Boolean {
         val storedPhone = LocalStorage.GetValueFor(AppConstants.AGENT_PHONE, baseContext)
         return phoneNumber == storedPhone
+    }
+
+    private suspend fun settle() = withContext(Dispatchers.IO) {
+        val gson = Gson()
+
+        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
+        val posDatabase: PosDatabase = PosDatabase.getInstance(this@LoginActivity)
+        val backendConfig: BackendConfig by inject()
+        val configService: ConfigService by inject()
+        val posNotificationDao = posDatabase.posNotificationDao()
+
+        val jobs = posNotificationDao.all().map { notification ->
+            async {
+                val requestBody = gson.toJson(notification).toRequestBody()
+
+                val (response) = safeRunSuspend {
+                    creditClubMiddleWareAPI.staticService.posCashOutNotification(
+                        requestBody,
+                        "iRestrict ${backendConfig.posNotificationToken}",
+                        configService.terminalId
+                    )
+                }
+
+                if (response?.isSuccessFul == true) {
+                    posNotificationDao.delete(notification)
+                }
+            }
+        }
+
+        jobs.awaitAll()
     }
 
     private fun ensureLocationEnabled() {

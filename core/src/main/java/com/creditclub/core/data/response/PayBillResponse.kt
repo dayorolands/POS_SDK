@@ -25,4 +25,16 @@ class PayBillResponse {
 
     @SerialName("ResponseStatus")
     var responseStatus: String? = ""
+
+    @SerialName("AdditionalInformation")
+    var additionalInformation: String? = ""
+
+    @Serializable
+    class AdditionalInformation {
+        @SerialName("CustomerAddress")
+        var customerAddress: String? = null
+
+        @SerialName("CustomerToken")
+        var customerToken: String? = null
+    }
 }

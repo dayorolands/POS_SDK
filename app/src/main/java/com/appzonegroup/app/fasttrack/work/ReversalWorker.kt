@@ -1,9 +1,10 @@
-package com.appzonegroup.creditclub.pos.work
+package com.appzonegroup.app.fasttrack.work
 
 import android.content.Context
 import android.os.Bundle
 import androidx.work.WorkerParameters
 import com.appzonegroup.creditclub.pos.Platform
+import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
@@ -26,6 +27,7 @@ class ReversalWorker(context: Context, params: WorkerParameters) :
         val firebaseAnalytics by lazy { FirebaseAnalytics.getInstance(applicationContext) }
         val isoSocketHelper by lazy { IsoSocketHelper(config, parameters, applicationContext) }
         val localStorage: LocalStorage by inject()
+        val posDatabase: PosDatabase by inject()
 
         val reversalDao = posDatabase.reversalDao()
 

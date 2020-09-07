@@ -20,11 +20,11 @@ import java.util.*
 class MobileTrackingWorker(context: Context, params: WorkerParameters) :
     CoroutineWorker(context, params), KoinComponent {
 
-    private val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
-    private val localStorage: LocalStorage by inject()
-
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val gson = Gson()
+
+        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
+        val localStorage: LocalStorage by inject()
 
         val transactionInformationDAO = DeviceTransactionInformationDAO(applicationContext)
         val allInfo = transactionInformationDAO.GetAll()

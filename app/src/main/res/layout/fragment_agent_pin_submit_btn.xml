@@ -1,47 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/activity_horizontal_margin">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.appzonegroup.app.fasttrack.fragment.OpenAccountViewModel" />
+    </data>
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <com.appzonegroup.app.fasttrack.ui.EditText
-            android:id="@+id/starter_pack_number_et"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_serial"
-            android:drawableLeft="@drawable/ic_serial"
-            android:hint="@string/serialNumberHint"
-            android:maxLength="8"
-            android:inputType="number"
-            style="@style/defaultEditText"/>
+            android:orientation="vertical"
+            android:padding="20dp">
 
-        <com.appzonegroup.app.fasttrack.ui.EditText
-            style="@style/defaultEditText"
-            android:id="@+id/agent_pin_et"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_password"
-            android:drawableLeft="@drawable/ic_password"
-            android:hint="@string/agentPIN_hint"
-            android:maxLength="4"
-            android:inputType="numberPassword"/>
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/cardSerialNumber"
+                app:counterEnabled="true"
+                app:counterMaxLength="8"
+                app:startIconDrawable="@drawable/ic_serial">
 
-        <com.appzonegroup.app.fasttrack.ui.CustomButton
-            android:id="@+id/account_info_next_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/form_margin_horizontal"
-            android:layout_marginRight="@dimen/form_margin_horizontal"
-            android:text="@string/submit"
-            android:background="@drawable/gradient_warning"
-            style="@style/button_style"
-            android:onClick="createAccount_click"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:maxLength="8"
+                    android:text="@={viewModel.starterPackNo}" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    </LinearLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:hint="@string/agent_pin"
+                app:counterEnabled="true"
+                app:counterMaxLength="4"
+                app:startIconDrawable="@drawable/ic_password">
 
-</ScrollView>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/agent_pin_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberPassword"
+                    android:maxLength="4"
+                    android:text="@={viewModel.agentPIN}" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.appzonegroup.app.fasttrack.ui.CustomButton
+                android:id="@+id/account_info_next_btn"
+                style="@style/button_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/gradient_warning"
+                android:text="@string/submit" />
+
+        </LinearLayout>
+
+    </ScrollView>
+</layout>

@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
-import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.localStorage
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
@@ -24,7 +23,9 @@ class SplashScreenActivity : AppCompatActivity() {
             finish()
             return
         }
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.navigationBarColor = getColor(R.color.colorPrimary)
+        }
         val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
         firebaseCrashlytics.setUserId(localStorage.agent?.agentCode ?: "guest")
         firebaseCrashlytics.setCustomKey(
@@ -52,12 +53,6 @@ class SplashScreenActivity : AppCompatActivity() {
                             Intent(this@SplashScreenActivity, AgentActivationActivity::class.java)
                         startActivity(intent)
                     } else {
-                        startService(
-                            Intent(
-                                this@SplashScreenActivity,
-                                LocationChangedService::class.java
-                            )
-                        )
                         val intent =
                             Intent(this@SplashScreenActivity, LoginActivity::class.java)
                         startActivity(intent)
@@ -73,10 +68,8 @@ class SplashScreenActivity : AppCompatActivity() {
     private fun setPolicy() {
         val builder = VmPolicy.Builder()
         StrictMode.setVmPolicy(builder.build())
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            //builder.detectFileUriExposure();
-            builder.detectAll()
-        }
+        //builder.detectFileUriExposure();
+        builder.detectAll()
     }
 
     private fun checkPermissions() {
