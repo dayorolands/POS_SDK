@@ -24,6 +24,7 @@ class IsoRequestLogWorker(context: Context, params: WorkerParameters) :
         val serializer = IsoRequestLog.serializer()
 
         val jobs = isoRequestLogDao.all().map { requestLog ->
+            if (requestLog.nodeName == "EPMS") requestLog.nodeName = null
             async {
                 val requestBody = Json(JsonConfiguration.Stable).stringify(serializer, requestLog).toRequestBody()
 

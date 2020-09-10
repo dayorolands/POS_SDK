@@ -13,9 +13,6 @@ import kotlinx.coroutines.withContext
  * Appzone Ltd
  */
 
-suspend inline fun <T> ioContext(crossinline block: suspend CoroutineScope.() -> T): T =
-    withContext(Dispatchers.IO) { block() }
-
 suspend inline fun <T> safeRunIO(crossinline block: suspend CoroutineScope.() -> T): SafeRunResult<T> =
     withContext(Dispatchers.IO) {
         var data: T? = null

@@ -19,6 +19,7 @@ class ReversalActivity : CardTransactionActivity() {
         makeRequest(ReversalRequest.generate(previousMessage!!, cardData).apply {
             processingCode3 = processingCode("00")
             withParameters(parameters.parameters)
+            messageReasonCode56 = "4000"
         })
     }
 

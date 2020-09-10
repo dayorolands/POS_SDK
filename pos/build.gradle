@@ -48,9 +48,9 @@ dependencies {
     implementation project(path: ':poscore')
     implementation project(path: ':uicentral')
     implementation project(path: ':telpo')
+    implementation project(path: ':mpos')
     implementation project(path: ':smartpeak')
     implementation project(path: ':nexgo')
-    implementation fileTree(dir: 'jniLibs', include: ['*.so'])
 
     implementation files('libs/jpos-1.9.0.jar')
 
@@ -87,6 +87,7 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
+    implementation "com.google.firebase:firebase-crashlytics:${versions.firebaseCrashlytics}"
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'

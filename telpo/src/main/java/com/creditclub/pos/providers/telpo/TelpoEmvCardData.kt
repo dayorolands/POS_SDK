@@ -1,5 +1,7 @@
 package com.creditclub.pos.providers.telpo
 
+import android.util.Log
+import com.creditclub.core.util.debugOnly
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
 import com.telpo.emv.EmvService
@@ -29,6 +31,7 @@ class TelpoEmvCardData constructor(
                 iccData += appendMeta("9F02", transactionAmount)
                 iccData += appendMeta("5F2A", transactionCurrency)
                 iccData += appendMeta("82", aip)
+                iccData += appendMeta("84", dedicatedFileName)
                 iccData += appendMeta("9F1A", terminalCountryCode)
                 iccData += appendMeta("9F34", cardHolderVerificationMethod)
                 iccData += appendMeta("9F33", terminalCapabilities)
@@ -51,6 +54,7 @@ class TelpoEmvCardData constructor(
         emvService?.run {
             authRequest = getValue(0x9F26)
             cryptogram = getValue(0x9F27)
+            debugOnly { Log.d("TelpoEmvCardData", "Cryptogram: $cryptogram") }
             iad = getValue(0x9F10)
             unpredictedNumber = getValue(0x9F37)
             atc = getValue(0x9F36)
@@ -63,6 +67,7 @@ class TelpoEmvCardData constructor(
             populateSRC(track2)
             exp = getValue(0x5F24)
             aip = getValue(0x82)
+            dedicatedFileName = getValue(0x84)
             holder = getValue(0x5F20, true)
             //terminalCountryCode = getValue(0x9F1A)
             cardHolderVerificationMethod = getValue(0x9F34)

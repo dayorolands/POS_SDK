@@ -32,6 +32,7 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
         val serializer = PosTransaction.serializer()
 
         val jobs = posTransactionDao.all().map { receipt ->
+            if (receipt.nodeName == "EPMS") receipt.nodeName = null
             async {
                 val requestBody = RequestBody.create(
                     mediaType,

@@ -4,24 +4,28 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Looper
 import androidx.activity.ComponentActivity
-import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.util.*
 import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.util.TrackGPS
+import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.jsonArrayStore
 import com.creditclub.core.util.delegates.stringStore
-import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
-import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
+import com.creditclub.pos.RemoteConnectionInfo
+import com.creditclub.pos.extensions.hexBytes
+import com.creditclub.pos.model.ConnectionInfo
+import com.creditclub.pos.utils.TripleDesCipher
+import com.creditclub.pos.utils.nonNullStringStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import org.jpos.iso.ISOMsg
-import org.jpos.iso.ISOUtil
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -36,59 +40,38 @@ import java.util.*
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/27/2019.
  * Appzone Ltd
  */
-open class ParameterService(context: Context) : PosParameter, KoinComponent {
-    private val prefs: SharedPreferences = context.getSharedPreferences("Parameters", 0)
+class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : PosParameter,
+    KoinComponent {
+    private val prefs: SharedPreferences = run {
+        val suffix = "${posMode.ip}~${posMode.port}"
+        context.getSharedPreferences("Parameters~$suffix", 0)
+    }
     private val config: PosConfig by inject()
     private val database: PosDatabase by inject()
     private val localStorage: LocalStorage by inject()
     private val gps: TrackGPS by inject()
+    private val json = Json(
+        JsonConfiguration.Stable.copy(
+            isLenient = true,
+            ignoreUnknownKeys = true,
+            serializeSpecialFloatingPointValues = true,
+            useArrayPolymorphism = true
+        )
+    )
 
-    override var masterKey = prefs.getString("MasterKey", "") as String
-        set(value) {
-            field = value
-            prefs.edit().putString("MasterKey", value).apply()
-        }
+    override var masterKey by prefs.nonNullStringStore("MasterKey")
+    override var sessionKey by prefs.nonNullStringStore("SessionKey")
+    override var pinKey by prefs.nonNullStringStore("PinKey")
 
-    override var sessionKey = prefs.getString("SessionKey", "") as String
-        set(value) {
-            field = value
-            prefs.edit().putString("SessionKey", value).apply()
-        }
-
-    override var pinKey = prefs.getString("PinKey", "") as String
-        set(value) {
-            field = value
-            prefs.edit().putString("PinKey", value).apply()
-        }
-
-    override val managementData: PosParameter.ManagementData
-        get() = parameters
-
-    override var managementDataString: String
-        get() = pfmd
-        set(value) {
-            pfmd = value
-        }
-
-    open var pfmd = prefs.getString("PFMD", "{}") as String
-        set(value) {
-            field = value
-            prefs.edit().putString("PFMD", value).apply()
-        }
-
+    override var managementDataString by prefs.nonNullStringStore("PFMD", "{}")
     override var updatedAt by prefs.stringStore("UpdatedAt")
-
     override var capkList by prefs.jsonArrayStore("CAPK_ARRAY")
-
     override var emvAidList by prefs.jsonArrayStore("EMV_APP_ARRAY")
 
-    val parameters: ParameterObject
-        get() = try {
-            Gson().fromJson(managementDataString, ParameterObject::class.java)
-        } catch (ex: java.lang.Exception) {
-            ex.printStackTrace()
-            ParameterObject()
-        }
+    override val managementData
+        get() = safeRun {
+            json.parse(ParameterObject.serializer(), managementDataString)
+        }.data ?: ParameterObject()
 
     override suspend fun downloadKeys(activity: ComponentActivity) {
         withContext(Dispatchers.Default) {
@@ -117,14 +100,10 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
         isoMsg.set(41, config.terminalId)
         isoMsg.packager = packager
 
-        TerminalUtils.logISOMsg(isoMsg)
+        isoMsg.log()
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(
-                config.remoteConnectionInfo.ip,
-                config.remoteConnectionInfo.port,
-                isoMsg.pack()
-            )
+            SocketJob.execute(posMode, isoMsg.pack())
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -137,18 +116,17 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
         println("MESSAGE: " + String(output))
         isoMsg.unpack(output)
 
-        TerminalUtils.logISOMsg(isoMsg)
+        isoMsg.log()
 
         if (isoMsg.hasFailed) {
-            println("Error contacting Nibss server")
+            println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw KeyDownloadException(isoMsg.responseMessage)
         }
-        val posMode = config.remoteConnectionInfo
-        val cryptKey = ISOUtil.xor(Misc.toByteArray(posMode.key1), Misc.toByteArray(posMode.key2))
-        val cryptData = TerminalUtils.hexStringToByteArray(isoMsg.getString(53).substring(0, 32))
+        val cryptKey = posMode.key1.hexBytes xor posMode.key2.hexBytes
+        val cryptData = isoMsg.getString(53).substring(0, 32).hexBytes
 
         val tripleDesCipher = TripleDesCipher(cryptKey)
-        masterKey = TerminalUtils.byteArrayToHex(tripleDesCipher.decrypt(cryptData).copyOf(16))
+        masterKey = tripleDesCipher.decrypt(cryptData).copyOf(16).hexString
     }
 
     @Throws(KeyDownloadException::class)
@@ -170,15 +148,11 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
 
         isoMsg.packager = packager
 
-        TerminalUtils.logISOMsg(isoMsg)
+        isoMsg.log()
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(
-                config.remoteConnectionInfo.ip,
-                config.remoteConnectionInfo.port,
-                isoMsg.pack()
-            )
+            SocketJob.execute(posMode, isoMsg.pack())
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -190,18 +164,17 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
 
         println("MESSAGE: " + String(output))
         isoMsg.unpack(output)
-        TerminalUtils.logISOMsg(isoMsg)
+        isoMsg.log()
 
         if (isoMsg.hasFailed) {
-            println("Error contacting Nibss server")
+            println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw KeyDownloadException(isoMsg.responseMessage)
         }
-        val cryptKey = TerminalUtils.hexStringToByteArray(masterKey)
-
-        val cryptData = TerminalUtils.hexStringToByteArray(isoMsg.getString(53).substring(0, 32))
+        val cryptKey = masterKey.hexBytes
+        val cryptData = isoMsg.getString(53).substring(0, 32).hexBytes
 
         val tripleDesCipher = TripleDesCipher(cryptKey)
-        sessionKey = TerminalUtils.byteArrayToHex(tripleDesCipher.decrypt(cryptData).copyOf(16))
+        sessionKey = tripleDesCipher.decrypt(cryptData).copyOf(16).hexString
     }
 
     @Throws(KeyDownloadException::class)
@@ -220,18 +193,13 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
         isoMsg.set(13, dateParams.localDate)
         isoMsg.set(41, config.terminalId)
 
-
         isoMsg.packager = packager
 
-        TerminalUtils.logISOMsg(isoMsg)
+        isoMsg.log()
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(
-                config.remoteConnectionInfo.ip,
-                config.remoteConnectionInfo.port,
-                isoMsg.pack()
-            )
+            SocketJob.execute(posMode, isoMsg.pack())
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -244,18 +212,17 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
         println("MESSAGE: " + String(output))
         isoMsg.unpack(output)
 
-        TerminalUtils.logISOMsg(isoMsg)
-
+        isoMsg.log()
         if (isoMsg.hasFailed) {
-            println("Error contacting Nibss server")
+            println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw KeyDownloadException(isoMsg.responseMessage)
         }
 
-        val cryptKey = TerminalUtils.hexStringToByteArray(masterKey)
-        val cryptData = TerminalUtils.hexStringToByteArray(isoMsg.getString(53).substring(0, 32))
+        val cryptKey = masterKey.hexBytes
+        val cryptData = isoMsg.getString(53).substring(0, 32).hexBytes
 
         val tripleDesCipher = TripleDesCipher(cryptKey)
-        pinKey = TerminalUtils.byteArrayToHex(tripleDesCipher.decrypt(cryptData).copyOf(16))
+        pinKey = tripleDesCipher.decrypt(cryptData).copyOf(16).hexString
     }
 
     @Throws(ParameterDownloadException::class)
@@ -279,25 +246,17 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
         val packedMsg = isoMsg.pack()
         packedMsg[19]++
 
-        val baos = ByteArrayOutputStream().apply {
-            write(TerminalUtils.hexStringToByteArray(sessionKey))
-            write(packedMsg)
-        }
-
-        val field64 = TerminalUtils.sha256(baos.toByteArray()).toUpperCase(Locale.getDefault())
+        val baos = sessionKey.hexBytes + packedMsg
+        val field64 = baos.sha256String.toUpperCase(Locale.getDefault())
         isoMsg.set(64, field64)
 
-        val finalMsgBytes = TerminalUtils.constructField64_128(packedMsg, field64.toByteArray())
+        val finalMsgBytes = packedMsg + field64.toByteArray()
 
-        if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
+        debugOnly { isoMsg.log() }
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(
-                config.remoteConnectionInfo.ip,
-                config.remoteConnectionInfo.port,
-                finalMsgBytes
-            )
+            SocketJob.execute(posMode, finalMsgBytes)
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -307,16 +266,16 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
         }
 
-        if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
+        debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
-            if (BuildConfig.DEBUG) println("Error contacting Nibss server")
+            debugOnly { println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}") }
             throw ParameterDownloadException(isoMsg.responseMessage)
         }
 
         println("Secured connection performed successfully")
 
-        pfmd = TerminalUtils.parsePrivateFieldData(isoMsg.getString(62))
+        managementDataString = isoMsg.getString(62)?.parsePrivateFieldDataBlock()?.toString()
             ?: throw ParameterDownloadException("")
     }
 
@@ -340,25 +299,17 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
         val packedMsg = isoMsg.pack()
         packedMsg[19]++
 
-        val baos = ByteArrayOutputStream().apply {
-            write(TerminalUtils.hexStringToByteArray(sessionKey))
-            write(packedMsg)
-        }
-
-        val field64 = TerminalUtils.sha256(baos.toByteArray()).toUpperCase(Locale.getDefault())
+        val baos = sessionKey.hexBytes + packedMsg
+        val field64 = baos.sha256String.toUpperCase(Locale.getDefault())
         isoMsg.set(64, field64)
 
-        val finalMsgBytes = TerminalUtils.constructField64_128(packedMsg, field64.toByteArray())
+        val finalMsgBytes = packedMsg + field64.toByteArray()
 
-        if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
+        debugOnly { isoMsg.log() }
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(
-                config.remoteConnectionInfo.ip,
-                config.remoteConnectionInfo.port,
-                finalMsgBytes
-            )
+            SocketJob.execute(posMode, finalMsgBytes)
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -368,10 +319,10 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
         }
 
-        if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
+        debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
-            if (BuildConfig.DEBUG) println("Error contacting Nibss server")
+            debugOnly { println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}") }
             throw PublicKeyDownloadException(isoMsg.responseMessage)
         }
 
@@ -401,25 +352,16 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
         val packedMsg = isoMsg.pack()
         packedMsg[19]++
 
-        val baos = ByteArrayOutputStream().apply {
-            write(TerminalUtils.hexStringToByteArray(sessionKey))
-            write(packedMsg)
-        }
-
-        val field64 = TerminalUtils.sha256(baos.toByteArray()).toUpperCase(Locale.getDefault())
+        val baos = sessionKey.hexBytes + packedMsg
+        val field64 = baos.sha256String.toUpperCase(Locale.getDefault())
         isoMsg.set(64, field64)
 
-        val finalMsgBytes = TerminalUtils.constructField64_128(packedMsg, field64.toByteArray())
-
-        if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
+        val finalMsgBytes = packedMsg + field64.toByteArray()
+        debugOnly { isoMsg.log() }
 
         val isoRequestLog = isoMsg.generateRequestLog()
         val (output, error) = safeRun {
-            SocketJob.sslSocketConnectionJob(
-                config.remoteConnectionInfo.ip,
-                config.remoteConnectionInfo.port,
-                finalMsgBytes
-            )
+            SocketJob.execute(posMode, finalMsgBytes)
         }
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -429,10 +371,12 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
         }
 
-        if (BuildConfig.DEBUG) TerminalUtils.logISOMsg(isoMsg)
+        debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
-            if (BuildConfig.DEBUG) println("Error contacting Nibss server")
+            debugOnly {
+                println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
+            }
             throw EmvAidDownloadException(isoMsg.responseMessage)
         }
 
@@ -453,6 +397,10 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
             gpsCoordinates = gps.geolocationString ?: "0.00;0.00"
+            nodeName = posMode.nodeName
+            if (posMode is ConnectionInfo) {
+                connectionInfo = posMode
+            }
         }
     }
 
@@ -503,20 +451,21 @@ open class ParameterService(context: Context) : PosParameter, KoinComponent {
     class EmvAidDownloadException(message: String) :
         Exception("EMV Application AID Download Failed. $message")
 
+    @Serializable
     class ParameterObject : PosParameter.ManagementData {
-        @SerializedName("03")
+        @SerialName("03")
         override var cardAcceptorId = ""
 
-        @SerializedName("05")
+        @SerialName("05")
         override var currencyCode = ""
 
-        @SerializedName("06")
+        @SerialName("06")
         override var countryCode = ""
 
-        @SerializedName("08")
+        @SerialName("08")
         override var merchantCategoryCode = ""
 
-        @SerializedName("52")
+        @SerialName("52")
         override var cardAcceptorLocation = ""
     }
 }

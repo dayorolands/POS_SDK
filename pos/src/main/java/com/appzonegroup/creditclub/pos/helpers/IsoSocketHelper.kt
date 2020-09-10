@@ -1,22 +1,25 @@
 package com.appzonegroup.creditclub.pos.helpers
 
-import android.content.Context
 import android.os.Looper
-import android.util.Log
 import com.appzonegroup.creditclub.pos.card.CardIsoMsg
 import com.appzonegroup.creditclub.pos.data.PosDatabase
-import com.appzonegroup.creditclub.pos.extension.generateLog
+import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.SocketJob
-import com.appzonegroup.creditclub.pos.util.TerminalUtils
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
-import kotlinx.coroutines.*
+import com.creditclub.pos.RemoteConnectionInfo
+import com.creditclub.pos.model.ConnectionInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jpos.iso.ISOException
+import org.jpos.iso.ISOMsg
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.threeten.bp.Instant
@@ -30,10 +33,8 @@ import java.net.ConnectException
 class IsoSocketHelper(
     val config: PosConfig,
     val parameters: PosParameter,
-    context: Context
+    internal val remoteConnectionInfo: RemoteConnectionInfo = config.remoteConnectionInfo
 ) : KoinComponent {
-    private val tag = IsoSocketHelper::class.java.simpleName
-
     private val database: PosDatabase by inject()
     private val localStorage: LocalStorage by inject()
     private val gps: TrackGPS by inject()
@@ -48,13 +49,7 @@ class IsoSocketHelper(
         }
     }
 
-    inline fun open(crossinline block: suspend CoroutineScope.() -> Unit) {
-        GlobalScope.launch(Dispatchers.Main) {
-            block()
-        }
-    }
-
-    fun send(request: BaseIsoMsg): Result {
+    fun send(request: ISOMsg): Result {
         request.terminalId41 = config.terminalId
 
         Looper.myLooper() ?: Looper.prepare()
@@ -64,32 +59,22 @@ class IsoSocketHelper(
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
             gpsCoordinates = gps.geolocationString ?: "0.00;0.00"
+            nodeName = remoteConnectionInfo.nodeName
+            if (remoteConnectionInfo is ConnectionInfo) {
+                connectionInfo = remoteConnectionInfo
+            }
         }
 
         val (response, error) = safeRun {
             val sessionKey = parameters.sessionKey
             val outputData = request.prepare(sessionKey)
-            request.dump(System.out, "REQUEST")
-            Log.d(tag, "RESULT : " + String(outputData))
-            val output =
-                SocketJob.sslSocketConnectionJob(
-                    config.remoteConnectionInfo.ip,
-                    config.remoteConnectionInfo.port,
-                    outputData
-                )
-
-            println("MESSAGE: " + String(output!!))
-
-            val response = BaseIsoMsg()
-            response.packager = ISO87Packager()
-            response.unpack(output)
-            TerminalUtils.logISOMsg(response)
-
-            if (response.getString(39) != "00") {
-                Log.d(tag, "Error contacting Nibss server")
-            } else {
-                Log.d(tag, "Successful Call to Nibss")
+            request.log()
+            val output = SocketJob.execute(remoteConnectionInfo, outputData)
+            val response = ISOMsg().apply {
+                packager = ISO87Packager()
+                unpack(output)
             }
+            response.log()
 
             response
         }
@@ -111,6 +96,10 @@ class IsoSocketHelper(
         maxAttempts: Int,
         crossinline onReattempt: suspend (attempt: Int) -> Unit
     ): Boolean {
+        if (maxAttempts < 2) {
+            send(request).error ?: return true
+            return false
+        }
         for (attempt in 1..maxAttempts) {
             if (attempt > 1) onReattempt(attempt)
 
@@ -123,5 +112,33 @@ class IsoSocketHelper(
         return false
     }
 
-    data class Result(val response: BaseIsoMsg?, val error: java.lang.Exception?)
+    suspend inline fun send(
+        request: ISOMsg,
+        maxAttempts: Int,
+        crossinline onReattempt: suspend (attempt: Int) -> Unit
+    ): Result {
+        if (maxAttempts < 2) return send(request)
+        for (attempt in 1..maxAttempts) {
+            if (attempt > 1) onReattempt(attempt)
+
+            val result = send(request)
+            if (attempt == maxAttempts) return result
+            result.response ?: continue
+            result.error ?: return result
+        }
+
+        return Result(null, null)
+    }
+
+    fun send(request: ISOMsg, maxAttempts: Int): Result {
+        if (maxAttempts < 2) return send(request)
+        var result = Result(null, null)
+        for (attempt in 1..maxAttempts) {
+            result = send(request)
+            if (result.error !is ConnectException) break
+        }
+        return result
+    }
+
+    data class Result(val response: ISOMsg?, val error: java.lang.Exception?)
 }

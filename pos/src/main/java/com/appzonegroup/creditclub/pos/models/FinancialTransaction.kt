@@ -5,8 +5,10 @@ import androidx.room.*
 import com.appzonegroup.creditclub.pos.card.CardIsoMsg
 import com.appzonegroup.creditclub.pos.card.cardTransactionType
 import com.appzonegroup.creditclub.pos.card.maskPan
-import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
+import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.util.Misc
+import com.creditclub.pos.model.ConnectionInfo
+import org.jpos.iso.ISOMsg
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
@@ -37,6 +39,8 @@ open class FinancialTransaction {
     var cardType = ""
     var aid = ""
     var rrn = ""
+    var nodeName: String? = null
+    var connectionInfo: ConnectionInfo? = null
 
     @Ignore
     @Transient
@@ -86,9 +90,7 @@ open class FinancialTransaction {
 
     constructor()
 
-    constructor(isoMsg: BaseIsoMsg) {
-        val msg = isoMsg.convert(::CardIsoMsg)
-
+    constructor(msg: ISOMsg) {
         stan = msg.stan11 ?: ""
         date = msg.localTransactionDate13 ?: ""
         content = Misc.toHexString(msg.pack())
@@ -101,7 +103,7 @@ open class FinancialTransaction {
         terminalId41 = msg.terminalId41 ?: ""
         cardExpirationDate14 = msg.cardExpirationDate14 ?: ""
         responseCode39 = msg.responseCode39 ?: ""
-        additionalAmount = msg.additionalAmount ?: ""
+        additionalAmount = msg.additionalAmounts54 ?: ""
         transactionAmount4 = msg.transactionAmount4 ?: ""
     }
 

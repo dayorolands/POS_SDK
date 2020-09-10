@@ -31,6 +31,7 @@ abstract class CardData {
     var transactionType: String = ""
     var transactionCurrency: String = ""
     var aip: String = ""
+    var dedicatedFileName: String = ""
     var terminalCountryCode: String = ""
     var cardHolderVerificationMethod: String = ""
     var terminalCapabilities: String = ""
@@ -39,6 +40,7 @@ abstract class CardData {
 
     // Status fields
     var aid: String = ""
+    var ksnData: String? = null
     open var ret: Int = -1
 
     val type: String
