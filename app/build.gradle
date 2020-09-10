@@ -17,8 +17,8 @@ android {
         targetSdkVersion versions.targetSdk
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 17
-        versionName "1.3.4 ISW Pilot"
+        versionCode 18
+        versionName "1.3.5"
     }
 
     lintOptions {

@@ -8,6 +8,9 @@ import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
 import com.creditclub.core.util.toString
+import com.creditclub.pos.printer.Alignment
+import com.creditclub.pos.printer.PrintNode
+import com.creditclub.pos.printer.TextNode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.threeten.bp.Instant

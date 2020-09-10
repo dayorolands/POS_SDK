@@ -80,6 +80,7 @@ val configModule = module {
         object : BackendConfig {
             override val apiHost = BuildConfig.API_HOST
             override val posNotificationToken = BuildConfig.NOTIFICATION_TOKEN
+            override val appVersionName = BuildConfig.VERSION_NAME
         }
     }
 }

@@ -17,7 +17,7 @@ val footerNodes = listOf<PrintNode>(
         wordFont = 15
     },
 
-    TextNode("CreditClub POS v1.0.1. Powered by CreditClub")
+    TextNode("CreditClub POS v1.3.5. Powered by CreditClub")
         .apply {
         align = Alignment.MIDDLE
         wordFont = 15

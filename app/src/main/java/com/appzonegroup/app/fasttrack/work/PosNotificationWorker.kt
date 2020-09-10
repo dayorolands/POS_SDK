@@ -3,9 +3,10 @@ package com.appzonegroup.app.fasttrack.work
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.appzonegroup.creditclub.pos.Platform
+import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.service.ConfigService
-import com.appzonegroup.creditclub.pos.work.BaseWorker
-import com.creditclub.core.data.prefs.LocalStorage
+import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.util.safeRunSuspend
 import com.creditclub.pos.api.PosApiService
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +25,9 @@ class PosNotificationWorker(context: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         if (Platform.isPOS) return@withContext Result.failure()
+        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
+        val posDatabase: PosDatabase by inject()
+        val backendConfig: BackendConfig by inject()
         val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
         val posNotificationDao = posDatabase.posNotificationDao()
 
