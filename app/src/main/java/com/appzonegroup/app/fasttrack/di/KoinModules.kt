@@ -2,6 +2,7 @@ package com.appzonegroup.app.fasttrack.di
 
 import android.content.Context
 import com.appzonegroup.app.fasttrack.BuildConfig
+import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.app.LocalInstitutionConfig
 import com.appzonegroup.app.fasttrack.ui.CreditClubDialogProvider
 import com.creditclub.analytics.NetworkMetricsInterceptor
@@ -82,6 +83,9 @@ val configModule = module {
         object : BackendConfig {
             override val apiHost = BuildConfig.API_HOST
             override val posNotificationToken = BuildConfig.NOTIFICATION_TOKEN
+            override val appName = androidContext().getString(R.string.app_name)
+            override val versionName = BuildConfig.VERSION_NAME
+            override val versionCode = BuildConfig.VERSION_CODE
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.creditclub.analytics
 
 import com.creditclub.analytics.models.NetworkMeasurement
+import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.safeRun
 import io.objectbox.kotlin.boxFor
@@ -13,6 +14,7 @@ import org.threeten.bp.Instant
 
 class NetworkMetricsInterceptor : Interceptor, KoinComponent {
     private val localStorage: LocalStorage by inject()
+    private val backendConfig: BackendConfig by inject()
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val metricsBox = AnalyticsObjectBox.boxStore.boxFor<NetworkMeasurement>()
@@ -25,6 +27,8 @@ class NetworkMetricsInterceptor : Interceptor, KoinComponent {
             url = request.url().encodedPath()
             method = request.method()
             requestTime = Instant.now()
+            appName = backendConfig.appName
+            appVersion = backendConfig.versionName
         }
 
         val (response, error) = safeRun { chain.proceed(request) }
@@ -37,8 +41,12 @@ class NetworkMetricsInterceptor : Interceptor, KoinComponent {
         networkMeasurement.duration = networkMeasurement.run {
             Duration.between(requestTime, responseTime).toMillis()
         }
+        if (error != null) {
+            networkMeasurement.message = error.message
+            metricsBox.put(networkMeasurement)
+            throw error
+        }
         metricsBox.put(networkMeasurement)
-        if (error != null) throw error
         return chain.proceed(request)
     }
 }

@@ -37,6 +37,15 @@ class NetworkMeasurement {
     @SerialName("StatusCode")
     var statusCode: Int = 0
 
+    @SerialName("AppName")
+    var appName: String? = null
+
+    @SerialName("AppVersionCode")
+    var appVersion: String? = null
+
+    @SerialName("Message")
+    var message: String? = null
+
     @SerialName("Duration")
     var duration: Long = 0
 

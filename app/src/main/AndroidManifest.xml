@@ -195,8 +195,6 @@
             android:name=".AgentActivationActivity"
             android:label="@string/agentSetup" />
 
-        <service android:name=".LocationChangedService" />
-
         <activity
             android:name=".BVNUpdateActivity"
             android:label="@string/title_activity_bvnUpdate"
