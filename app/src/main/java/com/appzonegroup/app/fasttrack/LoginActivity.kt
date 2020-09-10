@@ -17,6 +17,7 @@ import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.service.ConfigService
+import com.appzonegroup.creditclub.pos.data.posPreferences
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.api.BackendConfig
@@ -27,6 +28,7 @@ import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
 import com.google.gson.Gson
+import com.creditclub.pos.api.posApiService
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
@@ -46,7 +48,8 @@ class LoginActivity : CreditClubActivity() {
         }
 
         debugOnly {
-            version_tv.text = "Version ${packageInfo?.versionName}. Staging"
+            val debugInfo = "Version ${packageInfo?.versionName}. ${BuildConfig.BUILD_TYPE}"
+            version_tv.text = debugInfo
             login_phoneNumber.setText(localStorage.agent?.phoneNumber)
         }
 
@@ -78,6 +81,7 @@ class LoginActivity : CreditClubActivity() {
             firebaseAnalytics.setUserId(localStorage.agent?.agentCode)
         }
         mainScope.launch { (application as CreditClubApplication).getLatestVersion() }
+        mainScope.launch { updateBinRoutes() }
 
         if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
             dialogProvider.showError("Timeout due to inactivity")
@@ -95,6 +99,18 @@ class LoginActivity : CreditClubActivity() {
         downloadSurveyQuestions()
         if (Platform.isPOS) {
             mainScope.launch { settle() }
+        }
+    }
+
+    private suspend fun updateBinRoutes() {
+        val (response) = safeRunIO {
+            creditClubMiddleWareAPI.posApiService.getBinRoutes(
+                localStorage.institutionCode,
+                localStorage.agentPhone
+            )
+        }
+        if (response?.isSuccessful() == true) {
+            posPreferences.binRoutes = response.data
         }
     }
 

@@ -20,7 +20,7 @@ interface DialogProvider {
 
     fun showError(message: String?)
 
-    fun <T> showError(message: String?, block: DialogListenerBlock<T>)
+    fun <T> showError(message: String?, block: DialogListenerBlock<T>?)
 
     fun <T> showInfo(message: String?, block: DialogListenerBlock<T>): Dialog
 

@@ -14,7 +14,7 @@ import kotlin.coroutines.CoroutineContext
 
 @Database(
     entities = [FinancialTransaction::class, Reversal::class, PosNotification::class, IsoRequestLog::class, PosTransaction::class],
-    version = 9,
+    version = 10,
     exportSchema = true
 )
 @TypeConverters(RoomConverters::class)
@@ -38,7 +38,7 @@ abstract class PosDatabase : RoomDatabase() {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
                         PosDatabase::class.java, "credit_club_pos.db"
-                    ).addMigrations(MIGRATION_7_8, MIGRATION_8_9).build()
+                    ).addMigrations(MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10).build()
                 }
 
                 return INSTANCE as PosDatabase

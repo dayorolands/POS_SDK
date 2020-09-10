@@ -27,23 +27,4 @@ public class Misc extends CardMisc {
     public static String getCurrentDateLongString() {
         return dateToLongString(getCurrentDateTime());
     }
-
-    public static byte[] hexStringToByte(String hex) {
-        if(hex == null || hex.length()==0){
-            return null;
-        }
-        int len = (hex.length() / 2);
-        byte[] result = new byte[len];
-        char[] achar = hex.toUpperCase().toCharArray();
-        for (int i = 0; i < len; i++) {
-            int pos = i * 2;
-            result[i] = (byte) (toByte(achar[pos]) << 4 | toByte(achar[pos + 1]));
-        }
-        return result;
-    }
-
-    public static byte toByte(char c) {
-        byte b = (byte) "0123456789ABCDEF".indexOf(c);
-        return b;
-    }
 }

@@ -22,12 +22,14 @@ import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.task.AsyncResponse
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
-import com.appzonegroup.creditclub.pos.service.ConfigService
+import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogListenerBlock
+import com.creditclub.pos.printer.PosPrinter
 import com.google.gson.Gson
 import org.json.JSONObject
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 /**
  * Created by Joseph on 1/21/2018.
@@ -36,7 +38,7 @@ import org.json.JSONObject
 @SuppressLint("Registered")
 open class BaseActivity : CreditClubActivity(), AsyncResponse {
 
-    val printer by lazy { PosPrinter(this, dialogProvider) }
+    val printer: PosPrinter by inject { parametersOf(this, dialogProvider) }
     override val hasLogoutTimer get() = true
 
     open fun showNotification(message: String) {
@@ -238,7 +240,7 @@ open class BaseActivity : CreditClubActivity(), AsyncResponse {
         closeOnFail: Boolean = false,
         next: (Boolean) -> Unit
     ) {
-        val status = password == ConfigService.getInstance(this).adminPin
+        val status = password == posConfig.adminPin
         if (!status) {
             if (closeOnFail) return dialogProvider.showError<Nothing>("Incorrect Password") {
                 onClose {
@@ -295,5 +297,6 @@ open class BaseActivity : CreditClubActivity(), AsyncResponse {
 
     fun hideProgressBar() = dialogProvider.hideProgressBar()
 
-    fun requestPIN(title: String, block: DialogListenerBlock<String>) = dialogProvider.requestPIN(title, block)
+    fun requestPIN(title: String, block: DialogListenerBlock<String>) =
+        dialogProvider.requestPIN(title, block)
 }

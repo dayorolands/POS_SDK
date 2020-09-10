@@ -11,7 +11,7 @@ import com.appzonegroup.app.fasttrack.model.BillerItem
 import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.PrinterStatus
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.util.*

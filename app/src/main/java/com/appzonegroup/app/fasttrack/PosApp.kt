@@ -1,17 +1,19 @@
-package com.appzonegroup.app.fasttrack
+package com.appzonegroup.creditclub.pos
 
 import android.app.Application
 import androidx.work.*
-import com.appzonegroup.app.fasttrack.work.IsoRequestLogWorker
-import com.appzonegroup.app.fasttrack.work.ReversalWorker
-import com.appzonegroup.app.fasttrack.work.TransactionLogWorker
 import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
-import org.koin.android.ext.android.get
+import com.appzonegroup.creditclub.pos.work.IsoRequestLogWorker
+import com.appzonegroup.creditclub.pos.work.ReversalWorker
+import com.appzonegroup.creditclub.pos.work.TransactionLogWorker
+import com.creditclub.pos.PosConfig
+import com.creditclub.pos.PosParameter
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.KoinApplication
+import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
 
@@ -55,18 +57,26 @@ fun Application.startPosApp() {
             .build()
     )
 
-    if (get<ConfigService>().terminalId.isNotEmpty()) {
-        get<ParameterService>().downloadKeysAsync()
-        get<CallHomeService>().startCallHomeTimer()
-    }
+//    if (get<ConfigService>().terminalId.isNotEmpty()) {
+//        GlobalScope.launch(Dispatchers.Main) {
+//            safeRunIO { get<PosParameter>().downloadKeys() }
+//        }
+//        get<CallHomeService>().startCallHomeTimer()
+//    }
 }
 
-fun KoinApplication.loadPosModules() {
+fun loadPosModules() {
 
-    modules(module {
-        single { ConfigService.getInstance(androidContext()) }
+    loadKoinModules(module {
+        single<PosConfig> { ConfigService(androidContext()) }
         single { PosDatabase.getInstance(androidContext()) }
-        single { ParameterService.getInstance(androidContext()) }
-        single { CallHomeService.getInstance(get(), get(), androidContext()) }
+        single<PosParameter>(override = true) {
+            ParameterService(
+                androidContext(),
+                get<PosConfig>().remoteConnectionInfo
+            )
+        }
+        single { CallHomeService() }
+        single { IsoSocketHelper(get(), get()) }
     })
 }

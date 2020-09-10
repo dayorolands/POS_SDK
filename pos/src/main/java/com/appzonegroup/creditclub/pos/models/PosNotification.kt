@@ -2,11 +2,10 @@ package com.appzonegroup.creditclub.pos.models
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.google.gson.annotations.SerializedName
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
-import java.util.*
+import com.creditclub.core.util.format
+import com.creditclub.pos.model.ConnectionInfo
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
 /**
@@ -15,62 +14,58 @@ import java.util.*
  */
 
 @Entity
+@Serializable
 class PosNotification {
-    @delegate:Transient
-    @delegate:Ignore
-    private val paymentDateDf by lazy {
-        DateTimeFormatter.ofPattern("dd-MM-YYYY hh:mm:ss").withLocale(Locale.ENGLISH)
-            .withZone(ZoneId.of("UTC"))
-    }
-
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
 
-    @SerializedName("TransactionReference")
+    @SerialName("TransactionReference")
     var transactionReference: String? = "2058HK58-00022224148-1031170618"
 
-    @SerializedName("Amount")
+    @SerialName("Amount")
     var amount: Double? = 0.00
 
-    @SerializedName("Reference")
+    @SerialName("Reference")
     var reference: String? = ""
 
-    @SerializedName("Currency")
+    @SerialName("Currency")
     var currency: String? = "NGN"
 
-    @SerializedName("Type")
+    @SerialName("Type")
     var type: String? = "Invoice"
 
-    @SerializedName("CardScheme")
+    @SerialName("CardScheme")
     var cardScheme: String? = "Debit MasterCard"
 
-    @SerializedName("StatusCode")
+    @SerialName("StatusCode")
     var statusCode: String? = "00"
 
-    @SerializedName("PaymentDate")
+    @SerialName("PaymentDate")
     var paymentDate: String? = "2018-10-31 17:06:18"
 
-    @SerializedName("RetrievalReferenceNumber")
+    @SerialName("RetrievalReferenceNumber")
     var retrievalReferenceNumber: String? = "000220000148"
 
-    @SerializedName("MaskedPAN")
+    @SerialName("MaskedPAN")
     var maskedPAN: String? = "539983******9569"
 
-    @SerializedName("Nuban")
+    @SerialName("Nuban")
     var nuban: String? = ""
 
-    @SerializedName("CustomerName")
+    @SerialName("CustomerName")
     var customerName: String? = "SAIDU/M"
 
-    @SerializedName("StatusDescription")
+    @SerialName("StatusDescription")
     var statusDescription: String? = "Approved or completed successfully"
 
-    @SerializedName("AdditionalInformation")
+    @SerialName("AdditionalInformation")
     var additionalInformation: String? = ""
 
-    fun paymentDate(instant: Instant): String? {
-        return paymentDateDf.format(instant)
-    }
+    @SerialName("NodeName")
+    var nodeName: String? = null
+
+    @kotlinx.serialization.Transient
+    var connectionInfo: ConnectionInfo? = null
 
     companion object {
         fun create(trn: FinancialTransaction): PosNotification {
@@ -83,7 +78,7 @@ class PosNotification {
                 currency = "NGN"
                 cardScheme = trn.cardType
                 statusCode = trn.isoMsg.responseCode39
-                paymentDate = paymentDate(trn.createdAt)
+                paymentDate = trn.createdAt.format("dd-MM-YYYY hh:mm:ss")
                 retrievalReferenceNumber = trn.isoMsg.retrievalReferenceNumber37
                 maskedPAN = trn.pan
                 nuban = ""

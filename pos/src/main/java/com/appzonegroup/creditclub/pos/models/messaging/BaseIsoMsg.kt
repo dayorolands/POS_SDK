@@ -1,9 +1,8 @@
 package com.appzonegroup.creditclub.pos.models.messaging
 
-import com.appzonegroup.creditclub.pos.util.ISO87Packager
-import com.appzonegroup.creditclub.pos.util.Misc
-import com.appzonegroup.creditclub.pos.util.TerminalUtils
-import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
+import com.appzonegroup.creditclub.pos.extension.generateStan
+import com.appzonegroup.creditclub.pos.extension.setTransactionTime
+import com.appzonegroup.creditclub.pos.util.*
 import org.jpos.iso.ISOMsg
 import org.threeten.bp.Instant
 import java.io.ByteArrayOutputStream
@@ -54,24 +53,6 @@ open class BaseIsoMsg : ISOMsg() {
         setTransactionTime()
     }
 
-    open fun setTransactionTime(): Instant {
-        val dateParams = TransmissionDateParams()
-
-        transmissionDateTime7 = dateParams.transmissionDateTime
-        localTransactionTime12 = dateParams.localTime
-        localTransactionDate13 = dateParams.localDate
-
-
-        return dateParams.date
-    }
-
-    open fun generateStan() {
-        val mStan = SecureRandom().nextInt(1000)
-        val mStanString = String.format("%06d", mStan)
-
-        stan11 = mStanString
-    }
-
     fun unpack(msg: String) {
         unpack(Misc.toByteArray(msg))
     }
@@ -85,12 +66,9 @@ open class BaseIsoMsg : ISOMsg() {
             packedMsg[19]++
         }
 
-        val output = ByteArrayOutputStream()
-        output.write(TerminalUtils.hexStringToByteArray(sessionKeyString))
-        output.write(packedMsg)
-
-        val mac = TerminalUtils.sha256(output.toByteArray()).toUpperCase(Locale.getDefault())
-        return TerminalUtils.constructField64_128(packedMsg, mac.toByteArray())
+        val output = sessionKeyString + packedMsg
+        val mac = output.toByteArray().sha256String.toUpperCase(Locale.getDefault())
+        return packedMsg + mac.toByteArray()
     }
 
     fun <T : BaseIsoMsg> convert(factory: () -> T): T {

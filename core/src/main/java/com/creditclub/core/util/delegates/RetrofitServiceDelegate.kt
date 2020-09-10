@@ -23,3 +23,7 @@ class RetrofitServiceDelegate<T>(
 fun <T : Any> Retrofit.service(serviceClass: KClass<T>): RetrofitServiceDelegate<T> {
     return RetrofitServiceDelegate(this, serviceClass.java)
 }
+
+inline fun <reified T : Any> Retrofit.service(): RetrofitServiceDelegate<T> {
+    return RetrofitServiceDelegate(this, T::class.java)
+}

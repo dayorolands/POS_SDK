@@ -2,10 +2,10 @@ package com.appzonegroup.creditclub.pos.receipt
 
 import android.content.Context
 import com.appzonegroup.creditclub.pos.R
-import com.appzonegroup.creditclub.pos.printer.Alignment
-import com.appzonegroup.creditclub.pos.printer.PrintJob
-import com.appzonegroup.creditclub.pos.printer.PrintNode
-import com.appzonegroup.creditclub.pos.printer.TextNode
+import com.creditclub.pos.printer.Alignment
+import com.creditclub.pos.printer.PrintJob
+import com.creditclub.pos.printer.PrintNode
+import com.creditclub.pos.printer.TextNode
 import com.creditclub.core.data.response.BackendResponse
 import java.util.*
 
@@ -13,7 +13,8 @@ import java.util.*
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 05/10/2019.
  * Appzone Ltd
  */
-abstract class TransactionReceipt(val context: Context) : PrintJob {
+abstract class TransactionReceipt(val context: Context) :
+    PrintJob {
 
     var isSuccessful = false
     var isCustomerCopy = true
@@ -26,7 +27,9 @@ abstract class TransactionReceipt(val context: Context) : PrintJob {
 
     open fun MutableList<PrintNode>.addTransactionStatus() {
 
-        add(TextNode(statusMessage.toUpperCase(Locale.getDefault())).apply {
+        add(
+            TextNode(statusMessage.toUpperCase(Locale.getDefault()))
+                .apply {
             align = Alignment.MIDDLE
             wordFont = 35
         })

@@ -1,14 +1,14 @@
-package com.appzonegroup.app.fasttrack.work
+package com.appzonegroup.creditclub.pos.work
 
 import android.content.Context
 import android.os.Bundle
 import androidx.work.WorkerParameters
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.extension.responseCode39
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
-import com.appzonegroup.creditclub.pos.service.ConfigService
-import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.creditclub.core.data.prefs.LocalStorage
+import com.creditclub.pos.PosConfig
+import com.creditclub.pos.PosParameter
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -22,12 +22,11 @@ class ReversalWorker(context: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         if (!Platform.isPOS) Result.failure()
 
-        val config: ConfigService by inject()
-        val parameters: ParameterService by inject()
+        val config: PosConfig by inject()
+        val parameters: PosParameter by inject()
         val firebaseAnalytics by lazy { FirebaseAnalytics.getInstance(applicationContext) }
-        val isoSocketHelper by lazy { IsoSocketHelper(config, parameters, applicationContext) }
+        val isoSocketHelper by lazy { IsoSocketHelper(config, parameters) }
         val localStorage: LocalStorage by inject()
-        val posDatabase: PosDatabase by inject()
 
         val reversalDao = posDatabase.reversalDao()
 

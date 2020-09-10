@@ -51,15 +51,10 @@ class BankOneApplication : CreditClubApplication() {
                 uiModule,
                 configModule
             ))
-
-            if (Platform.isPOS) loadPosModules()
         }
 
         registerAppFunctions()
+        Platform.test(this)
         registerWorkers()
-
-        if (Platform.isPOS) {
-            startPosApp()
-        }
     }
 }

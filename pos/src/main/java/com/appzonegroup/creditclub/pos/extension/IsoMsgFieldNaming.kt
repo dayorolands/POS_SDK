@@ -81,7 +81,15 @@ var ISOMsg.posPinCaptureCode26 by isoMsgField(26)
 
 var ISOMsg.transportData by isoMsgField(59)
 
-var ISOMsg.managementDataOne by isoMsgField(62)
+var ISOMsg.managementDataOne62 by isoMsgField(62)
+
+var ISOMsg.managementDataTwo63 by isoMsgField(63)
+
+var ISOMsg.originalDataElements90 by isoMsgField(90)
+
+var ISOMsg.replacementAmounts95 by isoMsgField(95)
+
+var ISOMsg.ksnData120 by isoMsgField(120)
 
 var ISOMsg.posDataCode123 by isoMsgField(123)
 

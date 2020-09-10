@@ -1,12 +1,10 @@
 package com.creditclub.core.util
 
-import android.util.Log
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,17 +22,6 @@ private fun formatter(pattern: String, zoneID: String = defaultZone): DateTimeFo
         .withZone(ZoneId.of(zoneID))
 }
 
-val Date.shortString: String
-    get() {
-        val formatter = SimpleDateFormat("yyyy-MM-dd")
-        return formatter.format(this)
-    }
-
-fun dateToShortStringDDMMYYYY(date: Date): String {
-    val formatter = SimpleDateFormat("dd-MM-yyyy")
-    return formatter.format(date)
-}
-
 val Date.longString: String
     get() {
         val formatter = SimpleDateFormat("dd-MM-yyyy hh:mm:ss:SSS")
@@ -42,31 +29,6 @@ val Date.longString: String
         part += "0000 "
         return part + SimpleDateFormat("a").format(this)
     }
-
-fun dateToLongStringNoMicrosecond(date: Date): String {
-    return SimpleDateFormat("dd-MMM-yyyy hh:mm:ss").format(date)
-}
-
-fun stringToDate(dateString: String): Date {
-    try {
-        return SimpleDateFormat("yyyy-MM-dd").parse(dateString)
-    } catch (e: ParseException) {
-        e.printStackTrace()
-    }
-
-    return Date()
-}
-
-fun serverTimetoDate(time: String): Date {
-    try {
-        return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(time)
-    } catch (e: ParseException) {
-        e.printStackTrace()
-        Log.e("custom", "unable to parse time")
-    }
-
-    return Date()
-}
 
 fun Instant.format(pattern: String, zoneID: String = defaultZone): String {
     return formatter(pattern, zoneID).format(this)

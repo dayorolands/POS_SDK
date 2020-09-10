@@ -16,23 +16,25 @@ import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
 import com.creditclub.core.data.request.CollectionPaymentRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.getPin
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.showErrorAndWait
 import com.creditclub.core.util.showSuccessAndWait
+import com.creditclub.pos.printer.PosPrinter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 import org.threeten.bp.Instant
 import java.util.*
 
 class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment_fragment) {
     private var regions: List<String>? = null
     private var collectionTypes: List<String>? = null
-    private val posPrinter: PosPrinter by lazy { PosPrinter(requireContext(), dialogProvider) }
+    private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
     private val binding by dataBinding<CollectionPaymentFragmentBinding>()
     private val viewModel: CollectionPaymentViewModel by navGraphViewModels(R.id.collectionGraph)
     override val functionId = FunctionIds.COLLECTION_PAYMENT

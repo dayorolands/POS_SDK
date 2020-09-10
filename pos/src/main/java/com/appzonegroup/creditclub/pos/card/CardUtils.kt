@@ -1,6 +1,8 @@
 package com.appzonegroup.creditclub.pos.card
 
 import com.appzonegroup.creditclub.pos.extension.processingCode3
+import com.creditclub.pos.card.CardData
+import com.creditclub.pos.card.TransactionType
 import org.jpos.iso.ISOMsg
 
 
@@ -35,7 +37,7 @@ fun cardTransactionType(msg: ISOMsg) = when (msg.mti) {
         "61" -> TransactionType.SalesComplete
         else -> TransactionType.Unknown
     }
-    "0420", "421", "0430" -> TransactionType.Reversal
+    "0420", "0421", "0430" -> TransactionType.Reversal
     else -> TransactionType.Unknown
 }
 
