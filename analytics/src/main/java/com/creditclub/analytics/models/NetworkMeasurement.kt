@@ -40,7 +40,7 @@ class NetworkMeasurement {
     @SerialName("AppName")
     var appName: String? = null
 
-    @SerialName("AppVersionCode")
+    @SerialName("AppVersion")
     var appVersion: String? = null
 
     @SerialName("Message")
