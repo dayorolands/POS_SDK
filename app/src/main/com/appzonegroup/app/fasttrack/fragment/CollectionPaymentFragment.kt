@@ -236,9 +236,10 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
         val json = Json(JsonConfiguration.Stable)
         val serializer = CollectionPaymentRequest.Additional.serializer()
+        val agent = localStorage.agent
         val additional = CollectionPaymentRequest.Additional().apply {
-            agentCode = localStorage.agent?.agentCode
-            terminalId = localStorage.agent?.terminalID
+            agentCode = agent?.agentCode
+            terminalId = agent?.terminalID
         }
         request.apply {
             collectionReference = viewModel.collectionReference.value?.reference

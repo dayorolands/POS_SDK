@@ -13,11 +13,12 @@ import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.ui.SurveyDialog
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
-import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
-import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.data.posPreferences
+import com.appzonegroup.creditclub.pos.extension.posConfig
+import com.appzonegroup.creditclub.pos.extension.posParameter
+import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.api.BackendConfig
@@ -27,14 +28,17 @@ import com.creditclub.core.data.request.SubmitSurveyRequest
 import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
-import com.google.gson.Gson
+import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.api.posApiService
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.builtins.list
 import kotlinx.serialization.builtins.serializer
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import retrofit2.create
 
 class LoginActivity : CreditClubActivity() {
 
@@ -291,33 +295,79 @@ class LoginActivity : CreditClubActivity() {
     }
 
     private suspend fun settle() = withContext(Dispatchers.IO) {
-        val gson = Gson()
-
         val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
         val posDatabase: PosDatabase = PosDatabase.getInstance(this@LoginActivity)
         val backendConfig: BackendConfig by inject()
         val configService: ConfigService by inject()
         val posNotificationDao = posDatabase.posNotificationDao()
+        val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
 
         val jobs = posNotificationDao.all().map { notification ->
             async {
-                val requestBody = gson.toJson(notification).toRequestBody()
-
                 val (response) = safeRunSuspend {
-                    creditClubMiddleWareAPI.staticService.posCashOutNotification(
-                        requestBody,
+                    posApiService.posCashOutNotification(
+                        notification,
                         "iRestrict ${backendConfig.posNotificationToken}",
-                        configService.terminalId
+                        notification.terminalId ?: configService.terminalId
                     )
                 }
 
-                if (response?.isSuccessFul == true) {
+                if (!response?.billerReference.isNullOrBlank()) {
                     posNotificationDao.delete(notification)
                 }
             }
         }
 
         jobs.awaitAll()
+    }
+
+    private suspend fun syncAgentInfo() {
+        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI = get()
+        val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
+
+        val (agent, error) = safeRunIO {
+            creditClubMiddleWareAPI.staticService.getAgentInfoByPhoneNumber(
+                localStorage.institutionCode,
+                localStorage.agentPhone
+            )
+        }
+
+        if (error != null) return
+        agent ?: return
+
+        localStorage.agent = agent
+        firebaseCrashlytics.setUserId(agent.agentCode ?: "0")
+        firebaseCrashlytics.setCustomKey("agent_name", agent.agentName ?: "")
+        firebaseCrashlytics.setCustomKey("agent_phone", agent.phoneNumber ?: "")
+        firebaseCrashlytics.setCustomKey("terminal_id", agent.terminalID ?: "")
+
+        if (Platform.isPOS) {
+            val configHasChanged =
+                posConfig.terminalId != agent.terminalID // || posConfig.posModeStr != agent.posMode
+
+            if (configHasChanged) {
+                val notificationCount = withContext(Dispatchers.IO) {
+                    val posDatabase: PosDatabase = PosDatabase.getInstance(this@LoginActivity)
+                    posDatabase.posNotificationDao().count()
+                }
+
+                if (notificationCount > 0) {
+                    return dialogProvider.showError<Nothing>(
+                        "Access restricted. \n" +
+                                "There are pending cashout settlement requests against your previous terminal id. \n" +
+                                "Kindly contact your administrator"
+                    ) {
+                        onClose {
+                            finish()
+                        }
+                    }
+                }
+
+//                    posConfig.posModeStr = agent.posMode
+                posConfig.terminalId = agent.terminalID ?: ""
+                posParameter.reset()
+            }
+        }
     }
 
     private fun ensureLocationEnabled() {

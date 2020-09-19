@@ -2,7 +2,10 @@ package com.creditclub.core.data.api
 
 import com.creditclub.core.data.model.*
 import com.creditclub.core.data.request.*
-import com.creditclub.core.data.response.*
+import com.creditclub.core.data.response.ApiResponse
+import com.creditclub.core.data.response.BackendResponse
+import com.creditclub.core.data.response.MiniStatementResponse
+import com.creditclub.core.data.response.RequestStatus
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.http.*
@@ -139,13 +142,6 @@ interface StaticService {
         @Query("instituionCode") institutionCode: String?,
         @Query("BVN") bvn: String
     ): BVNDetails?
-
-    @POST("CreditClubStatic/POSCashOutNotification")
-    suspend fun posCashOutNotification(
-        @Body request: RequestBody,
-        @Header("Authorization") authToken: String,
-        @Header("TerminalID") terminalID: String
-    ): PosNotificationResponse?
 
     @POST("CreditClubStatic/LogToGrafanaForPOSTransactions")
     suspend fun logToGrafanaForPOSTransactions(

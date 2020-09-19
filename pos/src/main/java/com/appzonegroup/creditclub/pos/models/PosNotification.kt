@@ -121,4 +121,7 @@ interface PosNotificationDao {
 
     @Query("SELECT * FROM PosNotification")
     suspend fun all(): List<PosNotification>
+
+    @Query("SELECT COUNT(*) FROM PosNotification")
+    suspend fun count(): Long
 }

@@ -426,6 +426,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
 
                     if (response.isSuccessful) {
                         val posNotification = PosNotification.create(transaction)
+                        posNotification.terminalId = config.terminalId
                         posNotification.nodeName = remoteConnectionInfo.nodeName
                         if (remoteConnectionInfo is ConnectionInfo) {
                             posNotification.connectionInfo = remoteConnectionInfo

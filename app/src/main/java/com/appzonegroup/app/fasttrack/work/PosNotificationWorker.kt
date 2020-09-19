@@ -42,7 +42,7 @@ class PosNotificationWorker(context: Context, params: WorkerParameters) :
                     )
                 }
 
-                if (response?.isSuccessFul == true) {
+                if (!response?.billerReference.isNullOrBlank()) {
                     posNotificationDao.delete(notification)
                 }
             }

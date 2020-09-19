@@ -111,6 +111,7 @@ dependencies {
 
     implementation "androidx.navigation:navigation-fragment-ktx:${versions.navigation}"
     implementation "androidx.navigation:navigation-ui-ktx:${versions.navigation}"
+    implementation "androidx.activity:activity-ktx:1.2.0-alpha06"
 }
 
 repositories {
