@@ -52,6 +52,9 @@ class PosNotification {
     @SerialName("Nuban")
     var nuban: String? = ""
 
+    @SerialName("TerminalID")
+    var terminalId: String? = null
+
     @SerialName("CustomerName")
     var customerName: String? = "SAIDU/M"
 

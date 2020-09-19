@@ -38,7 +38,7 @@ class PosNotificationWorker(context: Context, params: WorkerParameters) :
                     posApiService.posCashOutNotification(
                         notification,
                         "iRestrict ${backendConfig.posNotificationToken}",
-                        configService.terminalId
+                        notification.terminalId ?: configService.terminalId
                     )
                 }
 
