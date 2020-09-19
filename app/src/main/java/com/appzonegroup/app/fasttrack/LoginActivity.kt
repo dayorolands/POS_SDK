@@ -30,13 +30,11 @@ import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
 import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.api.posApiService
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.builtins.list
 import kotlinx.serialization.builtins.serializer
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import retrofit2.create
 
@@ -78,12 +76,10 @@ class LoginActivity : CreditClubActivity() {
             })
         }
 
-        findViewById<View>(R.id.email_sign_in_button).setOnClickListener { attemptLogin() }
-
-        mainScope.launch {
-            syncAgentInfo()
-            firebaseAnalytics.setUserId(localStorage.agent?.agentCode)
+        findViewById<View>(R.id.email_sign_in_button).setOnClickListener {
+            mainScope.launch { attemptLogin() }
         }
+
         mainScope.launch { (application as CreditClubApplication).getLatestVersion() }
         mainScope.launch { updateBinRoutes() }
 
@@ -227,7 +223,7 @@ class LoginActivity : CreditClubActivity() {
         }
     }
 
-    private fun attemptLogin() {
+    private suspend fun attemptLogin() {
         val phoneNumber = (findViewById<View>(R.id.login_phoneNumber) as EditText).text.toString()
         val pin = (findViewById<View>(R.id.login_pin) as EditText).text.toString()
 
@@ -251,37 +247,38 @@ class LoginActivity : CreditClubActivity() {
             return
         }
 
-        mainScope.launch {
-            dialogProvider.showProgressBar("Logging you in")
-            val (response, error) = safeRunIO {
-                creditClubMiddleWareAPI.staticService.confirmAgentInformation(
-                    localStorage.institutionCode,
-                    phoneNumber,
-                    pin,
-                    appVersionName,
-                    if (Platform.isPOS) "TelpoPOS" else "Mobile"
-                )
-            }
-            dialogProvider.hideProgressBar()
-
-            if (error != null) return@launch dialogProvider.showError(error)
-            if (response == null) return@launch dialogProvider.showError("PIN is invalid")
-            if (!response.isSuccessful) return@launch dialogProvider.showError(response.responseMessage)
-
-            firebaseAnalytics.logEvent("login", Bundle().apply {
-                putString("agent_code", localStorage.agent?.agentCode)
-                putString("institution_code", localStorage.institutionCode)
-                putString("phone_number", phoneNumber)
-            })
-
-            val lastLogin = "Last Login: " + Misc.dateToLongString(Misc.getCurrentDateTime())
-            LocalStorage.SaveValue(AppConstants.LAST_LOGIN, lastLogin, baseContext)
-
-            val intent = Intent(this@LoginActivity, MainActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-            startActivity(intent)
-            finish()
+        if (!syncAgentInfo()) return
+        dialogProvider.showProgressBar("Logging you in")
+        val (response, error) = safeRunIO {
+            creditClubMiddleWareAPI.staticService.confirmAgentInformation(
+                localStorage.institutionCode,
+                phoneNumber,
+                pin,
+                appVersionName,
+                if (Platform.isPOS) "TelpoPOS" else "Mobile"
+            )
         }
+        dialogProvider.hideProgressBar()
+
+        if (error != null) return dialogProvider.showError(error)
+        if (response == null) return dialogProvider.showError("PIN is invalid")
+        if (!response.isSuccessful) return dialogProvider.showError(response.responseMessage)
+
+        val agent = localStorage.agent
+        firebaseAnalytics.logEvent("login", Bundle().apply {
+            putString("agent_code", agent?.agentCode)
+            putString("institution_code", localStorage.institutionCode)
+            putString("phone_number", phoneNumber)
+            putString("terminal_id", agent?.terminalID)
+        })
+
+        val lastLogin = "Last Login: " + Misc.dateToLongString(Misc.getCurrentDateTime())
+        LocalStorage.SaveValue(AppConstants.LAST_LOGIN, lastLogin, baseContext)
+
+        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+        startActivity(intent)
+        finish()
     }
 
     private fun showError(message: String, viewId: Int) {
@@ -321,19 +318,24 @@ class LoginActivity : CreditClubActivity() {
         jobs.awaitAll()
     }
 
-    private suspend fun syncAgentInfo() {
-        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI = get()
-        val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
-
+    private suspend fun syncAgentInfo(): Boolean {
+        dialogProvider.showProgressBar("Checking agent details")
         val (agent, error) = safeRunIO {
             creditClubMiddleWareAPI.staticService.getAgentInfoByPhoneNumber(
                 localStorage.institutionCode,
                 localStorage.agentPhone
             )
         }
+        dialogProvider.hideProgressBar()
 
-        if (error != null) return
-        agent ?: return
+        if (error != null) {
+            dialogProvider.showErrorAndWait(error)
+            return false
+        }
+        if (agent == null) {
+            dialogProvider.showErrorAndWait("Invalid agent details")
+            return false
+        }
 
         localStorage.agent = agent
         firebaseCrashlytics.setUserId(agent.agentCode ?: "0")
@@ -352,15 +354,12 @@ class LoginActivity : CreditClubActivity() {
                 }
 
                 if (notificationCount > 0) {
-                    return dialogProvider.showError<Nothing>(
+                    dialogProvider.showErrorAndWait(
                         "Access restricted. \n" +
                                 "There are pending cashout settlement requests against your previous terminal id. \n" +
                                 "Kindly contact your administrator"
-                    ) {
-                        onClose {
-                            finish()
-                        }
-                    }
+                    )
+                    return false
                 }
 
 //                    posConfig.posModeStr = agent.posMode
@@ -368,6 +367,8 @@ class LoginActivity : CreditClubActivity() {
                 posParameter.reset()
             }
         }
+
+        return true
     }
 
     private fun ensureLocationEnabled() {
