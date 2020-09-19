@@ -1,32 +1,33 @@
 package com.appzonegroup.creditclub.pos.printer
 
+import android.content.Context
+import com.appzonegroup.creditclub.pos.BuildConfig
+import com.appzonegroup.creditclub.pos.R
 import com.creditclub.pos.printer.Alignment
 import com.creditclub.pos.printer.PrintNode
 import com.creditclub.pos.printer.TextNode
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 02/10/2019.
- * Appzone Ltd
- */
-
-val footerNodes = listOf<PrintNode>(
+fun footerNodes(context: Context) = listOf<PrintNode>(
 
     TextNode("-----------------------------").apply {
         align = Alignment.MIDDLE
         wordFont = 15
     },
 
-    TextNode("CreditClub POS v1.3.5. Powered by CreditClub")
-        .apply {
+    TextNode(
+        "${context.getString(R.string.app_name)} v${BuildConfig.VERSION_NAME}. Powered by ${context.getString(
+            R.string.institution_name
+        )}"
+    ).apply {
         align = Alignment.MIDDLE
         wordFont = 15
     },
 
-    TextNode("http://www.appzonegroup.com/products/creditclub")
+    TextNode(context.getString(R.string.institution_website))
         .apply {
-        align = Alignment.MIDDLE
-        walkPaperAfterPrint = 10
-        wordFont = 15
-    }
+            align = Alignment.MIDDLE
+            walkPaperAfterPrint = 10
+            wordFont = 15
+        }
 )

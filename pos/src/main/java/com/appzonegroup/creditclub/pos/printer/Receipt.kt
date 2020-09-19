@@ -100,7 +100,7 @@ RRN: $rrn"""
                 align = Alignment.MIDDLE
             })
 
-            nodes.addAll(footerNodes)
+            nodes.addAll(footerNodes(context))
 
             return nodes
         }

@@ -68,7 +68,7 @@ Transaction ID: ${request.customerDepositSlipNumber}"""
             }
 
             nodes.addTransactionStatus()
-            nodes.addAll(footerNodes)
+            nodes.addAll(footerNodes(context))
             return nodes.toList()
         }
 
