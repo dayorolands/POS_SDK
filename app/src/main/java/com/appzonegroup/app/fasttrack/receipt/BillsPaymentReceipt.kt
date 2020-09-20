@@ -78,7 +78,14 @@ Transaction ID: ${request.customerDepositSlipNumber}"""
         isSuccessful = response.isSuccessFul == true
         reason = response.responseMessage
         response.additionalInformation?.run {
-            val json = Json(JsonConfiguration.Stable)
+            val json = Json(
+                JsonConfiguration.Stable.copy(
+                    isLenient = true,
+                    ignoreUnknownKeys = true,
+                    serializeSpecialFloatingPointValues = true,
+                    useArrayPolymorphism = true
+                )
+            )
             val serializer = PayBillResponse.AdditionalInformation.serializer()
             additionalInformation = json.parse(serializer, this)
         }

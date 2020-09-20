@@ -15,6 +15,7 @@ import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.request.PayBillRequest
+import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
 import com.creditclub.pos.printer.PosPrinter
@@ -264,6 +265,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         if (error != null) return dialogProvider.showErrorAndWait(error)
         if (response == null) {
             dialogProvider.showErrorAndWait("An error occurred. Please try again later")
+            printReceipt(null)
             activity?.onBackPressed()
             return
         }
@@ -276,11 +278,14 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             dialogProvider.showErrorAndWait(message)
         }
 
+        printReceipt(response)
+        activity?.onBackPressed()
+    }
+
+    private suspend fun printReceipt(response: PayBillResponse?) {
         if (Platform.hasPrinter) {
             val receipt = BillsPaymentReceipt(requireContext(), request).withResponse(response)
             posPrinter.print(receipt)
         }
-
-        activity?.onBackPressed()
     }
 }
