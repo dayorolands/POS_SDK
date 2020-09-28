@@ -2,7 +2,9 @@ package com.creditclub.core.util
 
 import android.util.Patterns
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.regex.Pattern
 
 
@@ -31,6 +33,6 @@ fun String?.mask(first: Int, last: Int): String {
 }
 
 fun String.toRequestBody(): RequestBody {
-    val mediaType = MediaType.parse("application/json")
-    return RequestBody.create(mediaType, this)
+    val mediaType = "application/json".toMediaTypeOrNull()
+    return this.toRequestBody(mediaType)
 }

@@ -8,6 +8,7 @@ import com.creditclub.pos.printer.PrinterStatus
 import com.creditclub.pos.printer.TextNode
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.format
 import kotlinx.coroutines.*
 import org.koin.core.KoinComponent
 import org.koin.core.get
@@ -53,7 +54,7 @@ class PrintEOD(
                 val iso = trn.isoMsg
                 if (iso.isSuccessful) totalAmount += iso.transactionAmount4?.toLong() ?: 0
 
-                text.append("\nTime    ${trn.prettyTime}")
+                text.append("\nTime    ${trn.createdAt.format("dd/MM/YYYY hh:mm", "+0100")}")
                 text.append("\nType    ${trn.type}")
                 text.append("\nPAN     ${trn.pan}")
                 text.append("\nAmount  ${CurrencyFormatter.format(iso.transactionAmount4)}")

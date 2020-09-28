@@ -11,11 +11,13 @@ import com.appzonegroup.app.fasttrack.model.BillerItem
 import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
+import com.creditclub.core.data.api.BillsPaymentService
 import com.creditclub.pos.printer.PrinterStatus
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
+import com.creditclub.core.util.delegates.service
 import kotlinx.android.synthetic.main.activity_billpayment.*
 import kotlinx.coroutines.launch
 
@@ -45,6 +47,7 @@ class BillPaymentActivity : BaseActivity() {
 
     private val isAirtime by lazy { extras!!.getBoolean("isAirtime", false) }
     private val reference = Misc.getRandomString()
+    private val billsPaymentService by creditClubMiddleWareAPI.retrofit.service<BillsPaymentService>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -195,7 +198,7 @@ class BillPaymentActivity : BaseActivity() {
                 mainScope.launch {
                     showProgressBar("Processing...")
                     val (response, error) = safeRunIO {
-                        creditClubMiddleWareAPI.billsPaymentService.runTransaction(paymentRequest)
+                        billsPaymentService.runTransaction(paymentRequest)
                     }
                     hideProgressBar()
 
@@ -206,7 +209,7 @@ class BillPaymentActivity : BaseActivity() {
                         }
                     }
 
-                    if (error != null) return@launch showError(error, finishOnClose)
+                    if (error != null) return@launch dialogProvider.showError(error, finishOnClose)
 
                     if (response == null) {
                         showError("An error occurred", finishOnClose)

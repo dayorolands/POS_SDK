@@ -5,10 +5,11 @@ import com.creditclub.core.data.request.*
 import com.creditclub.core.data.response.ApiResponse
 import com.creditclub.core.data.response.BackendResponse
 import com.creditclub.core.data.response.MiniStatementResponse
-import com.creditclub.core.data.response.RequestStatus
-import okhttp3.RequestBody
 import okhttp3.ResponseBody
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Query
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/4/2019.
@@ -143,22 +144,8 @@ interface StaticService {
         @Query("BVN") bvn: String
     ): BVNDetails?
 
-    @POST("CreditClubStatic/LogToGrafanaForPOSTransactions")
-    suspend fun logToGrafanaForPOSTransactions(
-        @Body request: RequestBody,
-        @Header("Authorization") authToken: String,
-        @Header("TerminalID") terminalID: String
-    ): RequestStatus?
-
     @POST("CreditClubStatic/MiniStatement")
     suspend fun miniStatement(@Body request: MiniStatementRequest): MiniStatementResponse?
-
-    @POST("CreditClubStatic/TransactionLog")
-    suspend fun transactionLog(
-        @Body request: RequestBody,
-        @Header("Authorization") authToken: String,
-        @Header("TerminalID") terminalID: String?
-    ): ApiResponse<String>?
 
     @POST("CreditClubStatic/SubmitSurvey")
     suspend fun submitSurvey(@Body request: SubmitSurveyRequest)

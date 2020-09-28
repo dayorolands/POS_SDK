@@ -30,7 +30,7 @@ abstract class CreditClubUnitTest {
             .build()
     }
 
-    private val middleware by lazy { CreditClubMiddleWareAPI(okHttpClient) }
+    val creditClubMiddleWareAPI by lazy { CreditClubMiddleWareAPI(okHttpClient, BuildConfig.API_HOST) }
 
     @Before
     fun setUp() {
@@ -43,14 +43,8 @@ abstract class CreditClubUnitTest {
         mainThreadSurrogate.close()
     }
 
-    fun <T> mainScope(block: suspend CoroutineScope.() -> T) = runBlocking {
+    inline fun <T> mainScope(crossinline block: suspend CoroutineScope.() -> T) = runBlocking {
         launch(Dispatchers.Main) {
-            block()
-        }
-    }
-
-    fun <T> ioScope(block: suspend CoroutineScope.() -> T) = runBlocking {
-        launch(Dispatchers.IO) {
             block()
         }
     }

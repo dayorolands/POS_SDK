@@ -21,8 +21,8 @@ import com.creditclub.ui.manager.DataBindingActivityManager
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
-import org.threeten.bp.LocalDate
-import org.threeten.bp.Period
+import java.time.LocalDate
+import java.time.Period
 
 
 /**

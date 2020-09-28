@@ -14,10 +14,12 @@ import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
+import com.creditclub.core.data.api.BillsPaymentService
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
+import com.creditclub.core.util.delegates.service
 import com.creditclub.pos.printer.PosPrinter
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -32,6 +34,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     private val request = PayBillRequest()
     private val uniqueReference = UUID.randomUUID().toString()
     private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
+    private val billsPaymentService by creditClubMiddleWareAPI.retrofit.service<BillsPaymentService>()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -124,7 +127,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
     private suspend fun loadCategories() =
         loadDependencies("category list") {
-            val categoryList = creditClubMiddleWareAPI.billsPaymentService.getBillerCategories(
+            val categoryList = billsPaymentService.getBillerCategories(
                 localStorage.institutionCode
             )
             viewModel.categoryList.postValue(categoryList)
@@ -132,7 +135,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
     private suspend fun loadBillers() =
         loadDependencies("biller list") {
-            val billerList = creditClubMiddleWareAPI.billsPaymentService.getBillers(
+            val billerList = billsPaymentService.getBillers(
                 localStorage.institutionCode,
                 viewModel.category.value?.id
             )
@@ -141,7 +144,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
     private suspend fun loadItems() =
         loadDependencies("item list") {
-            val itemList = creditClubMiddleWareAPI.billsPaymentService.getPaymentItems(
+            val itemList = billsPaymentService.getPaymentItems(
                 localStorage.institutionCode,
                 viewModel.biller.value?.id
             )
@@ -259,7 +262,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         }
         dialogProvider.showProgressBar("Processing request")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.billsPaymentService.runTransaction(request)
+            billsPaymentService.runTransaction(request)
         }
         dialogProvider.hideProgressBar()
         if (error != null) return dialogProvider.showErrorAndWait(error)

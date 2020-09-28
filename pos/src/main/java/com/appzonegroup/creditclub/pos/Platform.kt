@@ -33,21 +33,23 @@ object Platform : KoinComponent {
             if (posManagerCompanion.isCompatible(application)) {
                 isPOS = true
                 posManagerCompanion.setup(application)
-                loadKoinModules(module {
-                    single<PosConfig> { ConfigService(androidContext()) }
-                    single { PosDatabase.getInstance(androidContext()) }
-                    single<PosParameter>(override = true) {
-                        ParameterService(
-                            androidContext(),
-                            get<PosConfig>().remoteConnectionInfo
-                        )
-                    }
-                    single { CallHomeService() }
-                    single { IsoSocketHelper(get(), get()) }
-                })
+                loadKoinModules(posModule)
                 loadKoinModules(posManagerCompanion.module)
                 return
             }
         }
     }
+}
+
+val posModule = module {
+    single<PosConfig> { ConfigService(androidContext()) }
+    single { PosDatabase.getInstance(androidContext()) }
+    single<PosParameter>(override = true) {
+        ParameterService(
+            androidContext(),
+            get<PosConfig>().remoteConnectionInfo
+        )
+    }
+    single { CallHomeService() }
+    single { IsoSocketHelper(get(), get()) }
 }

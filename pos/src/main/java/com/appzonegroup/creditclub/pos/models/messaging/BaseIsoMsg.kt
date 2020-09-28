@@ -4,7 +4,7 @@ import com.appzonegroup.creditclub.pos.extension.generateStan
 import com.appzonegroup.creditclub.pos.extension.setTransactionTime
 import com.appzonegroup.creditclub.pos.util.*
 import org.jpos.iso.ISOMsg
-import org.threeten.bp.Instant
+import java.time.Instant
 import java.io.ByteArrayOutputStream
 import java.security.SecureRandom
 import java.util.*

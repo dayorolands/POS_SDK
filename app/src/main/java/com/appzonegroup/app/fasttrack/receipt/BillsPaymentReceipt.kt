@@ -13,7 +13,7 @@ import com.creditclub.pos.printer.PrintNode
 import com.creditclub.pos.printer.TextNode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
-import org.threeten.bp.Instant
+import java.time.Instant
 
 
 /**

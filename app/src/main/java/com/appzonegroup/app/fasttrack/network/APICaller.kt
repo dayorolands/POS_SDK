@@ -3,10 +3,10 @@ package com.appzonegroup.app.fasttrack.network
 import android.content.Context
 import com.appzonegroup.app.fasttrack.BuildConfig
 import com.creditclub.core.util.safeRun
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 
@@ -24,7 +24,7 @@ object APICaller {
         token: String? = null
     ): String? {
         return safeRun {
-            val mediaType = MediaType.parse("application/json")
+            val mediaType = "application/json".toMediaTypeOrNull()
             val interceptor = HttpLoggingInterceptor()
             interceptor.level =
                 if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
@@ -33,7 +33,7 @@ object APICaller {
                 .addInterceptor(interceptor)
                 .readTimeout(5, TimeUnit.MINUTES)
                 .build()
-            val body = RequestBody.create(mediaType, json)
+            val body = json.toRequestBody(mediaType)
             val request = Request.Builder()
                 .url(url)
                 .post(body).also {
@@ -43,7 +43,7 @@ object APICaller {
                 }
                 .build()
             val response = client.newCall(request).execute()
-            response.body()?.string()
+            response.body?.string()
         }.data
     }
 
@@ -65,7 +65,7 @@ object APICaller {
 
             val response = client.newCall(request).execute()
 
-            response.body()?.string()
+            response.body?.string()
         }.data
     }
 }

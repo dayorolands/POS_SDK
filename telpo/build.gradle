@@ -13,6 +13,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -35,4 +36,5 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${versions.desugarJdk}"
 }

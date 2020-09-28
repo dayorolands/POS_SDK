@@ -15,7 +15,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.json.JSONArray
 import org.koin.core.KoinComponent
-import org.threeten.bp.Instant
+import java.time.Instant
 
 class N3ParameterStore constructor(context: Context) : PosParameter, KoinComponent {
     private val prefs: SharedPreferences = context.getSharedPreferences("N3Parameters", 0)

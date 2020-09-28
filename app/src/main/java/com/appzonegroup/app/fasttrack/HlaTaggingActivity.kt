@@ -6,6 +6,7 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityHlaTaggingBinding
 import com.appzonegroup.app.fasttrack.databinding.ItemAddImageBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.contract.FormDataHolder
+import com.creditclub.core.data.api.OfflineHlaTaggingService
 import com.creditclub.core.data.model.GeoTagCoordinate
 import com.creditclub.core.data.model.State
 import com.creditclub.core.data.model.StatesAndLgas
@@ -14,6 +15,7 @@ import com.creditclub.core.model.CreditClubImage
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.util.delegates.contentView
+import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.includesSpecialCharacters
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
@@ -21,7 +23,7 @@ import com.creditclub.core.util.showError
 import com.esafirm.imagepicker.features.ImagePicker
 import com.esafirm.imagepicker.model.Image
 import kotlinx.coroutines.launch
-import org.threeten.bp.Instant
+import java.time.Instant
 import java.io.IOException
 
 typealias ImageListenerBlock = (CreditClubImage) -> Unit
@@ -31,6 +33,7 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
     private val binding by contentView<HlaTaggingActivity, ActivityHlaTaggingBinding>(R.layout.activity_hla_tagging)
     override val functionId = FunctionIds.HLA_TAGGING
     private var imageListener: ImageListenerBlock? = null
+    private val offlineHlaTaggingService: OfflineHlaTaggingService by creditClubMiddleWareAPI.retrofit.service()
 
     override val formData: OfflineHLATaggingRequest = OfflineHLATaggingRequest().apply {
         pictures = mutableListOf(null, null, null, null)
@@ -44,7 +47,7 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
         mainScope.launch {
             dialogProvider.showProgressBar("Loading")
             val (response, error) = safeRunIO {
-                creditClubMiddleWareAPI.offlineHlaTaggingService.getStatesAndLGA()
+                offlineHlaTaggingService.getStatesAndLGA()
             }
             dialogProvider.hideProgressBar()
 
@@ -202,7 +205,7 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
         mainScope.launch {
             dialogProvider.showProgressBar("Uploading")
             val (response, error) = safeRunIO {
-                creditClubMiddleWareAPI.offlineHlaTaggingService.postOfflineTaggingData(formData)
+                offlineHlaTaggingService.postOfflineTaggingData(formData)
             }
             dialogProvider.hideProgressBar()
 

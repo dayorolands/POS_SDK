@@ -4,6 +4,7 @@ import android.content.Context
 import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
+import com.creditclub.core.util.format
 import com.creditclub.core.util.localStorage
 import com.creditclub.pos.printer.Alignment
 import com.creditclub.pos.printer.PrintJob
@@ -60,7 +61,7 @@ Agent Name: ${context.localStorage.agent?.agentName}
 Agent Code: ${context.localStorage.agent?.agentCode}
 TID: $terminalId
 
-${transaction.prettyTime}
+${transaction.createdAt.format("dd/MM/YYYY hh:mm", "+0100")}
 
 $cardType
 Card: ${transaction.pan}

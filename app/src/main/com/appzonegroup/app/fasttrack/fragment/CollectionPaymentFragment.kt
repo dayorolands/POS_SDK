@@ -28,7 +28,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
-import org.threeten.bp.Instant
+import java.time.Instant
 import java.util.*
 
 class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment_fragment) {

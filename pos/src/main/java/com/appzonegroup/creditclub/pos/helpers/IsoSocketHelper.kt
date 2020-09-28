@@ -22,7 +22,7 @@ import org.jpos.iso.ISOException
 import org.jpos.iso.ISOMsg
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import org.threeten.bp.Instant
+import java.time.Instant
 import java.io.IOException
 import java.net.ConnectException
 

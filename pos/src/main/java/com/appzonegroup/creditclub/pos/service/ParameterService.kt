@@ -31,7 +31,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import org.threeten.bp.Instant
+import java.time.Instant
 import java.io.ByteArrayOutputStream
 import java.security.SecureRandom
 import java.util.*

@@ -9,6 +9,7 @@ import com.appzonegroup.creditclub.pos.adapter.PosNotificationAdapter
 import com.appzonegroup.creditclub.pos.models.PosNotification
 import com.appzonegroup.creditclub.pos.models.view.NotificationViewModel
 import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.showError
 import com.creditclub.pos.api.PosApiService
 import kotlinx.android.synthetic.main.activity_pending_confirmation.*
 import kotlinx.coroutines.launch
@@ -34,10 +35,8 @@ class UnsettledTransactionsActivity : PosActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pending_confirmation)
 
-        list.apply {
-            adapter = rAdapter
-            layoutManager = LinearLayoutManager(this@UnsettledTransactionsActivity)
-        }
+        list.adapter = rAdapter
+        list.layoutManager = LinearLayoutManager(this)
 
         viewModel.unsettledTransactions.observe(
             this,
@@ -47,13 +46,15 @@ class UnsettledTransactionsActivity : PosActivity() {
 
     private suspend fun PosApiService.settleTransaction(notification: PosNotification) {
         dialogProvider.showProgressBar("Settling")
-        val (response) = safeRunIO {
+        val (response, error) = safeRunIO {
             posCashOutNotification(
                 notification,
                 "iRestrict ${backendConfig.posNotificationToken}",
                 notification.terminalId ?: config.terminalId
             )
         }
+
+        if (error != null) return dialogProvider.showError(error)
 
         if (!response?.billerReference.isNullOrBlank()) safeRunIO {
             viewModel.deleteNotification(notification)

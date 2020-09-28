@@ -36,13 +36,13 @@ fun Application.startPosApp() {
             .build()
 
     workManager.enqueueUniquePeriodicWork(
-        "TRANSACTION_LOG",
+        "APP_TRANSACTION_LOG",
         ExistingPeriodicWorkPolicy.REPLACE,
         transactionLogRequest
     )
 
     workManager.enqueueUniquePeriodicWork(
-        "ISO_REQUEST_LOG",
+        "APP_ISO_REQUEST_LOG",
         ExistingPeriodicWorkPolicy.REPLACE,
         PeriodicWorkRequestBuilder<IsoRequestLogWorker>(15, TimeUnit.MINUTES)
             .setConstraints(constraints)
@@ -50,7 +50,7 @@ fun Application.startPosApp() {
     )
 
     workManager.enqueueUniquePeriodicWork(
-        "REVERSAL",
+        "APP_REVERSAL",
         ExistingPeriodicWorkPolicy.REPLACE,
         PeriodicWorkRequestBuilder<ReversalWorker>(15, TimeUnit.MINUTES)
             .setConstraints(constraints)
@@ -63,20 +63,4 @@ fun Application.startPosApp() {
 //        }
 //        get<CallHomeService>().startCallHomeTimer()
 //    }
-}
-
-fun loadPosModules() {
-
-    loadKoinModules(module {
-        single<PosConfig> { ConfigService(androidContext()) }
-        single { PosDatabase.getInstance(androidContext()) }
-        single<PosParameter>(override = true) {
-            ParameterService(
-                androidContext(),
-                get<PosConfig>().remoteConnectionInfo
-            )
-        }
-        single { CallHomeService() }
-        single { IsoSocketHelper(get(), get()) }
-    })
 }

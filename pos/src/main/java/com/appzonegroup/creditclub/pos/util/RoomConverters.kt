@@ -4,8 +4,8 @@ import androidx.room.TypeConverter
 import com.creditclub.pos.model.ConnectionInfo
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
-import org.threeten.bp.Instant
-import org.threeten.bp.format.DateTimeFormatter
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 
 
 /**
