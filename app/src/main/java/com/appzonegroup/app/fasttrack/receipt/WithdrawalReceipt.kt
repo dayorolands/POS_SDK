@@ -1,17 +1,17 @@
 package com.appzonegroup.app.fasttrack.receipt
 
 import android.content.Context
-import com.appzonegroup.creditclub.pos.printer.Alignment
+import com.creditclub.pos.printer.Alignment
 import com.appzonegroup.creditclub.pos.printer.LogoNode
-import com.appzonegroup.creditclub.pos.printer.PrintNode
-import com.appzonegroup.creditclub.pos.printer.TextNode
+import com.creditclub.pos.printer.PrintNode
+import com.creditclub.pos.printer.TextNode
 import com.appzonegroup.creditclub.pos.receipt.TransactionReceipt
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.request.WithdrawalRequest
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
 import com.creditclub.core.util.toString
-import org.threeten.bp.Instant
+import java.time.Instant
 
 
 /**

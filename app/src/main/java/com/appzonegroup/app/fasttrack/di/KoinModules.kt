@@ -9,13 +9,13 @@ import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubClient
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.api.BackendConfig
+import com.creditclub.core.data.api.RequestFailureInterceptor
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.debugOnly
 import okhttp3.Cache
-import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
@@ -29,6 +29,8 @@ import java.util.concurrent.TimeUnit
  * Appzone Ltd
  */
 
+private const val CACHE_SIZE = 10L * 1024 * 1024 // 10 MB
+
 val dataModule = module {
     single { LocalStorage.getInstance(androidContext()) }
     single { AppDataStorage.getInstance(androidContext()) }
@@ -41,14 +43,8 @@ val locationModule = module {
 
 val apiModule = module {
     single(named("middleware")) {
-        val cacheSize = 10L * 1024 * 1024 // 10 MB
-        val cache = Cache(androidContext().cacheDir, cacheSize)
-        val certificatePinner = CertificatePinner.Builder()
-            .add("api.mybankone.com", "sha256/goId03pe7sxzYmTdNcd1vI+psOY/FX5YGYjkPeioB0w=")
-            .build()
-
+        val cache = Cache(androidContext().cacheDir, CACHE_SIZE)
         val builder = OkHttpClient().newBuilder()
-            .certificatePinner(certificatePinner)
             .connectTimeout(2, TimeUnit.MINUTES)
             .readTimeout(2, TimeUnit.MINUTES)
             .writeTimeout(2, TimeUnit.MINUTES)
@@ -59,6 +55,8 @@ val apiModule = module {
             interceptor.level = HttpLoggingInterceptor.Level.BODY
             builder.addInterceptor(interceptor)
         }
+
+        builder.addInterceptor(RequestFailureInterceptor())
 
         return@single builder.build()
     }
@@ -80,6 +78,7 @@ val configModule = module {
         object : BackendConfig {
             override val apiHost = BuildConfig.API_HOST
             override val posNotificationToken = BuildConfig.NOTIFICATION_TOKEN
+            override val appVersionName = BuildConfig.VERSION_NAME
         }
     }
 }

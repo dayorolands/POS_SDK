@@ -3,19 +3,22 @@ package com.creditclub.ui.manager
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.creditclub.core.data.api.CommissionService
 import com.creditclub.core.type.PaymentStatus
 import com.creditclub.core.type.TransactionType
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DateInputParams
 import com.creditclub.core.ui.widget.DialogOptionItem
+import com.creditclub.core.util.creditClubMiddleWareAPI
+import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.toString
 import com.creditclub.ui.adapter.CommissionReportAdapter
 import com.creditclub.ui.databinding.ActivityCommissionsBinding
 import kotlinx.coroutines.launch
-import org.threeten.bp.LocalDate
-import org.threeten.bp.Period
+import java.time.LocalDate
+import java.time.Period
 
 
 /**
@@ -43,6 +46,8 @@ class ActivityCommissionsManager(
     private var endDate = LocalDate.now()
     private var startDate = endDate.minusDays(7)
     private var today = LocalDate.now()
+
+    private val commissionService: CommissionService by creditClubMiddleWareAPI.retrofit.service()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -155,7 +160,7 @@ class ActivityCommissionsManager(
 
                 showProgressBar("Getting commissions")
                 val (response, error) = safeRunIO {
-                    creditClubMiddleWareAPI.commissionService.getTransactions(
+                    commissionService.getTransactions(
                         localStorage.agentPhone,
                         localStorage.institutionCode,
                         selectedTransactionType.code,

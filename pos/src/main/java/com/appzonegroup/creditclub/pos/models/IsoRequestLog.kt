@@ -2,11 +2,11 @@ package com.appzonegroup.creditclub.pos.models
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.creditclub.core.data.contract.IISoRequestLog
 import com.creditclub.core.serializer.TimeInstantSerializer
+import com.creditclub.pos.model.ConnectionInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.threeten.bp.Instant
+import java.time.Instant
 
 
 /**
@@ -16,45 +16,51 @@ import org.threeten.bp.Instant
 
 @Entity
 @Serializable
-class IsoRequestLog : IISoRequestLog {
+class IsoRequestLog {
 
     @PrimaryKey(autoGenerate = true)
-    override var id: Long = 0
+    var id: Long = 0
 
     @SerialName("UniqueID")
-    override var uniqueId: String = ""
+    var uniqueId: String = ""
 
     @SerialName("InstitutionCode")
-    override var institutionCode: String = ""
+    var institutionCode: String = ""
 
     @SerialName("TerminalID")
-    override var terminalId: String = ""
+    var terminalId: String = ""
 
     @SerialName("RRN")
-    override var rrn: String = ""
+    var rrn: String = ""
 
     @SerialName("TransactionType")
-    override var transactionType: String = ""
+    var transactionType: String = ""
 
     @SerialName("Amount")
-    override var amount: String = ""
+    var amount: String = ""
 
     @SerialName("AgentCode")
-    override var agentCode: String = ""
+    var agentCode: String = ""
 
     @SerialName("GPSCoordinates")
-    override var gpsCoordinates: String = ""
+    var gpsCoordinates: String = ""
 
     @SerialName("ResponseCode")
-    override var responseCode: String = ""
+    var responseCode: String = ""
 
     @Serializable(with = TimeInstantSerializer::class)
     @SerialName("RequestTime")
-    override var requestTime: Instant = Instant.now()
+    var requestTime: Instant = Instant.now()
 
     @Serializable(with = TimeInstantSerializer::class)
     @SerialName("ResponseTime")
-    override var responseTime: Instant? = null
+    var responseTime: Instant? = null
+
+    @SerialName("NodeName")
+    var nodeName: String? = null
+
+    @kotlinx.serialization.Transient
+    var connectionInfo: ConnectionInfo? = null
 }
 
 @Dao

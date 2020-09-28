@@ -3,7 +3,7 @@ package com.creditclub.core.data.response
 import com.creditclub.core.serializer.TimeInstantSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.threeten.bp.Instant
+import java.time.Instant
 
 @Serializable
 class CollectionPaymentResponse {

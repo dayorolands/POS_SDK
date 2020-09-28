@@ -1,97 +1,55 @@
 package com.appzonegroup.creditclub.pos
 
-import android.content.Context
-import android.content.Intent
-import android.os.Environment
-import com.telpo.tps550.api.util.StringUtil
-import com.telpo.tps550.api.util.SystemUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
+import android.app.Application
+import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
+import com.appzonegroup.creditclub.pos.service.CallHomeService
+import com.appzonegroup.creditclub.pos.service.ConfigService
+import com.appzonegroup.creditclub.pos.service.ParameterService
+import com.creditclub.pos.PosConfig
+import com.creditclub.pos.PosParameter
+import com.creditclub.pos.PosProviders
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.KoinComponent
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 6/29/2019.
  * Appzone Ltd
  */
-object Platform {
-    private var deviceType = -1
+object Platform : KoinComponent {
 
     @JvmStatic
-    val isPOS
-        get() = supportsPos()
+    var isPOS = false
+        private set
 
     @JvmStatic
     val hasPrinter
-        get() = supportsPrinter()
+        get() = isPOS
 
-    init {
-        try {
-            deviceType = SystemUtil.getDeviceType()
-        } catch (ex: Exception) {
-            if (BuildConfig.DEBUG) ex.printStackTrace()
-        } catch (err: UnsatisfiedLinkError) {
-            if (BuildConfig.DEBUG) err.printStackTrace()
-        }
-    }
-
-    @JvmStatic
-    fun supportsPos(): Boolean {
-        if (deviceType == -1) return false
-
-        return deviceType == StringUtil.DeviceModelEnum.TPS450C.ordinal || deviceType == StringUtil.DeviceModelEnum.TPS360IC.ordinal || deviceType == StringUtil.DeviceModelEnum.TPS900.ordinal
-    }
-
-    @JvmStatic
-    fun supportsPrinter(): Boolean {
-        if (deviceType == -1) return false
-
-        return deviceType == StringUtil.DeviceModelEnum.TPS900.ordinal
-    }
-
-    @JvmStatic
-    fun setup(context: Context) {
-        val testFolder = Environment.getExternalStorageDirectory().path
-
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
-                context.copyAssetToFolder("pinpad_res.zip", "$testFolder/test", "res.zip")
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                return@launch
-            }
-
-            val setResIntent = Intent("android.intent.action.emv.res.set")
-            setResIntent.putExtra("emv_res", "$testFolder/res.zip")
-            context.sendBroadcast(setResIntent)
-        }
-    }
-
-
-    @Throws(Exception::class)
-    fun Context.copyAssetToFolder(assetName: String, savePath: String, saveName: String) {
-        val filename = "$savePath/$saveName"
-        val dir = File(savePath)
-
-        if (!dir.exists()) {
-            dir.mkdir()
-        }
-
-        val inputStream = resources.assets.open(assetName)
-        val fileOutputStream = FileOutputStream(filename)
-        val buffer = ByteArray(7168)
-
-        while (true) {
-            val read = inputStream.read(buffer)
-
-            if (read > 0) {
-                fileOutputStream.write(buffer, 0, read)
-            } else {
-                fileOutputStream.close()
-                inputStream.close()
+    fun test(application: Application) {
+        for (posManagerCompanion in PosProviders.registered) {
+            if (posManagerCompanion.isCompatible(application)) {
+                isPOS = true
+                posManagerCompanion.setup(application)
+                loadKoinModules(posModule)
+                loadKoinModules(posManagerCompanion.module)
                 return
             }
         }
     }
+}
+
+val posModule = module {
+    single<PosConfig> { ConfigService(androidContext()) }
+    single { PosDatabase.getInstance(androidContext()) }
+    single<PosParameter>(override = true) {
+        ParameterService(
+            androidContext(),
+            get<PosConfig>().remoteConnectionInfo
+        )
+    }
+    single { CallHomeService() }
+    single { IsoSocketHelper(get(), get()) }
 }

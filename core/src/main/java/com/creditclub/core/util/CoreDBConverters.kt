@@ -1,8 +1,8 @@
 package com.creditclub.core.util
 
 import androidx.room.TypeConverter
-import org.threeten.bp.Instant
-import org.threeten.bp.format.DateTimeFormatter
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 
 
 /**

@@ -24,7 +24,7 @@ import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
-import org.threeten.bp.Instant
+import java.time.Instant
 
 class SupportThreadActivity : BaseActivity() {
 

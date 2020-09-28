@@ -1,0 +1,17 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.creditclub.pos.providers.telpo">
+
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.TELPO_ICC " />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+
+    <application>
+        <provider
+            android:name=".TelpoPosManagerProvider"
+            android:authorities="${applicationId}.TelpoPosManagerProvider"
+            android:enabled="true"
+            android:exported="false" />
+    </application>
+</manifest>

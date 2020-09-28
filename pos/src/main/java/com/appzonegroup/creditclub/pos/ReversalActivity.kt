@@ -1,10 +1,12 @@
 package com.appzonegroup.creditclub.pos
 
 import android.os.Bundle
-import com.appzonegroup.creditclub.pos.card.CardData
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
+import com.creditclub.pos.card.CardData
+import com.creditclub.pos.card.TransactionType
 
 class ReversalActivity : CardTransactionActivity() {
+    override var transactionType = TransactionType.Reversal
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,6 +19,7 @@ class ReversalActivity : CardTransactionActivity() {
         makeRequest(ReversalRequest.generate(previousMessage!!, cardData).apply {
             processingCode3 = processingCode("00")
             withParameters(parameters.parameters)
+            messageReasonCode56 = "4000"
         })
     }
 

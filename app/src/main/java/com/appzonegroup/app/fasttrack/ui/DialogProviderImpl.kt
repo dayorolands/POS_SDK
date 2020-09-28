@@ -22,8 +22,8 @@ import com.creditclub.core.util.safeRun
 import com.creditclub.ui.adapter.DialogOptionAdapter
 import com.creditclub.ui.databinding.DialogOptionsBinding
 import kotlinx.android.synthetic.main.dialog_error.*
-import org.threeten.bp.LocalDate
-import org.threeten.bp.ZoneId
+import java.time.LocalDate
+import java.time.ZoneId
 
 
 /**
@@ -50,15 +50,14 @@ interface DialogProviderImpl : DialogProvider {
         }
     }
 
-    override fun <T> showError(message: String?, block: DialogListenerBlock<T>) {
+    override fun <T> showError(message: String?, block: DialogListenerBlock<T>?) {
         activity.runOnUiThread {
             hideProgressBar()
             val dialog = Dialogs.getErrorDialog(activity, message)
-            val listener = DialogListener.create(block)
 
             dialog.close_btn.setOnClickListener {
                 dialog.dismiss()
-                listener.close()
+                if (block != null) DialogListener.create(block).close()
             }
 
             dialog.show()
@@ -346,39 +345,41 @@ interface DialogProviderImpl : DialogProvider {
         options: List<DialogOptionItem>,
         block: DialogListenerBlock<Int>
     ) {
-        val dialog = Dialogs.getDialog(activity)
-        val listener = DialogListener.create(block)
+        activity.runOnUiThread {
+            val dialog = Dialogs.getDialog(activity)
+            val listener = DialogListener.create(block)
 
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(false)
+            dialog.setCancelable(true)
+            dialog.setCanceledOnTouchOutside(false)
 
-        val binding = DataBindingUtil.inflate<DialogOptionsBinding>(
-            LayoutInflater.from(activity),
-            R.layout.dialog_options,
-            null,
-            false
-        )
+            val binding = DataBindingUtil.inflate<DialogOptionsBinding>(
+                LayoutInflater.from(activity),
+                R.layout.dialog_options,
+                null,
+                false
+            )
 
-        dialog.setContentView(binding.root)
+            dialog.setContentView(binding.root)
 
-        binding.cancelButton.setOnClickListener {
-            dialog.dismiss()
-            listener.close()
+            binding.cancelButton.setOnClickListener {
+                dialog.dismiss()
+                listener.close()
+            }
+
+            binding.title = title
+            binding.container.layoutManager = LinearLayoutManager(activity)
+            binding.container.adapter = DialogOptionAdapter(options) {
+                dialog.dismiss()
+                listener.submit(dialog, it)
+            }
+
+            dialog.setOnCancelListener {
+                dialog.dismiss()
+                listener.close()
+            }
+
+            dialog.show()
         }
-
-        binding.title = title
-        binding.container.layoutManager = LinearLayoutManager(activity)
-        binding.container.adapter = DialogOptionAdapter(options) {
-            dialog.dismiss()
-            listener.submit(dialog, it)
-        }
-
-        dialog.setOnCancelListener {
-            dialog.dismiss()
-            listener.close()
-        }
-
-        dialog.show()
     }
 
     override fun confirm(title: String, subtitle: String?, block: DialogListenerBlock<Boolean>) {

@@ -8,4 +8,5 @@ package com.creditclub.core.data.api
 interface BackendConfig {
     val apiHost: String
     val posNotificationToken: String
+    val appVersionName: String
 }

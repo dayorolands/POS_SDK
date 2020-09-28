@@ -30,3 +30,7 @@ class DialogListener<T> {
         }
     }
 }
+
+fun <T> DialogListenerBlock<T>.build(): DialogListener<T> {
+    return DialogListener.create(this)
+}

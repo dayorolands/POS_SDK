@@ -19,7 +19,7 @@ import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.ui.widget.DateInputParams
 import com.creditclub.core.util.*
 import kotlinx.coroutines.launch
-import org.threeten.bp.LocalDate
+import java.time.LocalDate
 
 class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_request_general_info) {
     private val binding by dataBinding<FragmentCustomerRequestGeneralInfoBinding>()

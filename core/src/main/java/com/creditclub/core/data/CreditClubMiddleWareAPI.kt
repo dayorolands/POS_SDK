@@ -5,7 +5,7 @@ import com.creditclub.core.util.delegates.service
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -16,9 +16,9 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
  * Appzone Ltd
  */
 open class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) {
-    private val contentType = MediaType.get("application/json")
+    private val contentType = "application/json".toMediaType()
 
-    private val retrofit = Retrofit.Builder()
+    val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl("${apiHost}/CreditClubMiddlewareAPI/")
         .client(okHttpClient)
         .addConverterFactory(NullOnEmptyConverterFactory.create())
@@ -35,25 +35,10 @@ open class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) 
         )
         .build()
 
-    val staticService by retrofit.service(StaticService::class)
-
-    val mobileTrackingService by retrofit.service(MobileTrackingService::class)
-
-    val billsPaymentService by retrofit.service(BillsPaymentService::class)
-
-    val caseLogService by retrofit.service(CaseLogService::class)
-
-    val commissionService by retrofit.service(CommissionService::class)
-
-    val reportService by retrofit.service(ReportService::class)
-
-    val fundsTransferService by retrofit.service(FundsTransferService::class)
-
-    val onlineService by retrofit.service(BankOneService::class)
-
-    val offlineHlaTaggingService by retrofit.service(OfflineHlaTaggingService::class)
-
-    val versionService by retrofit.service(VersionService::class)
-
-    val collectionsService by retrofit.service(CollectionsService::class)
+    val staticService: StaticService by retrofit.service()
+    val caseLogService: CaseLogService by retrofit.service()
+    val reportService: ReportService by retrofit.service()
+    val fundsTransferService: FundsTransferService by retrofit.service()
+    val versionService: VersionService by retrofit.service()
+    val collectionsService: CollectionsService by retrofit.service()
 }

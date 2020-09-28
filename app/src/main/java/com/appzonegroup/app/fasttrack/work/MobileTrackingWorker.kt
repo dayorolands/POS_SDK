@@ -6,12 +6,15 @@ import androidx.work.WorkerParameters
 import com.appzonegroup.app.fasttrack.dataaccess.DeviceTransactionInformationDAO
 import com.appzonegroup.app.fasttrack.model.DeviceTransactionInformation
 import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.api.MobileTrackingService
 import com.creditclub.core.data.prefs.LocalStorage
+import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.safeRunSuspend
-import com.creditclub.core.util.toRequestBody
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*
@@ -24,6 +27,7 @@ class MobileTrackingWorker(context: Context, params: WorkerParameters) :
         val gson = Gson()
 
         val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
+        val mobileTrackingService by creditClubMiddleWareAPI.retrofit.service<MobileTrackingService>()
         val localStorage: LocalStorage by inject()
 
         val transactionInformationDAO = DeviceTransactionInformationDAO(applicationContext)
@@ -49,10 +53,9 @@ class MobileTrackingWorker(context: Context, params: WorkerParameters) :
 
         val dataToSend = gson.toJson(finishedTransactions)
 
+        val mediaType = "application/json".toMediaTypeOrNull()
         val (response) = safeRunSuspend {
-            creditClubMiddleWareAPI
-                .mobileTrackingService
-                .saveAgentMobileTrackingDetails(dataToSend.toRequestBody())
+            mobileTrackingService.saveAgentMobileTrackingDetails(dataToSend.toRequestBody(mediaType))
         }
 
         if (response?.isSuccessful == true) {

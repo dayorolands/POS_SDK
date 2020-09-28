@@ -8,9 +8,12 @@ import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
 import com.creditclub.core.util.toString
+import com.creditclub.pos.printer.Alignment
+import com.creditclub.pos.printer.PrintNode
+import com.creditclub.pos.printer.TextNode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
-import org.threeten.bp.Instant
+import java.time.Instant
 
 
 /**
@@ -65,7 +68,7 @@ Transaction ID: ${request.customerDepositSlipNumber}"""
             }
 
             nodes.addTransactionStatus()
-            nodes.addAll(footerNodes)
+            nodes.addAll(footerNodes(context))
             return nodes.toList()
         }
 
@@ -75,7 +78,14 @@ Transaction ID: ${request.customerDepositSlipNumber}"""
         isSuccessful = response.isSuccessFul == true
         reason = response.responseMessage
         response.additionalInformation?.run {
-            val json = Json(JsonConfiguration.Stable)
+            val json = Json(
+                JsonConfiguration.Stable.copy(
+                    isLenient = true,
+                    ignoreUnknownKeys = true,
+                    serializeSpecialFloatingPointValues = true,
+                    useArrayPolymorphism = true
+                )
+            )
             val serializer = PayBillResponse.AdditionalInformation.serializer()
             additionalInformation = json.parse(serializer, this)
         }

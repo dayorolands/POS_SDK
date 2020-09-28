@@ -1,6 +1,6 @@
 package com.appzonegroup.creditclub.pos.models.messaging
 
-import com.appzonegroup.creditclub.pos.card.CardData
+import com.creditclub.pos.card.CardData
 import com.appzonegroup.creditclub.pos.card.CardIsoMsg
 import com.appzonegroup.creditclub.pos.card.cardIsoMsg
 import org.jpos.iso.ISOException

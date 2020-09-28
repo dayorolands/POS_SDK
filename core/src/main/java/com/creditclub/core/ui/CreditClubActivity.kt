@@ -89,7 +89,6 @@ abstract class CreditClubActivity : AppCompatActivity {
             firebaseAnalytics.setUserProperty("agent_name", agent.agentName)
             firebaseAnalytics.setUserProperty("agent_code", agent.agentCode)
             firebaseAnalytics.setUserProperty("agent_phone", agent.phoneNumber)
-            firebaseAnalytics.setUserProperty("terminal_id", agent.terminalID)
         }
 
         if (ActivityCompat.checkSelfPermission(

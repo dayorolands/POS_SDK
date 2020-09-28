@@ -1,12 +1,9 @@
 package com.appzonegroup.app.fasttrack
 
-import com.appzonegroup.app.fasttrack.model.PosNotification
-import com.appzonegroup.app.fasttrack.network.ApiServiceObject
-import com.appzonegroup.creditclub.pos.models.NotificationResponse
-import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import okhttp3.Headers
+import com.appzonegroup.creditclub.pos.models.PosNotification
+import com.creditclub.core.util.delegates.service
+import com.creditclub.core.util.safeRunIO
+import com.creditclub.pos.api.PosApiService
 import org.junit.Test
 
 
@@ -16,39 +13,21 @@ import org.junit.Test
  */
 
 class TestPosNotification : CreditClubUnitTest() {
-
-
     @Test
     fun `pos notifications are logged successfully`() {
-        val url = "${ApiServiceObject.BASE_URL}/${ApiServiceObject.STATIC}/POSCashOutNotification"
-
-        val dataToSend = Gson().toJson(PosNotification())
-
-        val headers = Headers.Builder()
-        headers.add("TerminalID", "20390008")
-        headers.add("Authorization", "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}")
+        val posApiService: PosApiService by creditClubMiddleWareAPI.retrofit.service()
+        val notification = PosNotification()
 
         mainScope {
-            val (responseString, error) = withContext(Dispatchers.IO) {
-                ApiServiceObject.post(url, dataToSend, headers.build())
+            val (response) = safeRunIO {
+                posApiService.posCashOutNotification(
+                    notification,
+                    "20390008",
+                    "iRestrict ${BuildConfig.NOTIFICATION_TOKEN}"
+                )
             }
 
-            error?.printStackTrace()
-
-            responseString?.also {
-                log("PosNotification response: $responseString")
-                try {
-                    val response = Gson().fromJson(responseString, NotificationResponse::class.java)
-                    if (response != null) {
-                        assert(response.billerReference != null)
-                        println(response.billerReference)
-                    }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                }
-            }
+            assert(response?.billerReference != null)
         }
     }
-
-    private fun log(message: String) = println(message)
 }

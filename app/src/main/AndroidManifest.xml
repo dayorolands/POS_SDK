@@ -195,8 +195,6 @@
             android:name=".AgentActivationActivity"
             android:label="@string/agentSetup" />
 
-        <service android:name=".LocationChangedService" />
-
         <activity
             android:name=".BVNUpdateActivity"
             android:label="@string/title_activity_bvnUpdate"
@@ -312,7 +310,10 @@
             android:windowSoftInputMode="adjustUnspecified|stateHidden">
             <intent-filter>
                 <action android:name="com.appzonegroup.creditclub.pos.CARD_MENU" />
-
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PAY_APP" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

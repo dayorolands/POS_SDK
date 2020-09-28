@@ -6,7 +6,7 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityWithdrawBinding
 import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.PrinterStatus
 import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.request.WithdrawalRequest
 import com.creditclub.core.type.TokenType

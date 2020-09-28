@@ -13,14 +13,16 @@ import com.creditclub.ui.adapter.PosReportAdapter
 import com.appzonegroup.app.fasttrack.adapter.TransactionReportAdapter
 import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
 import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.printer.PosPrinter
+import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.core.data.model.TransactionReport
 import com.creditclub.core.util.*
 import com.creditclub.ui.databinding.ActivityReportBinding
 import com.creditclub.ui.manager.DataBindingActivityManager
 import kotlinx.coroutines.launch
-import org.threeten.bp.LocalDate
-import org.threeten.bp.Period
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
+import java.time.LocalDate
+import java.time.Period
 
 
 /**
@@ -37,7 +39,7 @@ class ActivityReportManager(
     private val maxSize = 20
     private var totalCount = 0
     private val dialogProvider = activity.dialogProvider
-    private val posPrinter by lazy { PosPrinter(context, dialogProvider) }
+    private val posPrinter: PosPrinter by inject { parametersOf(context, dialogProvider) }
     private var selectedTransactionType = transactionGroup.first()
     private var selectedTransactionStatus = TransactionStatus.Successful
     private var transactionAdapter =

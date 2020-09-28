@@ -5,7 +5,7 @@ import android.content.Context
 import android.widget.EditText
 import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.ui.CreditClubActivity
-import org.threeten.bp.LocalDate
+import java.time.LocalDate
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 6/26/2019.
@@ -20,7 +20,7 @@ interface DialogProvider {
 
     fun showError(message: String?)
 
-    fun <T> showError(message: String?, block: DialogListenerBlock<T>)
+    fun <T> showError(message: String?, block: DialogListenerBlock<T>?)
 
     fun <T> showInfo(message: String?, block: DialogListenerBlock<T>): Dialog
 
