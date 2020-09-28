@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -14,12 +15,13 @@
 
     <LinearLayout
         android:id="@+id/button"
+        style="@style/Widget.AppCompat.Button"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:background="@drawable/round_white_button"
-        style="@style/Widget.AppCompat.Button"
         android:layout_margin="@dimen/five_dp"
+        android:background="@drawable/round_white_button"
         android:gravity="center"
+        android:minWidth="150dp"
         android:orientation="vertical"
         android:padding="10dp">
 

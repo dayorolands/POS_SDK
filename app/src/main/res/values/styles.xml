@@ -142,7 +142,7 @@
         <item name="layout_flexGrow">1</item>
         <item name="layout_flexShrink">1</item>
         <item name="layout_maxWidth">300dp</item>
-        <item name="layout_minWidth">80dp</item>
+        <item name="layout_minWidth">150dp</item>
     </style>
 
     <style name="AppButton.Base" parent="Base.Widget.AppCompat.Button">
