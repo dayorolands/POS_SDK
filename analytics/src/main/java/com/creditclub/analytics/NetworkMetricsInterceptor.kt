@@ -39,7 +39,7 @@ class NetworkMetricsInterceptor : Interceptor, KoinComponent {
             }
         } else networkMeasurement.statusCode = -1
         networkMeasurement.duration = networkMeasurement.run {
-            Duration.between(requestTime, responseTime).toMillis()
+            Duration.between(requestTime, responseTime ?: Instant.now()).toMillis()
         }
         if (error != null) {
             networkMeasurement.message = error.message
