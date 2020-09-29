@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:5761920719266012762",
-      "lastPropertyId": "14:2790518971275482384",
+      "lastPropertyId": "17:3430836114913371064",
       "name": "NetworkMeasurement",
       "properties": [
         {
@@ -64,6 +64,21 @@
         {
           "id": "14:2790518971275482384",
           "name": "responseTime",
+          "type": 9
+        },
+        {
+          "id": "15:5510228247449529922",
+          "name": "appName",
+          "type": 9
+        },
+        {
+          "id": "16:6808242991001147387",
+          "name": "appVersion",
+          "type": 9
+        },
+        {
+          "id": "17:3430836114913371064",
+          "name": "message",
           "type": 9
         }
       ],
