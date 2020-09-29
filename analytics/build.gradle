@@ -28,6 +28,7 @@ android {
         }
     }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -44,6 +45,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${versions.serialization}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
     implementation "io.objectbox:objectbox-kotlin:${versions.objectBox}"
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${versions.desugarJdk}"
 }
 
 apply plugin: 'io.objectbox'
