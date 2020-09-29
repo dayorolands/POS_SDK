@@ -2,7 +2,7 @@ package com.creditclub.core.serializer
 
 import com.creditclub.core.util.toInstant
 import kotlinx.serialization.*
-import org.threeten.bp.Instant
+import java.time.Instant
 
 @Serializer(forClass = Instant::class)
 object TimeInstantSerializer {

@@ -21,7 +21,7 @@ fun Application.registerWorkers() {
             .build()
 
     workManager.enqueueUniquePeriodicWork(
-        "MOBILE_TRACKING",
+        "APP_MOBILE_TRACKING",
         ExistingPeriodicWorkPolicy.REPLACE,
         mobileTrackingRequest
     )
@@ -33,7 +33,7 @@ fun Application.registerWorkers() {
                 .build()
 
         workManager.enqueueUniquePeriodicWork(
-            "POS_NOTIFICATION",
+            "APP_POS_NOTIFICATION",
             ExistingPeriodicWorkPolicy.REPLACE,
             posNotificationRequest
         )

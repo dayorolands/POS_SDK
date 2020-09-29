@@ -1,7 +1,7 @@
 package com.appzonegroup.creditclub.pos.util
 
-import org.threeten.bp.Instant
-import org.threeten.bp.format.DateTimeFormatter
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 
 
 /**

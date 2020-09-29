@@ -7,7 +7,7 @@ import com.appzonegroup.app.fasttrack.di.apiModule
 import com.appzonegroup.app.fasttrack.di.configModule
 import com.appzonegroup.app.fasttrack.di.dataModule
 import com.appzonegroup.app.fasttrack.di.locationModule
-import com.appzonegroup.app.fasttrack.loadPosModules
+import com.appzonegroup.creditclub.pos.posModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.KoinComponent
@@ -30,11 +30,10 @@ abstract class BaseWorker(context: Context, params: WorkerParameters) :
                 apiModule,
                 locationModule,
                 dataModule,
-                configModule
+                configModule,
+                posModule
             )
         )
-
-        loadPosModules()
     }
 
     override fun getKoin() = koinApp.koin

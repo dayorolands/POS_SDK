@@ -5,12 +5,11 @@ import androidx.room.*
 import com.appzonegroup.creditclub.pos.card.CardIsoMsg
 import com.appzonegroup.creditclub.pos.card.cardTransactionType
 import com.appzonegroup.creditclub.pos.card.maskPan
-import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
+import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.util.Misc
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
-import java.util.*
+import com.creditclub.pos.model.ConnectionInfo
+import org.jpos.iso.ISOMsg
+import java.time.Instant
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 2/25/2019.
@@ -22,13 +21,6 @@ open class FinancialTransaction {
     @PrimaryKey(autoGenerate = true)
     open var id: Int? = null
 
-    @delegate:Ignore
-    @delegate:Transient
-    private val localDateDf by lazy {
-        DateTimeFormatter.ofPattern("dd/MM/YYYY hh:mm").withLocale(Locale.ENGLISH)
-            .withZone(ZoneId.of("+0100"))
-    }
-
     var stan = ""
     var isSettled = false
     var content: String = ""
@@ -37,6 +29,8 @@ open class FinancialTransaction {
     var cardType = ""
     var aid = ""
     var rrn = ""
+    var nodeName: String? = null
+    var connectionInfo: ConnectionInfo? = null
 
     @Ignore
     @Transient
@@ -86,9 +80,7 @@ open class FinancialTransaction {
 
     constructor()
 
-    constructor(isoMsg: BaseIsoMsg) {
-        val msg = isoMsg.convert(::CardIsoMsg)
-
+    constructor(msg: ISOMsg) {
         stan = msg.stan11 ?: ""
         date = msg.localTransactionDate13 ?: ""
         content = Misc.toHexString(msg.pack())
@@ -101,14 +93,8 @@ open class FinancialTransaction {
         terminalId41 = msg.terminalId41 ?: ""
         cardExpirationDate14 = msg.cardExpirationDate14 ?: ""
         responseCode39 = msg.responseCode39 ?: ""
-        additionalAmount = msg.additionalAmount ?: ""
+        additionalAmount = msg.additionalAmounts54 ?: ""
         transactionAmount4 = msg.transactionAmount4 ?: ""
-    }
-
-    @delegate:Ignore
-    @delegate:Transient
-    val prettyTime: String by lazy {
-        localDateDf.format(createdAt)
     }
 }
 

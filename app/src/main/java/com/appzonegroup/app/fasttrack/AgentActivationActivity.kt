@@ -8,11 +8,11 @@ import com.android.volley.Response
 import com.appzonegroup.app.fasttrack.databinding.ActivityAgentActivationBinding
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
-import com.appzonegroup.app.fasttrack.utility.LocalStorage
-import com.appzonegroup.app.fasttrack.utility.extensions.syncAgentInfo
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
+import com.appzonegroup.creditclub.pos.extension.posConfig
+import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.extension.posSerialNumber
 import com.creditclub.core.data.request.PinChangeRequest
 import com.creditclub.core.util.debugOnly
@@ -197,6 +197,32 @@ class AgentActivationActivity : BaseActivity() {
 
             showError(response.responseMessage)
         }
+    }
+
+    private suspend fun syncAgentInfo(): Boolean {
+        val (agent, error) = safeRunIO {
+            creditClubMiddleWareAPI.staticService.getAgentInfoByPhoneNumber(
+                localStorage.institutionCode,
+                localStorage.agentPhone
+            )
+        }
+
+        if (error != null) return false
+        agent ?: return false
+
+        localStorage.agent = agent
+        firebaseCrashlytics.setUserId(agent.agentCode ?: "0")
+        firebaseCrashlytics.setCustomKey("agent_name", agent.agentName ?: "")
+        firebaseCrashlytics.setCustomKey("agent_phone", agent.phoneNumber ?: "")
+        firebaseCrashlytics.setCustomKey("terminal_id", agent.terminalID ?: "")
+
+        if (Platform.isPOS) {
+//            posConfig.posModeStr = agent.posMode
+            posConfig.terminalId = agent.terminalID ?: ""
+            posParameter.reset()
+        }
+
+        return true
     }
 
     private suspend inline fun verify() {

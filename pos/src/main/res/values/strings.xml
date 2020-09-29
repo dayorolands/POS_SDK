@@ -1,75 +1,13 @@
 <resources>
     <string name="app_name">TrezPay 2.0</string>
     <string name="institution_name">Appzone</string>
+    <string name="institution_website" />
     <string name="pos_acquirer">@string/institution_name</string>
     <string name="loading">Loading</string>
     <string name="please_wait">Please wait</string>
     <string name="title_activity_cash_out_form">CashOutFormActivity</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
-
-    <!-- Print -->
-    <string name="print_test">Print Test</string>
-    <string name="printer_version">Printer Version：</string>
-    <string name="bar_code">Barcode:</string>
-    <string name="print_bar_code">Print Barcode</string>
-    <string name="D_bar_code">Qrcode:</string>
-    <string name="print_2D_barcode">Print Qrcode</string>
-    <string name="walk_paper_lines">Walk Paper Lines:</string>
-    <string name="walk_paper_test">Walk Paper</string>
-    <string name="left_margin">Left Margin:</string>
-    <string name="right_margin">Right Margin</string>
-    <string name="row_space">Row Space:</string>
-    <string name="font_size">Font Size：</string>
-    <string name="gray_level">Gray Level:</string>
-    <string name="print_content">Print Content：</string>
-    <string name="chinese_example">ZH Example</string>
-    <string name="english_example">EN Example</string>
-    <string name="fr_example">FR Example</string>
-    <string name="clear_text">Clear</string>
-    <string name="print_text">Print Text</string>
-    <string name="printing_wait">Printing, please wait……</string>
-    <string name="D_barcode_loading">Qrcode loading</string>
-    <string name="generate_barcode_wait">Generating barcode, please wait……</string>
-    <string name="input_print_data">Please input print data</string>
-    <string name="maker_search_distance">Walk Paper For Search Black Block:</string>
-    <string name="maker_walk_distance">Walk Paper After Haved Search:</string>
-    <string name="maker_walk_distance_range">(0–255)</string>
-    <string name="maker">Black Block Detection</string>
-    <string name="maker_error">maker input value not fit</string>
-    <string name="maker_not_find">Cannot Find Black Block</string>
-    <string name="papercut">Paper Cut</string>
-    <string name="walk_paper_intput_value">walk paper intput value not fit</string>
-    <string name="print_picture">Print Picture</string>
-    <string name="sure">sure</string>
-    <string name="not_find_picture">not find picture</string>
-    <string name="input_command">Please Input Command</string>
-    <string name="execute_command">Execute Command</string>
-    <string name="watting">Please wait while checking driver version</string>
-    <string name="noPaper">No paper</string>
-    <string name="noPaperNotice">No paper, please put paper in and retry</string>
-    <string name="LowBattery">Low battery, please connect the charger!</string>
-    <string name="overTemp">over temp !</string>
-    <string name="ptintInit">Printer initialing… Please try again after a few seconds.</string>
-    <string name="outOfLeft">Beyond the left margin！</string>
-    <string name="outOfLine">Beyond the row space！</string>
-    <string name="outOfFont">Beyond the font size！</string>
-    <string name="outOfGray">Beyond the gray level！</string>
-    <string name="outOfCharSpace">Beyond The Char Space！</string>
-    <string name="empty">The content is empty！</string>
-    <string name="lengthNotEnougth">The length is not enough！</string>
-    <string name="index_text">Print Text</string>
-    <string name="index_pic">Picture/Qrcode</string>
-    <string name="index_comm">Print Command</string>
-    <string name="input_content">input content</string>
-    <string name="dialog_comfirm">ConFirm</string>
-    <string name="operation_result">Result</string>
-    <string name="bl_dy">Print</string>
-    <string name="print_waring">Tip: If the SDK provides the function of can not meet your printing needs, you can send the print instruction way for implementation</string>
-    <string name="printer_type_common">SerialPort Printer</string>
-    <string name="printer_type_usb">USB Printer</string>
-    <string name="printer_type_select">Select Printer Type</string>
-    <string name="operation_fail">Operation failed</string>
 
     <!--POS Strings-->
     <string name="pos_1_purchase">1. Withdrawal</string>
@@ -171,4 +109,6 @@
     <string name="pos_transaction_approved">Transaction Approved</string>
     <string name="pos_terminal_id_required">You need a terminal ID to access card functions. Please contact your administrator for assistance</string>
     <string name="pos_card_transactions">Card Transactions</string>
+    <string name="pos_select_mpos_device">Select mPOS device</string>
+    <string name="pos_searching_for_mpos_devices">Searching for mPOS devices</string>
 </resources>

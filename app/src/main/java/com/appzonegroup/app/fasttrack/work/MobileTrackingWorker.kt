@@ -10,11 +10,13 @@ import com.appzonegroup.app.fasttrack.model.DeviceTransactionInformation
 import com.creditclub.analytics.AnalyticsObjectBox
 import com.creditclub.analytics.models.NetworkMeasurement
 import com.creditclub.core.data.NullOnEmptyConverterFactory
+import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.api.MobileTrackingService
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.delegates.service
+import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.safeRunSuspend
-import com.creditclub.core.util.toRequestBody
 import com.google.gson.Gson
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import io.objectbox.kotlin.boxFor
@@ -24,6 +26,10 @@ import kotlinx.serialization.json.JsonConfiguration
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import retrofit2.Retrofit
@@ -116,8 +122,9 @@ class MobileTrackingWorker(context: Context, params: WorkerParameters) :
 
         val dataToSend = gson.toJson(finishedTransactions)
 
+        val mediaType = "application/json".toMediaTypeOrNull()
         val (response) = safeRunSuspend {
-            mobileTrackingService.saveAgentMobileTrackingDetails(dataToSend.toRequestBody())
+            mobileTrackingService.saveAgentMobileTrackingDetails(dataToSend.toRequestBody(mediaType))
         }
 
         if (response?.isSuccessful == true) {

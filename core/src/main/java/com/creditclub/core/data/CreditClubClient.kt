@@ -20,5 +20,5 @@ open class CreditClubClient(okHttpClient: OkHttpClient, baseUrl: String) {
         .addConverterFactory(ScalarsConverterFactory.create())
         .build()
 
-    val bankOneService by retrofit.service(BankOneService::class)
+    val bankOneService by retrofit.service<BankOneService>()
 }

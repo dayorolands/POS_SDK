@@ -7,7 +7,6 @@ import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.util.appDataStorage
 import com.creditclub.core.util.safeRunIO
 import com.google.android.play.core.missingsplits.MissingSplitsManagerFactory
-import com.jakewharton.threetenabp.AndroidThreeTen
 import org.koin.android.ext.android.get
 
 
@@ -29,8 +28,6 @@ open class CreditClubApplication : Application(), Configuration.Provider {
         if (MissingSplitsManagerFactory.create(this).disableAppIfMissingRequiredSplits()) {
             return
         }
-
-        AndroidThreeTen.init(this)
 
         val myConfig = Configuration.Builder()
             .setMinimumLoggingLevel(if (BuildConfig.DEBUG) android.util.Log.DEBUG else android.util.Log.INFO)

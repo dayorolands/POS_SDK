@@ -2,6 +2,7 @@ package com.creditclub.core.util
 
 import android.content.Context
 import com.creditclub.core.R
+import com.creditclub.core.data.api.RequestFailureException
 import kotlinx.serialization.json.JsonDecodingException
 import retrofit2.HttpException
 import java.io.IOException
@@ -24,6 +25,7 @@ fun Exception?.isKotlinNPE() = this != null && this is KotlinNullPointerExceptio
 
 fun Exception.getMessage(context: Context): String {
     return when {
+        this is RequestFailureException -> message
         this is ConnectException && cause.toString().contains("ECONNREFUSED") -> context.getString(
             R.string.connection_refused_error
         )

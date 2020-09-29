@@ -46,22 +46,20 @@ class BankOneApplication : CreditClubApplication() {
             androidLogger()
             androidContext(this@BankOneApplication)
 
-            modules(listOf(
-                apiModule,
-                locationModule,
-                dataModule,
-                uiModule,
-                configModule
-            ))
-
-            if (Platform.isPOS) loadPosModules()
+            modules(
+                listOf(
+                    apiModule,
+                    locationModule,
+                    dataModule,
+                    uiModule,
+                    configModule
+                )
+            )
         }
 
         registerAppFunctions()
+        Platform.test(this)
+        if (Platform.isPOS) startPosApp()
         registerWorkers()
-
-        if (Platform.isPOS) {
-            startPosApp()
-        }
     }
 }

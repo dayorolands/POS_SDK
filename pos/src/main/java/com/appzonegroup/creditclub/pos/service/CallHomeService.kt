@@ -1,9 +1,11 @@
 package com.appzonegroup.creditclub.pos.service
 
-import android.content.Context
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.models.messaging.NetworkManagement
 import com.appzonegroup.creditclub.pos.models.messaging.isoMsg
+import com.creditclub.pos.PosConfig
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -13,14 +15,12 @@ import kotlin.concurrent.schedule
  * Appzone Ltd
  */
 
-class CallHomeService(
-    private val config: ConfigService,
-    parameters: ParameterService,
-    context: Context
-) {
-    private val period get() = 1000L * config.callHome.toLong()
+class CallHomeService : KoinComponent {
+
+    private val posConfig: PosConfig by inject()
+    private val period get() = 1000L * posConfig.callHome.toLong()
     private var isCallHomeTimerRunning = false
-    private val connection by lazy { IsoSocketHelper(config, parameters, context) }
+    private val connection: IsoSocketHelper by inject()
     private var callHomeTask = createTimer()
 
     fun startCallHomeTimer() {
@@ -51,24 +51,6 @@ class CallHomeService(
         isCallHomeTimerRunning = true
         return Timer().schedule(period, period) {
             callHome()
-        }
-    }
-
-
-    companion object {
-        private var INSTANCE: CallHomeService? = null
-
-        fun getInstance(
-            config: ConfigService,
-            parameters: ParameterService,
-            context: Context
-        ): CallHomeService {
-
-            if (INSTANCE == null) {
-                INSTANCE = CallHomeService(config, parameters, context.applicationContext)
-            }
-
-            return INSTANCE as CallHomeService
         }
     }
 }

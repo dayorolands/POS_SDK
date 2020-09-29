@@ -199,9 +199,10 @@ class CollectionReferenceGenerationFragment :
 
         val json = Json(JsonConfiguration.Stable)
         val serializer = CollectionReferenceGenerationRequest.Additional.serializer()
+        val agent = localStorage.agent
         val additional = CollectionReferenceGenerationRequest.Additional().apply {
-            agentCode = localStorage.agent?.agentCode
-            terminalId = localStorage.agent?.terminalID
+            agentCode = agent?.agentCode
+            terminalId = agent?.terminalID
         }
 
         request.apply {
