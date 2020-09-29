@@ -7,7 +7,7 @@ import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.threeten.bp.Instant
+import java.time.Instant
 
 @Entity
 @Serializable

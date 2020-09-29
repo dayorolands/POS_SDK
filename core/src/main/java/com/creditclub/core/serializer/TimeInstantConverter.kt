@@ -2,7 +2,7 @@ package com.creditclub.core.serializer
 
 import com.creditclub.core.util.toInstant
 import io.objectbox.converter.PropertyConverter
-import org.threeten.bp.Instant
+import java.time.Instant
 
 class TimeInstantConverter : PropertyConverter<Instant, String> {
 
