@@ -1,4 +1,4 @@
-package com.globalaccelerex.nexgo.n3
+package com.nexgo.n3
 
 import android.content.ContentProvider
 import android.content.ContentValues
@@ -56,9 +56,9 @@ class N3PosManagerProvider : ContentProvider() {
         if (providerInfo == null) {
             throw NullPointerException("N3PosManagerProvider ProviderInfo cannot be null.")
         }
-        val packageName = "com.globalaccelerex.nexgo.n3"
+        val packageName = "com.nexgo"
         // So if the authorities equal the library internal ones, the developer forgot to set his applicationId
-        check("$packageName.SmartPeakPosManagerProvider" != providerInfo.authority) {
+        check("$packageName.n3.N3PosManagerProvider" != providerInfo.authority) {
             ("Incorrect provider authority in manifest. Most likely due to a "
                     + "missing applicationId variable in application\'s build.gradle.")
         }

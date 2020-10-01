@@ -10,10 +10,10 @@ import com.creditclub.core.ui.widget.build
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosManagerCompanion
 import com.creditclub.pos.PosParameter
-import com.creditclub.pos.TransactionResponse
 import com.creditclub.pos.card.CardDataListener
 import com.creditclub.pos.card.CardReader
 import com.creditclub.pos.card.CardTransactionStatus
+import com.creditclub.pos.printer.PosPrinter
 import com.jhl.bluetooth.ibridge.BluetoothIBridgeDevice
 import com.jhl.jhlblueconn.BlueStateListenerCallback
 import com.jhl.jhlblueconn.BluetoothCommmanager
@@ -53,10 +53,6 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
 
     override fun cleanUpEmv() {
         connectionManager.closeResource()
-    }
-
-    override suspend fun startTransaction(): TransactionResponse {
-        throw NotImplementedError("An operation is not implemented")
     }
 
     override fun onDeviceInfo(p0: MutableMap<String, String>?) {
@@ -246,6 +242,9 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
         override val module = module {
             factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
                 MPosManager(activity)
+            }
+            factory<PosPrinter>(override = true) { (activity: CreditClubActivity) ->
+                MposPrinter(activity)
             }
         }
 

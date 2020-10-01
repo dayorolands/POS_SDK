@@ -48,10 +48,6 @@ class SmartPeakPosManager(val activity: CreditClubActivity) : PosManager, KoinCo
 
     }
 
-    override suspend fun startTransaction(): TransactionResponse {
-        throw NotImplementedError("An operation is not implemented")
-    }
-
     inner class SmartPeakCardReader : CardReader {
         override suspend fun waitForCard(): CardReaderEvent {
             return CardReaderEvent.CHIP

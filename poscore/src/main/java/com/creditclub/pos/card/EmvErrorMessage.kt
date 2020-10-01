@@ -1,10 +1,14 @@
-package com.appzonegroup.creditclub.pos.card
+package com.creditclub.pos.card
 
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 7/5/2019.
  * Appzone Ltd
  */
+
+const val ERROR_PIN_TRIES_EXCEEDED = -32
+const val ERROR_TIMEOUT = -5
+
 object EmvErrorMessage {
     operator fun get(code: Int): String {
         return when (code) {

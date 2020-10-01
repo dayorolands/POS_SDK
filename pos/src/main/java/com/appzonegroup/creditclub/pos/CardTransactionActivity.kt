@@ -31,10 +31,7 @@ import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.util.*
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.api.PosApiService
-import com.creditclub.pos.card.CardData
-import com.creditclub.pos.card.CardReaderEvent
-import com.creditclub.pos.card.CardTransactionStatus
-import com.creditclub.pos.card.TransactionType
+import com.creditclub.pos.card.*
 import com.creditclub.pos.model.ConnectionInfo
 import com.creditclub.pos.model.getSupportedRoute
 import com.creditclub.pos.printer.PrinterStatus
@@ -48,9 +45,9 @@ import kotlinx.coroutines.withContext
 import org.jpos.iso.ISOMsg
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
-import java.time.Instant
 import retrofit2.create
 import java.net.ConnectException
+import java.time.Instant
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -298,7 +295,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                         onReadCard(cardData)
                     }
                     CardTransactionStatus.UserCancel -> renderTransactionFailure("Transaction Cancelled")
-                    CardTransactionStatus.Failure -> renderTransactionFailure("Wrong PIN. Card Restricted")
+                    CardTransactionStatus.Failure -> renderTransactionFailure("Failed to read card")
                     CardTransactionStatus.Timeout -> renderTransactionFailure("Timeout while reading card")
                     CardTransactionStatus.OfflinePinVerifyError -> renderTransactionFailure("Wrong PIN. Card Restricted")
                     else -> renderTransactionFailure(EmvErrorMessage[cardData.ret])
@@ -435,7 +432,12 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                             posDatabase.posNotificationDao().save(posNotification)
                         }
                         val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
-                        posApiService.logPosNotification(posDatabase, backendConfig, posConfig, posNotification)
+                        posApiService.logPosNotification(
+                            posDatabase,
+                            backendConfig,
+                            posConfig,
+                            posNotification
+                        )
                     }
                 }
 
@@ -574,18 +576,6 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
             }
             if (amountText.isEmpty()) {
                 indicateError("Please specify amount", null)
-                return@setOnClickListener
-            }
-
-            if (sessionData.canRunTransaction) {
-                mainScope.launch {
-                    val response = posManager.startTransaction()
-                    if (response.code == "00") {
-                        dialogProvider.showSuccessAndWait("Transaction approved")
-                    } else {
-                        renderTransactionFailure(response.responseMessage)
-                    }
-                }
                 return@setOnClickListener
             }
 

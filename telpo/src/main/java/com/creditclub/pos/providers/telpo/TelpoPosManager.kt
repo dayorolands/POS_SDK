@@ -9,7 +9,6 @@ import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosManagerCompanion
 import com.creditclub.pos.PosParameter
-import com.creditclub.pos.TransactionResponse
 import com.creditclub.pos.extensions.*
 import com.creditclub.pos.printer.PosPrinter
 import com.telpo.emv.EmvApp
@@ -57,10 +56,6 @@ class TelpoPosManager(private val activity: CreditClubActivity) : PosManager, Ko
     override fun cleanUpEmv() {
         PinpadService.Close()
         EmvService.deviceClose()
-    }
-
-    override suspend fun startTransaction(): TransactionResponse {
-        throw NotImplementedError("An operation is not implemented")
     }
 
     private fun injectAid() {

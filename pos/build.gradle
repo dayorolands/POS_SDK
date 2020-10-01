@@ -49,6 +49,8 @@ dependencies {
     implementation project(path: ':poscore')
     implementation project(path: ':uicentral')
     implementation project(path: ':telpo')
+    implementation project(path: ':nexgo')
+    implementation project(path: ':mpos')
 
     api files('libs/jpos-1.9.0.jar')
 

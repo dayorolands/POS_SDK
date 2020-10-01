@@ -42,6 +42,12 @@ abstract class CardData {
     var aid: String = ""
     var ksnData: String? = null
     open var ret: Int = -1
+    open var status: CardTransactionStatus? = null
+        get() = CardTransactionStatus.find(ret)
+        set(value) {
+            field = value
+            ret = value?.code ?: -1
+        }
 
     val type: String
         get() = when (aid) {
