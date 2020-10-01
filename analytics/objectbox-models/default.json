@@ -1,0 +1,103 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:5761920719266012762",
+      "lastPropertyId": "17:3430836114913371064",
+      "name": "NetworkMeasurement",
+      "properties": [
+        {
+          "id": "1:425552830577033483",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "5:5912843763235183283",
+          "name": "agentCode",
+          "type": 9
+        },
+        {
+          "id": "6:8630390068015597052",
+          "name": "agentPhoneNumber",
+          "type": 9
+        },
+        {
+          "id": "7:2366722702196447915",
+          "name": "institutionCode",
+          "type": 9
+        },
+        {
+          "id": "8:4483291717038723119",
+          "name": "url",
+          "type": 9
+        },
+        {
+          "id": "9:3529523061544069111",
+          "name": "method",
+          "type": 9
+        },
+        {
+          "id": "10:5720325925497149998",
+          "name": "gpsCoordinates",
+          "type": 9
+        },
+        {
+          "id": "11:3602580083113715491",
+          "name": "statusCode",
+          "type": 5,
+          "flags": 4
+        },
+        {
+          "id": "12:7327346849125271323",
+          "name": "duration",
+          "type": 6,
+          "flags": 4
+        },
+        {
+          "id": "13:5690835953227128207",
+          "name": "requestTime",
+          "type": 9
+        },
+        {
+          "id": "14:2790518971275482384",
+          "name": "responseTime",
+          "type": 9
+        },
+        {
+          "id": "15:5510228247449529922",
+          "name": "appName",
+          "type": 9
+        },
+        {
+          "id": "16:6808242991001147387",
+          "name": "appVersion",
+          "type": 9
+        },
+        {
+          "id": "17:3430836114913371064",
+          "name": "message",
+          "type": 9
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "1:5761920719266012762",
+  "lastIndexId": "0:0",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    4660447320361124302,
+    2181047505308306484,
+    7453503750613910945
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}

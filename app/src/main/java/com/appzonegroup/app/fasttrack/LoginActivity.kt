@@ -52,7 +52,7 @@ class LoginActivity : CreditClubActivity() {
         debugOnly {
             val debugInfo = "Version ${packageInfo?.versionName}. ${BuildConfig.BUILD_TYPE}"
             version_tv.text = debugInfo
-            login_phoneNumber.setText(localStorage.agent?.phoneNumber)
+            login_phoneNumber.setText(localStorage.agentPhone)
         }
 
         findViewById<EditText>(R.id.login_phoneNumber).also {
@@ -127,7 +127,7 @@ class LoginActivity : CreditClubActivity() {
                             val surveyData = SubmitSurveyRequest().apply {
                                 answers = data
                                 institutionCode = localStorage.institutionCode
-                                agentPhoneNumber = localStorage.agent?.phoneNumber
+                                agentPhoneNumber = localStorage.agentPhone
                                 geoLocation = gps.geolocationString
                             }
 
@@ -145,7 +145,7 @@ class LoginActivity : CreditClubActivity() {
             val (response) = safeRunIO {
                 creditClubMiddleWareAPI.staticService.getBannerImages(
                     localStorage.institutionCode,
-                    localStorage.agent?.phoneNumber,
+                    localStorage.agentPhone,
                     packageInfo?.versionName
                 )
             }
@@ -165,7 +165,7 @@ class LoginActivity : CreditClubActivity() {
             val (response) = safeRunIO {
                 creditClubMiddleWareAPI.staticService.getSurveyQuestions(
                     localStorage.institutionCode,
-                    localStorage.agent?.phoneNumber,
+                    localStorage.agentPhone,
                     packageInfo?.versionName
                 )
             }

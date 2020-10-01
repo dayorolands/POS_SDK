@@ -1,3 +1,4 @@
+include ':analytics'
 include ':nexgo_smartpos_sdk'
 include ':nexgo'
 include ':telpo'

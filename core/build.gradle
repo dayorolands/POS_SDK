@@ -109,6 +109,7 @@ dependencies {
 
     implementation "androidx.navigation:navigation-fragment-ktx:${versions.navigation}"
     implementation "androidx.navigation:navigation-ui-ktx:${versions.navigation}"
+    implementation "io.objectbox:objectbox-kotlin:${versions.objectBox}"
     implementation "androidx.activity:activity-ktx:${versions.activityKtx}"
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${versions.desugarJdk}"
 }
@@ -116,3 +117,5 @@ dependencies {
 repositories {
     mavenCentral()
 }
+
+apply plugin: 'io.objectbox'
