@@ -3,7 +3,6 @@ package com.creditclub.analytics
 import com.creditclub.analytics.models.NetworkMeasurement
 import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.util.safeRun
 import io.objectbox.kotlin.boxFor
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -31,7 +30,13 @@ class NetworkMetricsInterceptor : Interceptor, KoinComponent {
             appVersion = backendConfig.versionName
         }
 
-        val (response, error) = safeRun { chain.proceed(request) }
+        var response: Response? = null
+        var error: Throwable? = null
+        try {
+            response = chain.proceed(request)
+        } catch (t: Throwable) {
+            error = t
+        }
         if (response != null) {
             networkMeasurement.apply {
                 statusCode = response.code
