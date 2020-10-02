@@ -1,6 +1,7 @@
 package com.creditclub.core.serializer
 
 import com.creditclub.core.util.toInstant
+import com.creditclub.core.util.toOffsetDateTime
 import kotlinx.serialization.*
 import java.time.Instant
 
@@ -14,6 +15,6 @@ object TimeInstantSerializer {
     }
 
     override fun serialize(encoder: Encoder, value: Instant) {
-        encoder.encodeString(value.toString())
+        encoder.encodeString(value.toOffsetDateTime())
     }
 }
