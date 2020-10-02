@@ -34,10 +34,6 @@ fun Instant.format(pattern: String, zoneID: String = defaultZone): String {
     return formatter(pattern, zoneID).format(this)
 }
 
-fun Instant.toOffsetDateTime(): String {
-    return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(this)
-}
-
 fun Instant.toString(pattern: String, zoneID: String = defaultZone) = format(pattern, zoneID)
 
 fun LocalDate.format(pattern: String, zoneID: String = defaultZone): String {
@@ -52,8 +48,12 @@ fun String.toInstant(pattern: String, zoneID: String = defaultZone): Instant {
     return Instant.from(formatter(pattern, zoneID).parse(this))
 }
 
-fun String.toInstant(formatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME): Instant {
-    return Instant.from(formatter.parse(this))
+fun String.toInstant(): Instant {
+    return Instant.from(DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(this))
+}
+
+fun String.instantFromPattern(pattern: String): Instant {
+    return Instant.from(formatter(pattern).parse(this))
 }
 
 fun Instant.timeAgo(): String {
