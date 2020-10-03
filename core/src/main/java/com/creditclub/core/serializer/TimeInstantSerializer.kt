@@ -1,6 +1,7 @@
 package com.creditclub.core.serializer
 
 import com.creditclub.core.util.CREDIT_CLUB_DATE_PATTERN
+import com.creditclub.core.util.CREDIT_CLUB_REQUEST_DATE_PATTERN
 import com.creditclub.core.util.format
 import com.creditclub.core.util.instantFromPattern
 import kotlinx.serialization.*
@@ -16,6 +17,6 @@ object TimeInstantSerializer {
     }
 
     override fun serialize(encoder: Encoder, value: Instant) {
-        encoder.encodeString(value.format(CREDIT_CLUB_DATE_PATTERN))
+        encoder.encodeString(value.format(CREDIT_CLUB_REQUEST_DATE_PATTERN))
     }
 }
