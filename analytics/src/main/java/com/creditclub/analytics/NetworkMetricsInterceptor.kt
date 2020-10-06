@@ -52,6 +52,6 @@ class NetworkMetricsInterceptor : Interceptor, KoinComponent {
             throw error
         }
         metricsBox.put(networkMeasurement)
-        return chain.proceed(request)
+        return response!!
     }
 }
