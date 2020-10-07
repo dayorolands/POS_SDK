@@ -9,12 +9,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.*
+import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.core.KoinComponent
+import org.koin.core.inject
+import org.koin.core.qualifier.named
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 
 /**
@@ -22,23 +25,12 @@ import java.util.concurrent.TimeUnit
  * Appzone Ltd
  */
 
-object ApiServiceObject {
+object ApiServiceObject : KoinComponent {
     private const val HOST = BuildConfig.API_HOST
     const val BASE_URL = "$HOST/CreditClubMiddlewareAPI"
     const val CASE_LOG = "api/CaseLog"
 
-    private val client: OkHttpClient by lazy {
-        val logger = HttpLoggingInterceptor().apply {
-            level =
-                if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
-        }
-
-        OkHttpClient.Builder()
-            .connectTimeout(2, TimeUnit.MINUTES)
-            .readTimeout(2, TimeUnit.MINUTES)
-            .writeTimeout(2, TimeUnit.SECONDS)
-            .addInterceptor(logger).build()
-    }
+    private val client: OkHttpClient by inject(named("middleware"))
 
     fun postAsync(url: String, body: Any, next: (ApiResult<String>) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) {
@@ -78,45 +70,6 @@ object ApiServiceObject {
             error = ex
         } catch (ex: Exception) {
             Log.e("PostError", ex.toString())
-            error = ex
-        } finally {
-            return ApiResult(response, error)
-        }
-    }
-
-    @JvmOverloads
-    fun get(url: String, bodyObject: Any? = null): ApiResult<String> {
-        log("URL: $url")
-
-        val body = when (bodyObject) {
-            is String? -> bodyObject
-            else -> Gson().toJson(bodyObject)
-        }
-
-        log("Request: $body")
-
-        var response: String? = null
-        var error: Exception? = null
-
-        try {
-            val mediaType = "application/json".toMediaTypeOrNull()
-
-            val requestBuilder = Request.Builder().url(url)
-
-            if (body != null) {
-                val requestBody = body.toRequestBody(mediaType)
-                requestBuilder.method("GET", requestBody)
-            } else {
-                requestBuilder.get()
-            }
-
-            val request = requestBuilder.build()
-
-            log("Call Made" + Misc.getCurrentDateLongString())
-            response = client.newCall(request).execute().body?.string()
-            log("Response: $response")
-        } catch (ex: Exception) {
-            log("GetError: $ex")
             error = ex
         } finally {
             return ApiResult(response, error)

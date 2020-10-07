@@ -1,7 +1,9 @@
-package com.creditclub.core.data.api
+package com.creditclub.analytics.api
 
+import com.creditclub.analytics.models.NetworkMeasurement
 import com.creditclub.core.data.model.DeviceTransactionInformation
-import com.creditclub.core.data.response.MobileTrackingResponse
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -20,4 +22,16 @@ interface MobileTrackingService {
 
     @POST("api/MobileTracking/SaveAgentMobileTrackingDetails")
     suspend fun saveAgentMobileTrackingDetails(@Body body: RequestBody): MobileTrackingResponse?
+
+    @POST("api/MobileTracking/MobileTracking")
+    suspend fun logNetworkMetrics(@Body request: List<NetworkMeasurement>): MobileTrackingResponse?
+
+    @Serializable
+    data class MobileTrackingResponse(
+        @SerialName("ReponseMessage")
+        var responseMessage: String? = null,
+
+        @SerialName("isSuccessful")
+        var isSuccessful: Boolean = false
+    )
 }

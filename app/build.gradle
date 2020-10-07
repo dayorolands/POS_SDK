@@ -152,6 +152,7 @@ dependencies {
     implementation project(path: ':uicentral')
     implementation project(path: ':poscore')
     implementation project(path: ':pos')
+    implementation project(path: ':analytics')
 
     implementation fileTree(dir: 'jniLibs', include: ['*.so'])
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -234,4 +235,5 @@ dependencies {
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${versions.desugarJdk}"
 }
 
+apply plugin: 'io.objectbox'
 apply plugin: 'com.google.gms.google-services'

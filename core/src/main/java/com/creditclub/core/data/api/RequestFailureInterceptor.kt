@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.json.JsonDecodingException
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
@@ -25,8 +26,14 @@ class RequestFailureInterceptor : Interceptor {
 
         if (response.code != 200) {
             val jsonPayload = response.body?.string() ?: return response
-            val failureResponse = json.parse(FailureResponse.serializer(), jsonPayload)
+            val failureResponse = try {
+                json.parse(FailureResponse.serializer(), jsonPayload)
+            } catch (ex: JsonDecodingException) {
+                response.close()
+                throw RequestFailureException("A server error has occurred. Please try again later")
+            }
             val message = failureResponse.message ?: return response
+            response.close()
             throw RequestFailureException(message)
         }
 
