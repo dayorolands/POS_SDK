@@ -2,10 +2,14 @@ package com.creditclub.core.data.api
 
 import com.creditclub.core.data.model.*
 import com.creditclub.core.data.request.*
-import com.creditclub.core.data.response.*
-import okhttp3.RequestBody
+import com.creditclub.core.data.response.ApiResponse
+import com.creditclub.core.data.response.BackendResponse
+import com.creditclub.core.data.response.MiniStatementResponse
 import okhttp3.ResponseBody
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Query
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/4/2019.
@@ -14,7 +18,10 @@ import retrofit2.http.*
 interface StaticService {
 
     @GET("CreditClubStatic/Status")
-    suspend fun status(@Query("reference") reference: String, @Query("type") type: Int): BackendResponse?
+    suspend fun status(
+        @Query("reference") reference: String,
+        @Query("type") type: Int
+    ): BackendResponse?
 
     @POST("CreditClubStatic/BalanceEnquiry")
     suspend fun balanceEnquiry(@Body request: BalanceEnquiryRequest): Balance?
@@ -35,7 +42,10 @@ interface StaticService {
     suspend fun bVNUpdate(@Body request: BVNRequest): BackendResponse?
 
     @POST("CreditClubStatic/Register")
-    suspend fun register(@Body request: CustomerRequest, @Query("IsRetrial") isRetrial: Boolean = false): BackendResponse?
+    suspend fun register(
+        @Body request: CustomerRequest,
+        @Query("IsRetrial") isRetrial: Boolean = false
+    ): BackendResponse?
 
     @POST("CreditClubStatic/CompleteActivationWithPinChange")
     suspend fun completeActivationWithPinChange(@Body request: PinChangeRequest): BackendResponse?
@@ -92,7 +102,9 @@ interface StaticService {
     suspend fun confirmAgentInformation(
         @Query("institutionCode") institutionCode: String?,
         @Query("agentPhoneNumber") agentPhoneNumber: String,
-        @Query("agentPIN") verificationCode: String
+        @Query("agentPIN") agentPin: String,
+        @Query("AppVersion") appVersion: String,
+        @Query("DeviceType") deviceType: String
     ): BackendResponse?
 
     @GET("CreditClubStatic/GetAssociations")
@@ -132,29 +144,8 @@ interface StaticService {
         @Query("BVN") bvn: String
     ): BVNDetails?
 
-    @POST("CreditClubStatic/POSCashOutNotification")
-    suspend fun posCashOutNotification(
-        @Body request: RequestBody,
-        @Header("Authorization") authToken: String,
-        @Header("TerminalID") terminalID: String
-    ): PosNotificationResponse?
-
-    @POST("CreditClubStatic/LogToGrafanaForPOSTransactions")
-    suspend fun logToGrafanaForPOSTransactions(
-        @Body request: RequestBody,
-        @Header("Authorization") authToken: String,
-        @Header("TerminalID") terminalID: String
-    ): RequestStatus?
-
     @POST("CreditClubStatic/MiniStatement")
     suspend fun miniStatement(@Body request: MiniStatementRequest): MiniStatementResponse?
-
-    @POST("CreditClubStatic/TransactionLog")
-    suspend fun transactionLog(
-        @Body request: RequestBody,
-        @Header("Authorization") authToken: String,
-        @Header("TerminalID") terminalID: String?
-    ): ApiResponse<String>?
 
     @POST("CreditClubStatic/SubmitSurvey")
     suspend fun submitSurvey(@Body request: SubmitSurveyRequest)
@@ -172,4 +163,13 @@ interface StaticService {
         @Query("AgentPhoneNumber") agentPhoneNumber: String?,
         @Query("AppVersionName") appVersionName: String?
     ): ApiResponse<List<SurveyQuestion>>
+
+    @GET("CreditClubStatic/GetStates")
+    suspend fun getStates(@Query("institutionCode") institutionCode: String?): ApiResponse<List<State>?>?
+
+    @GET("CreditClubStatic/GetLGAs")
+    suspend fun getLgas(
+        @Query("institutionCode") institutionCode: String?,
+        @Query("stateID") stateId: String?
+    ): ApiResponse<List<Lga>?>?
 }

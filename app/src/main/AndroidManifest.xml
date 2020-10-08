@@ -26,6 +26,8 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="${usesCleartextTraffic}"
+        android:extractNativeLibs="true"
+        tools:replace="extractNativeLibs"
         tools:targetApi="n">
         <activity
             android:name=".MainActivity"
@@ -83,8 +85,7 @@
             android:name=".OpenAccountActivity"
             android:label="@string/title_activity_open_account"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            tools:replace="android:parentActivityName">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />

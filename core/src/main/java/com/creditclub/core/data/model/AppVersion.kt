@@ -3,8 +3,8 @@ package com.creditclub.core.data.model
 import com.creditclub.core.serializer.LocalDateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.threeten.bp.LocalDate
-import org.threeten.bp.Period
+import java.time.LocalDate
+import java.time.Period
 
 @Serializable
 data class AppVersion(

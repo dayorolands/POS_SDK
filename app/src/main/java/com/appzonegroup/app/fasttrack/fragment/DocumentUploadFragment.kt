@@ -24,7 +24,7 @@ class DocumentUploadFragment : CreditClubFragment(R.layout.fragment_document_upl
     private var imageType: ImageType = ImageType.Passport
 
     private enum class ImageType {
-        IDCard,
+//        IDCard,
         Passport,
         Signature
     }
@@ -44,6 +44,19 @@ class DocumentUploadFragment : CreditClubFragment(R.layout.fragment_document_upl
             ImagePicker.cameraOnly().start(this)
         }
 
+        binding.signatureGalleryBtn.setOnClickListener {
+            imageType = ImageType.Signature
+            ImagePicker.create(this)
+                .returnMode(ReturnMode.ALL)
+                .folderMode(true)
+                .single().single().showCamera(false).start()
+        }
+
+        binding.signatureTakePhotoBtn.setOnClickListener {
+            imageType = ImageType.Signature
+            ImagePicker.cameraOnly().start(this)
+        }
+
         binding.nextBtn.setOnClickListener { next() }
     }
 
@@ -57,10 +70,18 @@ class DocumentUploadFragment : CreditClubFragment(R.layout.fragment_document_upl
                 mainScope.launch {
                     dialogProvider.showProgressBar("Processing image")
                     val (bitmap) = safeRunIO { image.bitmap }
-                    binding.passportImageView.setImageBitmap(bitmap)
+                    val imageView = when (imageType) {
+                        ImageType.Passport -> binding.passportImageView
+                        ImageType.Signature -> binding.signatureImageView
+                    }
+                    imageView.setImageBitmap(bitmap)
 
-                    val passportString = safeRunIO { image.bitmapString }.data
-                    viewModel.passportString.postValue(passportString)
+                    val bitmapString = safeRunIO { image.bitmapString }.data
+                    val bitmapLiveData = when (imageType) {
+                        ImageType.Passport -> viewModel.passportString
+                        ImageType.Signature -> viewModel.signatureString
+                    }
+                    bitmapLiveData.postValue(bitmapString)
                     dialogProvider.hideProgressBar()
                 }
             } catch (ex: Exception) {
@@ -80,13 +101,12 @@ class DocumentUploadFragment : CreditClubFragment(R.layout.fragment_document_upl
         {
             dialogProvider.showError(getString(R.string.please_upload_customers_id_card));
             return;
-        }
-
-        if (signatureString == null)
-        {
-            dialogProvider.showError(getString(R.string.please_upload_customers_signature));
-            return;
         }*/
+
+        if (viewModel.signatureString.value.isNullOrBlank()) {
+            dialogProvider.showError(getString(R.string.please_upload_customers_signature))
+            return
+        }
 
         viewModel.afterDocumentUpload.value?.invoke()
     }

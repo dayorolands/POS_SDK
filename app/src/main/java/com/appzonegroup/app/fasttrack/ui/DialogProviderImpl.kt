@@ -21,8 +21,8 @@ import com.creditclub.core.ui.widget.*
 import com.creditclub.ui.adapter.DialogOptionAdapter
 import com.creditclub.ui.databinding.DialogOptionsBinding
 import kotlinx.android.synthetic.main.dialog_error.*
-import org.threeten.bp.LocalDate
-import org.threeten.bp.ZoneId
+import java.time.LocalDate
+import java.time.ZoneId
 
 
 /**

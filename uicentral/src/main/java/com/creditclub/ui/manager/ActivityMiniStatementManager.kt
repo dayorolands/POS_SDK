@@ -11,8 +11,8 @@ import com.creditclub.core.util.toString
 import com.creditclub.ui.adapter.MiniStatementAdapter
 import com.creditclub.ui.databinding.ActivityMiniStatementBinding
 import kotlinx.coroutines.launch
-import org.threeten.bp.LocalDate
-import org.threeten.bp.Period
+import java.time.LocalDate
+import java.time.Period
 
 
 /**

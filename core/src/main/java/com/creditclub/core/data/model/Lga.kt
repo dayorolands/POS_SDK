@@ -11,4 +11,9 @@ class Lga {
 
     @SerialName("Name")
     var name = ""
+
+    @SerialName("State")
+    var state: State? = null
+
+    override fun toString() = name
 }

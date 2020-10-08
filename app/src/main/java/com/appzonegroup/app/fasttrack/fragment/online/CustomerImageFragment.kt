@@ -6,24 +6,19 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import com.appzonegroup.app.fasttrack.BankOneApplication
-import com.appzonegroup.app.fasttrack.BaseActivity
 import com.appzonegroup.app.fasttrack.OnlineActivity
 import com.appzonegroup.app.fasttrack.R
+import com.appzonegroup.app.fasttrack.databinding.FragmentCustomerImageBinding
 import com.appzonegroup.app.fasttrack.fragment.online.EnterDetailFragment.OptionsText
 import com.appzonegroup.app.fasttrack.model.TransactionCountType
 import com.appzonegroup.app.fasttrack.model.online.Response
 import com.appzonegroup.app.fasttrack.network.online.APIHelper
 import com.appzonegroup.app.fasttrack.network.online.APIHelper.VolleyCallback
+import com.appzonegroup.app.fasttrack.ui.viewBinding
 import com.appzonegroup.app.fasttrack.utility.GPSTracker
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
@@ -31,57 +26,34 @@ import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson
 import com.creditclub.core.data.Encryption
 import com.creditclub.core.model.CreditClubImage
-import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.safeRunIO
 import com.esafirm.imagepicker.features.ImagePicker
 import com.esafirm.imagepicker.features.ReturnMode
 import com.esafirm.imagepicker.model.Image
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.File
 import java.util.concurrent.TimeoutException
 
-class CustomerImageFragment : Fragment(),
+class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_image),
     View.OnClickListener {
     private var creditClubImage: CreditClubImage? = null
     private var imageString: String? = null
     private var image: Bitmap? = null
-
-    val next: Button? by lazy { view?.findViewById<Button>(R.id.btnActivate) }
-    private val fromGallery: Button? by lazy { view?.findViewById<Button>(R.id.gallery) }
-    private val takePhoto: Button? by lazy { view?.findViewById<Button>(R.id.takePhoto) }
-    private val upperHint: TextView? by lazy { view?.findViewById<TextView>(R.id.upperHint) }
-    private val imageView: ImageView? by lazy { view?.findViewById<ImageView>(R.id.image) }
-    private val bankOneApplication: BankOneApplication? by lazy {
-        activity?.application as BankOneApplication?
-    }
-    var optionsText: OptionsText? = null
-
-    private val baseActivity: BaseActivity by lazy { activity as BaseActivity }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        val view =
-            inflater.inflate(R.layout.fragment_customer_image, container, false)
-        OnlineActivity.isHome = false
-        return view
-    }
+    private val binding by viewBinding(FragmentCustomerImageBinding::bind)
+    private var optionsText: OptionsText? = null
 
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
-        upperHint!!.text = if (optionsText == null) "" else optionsText!!.hintText
-        fromGallery!!.setOnClickListener(this)
-        takePhoto!!.setOnClickListener(this)
-        next!!.setOnClickListener(this)
+        OnlineActivity.isHome = false
+        binding.upperHint.text = optionsText?.hintText ?: ""
+        binding.gallery.setOnClickListener(this)
+        binding.takePhoto.setOnClickListener(this)
+        binding.btnActivate.setOnClickListener(this)
 
         activity?.currentFocus?.let { view ->
             val imm =
@@ -104,9 +76,9 @@ class CustomerImageFragment : Fragment(),
 
     override fun onClick(view: View) {
         try {
-            if (view === fromGallery) {
+            if (view === binding.gallery) {
                 openGallery()
-            } else if (view === takePhoto) {
+            } else if (view === binding.takePhoto) {
                 openCamera()
             } else {
 
@@ -119,7 +91,6 @@ class CustomerImageFragment : Fragment(),
                         val longitude = gpsTracker.location.longitude.toString()
                         val latitude = gpsTracker.location.latitude.toString()
                         finalLocation = "$latitude;$longitude"
-                        Log.e("Location", finalLocation)
                     }
                     nextOperation()
 
@@ -142,18 +113,19 @@ class CustomerImageFragment : Fragment(),
 
     private fun nextOperation() {
         val finalFile = File(creditClubImage?.path)
+        val bankOneApplication = activity?.application as BankOneApplication?
         val authResponse = bankOneApplication?.authResponse
         val ah = APIHelper(requireActivity())
-        baseActivity.showProgressBar("Uploading")
+        dialogProvider.showProgressBar("Uploading")
         ah.getNextOperationImage(authResponse?.phoneNumber ?: "",
             authResponse?.sessionId ?: "nothing",
             finalFile,
             finalLocation ?: "",
             optionsText?.isShouldCompress ?: false,
-            baseActivity.mainScope,
+            mainScope,
             object : APIHelper.FutureCallback<String> {
                 override fun onCompleted(e: Exception?, result: String?) {
-                    baseActivity.hideProgressBar()
+                    dialogProvider.hideProgressBar()
                     if (e == null && result != null) {
                         try {
                             val answer = Response.fixResponse(result)
@@ -198,10 +170,10 @@ class CustomerImageFragment : Fragment(),
                                     TransactionCountType.NO_INTERNET_COUNT,
                                     authResponse?.sessionId
                                 )
-                                baseActivity.showError("Connection lost")
+                                dialogProvider.showError("Connection lost")
                             }
                         } else {
-                            baseActivity.showError("Connection lost")
+                            dialogProvider.showError("Connection lost")
                             Misc.increaseTransactionMonitorCounter(
                                 activity,
                                 TransactionCountType.NO_INTERNET_COUNT,
@@ -213,8 +185,8 @@ class CustomerImageFragment : Fragment(),
             })
     }
 
-    fun showDialogWithGoHomeAction(message: String?) {
-        baseActivity.dialogProvider.showError<Nothing>(message) {
+    private fun showDialogWithGoHomeAction(message: String?) {
+        dialogProvider.showError<Nothing>(message) {
             onClose {
                 (activity as OnlineActivity?)?.goHome()
             }
@@ -222,7 +194,7 @@ class CustomerImageFragment : Fragment(),
     }
 
     private fun moveToNext() {
-        baseActivity.dialogProvider.showProgressBar("Loading")
+        dialogProvider.showProgressBar("Loading")
         //final AuthResponse authResponse = bankOneApplication.getAuthResponse();// LocalStorage.getCachedAuthResponse(getActivity());
         val authResponse =
             (requireActivity().application as BankOneApplication).authResponse
@@ -244,16 +216,15 @@ class CustomerImageFragment : Fragment(),
                     result: String?,
                     status: Boolean
                 ) {
-                    baseActivity.hideProgressBar()
+                    dialogProvider.hideProgressBar()
                     if (status) {
                         try {
                             val answer = Response.fixResponse(result)
-                            Log.e("DECRYPTED", Encryption.decrypt(answer))
                             val decryptedAnswer = Encryption.decrypt(answer)
                             val response =
                                 XmlToJson.convertXmlToJson(decryptedAnswer)
                             if (response == null) {
-                                baseActivity.showError("Connection lost")
+                                dialogProvider.showError("Connection lost")
                                 Misc.increaseTransactionMonitorCounter(
                                     activity,
                                     TransactionCountType.NO_INTERNET_COUNT,
@@ -320,7 +291,7 @@ class CustomerImageFragment : Fragment(),
                                                     responseBase.getJSONObject("Menu")
                                                         .getJSONObject("Response")
                                                 if (resp.contains("\"IsImage\":true")) {
-                                                    activity!!.supportFragmentManager
+                                                    requireActivity().supportFragmentManager
                                                         .beginTransaction().replace(
                                                             R.id.container,
                                                             instantiate(
@@ -328,7 +299,7 @@ class CustomerImageFragment : Fragment(),
                                                             )
                                                         ).commit()
                                                 } else {
-                                                    activity!!.supportFragmentManager
+                                                    requireActivity().supportFragmentManager
                                                         .beginTransaction().replace(
                                                             R.id.container,
                                                             EnterDetailFragment.instantiate(data)
@@ -339,7 +310,7 @@ class CustomerImageFragment : Fragment(),
                                                     responseBase.getJSONObject("Menu")
                                                         .getJSONObject("Response")
                                                         .getString("Display")
-                                                baseActivity.showError(message)
+                                                dialogProvider.showError(message)
                                             }
                                         }
                                     } else {
@@ -358,7 +329,7 @@ class CustomerImageFragment : Fragment(),
                                                     )
                                             )
                                         } else {
-                                            baseActivity.showError(
+                                            dialogProvider.showError(
                                                 responseBase.optString(
                                                     "Menu",
                                                     ErrorMessages.PHONE_NOT_REGISTERED
@@ -386,7 +357,7 @@ class CustomerImageFragment : Fragment(),
                                     authResponse.sessionId
                                 )
                             } else {
-                                baseActivity.showError("Connection lost")
+                                dialogProvider.showError("Connection lost")
                                 Misc.increaseTransactionMonitorCounter(
                                     activity,
                                     TransactionCountType.ERROR_RESPONSE_COUNT,
@@ -394,7 +365,7 @@ class CustomerImageFragment : Fragment(),
                                 )
                             }
                         } else {
-                            baseActivity.showError("Connection lost")
+                            dialogProvider.showError("Connection lost")
                             Misc.increaseTransactionMonitorCounter(
                                 activity,
                                 TransactionCountType.ERROR_RESPONSE_COUNT,
@@ -412,26 +383,24 @@ class CustomerImageFragment : Fragment(),
         data: Intent?
     ) {
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
-            (activity as BaseActivity).run {
-                try {
-                    val tmpImage: Image? = ImagePicker.getFirstImageOrNull(data)
-                    tmpImage ?: return@run showError("An internal error occurred")
-                    creditClubImage = CreditClubImage(tmpImage)
+            try {
+                val tmpImage: Image? = ImagePicker.getFirstImageOrNull(data)
+                tmpImage ?: return dialogProvider.showError("An internal error occurred")
+                creditClubImage = CreditClubImage(tmpImage)
 
-                    baseActivity.mainScope.launch {
-                        showProgressBar("Processing image")
+                mainScope.launch {
+                    dialogProvider.showProgressBar("Processing image")
 
-                        val (bitmap) = safeRunIO { creditClubImage?.bitmap }
-                        image = bitmap
-                        imageView?.setImageBitmap(bitmap)
+                    val (bitmap) = safeRunIO { creditClubImage?.bitmap }
+                    image = bitmap
+                    binding.image.setImageBitmap(bitmap)
 
-                        imageString = safeRunIO { creditClubImage?.bitmapString }.data
-                        hideProgressBar()
-                    }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                    showError("An internal error occurred")
+                    imageString = safeRunIO { creditClubImage?.bitmapString }.data
+                    dialogProvider.hideProgressBar()
                 }
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                dialogProvider.showError("An internal error occurred")
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

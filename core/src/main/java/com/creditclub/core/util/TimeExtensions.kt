@@ -1,10 +1,10 @@
 package com.creditclub.core.util
 
-import org.threeten.bp.Duration
-import org.threeten.bp.Instant
-import org.threeten.bp.LocalDate
-import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -16,6 +16,7 @@ import java.util.*
 
 private const val defaultZone = "UTC+01:00"
 const val CREDIT_CLUB_DATE_PATTERN = "uuuu-MM-dd'T'HH:mm:ss[.SSS][xxx][xx][X]"
+const val CREDIT_CLUB_REQUEST_DATE_PATTERN = "uuuu-MM-dd'T'HH:mm:ss[.SSS]"
 
 private fun formatter(pattern: String, zoneID: String = defaultZone): DateTimeFormatter {
     return DateTimeFormatter.ofPattern(pattern).withLocale(Locale.ENGLISH)
@@ -50,6 +51,10 @@ fun String.toInstant(pattern: String, zoneID: String = defaultZone): Instant {
 
 fun String.toInstant(): Instant {
     return Instant.from(DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(this))
+}
+
+fun String.instantFromPattern(pattern: String): Instant {
+    return Instant.from(formatter(pattern).parse(this))
 }
 
 fun Instant.timeAgo(): String {

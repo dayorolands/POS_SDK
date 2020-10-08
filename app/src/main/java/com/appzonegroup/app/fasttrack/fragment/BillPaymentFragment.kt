@@ -14,9 +14,12 @@ import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
+import com.creditclub.core.data.api.BillsPaymentService
 import com.creditclub.core.data.request.PayBillRequest
+import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
+import com.creditclub.core.util.delegates.service
 import com.creditclub.pos.printer.PosPrinter
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -31,6 +34,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     private val request = PayBillRequest()
     private val uniqueReference = UUID.randomUUID().toString()
     private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
+    private val billsPaymentService by creditClubMiddleWareAPI.retrofit.service<BillsPaymentService>()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -49,18 +53,15 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         }
 
         viewModel.run {
-            categoryList.bindDropDown(category, binding.categoryInput) {
-                map { it.name ?: "Unknown" }
-            }
+            categoryList.bindDropDown(category, binding.categoryInput) { this }
             billerList.bindDropDown(biller, binding.billerInput) {
                 val categoryId = viewModel.category.value?.id
                 filter { b ->
                     b.categoryId == categoryId || "${b.billerCategoryId}" == categoryId
-                }.map { it.name ?: "Unknown" }
+                }
             }
             itemList.bindDropDown(item, binding.paymentItemInput) {
                 filter { b -> "${b.billerId}" == viewModel.biller.value?.id }
-                    .map { it.name ?: "Unknown" }
             }
 
             category.onChange { newCategory ->
@@ -106,18 +107,19 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         })
     }
 
+    @Suppress("UNCHECKED_CAST")
     private inline fun <T> MutableLiveData<List<T>>.bindDropDown(
         selectedItemLiveData: MutableLiveData<T>,
         autoCompleteTextView: AutoCompleteTextView,
-        crossinline mapFunction: List<T>.() -> List<String>
+        crossinline mapFunction: List<T>.() -> List<Any>
     ) {
         observe(viewLifecycleOwner, Observer { list ->
             val items = list?.mapFunction() ?: emptyList()
             val adapter = ArrayAdapter(requireContext(), R.layout.list_item, items)
             autoCompleteTextView.setAdapter(adapter)
             if (list != null) {
-                autoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
-                    selectedItemLiveData.postValue(list[position])
+                autoCompleteTextView.setOnItemClickListener { parent, _, position, _ ->
+                    selectedItemLiveData.postValue(parent.getItemAtPosition(position) as T)
                 }
             }
         })
@@ -125,7 +127,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
     private suspend fun loadCategories() =
         loadDependencies("category list") {
-            val categoryList = creditClubMiddleWareAPI.billsPaymentService.getBillerCategories(
+            val categoryList = billsPaymentService.getBillerCategories(
                 localStorage.institutionCode
             )
             viewModel.categoryList.postValue(categoryList)
@@ -133,7 +135,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
     private suspend fun loadBillers() =
         loadDependencies("biller list") {
-            val billerList = creditClubMiddleWareAPI.billsPaymentService.getBillers(
+            val billerList = billsPaymentService.getBillers(
                 localStorage.institutionCode,
                 viewModel.category.value?.id
             )
@@ -142,7 +144,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
     private suspend fun loadItems() =
         loadDependencies("item list") {
-            val itemList = creditClubMiddleWareAPI.billsPaymentService.getPaymentItems(
+            val itemList = billsPaymentService.getPaymentItems(
                 localStorage.institutionCode,
                 viewModel.biller.value?.id
             )
@@ -231,6 +233,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         }
 
         val pin = dialogProvider.getPin("Agent PIN") ?: return
+        if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
         request.apply {
             agentPin = pin
@@ -259,12 +262,13 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         }
         dialogProvider.showProgressBar("Processing request")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.billsPaymentService.runTransaction(request)
+            billsPaymentService.runTransaction(request)
         }
         dialogProvider.hideProgressBar()
         if (error != null) return dialogProvider.showErrorAndWait(error)
         if (response == null) {
             dialogProvider.showErrorAndWait("An error occurred. Please try again later")
+            printReceipt(null)
             activity?.onBackPressed()
             return
         }
@@ -277,11 +281,14 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             dialogProvider.showErrorAndWait(message)
         }
 
+        printReceipt(response)
+        activity?.onBackPressed()
+    }
+
+    private suspend fun printReceipt(response: PayBillResponse?) {
         if (Platform.hasPrinter) {
             val receipt = BillsPaymentReceipt(requireContext(), request).withResponse(response)
             posPrinter.print(receipt)
         }
-
-        activity?.onBackPressed()
     }
 }

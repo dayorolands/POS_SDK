@@ -7,15 +7,19 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.appzonegroup.app.fasttrack.BuildConfig
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.FragmentCustomerRequestGeneralInfoBinding
 import com.appzonegroup.app.fasttrack.ui.dataBinding
+import com.creditclub.core.data.response.ApiResponse
+import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.ui.widget.DateInputParams
 import com.creditclub.core.util.*
-import org.threeten.bp.LocalDate
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_request_general_info) {
     private val binding by dataBinding<FragmentCustomerRequestGeneralInfoBinding>()
@@ -73,6 +77,23 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
         })
 
         binding.basicInfoNextBtn.setOnClickListener { next() }
+        viewModel.run {
+            addressState.onChange {
+                binding.addressLgaInput.setText("")
+                mainScope.launch { loadLgas() }
+            }
+        }
+        viewModel.stateList.value ?: mainScope.launch { loadStates() }
+    }
+
+    private inline fun <T> MutableLiveData<T>.onChange(crossinline block: () -> Unit) {
+        var oldValue = value
+        observe(viewLifecycleOwner, Observer {
+            if (value != oldValue) {
+                oldValue = value
+                block()
+            }
+        })
     }
 
     private inline fun AutoCompleteTextView.onItemClick(crossinline block: (position: Int) -> Unit) {
@@ -108,6 +129,14 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
                 binding.phoneEt
             )
             return
+        }
+
+        if (viewModel.addressState.value == null) {
+            return dialogProvider.showError("Please select a valid state")
+        }
+
+        if (viewModel.addressLga.value == null) {
+            return dialogProvider.showError("Please select a valid lga")
         }
 
         val address = viewModel.address.value
@@ -191,5 +220,39 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
     private fun indicateError(message: String, view: EditText?) {
         view?.error = message
         view?.requestFocus()
+    }
+
+    private suspend fun loadStates() = viewModel.stateList.download("states") {
+        creditClubMiddleWareAPI.staticService.getStates(localStorage.institutionCode)
+    }
+
+    private suspend fun loadLgas() =
+        viewModel.lgaList.download("lgas") {
+            creditClubMiddleWareAPI.staticService.getLgas(
+                localStorage.institutionCode,
+                viewModel.addressState.value?.id
+            )
+        }
+
+    private suspend inline fun <T> MutableLiveData<T>.download(
+        dependencyName: String,
+        crossinline fetcher: suspend () -> ApiResponse<T?>?
+    ) {
+        value = null
+        dialogProvider.showProgressBar("Loading $dependencyName")
+        val (response) = safeRunIO { fetcher() }
+        dialogProvider.hideProgressBar()
+
+        if (response == null) {
+            dialogProvider.showErrorAndWait("An error occurred while loading $dependencyName")
+            return
+        }
+
+        if (response.isSuccessful) {
+            postValue(response.data)
+            return
+        }
+
+        dialogProvider.showErrorAndWait(response.message)
     }
 }

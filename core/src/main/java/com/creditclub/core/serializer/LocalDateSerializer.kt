@@ -2,7 +2,7 @@ package com.creditclub.core.serializer
 
 import com.creditclub.core.util.toLocalDate
 import kotlinx.serialization.*
-import org.threeten.bp.LocalDate
+import java.time.LocalDate
 
 @Serializer(forClass = LocalDate::class)
 object LocalDateSerializer {

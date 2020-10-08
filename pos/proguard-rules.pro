@@ -61,16 +61,11 @@
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.SerializationKt
 -keep,includedescriptorclasses class com.appzonegroup.creditclub.pos.models.**$$serializer { *; }
--keepclassmembers class com.appzonegroup.creditclub.pos.models.** {
+-keepclassmembers class com.appzonegroup.creditclub.pos.models.* {
     *** Companion;
 }
--keepclasseswithmembers class com.appzonegroup.creditclub.pos.models.** {
+-keepclasseswithmembers class com.appzonegroup.creditclub.pos.models.* {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
 -keepattributes Signature
-# For using GSON @Expose annotation
--keepattributes *Annotation*
-# Gson specific classes
--keep class sun.misc.Unsafe { *; }
-#-keep class com.google.gson.stream.** { *; }

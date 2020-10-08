@@ -1,3 +1,4 @@
+include ':analytics'
 include ':dspread'
 include ':nexgo'
 include ':telpo'

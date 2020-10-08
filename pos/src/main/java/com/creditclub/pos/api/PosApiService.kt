@@ -23,7 +23,6 @@ interface PosApiService {
         @Header("TerminalID") terminalID: String?
     ): ApiResponse<String>?
 
-    // TODO: Migrate PosNotification from gson to kotlinx.serialization
     @POST("CreditClubStatic/POSCashOutNotification")
     suspend fun posCashOutNotification(
         @Body request: PosNotification,

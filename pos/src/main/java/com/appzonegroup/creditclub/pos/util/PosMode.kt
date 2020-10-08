@@ -12,7 +12,8 @@ enum class PosMode(
     override val port: Int,
     override val ssl: Boolean = true,
     override val dukptConfig: DukptConfig? = null,
-    override val maxAttempts: Int = 1
+    override val maxAttempts: Int = 1,
+    override val nodeName: String? = null
 ) : RemoteConnectionInfo {
 
     EPMS(

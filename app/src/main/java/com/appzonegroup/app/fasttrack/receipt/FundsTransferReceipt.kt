@@ -10,7 +10,7 @@ import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
 import com.creditclub.core.util.toString
-import org.threeten.bp.Instant
+import java.time.Instant
 
 
 /**

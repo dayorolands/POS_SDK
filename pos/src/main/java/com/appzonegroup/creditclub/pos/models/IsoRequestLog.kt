@@ -6,7 +6,7 @@ import com.creditclub.core.serializer.TimeInstantSerializer
 import com.creditclub.pos.model.ConnectionInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.threeten.bp.Instant
+import java.time.Instant
 
 
 /**

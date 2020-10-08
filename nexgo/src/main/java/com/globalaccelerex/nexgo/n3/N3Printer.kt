@@ -17,7 +17,14 @@ import kotlinx.serialization.json.JsonConfiguration
 
 class N3Printer(override val context: Context, override val dialogProvider: DialogProvider) :
     PosPrinter {
-    private val json = Json(JsonConfiguration.Stable)
+    private val json = Json(
+        JsonConfiguration.Stable.copy(
+            isLenient = true,
+            ignoreUnknownKeys = true,
+            serializeSpecialFloatingPointValues = true,
+            useArrayPolymorphism = true
+        )
+    )
     private val mainScope = CoroutineScope(Dispatchers.Main)
 
     override fun check(): PrinterStatus {

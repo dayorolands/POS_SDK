@@ -11,7 +11,14 @@ class JsonStoreDelegate<T : Any>(
     private val prefs: SharedPreferences,
     private val key: String,
     private val serializer: KSerializer<T>,
-    private val json: Json = Json(JsonConfiguration.Stable)
+    private val json: Json = Json(
+        JsonConfiguration.Stable.copy(
+            isLenient = true,
+            ignoreUnknownKeys = true,
+            serializeSpecialFloatingPointValues = true,
+            useArrayPolymorphism = true
+        )
+    )
 ) {
     operator fun getValue(obj: Any, prop: KProperty<*>): T? {
         val value = prefs.getString(key, null) ?: return null

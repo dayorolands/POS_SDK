@@ -31,7 +31,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import org.threeten.bp.Instant
+import java.time.Instant
 import java.io.ByteArrayOutputStream
 import java.security.SecureRandom
 import java.util.*
@@ -397,7 +397,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
             gpsCoordinates = gps.geolocationString ?: "0.00;0.00"
-            nodeName = posMode.id
+            nodeName = posMode.nodeName
             if (posMode is ConnectionInfo) {
                 connectionInfo = posMode
             }

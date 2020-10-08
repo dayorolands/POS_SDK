@@ -7,7 +7,7 @@ import com.creditclub.pos.model.ConnectionInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.koin.core.KoinComponent
-import org.threeten.bp.Instant
+import java.time.Instant
 
 
 /**

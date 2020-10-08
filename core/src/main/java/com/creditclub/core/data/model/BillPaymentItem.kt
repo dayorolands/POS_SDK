@@ -29,4 +29,6 @@ class BillPaymentItem {
     var name: String? = null
 
     var propertyChanged: String? = null
+
+    override fun toString() = name ?: "Payment Item $id"
 }

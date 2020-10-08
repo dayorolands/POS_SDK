@@ -30,6 +30,7 @@ import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.util.*
 import com.creditclub.pos.PosManager
+import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
 import com.creditclub.pos.card.CardTransactionStatus
@@ -47,7 +48,9 @@ import kotlinx.coroutines.withContext
 import org.jpos.iso.ISOMsg
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
-import org.threeten.bp.Instant
+import java.time.Instant
+import retrofit2.create
+import java.net.ConnectException
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -59,7 +62,6 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
     protected var previousMessage: CardIsoMsg? = null
     private var accountType: AccountType? = null
     abstract var transactionType: TransactionType
-
     private lateinit var cardData: CardData
     private var cardReaderEvent: CardReaderEvent = CardReaderEvent.CANCELLED
 
@@ -335,15 +337,20 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
 
                 val (response, error) = withContext(Dispatchers.IO) {
                     if (request.mti == "0200" && remoteConnectionInfo.maxAttempts > 1) {
-                        isoSocketHelper.send(
-                            request,
-                            remoteConnectionInfo.maxAttempts,
-                            onReattempt = {
-                                delay(5000)
-                                request.mti = if (it > 2) "0221" else "0220"
-                                runOnUiThread { dialogProvider.showProgressBar("Retrying...$it") }
+                        var result: IsoSocketHelper.Result = IsoSocketHelper.Result(null, null)
+                        for (attempt in 1..remoteConnectionInfo.maxAttempts) {
+                            if (attempt > 1) {
+                                delay(2000)
+                                request.mti =
+                                    if (attempt > 2 && result.error !is ConnectException) "0221" else "0220"
+                                runOnUiThread { dialogProvider.showProgressBar("Retrying...$attempt") }
                             }
-                        )
+
+                            result = isoSocketHelper.send(request)
+                            result.response ?: continue
+                            result.error ?: break
+                        }
+                        result
                     } else {
                         isoSocketHelper.send(request)
                     }
@@ -366,7 +373,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                     cardHolder = cardData.holder
                     aid = cardData.aid
                     cardType = cardData.type
-                    nodeName = remoteConnectionInfo.id
+                    nodeName = remoteConnectionInfo.nodeName
                     if (remoteConnectionInfo is ConnectionInfo) {
                         connectionInfo = remoteConnectionInfo
                     }
@@ -425,12 +432,16 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
 
                     if (response.isSuccessful) {
                         val posNotification = PosNotification.create(transaction)
-                        posNotification.nodeName = remoteConnectionInfo.id
+                        posNotification.terminalId = config.terminalId
+                        posNotification.nodeName = remoteConnectionInfo.nodeName
                         if (remoteConnectionInfo is ConnectionInfo) {
                             posNotification.connectionInfo = remoteConnectionInfo
                         }
-
-                        logPosNotification(posDatabase, backendConfig, posConfig, posNotification)
+                        withContext(Dispatchers.IO) {
+                            posDatabase.posNotificationDao().save(posNotification)
+                        }
+                        val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
+                        posApiService.logPosNotification(posDatabase, backendConfig, posConfig, posNotification)
                     }
                 }
 
@@ -487,7 +498,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
 
             if (!success) {
                 val reversalRecord = Reversal(reversal).apply {
-                    nodeName = remoteConnectionInfo.id
+                    nodeName = remoteConnectionInfo.nodeName
                     if (remoteConnectionInfo is ConnectionInfo) {
                         connectionInfo = remoteConnectionInfo
                     }

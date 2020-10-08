@@ -11,7 +11,9 @@ import com.creditclub.core.util.toString
 import com.creditclub.pos.printer.Alignment
 import com.creditclub.pos.printer.PrintNode
 import com.creditclub.pos.printer.TextNode
-import org.threeten.bp.Instant
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
+import java.time.Instant
 
 
 /**
@@ -22,13 +24,14 @@ import org.threeten.bp.Instant
 class BillsPaymentReceipt(context: Context, val request: PayBillRequest) :
     TransactionReceipt(context) {
 
+    private var additionalInformation: PayBillResponse.AdditionalInformation? = null
+
     override val nodes: List<PrintNode>
         get() {
-            return mutableListOf(
+            val nodes = mutableListOf(
                 LogoNode(),
 
-                TextNode(if (request.isRecharge) "Airtime Recharge" else "Bills Payment")
-                    .apply {
+                TextNode(if (request.isRecharge) "Airtime Recharge" else "Bills Payment").apply {
                     align = Alignment.MIDDLE
                     wordFont = 35
                 },
@@ -54,12 +57,38 @@ Customer Name: ${request.customerName}
 RRN: ${request.retrievalReferenceNumber}
 Transaction ID: ${request.customerDepositSlipNumber}"""
                 )
-            ).apply { addTransactionStatus(); addAll(footerNodes) }.toList()
+            )
+
+            additionalInformation?.customerAddress?.run {
+                nodes.add(TextNode("Customer Address: $this"))
+            }
+
+            additionalInformation?.customerToken?.run {
+                nodes.add(TextNode("Customer Token: $this"))
+            }
+
+            nodes.addTransactionStatus()
+            nodes.addAll(footerNodes(context))
+            return nodes.toList()
         }
 
     fun withResponse(response: PayBillResponse?): BillsPaymentReceipt {
-        isSuccessful = response?.isSuccessFul == true
-        reason = response?.responseMessage
+        response ?: return this
+
+        isSuccessful = response.isSuccessFul == true
+        reason = response.responseMessage
+        response.additionalInformation?.run {
+            val json = Json(
+                JsonConfiguration.Stable.copy(
+                    isLenient = true,
+                    ignoreUnknownKeys = true,
+                    serializeSpecialFloatingPointValues = true,
+                    useArrayPolymorphism = true
+                )
+            )
+            val serializer = PayBillResponse.AdditionalInformation.serializer()
+            additionalInformation = json.parse(serializer, this)
+        }
 
         return this
     }

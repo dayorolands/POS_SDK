@@ -10,4 +10,5 @@ interface RemoteConnectionInfo {
     val ssl: Boolean
     val dukptConfig: DukptConfig?
     val maxAttempts: Int
+    val nodeName: String?
 }

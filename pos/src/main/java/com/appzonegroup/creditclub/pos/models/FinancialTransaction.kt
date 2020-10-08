@@ -9,10 +9,7 @@ import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.util.hexString
 import com.creditclub.pos.model.ConnectionInfo
 import org.jpos.iso.ISOMsg
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
-import java.util.*
+import java.time.Instant
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 2/25/2019.
@@ -23,13 +20,6 @@ import java.util.*
 open class FinancialTransaction {
     @PrimaryKey(autoGenerate = true)
     open var id: Int? = null
-
-    @delegate:Ignore
-    @delegate:Transient
-    private val localDateDf by lazy {
-        DateTimeFormatter.ofPattern("dd/MM/YYYY hh:mm").withLocale(Locale.ENGLISH)
-            .withZone(ZoneId.of("+0100"))
-    }
 
     var stan = ""
     var isSettled = false
@@ -105,12 +95,6 @@ open class FinancialTransaction {
         responseCode39 = msg.responseCode39 ?: ""
         additionalAmount = msg.additionalAmounts54 ?: ""
         transactionAmount4 = msg.transactionAmount4 ?: ""
-    }
-
-    @delegate:Ignore
-    @delegate:Transient
-    val prettyTime: String by lazy {
-        localDateDf.format(createdAt)
     }
 }
 

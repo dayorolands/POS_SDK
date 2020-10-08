@@ -1,15 +1,15 @@
-package com.appzonegroup.creditclub.pos
+package com.appzonegroup.app.fasttrack
 
 import android.app.Application
 import androidx.work.*
+import com.appzonegroup.app.fasttrack.work.IsoRequestLogWorker
+import com.appzonegroup.app.fasttrack.work.TransactionLogWorker
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
-import com.appzonegroup.creditclub.pos.work.IsoRequestLogWorker
-import com.appzonegroup.creditclub.pos.work.ReversalWorker
-import com.appzonegroup.creditclub.pos.work.TransactionLogWorker
+import com.appzonegroup.app.fasttrack.work.ReversalWorker
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import org.koin.android.ext.koin.androidContext
@@ -36,13 +36,13 @@ fun Application.startPosApp() {
             .build()
 
     workManager.enqueueUniquePeriodicWork(
-        "TRANSACTION_LOG",
+        "APP_TRANSACTION_LOG",
         ExistingPeriodicWorkPolicy.REPLACE,
         transactionLogRequest
     )
 
     workManager.enqueueUniquePeriodicWork(
-        "ISO_REQUEST_LOG",
+        "APP_ISO_REQUEST_LOG",
         ExistingPeriodicWorkPolicy.REPLACE,
         PeriodicWorkRequestBuilder<IsoRequestLogWorker>(15, TimeUnit.MINUTES)
             .setConstraints(constraints)
@@ -50,7 +50,7 @@ fun Application.startPosApp() {
     )
 
     workManager.enqueueUniquePeriodicWork(
-        "REVERSAL",
+        "APP_REVERSAL",
         ExistingPeriodicWorkPolicy.REPLACE,
         PeriodicWorkRequestBuilder<ReversalWorker>(15, TimeUnit.MINUTES)
             .setConstraints(constraints)
@@ -63,20 +63,4 @@ fun Application.startPosApp() {
 //        }
 //        get<CallHomeService>().startCallHomeTimer()
 //    }
-}
-
-fun loadPosModules() {
-
-    loadKoinModules(module {
-        single<PosConfig> { ConfigService(androidContext()) }
-        single { PosDatabase.getInstance(androidContext()) }
-        single<PosParameter>(override = true) {
-            ParameterService(
-                androidContext(),
-                get<PosConfig>().remoteConnectionInfo
-            )
-        }
-        single { CallHomeService() }
-        single { IsoSocketHelper(get(), get()) }
-    })
 }

@@ -17,8 +17,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.Headers
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.io.File
@@ -178,7 +180,7 @@ class APIHelper @JvmOverloads constructor(
                 MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(image).toString())
             )
             val requestFile: RequestBody = RequestBody.create(
-                MediaType.parse(mimeType ?: "image/jpeg"),
+                (mimeType ?: "image/jpeg").toMediaTypeOrNull(),
                 image
             )
 
@@ -273,7 +275,7 @@ class APIHelper @JvmOverloads constructor(
         val requestBody = if (req.body != null) {
             RequestBody.create(null, req.body)
         } else {
-            RequestBody.create(null, "{}")
+            "{}".toRequestBody(null)
         }
 
         scope.launch {

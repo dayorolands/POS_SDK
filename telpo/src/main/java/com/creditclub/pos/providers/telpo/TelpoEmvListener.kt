@@ -21,7 +21,7 @@ import com.telpo.pinpad.PinParam
 import com.telpo.pinpad.PinpadService
 import org.koin.core.KoinComponent
 import org.koin.core.get
-import org.threeten.bp.Instant
+import java.time.Instant
 import java.io.UnsupportedEncodingException
 
 

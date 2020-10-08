@@ -2,7 +2,6 @@ package com.appzonegroup.app.fasttrack.receipt
 
 import android.content.Context
 import com.appzonegroup.creditclub.pos.printer.LogoNode
-import com.appzonegroup.creditclub.pos.printer.footerNodes
 import com.appzonegroup.creditclub.pos.receipt.TransactionReceipt
 import com.creditclub.core.data.response.CollectionPaymentResponse
 import com.creditclub.core.util.format
@@ -32,6 +31,6 @@ Reference: ${response.collectionReference}
 Transaction Date: ${response.date?.format("dd-MM-YYYY hh:mm")}
 """
                 )
-            ).apply { addTransactionStatus(); addAll(footerNodes) }.toList()
+            ).apply { addTransactionStatus(); addAll(footerNodes(context)) }.toList()
         }
 }

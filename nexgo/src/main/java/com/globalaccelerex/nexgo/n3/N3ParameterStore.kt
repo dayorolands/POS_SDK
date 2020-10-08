@@ -15,7 +15,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.json.JSONArray
 import org.koin.core.KoinComponent
-import org.threeten.bp.Instant
+import java.time.Instant
 
 class N3ParameterStore constructor(context: Context) : PosParameter, KoinComponent {
     private val prefs: SharedPreferences = context.getSharedPreferences("N3Parameters", 0)
@@ -23,7 +23,14 @@ class N3ParameterStore constructor(context: Context) : PosParameter, KoinCompone
     override var masterKey: String by prefs.nonNullStringStore("MasterKey")
     override var sessionKey: String by prefs.nonNullStringStore("SessionKey")
     override var pinKey: String by prefs.nonNullStringStore("PinKey")
-    private val json: Json = Json(JsonConfiguration.Stable)
+    private val json: Json = Json(
+        JsonConfiguration.Stable.copy(
+            isLenient = true,
+            ignoreUnknownKeys = true,
+            serializeSpecialFloatingPointValues = true,
+            useArrayPolymorphism = true
+        )
+    )
 
     override val managementData: PosParameter.ManagementData
         get() = json.parse(ParameterObject.serializer(), managementDataString)

@@ -12,14 +12,13 @@ import kotlin.reflect.KProperty
 class RetrofitServiceDelegate<T>(
     private val retrofit: Retrofit,
     private val serviceClass: Class<T>
-) {
-    private var value: T? = null
-
-    operator fun getValue(obj: Any, property: KProperty<*>): T {
-        return value ?: retrofit.create(serviceClass).also { value = it }
-    }
+) : Lazy<T> {
+    private var service: T? = null
+    override fun isInitialized(): Boolean = service != null
+    override val value: T
+        get() = service ?: retrofit.create(serviceClass).also { service = it }
 }
 
-fun <T : Any> Retrofit.service(serviceClass: KClass<T>): RetrofitServiceDelegate<T> {
-    return RetrofitServiceDelegate(this, serviceClass.java)
+inline fun <reified T : Any> Retrofit.service(): RetrofitServiceDelegate<T> {
+    return RetrofitServiceDelegate(this, T::class.java)
 }
