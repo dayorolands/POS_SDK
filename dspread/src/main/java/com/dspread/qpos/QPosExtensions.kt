@@ -3,7 +3,11 @@ package com.dspread.qpos
 import android.content.Context
 import com.creditclub.pos.card.TransactionType
 import com.dspread.R
+import com.dspread.qpos.utils.TLV
+import com.dspread.qpos.utils.TLVParser
+import com.dspread.qpos.utils.hexBytes
 import com.dspread.xpos.QPOSService
+import java.util.*
 import kotlin.coroutines.suspendCoroutine
 
 
@@ -103,6 +107,25 @@ inline val TransactionType.asQposTransactionType: QPOSService.TransactionType
         TransactionType.PreAuth -> QPOSService.TransactionType.PREAUTH
     }
 
-internal suspend fun QPosManager.connectBtAndWait(address:String) = suspendCoroutine<Boolean> {
-    listener.posConnectContinuation
+fun List<TLV>.getTlv(tag: String): TLV? {
+    return TLVParser.searchTLV(this, tag)
+}
+
+fun List<TLV>.getValue(
+    tag: String,
+    hex: Boolean = false,
+    fpadded: Boolean = false
+): String {
+    val value = if (hex) String(getTlv(tag)?.value?.hexBytes ?: byteArrayOf())
+    else getTlv(tag)?.value ?: ""
+
+    if (fpadded) {
+        val stringBuffer = StringBuffer(value)
+        if (stringBuffer[stringBuffer.toString().length - 1] == 'F') {
+            stringBuffer.deleteCharAt(stringBuffer.toString().length - 1)
+        }
+        return stringBuffer.toString().toUpperCase(Locale.getDefault())
+    }
+
+    return value.toUpperCase(Locale.getDefault())
 }

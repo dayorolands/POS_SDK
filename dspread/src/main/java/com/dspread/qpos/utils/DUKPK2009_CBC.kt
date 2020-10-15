@@ -435,31 +435,10 @@ object DUKPK2009_CBC {
     }
 
     // 十六进制字符串转字节数组
-    fun parseHexStr2Byte(hexStr: String?): ByteArray? {
-        if (hexStr!!.length < 1) return null
-        val result = ByteArray(hexStr.length / 2)
-        for (i in 0 until hexStr.length / 2) {
-            val high = hexStr.substring(i * 2, i * 2 + 1).toInt(16)
-            val low = hexStr.substring(i * 2 + 1, i * 2 + 2).toInt(
-                16
-            )
-            result[i] = (high * 16 + low).toByte()
-        }
-        return result
-    }
+    fun parseHexStr2Byte(hexStr: String?): ByteArray? = hexStr?.hexBytes
 
     // 字节数组转十六进制字符串
-    fun parseByte2HexStr(buf: ByteArray?): String {
-        val sb = StringBuffer()
-        for (i in buf!!.indices) {
-            var hex = Integer.toHexString((buf[i] and 0xFF.toByte()).toInt())
-            if (hex.length == 1) {
-                hex = "0$hex"
-            }
-            sb.append(hex.toUpperCase())
-        }
-        return sb.toString()
-    }
+    fun parseByte2HexStr(buf: ByteArray?): String = buf?.hexString ?: ""
 
     // 数据补位
     fun dataFill(dataStr: String): String {
@@ -492,37 +471,6 @@ object DUKPK2009_CBC {
         return result
     }
 
-    @Throws(InterruptedException::class)
-    @JvmStatic
-    fun main(args: Array<String>) { //        07-08 17:50:27.306 12376-12376/com.dspread.demoui D/POS_SDK: onRequestOnlineProcess5F201A20202020202020202020202020202020202020202020202020204F08A0000003330101015F24032612319F160F4243544553542031323334353637389F21031750229A031907089F02060000000001119F03060000000000009F34030203009F120A50424F432044454249549F0607A00000033301015F300202209F4E0F616263640000000000000000000000C408622622FFFFFF3603C10A09118012400705E00002C708DBD7F58811779698C00A09118012400705E00001C28201880C54D377643A72400707E993BDEB6AFD891CFD5EC8CA03A251DF9301E70F76999ADABCECF859C26B9320724644D15B53BDE669414C7C8336EFDC0892A6F883DB5163D0613557949D66349BB6CB6BBCD8877017D3FEF5404C4446F2F2244CB62C62CAAE6EB86F99C9F31E69DB32BBDA2390A73EA907E4D8BDEED105E876319F4D17A5DE1788B0DA32730E4102F42A7232BE4D9D5E7BF46E7313C0F190E4F7A7D320D29DD3765E06DB5FE847C8B2B5ABBBAC0B22E5C9722303EF6E1C050C33B4F88D1BE8E79A8FBACA1086E466CB79A54A528DF53D98DA85E79EACAC4F464B0BC2941A540E1E6DFA47D4D369F50BEECFDC37AED04F63500BED4D4DB524E69345F6FE94A1CB2353D39959953393ADDD7930A43E2FCC3AE8AB348B0A8025C63C8650AF6F7C2F613EEF31549B6E073898D256815A851B5C39341B609BB3DB9974985550F096DEA5440B429BB0346D93FC25A17441F27F219A4004EE2A244014434E5D17B9F645CACB534E0CF7D3D555EE861780CF33A674D0A9A04C523C85D3F8062CE34309514A32F2AA
-//        String tlvDate = "5F201A20202020202020202020202020202020202020202020202020204F08A0000003330101015F24032512319F160F4243544553543132333435363738009F21031824329A031908019F02060000000011119F03060000000000009F34030203009F120A50424F432044454249549F0607A00000033301015F300202209F4E0F616263640000000000000000000000C408621691FFFFFF5696C10A00000510F3C360600001C708F6368E3D35599107C00A00000510F3C360600001C22046FF9418E43BAC13B98549CFA3C3BA60816EE7BF1F231711FD1C2F3EFD43D891D010A274BDC41868B91F5069764D5797B823";
-//        String tlvDate = "5f200a46414e2f4a49554855414f07a00000000310105f24032110319f160f4243544553543132333435363738009f21030542259a037005079f02060000000011119f03060000000000009f34031f03009f120b56495341204352454449549f0607a00000000310105f300202019f4e0f616263640000000000000000000000c408451461ffffff2125c00a00000332100300e0001dc22045e76e7f539c7ae82061b909dcc05b5151210784da7fe1ad82b3b5a9fa14c6e2d0105214696f298eddf4b12519f8d185a01e";
-//        List<TLV> parse = TLVParser.parse(tlvDate);
-//c0
-//        String onLineksn = TLVParser.searchTLV(parse, "c0").value;
-//        //c2
-//		String onLineblockData = TLVParser.searchTLV(parse, "c2").value;
-//        //c1
-//        String Pinksn = TLVParser.searchTLV(parse, "c1").value;
-//        //c7
-//        String pinblockData = TLVParser.searchTLV(parse, "c7").value;
-//        String pin = getDate(Pinksn, pinblockData, Enum_key.PIN, Enum_mode.ECB);
-//        String onLinedate = getDate(onLineksn, onLineblockData, Enum_key.DATA, Enum_mode.CBC);
-//        System.out.println(onLinedate);
-//        parse = TLVParser.parse(onLinedate);
-//
-//        String realPan = TLVParser.searchTLV(parse, "5A").value;
-//		String parsCarN = "0000" + realPan.substring(realPan.length() - 13, realPan.length() - 1);
-//		String realPin = xor(parsCarN, pin);
-//        System.out.println(pin);
-    }
-
-    fun printArrFun(cl: Array<Any>) {
-        for (i in cl.indices) {
-            println(cl[i].toString())
-        }
-    }
-
     fun copyOfFun(cl: Array<Any?>, newLen: Int): Any? {
         val aClass = cl.javaClass
         if (!aClass.isArray) return null
@@ -550,25 +498,5 @@ object DUKPK2009_CBC {
 
     enum class Enum_mode {
         ECB, CBC
-    }
-
-    internal class TestClass(var name: String) : TimerTask() {
-        var age: String? = null
-        var color: String? = null
-        var aint = 0
-        private var aBoolean = false
-
-        fun isaBoolean(): Boolean {
-            return aBoolean
-        }
-
-        fun setaBoolean(aBoolean: Boolean) {
-            this.aBoolean = aBoolean
-        }
-
-        override fun run() {
-            println("dsvdsvdvssdv")
-        }
-
     }
 }

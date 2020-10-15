@@ -3,9 +3,10 @@ package com.dspread.qpos.injectKey;//
 // (powered by Fernflower decompiler)
 //
 
+import android.util.Base64;
+
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import Decoder.BASE64Decoder;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +28,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -96,8 +98,7 @@ public class RSA {
 
     public void loadPublicKey(String publicKeyStr) throws Exception {
         try {
-            BASE64Decoder base64Decoder = new BASE64Decoder();
-            byte[] buffer = base64Decoder.decodeBuffer(publicKeyStr);
+            byte[] buffer = Base64.decode(publicKeyStr, Base64.DEFAULT);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(buffer);
             this.publicKey = (RSAPublicKey)keyFactory.generatePublic(keySpec);
@@ -105,8 +106,6 @@ public class RSA {
             throw new Exception("无此算法");
         } catch (InvalidKeySpecException var7) {
             throw new Exception("公钥非法");
-        } catch (IOException var8) {
-            throw new Exception("公钥数据内容读取错误");
         } catch (NullPointerException var9) {
             throw new Exception("公钥数据为空");
         }
@@ -135,8 +134,7 @@ public class RSA {
 
     public void loadPrivateKey(String privateKeyStr) throws Exception {
         try {
-            BASE64Decoder base64Decoder = new BASE64Decoder();
-            byte[] buffer = base64Decoder.decodeBuffer(privateKeyStr);
+            byte[] buffer = Base64.decode(privateKeyStr, Base64.DEFAULT);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(buffer);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             this.privateKey = (RSAPrivateKey)keyFactory.generatePrivate(keySpec);
@@ -144,8 +142,6 @@ public class RSA {
             throw new Exception("无此算法");
         } catch (InvalidKeySpecException var7) {
             throw new Exception("私钥非法");
-        } catch (IOException var8) {
-            throw new Exception("私钥数据内容读取错误");
         } catch (NullPointerException var9) {
             throw new Exception("私钥数据为空");
         }

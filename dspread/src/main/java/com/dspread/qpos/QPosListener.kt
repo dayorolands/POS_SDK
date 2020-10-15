@@ -1,6 +1,5 @@
 package com.dspread.qpos
 
-import Decoder.BASE64Encoder
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -8,23 +7,28 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
-import android.text.TextUtils
+import android.util.Base64
 import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.util.format
+import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
+import com.creditclub.pos.card.CardTransactionStatus
+import com.creditclub.pos.extensions.hexBytes
+import com.creditclub.pos.utils.TripleDesCipher
 import com.dspread.R
-import com.dspread.qpos.utils.DUKPK2009_CBC
-import com.dspread.qpos.utils.QPOSUtil
-import com.dspread.qpos.utils.TLV
-import com.dspread.qpos.utils.TLVParser
+import com.dspread.qpos.utils.*
 import com.dspread.xpos.CQPOSService
 import com.dspread.xpos.QPOSService
-import org.threeten.bp.Instant
+import org.koin.core.KoinComponent
+import org.koin.core.get
+import org.koin.core.inject
+import java.time.Instant
 import java.util.*
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 /**
@@ -32,12 +36,17 @@ import kotlin.coroutines.resume
  * Appzone Ltd
  */
 
-class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
+class QPosListener(
+    private val pos: QPOSService,
+    private val qPosManager: QPosManager
+) : CQPOSService(), KoinComponent {
     internal var cardDataContinuation: Continuation<CardData?>? = null
     internal var cardEventContinuation: Continuation<CardReaderEvent>? = null
     internal var posConnectContinuation: Continuation<Boolean>? = null
-    private var cardData: CardData? = null
+    internal var unitContinuation: Continuation<Unit>? = null
+    private var cardData = QposCardData()
     private fun getString(id: Int) = qPosManager.activity.getString(id)
+    private val posParameter: PosParameter by inject()
 
     override fun onRequestWaitingUser() {}
 
@@ -45,136 +54,28 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
         result: QPOSService.DoTradeResult,
         decodeData: Hashtable<String, String>?
     ) {
-        TRACE.d("(DoTradeResult result, Hashtable<String, String> decodeData) " + result.toString() + TRACE.NEW_LINE + "decodeData:" + decodeData)
-        var cardNo: String? = ""
-        if (result == QPOSService.DoTradeResult.NONE) {
-            statusEditText.setText(getString(R.string.no_card_detected))
-        } else if (result == QPOSService.DoTradeResult.ICC) {
-            statusEditText.setText(getString(R.string.icc_card_inserted))
-            TRACE.d("EMV ICC Start")
-            pos.doEmvApp(QPOSService.EmvOption.START)
-        } else if (result == QPOSService.DoTradeResult.NOT_ICC) {
-            statusEditText.setText(getString(R.string.card_inserted))
-        } else if (result == QPOSService.DoTradeResult.BAD_SWIPE) {
-            statusEditText.setText(getString(R.string.bad_swipe))
-        } else if (result == QPOSService.DoTradeResult.MCR) { //磁条卡
-            var content: String = getString(R.string.card_swiped)
-            decodeData ?: return
-            val formatID = decodeData["formatID"]
-            if (formatID == "31" || formatID == "40" || formatID == "37" || formatID == "17" || formatID == "11" || formatID == "10") {
-                val maskedPAN = decodeData["maskedPAN"]
-                val expiryDate = decodeData["expiryDate"]
-                val cardHolderName = decodeData["cardholderName"]
-                val serviceCode = decodeData["serviceCode"]
-                val trackblock = decodeData["trackblock"]
-                val psamId = decodeData["psamId"]
-                val posId = decodeData["posId"]
-                val pinblock = decodeData["pinblock"]
-                val macblock = decodeData["macblock"]
-                val activateCode = decodeData["activateCode"]
-                val trackRandomNumber = decodeData["trackRandomNumber"]
-                content += getString(R.string.format_id) + " " + formatID + "\n"
-                content += getString(R.string.masked_pan) + " " + maskedPAN + "\n"
-                content += getString(R.string.expiry_date) + " " + expiryDate + "\n"
-                content += getString(R.string.cardholder_name) + " " + cardHolderName + "\n"
-                content += getString(R.string.service_code) + " " + serviceCode + "\n"
-                content += "trackblock: $trackblock\n"
-                content += "psamId: $psamId\n"
-                content += "posId: $posId\n"
-                content += getString(R.string.pinBlock) + " " + pinblock + "\n"
-                content += "macblock: $macblock\n"
-                content += "activateCode: $activateCode\n"
-                content += "trackRandomNumber: $trackRandomNumber\n"
-                cardNo = maskedPAN
-            } else if (formatID == "FF") {
-                val type = decodeData["type"]
-                val encTrack1 = decodeData["encTrack1"]
-                val encTrack2 = decodeData["encTrack2"]
-                val encTrack3 = decodeData["encTrack3"]
-                content += "cardType: $type\n"
-                content += "track_1: $encTrack1\n"
-                content += "track_2: $encTrack2\n"
-                content += "track_3: $encTrack3\n"
-            } else {
-                val orderID = decodeData["orderId"]
-                val maskedPAN = decodeData["maskedPAN"]
-                val expiryDate = decodeData["expiryDate"]
-                val cardHolderName = decodeData["cardholderName"]
-                //					String ksn = decodeData.get("ksn");
-                val serviceCode = decodeData["serviceCode"]
-                val track1Length = decodeData["track1Length"]
-                val track2Length = decodeData["track2Length"]
-                val track3Length = decodeData["track3Length"]
-                val encTracks = decodeData["encTracks"]
-                val encTrack1 = decodeData["encTrack1"]
-                val encTrack2 = decodeData["encTrack2"]
-                val encTrack3 = decodeData["encTrack3"]
-                val partialTrack = decodeData["partialTrack"]
-                // TODO
-                val pinKsn = decodeData["pinKsn"]
-                val trackksn = decodeData["trackksn"]
-                val pinBlock = decodeData["pinBlock"]
-                val encPAN = decodeData["encPAN"]
-                val trackRandomNumber = decodeData["trackRandomNumber"]
-                val pinRandomNumber = decodeData["pinRandomNumber"]
-                if (orderID != null && "" != orderID) {
-                    content += "orderID:$orderID"
-                }
-                content += getString(R.string.format_id) + " " + formatID + "\n"
-                content += getString(R.string.masked_pan) + " " + maskedPAN + "\n"
-                content += getString(R.string.expiry_date) + " " + expiryDate + "\n"
-                content += getString(R.string.cardholder_name) + " " + cardHolderName + "\n"
-                //					content += getString(R.string.ksn) + " " + ksn + "\n";
-                content += getString(R.string.pinKsn) + " " + pinKsn + "\n"
-                content += getString(R.string.trackksn) + " " + trackksn + "\n"
-                content += getString(R.string.service_code) + " " + serviceCode + "\n"
-                content += getString(R.string.track_1_length) + " " + track1Length + "\n"
-                content += getString(R.string.track_2_length) + " " + track2Length + "\n"
-                content += getString(R.string.track_3_length) + " " + track3Length + "\n"
-                content += getString(R.string.encrypted_tracks) + " " + encTracks + "\n"
-                content += getString(R.string.encrypted_track_1) + " " + encTrack1 + "\n"
-                content += getString(R.string.encrypted_track_2) + " " + encTrack2 + "\n"
-                content += getString(R.string.encrypted_track_3) + " " + encTrack3 + "\n"
-                content += getString(R.string.partial_track) + " " + partialTrack + "\n"
-                content += getString(R.string.pinBlock) + " " + pinBlock + "\n"
-                content += "encPAN: $encPAN\n"
-                content += "trackRandomNumber: $trackRandomNumber\n"
-                content += "pinRandomNumber: $pinRandomNumber\n"
-                cardNo = maskedPAN
-                var realPan: String? = null
-                if (!TextUtils.isEmpty(trackksn) && !TextUtils.isEmpty(
-                        encTrack2
-                    )
-                ) {
-                    val clearPan: String = DUKPK2009_CBC.getDate(
-                        trackksn,
-                        encTrack2,
-                        DUKPK2009_CBC.Enum_key.DATA,
-                        DUKPK2009_CBC.Enum_mode.CBC
-                    )
-                    content += "encTrack2: $clearPan\n"
-                    realPan = clearPan.substring(0, maskedPAN!!.length)
-                    content += "realPan: $realPan\n"
-                }
-                if (!TextUtils.isEmpty(pinKsn) && !TextUtils.isEmpty(
-                        pinBlock
-                    ) && !TextUtils.isEmpty(realPan)
-                ) {
-                    val date: String = DUKPK2009_CBC.getDate(
-                        pinKsn,
-                        pinBlock,
-                        DUKPK2009_CBC.Enum_key.PIN,
-                        DUKPK2009_CBC.Enum_mode.CBC
-                    )
-                    val parsCarN =
-                        "0000" + realPan!!.substring(realPan.length - 13, realPan.length - 1)
-                    val s: String = DUKPK2009_CBC.xor(parsCarN, date)
-                    content += "PIN: $s\n"
-                }
+        when (result) {
+            QPOSService.DoTradeResult.NONE -> {
+                statusEditText.setText(getString(R.string.no_card_detected))
             }
-            statusEditText.setText(content)
-        } else if (result == QPOSService.DoTradeResult.NO_RESPONSE) {
-            statusEditText.setText(getString(R.string.card_no_response))
+            QPOSService.DoTradeResult.ICC -> {
+                statusEditText.setText(getString(R.string.icc_card_inserted))
+                TRACE.d("EMV ICC Start")
+                pos.doEmvApp(QPOSService.EmvOption.START)
+            }
+            QPOSService.DoTradeResult.NOT_ICC -> {
+                statusEditText.setText(getString(R.string.card_inserted))
+            }
+            QPOSService.DoTradeResult.BAD_SWIPE -> {
+                statusEditText.setText(getString(R.string.bad_swipe))
+            }
+            QPOSService.DoTradeResult.MCR -> {
+                decodeData ?: return
+                extractMcrData(decodeData)
+            }
+            QPOSService.DoTradeResult.NO_RESPONSE -> {
+                statusEditText.setText(getString(R.string.card_no_response))
+            }
         }
     }
 
@@ -220,8 +121,7 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
     override fun onRequestTransactionResult(transactionResult: QPOSService.TransactionResult) {
         qPosManager.hideProgressBar()
         if (transactionResult == QPOSService.TransactionResult.APPROVED) {
-            qPosManager.showSuccess(transactionResult.getMessage(activity))
-            handleCardData(cardData)
+            handleCardData()
         } else {
             qPosManager.showError<Nothing>(transactionResult.getMessage(activity)) {
                 onClose {
@@ -290,25 +190,85 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
     }
 
     override fun onRequestOnlineProcess(tlv: String) {
-        try { //                    analyData(tlv);// analy tlv ,get the tag you need
+        try {
+            extractData(tlv)// analy tlv ,get the tag you need
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
 
         if (isPinCanceled) {
-            val message = getString(R.string.replied_success)
-            qPosManager.showSuccess<Nothing>(message) {
-                onClose {
-                    pos.sendOnlineProcessResult(null)
-                }
-            }
+            pos.sendOnlineProcessResult(null)
         } else {
-            val message = getString(R.string.replied_failed)
-            qPosManager.showError<Nothing>(message) {
-                onClose {
-                    val str = "8A023030"
-                    pos.sendOnlineProcessResult(str)
-                }
+            val str = "8A023030"
+            pos.sendOnlineProcessResult(str)
+        }
+    }
+
+    private fun extractData(tlv: String) {
+        val list: List<TLV> = TLVParser.parse(tlv) // get the tag list
+        val tlvStrArr = arrayOf("c0", "c2", "c1", "c7")
+        val c0Tlv: TLV? = TLVParser.searchTLV(list, tlvStrArr[0])
+        val c2Tlv: TLV? = TLVParser.searchTLV(list, tlvStrArr[1])
+        val c1Tlv: TLV? = TLVParser.searchTLV(list, tlvStrArr[2])
+        val c7Tlv: TLV? = TLVParser.searchTLV(list, tlvStrArr[3])
+        if (c0Tlv == null || c2Tlv == null) return
+        val ksn: String = c0Tlv.value //ksn
+        val dataStr: String = c2Tlv.value //datastr
+        val date = DUKPK2009_CBC.getDate(
+            ksn,
+            dataStr,
+            DUKPK2009_CBC.Enum_key.DATA,
+            DUKPK2009_CBC.Enum_mode.CBC
+        )
+        val dates: List<TLV> = TLVParser.parse(date) ?: return
+        val tlvStrArrs = arrayOf("5A", "5F2A", "9F09")
+        val dateTlv: TLV = TLVParser.searchTLV(dates, tlvStrArrs[0])
+        val dataCu: TLV = TLVParser.searchTLV(dates, tlvStrArrs[1])
+        val data9F09: TLV = TLVParser.searchTLV(dates, tlvStrArrs[2])
+
+        cardData.apply {
+            ret = CardTransactionStatus.Success.code
+            transactionAmount = list.getValue("9F02")
+            pan = dates.getValue("5A", hex = false, fpadded = true)
+            exp = list.getValue("5F24").substring(0, 4)
+            holder = list.getValue("5F20", true)
+            cardSequenceNumber = list.getValue("5f34")
+            aid = list.getValue("9F06")
+            track2 = dates.getValue("57", hex = false, fpadded = true)
+            var markerIndex = track2.indexOf("D")
+            if (markerIndex < 0) {
+                markerIndex = track2.indexOf("=")
+            }
+            src = track2.substring(markerIndex + 5, markerIndex + 8)
+
+            setIccTlv(dates)
+            cardMethod = CardReaderEvent.CHIP
+        }
+
+        val tvr = dates.getValue("95").hexBytes
+        if (tvr.isNotEmpty() && tvr.last() == 1.toByte()) {
+            cardData.ret = CardTransactionStatus.OfflinePinVerifyError.code
+        }
+
+        cardData.pinBlock =
+            encryptedPinBlock(cardData.pan, String(byteArrayOf(30, 31, 32, 30))).hexString
+
+        if (c1Tlv != null || c7Tlv != null) {
+            val pinKsn: String? = c1Tlv?.value
+            val pinBlock: String? = c7Tlv?.value
+            if (pinKsn != null || pinBlock != null) {
+                val encryptedPin = DUKPK2009_CBC.getDate(
+                    pinKsn,
+                    pinBlock,
+                    DUKPK2009_CBC.Enum_key.PIN,
+                    DUKPK2009_CBC.Enum_mode.CBC
+                )
+                val pan = dates.getValue("5A", hex = false, fpadded = true)
+                val parsCarN = "0000" + pan.substring(
+                    pan.length - 13,
+                    pan.length - 1
+                )
+                val pin = DUKPK2009_CBC.xor(parsCarN, encryptedPin)
             }
         }
     }
@@ -316,7 +276,6 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
     override fun onRequestTime() {
         val terminalTime = Instant.now().format("yyyyMMddHHmmss")
         pos.sendTime(terminalTime)
-        statusEditText.setText(getString(R.string.request_terminal_time) + " " + terminalTime)
     }
 
     override fun onRequestDisplay(displayMsg: QPOSService.Display) {
@@ -436,7 +395,7 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
                 statusEditText.setText(getString(R.string.device_reset))
             }
         }
-        handleCardData(null)
+        handleCardData()
         handleCardReaderEvent(CardReaderEvent.CANCELLED)
     }
 
@@ -489,8 +448,7 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
         statusEditText.setText("cardNo: $cardNo")
     }
 
-    override fun onRequestCalculateMac(calMac: String) { // statusEditText.setText("calMac: " + calMac);
-// TRACE.d("calMac_result: calMac=> " + calMac);
+    override fun onRequestCalculateMac(calMac: String) {
         var calMac: String? = calMac
         TRACE.d("onRequestCalculateMac(String calMac):$calMac")
         if (calMac != null && "" != calMac) {
@@ -512,8 +470,7 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
         isSuccess: Boolean,
         result: String
     ) {
-        TRACE.d("onReturnCustomConfigResult(boolean isSuccess, String result):" + isSuccess + TRACE.NEW_LINE + result)
-        statusEditText.setText("result: $isSuccess\ndata: $result")
+        handleUnitContinuation()
     }
 
     override fun onRequestSetPin() {
@@ -708,20 +665,17 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
     }
 
     override fun onReturnUpdateIPEKResult(arg0: Boolean) {
-        TRACE.d("onReturnUpdateIPEKResult(boolean arg0):$arg0")
-        if (arg0) {
-            statusEditText.setText("update IPEK success")
-        } else {
-            statusEditText.setText("update IPEK fail")
-        }
+        handleUnitContinuation()
     }
 
     override fun onReturnUpdateEMVRIDResult(arg0: Boolean) {
         TRACE.d("onReturnUpdateEMVRIDResult(boolean arg0):$arg0")
+        handleUnitContinuation()
     }
 
     override fun onReturnUpdateEMVResult(arg0: Boolean) { // TODO Auto-generated method stub
         TRACE.d("onReturnUpdateEMVResult(boolean arg0):$arg0")
+        handleUnitContinuation()
     }
 
     override fun onBluetoothBoardStateResult(arg0: Boolean) { // TODO Auto-generated method stub
@@ -891,8 +845,7 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
         signaturedData: String
     ) {
         if (b) {
-            val base64Encoder = BASE64Encoder()
-            val encode = base64Encoder.encode(signaturedData.toByteArray())
+            val encode = Base64.encode(signaturedData.toByteArray(), Base64.DEFAULT)
             statusEditText.setText("signature data (Base64 encoding):$encode")
         }
     }
@@ -941,7 +894,13 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
         continuation.resume(status)
     }
 
-    private fun handleCardData(cardData: CardData?) {
+    private fun handleUnitContinuation() {
+        val continuation = unitContinuation ?: return
+        unitContinuation = null
+        continuation.resume(Unit)
+    }
+
+    private fun handleCardData() {
         val continuation = cardDataContinuation ?: return
         cardDataContinuation = null
         continuation.resume(cardData)
@@ -953,16 +912,30 @@ class QPosListener(private val qPosManager: QPosManager) : CQPOSService() {
         continuation.resume(cardReaderEvent)
     }
 
+    internal suspend inline fun waitForUnit(crossinline block: () -> Unit) =
+        suspendCoroutine<Unit> {
+            unitContinuation = it
+            block()
+        }
+
     //////////// STUBS /////////////
 
     private var isPinCanceled = false
     private val activity get() = qPosManager.activity
     private val sessionData get() = qPosManager.sessionData
-    private val pos get() = qPosManager.pos
     private val statusEditText = object {
         fun setText(string: String?) {
             TRACE.d(string)
         }
     }
     private val updateThread: UpdateThread? = UpdateThread(qPosManager)
+
+    private fun encryptedPinBlock(pan: String, pin: String): ByteArray {
+        val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
+        val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
+        val cipherKey = posParameter.pinKey.hexBytes
+        val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
+        val tripleDesCipher = TripleDesCipher(cipherKey)
+        return tripleDesCipher.encrypt(cryptData).copyOf(8)
+    }
 }

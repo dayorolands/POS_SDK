@@ -1,7 +1,8 @@
 package com.dspread.qpos.utils;
 
+import android.util.Base64;
+
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -20,9 +21,6 @@ import java.util.Map;
 
 import javax.crypto.Cipher;
 
-import Decoder.BASE64Decoder;
-import Decoder.BASE64Encoder;
-
 /**
  * Created by dsppc11 on 2019/2/20.
  */
@@ -31,7 +29,7 @@ public class CreateSecretKey {
     public static final String KEY_ALGORITHM = "RSA";
     private static final String PUBLIC_KEY = "RSAPublicKey";
     private static final String PRIVATE_KEY = "RSAPrivateKey";
-    public static final String SIGNATURE_ALGORITHM="MD5withRSA";
+    public static final String SIGNATURE_ALGORITHM = "MD5withRSA";
     /**
      * RSA最大加密明文大小
      */
@@ -62,7 +60,7 @@ public class CreateSecretKey {
     //获取公钥
     public static PublicKey getPublicKey(String key) throws Exception {
         byte[] keyBytes;
-        keyBytes = (new BASE64Decoder()).decodeBuffer(key);
+        keyBytes = Base64.decode(key, Base64.DEFAULT);
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         PublicKey publicKey = keyFactory.generatePublic(keySpec);
@@ -72,7 +70,7 @@ public class CreateSecretKey {
     //获取私钥
     public static PrivateKey getPrivateKey(String key) throws Exception {
         byte[] keyBytes;
-        keyBytes = (new BASE64Decoder()).decodeBuffer(key);
+        keyBytes = Base64.decode(key, Base64.DEFAULT);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
         PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
@@ -81,17 +79,17 @@ public class CreateSecretKey {
 
     //解码返回byte
     public static byte[] decryptBASE64(String key) throws Exception {
-        return (new BASE64Decoder()).decodeBuffer(key);
+        return Base64.decode(key, Base64.DEFAULT);
     }
 
 
     //编码返回字符串
     public static String encryptBASE64(byte[] key) throws Exception {
-        return (new BASE64Encoder()).encodeBuffer(key);
+        return new String(Base64.encode(key, Base64.DEFAULT));
     }
 
     //***************************签名和验证*******************************
-    public static byte[] sign(byte[] data,String privateKeyStr) throws Exception {
+    public static byte[] sign(byte[] data, String privateKeyStr) throws Exception {
         PrivateKey priK = getPrivateKey(privateKeyStr);
         Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM);
         sig.initSign(priK);
@@ -99,7 +97,7 @@ public class CreateSecretKey {
         return sig.sign();
     }
 
-    public static boolean verify(byte[] data,byte[] sign,String publicKeyStr) throws Exception {
+    public static boolean verify(byte[] data, byte[] sign, String publicKeyStr) throws Exception {
         PublicKey pubK = getPublicKey(publicKeyStr);
         Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM);
         sig.initVerify(pubK);
@@ -108,7 +106,7 @@ public class CreateSecretKey {
     }
 
     //************************加密解密**************************
-    public static byte[] encrypt(byte[] plainText,String publicKeyStr)throws Exception {
+    public static byte[] encrypt(byte[] plainText, String publicKeyStr) throws Exception {
         PublicKey publicKey = getPublicKey(publicKeyStr);
         Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
@@ -132,7 +130,7 @@ public class CreateSecretKey {
         return encryptText;
     }
 
-    public static byte[] decrypt(byte[] encryptText,String privateKeyStr)throws Exception {
+    public static byte[] decrypt(byte[] encryptText, String privateKeyStr) throws Exception {
         PrivateKey privateKey = getPrivateKey(privateKeyStr);
         Cipher cipher = Cipher.getInstance(KEY_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
@@ -158,19 +156,18 @@ public class CreateSecretKey {
     }
 
 
-    public static Map<String,Object> initKey() throws Exception {
+    public static Map<String, Object> initKey() throws Exception {
         KeyPairGenerator keyPairGen = KeyPairGenerator
                 .getInstance(KEY_ALGORITHM);
         keyPairGen.initialize(1024);
         KeyPair keyPair = keyPairGen.generateKeyPair();
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        Map<String,Object> keyMap = new HashMap<String,Object>(2);
+        Map<String, Object> keyMap = new HashMap<String, Object>(2);
         keyMap.put(PUBLIC_KEY, publicKey);
         keyMap.put(PRIVATE_KEY, privateKey);
         return keyMap;
     }
-
 
 
     /**
@@ -180,7 +177,7 @@ public class CreateSecretKey {
      * @return
      * @throws Exception
      */
-    public static byte[] decryptPubKey(Key publicKey,String cryptograph) throws Exception {
+    public static byte[] decryptPubKey(Key publicKey, String cryptograph) throws Exception {
         ;
 
         /** 得到Cipher对象对已用公钥加密的数据进行RSA解密 */
@@ -191,6 +188,7 @@ public class CreateSecretKey {
         byte[] b = cipher.doFinal(b1);
         return b;
     }
+
     // 十六进制字符串转字节数组
     public static byte[] parseHexStr2Byte(String hexStr) {
         if (hexStr.length() < 1)
@@ -205,16 +203,16 @@ public class CreateSecretKey {
         return result;
     }
 
-    public static RSAPublicKey generateRSAPublicKey(String  modulus, String  publicExponent) {
+    public static RSAPublicKey generateRSAPublicKey(String modulus, String publicExponent) {
         PublicKey publicKey = null;
         try {
-        BigInteger bigIntModulus = new BigInteger(modulus,16);
+            BigInteger bigIntModulus = new BigInteger(modulus, 16);
 
-        BigInteger bigIntPrivateExponent = new BigInteger(publicExponent,16);
+            BigInteger bigIntPrivateExponent = new BigInteger(publicExponent, 16);
 
-        RSAPublicKeySpec keySpec = new RSAPublicKeySpec(bigIntModulus, bigIntPrivateExponent);
+            RSAPublicKeySpec keySpec = new RSAPublicKeySpec(bigIntModulus, bigIntPrivateExponent);
 
-        KeyFactory keyFactory = null;
+            KeyFactory keyFactory = null;
 
             keyFactory = KeyFactory.getInstance("RSA");
             publicKey = keyFactory.generatePublic(keySpec);
@@ -239,7 +237,6 @@ public class CreateSecretKey {
         }
         return sb.toString();
     }
-
 
 
     public static void main(String[] args) {
@@ -281,17 +278,15 @@ public class CreateSecretKey {
         String key = "S5SfG0qyDDW6rvKVDG4akUj6NGbtXPTSwS9kUkBzKZbPJZxTevIjiNxguWbxJUqe/6ors0UsYqcHNFrT7VEyXNNaoUloULnci2QDQ0RDFFhzeLYiJcFDkTjSX18n035I+/YLH17+rJdUQAWglJUbvPn0+9BezdgX+wRtBxjCztI=";
 
         try {
-            byte[] bytes = new BASE64Decoder().decodeBuffer(key);
+            byte[] bytes = Base64.decode(key, Base64.DEFAULT);
             String s = parseByte2HexStr(bytes);
             System.out.println(s);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
 
     }
-
-
 
 
 }
