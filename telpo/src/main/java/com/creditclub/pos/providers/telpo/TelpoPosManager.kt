@@ -109,7 +109,8 @@ class TelpoPosManager(private val activity: CreditClubActivity) : PosManager, Ko
     }
 
     companion object : PosManagerCompanion {
-        private var deviceType = -1
+        override val id = "POS"
+        override val deviceType = 1
 
         override val module = module {
             factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
@@ -122,7 +123,7 @@ class TelpoPosManager(private val activity: CreditClubActivity) : PosManager, Ko
 
         override fun isCompatible(context: Context): Boolean {
             try {
-                deviceType = SystemUtil.getDeviceType()
+                SystemUtil.getDeviceType()
                 return true
             } catch (ex: Exception) {
                 debugOnly { Log.e("TelpoPosManager", ex.message, ex) }

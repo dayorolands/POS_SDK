@@ -17,7 +17,7 @@ import org.koin.core.context.startKoin
 class BankOneApplication : CreditClubApplication() {
 
     override val otaAppName: String
-        get() = if (Platform.isPOS) "${super.otaAppName}POS" else super.otaAppName
+        get() = if (Platform.isPOS) "${super.otaAppName}${Platform.posId}" else super.otaAppName
 
     val authResponse: AuthResponse by lazy {
         val phoneNumber = "234${localStorage.agentPhone?.substring(1)}"

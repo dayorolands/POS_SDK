@@ -31,7 +31,7 @@ abstract class TransactionReceipt(val context: Context) :
             TextNode(statusMessage.toUpperCase(Locale.getDefault()))
                 .apply {
             align = Alignment.MIDDLE
-            wordFont = 35
+            wordFont = 30
         })
 
         if (!isSuccessful) {

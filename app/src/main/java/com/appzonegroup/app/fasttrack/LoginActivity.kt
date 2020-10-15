@@ -255,7 +255,7 @@ class LoginActivity : CreditClubActivity() {
                 phoneNumber,
                 pin,
                 appVersionName,
-                if (Platform.isPOS) "TelpoPOS" else "Mobile"
+                Platform.deviceType
             )
         }
         dialogProvider.hideProgressBar()

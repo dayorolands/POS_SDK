@@ -70,6 +70,9 @@ class SunmiPosManager(private val context: Context) :
     }
 
     companion object : PosManagerCompanion {
+        override val id = "SunmiPOS"
+        override val deviceType = 4
+
         override val module = module {
             factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
                 SunmiPosManager(activity)

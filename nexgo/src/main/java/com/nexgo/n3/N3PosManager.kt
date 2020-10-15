@@ -108,6 +108,9 @@ class N3PosManager(private val activity: CreditClubActivity) : PosManager, KoinC
     }
 
     companion object : PosManagerCompanion {
+        override val id = "NexgoPOS"
+        override val deviceType = 3
+
         override fun setup(context: Context) {
             APIProxy.getDeviceEngine(context).getEmvHandler2("app2")
         }

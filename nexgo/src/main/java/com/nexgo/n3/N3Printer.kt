@@ -85,7 +85,7 @@ class N3Printer(override val context: Context, override val dialogProvider: Dial
     private fun Printer.printImage(node: ImageNode) {
         val bitmap = BitmapFactory.decodeResource(context.resources, node.drawable)
         appendImage(bitmap, node.align.asAlignEnum)
-        walkPaper(node.walkPaperAfterPrint)
+//        walkPaper(node.walkPaperAfterPrint)
     }
 
     private inline val FontWeight.fontEntity
