@@ -1,5 +1,6 @@
 include ':analytics'
 include ':nexgo_smartpos_sdk'
+include ':dspread'
 include ':nexgo'
 include ':telpo'
 include ':sunmi'

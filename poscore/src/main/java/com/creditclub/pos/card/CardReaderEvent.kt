@@ -13,5 +13,6 @@ enum class CardReaderEvent(val code: Int, val message: String) {
     REMOVED(-1, "Card Removed"),
     CANCELLED(-2, "Cancelled"),
     CHIP_FAILURE(-3, "ICC card failure"),
+    Timeout(-2, "Cancelled"),
     HYBRID_FAILURE(-4, "ICC card failure")
 }
