@@ -116,8 +116,8 @@ class N3CardReader(
                 else -> 0x00.toByte()
             }
 
-            countryCode = "566" //CountryCode
-            currencyCode = "566" //CurrencyCode, 840 indicate USD dollar
+            countryCode = "0566" //CountryCode
+            currencyCode = "0566" //CurrencyCode
             termId = posConfig.terminalId
             merId = posParameter.managementData.cardAcceptorId
             transDate =
@@ -131,7 +131,7 @@ class N3CardReader(
             } else {
                 EmvEntryModeEnum.EMV_ENTRY_MODE_CONTACTLESS
             }
-            isContactForceOnline = true
+//            isContactForceOnline = true
         }
 
     private fun openDevice() {
