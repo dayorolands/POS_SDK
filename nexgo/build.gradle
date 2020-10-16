@@ -13,6 +13,11 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    buildFeatures {
+        dataBinding = true
+    }
+
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']

@@ -1,6 +1,8 @@
 package com.nexgo.n3
 
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
+import androidx.databinding.DataBindingUtil
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.pos.PosManager
@@ -11,6 +13,8 @@ import com.creditclub.pos.card.CardTransactionStatus
 import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.extensions.hexString
 import com.creditclub.pos.utils.TripleDesCipher
+import com.nexgo.R
+import com.nexgo.databinding.NexgoN3PinInputDialogBinding
 import com.nexgo.oaf.apiv3.DeviceEngine
 import com.nexgo.oaf.apiv3.SdkResult
 import com.nexgo.oaf.apiv3.device.pinpad.*
@@ -48,6 +52,7 @@ class N3EmvListener(
     }
 
     override fun onTransInitBeforeGPO() {
+//        emvHandler2.setPureKernelCapab(byteArrayOf(0xE0.toByte(), 0x40.toByte(), 0xC8.toByte()))
         emvHandler2.onSetTransInitBeforeGPOResponse(true)
     }
 
@@ -89,33 +94,55 @@ class N3EmvListener(
             val pinKey = posParameter.pinKey.hexBytes
             pinPad.writeWKey(0, WorkKeyTypeEnum.PINKEY, pinKey, pinKey.size)
         }
-        val pinPadInputListener = object : OnPinPadInputListener {
-            override fun onInputResult(retCode: Int, data: ByteArray?) {
-                if (retCode == SdkResult.Success || retCode == SdkResult.PinPad_No_Pin_Input || retCode == SdkResult.PinPad_Input_Cancel) {
-                    if (data != null && isOnlinePin) {
-                        val temp = ByteArray(8)
-                        System.arraycopy(data, 0, temp, 0, 8)
+        activity.runOnUiThread {
+            var pwdText = ""
+            val inflater = activity.layoutInflater
+            val binding =
+                DataBindingUtil.inflate<NexgoN3PinInputDialogBinding>(
+                    inflater,
+                    R.layout.nexgo_n3_pin_input_dialog,
+                    null,
+                    false
+                )
+            binding.triesLeftTv.text = "$leftTimes"
+            val dialog = AlertDialog.Builder(activity).setView(binding.root).create()
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.show()
+            val pinPadInputListener = object : OnPinPadInputListener {
+                override fun onInputResult(retCode: Int, data: ByteArray?) {
+                    dialog.dismiss()
+                    if (retCode == SdkResult.Success || retCode == SdkResult.PinPad_No_Pin_Input || retCode == SdkResult.PinPad_Input_Cancel) {
+                        if (data != null && isOnlinePin) {
+                            val temp = ByteArray(8)
+                            System.arraycopy(data, 0, temp, 0, 8)
 //                        if (dukptConfig != null) {
 //                            val pinBlock =
 //                                pinPad.dukptEncrypt(0, DukptKeyModeEnum.REQUEST, data, data.size)
 //                            cardData.pinBlock = pinBlock.hexString
 //                            cardData.ksnData = pinPad.dukptCurrentKsn(0)?.hexString
 //                        }
+                        }
+                        emvHandler2.onSetPinInputResponse(
+                            retCode != SdkResult.PinPad_Input_Cancel,
+                            retCode == SdkResult.PinPad_No_Pin_Input
+                        )
+                    } else {
+                        emvHandler2.onSetPinInputResponse(false, false)
                     }
-                    emvHandler2.onSetPinInputResponse(
-                        retCode != SdkResult.PinPad_Input_Cancel,
-                        retCode == SdkResult.PinPad_No_Pin_Input
-                    )
-                } else {
-                    emvHandler2.onSetPinInputResponse(false, false)
+                }
+
+                override fun onSendKey(keyCode: Byte) {
+                    activity.runOnUiThread {
+                        if (keyCode == PinPadKeyCode.KEYCODE_CLEAR) {
+                            pwdText = ""
+                        } else {
+                            pwdText += "* "
+                        }
+                        binding.pinTv.text = pwdText
+                    }
                 }
             }
 
-            override fun onSendKey(keyCode: Byte) {
-
-            }
-        }
-        activity.runOnUiThread {
             pinPad.setPinKeyboardMode(PinKeyboardModeEnum.RANDOM)
             if (isOnlinePin) {
                 pinPad.inputOnlinePin(

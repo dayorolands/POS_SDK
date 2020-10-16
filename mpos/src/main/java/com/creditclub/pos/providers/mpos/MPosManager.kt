@@ -276,6 +276,8 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     }
 
     companion object : PosManagerCompanion {
+        override val id = ""
+        override val deviceType = 2
         override val module = module {
             factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
                 MPosManager(activity)
