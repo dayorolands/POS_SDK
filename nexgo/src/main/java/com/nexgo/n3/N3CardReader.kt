@@ -106,7 +106,7 @@ class N3CardReader(
                 TransactionType.CashBack -> {
                     cashbackAmount = posManager
                         .sessionData
-                        .cashbackAmount
+                        .cashBackAmount
                         .toString()
                         .padStart(12, '0')
 

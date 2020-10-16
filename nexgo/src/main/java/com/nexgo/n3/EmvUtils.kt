@@ -3,7 +3,6 @@ package com.nexgo.n3
 import android.content.Context
 import android.util.Log
 import com.creditclub.pos.extensions.hexBytes
-import com.creditclub.pos.extensions.hexString
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonParser
@@ -63,36 +62,28 @@ private fun Context.readAssetsTxt(fileName: String): String {
 
 inline val Int.hexString get() = toString(16)
 
-fun EmvHandler2.getTag(
-    tagInt: Int,
-    source: EmvDataSourceEnum = EmvDataSourceEnum.FROM_KERNEL
-): ByteArray {
+fun EmvHandler2.getTag(tagInt: Int): ByteArray {
     return getValue(tagInt).hexBytes
 }
 
-fun EmvHandler2.getValue(
-    tag: Int,
-    hex: Boolean = false,
-    fPadded: Boolean = false,
-    source: EmvDataSourceEnum = EmvDataSourceEnum.FROM_KERNEL
-): String {
+fun EmvHandler2.getValue(tag: Int, hex: Boolean = false, fPadded: Boolean = false): String {
     val tagString = tag.hexString
-    return getTlvByTags(arrayOf(tagString)).substring(tagString.length + 2)
+    val rawValue = getTlvByTags(arrayOf(tagString)).substring(tagString.length + 2)
 
-//    val value = when {
-//        hex -> String(getTag(tag, source))
-//        else -> getTag(tag, source).hexString
-//    }
-//
-//    if (fPadded) {
-//        val stringBuffer = StringBuffer(value)
-//        if (stringBuffer[stringBuffer.toString().length - 1] == 'F') {
-//            stringBuffer.deleteCharAt(stringBuffer.toString().length - 1)
-//        }
-//        return stringBuffer.toString()
-//    }
-//
-//    return value
+    val value = when {
+        hex -> String(rawValue.hexBytes)
+        else -> rawValue
+    }
+
+    if (fPadded) {
+        val stringBuffer = StringBuffer(value)
+        if (stringBuffer[stringBuffer.toString().length - 1] == 'F') {
+            stringBuffer.deleteCharAt(stringBuffer.toString().length - 1)
+        }
+        return stringBuffer.toString()
+    }
+
+    return value
 }
 
 internal infix fun ByteArray.xor(other: ByteArray): ByteArray {

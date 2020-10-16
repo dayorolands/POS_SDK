@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <data>
-
-        <variable
-            name="title"
-            type="String" />
-    </data>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:paddingBottom="300dp"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -25,7 +18,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginTop="20dp"
-                android:text='@{title, default=@string/enter_pin}'
+                android:text="@string/enter_pin"
                 android:textSize="30sp"
                 android:textColor="#000"
                 android:textStyle="bold" />
@@ -36,7 +29,7 @@
                 android:layout_toStartOf="@id/tries_left_tv"
                 android:layout_centerVertical="true"
                 android:layout_marginTop="20dp"
-                android:text='@{title, default=@string/tries_left}'
+                android:text="@string/tries_left"
                 android:textSize="22sp"
                 android:layout_marginEnd="10dp"
                 android:textStyle="bold" />
@@ -48,10 +41,20 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginTop="20dp"
-                android:text='@{title, default=3}'
+                android:text="3"
                 android:textSize="22sp"
                 android:textStyle="bold" />
         </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/amount_tv"
+            android:text=""
+            android:textSize="25sp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="10dp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/pin_tv"

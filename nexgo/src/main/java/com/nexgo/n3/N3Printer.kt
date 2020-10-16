@@ -73,7 +73,7 @@ class N3Printer(override val context: Context, override val dialogProvider: Dial
 
     private fun Printer.walkPaper(distance: Int) {
         if (distance > 0) {
-            appendPrnStr("\n".repeat(distance), 20, AlignEnum.CENTER, false)
+            appendPrnStr("\n".repeat(distance / 3), 20, AlignEnum.CENTER, false)
         }
     }
 

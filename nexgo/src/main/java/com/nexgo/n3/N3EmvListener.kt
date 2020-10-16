@@ -5,6 +5,7 @@ import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogOptionItem
+import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardData
@@ -56,18 +57,18 @@ class N3EmvListener(
         emvHandler2.onSetTransInitBeforeGPOResponse(true)
     }
 
-    override fun onConfirmCardNo(cardInfo: CardInfoEntity) = activity.runOnUiThread {
-        val cardNo = cardInfo.cardNo
-        dialogProvider.confirm("Please Confirm Card Number", cardNo) {
-            onSubmit { emvHandler2.onSetConfirmCardNoResponse(true) }
-            onClose { emvHandler2.onSetConfirmCardNoResponse(false) }
-        }
+    override fun onConfirmCardNo(cardInfo: CardInfoEntity) {
+        emvHandler2.onSetConfirmCardNoResponse(true)
     }
 
     override fun onCardHolderInputPin(isOnlinePin: Boolean, leftTimes: Int) {
         val pinPad: PinPad = deviceEngine.pinPad
         val cardNo = emvHandler2.emvCardDataInfo.cardNo
         val amount = sessionData.amount / 100.0
+        var amountText = ""
+        if (sessionData.amount > 0) amountText = "Amount: ${amount.toCurrencyFormat()}"
+        if (sessionData.cashBackAmount > 0) amountText = "$amount        " +
+                "Cashback Amount: ${amount.toCurrencyFormat()}"
         val dukptConfig = sessionData.getDukptConfig?.invoke(cardNo, amount)
         if (dukptConfig != null) {
             val paddedIpek = dukptConfig.ipek.padStart(20, '0')
@@ -105,6 +106,7 @@ class N3EmvListener(
                     false
                 )
             binding.triesLeftTv.text = "$leftTimes"
+            binding.amountTv.text = amountText
             val dialog = AlertDialog.Builder(activity).setView(binding.root).create()
             dialog.setCanceledOnTouchOutside(false)
             dialog.show()
