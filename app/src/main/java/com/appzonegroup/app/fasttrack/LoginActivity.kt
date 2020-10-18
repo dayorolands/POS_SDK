@@ -81,7 +81,10 @@ class LoginActivity : CreditClubActivity() {
         }
 
         mainScope.launch { (application as CreditClubApplication).getLatestVersion() }
-        mainScope.launch { updateBinRoutes() }
+        mainScope.launch {
+            updateBinRoutes()
+            checkRequirements()
+        }
 
         if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
             dialogProvider.showError("Timeout due to inactivity")
@@ -102,13 +105,16 @@ class LoginActivity : CreditClubActivity() {
         }
     }
 
-    private suspend fun updateBinRoutes() {
+    private suspend fun updateBinRoutes(showDialog: Boolean = false) {
+        posPreferences.clearBinRoutes()
+        if (showDialog) dialogProvider.showProgressBar("Downloading pos settings")
         val (response) = safeRunIO {
             creditClubMiddleWareAPI.posApiService.getBinRoutes(
                 localStorage.institutionCode,
                 localStorage.agentPhone
             )
         }
+        if (showDialog) dialogProvider.hideProgressBar()
         if (response?.isSuccessful() == true) {
             posPreferences.binRoutes = response.data
         }
@@ -279,6 +285,24 @@ class LoginActivity : CreditClubActivity() {
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
         startActivity(intent)
         finish()
+    }
+
+    private fun checkRequirements() {
+        if (!posPreferences.hasBinRoutes) {
+            return dialogProvider.confirm(
+                "We couldn't download some settings",
+                "Do you want to retry?"
+            ) {
+                onSubmit {
+                    if (it) {
+                        mainScope.launch {
+                            updateBinRoutes()
+                            checkRequirements()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun showError(message: String, viewId: Int) {

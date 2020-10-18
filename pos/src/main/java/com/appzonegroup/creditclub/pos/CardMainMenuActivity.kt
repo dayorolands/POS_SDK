@@ -27,7 +27,6 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu), View
     private val binding by dataBinding<ActivityCardMainMenuBinding>()
 
     //    override val functionId = FunctionIds.CARD_TRANSACTIONS
-    private val posManager: PosManager by inject { parametersOf(this) }
     private val defaultParameterStore: PosParameter by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {

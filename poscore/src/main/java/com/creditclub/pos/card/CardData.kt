@@ -43,7 +43,7 @@ abstract class CardData {
     var ksnData: String? = null
     open var ret: Int = -1
     open var status: CardTransactionStatus? = null
-        get() = CardTransactionStatus.find(ret)
+        get() = field ?: CardTransactionStatus.find(ret)
         set(value) {
             field = value
             ret = value?.code ?: -1

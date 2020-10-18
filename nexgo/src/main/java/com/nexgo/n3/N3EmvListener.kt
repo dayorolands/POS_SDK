@@ -62,6 +62,14 @@ class N3EmvListener(
     }
 
     override fun onCardHolderInputPin(isOnlinePin: Boolean, leftTimes: Int) {
+        if (!isOnlinePin && leftTimes < 1) {
+            emvHandler2.emvProcessCancel()
+            continuation.resume(N3CardData().apply {
+                status = CardTransactionStatus.CardRestricted
+            })
+            return
+        }
+
         val pinPad: PinPad = deviceEngine.pinPad
         val cardNo = emvHandler2.emvCardDataInfo.cardNo
         val amount = sessionData.amount / 100.0
