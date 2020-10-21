@@ -105,7 +105,7 @@ public class TokenCashOutActivity extends BaseActivity {
     void init()
     {
         //sessionID = UUID.randomUUID().toString().substring(0, 8);
-        Spinner destinationBankSpinner = (Spinner) findViewById(R.id.spinner_destination_bank);
+        Spinner destinationBankSpinner = (Spinner) findViewById(R.id.destination_bank_spinner);
 
         ArrayList<String> bankNames = new ArrayList<>();
         bankNames.add("Select bank...");

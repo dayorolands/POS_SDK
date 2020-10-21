@@ -241,7 +241,6 @@
         <activity
             android:name=".CashoutMainMenuActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".LocationCheckDialog" />
         <activity
             android:name=".CustomerRequestOpenAccountActivity"
             android:label="@string/title_activity_open_account"

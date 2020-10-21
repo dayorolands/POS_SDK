@@ -6,6 +6,9 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import androidx.core.view.GravityCompat
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.databinding.HomeFragmentBinding
@@ -15,8 +18,11 @@ import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.AppFunctions
+import com.creditclub.core.data.api.NotificationService
+import com.creditclub.core.data.model.NotificationRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.debugOnly
+import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.ui.UpdateActivity
@@ -29,6 +35,8 @@ class HomeFragment : CreditClubFragment(R.layout.home_fragment),
 
     private val packageInfo get() = requireContext().packageInfo
     private val binding by dataBinding<HomeFragmentBinding>()
+    private val notificationViewModel by activityViewModels<NotificationViewModel>()
+    private val notificationService by creditClubMiddleWareAPI.retrofit.service<NotificationService>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -69,7 +77,8 @@ class HomeFragment : CreditClubFragment(R.layout.home_fragment),
             }
         }
 
-        getFavorites()
+        mainScope.launch { getFavorites() }
+        mainScope.launch { getNotifications() }
 
         binding.navView.menu.getItem(0).run {
             isVisible = institutionConfig.hasOnlineFunctions
@@ -83,76 +92,88 @@ class HomeFragment : CreditClubFragment(R.layout.home_fragment),
             isVisible = institutionConfig.hasHlaTagging
         }
 
-        if (hasPosUpdateManager) {
-            appDataStorage.latestVersion?.run {
-                val currentVersion = packageInfo?.versionName
-                if (currentVersion != null) {
-                    if (updateIsAvailable(currentVersion)) {
-                        val updateIsRequired = updateIsRequired(currentVersion)
-                        val mustUpdate = updateIsRequired && daysOfGraceLeft() < 1
-                        val message = "A new version (v$version) is available."
-                        val subtitle =
-                            if (updateIsRequired && mustUpdate) "You need to update now"
-                            else if (updateIsRequired) "Please update with ${daysOfGraceLeft()} days"
-                            else "Please update"
-
-                        val dialog =
-                            Dialogs.confirm(requireContext(), message, subtitle) {
-                                onSubmit {
-                                    if (it) {
-                                        startActivity(
-                                            Intent(
-                                                requireContext(),
-                                                UpdateActivity::class.java
-                                            )
-                                        )
-                                        requireActivity().finish()
-                                    } else if (mustUpdate) requireActivity().finish()
-                                }
-
-                                onClose {
-                                    if (mustUpdate) requireActivity().finish()
-                                }
-                            }
-                        dialog.setCancelable(!mustUpdate)
-                        dialog.setCanceledOnTouchOutside(false)
-                    }
-                }
-            }
-        }
+        if (hasPosUpdateManager) checkForUpdate()
 
         binding.drawerToggle.setOnClickListener { openDrawer() }
+        binding.notificationBtn.setOnClickListener {
+            findNavController().navigate(HomeFragmentDirections.homeToNotifications())
+        }
     }
 
-    private fun getFavorites() {
+    private suspend fun getNotifications() {
+        val (response, error) = safeRunIO {
+            notificationService.getNotifications(
+                NotificationRequest(
+                    localStorage.agentPhone,
+                    localStorage.institutionCode,
+                    20,
+                    0
+                )
+            )
+        }
+
+        if (response != null) notificationViewModel.notificationList.value = response
+    }
+
+    private fun checkForUpdate() = appDataStorage.latestVersion?.run {
+        val currentVersion = packageInfo?.versionName
+        if (currentVersion != null && updateIsAvailable(currentVersion)) {
+            val updateIsRequired = updateIsRequired(currentVersion)
+            val mustUpdate = updateIsRequired && daysOfGraceLeft() < 1
+            val message = "A new version (v$version) is available."
+            val subtitle =
+                if (updateIsRequired && mustUpdate) "You need to update now"
+                else if (updateIsRequired) "Please update with ${daysOfGraceLeft()} days"
+                else "Please update"
+
+            val dialog =
+                Dialogs.confirm(requireContext(), message, subtitle) {
+                    onSubmit {
+                        if (it) {
+                            startActivity(
+                                Intent(
+                                    requireContext(),
+                                    UpdateActivity::class.java
+                                )
+                            )
+                            requireActivity().finish()
+                        } else if (mustUpdate) requireActivity().finish()
+                    }
+
+                    onClose {
+                        if (mustUpdate) requireActivity().finish()
+                    }
+                }
+            dialog.setCancelable(!mustUpdate)
+            dialog.setCanceledOnTouchOutside(false)
+        }
+    }
+
+    private suspend fun getFavorites() {
         val frequentBindings =
             listOf(binding.frequent.fn1, binding.frequent.fn2, binding.frequent.fn3)
 
         binding.frequent.root.visibility = View.GONE
         frequentBindings.forEach { it.root.visibility = View.GONE }
 
-        mainScope.launch {
-            val (list) = safeRunIO {
-                coreDatabase.appFunctionUsageDao().getMostUsed()
-            }
+        val (list) = safeRunIO {
+            coreDatabase.appFunctionUsageDao().getMostUsed()
+        }
 
-            if (list == null || list.isEmpty()) {
-                return@launch
-            }
+        if (list == null || list.isEmpty()) return
 
-            binding.frequent.root.visibility = View.VISIBLE
+        binding.frequent.root.visibility = View.VISIBLE
 
-            for (appFunctionUsage in list) {
+        for (appFunctionUsage in list) {
 
-                AppFunctions[appFunctionUsage.fid]?.run {
-                    val index = list.indexOf(appFunctionUsage)
+            AppFunctions[appFunctionUsage.fid]?.run {
+                val index = list.indexOf(appFunctionUsage)
 
-                    frequentBindings[index].root.visibility = View.VISIBLE
-                    if (icon != null) frequentBindings[index].iconIv.setImageResource(icon!!)
-                    frequentBindings[index].nameTv.setText(label)
-                    frequentBindings[index].root.setOnClickListener {
-                        openPageById(id)
-                    }
+                frequentBindings[index].root.visibility = View.VISIBLE
+                if (icon != null) frequentBindings[index].iconIv.setImageResource(icon!!)
+                frequentBindings[index].nameTv.setText(label)
+                frequentBindings[index].root.setOnClickListener {
+                    openPageById(id)
                 }
             }
         }
@@ -208,7 +229,18 @@ class HomeFragment : CreditClubFragment(R.layout.home_fragment),
         return true
     }
 
-    fun openDrawer() {
+    private inline fun <T> MutableLiveData<T>.watch(crossinline block: (T?) -> Unit) {
+        block(value)
+        var oldValue = value
+        observe(viewLifecycleOwner, Observer {
+            if (value != oldValue) {
+                oldValue = value
+                block(it)
+            }
+        })
+    }
+
+    private fun openDrawer() {
         binding.creditClubMainMenuCoordinator.run {
             if (isDrawerOpen(GravityCompat.START)) {
                 closeDrawer(GravityCompat.START)
