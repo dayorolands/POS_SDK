@@ -22,6 +22,7 @@ import com.creditclub.ui.dataBinding
 import kotlinx.android.synthetic.main.activity_fundstransfer.*
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
+import org.koin.core.parameter.parametersOf
 import java.util.*
 
 class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer) {
@@ -181,7 +182,7 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
         )
 
         if (Platform.hasPrinter) {
-            val printer = get<PosPrinter>()
+            val printer = get<PosPrinter> { parametersOf(this, dialogProvider) }
             printer.printAsync(receipt) { printerStatus ->
                 if (printerStatus != PrinterStatus.READY) dialogProvider.showError(printerStatus.message)
             }
