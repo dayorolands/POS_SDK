@@ -11,6 +11,7 @@ import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.pos.printer.PrintJob
+import com.creditclub.pos.printer.PrinterStatus
 import org.koin.android.ext.android.get
 import org.koin.core.parameter.parametersOf
 
@@ -53,7 +54,9 @@ internal fun CreditClubActivity.renderTransactionStatusPage(
         val printer = get<PosPrinter> { parametersOf(this, dialogProvider) }
         binding.printReceiptButton.visibility = View.VISIBLE
         binding.printReceiptButton.setOnClickListener {
-            printer.printAsync(receipt)
+            printer.printAsync(receipt) { printerStatus ->
+                if (printerStatus != PrinterStatus.READY) dialogProvider.showError(printerStatus.message)
+            }
         }
     }
 

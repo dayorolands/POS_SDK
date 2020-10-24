@@ -133,16 +133,17 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="AppTheme.MenuFlexLayout">
-        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_horizontal</item>
         <item name="alignContent">stretch</item>
         <item name="alignItems">stretch</item>
         <item name="flexWrap">wrap</item>
-        <item name="justifyContent">space_evenly</item>
+<!--        <item name="justifyContent">space_evenly</item>-->
         <item name="layout_flexGrow">1</item>
         <item name="layout_flexShrink">1</item>
-        <item name="layout_maxWidth">300dp</item>
-        <item name="layout_minWidth">80dp</item>
+        <item name="android:maxWidth">300dp</item>
+        <item name="android:minWidth">80dp</item>
     </style>
 
     <style name="AppButton.Base" parent="Base.Widget.AppCompat.Button">

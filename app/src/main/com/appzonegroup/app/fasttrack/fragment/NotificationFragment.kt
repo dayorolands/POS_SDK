@@ -7,16 +7,19 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.NotificationFragmentBinding
+import com.appzonegroup.app.fasttrack.databinding.NotificationItemBinding
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.creditclub.core.data.api.NotificationService
+import com.creditclub.core.data.model.Notification
 import com.creditclub.core.data.model.NotificationRequest
 import com.creditclub.core.ui.CreditClubFragment
+import com.creditclub.core.ui.SimpleBindingAdapter
 import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.showError
+import com.creditclub.core.util.timeAgo
 import kotlinx.coroutines.launch
 
 class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) {
@@ -57,7 +60,7 @@ class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) 
             )
         }
 
-        if (response != null) viewModel.notificationList.value = response
+        if (response != null) viewModel.notificationList.value = response.response
         if (error != null) dialogProvider.showError(error)
         binding.swipeRefreshLayout.isRefreshing = false
     }
@@ -71,5 +74,22 @@ class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) 
                 block(it)
             }
         })
+    }
+
+    private class NotificationAdapter(
+        override var values: List<Notification>
+    ) : SimpleBindingAdapter<Notification, NotificationItemBinding>(R.layout.notification_item) {
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val notification = values[position]
+            holder.binding.name.text = notification.message
+            holder.binding.description.text = notification.displayMessage
+            holder.binding.timeTv.text = notification.dateLogged?.timeAgo()
+            holder.binding.referenceTv.text = notification.id.toString()
+
+            holder.binding.root.setOnClickListener {
+
+            }
+        }
     }
 }

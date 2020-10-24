@@ -27,6 +27,7 @@ import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.ui.UpdateActivity
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
 
@@ -100,6 +101,34 @@ class HomeFragment : CreditClubFragment(R.layout.home_fragment),
         }
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+//        notificationViewModel.notificationList.watch {
+//            if (it != null && it.isNotEmpty()) {
+//                val notification=it.first()
+//                val snackbar = Snackbar.make(
+//                    binding.frequent.root,
+//                    notification.message ?: "",
+//                    Snackbar.LENGTH_INDEFINITE
+//                )
+//                snackbar.setAction("Close") {
+//                    snackbar.dismiss()
+//                    mainScope.launch {
+//                        safeRunIO {
+//                            notificationService.markAsRead(
+//                                localStorage.agentPhone,
+//                                localStorage.institutionCode,
+//                                notification.reference
+//                            )
+//                        }
+//                        getNotifications()
+//                    }
+//                }
+//                snackbar.show()
+//            }
+//        }
+    }
+
     private suspend fun getNotifications() {
         val (response, error) = safeRunIO {
             notificationService.getNotifications(
@@ -112,7 +141,7 @@ class HomeFragment : CreditClubFragment(R.layout.home_fragment),
             )
         }
 
-        if (response != null) notificationViewModel.notificationList.value = response
+        if (response != null) notificationViewModel.notificationList.value = response.response
     }
 
     private fun checkForUpdate() = appDataStorage.latestVersion?.run {

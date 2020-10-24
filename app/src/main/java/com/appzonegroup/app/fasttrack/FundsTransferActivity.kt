@@ -175,7 +175,7 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
 
         renderTransactionStatusPage(
             getString(R.string.fund_stransfer),
-            (amountDouble * 100).toLong(),
+            amountDouble.toLong(),
             response.isSuccessful,
             response.responseMessage,
             receipt
