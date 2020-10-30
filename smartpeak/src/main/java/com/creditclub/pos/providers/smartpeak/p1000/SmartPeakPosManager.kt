@@ -48,10 +48,6 @@ class SmartPeakPosManager(val activity: CreditClubActivity) : PosManager, KoinCo
 
     }
 
-    override suspend fun startTransaction(): TransactionResponse {
-        throw NotImplementedError("An operation is not implemented")
-    }
-
     inner class SmartPeakCardReader : CardReader {
         override suspend fun waitForCard(): CardReaderEvent {
             return CardReaderEvent.CHIP
@@ -91,6 +87,9 @@ class SmartPeakPosManager(val activity: CreditClubActivity) : PosManager, KoinCo
     }
 
     companion object : PosManagerCompanion {
+        override val id = "SmartPeakPOS"
+        override val deviceType = 5
+
         override fun setup(context: Context) {
             ServiceManager.getInstence().init(context.applicationContext)
             DataBaseManager.getInstance().init(context.applicationContext)

@@ -104,7 +104,7 @@ interface StaticService {
         @Query("agentPhoneNumber") agentPhoneNumber: String,
         @Query("agentPIN") agentPin: String,
         @Query("AppVersion") appVersion: String,
-        @Query("DeviceType") deviceType: String
+        @Query("DeviceType") deviceType: Int
     ): BackendResponse?
 
     @GET("CreditClubStatic/GetAssociations")

@@ -22,7 +22,9 @@ interface DialogProvider {
 
     fun <T> showError(message: String?, block: DialogListenerBlock<T>?)
 
-    fun <T> showInfo(message: String?, block: DialogListenerBlock<T>): Dialog
+    fun <T> showInfo(message: String?, block: DialogListenerBlock<T>?)
+
+    fun showInfo(message: String?) = showInfo<Nothing>(message, null)
 
     fun showSuccess(message: String?)
 
@@ -75,9 +77,19 @@ interface DialogProvider {
         showError("Calendar input not implemented", block)
     }
 
-    fun showOptions(title: String, options: List<DialogOptionItem>, block: DialogListenerBlock<Int>) {
+    fun showOptions(
+        title: String,
+        options: List<DialogOptionItem>,
+        block: DialogListenerBlock<Int>
+    ) {
         showError("Option dialog not implemented", block)
     }
 
-    fun confirm(title: String, subtitle:String?, block: DialogListenerBlock<Boolean>)
+    fun confirm(params: DialogConfirmParams, block: DialogListenerBlock<Boolean>?) {
+        showError("Confirmation dialog not implemented", block)
+    }
+
+    fun confirm(title: String, subtitle: String?, block: DialogListenerBlock<Boolean>?) {
+        confirm(DialogConfirmParams(title, subtitle ?: ""), block)
+    }
 }

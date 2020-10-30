@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="token_withdrawal_customer_pin">false</bool>
+
+    <bool name="flow_wallet_opening">false</bool>
+    <bool name="flow_customer_pin_change">false</bool>
+    <bool name="flow_bvn_update">false</bool>
+</resources>

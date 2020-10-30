@@ -25,6 +25,14 @@ object Platform : KoinComponent {
         private set
 
     @JvmStatic
+    var posId = ""
+        private set
+
+    @JvmStatic
+    var deviceType = 2
+        private set
+
+    @JvmStatic
     val hasPrinter
         get() = isPOS
 
@@ -32,6 +40,8 @@ object Platform : KoinComponent {
         for (posManagerCompanion in PosProviders.registered) {
             if (posManagerCompanion.isCompatible(application)) {
                 isPOS = true
+                posId = posManagerCompanion.id
+                deviceType = posManagerCompanion.deviceType
                 posManagerCompanion.setup(application)
                 loadKoinModules(posModule)
                 loadKoinModules(posManagerCompanion.module)

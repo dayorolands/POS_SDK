@@ -27,13 +27,15 @@ object Modules {
     const val PRINT_SUMMARY = 5
     const val PRINT_TOTAL = 6
 
-//    const val LOGON = 7
+    //    const val LOGON = 7
     const val DOWNLOAD_PARAMETER = 8
-//    const val DOWNLOAD_BILL = 9
+
+    //    const val DOWNLOAD_BILL = 9
 //    const val PRINT_LIBS = 10
 //    const val BALANCE = 11
     const val PRINT_PARAMETER = 12
-//    const val DOWNLOAD_AID = 13
+
+    //    const val DOWNLOAD_AID = 13
     const val DOWN_CAPK = 14
     const val NETWORK_PARAMETERS = 15
     const val KEY_DOWNLOAD = 16
@@ -57,7 +59,7 @@ object Modules {
 
             onClick { activity ->
                 PosDatabase.open(activity, Dispatchers.Main) { db ->
-                    val trn = withContext(Dispatchers.Default) {
+                    val trn = withContext(Dispatchers.IO) {
                         db.financialTransactionDao().lastTransaction()
                     } ?: return@open activity.showError("No transactions")
 
@@ -125,7 +127,9 @@ object Modules {
             receipt.isCustomerCopy = true
 
             activity.printer.printAsync(receipt) { printerStatus ->
-                if (printerStatus != PrinterStatus.READY) return@printAsync activity.showError(printerStatus.message)
+                if (printerStatus != PrinterStatus.READY) return@printAsync activity.showError(
+                    printerStatus.message
+                )
             }
 
             return
@@ -134,14 +138,18 @@ object Modules {
         receipt.isCustomerCopy = false
         activity.run {
             printer.printAsync(receipt) { printerStatus ->
-                if (printerStatus != PrinterStatus.READY) return@printAsync activity.showError(printerStatus.message)
+                if (printerStatus != PrinterStatus.READY) return@printAsync activity.showError(
+                    printerStatus.message
+                )
 
                 Dialogs.confirm(activity, "Print Customer Copy?", "") {
                     onSubmit {
                         dismiss()
                         receipt.isCustomerCopy = true
                         printer.printAsync(receipt) { printerStatus ->
-                            if (printerStatus != PrinterStatus.READY) activity.showError(printerStatus.message)
+                            if (printerStatus != PrinterStatus.READY) activity.showError(
+                                printerStatus.message
+                            )
                         }
                     }
                 }.show()
@@ -149,7 +157,10 @@ object Modules {
         }
     }
 
-    private fun printEod(activity: PosActivity, localDate: String = TransmissionDateParams().localDate) {
+    private fun printEod(
+        activity: PosActivity,
+        localDate: String = TransmissionDateParams().localDate
+    ) {
         PrintEOD(activity, activity.isoSocketHelper, activity.dialogProvider, localDate).run()
     }
 }

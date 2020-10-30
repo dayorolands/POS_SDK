@@ -1,5 +1,6 @@
 package com.creditclub.core.util
 
+import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.ui.widget.TextFieldParams
@@ -40,9 +41,9 @@ suspend inline fun DialogProvider.getPin(title: String) =
         }
     }
 
-suspend inline fun DialogProvider.getConfirmation(title: String, subtitle: String? = null) =
+suspend inline fun DialogProvider.getConfirmation(title: String, subtitle: String = "") =
     suspendCoroutine<Boolean> { continuation ->
-        confirm(title, subtitle) {
+        confirm(DialogConfirmParams(title, subtitle)) {
             onSubmit {
                 dismiss()
                 continuation.resume(it)

@@ -11,7 +11,7 @@ open class TextNode(open val text: String) :
     var lineDistance: Int = 0
     var wordFont: Int = 22
     var printGray: Int = 5
-    var align: Alignment =
-        Alignment.LEFT
+    var align: Alignment = Alignment.LEFT
+    var fontWeight: FontWeight = FontWeight.Normal
     override var walkPaperAfterPrint: Int = 0
 }
