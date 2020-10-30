@@ -1,6 +1,7 @@
 package com.appzonegroup.app.fasttrack.fragment
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
@@ -8,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.R
+import com.appzonegroup.app.fasttrack.databinding.NotificationDetailDialogBinding
 import com.appzonegroup.app.fasttrack.databinding.NotificationFragmentBinding
 import com.appzonegroup.app.fasttrack.databinding.NotificationItemBinding
 import com.appzonegroup.app.fasttrack.ui.dataBinding
@@ -16,10 +18,8 @@ import com.creditclub.core.data.model.Notification
 import com.creditclub.core.data.model.NotificationRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.ui.SimpleBindingAdapter
+import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.service
-import com.creditclub.core.util.safeRunIO
-import com.creditclub.core.util.showError
-import com.creditclub.core.util.timeAgo
 import kotlinx.coroutines.launch
 
 class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) {
@@ -76,20 +76,31 @@ class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) 
         })
     }
 
-    private class NotificationAdapter(
+    private fun showDetails(notification: Notification) {
+        val dialog = requireContext().createDialog()
+        val binding = LayoutInflater.from(requireContext()).viewBinding(
+            NotificationDetailDialogBinding::bind,
+            R.layout.notification_detail_dialog
+        )
+        binding.titleTv.text = notification.header
+        binding.messageTv.text = notification.message
+        dialog.setContentView(binding.root)
+        dialog.show()
+        binding.btnDone.setOnClickListener { dialog.dismiss() }
+    }
+
+    private inner class NotificationAdapter(
         override var values: List<Notification>
     ) : SimpleBindingAdapter<Notification, NotificationItemBinding>(R.layout.notification_item) {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val notification = values[position]
-            holder.binding.name.text = notification.message
-            holder.binding.description.text = notification.displayMessage
+            holder.binding.name.text = notification.header
+            holder.binding.description.text = notification.message
             holder.binding.timeTv.text = notification.dateLogged?.timeAgo()
             holder.binding.referenceTv.text = notification.id.toString()
 
-            holder.binding.root.setOnClickListener {
-
-            }
+            holder.binding.root.setOnClickListener { showDetails(notification) }
         }
     }
 }

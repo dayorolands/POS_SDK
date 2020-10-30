@@ -1,9 +1,13 @@
 package com.creditclub.core.util
 
 import android.app.Dialog
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.view.Window
 import com.creditclub.core.R
-import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogListener
+import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogProvider
 
 
@@ -51,3 +55,12 @@ fun <T> DialogProvider.showError(exception: Exception, block: DialogListenerBloc
 }
 
 fun DialogProvider.showError(exception: Exception) = showError<Nothing>(exception, null)
+
+fun Context.createDialog(): Dialog {
+    val dialog = Dialog(this)
+    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+    dialog.setCanceledOnTouchOutside(false)
+    dialog.setCancelable(false)
+    return dialog
+}

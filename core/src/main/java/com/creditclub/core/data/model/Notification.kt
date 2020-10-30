@@ -14,8 +14,8 @@ data class Notification(
     @Serializable(with = TimeInstantSerializer::class)
     val dateLogged: Instant?,
 
-    @SerialName("DisplayMessage")
-    val displayMessage: String?,
+    @SerialName("Header")
+    val header: String?,
 
     @SerialName("ID")
     val id: Int,

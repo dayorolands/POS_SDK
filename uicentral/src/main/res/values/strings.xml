@@ -17,4 +17,5 @@
     <string name="product">Product</string>
     <string name="title_activity_update">UpdateActivity</string>
     <string name="middle_name_hint">Enter middle name (optional)…</string>
+    <string name="title">Title</string>
 </resources>
