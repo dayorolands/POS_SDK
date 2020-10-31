@@ -4,7 +4,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil
 import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosParameter
@@ -34,7 +33,6 @@ class N3EmvListener(
     private val continuation: Continuation<CardData?>
 ) : OnEmvProcessListener2, KoinComponent {
     private val emvHandler2 = deviceEngine.getEmvHandler2("app2")
-    private val dialogProvider = activity.dialogProvider
     private val cardData = N3CardData()
     private var filed55: String? = null
     private val prefs = activity.getSharedPreferences("N3PosManager", 0)
@@ -44,12 +42,9 @@ class N3EmvListener(
         appNameList: List<String>?,
         appInfoList: List<CandidateAppInfoEntity>?,
         isFirstSelect: Boolean
-    ) = activity.runOnUiThread {
-        val options = appNameList?.map { DialogOptionItem(it) }
-        options ?: return@runOnUiThread
-        dialogProvider.showOptions("Select app", options) {
-            onSubmit { position -> emvHandler2.onSetSelAppResponse(position + 1) }
-        }
+    ) {
+        appNameList ?: return
+        emvHandler2.onSetSelAppResponse(1)
     }
 
     override fun onTransInitBeforeGPO() {
