@@ -50,6 +50,7 @@ dependencies {
     implementation project(path: ':uicentral')
 //    implementation project(path: ':dspread')
     implementation project(path: ':nexgo')
+    implementation project(path: ':telpo')
     api("org.jpos:jpos:2.1.4") {
         exclude group: 'junit', module: 'junit'
         exclude group: 'com.sleepycat', module: 'je'
