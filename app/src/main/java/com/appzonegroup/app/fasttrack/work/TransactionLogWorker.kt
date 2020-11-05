@@ -1,6 +1,7 @@
 package com.appzonegroup.app.fasttrack.work
 
 import android.content.Context
+import android.os.Bundle
 import androidx.work.WorkerParameters
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
@@ -48,6 +49,15 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
                 if (response.isSuccessful) {
                     posTransactionDao.delete(receipt)
                 }
+
+                firebaseAnalytics.logEvent("transaction_log_attempt", Bundle().apply {
+                    putString("terminal_id", receipt.terminalId)
+                    putString("rrn", receipt.retrievalReferenceNumber)
+                    putString("agent_code", receipt.agentCode)
+                    putString("agent_phone", receipt.agentPhoneNumber)
+                    putString("institution_code", receipt.institutionCode)
+                    putBoolean("status", response.isSuccessful)
+                })
             }
         }
 

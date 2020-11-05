@@ -1,22 +1,19 @@
 package com.appzonegroup.app.fasttrack.work
 
 import android.content.Context
+import android.os.Bundle
 import androidx.work.WorkerParameters
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
-import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.api.BackendConfig
+import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.safeRunSuspend
 import com.creditclub.pos.api.PosApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.core.inject
 import retrofit2.create
 
@@ -32,6 +29,8 @@ class IsoRequestLogWorker(context: Context, params: WorkerParameters) :
         val backendConfig: BackendConfig by inject()
 
         val isoRequestLogDao = posDatabase.isoRequestLogDao()
+        val localStorage: LocalStorage by inject()
+        val agentPhone = localStorage.agentPhone
 
         val jobs = isoRequestLogDao.all().map { requestLog ->
             if (requestLog.nodeName == "EPMS") requestLog.nodeName = null
@@ -47,6 +46,15 @@ class IsoRequestLogWorker(context: Context, params: WorkerParameters) :
                 if (response?.status == true) {
                     isoRequestLogDao.delete(requestLog)
                 }
+
+                firebaseAnalytics.logEvent("iso_log_attempt", Bundle().apply {
+                    putString("terminal_id", requestLog.terminalId)
+                    putString("rrn", requestLog.rrn)
+                    putString("agent_code", requestLog.agentCode)
+                    putString("agent_phone", agentPhone)
+                    putString("institution_code", requestLog.institutionCode)
+                    putBoolean("status", response?.status == true)
+                })
             }
         }
 

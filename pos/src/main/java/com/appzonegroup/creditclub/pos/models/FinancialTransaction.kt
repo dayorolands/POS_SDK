@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.appzonegroup.creditclub.pos.card.CardIsoMsg
 import com.appzonegroup.creditclub.pos.card.cardTransactionType
-import com.appzonegroup.creditclub.pos.card.maskPan
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.util.hexString
+import com.creditclub.core.util.mask
 import com.creditclub.pos.model.ConnectionInfo
 import org.jpos.iso.ISOMsg
 import java.time.Instant
@@ -85,7 +85,7 @@ open class FinancialTransaction {
         date = msg.localTransactionDate13 ?: ""
         content = msg.pack().hexString
         type = cardTransactionType(msg).type
-        pan = maskPan(msg.pan)
+        pan = msg.pan.mask(6, 4)
         rrn = msg.retrievalReferenceNumber37 ?: ""
 
         cardAcceptorNameLocation43 = msg.cardAcceptorNameLocation43 ?: ""
