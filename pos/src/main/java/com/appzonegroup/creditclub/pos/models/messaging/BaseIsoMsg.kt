@@ -2,13 +2,12 @@ package com.appzonegroup.creditclub.pos.models.messaging
 
 import com.appzonegroup.creditclub.pos.extension.generateStan
 import com.appzonegroup.creditclub.pos.extension.setTransactionTime
-import com.appzonegroup.creditclub.pos.util.*
+import com.appzonegroup.creditclub.pos.util.ISO87Packager
+import com.appzonegroup.creditclub.pos.util.sha256String
 import com.creditclub.pos.extensions.hexBytes
 import org.jpos.iso.ISOMsg
-import java.time.Instant
-import java.io.ByteArrayOutputStream
-import java.security.SecureRandom
 import java.util.*
+import kotlin.experimental.or
 
 open class BaseIsoMsg : ISOMsg() {
 
@@ -55,7 +54,7 @@ open class BaseIsoMsg : ISOMsg() {
     }
 
     fun unpack(msg: String) {
-        unpack(msg.hexBytes)
+        unpack(msg.replace(" ", "").hexBytes)
     }
 
     fun prepare(sessionKeyString: String): ByteArray {
