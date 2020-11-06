@@ -41,7 +41,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${versions.serialization}"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serialization}"
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${versions.desugarJdk}"
     implementation 'com.google.code.gson:gson:2.8.5'
 }

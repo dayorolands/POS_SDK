@@ -51,7 +51,7 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
 
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${versions.serialization}"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serialization}"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}"
 
@@ -59,7 +59,7 @@ dependencies {
     api "com.squareup.okhttp3:logging-interceptor:${versions.okhttp}"
     api "com.squareup.retrofit2:retrofit:${versions.retrofit}"
     api "com.squareup.retrofit2:converter-scalars:${versions.retrofit}"
-    api 'com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0'
+    api 'com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0'
 
     implementation "androidx.room:room-runtime:${versions.room}"
     kapt "androidx.room:room-compiler:${versions.room}"

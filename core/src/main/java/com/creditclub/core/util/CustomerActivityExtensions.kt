@@ -16,7 +16,7 @@ import com.creditclub.core.ui.widget.TextFieldParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonDecodingException
+import kotlinx.serialization.SerializationException
 import java.security.SecureRandom
 
 
@@ -143,7 +143,7 @@ fun CreditClubActivity.requireAccountInfo(
 
                                 dialogProvider.hideProgressBar()
 
-                                if (error != null && (error is JsonDecodingException || error.isKotlinNPE())) {
+                                if (error != null && (error is SerializationException || error.isKotlinNPE())) {
                                     return@launch dialogProvider.showError(
                                         "Account Number is invalid",
                                         showOnClose

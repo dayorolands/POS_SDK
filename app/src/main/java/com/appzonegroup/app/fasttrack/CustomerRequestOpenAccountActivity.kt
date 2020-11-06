@@ -21,7 +21,6 @@ import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.pos.printer.PrinterStatus
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import java.util.*
@@ -109,7 +108,7 @@ class CustomerRequestOpenAccountActivity : CreditClubActivity(R.layout.activity_
         //additionalInformation.setProvince(province);
 
         request.additionalInformation =
-            Json(JsonConfiguration.Stable).stringify(
+            Json.encodeToString(
                 CustomerRequest.Additional.serializer(),
                 additionalInformation
             )

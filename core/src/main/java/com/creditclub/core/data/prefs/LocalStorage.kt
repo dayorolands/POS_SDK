@@ -9,7 +9,6 @@ import com.creditclub.core.data.model.AuthResponse
 import com.creditclub.core.util.delegates.jsonStore
 import com.creditclub.core.util.delegates.valueStore
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
@@ -22,14 +21,12 @@ class LocalStorage private constructor(
         Context.MODE_PRIVATE
     )
 ) : SharedPreferences by pref {
-    private val json = Json(
-        JsonConfiguration.Stable.copy(
-            isLenient = true,
-            ignoreUnknownKeys = true,
-            serializeSpecialFloatingPointValues = true,
-            useArrayPolymorphism = true
-        )
-    )
+    private val json = Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+        allowSpecialFloatingPointValues = true
+        useArrayPolymorphism = true
+    }
 
     var cacheAuth: String? by valueStore(KEY_AUTH)
     var institutionCode: String? by valueStore(INSTITUTION_CODE)

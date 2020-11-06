@@ -23,24 +23,24 @@ import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.data.model.SurveyQuestion
-import com.creditclub.core.data.prefs.JsonStorage
 import com.creditclub.core.data.request.SubmitSurveyRequest
 import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
+import com.creditclub.core.util.delegates.jsonStore
 import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.api.posApiService
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
-import kotlinx.serialization.builtins.list
-import kotlinx.serialization.builtins.serializer
 import org.koin.android.ext.android.inject
 import retrofit2.create
 
 class LoginActivity : CreditClubActivity() {
 
-    private val jsonStore by lazy { JsonStorage.getStore(this) }
+    private val jsonPrefs = getSharedPreferences("JSON_STORAGE", 0)
+    private var bannerImages by jsonPrefs.jsonStore<List<String>>("DATA_BANNER_IMAGES")
+    private var surveyQuestions by jsonPrefs.jsonStore<List<SurveyQuestion>>("DATA_SURVEY_QUESTIONS")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +48,6 @@ class LoginActivity : CreditClubActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.navigationBarColor = getColor(R.color.colorPrimary)
         }
-
         debugOnly {
             val debugInfo = "Version ${packageInfo?.versionName}. ${BuildConfig.BUILD_TYPE}"
             version_tv.text = debugInfo
@@ -91,7 +90,7 @@ class LoginActivity : CreditClubActivity() {
         } else {
             val loggedOut = intent.getBooleanExtra("LOGGED_OUT", false)
 
-            if (!loggedOut && jsonStore.has("BANNER_IMAGES")) {
+            if (!loggedOut && jsonPrefs.contains("DATA_BANNER_IMAGES")) {
                 startActivity(Intent(this, BannerActivity::class.java))
             }
 
@@ -121,29 +120,26 @@ class LoginActivity : CreditClubActivity() {
     }
 
     private fun checkLocalSurveyQuestions() {
-        if (jsonStore.has("SURVEY_QUESTIONS")) {
-            val questionsJson = jsonStore.get("SURVEY_QUESTIONS", SurveyQuestion.serializer().list)
-            val questions = questionsJson.data ?: return
-            if (questions.isEmpty()) return
+        val questions = surveyQuestions ?: return
+        if (questions.isEmpty()) return
 
-            SurveyDialog.create(this, questions) {
-                onSubmit { data ->
-                    ioScope.launch {
-                        safeRunIO {
-                            val surveyData = SubmitSurveyRequest().apply {
-                                answers = data
-                                institutionCode = localStorage.institutionCode
-                                agentPhoneNumber = localStorage.agentPhone
-                                geoLocation = gps.geolocationString
-                            }
-
-                            creditClubMiddleWareAPI.staticService.submitSurvey(surveyData)
+        SurveyDialog.create(this, questions) {
+            onSubmit { data ->
+                ioScope.launch {
+                    safeRunIO {
+                        val surveyData = SubmitSurveyRequest().apply {
+                            answers = data
+                            institutionCode = localStorage.institutionCode
+                            agentPhoneNumber = localStorage.agentPhone
+                            geoLocation = gps.geolocationString
                         }
-                        jsonStore.delete("SURVEY_QUESTIONS")
+
+                        creditClubMiddleWareAPI.staticService.submitSurvey(surveyData)
                     }
+                    surveyQuestions = null
                 }
-            }.show()
-        }
+            }
+        }.show()
     }
 
     private fun downloadBannerImages() {
@@ -157,11 +153,11 @@ class LoginActivity : CreditClubActivity() {
             }
 
             response ?: return@launch
-            val bannerImageList = response.data ?: return@launch
+            val data = response.data ?: return@launch
 
             if (response.isSuccessful) {
-                bannerImageList.forEach { Picasso.get().load(it).fetch() }
-                jsonStore.save("BANNER_IMAGES", bannerImageList, String.serializer().list)
+                data.forEach { Picasso.get().load(it).fetch() }
+                bannerImages = data
             }
         }
     }
@@ -177,14 +173,10 @@ class LoginActivity : CreditClubActivity() {
             }
 
             response ?: return@launch
-            val surveyQuestions = response.data ?: return@launch
+            val data = response.data ?: return@launch
 
             if (response.isSuccessful) {
-                jsonStore.save(
-                    "SURVEY_QUESTIONS",
-                    surveyQuestions,
-                    SurveyQuestion.serializer().list
-                )
+                surveyQuestions = data
             }
         }
     }

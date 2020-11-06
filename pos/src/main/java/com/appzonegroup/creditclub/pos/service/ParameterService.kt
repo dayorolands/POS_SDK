@@ -24,7 +24,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import org.jpos.iso.ISOMsg
 import org.json.JSONArray
 import org.json.JSONException
@@ -50,14 +49,12 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
     private val database: PosDatabase by inject()
     private val localStorage: LocalStorage by inject()
     private val gps: TrackGPS by inject()
-    private val json = Json(
-        JsonConfiguration.Stable.copy(
-            isLenient = true,
-            ignoreUnknownKeys = true,
-            serializeSpecialFloatingPointValues = true,
-            useArrayPolymorphism = true
-        )
-    )
+    private val json = Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+        allowSpecialFloatingPointValues = true
+        useArrayPolymorphism = true
+    }
 
     override var masterKey by prefs.nonNullStringStore("MasterKey")
     override var sessionKey by prefs.nonNullStringStore("SessionKey")
@@ -70,7 +67,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
 
     override val managementData
         get() = safeRun {
-            json.parse(ParameterObject.serializer(), managementDataString)
+            json.decodeFromString(ParameterObject.serializer(), managementDataString)
         }.data ?: ParameterObject()
 
     override suspend fun downloadKeys(activity: ComponentActivity) {
