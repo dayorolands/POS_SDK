@@ -3,7 +3,6 @@ package com.appzonegroup.creditclub.pos.util
 import androidx.room.TypeConverter
 import com.creditclub.pos.model.ConnectionInfo
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
@@ -15,14 +14,12 @@ import java.time.format.DateTimeFormatter
 
 object RoomConverters {
     private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-    private val json = Json(
-        JsonConfiguration.Stable.copy(
-            isLenient = true,
-            ignoreUnknownKeys = true,
-            serializeSpecialFloatingPointValues = true,
-            useArrayPolymorphism = true
-        )
-    )
+    private val json = Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+        allowSpecialFloatingPointValues = true
+        useArrayPolymorphism = true
+    }
 
     @TypeConverter
     @JvmStatic
@@ -42,7 +39,7 @@ object RoomConverters {
     @JvmStatic
     fun toConnectionInfo(value: String?): ConnectionInfo? {
         return value?.run {
-            return json.parse(ConnectionInfo.serializer(), this)
+            return json.decodeFromString(ConnectionInfo.serializer(), this)
         }
     }
 
@@ -50,7 +47,7 @@ object RoomConverters {
     @JvmStatic
     fun fromConnectionInfo(connectionInfo: ConnectionInfo?): String? {
         return connectionInfo?.run {
-            json.stringify(ConnectionInfo.serializer(), this)
+            json.encodeToString(ConnectionInfo.serializer(), this)
         }
     }
 }

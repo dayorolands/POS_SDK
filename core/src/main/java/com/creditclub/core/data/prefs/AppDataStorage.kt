@@ -7,7 +7,6 @@ import com.creditclub.core.R
 import com.creditclub.core.data.model.AppVersion
 import com.creditclub.core.util.delegates.valueStore
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
@@ -20,27 +19,25 @@ class AppDataStorage(
         Context.MODE_PRIVATE
     )
 ) : SharedPreferences by pref {
-    private val json = Json(
-        JsonConfiguration.Stable.copy(
-            isLenient = true,
-            ignoreUnknownKeys = true,
-            serializeSpecialFloatingPointValues = true,
-            useArrayPolymorphism = true
-        )
-    )
+    private val json = Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+        allowSpecialFloatingPointValues = true
+        useArrayPolymorphism = true
+    }
     private var latestVersionJson: String? by valueStore("LATEST_VERSION_JSON")
     var latestVersionLink: String? by valueStore("LATEST_VERSION_LINK")
 
     var latestVersion: AppVersion?
         get() = if (latestVersionJson != null) {
-            json.parse(
+            json.decodeFromString(
                 AppVersion.serializer(),
                 latestVersionJson!!
             )
         } else null
         set(value) {
             latestVersionJson = if (value != null) {
-                json.stringify(AppVersion.serializer(), value)
+                json.encodeToString(AppVersion.serializer(), value)
             } else null
         }
 

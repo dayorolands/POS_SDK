@@ -1,15 +1,19 @@
 package com.appzonegroup.creditclub.pos.printer
 
 import android.content.Context
+import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
+import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.util.format
 import com.creditclub.core.util.localStorage
 import com.creditclub.pos.printer.Alignment
 import com.creditclub.pos.printer.PrintJob
 import com.creditclub.pos.printer.PrintNode
 import com.creditclub.pos.printer.TextNode
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
 
 /**
@@ -17,7 +21,8 @@ import com.creditclub.pos.printer.TextNode
  * Appzone Ltd
  */
 class Receipt(val context: Context, val transaction: FinancialTransaction) :
-    PrintJob {
+    PrintJob, KoinComponent {
+    private val backendConfig by inject<BackendConfig>()
     var isCustomerCopy = true
     var isReprint = false
 
@@ -44,14 +49,14 @@ class Receipt(val context: Context, val transaction: FinancialTransaction) :
 
             if (isReprint) nodes.add(
                 TextNode("***REPRINT***").apply {
-                align = Alignment.MIDDLE
-            })
+                    align = Alignment.MIDDLE
+                })
 
             nodes.add(
                 TextNode(if (isCustomerCopy) "***CUSTOMER COPY***" else "***MERCHANT COPY***")
                     .apply {
-                align = Alignment.MIDDLE
-            })
+                        align = Alignment.MIDDLE
+                    })
 
             nodes.add(
                 TextNode(
@@ -90,18 +95,41 @@ RRN: $rrn"""
             nodes.add(
                 TextNode(if (successful) "TRANSACTION APPROVED" else "TRANSACTION DECLINED")
                     .apply {
-                align = Alignment.MIDDLE
-                wordFont = 25
-            })
+                        align = Alignment.MIDDLE
+                        wordFont = 25
+                    })
 
             if (!successful) nodes.add(
                 TextNode(
                     transaction.isoMsg.responseMessage
                 ).apply {
+                    align = Alignment.MIDDLE
+                })
+
+            nodes.add(
+                TextNode("-----------------------------").apply {
+                    align = Alignment.MIDDLE
+                    wordFont = 15
+                })
+
+            nodes.add(TextNode(
+                "${context.getString(R.string.app_name)} v${backendConfig.versionName}. Powered by ${
+                    context.getString(
+                        R.string.institution_name
+                    )
+                }"
+            ).apply {
                 align = Alignment.MIDDLE
+                wordFont = 15
             })
 
-            nodes.addAll(footerNodes(context))
+            nodes.add(TextNode(context.getString(R.string.institution_website))
+                .apply {
+                    align = Alignment.MIDDLE
+                    walkPaperAfterPrint = 10
+                    wordFont = 15
+                }
+            )
 
             return nodes
         }

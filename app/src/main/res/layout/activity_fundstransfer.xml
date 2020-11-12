@@ -1,223 +1,226 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/activity_horizontal_margin">
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/transfer_type_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="20dp"
-            android:weightSum="2">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <ImageButton
-                    android:id="@+id/same_bank_option"
-                    style="@style/AppButton.RoundBlueButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="98dp"
-                    android:onClick="onSameBankClick"
-                    android:padding="15dp"
-                    android:scaleType="centerInside"
-                    android:tint="@color/fundsTransferSameBankTint"
-                    android:src="@drawable/funds_transfer_same_bank" />
-
-                <com.appzonegroup.app.fasttrack.ui.TextView
-                    android:id="@+id/same_bank_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center"
-                    android:onClick="onSameBankClick"
-                    android:text="@string/funds_transfer_same_bank"
-                    android:textAlignment="center"
-                    android:textAllCaps="true"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <ImageButton
-                    android:id="@+id/other_banks_option"
-                    style="@style/AppButton.RoundBlueButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:onClick="onOtherBankClick"
-                    android:padding="15dp"
-                    android:scaleType="centerInside"
-                    android:tint="@color/colorAccent"
-                    app:srcCompat="@drawable/ic_bank_building" />
-
-                <com.appzonegroup.app.fasttrack.ui.TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center"
-                    android:onClick="onOtherBankClick"
-                    android:text="Other banks"
-                    android:textAlignment="center"
-                    android:textAllCaps="true"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="18sp" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/bank_details_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone">
-
-            <com.appzonegroup.app.fasttrack.ui.TextView
-                android:id="@+id/destination_bank_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="@string/customer_bank" />
-
-            <Spinner
-                android:id="@+id/spinner_destination_bank"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp" />
-
-            <com.appzonegroup.app.fasttrack.ui.TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="@string/receivers_account_number" />
-
-            <com.appzonegroup.app.fasttrack.ui.EditText
-                android:id="@+id/fundstransfer_accountnumber"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:inputType="number"
-                android:maxLength="10" />
-
-            <Button
-                style="@style/button_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="validateClicked"
-                android:text="@string/validate_account" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/other_details_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <com.appzonegroup.app.fasttrack.ui.TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="@string/AccountName" />
-
-            <com.appzonegroup.app.fasttrack.ui.EditText
-                android:id="@+id/fundstransfer_accountname"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:enabled="false" />
-
-            <com.appzonegroup.app.fasttrack.ui.TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="@string/transactionAmount" />
-
-            <com.appzonegroup.app.fasttrack.ui.EditText
-                android:id="@+id/fundstransfer_amount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:hint="@string/enter_amount"
-                android:inputType="number" />
-
-            <com.appzonegroup.app.fasttrack.ui.TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="@string/narration" />
-
-            <com.appzonegroup.app.fasttrack.ui.EditText
-                android:id="@+id/fundstransfer_narration_et"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/twenty_five_dp"
-                android:hint="@string/narration_hint"
-                android:maxLength="40"
-                android:inputType="text" />
-
-            <com.appzonegroup.app.fasttrack.ui.TextView
-                android:id="@+id/agent_pin_label_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="@string/agentPIN" />
-
-            <com.appzonegroup.app.fasttrack.ui.EditText
-                android:id="@+id/fundstransfer_agentpin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/twenty_five_dp"
-                android:hint="@string/agentPIN"
-                android:inputType="numberPassword"
-                android:maxLength="4" />
+            android:padding="@dimen/activity_horizontal_margin">
 
             <LinearLayout
+                android:id="@+id/transfer_type_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="20dp"
+                android:weightSum="2">
 
-                <Button
-                    style="@style/button_style_orange"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="@dimen/two_dp"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"
                     android:layout_weight="1"
-                    android:onClick="backClicked"
-                    android:text="@string/back" />
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/same_bank_option"
+                        style="@style/AppButton.RoundBlueButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="98dp"
+                        android:onClick="onSameBankClick"
+                        android:padding="15dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/funds_transfer_same_bank"
+                        android:tint="@color/fundsTransferSameBankTint" />
+
+                    <com.appzonegroup.app.fasttrack.ui.TextView
+                        android:id="@+id/same_bank_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:onClick="onSameBankClick"
+                        android:text="@string/funds_transfer_same_bank"
+                        android:textAlignment="center"
+                        android:textAllCaps="true"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:id="@+id/other_banks_option"
+                        style="@style/AppButton.RoundBlueButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:onClick="onOtherBankClick"
+                        android:padding="15dp"
+                        android:scaleType="centerInside"
+                        android:tint="@color/colorAccent"
+                        app:srcCompat="@drawable/ic_bank_building" />
+
+                    <com.appzonegroup.app.fasttrack.ui.TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:onClick="onOtherBankClick"
+                        android:text="Other banks"
+                        android:textAlignment="center"
+                        android:textAllCaps="true"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/bank_details_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.appzonegroup.app.fasttrack.ui.TextView
+                    android:id="@+id/destination_bank_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/customer_bank" />
+
+                <Spinner
+                    android:id="@+id/destination_bank_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp" />
+
+                <com.appzonegroup.app.fasttrack.ui.TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/receivers_account_number" />
+
+                <com.appzonegroup.app.fasttrack.ui.EditText
+                    android:id="@+id/account_number_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:inputType="number"
+                    android:maxLength="10" />
 
                 <Button
                     style="@style/button_style"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/two_dp"
-                    android:layout_weight="1"
-                    android:onClick="transferFunds"
-                    android:text="@string/submit" />
+                    android:id="@+id/validate_button"
+                    android:text="@string/validate_account" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/other_details_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.appzonegroup.app.fasttrack.ui.TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/AccountName" />
+
+                <com.appzonegroup.app.fasttrack.ui.EditText
+                    android:id="@+id/account_name_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:enabled="false" />
+
+                <com.appzonegroup.app.fasttrack.ui.TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/transactionAmount" />
+
+                <com.appzonegroup.app.fasttrack.ui.EditText
+                    android:id="@+id/amount_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/enter_amount"
+                    android:inputType="number" />
+
+                <com.appzonegroup.app.fasttrack.ui.TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/narration" />
+
+                <com.appzonegroup.app.fasttrack.ui.EditText
+                    android:id="@+id/narration_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/twenty_five_dp"
+                    android:hint="@string/narration_hint"
+                    android:inputType="text"
+                    android:maxLength="40" />
+
+                <com.appzonegroup.app.fasttrack.ui.TextView
+                    android:id="@+id/agent_pin_label_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/agentPIN" />
+
+                <com.appzonegroup.app.fasttrack.ui.EditText
+                    android:id="@+id/agent_pin_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/twenty_five_dp"
+                    android:hint="@string/agentPIN"
+                    android:inputType="numberPassword"
+                    android:maxLength="4" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        style="@style/button_style_orange"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/two_dp"
+                        android:layout_weight="1"
+                        android:onClick="backClicked"
+                        android:text="@string/back" />
+
+                    <Button
+                        android:id="@+id/transfer_funds_button"
+                        style="@style/button_style"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/two_dp"
+                        android:layout_weight="1"
+                        android:text="@string/submit" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
-
-</ScrollView>
+    </ScrollView>
+</layout>

@@ -25,7 +25,6 @@ import com.creditclub.core.util.showSuccessAndWait
 import com.creditclub.pos.printer.PosPrinter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import java.time.Instant
@@ -234,7 +233,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         val pin = dialogProvider.getPin("Agent PIN") ?: return
         if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
-        val json = Json(JsonConfiguration.Stable)
         val serializer = CollectionPaymentRequest.Additional.serializer()
         val agent = localStorage.agent
         val additional = CollectionPaymentRequest.Additional().apply {
@@ -255,7 +253,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             agentPhoneNumber = localStorage.agentPhone
             collectionService = viewModel.collectionService.value
             requestReference = uniqueReference
-            additionalInformation = json.stringify(serializer, additional)
+            additionalInformation = Json.encodeToString(serializer, additional)
         }
         dialogProvider.showProgressBar("Processing request")
         val (response, error) = safeRunIO {

@@ -1,12 +1,15 @@
 package com.appzonegroup.app.fasttrack.work
 
 import android.content.Context
+import android.os.Bundle
 import androidx.work.WorkerParameters
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.extension.responseCode39
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.api.BackendConfig
+import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.safeRunSuspend
 import com.creditclub.pos.api.PosApiService
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +33,10 @@ class PosNotificationWorker(context: Context, params: WorkerParameters) :
         val backendConfig: BackendConfig by inject()
         val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
         val posNotificationDao = posDatabase.posNotificationDao()
+        val localStorage: LocalStorage by inject()
+        val agentCode = localStorage.agent?.agentCode
+        val agentPhone = localStorage.agentPhone
+        val institutionCode = localStorage.institutionCode
 
         val jobs = posNotificationDao.all().map { notification ->
             if (notification.nodeName == "EPMS") notification.nodeName = null
@@ -45,6 +52,15 @@ class PosNotificationWorker(context: Context, params: WorkerParameters) :
                 if (!response?.billerReference.isNullOrBlank()) {
                     posNotificationDao.delete(notification)
                 }
+
+                firebaseAnalytics.logEvent("pos_notification_attempt", Bundle().apply {
+                    putString("terminal_id", notification.terminalId)
+                    putString("rrn", notification.retrievalReferenceNumber)
+                    putString("agent_code", agentCode)
+                    putString("agent_phone", agentPhone)
+                    putString("institution_code", institutionCode)
+                    putBoolean("status", !response?.billerReference.isNullOrBlank())
+                })
             }
         }
 

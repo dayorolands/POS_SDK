@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 abstract class SimpleAdapter<A : RecyclerView.ViewHolder, T> : RecyclerView.Adapter<A>() {
 
-    abstract var values: List<T>
+    protected abstract var values: List<T>
 
     fun setData(newData: List<T>?) {
         this.values = newData ?: emptyList()

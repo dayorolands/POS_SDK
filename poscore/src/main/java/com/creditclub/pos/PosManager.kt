@@ -13,14 +13,12 @@ interface PosManager {
     val sessionData: SessionData
 
     suspend fun loadEmv()
-    suspend fun startTransaction(): TransactionResponse
 
     fun cleanUpEmv()
-    suspend fun openSettings() = false
-    suspend fun openReprint() = false
 
     open class SessionData {
         open var amount = 0L
+        open var cashBackAmount = 0L
         open var pinBlock: String? = null
         open var canRunTransaction = false
         open var canManageParameters = false

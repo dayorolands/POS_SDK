@@ -27,7 +27,6 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu), View
     private val binding by dataBinding<ActivityCardMainMenuBinding>()
 
     //    override val functionId = FunctionIds.CARD_TRANSACTIONS
-    private val posManager: PosManager by inject { parametersOf(this) }
     private val defaultParameterStore: PosParameter by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,23 +108,19 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu), View
                 startActivity(CardWithdrawalActivity::class.java)
             }
             R.id.admin_button -> mainScope.launch {
-                if (!posManager.openSettings()) {
-                    adminAction {
-                        val intent = Intent(this@CardMainMenuActivity, MenuActivity::class.java)
-                        intent.apply {
-                            putExtra(MenuPage.TITLE, MenuPages[MenuPages.ADMIN]?.name)
-                            putExtra(MenuPage.PAGE_NUMBER, MenuPages.ADMIN)
-                        }
-                        startActivity(intent)
+                adminAction {
+                    val intent = Intent(this@CardMainMenuActivity, MenuActivity::class.java)
+                    intent.apply {
+                        putExtra(MenuPage.TITLE, MenuPages[MenuPages.ADMIN]?.name)
+                        putExtra(MenuPage.PAGE_NUMBER, MenuPages.ADMIN)
                     }
+                    startActivity(intent)
                 }
             }
             R.id.reprint_button -> mainScope.launch {
-                if (!posManager.openReprint()) {
-                    supervisorAction {
-                        //                    Modules[Modules.REPRINT_LAST].click(this)
-                        startActivity(ReprintMenuActivity::class.java)
-                    }
+                supervisorAction {
+                    //                    Modules[Modules.REPRINT_LAST].click(this)
+                    startActivity(ReprintMenuActivity::class.java)
                 }
             }
 //                R.id.balance_button -> {

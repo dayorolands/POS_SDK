@@ -10,13 +10,14 @@ import com.creditclub.core.ui.widget.build
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosManagerCompanion
 import com.creditclub.pos.PosParameter
-import com.creditclub.pos.TransactionResponse
 import com.creditclub.pos.card.CardDataListener
 import com.creditclub.pos.card.CardReader
 import com.creditclub.pos.card.CardTransactionStatus
+import com.creditclub.pos.extensions.hexBytes
 import com.jhl.bluetooth.ibridge.BluetoothIBridgeDevice
 import com.jhl.jhlblueconn.BlueStateListenerCallback
 import com.jhl.jhlblueconn.BluetoothCommmanager
+import kotlinx.coroutines.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.koin.dsl.module
@@ -35,7 +36,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     private var scanDeviceListenerBlock: DialogListenerBlock<Unit>? = null
     private var readCardBlock: CardDataListener? = null
     private var findDeviceDialog: FindDeviceDialog? = null
-//    private var looper = Looper.myLooper() ?: Looper.prepare()
+    private val keyController by lazy { KeyController() }
 
     var device: BluetoothIBridgeDevice? = null
         private set
@@ -48,15 +49,14 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
         BluetoothCommmanager.getInstance(this, activity)
     }
 
+    private val activeJobs = mutableListOf<Job?>()
+
     override suspend fun loadEmv() {
+        println("...")
     }
 
     override fun cleanUpEmv() {
         connectionManager.closeResource()
-    }
-
-    override suspend fun startTransaction(): TransactionResponse {
-        throw NotImplementedError("An operation is not implemented")
     }
 
     override fun onDeviceInfo(p0: MutableMap<String, String>?) {
@@ -68,6 +68,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
 
     override fun onUpdateRSAState(bool: Boolean?, i: Int) {
         print("...")
+        connectionManager.deviceInfo
     }
 
     override fun onBluetoothIng() {
@@ -89,6 +90,8 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     }
 
     override fun onLoadMasterKeySuccess(bool: Boolean?) {
+        print("...")
+        connectionManager.writeWorkKey(parameters.pinKey.hexBytes)
     }
 
     override fun onGetCAPublicKeyListFailure(i: Int, str: String?) {
@@ -120,15 +123,17 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     }
 
     override fun onTimeout() {
-        hideProgressBar()
-        readCardBlock?.invoke(MPosCardData(CardTransactionStatus.Timeout.code, mapOf()))
+        activity.runOnUiThread {
+            hideProgressBar()
+            readCardBlock?.invoke(
+                MPosCardData(CardTransactionStatus.Timeout.code, mapOf(), null)
+            )
+        }
     }
 
     override fun onBluetoothConnected() {
         hideProgressBar()
-//        connectionManager.writeMainKey(Misc.hexStringToByte(parameters.masterKey))
-//        connectionManager.writeWorkKey(Misc.hexStringToByte(parameters.pinKey))
-        connectionManager.deviceInfo
+        connectionManager.writeMainKey(parameters.masterKey.hexBytes)
     }
 
     override fun onGetCAPublicKeyParamsSuccess(str: String?) {
@@ -174,6 +179,14 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     }
 
     override fun onLoadWorkKeySuccess(bool: Boolean?) {
+        showProgressBar("Securing connection")
+
+        val publicKey = keyController.publicKeyHex
+
+        publicKey?.also {
+            connectionManager.setTimeout(10000)
+            connectionManager.updateRSA(it)
+        }
     }
 
     override fun onAddCAPublicKeySuccess() {
@@ -188,10 +201,29 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
         print("...")
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun onReadCardData(p0: MutableMap<Any?, Any?>?) {
+        connectionManager.closeResource()
         activity.runOnUiThread {
+            val job = GlobalScope.launch(Dispatchers.Main) {
+                showProgressBar("Processing")
+
+                val cardData = withContext(Dispatchers.Default) {
+                    MPosCardData(1, p0 as Map<String, String>, keyController)
+                }
+
+                hideProgressBar()
+                readCardBlock?.invoke(cardData)
+            }
+            registerJob(job)
+        }
+    }
+
+    private fun registerJob(job: Job) {
+        activeJobs.add(job)
+        job.invokeOnCompletion {
+            activeJobs.remove(job)
             hideProgressBar()
-            readCardBlock?.invoke(MPosCardData(1, p0 as Map<String, String>))
         }
     }
 
@@ -200,9 +232,10 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
     }
 
     override fun onError(p0: Int, p1: String?) {
+        activeJobs.forEach { it?.cancel() }
         activity.runOnUiThread {
             hideProgressBar()
-            readCardBlock?.invoke(MPosCardData(p0, mapOf()))
+            readCardBlock?.invoke(MPosCardData(MPosErrorCode[p0], mapOf(), null))
         }
     }
 
@@ -237,12 +270,14 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
             }
 
             onClose {
-                block(MPosCardData(-1, mapOf()))
+                block(MPosCardData(-1, mapOf(), null))
             }
         }
     }
 
     companion object : PosManagerCompanion {
+        override val id = ""
+        override val deviceType = 2
         override val module = module {
             factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
                 MPosManager(activity)
@@ -257,6 +292,8 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
             }
         }
 
-        override fun setup(context: Context) {}
+        override fun setup(context: Context) {
+
+        }
     }
 }

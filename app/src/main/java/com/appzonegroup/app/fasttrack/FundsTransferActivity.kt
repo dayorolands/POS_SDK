@@ -1,53 +1,38 @@
 package com.appzonegroup.app.fasttrack
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.location.LocationManager
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.TextView
-import androidx.core.app.ActivityCompat
+import android.widget.Toast
+import com.appzonegroup.app.fasttrack.databinding.ActivityFundstransferBinding
 import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
-import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
-import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.pos.printer.PrinterStatus
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.data.response.NameEnquiryResponse
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.finishOnClose
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.showError
+import com.creditclub.pos.printer.PosPrinter
+import com.creditclub.pos.printer.PrinterStatus
+import com.creditclub.ui.dataBinding
 import kotlinx.android.synthetic.main.activity_fundstransfer.*
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.get
+import org.koin.core.parameter.parametersOf
 import java.util.*
 
-/**
- * Created by Oto-obong on 13/7/2017.
- */
-
-class FundsTransferActivity : BaseActivity() {
-
-    private val destinationBankSpinner: Spinner by lazy { findViewById<View>(R.id.spinner_destination_bank) as Spinner }
-    private val destinationAccountNumber_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_accountnumber) as EditText }
-    private val amount_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_amount) as EditText }
-    private val agentPin_et: EditText by lazy { findViewById<View>(R.id.fundstransfer_agentpin) as EditText }
-    private val narrationEt: EditText by lazy { findViewById<EditText>(R.id.fundstransfer_narration_et) }
+class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer) {
+    private val binding by dataBinding<ActivityFundstransferBinding>()
 
     private var destinationBank: String = ""
     internal var accountNumber: String = ""
     internal var amount: String = "0"
     internal var agentPin: String = ""
     private var banks = emptyList<Bank>()
-    internal val backgroundHandler: Handler by lazy { Misc.setupScheduler() }
-    private val locationManager: LocationManager by lazy { getSystemService(Context.LOCATION_SERVICE) as LocationManager }
 
     private val externalTransactionReference = UUID.randomUUID().toString().substring(0, 8)
     private var nameEnquiryResponse: NameEnquiryResponse? = null
@@ -69,10 +54,10 @@ class FundsTransferActivity : BaseActivity() {
             fundsTransferRequest.isToRelatedCommercialBank = isSameBank
             fundsTransferRequest.externalTransactionReference = externalTransactionReference
             fundsTransferRequest.geoLocation = gps.geolocationString
-            fundsTransferRequest.narration = narrationEt.text.toString().trim { it <= ' ' }
+            fundsTransferRequest.narration = binding.narrationEt.text.toString().trim { it <= ' ' }
 
             if (!isSameBank) {
-                val bank = banks[destinationBankSpinner.selectedItemPosition - 1]
+                val bank = banks[binding.destinationBankSpinner.selectedItemPosition - 1]
                 fundsTransferRequest.beneficiaryInstitutionCode = bank.code!!
             }
 
@@ -88,69 +73,28 @@ class FundsTransferActivity : BaseActivity() {
             return fundsTransferRequest
         }
 
-    private val receipt by lazy {
-        FundsTransferReceipt(
-            this,
-            fundsTransferRequest
-        )
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_fundstransfer)
-
-        findViewById<TextView>(R.id.same_bank_tv).text = institutionConfig.name
-
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            // Call your Alert message
-            val errorDialog = Dialogs.getErrorDialog(
-                this,
-                "Your GPS is not on. Please switch it on, shake your ic_phone and try again."
-            )
-            errorDialog.findViewById<View>(R.id.close_btn).setOnClickListener {
-                errorDialog.dismiss()
-                finish()
-            }
+        binding.sameBankTv.text = institutionConfig.name
+        binding.transferFundsButton.setOnClickListener {
+            mainScope.launch { transferFunds() }
         }
-
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-
-            return
+        binding.validateButton.setOnClickListener {
+            mainScope.launch { validateAccount() }
         }
-
-        hideSoftKeyboard()
-    }
-
-    override fun showNotification(message: String) {
-        Dialogs.showErrorMessage(this, message)
-        // Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
     }
 
     fun onOtherBankClick(view: View) {
         isSameBank = false
 
         mainScope.launch {
-            showProgressBar("Getting bank information")
+            dialogProvider.showProgressBar("Getting bank information")
 
             val (banks) = safeRunIO {
                 creditClubMiddleWareAPI.fundsTransferService.getBanks(localStorage.institutionCode)
             }
 
-            hideProgressBar()
+            dialogProvider.hideProgressBar()
 
             banks ?: return@launch showNetworkError()
 
@@ -169,7 +113,7 @@ class FundsTransferActivity : BaseActivity() {
                 bankNames
             )
             spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            destinationBankSpinner.adapter = spinnerArrayAdapter
+            binding.destinationBankSpinner.adapter = spinnerArrayAdapter
 
             transfer_type_layout.visibility = View.GONE
             bank_details_layout.visibility = View.VISIBLE
@@ -181,35 +125,25 @@ class FundsTransferActivity : BaseActivity() {
 
         transfer_type_layout.visibility = View.GONE
         bank_details_layout.visibility = View.VISIBLE
-        spinner_destination_bank.visibility = View.GONE
+        destination_bank_spinner.visibility = View.GONE
         destination_bank_tv.visibility = View.GONE
     }
 
-    internal fun indicateError(message: String, view: View?) {
-
-        showNotification(message)
+    private fun indicateError(message: String, view: View?) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         view?.requestFocus()
     }
 
-    fun hideSoftKeyboard() {
-        if (currentFocus != null) {
-            val inputMethodManager =
-                getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
-        }
-    }
-
-    fun transferFunds(view: View) {
-
-        agentPin = agentPin_et.text.toString()
+    private suspend fun transferFunds() {
+        agentPin = binding.agentPinEt.text.toString()
         if (agentPin.isEmpty()) {
-            indicateError("Please enter your PIN", agentPin_et as View)
+            indicateError("Please enter your PIN", binding.agentPinEt as View)
             return
         }
 
-        amount = amount_et.text.toString().trim { it <= ' ' }
+        amount = binding.amountEt.text.toString().trim { it <= ' ' }
         if (amount === "") {
-            indicateError("Please enter an Amount", amount_et as View)
+            indicateError("Please enter an Amount", binding.amountEt as View)
             return
         }
 
@@ -218,40 +152,44 @@ class FundsTransferActivity : BaseActivity() {
         try {
             amountDouble = java.lang.Double.parseDouble(amount)
         } catch (ex: Exception) {
-            indicateError("Please enter a valid amount", amount_et as View)
+            indicateError("Please enter a valid amount", binding.amountEt as View)
             return
         }
 
-        mainScope.launch {
-            showProgressBar("Transfer in progress")
-            val (response, error) = safeRunIO {
-                creditClubMiddleWareAPI.fundsTransferService.transfer(fundsTransferRequest)
-            }
-            hideProgressBar()
+        dialogProvider.showProgressBar("Transfer in progress")
+        val (response, error) = safeRunIO {
+            creditClubMiddleWareAPI.fundsTransferService.transfer(fundsTransferRequest)
+        }
+        dialogProvider.hideProgressBar()
 
-            if (error != null) return@launch showError(error, finishOnClose)
-            response ?: return@launch showNetworkError(finishOnClose)
+        if (error != null) return dialogProvider.showError(error, finishOnClose)
+        response ?: return showNetworkError(finishOnClose)
 
-            if (response.isSuccessful) {
-                showSuccess("Transfer was successful", finishOnClose)
-            } else {
-                showError(response.responseMessage, finishOnClose)
-            }
+        val receipt = FundsTransferReceipt(
+            this@FundsTransferActivity,
+            fundsTransferRequest
+        ).apply {
+            isSuccessful = response.isSuccessful
+            reason = response.responseMessage
+        }
 
-            if (Platform.hasPrinter) {
-                receipt.apply {
-                    isSuccessful = response.isSuccessful
-                    reason = response.responseMessage
-                }
+        renderTransactionStatusPage(
+            getString(R.string.fund_stransfer),
+            amountDouble.toLong(),
+            response.isSuccessful,
+            response.responseMessage,
+            receipt
+        )
 
-                printer.printAsync(receipt) { printerStatus ->
-                    if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
-                }
+        if (Platform.hasPrinter) {
+            val printer = get<PosPrinter> { parametersOf(this, dialogProvider) }
+            printer.printAsync(receipt) { printerStatus ->
+                if (printerStatus != PrinterStatus.READY) dialogProvider.showError(printerStatus.message)
             }
         }
     }
 
-    internal fun showControls(isForFinalAction: Boolean) {
+    private fun showControls(isForFinalAction: Boolean) {
         findViewById<View>(R.id.bank_details_layout).visibility =
             if (isForFinalAction) View.GONE else View.VISIBLE
         findViewById<View>(R.id.other_details_layout).visibility =
@@ -262,49 +200,45 @@ class FundsTransferActivity : BaseActivity() {
         showControls(false)
     }
 
-    fun validateClicked(view: View) {
+    private suspend fun validateAccount() {
         if (!isSameBank) {
-            destinationBank = destinationBankSpinner.selectedItem.toString()
-            if (destinationBankSpinner.selectedItemPosition == 0) {
-                indicateError("No Bank was selected", destinationBankSpinner)
+            destinationBank = binding.destinationBankSpinner.selectedItem.toString()
+            if (binding.destinationBankSpinner.selectedItemPosition == 0) {
+                indicateError("No Bank was selected", binding.destinationBankSpinner)
                 return
             }
         }
 
-        accountNumber = destinationAccountNumber_et.text.toString()
+        accountNumber = binding.accountNumberEt.text.toString()
         if (accountNumber.length != 10 && accountNumber.length != 11) {
             indicateError(
                 "Please enter a valid Account number",
-                destinationAccountNumber_et as View
+                binding.accountNumberEt as View
             )
             return
         }
 
-        mainScope.launch {
-            showProgressBar("Validating account information")
-            val (response, error) = safeRunIO {
-                creditClubMiddleWareAPI.fundsTransferService.nameEnquiry(fundsTransferRequest)
-            }
-            nameEnquiryResponse = response
+        dialogProvider.showProgressBar("Validating account information")
+        val (response, error) = safeRunIO {
+            creditClubMiddleWareAPI.fundsTransferService.nameEnquiry(fundsTransferRequest)
+        }
+        nameEnquiryResponse = response
 
-            hideProgressBar()
+        dialogProvider.hideProgressBar()
 
-            if (error != null) {
-                showError(error)
-                return@launch
-            }
+        if (error != null) {
+            dialogProvider.showError(error)
+            return
+        }
 
-            response ?: return@launch showError("Please enter a valid account number")
+        response ?: return dialogProvider.showError("Please enter a valid account number")
 
-            if (response.status) {
-                (findViewById<View>(R.id.fundstransfer_accountname) as EditText).setText(
-                    response.beneficiaryAccountName
-                )
-                showControls(true)
-            } else {
-                response.responseMessage ?: return@launch showInternalError()
-                showError(response.responseMessage)
-            }
+        if (response.status) {
+            binding.accountNameEt.setText(response.beneficiaryAccountName)
+            showControls(true)
+        } else {
+            response.responseMessage ?: return showInternalError()
+            dialogProvider.showError(response.responseMessage)
         }
     }
 }

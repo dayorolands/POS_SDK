@@ -10,7 +10,6 @@ import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosManagerCompanion
-import com.creditclub.pos.TransactionResponse
 import com.creditclub.pos.card.CardReader
 import com.creditclub.pos.printer.MockPosPrinter
 import com.creditclub.pos.printer.PosPrinter
@@ -50,10 +49,6 @@ class SunmiPosManager(private val context: Context) :
         payKernel.destroyPaySDK()
     }
 
-    override suspend fun startTransaction(): TransactionResponse {
-        throw NotImplementedError("An operation is not implemented")
-    }
-
     private val connectCallback: ConnectCallback = object : ConnectCallback {
         override fun onConnectPaySDK() {
             Log.d("SunmiPosManager", "onConnectPaySDK")
@@ -75,6 +70,9 @@ class SunmiPosManager(private val context: Context) :
     }
 
     companion object : PosManagerCompanion {
+        override val id = "SunmiPOS"
+        override val deviceType = 4
+
         override val module = module {
             factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
                 SunmiPosManager(activity)

@@ -1,7 +1,7 @@
 package com.appzonegroup.app.fasttrack.receipt
 
 import android.content.Context
-import com.appzonegroup.creditclub.pos.printer.*
+import com.appzonegroup.creditclub.pos.printer.LogoNode
 import com.appzonegroup.creditclub.pos.receipt.TransactionReceipt
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.data.response.PayBillResponse
@@ -12,7 +12,6 @@ import com.creditclub.pos.printer.Alignment
 import com.creditclub.pos.printer.PrintNode
 import com.creditclub.pos.printer.TextNode
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import java.time.Instant
 
 
@@ -78,16 +77,14 @@ Transaction ID: ${request.customerDepositSlipNumber}"""
         isSuccessful = response.isSuccessFul == true
         reason = response.responseMessage
         response.additionalInformation?.run {
-            val json = Json(
-                JsonConfiguration.Stable.copy(
-                    isLenient = true,
-                    ignoreUnknownKeys = true,
-                    serializeSpecialFloatingPointValues = true,
-                    useArrayPolymorphism = true
-                )
-            )
+            val json = Json {
+                isLenient = true
+                ignoreUnknownKeys = true
+                allowSpecialFloatingPointValues = true
+                useArrayPolymorphism = true
+            }
             val serializer = PayBillResponse.AdditionalInformation.serializer()
-            additionalInformation = json.parse(serializer, this)
+            additionalInformation = json.decodeFromString(serializer, this)
         }
 
         return this

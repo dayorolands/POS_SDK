@@ -19,6 +19,8 @@ import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.getMessage
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.logFunctionUsage
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -54,7 +56,7 @@ abstract class CreditClubActivity : AppCompatActivity {
     open val mainScope by lazy { CoroutineScope(Dispatchers.Main) }
     open val ioScope by lazy { CoroutineScope(Dispatchers.IO) }
 
-    val fusedLocationClient: FusedLocationProviderClient by lazy {
+    private val fusedLocationClient: FusedLocationProviderClient by lazy {
         LocationServices.getFusedLocationProviderClient(this)
     }
 
@@ -108,9 +110,12 @@ abstract class CreditClubActivity : AppCompatActivity {
             // for ActivityCompat#requestPermissions for more details.
             return
         }
-        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-            if (location != null) {
-                localStorage.lastKnownLocation = "${location.latitude};${location.longitude}"
+
+        if (checkPlayServices()) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    localStorage.lastKnownLocation = "${location.latitude};${location.longitude}"
+                }
             }
         }
     }
@@ -119,6 +124,21 @@ abstract class CreditClubActivity : AppCompatActivity {
         mainScope.cancel()
         ioScope.cancel()
         super.onDestroy()
+    }
+
+    private fun checkPlayServices(): Boolean {
+        val apiAvailability = GoogleApiAvailability.getInstance()
+        val resultCode = apiAvailability.isGooglePlayServicesAvailable(this)
+        if (resultCode != ConnectionResult.SUCCESS) {
+//            if (apiAvailability.isUserResolvableError(resultCode)) {
+//                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+//                    .show()
+//            } else {
+//                finish()
+//            }
+            return false
+        }
+        return true
     }
 
     fun showNetworkError() = showNetworkError<Nothing>(null)
@@ -150,4 +170,8 @@ abstract class CreditClubActivity : AppCompatActivity {
     }
 
     fun showError(exception: Exception) = showError<Nothing>(exception, null)
+
+    companion object {
+        private const val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
+    }
 }

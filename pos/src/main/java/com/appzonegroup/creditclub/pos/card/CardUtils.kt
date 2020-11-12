@@ -40,10 +40,3 @@ fun cardTransactionType(msg: ISOMsg) = when (msg.mti) {
     "0420", "0421", "0430" -> TransactionType.Reversal
     else -> TransactionType.Unknown
 }
-
-fun maskPan(pan: String?) = pan.run {
-    this ?: return@run "***"
-
-    if (length > 6) "${substring(0, 6)}${"*".repeat(length - 6)}"
-    else this
-}

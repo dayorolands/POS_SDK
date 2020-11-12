@@ -44,14 +44,14 @@ android {
 }
 
 dependencies {
-    api files('libs/bcprov-jdk15on-148.jar')
-
+    api 'com.loopj.android:android-async-http:1.4.10'
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.64'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
 
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:${versions.serialization}"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serialization}"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}"
 
@@ -59,7 +59,7 @@ dependencies {
     api "com.squareup.okhttp3:logging-interceptor:${versions.okhttp}"
     api "com.squareup.retrofit2:retrofit:${versions.retrofit}"
     api "com.squareup.retrofit2:converter-scalars:${versions.retrofit}"
-    api 'com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0'
+    api 'com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0'
 
     implementation "androidx.room:room-runtime:${versions.room}"
     kapt "androidx.room:room-compiler:${versions.room}"
@@ -86,9 +86,6 @@ dependencies {
 
     // Co-routine Tests
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7'
-
-    // For api backward compatibility
-    implementation 'com.android.volley:volley:1.1.0'
 
     api "org.koin:koin-android:${versions.koin}"
     api "org.koin:koin-androidx-scope:${versions.koin}"

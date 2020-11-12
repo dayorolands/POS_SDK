@@ -18,7 +18,6 @@ import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import java.util.*
 
 class CollectionReferenceGenerationFragment :
@@ -197,7 +196,6 @@ class CollectionReferenceGenerationFragment :
         val pin = dialogProvider.getPin("Agent PIN") ?: return
         if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
-        val json = Json(JsonConfiguration.Stable)
         val serializer = CollectionReferenceGenerationRequest.Additional.serializer()
         val agent = localStorage.agent
         val additional = CollectionReferenceGenerationRequest.Additional().apply {
@@ -226,7 +224,7 @@ class CollectionReferenceGenerationFragment :
             collectionService = viewModel.collectionService.value
             applyFee = true
             requestReference = uniqueReference
-            additionalInformation = json.stringify(serializer, additional)
+            additionalInformation = Json.encodeToString(serializer, additional)
         }
 
         dialogProvider.showProgressBar("Processing request")

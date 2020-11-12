@@ -2,32 +2,54 @@ package com.creditclub.pos.providers.mpos
 
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
+import com.creditclub.pos.extensions.hexBytes
 
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 04/12/2019.
  * Appzone Ltd
  */
-class MPosCardData(override var ret: Int, val map: Map<String, String>) : CardData() {
+class MPosCardData internal constructor(
+    override var ret: Int,
+    map: Map<String, String>,
+    keyController: KeyController?
+) : CardData() {
 
-    override val iccString: String? = map["IcData55"]
+    override val iccString: String? = keyController?.run { decrypt(map["ICData55"]) }
 
-    fun init() {
-        transactionAmount = map["Amount"] ?: "0"
-        cardSequenceNumber = map["PanSeqNo"] ?: ""
-        val downgrad = map["Downgrade"] // card mode ==0 normal 1: downgrade
-        val encryptTrack3 = map["EncryptTrack3"] // encrypted track 3  data
-        val encryptTrack2 = map["EncryptTrack2"] // encrypted track 2 data
-        val szentryMode = map["SzEntryMode"] // encryption mode 22 field
+    init {
+        if (keyController != null) {
+            iccString
+            transactionAmount = map["Amount"]?.replace(".", "") ?: "0"
+            cardSequenceNumber = map["PanSeqNo"] ?: ""
 
-        exp = map["ExpireDate"] ?: ""
+            track2 = keyController.decrypt(map["EncryptTrack2"]) ?: ""
 
-        cardMethod = when (map["CardType"]) {
-            "0" -> CardReaderEvent.MAG_STRIPE
-            "1" -> CardReaderEvent.CHIP
-            else -> CardReaderEvent.CANCELLED
+            exp = map["ExpireDate"] ?: ""
+            populateFromTrack2()
+
+            cardMethod = when (map["SzEntryMode"]) {
+                "0" -> CardReaderEvent.MAG_STRIPE
+                "1" -> CardReaderEvent.CHIP
+                else -> CardReaderEvent.CANCELLED
+            }
+
+//            pinBlock = map["PINBlock"]?.run {
+//                keyController.decrypt(TerminalUtils.hexStringToByteArray(this))
+//            } ?: "00000000"
         }
+    }
 
-        pinBlock = map["PINBlock"] ?: "00000000"
+    private fun KeyController.decrypt(encryptedValue: String?): String? {
+        return decrypt(encryptedValue?.hexBytes)
+    }
+
+    private fun populateFromTrack2() {
+        val fieldArray = track2.split('=', 'd', ignoreCase = true)
+
+        pan = fieldArray[0].substring(2)
+        holder = ""
+        exp = fieldArray[1].substring(0, 4)
+        src = fieldArray[1].substring(11, 14)
     }
 }

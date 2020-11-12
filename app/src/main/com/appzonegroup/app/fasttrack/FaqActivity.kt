@@ -37,7 +37,7 @@ class FaqActivity : BaseActivity() {
         mainScope.launch {
             val (faqs) = safeRunIO {
                 val fileContents = assets.open("faq.json").rawContents
-                Json.parse(FaqResponse.serializer(), fileContents)
+                Json.decodeFromString(FaqResponse.serializer(), fileContents)
             }
 
             faqs ?: return@launch

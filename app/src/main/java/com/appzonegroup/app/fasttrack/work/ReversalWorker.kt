@@ -7,8 +7,6 @@ import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.extension.responseCode39
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
-import com.creditclub.core.data.CreditClubMiddleWareAPI
-import com.creditclub.core.data.api.BackendConfig
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter

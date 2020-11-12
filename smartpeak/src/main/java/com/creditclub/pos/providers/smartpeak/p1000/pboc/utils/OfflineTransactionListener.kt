@@ -17,6 +17,7 @@ import com.basewin.define.*
 import com.basewin.packet8583.exception.Packet8583Exception
 import com.basewin.services.ServiceManager
 import com.basewin.utils.BCDHelper
+import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.pos.providers.smartpeak.p1000.pboc.iso8583.Iso8583Mgr
@@ -476,7 +477,7 @@ class OfflineTransactionListener(
         Log.d("TransactionListener", "IC card track:" + out.track)
         cardno = out.pan
         Looper.prepare()
-        dialogProvider.confirm("Confirm card number", cardno) {
+        dialogProvider.confirm(DialogConfirmParams("Confirm card number", cardno?:"")) {
             onSubmit {
                 try {
                     ServiceManager.getInstence().pboc.confirmCardInfo()
@@ -596,7 +597,7 @@ class OfflineTransactionListener(
             "EC currency code:" + balanceout.currencyType
         )
         Looper.prepare()
-        dialogProvider.confirm("ec balance", balanceout.ecBalance.toString()) {}
+        dialogProvider.confirm(DialogConfirmParams("ec balance", balanceout.ecBalance.toString())) {}
         Looper.loop()
     }
 

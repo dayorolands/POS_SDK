@@ -18,7 +18,6 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -55,14 +54,12 @@ class MobileTrackingWorker(context: Context, params: WorkerParameters) :
         .addConverterFactory(NullOnEmptyConverterFactory.create())
         .addConverterFactory(ScalarsConverterFactory.create())
         .addConverterFactory(
-            Json(
-                JsonConfiguration.Stable.copy(
-                    isLenient = true,
-                    ignoreUnknownKeys = true,
-                    serializeSpecialFloatingPointValues = true,
-                    useArrayPolymorphism = true
-                )
-            ).asConverterFactory(contentType)
+            Json {
+                isLenient = true
+                ignoreUnknownKeys = true
+                allowSpecialFloatingPointValues = true
+                useArrayPolymorphism = true
+            }.asConverterFactory(contentType)
         )
         .build()
     private val mobileTrackingService by retrofit.service<MobileTrackingService>()

@@ -3,7 +3,7 @@ package com.creditclub.core.util
 import android.content.Context
 import com.creditclub.core.R
 import com.creditclub.core.data.api.RequestFailureException
-import kotlinx.serialization.json.JsonDecodingException
+import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.ConnectException
@@ -31,7 +31,7 @@ fun Exception.getMessage(context: Context): String {
         )
         this is SocketTimeoutException -> context.getString(R.string.request_time_out)
         this is IOException || this is HttpException -> context.getString(R.string.a_network_error_occurred)
-        this is JsonDecodingException -> context.getString(R.string.an_internal_error_occurred)
+        this is SerializationException -> context.getString(R.string.an_internal_error_occurred)
         this is HttpException -> context.getString(R.string.server_response_error)
         else -> context.getString(R.string.an_internal_error_occurred)
     }

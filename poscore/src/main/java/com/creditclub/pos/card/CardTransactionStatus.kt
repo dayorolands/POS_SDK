@@ -10,7 +10,8 @@ enum class CardTransactionStatus(val code: Int) {
     Failure(0),
     UserCancel(-4),
     Timeout(-5),
-    OfflinePinVerifyError(-32);
+    OfflinePinVerifyError(-32),
+    CardRestricted(-6);
 
     companion object {
         fun find(code: Int) = values().find { it.code == code }

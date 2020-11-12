@@ -48,12 +48,17 @@ dependencies {
     implementation project(path: ':core')
     implementation project(path: ':poscore')
     implementation project(path: ':uicentral')
+//    implementation project(path: ':dspread')
+    implementation project(path: ':nexgo')
     implementation project(path: ':telpo')
-
-    api files('libs/jpos-1.9.0.jar')
+    api("org.jpos:jpos:2.1.4") {
+        exclude group: 'junit', module: 'junit'
+        exclude group: 'com.sleepycat', module: 'je'
+    }
 
     implementation 'com.loopj.android:android-async-http:1.4.10'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serialization}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
     implementation "com.google.android.material:material:${versions.material}"
