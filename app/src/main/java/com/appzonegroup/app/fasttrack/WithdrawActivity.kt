@@ -14,7 +14,6 @@ import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 
 /**
  * Created by DELL on 2/27/2017.
@@ -158,7 +157,7 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
         val additionalInformation = WithdrawalRequest.Additional().apply {
             customerPhoneNumber = accountInfo.phoneNumber
         }
-        formData.additionalInformation = Json(JsonConfiguration.Stable).stringify(
+        formData.additionalInformation = Json.encodeToString(
             WithdrawalRequest.Additional.serializer(),
             additionalInformation
         )
