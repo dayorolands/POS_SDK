@@ -25,7 +25,7 @@ data class ConnectionInfo(
     @SerialName("Port") override val port: Int,
     @SerialName("EnableSSL") override val ssl: Boolean,
     @SerialName("Dukpt") override val dukptConfig: DukptConfigImpl? = null,
-    @SerialName("MaxAttempts") override val maxAttempts: Int = 3
+    @SerialName("MaxAttempts") override val maxAttempts: Int = 2
 ) : RemoteConnectionInfo {
     override val id: String get() = nodeName
     override val label: String get() = nodeName
