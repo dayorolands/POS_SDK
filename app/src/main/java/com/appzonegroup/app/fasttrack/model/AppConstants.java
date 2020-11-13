@@ -17,7 +17,6 @@ public class AppConstants {
     }
 
     public static String getCardHotlistUrl(String cardPan, String accountNumber, String hotlistReason, String token) {
-        //https://api.mybankone.com/ThirdPartyAPIService/APIService/Cards/Hotlist/{CardPan}/{AccountNumber}/{HotlistReason}/{Token}
         return String.format(Locale.getDefault(),
                 "%s/ThirdPartyAPIService/APIService/Cards/Hotlist/%s/%s/%s/%s",
                 BASE_URL, cardPan, accountNumber, hotlistReason, token);

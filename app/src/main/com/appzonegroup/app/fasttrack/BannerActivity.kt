@@ -13,13 +13,13 @@ import com.squareup.picasso.Picasso
 class BannerActivity : AppCompatActivity() {
 
     private val binding by contentView<BannerActivity, ActivityBannerBinding>(R.layout.activity_banner)
-    private val jsonPrefs = getSharedPreferences("JSON_STORAGE", 0)
-    private val bannerImageList by jsonPrefs.jsonStore<List<String>>("DATA_BANNER_IMAGES")
+    private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.btnSkip.setOnClickListener { finish() }
 
+        val bannerImageList by jsonPrefs.jsonStore<List<String>>("DATA_BANNER_IMAGES")
         val data = bannerImageList ?: return finish()
         if (data.isEmpty()) return finish()
 

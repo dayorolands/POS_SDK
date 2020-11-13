@@ -18,12 +18,12 @@ class JsonStoreDelegate<T : Any>(
         useArrayPolymorphism = true
     }
 ) {
-    operator fun getValue(obj: Any, prop: KProperty<*>): T? {
+    operator fun getValue(obj: Any?, prop: KProperty<*>): T? {
         val value = prefs.getString(key, null) ?: return null
         return json.decodeFromString(serializer, value)
     }
 
-    operator fun setValue(obj: Any, prop: KProperty<*>, newValue: T?) {
+    operator fun setValue(obj: Any?, prop: KProperty<*>, newValue: T?) {
         val serializedValue = if (newValue == null) null
         else json.encodeToString(serializer, newValue)
 
