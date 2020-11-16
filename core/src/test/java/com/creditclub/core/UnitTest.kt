@@ -29,7 +29,7 @@ abstract class UnitTest {
             .build()
     }
 
-    internal val middleWareAPI by lazy { CreditClubMiddleWareAPI(okHttpClient, "https://staging.mybankone.com") }
+    internal val middleWareAPI by lazy { CreditClubMiddleWareAPI(okHttpClient, "http://52.168.85.231") }
 
     @Before
     fun setUp() {
