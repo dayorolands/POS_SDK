@@ -38,9 +38,7 @@ import retrofit2.create
 
 class LoginActivity : CreditClubActivity() {
 
-    private val jsonPrefs = getSharedPreferences("JSON_STORAGE", 0)
-    private var bannerImages by jsonPrefs.jsonStore<List<String>>("DATA_BANNER_IMAGES")
-    private var surveyQuestions by jsonPrefs.jsonStore<List<SurveyQuestion>>("DATA_SURVEY_QUESTIONS")
+    private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,6 +118,7 @@ class LoginActivity : CreditClubActivity() {
     }
 
     private fun checkLocalSurveyQuestions() {
+        var surveyQuestions by jsonPrefs.jsonStore<List<SurveyQuestion>>("DATA_SURVEY_QUESTIONS")
         val questions = surveyQuestions ?: return
         if (questions.isEmpty()) return
 
@@ -143,6 +142,7 @@ class LoginActivity : CreditClubActivity() {
     }
 
     private fun downloadBannerImages() {
+        var bannerImages by jsonPrefs.jsonStore<List<String>>("DATA_BANNER_IMAGES")
         ioScope.launch {
             val (response) = safeRunIO {
                 creditClubMiddleWareAPI.staticService.getBannerImages(
@@ -163,6 +163,7 @@ class LoginActivity : CreditClubActivity() {
     }
 
     private fun downloadSurveyQuestions() {
+        var surveyQuestions by jsonPrefs.jsonStore<List<SurveyQuestion>>("DATA_SURVEY_QUESTIONS")
         ioScope.launch {
             val (response) = safeRunIO {
                 creditClubMiddleWareAPI.staticService.getSurveyQuestions(
