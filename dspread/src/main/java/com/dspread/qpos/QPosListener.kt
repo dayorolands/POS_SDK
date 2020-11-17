@@ -250,7 +250,7 @@ class QPosListener(
         }
 
         cardData.pinBlock =
-            encryptedPinBlock(cardData.pan, String(byteArrayOf(30, 31, 32, 30))).hexString
+            encryptedPinBlock(cardData.pan, "1234").hexString
 
         if (c1Tlv != null || c7Tlv != null) {
             val pinKsn: String? = c1Tlv?.value

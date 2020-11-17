@@ -60,9 +60,9 @@ val PosParameter.parameters: String
 
 private fun PosParameter.mapAID(obj: JSONObject): String {
     val managementData = managementData
-    return "".appendTlv("9F06", obj.aid15)
-        .appendTlv("5F2A", decToHexString("0566"))
-        .appendTlv("5F36", decToHexString("00"))
+    return StringBuilder().appendTlv("9F06", obj.aid15)
+        .appendTlv("5F2A", "0566")
+        .appendTlv("5F36", "00")
         .appendTlv("9F01", null, "000000636092") // Acquirer Identifier
         .appendTlv("9F09", obj.appVersion18, "0100")
         .appendTlv("9F15", managementData.merchantCategoryCode, "0000") // Merchant Category Code
@@ -71,7 +71,7 @@ private fun PosParameter.mapAID(obj: JSONObject): String {
             null,
             managementData.cardAcceptorId.toByteArray().hexString
         ) // Merchant Identifier，add 0x00 if the digits is not enough
-        .appendTlv("9F1A", decToHexString("0566"))
+        .appendTlv("9F1A", "0566")
         .appendTlv("9F1B", obj.tflDomestic22, "00000000")
         .appendTlv("9F1C", null, "2076DK34".toByteArray().hexString) // Terminal Identification
         .appendTlv("9F1E", null, "3833323031494343") // Interface Device (IFD) Serial Number
@@ -109,6 +109,7 @@ private fun PosParameter.mapAID(obj: JSONObject): String {
         .appendTlv("DF79", null, "E040C8") // Contactless Terminal Capabilities
         .appendTlv("DF7A", null, "F000F0A001") // Contactless Additional Terminal Capabilities
         .appendTlv("DF7B", null, "")
+        .toString()
 }
 
 private fun mapCAPK(obj: JSONObject): String {
@@ -117,7 +118,7 @@ private fun mapCAPK(obj: JSONObject): String {
             "9F22" +
             mapToTLV(obj.optString("32") ?: "") +
             "DF05" +  // NO VALUE - KEY
-            decToHexString("0") +  // NO VALUE - VALUE
+            "0" +  // NO VALUE - VALUE
             "DF04" +
             mapToTLV(obj.optString("38") ?: "") +
             "DF02" +
@@ -130,12 +131,12 @@ private fun mapCAPK(obj: JSONObject): String {
             mapToTLV(obj.optString("39") ?: "")
 }
 
-fun String.appendTlv(tag: String, value: String?, defaultValue: String? = null): String {
+fun StringBuilder.appendTlv(tag: String, value: String?, defaultValue: String? = null): StringBuilder {
     val newValue =
         if (value != null && value.isBlank() && defaultValue != null) defaultValue
         else value ?: defaultValue ?: return this
 
-    return this + tag + mapToTLV(newValue)
+    return this.append(tag).append(mapToTLV(newValue))
 }
 
 private fun mapParameter(obj: JSONObject): String {
@@ -152,10 +153,6 @@ private fun mapParameter(obj: JSONObject): String {
         debugOnly { Log.e("Params", e.message) }
         ""
     }
-}
-
-private fun decToHexString(number: String): String {
-    return number // HexDump.toHexString(Integer.parseInt(number));
 }
 
 private fun mapToTLV(value: String): String {
