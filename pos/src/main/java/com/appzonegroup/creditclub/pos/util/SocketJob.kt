@@ -1,6 +1,5 @@
 package com.appzonegroup.creditclub.pos.util
 
-import android.util.Log
 import com.creditclub.core.util.debugOnly
 import com.creditclub.pos.RemoteConnectionInfo
 import java.io.ByteArrayOutputStream
@@ -21,8 +20,6 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 object SocketJob {
-    private val TAG = SocketJob::class.java.simpleName
-
     @Throws(
         NoSuchAlgorithmException::class,
         KeyManagementException::class,
@@ -30,12 +27,19 @@ object SocketJob {
     )
     fun execute(
         connectionInfo: RemoteConnectionInfo,
-        data: ByteArray
+        data: ByteArray,
+        isRetry: Boolean = false
     ): ByteArray? {
+        if (!connectionInfo.ssl) return socketConnectionJob(connectionInfo, data, isRetry)
+
         val host = connectionInfo.ip
         val port = connectionInfo.port
+
+        val timeout =
+            if (isRetry) connectionInfo.requeryConfig?.timeout ?: connectionInfo.timeout
+            else connectionInfo.timeout
+
         debugOnly { println("[remote environment]: $host:$port") }
-        if (!connectionInfo.ssl) return socketConnectionJob(host, port, data)
 
         val messageByte = ByteArray(1000)
         var end = false
@@ -54,33 +58,23 @@ object SocketJob {
         val trustAllCerts = arrayOf<TrustManager>(trustManager)
         val sc = SSLContext.getInstance("TLS")
         sc.init(null, trustAllCerts, SecureRandom())
-        Log.d(TAG, "Connecting")
         val sslsocket =
             sc.socketFactory.createSocket() as SSLSocket
-        sslsocket.connect(InetSocketAddress(host, port), 30000)
+        sslsocket.soTimeout = timeout * 1000
+        sslsocket.connect(InetSocketAddress(host, port), timeout * 1000)
         sslsocket.startHandshake()
         val `in` = DataInputStream(sslsocket.inputStream)
         val out = DataOutputStream(sslsocket.outputStream)
         val baos = ByteArrayOutputStream()
-        //InputStream in = connectionSocket.getInputStream();
-
-        //dialog.setMessage("Sending......");
-        Log.d(TAG, "Sending......")
-        Log.d(TAG, "Length to send " + data.size)
         val outputInfo = appendLengthBytes(data)
-        Log.d(TAG, "Bytes written to output " + String(outputInfo))
         out.write(outputInfo)
         out.flush()
-        //dialog.setMessage("Receiving....");
-        Log.d(TAG, "Receiving....")
         var bytesRead: Int
         `in`.readFully(messageByte, 0, 2)
-        println("Gotten length!!!!!")
 
         //ByteBuffer byteBuffer = ByteBuffer.wrap(messageByte, 0, 2);
         val byteBuffer = ByteBuffer.wrap(messageByte, 0, 2)
         val bytesToRead = byteBuffer.short.toInt()
-        println("About to read $bytesToRead octets")
         if (bytesToRead <= 1) {
             return null
         }
@@ -99,35 +93,38 @@ object SocketJob {
 
     @Throws(IOException::class)
     private fun socketConnectionJob(
-        host: String?,
-        port: Int,
-        data: ByteArray
+        connectionInfo: RemoteConnectionInfo,
+        data: ByteArray,
+        isRetry: Boolean = false
     ): ByteArray {
+        val host = connectionInfo.ip
+        val port = connectionInfo.port
+
+        val timeout =
+            if (isRetry) connectionInfo.requeryConfig?.timeout ?: connectionInfo.timeout
+            else connectionInfo.timeout
+
+        debugOnly { println("[remote environment]: $host:$port") }
+
         val connectionSocket: Socket
         val messageByte = ByteArray(1000)
         var end = false
         var dataString = ""
         val serverAddr = InetAddress.getByName(host)
-        Log.d(TAG, "Connecting")
         connectionSocket = Socket(serverAddr, port)
+        connectionSocket.soTimeout = timeout * 1000
         val baos = ByteArrayOutputStream()
         //InputStream in = connectionSocket.getInputStream();
         val `in` =
             DataInputStream(connectionSocket.getInputStream())
         val out = connectionSocket.getOutputStream()
-        //dialog.setMessage("Sending......");
-        Log.d(TAG, "Sending......")
-        Log.d(TAG, "Length to send " + data.size)
         out.write(appendLengthBytes(data))
-        //dialog.setMessage("Receiving....");
-        Log.d(TAG, "Receiving....")
         var bytesRead: Int
         messageByte[0] = `in`.readByte()
         messageByte[1] = `in`.readByte()
         //ByteBuffer byteBuffer = ByteBuffer.wrap(messageByte, 0, 2);
         val byteBuffer = ByteBuffer.wrap(messageByte, 0, 2)
         val bytesToRead = byteBuffer.short.toInt()
-        println("About to read $bytesToRead octets")
         //The following code shows in detail how to read from a TCP socket
         while (!end) {
             bytesRead = `in`.read(messageByte)

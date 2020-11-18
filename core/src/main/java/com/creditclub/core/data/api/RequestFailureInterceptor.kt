@@ -21,7 +21,7 @@ class RequestFailureInterceptor : Interceptor {
         val request = chain.request()
         val response = chain.proceed(request)
 
-        if (response.code != 200) {
+        if (!response.isSuccessful) {
             val jsonPayload = response.body?.string() ?: return response
             val failureResponse = try {
                 json.decodeFromString(FailureResponse.serializer(), jsonPayload)

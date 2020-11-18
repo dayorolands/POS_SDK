@@ -9,6 +9,12 @@ interface RemoteConnectionInfo {
     val port: Int
     val ssl: Boolean
     val dukptConfig: DukptConfig?
-    val maxAttempts: Int
+
+    /**
+     * The request timeout (in seconds)
+     */
+    val timeout: Int
+
     val nodeName: String?
+    val requeryConfig: RequeryConfig?
 }

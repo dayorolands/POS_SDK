@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.creditclub.core.util.format
 import com.creditclub.pos.model.ConnectionInfo
+import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -38,6 +39,7 @@ class PosNotification {
     var cardScheme: String? = "Debit MasterCard"
 
     @SerialName("StatusCode")
+    @Required
     var statusCode: String? = "00"
 
     @SerialName("PaymentDate")

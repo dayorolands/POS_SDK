@@ -2,6 +2,7 @@ package com.appzonegroup.creditclub.pos.util
 
 import com.creditclub.pos.DukptConfig
 import com.creditclub.pos.RemoteConnectionInfo
+import com.creditclub.pos.RequeryConfig
 
 enum class PosMode(
     override val id: String,
@@ -12,8 +13,9 @@ enum class PosMode(
     override val port: Int,
     override val ssl: Boolean = true,
     override val dukptConfig: DukptConfig? = null,
-    override val maxAttempts: Int = 1,
-    override val nodeName: String? = null
+    override val timeout: Int = 60,
+    override val nodeName: String? = null,
+    override val requeryConfig: RequeryConfig? = null,
 ) : RemoteConnectionInfo {
 
     EPMS(

@@ -22,9 +22,9 @@ import org.jpos.iso.ISOException
 import org.jpos.iso.ISOMsg
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.time.Instant
 import java.io.IOException
 import java.net.ConnectException
+import java.time.Instant
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/15/2019.
@@ -49,7 +49,7 @@ class IsoSocketHelper(
         }
     }
 
-    fun send(request: ISOMsg): Result {
+    fun send(request: ISOMsg, isRetry: Boolean = false): Result {
         request.terminalId41 = config.terminalId
 
         Looper.myLooper() ?: Looper.prepare()
@@ -69,7 +69,7 @@ class IsoSocketHelper(
             val sessionKey = parameters.sessionKey
             val outputData = request.prepare(sessionKey)
             request.log()
-            val output = SocketJob.execute(remoteConnectionInfo, outputData)
+            val output = SocketJob.execute(remoteConnectionInfo, outputData, isRetry)
             val response = ISOMsg().apply {
                 packager = ISO87Packager()
                 unpack(output)
@@ -128,16 +128,6 @@ class IsoSocketHelper(
         }
 
         return Result(null, null)
-    }
-
-    fun send(request: ISOMsg, maxAttempts: Int): Result {
-        if (maxAttempts < 2) return send(request)
-        var result = Result(null, null)
-        for (attempt in 1..maxAttempts) {
-            result = send(request)
-            if (result.error !is ConnectException) break
-        }
-        return result
     }
 
     data class Result(val response: ISOMsg?, val error: java.lang.Exception?)

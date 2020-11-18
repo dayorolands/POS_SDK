@@ -334,19 +334,22 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                 callHomeService.stopCallHomeTimer()
 
                 val (response, error) = withContext(Dispatchers.IO) {
-                    if (request.mti == "0200" && remoteConnectionInfo.maxAttempts > 1) {
+                    val maxAttempts = 1 + (remoteConnectionInfo.requeryConfig?.maxRetries ?: 0)
+                    if (request.mti == "0200" && maxAttempts > 1) {
                         var result: IsoSocketHelper.Result = IsoSocketHelper.Result(null, null)
-                        for (attempt in 1..remoteConnectionInfo.maxAttempts) {
-                            if (attempt > 1) {
+                        for (attempt in 1..maxAttempts) {
+                            val isRetry = attempt > 1
+                            if (isRetry) {
                                 delay(2000)
                                 request.mti =
                                     if (attempt > 2 && result.error !is ConnectException) "0221" else "0220"
                                 runOnUiThread { dialogProvider.showProgressBar("Retrying...$attempt") }
                             }
 
-                            result = isoSocketHelper.send(request)
-                            result.response ?: continue
-                            result.error ?: break
+                            result = isoSocketHelper.send(request, isRetry)
+                            val responseMsg = result.response ?: continue
+                            if (responseMsg.responseCode39 == "91") continue
+                            if (result.error == null) break
                         }
                         result
                     } else {
