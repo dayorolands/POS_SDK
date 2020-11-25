@@ -59,6 +59,7 @@ class MobileTrackingWorker(context: Context, params: WorkerParameters) :
                 ignoreUnknownKeys = true
                 allowSpecialFloatingPointValues = true
                 useArrayPolymorphism = true
+                encodeDefaults = true
             }.asConverterFactory(contentType)
         )
         .build()

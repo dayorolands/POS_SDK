@@ -52,8 +52,9 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
     private val json = Json {
         isLenient = true
         ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
+                allowSpecialFloatingPointValues = true
+                useArrayPolymorphism = true
+                encodeDefaults = true
     }
 
     override var masterKey by prefs.nonNullStringStore("MasterKey")

@@ -17,8 +17,9 @@ object RoomConverters {
     private val json = Json {
         isLenient = true
         ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
+                allowSpecialFloatingPointValues = true
+                useArrayPolymorphism = true
+                encodeDefaults = true
     }
 
     @TypeConverter

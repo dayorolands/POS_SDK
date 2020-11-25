@@ -82,6 +82,7 @@ Transaction ID: ${request.customerDepositSlipNumber}"""
                 ignoreUnknownKeys = true
                 allowSpecialFloatingPointValues = true
                 useArrayPolymorphism = true
+                encodeDefaults = true
             }
             val serializer = PayBillResponse.AdditionalInformation.serializer()
             additionalInformation = json.decodeFromString(serializer, this)

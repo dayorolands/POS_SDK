@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.databinding.ActivitySupportThreadBinding
 import com.appzonegroup.app.fasttrack.databinding.ItemCaseMessageBinding
 import com.appzonegroup.app.fasttrack.databinding.ItemCaseMessageReceivedBinding
-import com.appzonegroup.app.fasttrack.model.AgentInfo
 import com.creditclub.core.data.model.Feedback
 import com.creditclub.core.data.request.CaseMessageThreadRequest
 import com.creditclub.core.data.response.CaseResponse
@@ -22,7 +21,6 @@ import com.creditclub.core.ui.widget.DialogListener
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.time.Instant
 
@@ -32,12 +30,6 @@ class SupportThreadActivity : BaseActivity() {
     private var messageList: List<Feedback> = emptyList()
     private val adapter = Adapter(messageList)
     private val reference by lazy { intent.getStringExtra("REFERENCE") ?: "" }
-    private val agentName: String? by lazy {
-        Gson().fromJson(
-            localStorage.agentInfo,
-            AgentInfo::class.java
-        )?.agentName
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,7 +106,7 @@ class SupportThreadActivity : BaseActivity() {
                 caseReference = reference
                 message = newMessage
                 isAgent = true
-                name = agentName
+                name = localStorage.agent?.agentName
             }
 
             val (response, error) = safeRunIO {

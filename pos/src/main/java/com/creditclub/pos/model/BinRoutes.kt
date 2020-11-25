@@ -27,8 +27,8 @@ data class ConnectionInfo(
     @SerialName("EnableSSL") override val ssl: Boolean,
     @SerialName("Dukpt") override val dukptConfig: DukptConfigImpl? = null,
     @SerialName("Timeout") override val timeout: Int = 90,
-    @SerialName("RequeryConfig") override val requeryConfig: RequeryConfig? = RequeryConfigImpl(
-        timeout = 60,
+    @SerialName("RequeryConfig") override val requeryConfig: RequeryConfigImpl? = RequeryConfigImpl(
+        timeout = 90,
         maxRetries = 1
     ),
 ) : RemoteConnectionInfo {

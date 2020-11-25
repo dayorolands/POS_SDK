@@ -24,8 +24,9 @@ class LocalStorage private constructor(
     private val json = Json {
         isLenient = true
         ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
+                allowSpecialFloatingPointValues = true
+                useArrayPolymorphism = true
+                encodeDefaults = true
     }
 
     var cacheAuth: String? by valueStore(KEY_AUTH)
