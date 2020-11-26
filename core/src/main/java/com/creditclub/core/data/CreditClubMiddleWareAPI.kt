@@ -28,6 +28,7 @@ open class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) 
                 ignoreUnknownKeys = true
                 allowSpecialFloatingPointValues = true
                 useArrayPolymorphism = true
+                encodeDefaults = true
             }.asConverterFactory(contentType)
         )
         .build()

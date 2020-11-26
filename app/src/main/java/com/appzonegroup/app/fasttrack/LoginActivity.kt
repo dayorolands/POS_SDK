@@ -37,6 +37,7 @@ import org.koin.android.ext.android.inject
 import retrofit2.create
 
 class LoginActivity : CreditClubActivity() {
+
     private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -14,8 +14,9 @@ class JsonStoreDelegate<T : Any>(
     private val json: Json = Json {
         isLenient = true
         ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
+                allowSpecialFloatingPointValues = true
+                useArrayPolymorphism = true
+                encodeDefaults = true
     }
 ) {
     operator fun getValue(obj: Any?, prop: KProperty<*>): T? {

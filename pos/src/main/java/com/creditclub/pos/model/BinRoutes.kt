@@ -2,6 +2,7 @@ package com.creditclub.pos.model
 
 import com.creditclub.pos.DukptConfig
 import com.creditclub.pos.RemoteConnectionInfo
+import com.creditclub.pos.RequeryConfig
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -25,7 +26,11 @@ data class ConnectionInfo(
     @SerialName("Port") override val port: Int,
     @SerialName("EnableSSL") override val ssl: Boolean,
     @SerialName("Dukpt") override val dukptConfig: DukptConfigImpl? = null,
-    @SerialName("MaxAttempts") override val maxAttempts: Int = 2
+    @SerialName("Timeout") override val timeout: Int = 90,
+    @SerialName("RequeryConfig") override val requeryConfig: RequeryConfigImpl? = RequeryConfigImpl(
+        timeout = 90,
+        maxRetries = 1
+    ),
 ) : RemoteConnectionInfo {
     override val id: String get() = nodeName
     override val label: String get() = nodeName
@@ -38,6 +43,12 @@ data class DukptConfigImpl(
     @SerialName("IPEK") override val ipek: String,
     @SerialName("KSN") override val ksn: String
 ) : DukptConfig
+
+@Serializable
+data class RequeryConfigImpl(
+    @SerialName("Timeout") override val timeout: Int,
+    @SerialName("MaxRetries") override val maxRetries: Int
+) : RequeryConfig
 
 fun List<BinRoutes>.getSupportedRoute(bin: String, amount: Double): ConnectionInfo? {
     for (binRoutes in this) {

@@ -10,16 +10,9 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
-class CaseDetailsRequest {
-    @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null
-
-    @SerialName("InstitutionCode")
-    var institutionCode: String? = null
-
-    @SerialName("StartIndex")
-    val startIndex = 0
-
-    @SerialName("MaxSize")
-    var maxSize = 10
-}
+data class CaseDetailsRequest(
+    @SerialName("AgentPhoneNumber") val agentPhoneNumber: String? = null,
+    @SerialName("InstitutionCode") val institutionCode: String? = null,
+    @SerialName("StartIndex") val startIndex: Int = 0,
+    @SerialName("MaxSize") val maxSize: Int = 10
+)

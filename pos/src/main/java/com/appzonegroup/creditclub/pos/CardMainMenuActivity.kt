@@ -31,6 +31,7 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu), View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding.cont.visibility = View.INVISIBLE
         localStorage.agent ?: return finish()
         checkRequirements()
     }
@@ -61,6 +62,7 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu), View
         }
 
         mainScope.launch {
+            binding.cont.visibility = View.VISIBLE
             checkKeysAndParameters()
             bindView()
         }

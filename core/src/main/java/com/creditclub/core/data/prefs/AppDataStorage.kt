@@ -22,8 +22,9 @@ class AppDataStorage(
     private val json = Json {
         isLenient = true
         ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
+                allowSpecialFloatingPointValues = true
+                useArrayPolymorphism = true
+                encodeDefaults = true
     }
     private var latestVersionJson: String? by valueStore("LATEST_VERSION_JSON")
     var latestVersionLink: String? by valueStore("LATEST_VERSION_LINK")

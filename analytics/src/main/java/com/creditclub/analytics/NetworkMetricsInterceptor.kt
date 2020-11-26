@@ -2,6 +2,7 @@ package com.creditclub.analytics
 
 import com.creditclub.analytics.models.NetworkMeasurement
 import com.creditclub.core.data.api.BackendConfig
+import com.creditclub.core.data.api.RequestFailureException
 import com.creditclub.core.data.prefs.LocalStorage
 import io.objectbox.kotlin.boxFor
 import okhttp3.Interceptor
@@ -34,6 +35,12 @@ class NetworkMetricsInterceptor : Interceptor, KoinComponent {
         var error: Throwable? = null
         try {
             response = chain.proceed(request)
+        } catch (e: RequestFailureException) {
+            error = e
+            if (e.httpStatusCode != null) {
+                networkMeasurement.statusCode = e.httpStatusCode!!
+                networkMeasurement.responseTime = Instant.now()
+            }
         } catch (t: Throwable) {
             error = t
         }

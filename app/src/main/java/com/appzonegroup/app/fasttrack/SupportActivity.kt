@@ -43,10 +43,10 @@ class SupportActivity : BaseActivity() {
         mainScope.launch {
             showProgressBar("Loading Cases")
 
-            val request = CaseDetailsRequest().apply {
-                agentPhoneNumber = localStorage.agentPhone
+            val request = CaseDetailsRequest(
+                agentPhoneNumber = localStorage.agentPhone,
                 institutionCode = localStorage.institutionCode
-            }
+            )
 
             val (response, error) = safeRunIO {
                 creditClubMiddleWareAPI.caseLogService.caseDetails(request)
