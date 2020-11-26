@@ -40,7 +40,7 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
 
         if (tokenWithdrawalConfig.externalToken) {
             tokenSent = true
-            binding.withdrawalAmountEt.isEnabled = false
+            binding.withdrawalAmountEt.isEnabled = true
             binding.topLayout.isEnabled = false
             binding.sendTokenBtn.visibility = View.GONE
             binding.tokenBlock.visibility = View.VISIBLE

@@ -155,7 +155,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/customer_token"
                         android:inputType="number"
-                        android:maxLength="5" />
+                        android:maxLength="10" />
 
 
                     <com.appzonegroup.app.fasttrack.ui.CustomButton
