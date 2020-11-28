@@ -76,20 +76,20 @@ class QPosCardReader(
     private suspend fun updateEmvConfig() {
 //        val emvAppCfg = FileUtils.readAssetsLine("emv_app.bin", activity)?.hexString
 //        val emvCapkCfg = FileUtils.readAssetsLine("emv_capk.bin", activity)?.hexString
-//        val emvProfileTlv = String(FileUtils.readAssetsLine("emv_profile_tlv.xml", activity))
+        val emvProfileTlv = String(FileUtils.readAssetsLine("emv_profile_tlv.xml", activity))
 
 //        listener.waitForUnit { pos.updateEmvConfig(emvAppCfg, emvCapkCfg) }
-//        listener.waitForUnit { pos.updateEMVConfigByXml(emvProfileTlv) }
-        for (emvAid in posParameter.emvAids) {
-            listener.waitForUnit {
-                pos.updateEmvAPPByTlv(QPOSService.EMVDataOperation.update, emvAid)
-            }
-        }
-        for (capKey in posParameter.capKeys) {
-            listener.waitForUnit {
-                pos.updateEmvCAPKByTlv(QPOSService.EMVDataOperation.update, capKey)
-            }
-        }
+        listener.waitForUnit { pos.updateEMVConfigByXml(emvProfileTlv) }
+//        for (emvAid in posParameter.emvAids) {
+//            listener.waitForUnit {
+//                pos.updateEmvAPPByTlv(QPOSService.EMVDataOperation.update, emvAid)
+//            }
+//        }
+//        for (capKey in posParameter.capKeys) {
+//            listener.waitForUnit {
+//                pos.updateEmvCAPKByTlv(QPOSService.EMVDataOperation.update, capKey)
+//            }
+//        }
     }
 
     private suspend fun loadKeys() {

@@ -11,6 +11,7 @@ import android.util.Base64
 import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.util.format
+import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
@@ -60,7 +61,7 @@ class QPosListener(
             QPOSService.DoTradeResult.ICC -> {
                 statusEditText.setText(getString(R.string.icc_card_inserted))
                 TRACE.d("EMV ICC Start")
-                pos.doEmvApp(QPOSService.EmvOption.START)
+                pos.doEmvApp(QPOSService.EmvOption.START_WITH_FORCE_PIN)
             }
             QPOSService.DoTradeResult.NOT_ICC -> {
                 statusEditText.setText(getString(R.string.card_inserted))
@@ -189,11 +190,7 @@ class QPosListener(
     }
 
     override fun onRequestOnlineProcess(tlv: String) {
-        try {
-            extractData(tlv)// analy tlv ,get the tag you need
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
+        safeRun { extractData(tlv) }
 
         if (isPinCanceled) {
             pos.sendOnlineProcessResult(null)
@@ -211,8 +208,8 @@ class QPosListener(
         val c1Tlv: TLV? = TLVParser.searchTLV(list, tlvStrArr[2])
         val c7Tlv: TLV? = TLVParser.searchTLV(list, tlvStrArr[3])
         if (c0Tlv == null || c2Tlv == null) return
-        val ksn: String = c0Tlv.value //ksn
-        val dataStr: String = c2Tlv.value //datastr
+        val ksn: String = c0Tlv.value
+        val dataStr: String = c2Tlv.value
         val date = DUKPK2009_CBC.getDate(
             ksn,
             dataStr,
@@ -220,10 +217,6 @@ class QPosListener(
             DUKPK2009_CBC.Enum_mode.CBC
         )
         val dates: List<TLV> = TLVParser.parse(date) ?: return
-        val tlvStrArrs = arrayOf("5A", "5F2A", "9F09")
-        val dateTlv: TLV = TLVParser.searchTLV(dates, tlvStrArrs[0])
-        val dataCu: TLV = TLVParser.searchTLV(dates, tlvStrArrs[1])
-        val data9F09: TLV = TLVParser.searchTLV(dates, tlvStrArrs[2])
 
         cardData.apply {
             ret = CardTransactionStatus.Success.code
@@ -249,9 +242,6 @@ class QPosListener(
             cardData.ret = CardTransactionStatus.OfflinePinVerifyError.code
         }
 
-        cardData.pinBlock =
-            encryptedPinBlock(cardData.pan, String(byteArrayOf(30, 31, 32, 30))).hexString
-
         if (c1Tlv != null || c7Tlv != null) {
             val pinKsn: String? = c1Tlv?.value
             val pinBlock: String? = c7Tlv?.value
@@ -268,6 +258,7 @@ class QPosListener(
                     pan.length - 1
                 )
                 val pin = DUKPK2009_CBC.xor(parsCarN, encryptedPin)
+                cardData.pinBlock = encryptedPinBlock(cardData.pan, pin).hexString
             }
         }
     }
