@@ -143,8 +143,8 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
 
         val token = binding.tokenEt.value
 
-        if (token.length != 5) {
-            indicateError("Please enter the customer's token", binding.tokenEt)
+        if (token.length < 5) {
+            indicateError("Please enter a valid token", binding.tokenEt)
             return
         }
 
