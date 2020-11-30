@@ -1,5 +1,6 @@
 package com.dspread.qpos
 
+import android.bluetooth.BluetoothDevice
 import android.os.Handler
 import android.os.Looper
 import com.creditclub.core.ui.CreditClubActivity
@@ -9,12 +10,16 @@ import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReader
 import com.creditclub.pos.card.CardReaderEvent
 import com.creditclub.pos.card.CardReaderEventListener
-import com.dspread.qpos.utils.*
+import com.dspread.qpos.utils.Dukpt
+import com.dspread.qpos.utils.FileUtils
+import com.dspread.qpos.utils.hexBytes
 import com.dspread.qpos.utils.hexString
 import com.dspread.xpos.QPOSService
 import kotlinx.coroutines.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.util.*
+import kotlin.concurrent.scheduleAtFixedRate
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -116,12 +121,37 @@ class QPosCardReader(
     }
 
     private suspend fun connectDevice(): Boolean {
+        val device = findDevice() ?: return false
         dialogProvider.showProgressBar("Connecting to mPOS device")
         val connected: Boolean = withContext(Dispatchers.IO) {
-//            listener.posConnectContinuation = continuation
-            pos.syncConnectBluetooth(true, 25, "04:D1:6E:54:1E:02")
+            pos.syncConnectBluetooth(true, 25, device.address)
         }
         dialogProvider.hideProgressBar()
         return connected
+    }
+
+    private suspend fun findDevice(): BluetoothDevice? = suspendCoroutine {
+        pos.scanQPos2Mode(activity, 20)
+        var findDeviceDialog: QPosFindDeviceDialog? = null
+        var timerTask: TimerTask? = null
+        findDeviceDialog = QPosFindDeviceDialog(activity) {
+            onSubmit { device ->
+                timerTask?.cancel()
+                pos.stopScanQPos2Mode()
+                findDeviceDialog?.dismiss()
+                findDeviceDialog = null
+                it.resume(device)
+            }
+
+            onClose {
+                timerTask?.cancel()
+                pos.stopScanQPos2Mode()
+                it.resume(null)
+            }
+        }
+        timerTask = Timer().scheduleAtFixedRate(1000, 1000) {
+            activity.runOnUiThread { findDeviceDialog?.updateList(pos.deviceList) }
+        }
+        findDeviceDialog?.show()
     }
 }
