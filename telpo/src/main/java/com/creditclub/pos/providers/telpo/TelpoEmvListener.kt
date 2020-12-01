@@ -10,6 +10,7 @@ import com.creditclub.core.util.format
 import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosParameter
+import com.creditclub.pos.card.CardTransactionStatus
 import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.utils.TripleDesCipher
 import com.telpo.emv.*
@@ -21,8 +22,8 @@ import com.telpo.pinpad.PinParam
 import com.telpo.pinpad.PinpadService
 import org.koin.core.KoinComponent
 import org.koin.core.get
-import java.time.Instant
 import java.io.UnsupportedEncodingException
+import java.time.Instant
 
 
 class TelpoEmvListener(
@@ -35,6 +36,8 @@ class TelpoEmvListener(
     internal var pinBlock: String? = null
     private var bUIThreadisRunning = true
     private val prefs = context.getSharedPreferences("TelpoPosManager", 0)
+    var status: CardTransactionStatus? = null
+        private set
 
     private fun wakeUpAndUnlock(context: Context) {
         val km = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
@@ -89,7 +92,7 @@ class TelpoEmvListener(
                 }
                 PinpadService.TP_PinpadDukptSessionStart(0)
             }
-            val ret: Int
+            var ret: Int
             val pinText = PinData.getPinTextInfo(param)
             if (PinData.type.toInt() == 0) {
                 if (dukptConfig == null) {
@@ -112,15 +115,19 @@ class TelpoEmvListener(
                         PinData.type = 0
                         pinBlock = param.Pin_Block.hexString
                         ksnData = param.Curr_KSN.hexString
-//                        PinData.Pin = ByteArray(4) { it.toByte() }
                     }
                 }
             }
+            if (param.Pin_Block.isEmpty()) {
+                ret = PinpadService.PIN_ERROR_NOINI
+            }
             result = when {
                 ret == PinpadService.PIN_ERROR_CANCEL -> EmvService.ERR_USERCANCEL
-                ret == PinpadService.PIN_OK && param.Pin_Block.hexString == "00000000" -> {
-                    EmvService.ERR_NOPIN
+                ret == PinpadService.PIN_OK && param.Pin_Block.hexString == "0".repeat(param.Pin_Block.size * 2) -> {
+                    status = CardTransactionStatus.NoPin
+                    EmvService.ERR_OFFLINE_PIN_VERIFY_ERROR
                 }
+                ret == PinpadService.PIN_ERROR_NOINI -> EmvService.ERR_NOPIN
                 ret == PinpadService.PIN_OK -> EmvService.EMV_TRUE
                 ret == PinpadService.PIN_ERROR_TIMEOUT -> EmvService.ERR_TIMEOUT
                 else -> EmvService.EMV_FALSE
@@ -225,10 +232,6 @@ class TelpoEmvListener(
         AmountData.ReferCurrExp = 2.toByte()
         AmountData.ReferCurrCon = 0
         return EmvService.EMV_TRUE
-    }
-
-    private fun log(msg: String) {
-        Log.d("MyEMV", msg)
     }
 
     private inline val ByteArray.encryptedPinBlock: ByteArray

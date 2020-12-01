@@ -305,6 +305,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                     CardTransactionStatus.Timeout -> renderTransactionFailure("Timeout while reading card")
                     CardTransactionStatus.OfflinePinVerifyError -> renderTransactionFailure("Wrong PIN. Card Restricted")
                     CardTransactionStatus.CardRestricted -> renderTransactionFailure("Card Restricted")
+                    CardTransactionStatus.NoPin -> renderTransactionFailure("No PIN entered")
                     else -> renderTransactionFailure(EmvErrorMessage[cardData.ret])
                 }
             }

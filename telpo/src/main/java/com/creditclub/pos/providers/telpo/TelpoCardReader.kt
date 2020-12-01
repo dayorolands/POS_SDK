@@ -13,7 +13,7 @@ import com.creditclub.pos.card.CardReaderEvent
 import com.creditclub.pos.card.CardReaderEventListener
 import com.telpo.emv.EmvParam
 import com.telpo.emv.EmvService
-import com.telpo.emv.util.*
+import com.telpo.emv.util.StringUtil
 import com.telpo.pinpad.PinParam
 import com.telpo.pinpad.PinpadService
 import kotlinx.coroutines.Dispatchers
@@ -163,10 +163,11 @@ class TelpoCardReader(
                     deviceClose()
                     flow.hideProgressBar()
 
+                    val statusRet = emvListener.status?.code ?: ret
                     val cardData = emvListener.cardData ?: withContext(Dispatchers.Default) {
-                        TelpoEmvCardData(if (ret == EmvService.EMV_TRUE) emvService else null)
+                        TelpoEmvCardData(if (statusRet == EmvService.EMV_TRUE) emvService else null)
                     }
-                    cardData.ret = ret
+                    cardData.ret = statusRet
                     cardData.pinBlock = emvListener.pinBlock ?: ""
 
                     return cardData
