@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.appzonegroup.app.fasttrack.fragment.CaseLogViewModel" />
+    </data>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -53,41 +60,85 @@
                 android:orientation="vertical"
                 android:padding="15dp">
 
-                <include
-                    android:id="@+id/subject"
-                    layout="@layout/text_field"
-                    app:hint='@{"Subject"}' />
-
-                <include
-                    android:id="@+id/description"
-                    layout="@layout/text_field"
-                    app:hint='@{"Description"}' />
-
-                <include
-                    android:id="@+id/email"
-                    layout="@layout/text_field"
-                    app:hint='@{"Agent Email"}' />
-
-                <com.appzonegroup.app.fasttrack.ui.Picker
-                    android:id="@+id/categories"
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    app:label='@{"Categories"}' />
+                    android:layout_marginBottom="10dp"
+                    android:hint="Subject">
 
-                <com.appzonegroup.app.fasttrack.ui.Picker
-                    android:id="@+id/products"
+                    <com.google.android.material.textfield.TextInputEditText
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:singleLine="true"
+                        android:text="@={viewModel.subject}" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    app:label='@{"Products"}' />
+                    android:layout_marginBottom="10dp"
+                    android:hint="Description">
 
-                <include
-                    android:id="@+id/agent_pin"
-                    layout="@layout/text_field"
-                    app:hint='@{"Agent PIN"}'
-                    app:maxLength='@{4}'
-                    app:inputType='@{"numberPassword"}' />
+                    <com.google.android.material.textfield.TextInputEditText
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:singleLine="true"
+                        android:text="@={viewModel.description}" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:hint="Agent Email">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="textEmailAddress"
+                        android:text="@={viewModel.agentEmail}" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/category">
+
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:editable="false"
+                        android:inputType="none"
+                        android:singleLine="true"
+                        app:selected="@{viewModel.category}"
+                        app:suggestions="@{viewModel.categoryList}" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/product"
+                    app:dependsOn="@{viewModel.category}">
+
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:editable="false"
+                        android:inputType="none"
+                        android:singleLine="true"
+                        app:selected="@{viewModel.product}"
+                        app:suggestions="@{viewModel.productList}" />
+                </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
         </ScrollView>

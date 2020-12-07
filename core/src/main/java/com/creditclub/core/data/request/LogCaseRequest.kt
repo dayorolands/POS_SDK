@@ -6,26 +6,26 @@ import kotlinx.serialization.Serializable
 @Serializable
 class LogCaseRequest {
     @SerialName("InstitutionCode")
-    var institutionCode = ""
+    var institutionCode: String? = null
 
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber = ""
+    var agentPhoneNumber: String? = null
 
     @SerialName("AgentPin")
-    var agentPin = ""
+    var agentPin: String? = null
 
     @SerialName("Product")
-    var product = ""
+    var product: String? = null
 
     @SerialName("CaseCategoryID")
-    var caseCategoryID = ""
+    var caseCategoryID: String? = null
 
     @SerialName("Subject")
-    var subject = ""
+    var subject: String? = null
 
     @SerialName("Description")
-    var description = ""
+    var description: String? = null
 
     @SerialName("CaseReporterEmail")
-    var caseReporterEmail = ""
+    var caseReporterEmail: String? = null
 }

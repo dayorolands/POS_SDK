@@ -10,4 +10,6 @@ class CaseCategory {
 
     @SerialName("Name")
     var name = ""
+
+    override fun toString() = name
 }

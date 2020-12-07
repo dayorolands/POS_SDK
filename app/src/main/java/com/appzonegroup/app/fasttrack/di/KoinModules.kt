@@ -52,15 +52,15 @@ val apiModule = module {
             .writeTimeout(2, TimeUnit.MINUTES)
             .cache(cache)
 
+        builder
+            .addInterceptor(NetworkMetricsInterceptor())
+            .addInterceptor(RequestFailureInterceptor())
+
         debugOnly {
             val interceptor = HttpLoggingInterceptor()
             interceptor.level = HttpLoggingInterceptor.Level.BODY
             builder.addInterceptor(interceptor)
         }
-
-        builder
-            .addInterceptor(NetworkMetricsInterceptor())
-            .addInterceptor(RequestFailureInterceptor())
 
         return@single builder.build()
     }

@@ -27,7 +27,6 @@ import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.ui.UpdateActivity
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
 
@@ -43,7 +42,14 @@ class HomeFragment : CreditClubFragment(R.layout.home_fragment),
         super.onViewCreated(view, savedInstanceState)
 
         binding.agentCategoryButton.button.setOnClickListener(categoryClickListener(AppFunctions.Categories.AGENT_CATEGORY))
-        binding.customerCategoryButton.button.setOnClickListener(categoryClickListener(AppFunctions.Categories.CUSTOMER_CATEGORY))
+        binding.customerCategoryButton.run {
+            if (institutionConfig.categories.customers) {
+                root.visibility = View.VISIBLE
+                button.setOnClickListener(categoryClickListener(AppFunctions.Categories.CUSTOMER_CATEGORY))
+            } else {
+                root.visibility = View.GONE
+            }
+        }
         binding.loanCategoryButton.run {
             if (institutionConfig.categories.loans) {
                 root.visibility = View.VISIBLE

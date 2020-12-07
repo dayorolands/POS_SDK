@@ -17,4 +17,6 @@ class Bank {
 
     @SerialName("Code")
     var code: String? = null
+
+    override fun toString() = name ?: "Unnamed bank"
 }

@@ -2,6 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.appzonegroup.app.fasttrack.fragment.FundsTransferViewModel" />
+    </data>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -92,38 +99,50 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <com.appzonegroup.app.fasttrack.ui.TextView
-                    android:id="@+id/destination_bank_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/customer_bank" />
-
-                <Spinner
-                    android:id="@+id/destination_bank_spinner"
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp" />
-
-                <com.appzonegroup.app.fasttrack.ui.TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
-                    android:text="@string/receivers_account_number" />
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/customer_bank"
+                    app:goneIf="@{viewModel.isSameBank}">
 
-                <com.appzonegroup.app.fasttrack.ui.EditText
-                    android:id="@+id/account_number_et"
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:editable="false"
+                        android:inputType="none"
+                        android:singleLine="true"
+                        app:selected="@{viewModel.bank}"
+                        app:suggestions="@{viewModel.bankList}" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:inputType="number"
-                    android:maxLength="10" />
+                    android:hint="@string/receivers_account_number"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="10">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/receiver_account_number_et"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="number"
+                        android:maxLength="10"
+                        android:singleLine="true"
+                        android:text="@={viewModel.receiverAccountNumber}" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <Button
+                    android:id="@+id/validate_button"
                     style="@style/button_style"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/validate_button"
                     android:text="@string/validate_account" />
 
             </LinearLayout>
@@ -135,63 +154,56 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <com.appzonegroup.app.fasttrack.ui.TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/AccountName" />
-
-                <com.appzonegroup.app.fasttrack.ui.EditText
-                    android:id="@+id/account_name_et"
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:enabled="false" />
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="15dp"
+                    android:hint="Account Name">
 
-                <com.appzonegroup.app.fasttrack.ui.TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/transactionAmount" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:editable="false"
+                        android:singleLine="true"
+                        android:text="@{viewModel.accountName}" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <com.appzonegroup.app.fasttrack.ui.EditText
-                    android:id="@+id/amount_et"
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:hint="@string/enter_amount"
-                    android:inputType="number" />
+                    android:layout_marginBottom="15dp"
+                    android:hint="@string/amount">
 
-                <com.appzonegroup.app.fasttrack.ui.TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/narration" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/amount_et"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="numberDecimal"
+                        android:maxLength="7"
+                        android:singleLine="true"
+                        android:text="@={viewModel.amountString}" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <com.appzonegroup.app.fasttrack.ui.EditText
-                    android:id="@+id/narration_et"
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/twenty_five_dp"
-                    android:hint="@string/narration_hint"
-                    android:inputType="text"
-                    android:maxLength="40" />
+                    android:layout_marginBottom="35dp"
+                    android:hint="@string/narration">
 
-                <com.appzonegroup.app.fasttrack.ui.TextView
-                    android:id="@+id/agent_pin_label_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/agentPIN" />
-
-                <com.appzonegroup.app.fasttrack.ui.EditText
-                    android:id="@+id/agent_pin_et"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/twenty_five_dp"
-                    android:hint="@string/agentPIN"
-                    android:inputType="numberPassword"
-                    android:maxLength="4" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="text"
+                        android:singleLine="true"
+                        android:text="@={viewModel.narration}" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"

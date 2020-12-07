@@ -11,6 +11,7 @@ enum class CardTransactionStatus(val code: Int) {
     UserCancel(-4),
     Timeout(-5),
     OfflinePinVerifyError(-32),
+    NoPin(-11),
     CardRestricted(-6);
 
     companion object {
