@@ -57,7 +57,7 @@ class QPosManager(activity: CreditClubActivity) : PosManager,
                 QPosManager(activity)
             }
             factory<PosPrinter>(override = true) { (activity: CreditClubActivity) ->
-                DummyPosPrinter(activity)
+                QposPrinter(activity)
             }
         }
 
