@@ -12,16 +12,16 @@ import kotlinx.serialization.Serializable
 class NameEnquiryResponse {
 
     @SerialName("BeneficiaryAccountName")
-    var beneficiaryAccountName:String? = null
+    var beneficiaryAccountName: String? = null
 
     @SerialName("NameEnquirySessionID")
-    var nameEnquirySessionID:String? = null
+    var nameEnquirySessionID: String? = null
 
     @SerialName("BeneficiaryBVN")
-    var beneficiaryBVN:String? = null
+    var beneficiaryBVN: String? = null
 
     @SerialName("BeneficiaryKYC")
-    var beneficiaryKYC:String? = null
+    var beneficiaryKYC: String? = null
 
     @SerialName("Status")
     var status = false

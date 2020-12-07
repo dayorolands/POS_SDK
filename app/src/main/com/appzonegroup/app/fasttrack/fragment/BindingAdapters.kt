@@ -33,4 +33,16 @@ object BindingAdapters {
             item.postValue(parent.getItemAtPosition(position) as T)
         }
     }
+
+    @JvmStatic
+    @BindingAdapter("app:disableUnless")
+    fun disableUnless(view: View, enable: Boolean) {
+        view.isEnabled = enable
+    }
+
+    @JvmStatic
+    @BindingAdapter("app:goneIf")
+    fun goneIf(view: View, gone: Boolean) {
+        view.visibility = if (gone) View.GONE else View.VISIBLE
+    }
 }

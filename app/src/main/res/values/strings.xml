@@ -239,7 +239,7 @@
     <string name="customer_account_number">Customer\'s Account Number</string>
     <string name="customer_account_number_hint">Enter customer\'s account number</string>
     <string name="customer_phone_number_hint">Enter customer\'s phone number</string>
-    <string name="customer_phone_number">Customer\' Phone Number</string>
+    <string name="customer_phone_number">Customer\'s Phone Number</string>
     <string name="agent_phone_number">Enter agent\'s phone number</string>
     <string name="customer_PIN_hint">Enter customer\'s PIN&#8230;</string>
     <string name="customerPIN">Customer\'s PIN</string>
@@ -279,8 +279,7 @@
     <string name="networkoperator">Network Operator</string>
     <string name="enter_amount">Enter Amount&#8230;</string>
     <string name="EnterAgentPin">Enter Agent Pin</string>
-    <string name="Selectcategory">Category</string>
-    <string name="category">Select Category</string>
+    <string name="category">Category</string>
     <string name="selectcabletype">Select Cable Type</string>
     <string name="selectpaymenttype">Select Payment Type</string>
     <string name="email">Email (optional)</string>

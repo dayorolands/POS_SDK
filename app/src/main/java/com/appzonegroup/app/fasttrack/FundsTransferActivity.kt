@@ -2,79 +2,38 @@ package com.appzonegroup.app.fasttrack
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.viewModels
 import com.appzonegroup.app.fasttrack.databinding.ActivityFundstransferBinding
+import com.appzonegroup.app.fasttrack.fragment.FundsTransferViewModel
 import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.request.FundsTransferRequest
-import com.creditclub.core.data.response.NameEnquiryResponse
 import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.util.finishOnClose
-import com.creditclub.core.util.localStorage
-import com.creditclub.core.util.safeRunIO
-import com.creditclub.core.util.showError
+import com.creditclub.core.util.*
 import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.pos.printer.PrinterStatus
 import com.creditclub.ui.dataBinding
-import kotlinx.android.synthetic.main.activity_fundstransfer.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
 import org.koin.android.ext.android.get
 import org.koin.core.parameter.parametersOf
 import java.util.*
 
 class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer) {
     private val binding by dataBinding<ActivityFundstransferBinding>()
+    private val fundsTransferService = creditClubMiddleWareAPI.fundsTransferService
+    private val viewModel: FundsTransferViewModel by viewModels()
 
-    private var destinationBank: String = ""
-    internal var accountNumber: String = ""
-    internal var amount: String = "0"
-    internal var agentPin: String = ""
-    private var banks = emptyList<Bank>()
-
-    private val externalTransactionReference = UUID.randomUUID().toString().substring(0, 8)
-    private var nameEnquiryResponse: NameEnquiryResponse? = null
-
-    private var isSameBank = false
+    private val transactionReference = UUID.randomUUID().toString().substring(0, 8)
 
     override val functionId = FunctionIds.FUNDS_TRANSFER
 
-    private val fundsTransferRequest: FundsTransferRequest
-        get() {
-            val fundsTransferRequest = FundsTransferRequest()
-            fundsTransferRequest.agentPhoneNumber = localStorage.agentPhone!!
-            fundsTransferRequest.institutionCode = localStorage.institutionCode!!
-            fundsTransferRequest.agentPin = agentPin
-            fundsTransferRequest.authToken = "95C1D8B4-7589-4F70-8F20-473E89FB5F01"
-            fundsTransferRequest.beneficiaryAccountNumber = accountNumber
-            fundsTransferRequest.amountInNaira = amount.toDouble()
-
-            fundsTransferRequest.isToRelatedCommercialBank = isSameBank
-            fundsTransferRequest.externalTransactionReference = externalTransactionReference
-            fundsTransferRequest.geoLocation = gps.geolocationString
-            fundsTransferRequest.narration = binding.narrationEt.text.toString().trim { it <= ' ' }
-
-            if (!isSameBank) {
-                val bank = banks[binding.destinationBankSpinner.selectedItemPosition - 1]
-                fundsTransferRequest.beneficiaryInstitutionCode = bank.code!!
-            }
-
-            if (nameEnquiryResponse != null) {
-                fundsTransferRequest.beneficiaryAccountName =
-                    nameEnquiryResponse!!.beneficiaryAccountName
-                fundsTransferRequest.beneficiaryBVN = nameEnquiryResponse!!.beneficiaryBVN
-                fundsTransferRequest.beneficiaryKYC = nameEnquiryResponse!!.beneficiaryKYC
-                fundsTransferRequest.nameEnquirySessionID =
-                    nameEnquiryResponse!!.nameEnquirySessionID
-            }
-
-            return fundsTransferRequest
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        binding.viewModel = viewModel
         binding.sameBankTv.text = institutionConfig.name
         binding.transferFundsButton.setOnClickListener {
             mainScope.launch { transferFunds() }
@@ -85,48 +44,29 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
     }
 
     fun onOtherBankClick(view: View) {
-        isSameBank = false
+        viewModel.isSameBank.value = false
 
         mainScope.launch {
             dialogProvider.showProgressBar("Getting bank information")
-
-            val (banks) = safeRunIO {
-                creditClubMiddleWareAPI.fundsTransferService.getBanks(localStorage.institutionCode)
+            val (banks, error) = safeRunIO {
+                fundsTransferService.getBanks(localStorage.institutionCode)
             }
-
             dialogProvider.hideProgressBar()
 
+            if (error != null) return@launch dialogProvider.showError(error)
             banks ?: return@launch showNetworkError()
+            viewModel.bankList.value = banks
 
-            this@FundsTransferActivity.banks = banks
-
-            val bankNames = ArrayList<String>()
-            bankNames.add("Select bank...")
-
-            for (bank in banks) {
-                bankNames.add(bank.name ?: "Unknown")
-            }
-
-            val spinnerArrayAdapter = ArrayAdapter(
-                this@FundsTransferActivity,
-                android.R.layout.simple_spinner_item,
-                bankNames
-            )
-            spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.destinationBankSpinner.adapter = spinnerArrayAdapter
-
-            transfer_type_layout.visibility = View.GONE
-            bank_details_layout.visibility = View.VISIBLE
+            binding.transferTypeLayout.visibility = View.GONE
+            binding.bankDetailsLayout.visibility = View.VISIBLE
         }
     }
 
     fun onSameBankClick(view: View) {
-        isSameBank = true
+        viewModel.isSameBank.value = true
 
-        transfer_type_layout.visibility = View.GONE
-        bank_details_layout.visibility = View.VISIBLE
-        destination_bank_spinner.visibility = View.GONE
-        destination_bank_tv.visibility = View.GONE
+        binding.transferTypeLayout.visibility = View.GONE
+        binding.bankDetailsLayout.visibility = View.VISIBLE
     }
 
     private fun indicateError(message: String, view: View?) {
@@ -135,30 +75,50 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
     }
 
     private suspend fun transferFunds() {
-        agentPin = binding.agentPinEt.text.toString()
-        if (agentPin.isEmpty()) {
-            indicateError("Please enter your PIN", binding.agentPinEt as View)
-            return
-        }
+        val pin = dialogProvider.getPin("Agent PIN") ?: return
+        if (pin.isEmpty()) return showError("Please enter your PIN")
+        if (pin.length != 4) return showError("PIN must be four digits")
 
-        amount = binding.amountEt.text.toString().trim { it <= ' ' }
+        val amount = viewModel.amountString.value?.trim { it <= ' ' }
         if (amount === "") {
             indicateError("Please enter an Amount", binding.amountEt as View)
             return
         }
 
-        val amountDouble: Double
-
-        try {
-            amountDouble = java.lang.Double.parseDouble(amount)
-        } catch (ex: Exception) {
+        val amountDouble = amount?.toDoubleOrNull()
+        if (amountDouble == null) {
             indicateError("Please enter a valid amount", binding.amountEt as View)
             return
         }
 
+        val fundsTransferRequest = FundsTransferRequest().apply {
+            agentPhoneNumber = localStorage.agentPhone
+            institutionCode = localStorage.institutionCode
+            agentPin = pin
+            authToken = "95C1D8B4-7589-4F70-8F20-473E89FB5F01"
+            beneficiaryAccountNumber = viewModel.receiverAccountNumber.value
+            amountInNaira = amount.toDouble()
+
+            isToRelatedCommercialBank = viewModel.isSameBank.value ?: false
+            externalTransactionReference = transactionReference
+            geoLocation = gps.geolocationString
+            narration = viewModel.narration.value?.trim { it <= ' ' }
+
+            if (viewModel.isSameBank.value != true) {
+                beneficiaryInstitutionCode = viewModel.bank.value?.code
+            }
+        }
+
+        viewModel.nameEnquiryResponse.value?.run {
+            fundsTransferRequest.beneficiaryAccountName = beneficiaryAccountName
+            fundsTransferRequest.beneficiaryBVN = beneficiaryBVN
+            fundsTransferRequest.beneficiaryKYC = beneficiaryKYC
+            fundsTransferRequest.nameEnquirySessionID = nameEnquirySessionID
+        }
+
         dialogProvider.showProgressBar("Transfer in progress")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.fundsTransferService.transfer(fundsTransferRequest)
+            fundsTransferService.transfer(fundsTransferRequest)
         }
         dialogProvider.hideProgressBar()
 
@@ -190,10 +150,8 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
     }
 
     private fun showControls(isForFinalAction: Boolean) {
-        findViewById<View>(R.id.bank_details_layout).visibility =
-            if (isForFinalAction) View.GONE else View.VISIBLE
-        findViewById<View>(R.id.other_details_layout).visibility =
-            if (isForFinalAction) View.VISIBLE else View.GONE
+        binding.bankDetailsLayout.visibility = if (isForFinalAction) View.GONE else View.VISIBLE
+        binding.otherDetailsLayout.visibility = if (isForFinalAction) View.VISIBLE else View.GONE
     }
 
     fun backClicked(view: View) {
@@ -201,44 +159,53 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
     }
 
     private suspend fun validateAccount() {
-        if (!isSameBank) {
-            destinationBank = binding.destinationBankSpinner.selectedItem.toString()
-            if (binding.destinationBankSpinner.selectedItemPosition == 0) {
-                indicateError("No Bank was selected", binding.destinationBankSpinner)
-                return
-            }
+        if (viewModel.isSameBank.value != true && viewModel.bank.value == null) {
+            return dialogProvider.showError("No Bank was selected")
         }
 
-        accountNumber = binding.accountNumberEt.text.toString()
-        if (accountNumber.length != 10 && accountNumber.length != 11) {
+        val accountNumber = viewModel.receiverAccountNumber.value
+        if (accountNumber.isNullOrBlank() || accountNumber.length != 10 && accountNumber.length != 11) {
             indicateError(
                 "Please enter a valid Account number",
-                binding.accountNumberEt as View
+                binding.receiverAccountNumberEt as View
             )
             return
         }
 
+        val nameEnquiryRequest = FundsTransferRequest().apply {
+            agentPhoneNumber = localStorage.agentPhone
+            institutionCode = localStorage.institutionCode
+            authToken = "95C1D8B4-7589-4F70-8F20-473E89FB5F01"
+
+            isToRelatedCommercialBank = viewModel.isSameBank.value == true
+            externalTransactionReference = transactionReference
+            geoLocation = gps.geolocationString
+
+            if (viewModel.isSameBank.value != true) {
+                beneficiaryInstitutionCode = viewModel.bank.value?.code
+                beneficiaryAccountNumber = viewModel.receiverAccountNumber.value
+            }
+        }
+
         dialogProvider.showProgressBar("Validating account information")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.fundsTransferService.nameEnquiry(fundsTransferRequest)
+            fundsTransferService.nameEnquiry(nameEnquiryRequest)
         }
-        nameEnquiryResponse = response
-
         dialogProvider.hideProgressBar()
 
-        if (error != null) {
-            dialogProvider.showError(error)
-            return
-        }
+        viewModel.nameEnquiryResponse.value = response
 
-        response ?: return dialogProvider.showError("Please enter a valid account number")
+        if (error != null && (error is SerializationException || error.isKotlinNPE())) {
+            return dialogProvider.showError("Invalid account number")
+        }
+        if (error != null) return dialogProvider.showError(error)
+
+        response ?: return dialogProvider.showError("Invalid account number")
 
         if (response.status) {
-            binding.accountNameEt.setText(response.beneficiaryAccountName)
             showControls(true)
         } else {
-            response.responseMessage ?: return showInternalError()
-            dialogProvider.showError(response.responseMessage)
+            dialogProvider.showError(response.responseMessage ?: "Invalid account number")
         }
     }
 }

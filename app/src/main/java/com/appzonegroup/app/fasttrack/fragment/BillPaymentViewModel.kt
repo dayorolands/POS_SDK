@@ -39,18 +39,4 @@ class BillPaymentViewModel : ViewModel() {
     val customerEmail = MutableLiveData<String>()
 
     val isAirtime = Transformations.map(category) { it?.isAirtime == true }
-
-    companion object {
-        @JvmStatic
-        @BindingAdapter("app:disableUnless")
-        fun disableUnless(view: View, enable: Boolean) {
-            view.isEnabled = enable
-        }
-
-        @JvmStatic
-        @BindingAdapter("app:goneIf")
-        fun goneIf(view: View, gone: Boolean) {
-            view.visibility = if (gone) View.GONE else View.VISIBLE
-        }
-    }
 }
