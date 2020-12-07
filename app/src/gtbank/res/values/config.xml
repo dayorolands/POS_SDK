@@ -6,4 +6,5 @@
         <item>2,Account Number</item>
     </string-array>
     <bool name="token_withdrawal_external_token">true</bool>
+    <bool name="category_customer">false</bool>
 </resources>
