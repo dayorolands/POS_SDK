@@ -2,16 +2,17 @@ package com.appzonegroup.app.fasttrack
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
 import com.appzonegroup.app.fasttrack.databinding.ActivityWithdrawBinding
+import com.appzonegroup.app.fasttrack.fragment.WithdrawalViewModel
 import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.pos.printer.PrinterStatus
-import com.creditclub.core.contract.FormDataHolder
 import com.creditclub.core.data.request.WithdrawalRequest
 import com.creditclub.core.type.TokenType
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
+import com.creditclub.pos.printer.PrinterStatus
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
@@ -19,7 +20,7 @@ import kotlinx.serialization.json.Json
  * Created by DELL on 2/27/2017.
  */
 
-class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalRequest> {
+class WithdrawActivity : CustomerBaseActivity() {
 
     private val binding by contentView<WithdrawActivity, ActivityWithdrawBinding>(
         R.layout.activity_withdraw
@@ -27,19 +28,19 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
     override val functionId = FunctionIds.TOKEN_WITHDRAWAL
     private val tokenWithdrawalConfig by lazy { institutionConfig.flows.tokenWithdrawal }
 
-    override val formData = WithdrawalRequest().apply {
+    private val request = WithdrawalRequest().apply {
         retrievalReferenceNumber = generateRRN()
     }
 
-    private var tokenSent: Boolean = false
-
-    private var amount: String = ""
+    private val viewModel: WithdrawalViewModel by viewModels()
 
     override fun onCustomerReady(savedInstanceState: Bundle?) {
-        binding.accountsSpinner.isEnabled = false
+        binding.viewModel = viewModel
+        viewModel.hasExternalToken.value = tokenWithdrawalConfig.externalToken
+        viewModel.accountInfo.value = accountInfo
 
         if (tokenWithdrawalConfig.externalToken) {
-            tokenSent = true
+            viewModel.tokenSent.value = true
             binding.withdrawalAmountEt.isEnabled = true
             binding.topLayout.isEnabled = false
             binding.sendTokenBtn.visibility = View.GONE
@@ -54,13 +55,12 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
             requireAccountInfo(options = customerRequestOptions) {
                 onSubmit { accountInfo ->
                     this@WithdrawActivity.accountInfo = accountInfo
-                    binding.accountInfoEt.setText(accountInfo.accountName)
+                    viewModel.accountInfo.value = accountInfo
                 }
             }
         }
 
         binding.accountInfoEt.run {
-            setText(accountInfo.accountName)
             setOnFocusChangeListener { _, hasFocus -> if (hasFocus) chooseAnotherAccount() }
             setOnClickListener { if (isFocused) chooseAnotherAccount() }
         }
@@ -79,23 +79,22 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
     }
 
     private fun sendToken() {
-        amount = binding.withdrawalAmountEt.text!!.toString().trim { it <= ' ' }
-
+        val amount = viewModel.amountString.value!!.trim { it <= ' ' }
         if (amount.isEmpty()) {
-            showError(getString(R.string.please_enter_an_amount))
+            dialogProvider.showError(getString(R.string.please_enter_an_amount))
             return
         }
 
         try {
             amount.toDouble()
         } catch (ex: Exception) {
-            showError(getString(R.string.please_enter_a_valid_amount))
+            dialogProvider.showError(getString(R.string.please_enter_a_valid_amount))
             return
         }
 
         sendToken(accountInfo, TokenType.Withdrawal, amount.toDouble()) {
             onSubmit {
-                tokenSent = true
+                viewModel.tokenSent.value = true
                 binding.withdrawalAmountEt.isEnabled = false
                 binding.topLayout.isEnabled = false
                 binding.sendTokenBtn.visibility = View.GONE
@@ -106,13 +105,12 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
 
     private fun onWithdrawClick() {
 
-        if (!tokenSent) {
-            showError("No token has been sent to the customer. Click the \"Send Token\" button to continue")
+        if (viewModel.tokenSent.value != true) {
+            dialogProvider.showError("No token has been sent to the customer. Click the \"Send Token\" button to continue")
             return
         }
 
-        amount = binding.withdrawalAmountEt.value
-
+        val amount = viewModel.amountString.value!!.trim { it <= ' ' }
         if (amount.isEmpty()) {
             indicateError("Enter an amount", binding.withdrawalAmountEt)
             return
@@ -125,20 +123,26 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
             return
         }
 
-        if (tokenWithdrawalConfig.customerPin) {
-            formData.customerPin = binding.customerPinEt.value
+        val phoneNumber = binding.customerPhoneNumberEt.value
+        if (phoneNumber.length != 11) {
+            indicateError("Please enter a valid phone number", binding.customerPhoneNumberEt)
+            return
+        }
 
-            if (formData.customerPin.isNullOrEmpty()) {
+        if (tokenWithdrawalConfig.customerPin) {
+            request.customerPin = binding.customerPinEt.value
+
+            if (request.customerPin.isNullOrEmpty()) {
                 indicateError("Please enter a valid customer PIN", binding.customerPinEt)
                 return
             }
 
-            if (formData.customerPin?.length != 4) {
+            if (request.customerPin?.length != 4) {
                 indicateError("Customer PIN must be 4 digits", binding.customerPinEt)
                 return
             }
         } else {
-            formData.customerPin = "0000"
+            request.customerPin = "0000"
         }
 
         val token = binding.tokenEt.value
@@ -148,59 +152,58 @@ class WithdrawActivity : CustomerBaseActivity(), FormDataHolder<WithdrawalReques
             return
         }
 
-        formData.agentPhoneNumber = localStorage.agent?.phoneNumber
-        formData.customerAccountNumber = accountInfo.number
-        formData.amount = amount
-        formData.institutionCode = localStorage.institutionCode
-        formData.token = token
+        request.agentPhoneNumber = localStorage.agent?.phoneNumber
+        request.customerAccountNumber = accountInfo.number
+        request.amount = amount
+        request.institutionCode = localStorage.institutionCode
+        request.token = token
 
         val additionalInformation = WithdrawalRequest.Additional().apply {
-            customerPhoneNumber = accountInfo.phoneNumber
+            customerPhoneNumber = accountInfo.phoneNumber ?: viewModel.phoneNumber.value
         }
-        formData.additionalInformation = Json.encodeToString(
+        request.additionalInformation = Json.encodeToString(
             WithdrawalRequest.Additional.serializer(),
             additionalInformation
         )
 
         dialogProvider.requestPIN("Enter agent PIN") {
             onSubmit { pin ->
-                formData.agentPin = pin
+                request.agentPin = pin
                 mainScope.launch { withdraw() }
             }
         }
     }
 
     private suspend fun withdraw() {
-        showProgressBar("Processing transaction")
+        dialogProvider.showProgressBar("Processing transaction")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.withdrawal(formData)
+            creditClubMiddleWareAPI.staticService.withdrawal(request)
         }
-        hideProgressBar()
+        dialogProvider.hideProgressBar()
 
-        if (error != null) return showError(error, finishOnClose)
-        response ?: return showError(
+        if (error != null) return dialogProvider.showError(error, finishOnClose)
+        response ?: return dialogProvider.showError(
             "Transaction failed. Please try again later",
             finishOnClose
         )
 
         if (response.isSuccessful) {
-            showSuccess("The withdrawal was successful", finishOnClose)
+            dialogProvider.showSuccess("The withdrawal was successful", finishOnClose)
         } else {
-            showError(response.responseMessage, finishOnClose)
+            dialogProvider.showError(response.responseMessage, finishOnClose)
             binding.withdrawBtn.isClickable = true
         }
 
         if (Platform.hasPrinter) {
-            val receipt = WithdrawalReceipt(this@WithdrawActivity, formData, accountInfo)
+            val receipt = WithdrawalReceipt(this@WithdrawActivity, request, accountInfo)
             receipt.apply {
                 isSuccessful = response.isSuccessful
                 reason = response.responseMessage
             }
 
-            printer.printAsync(receipt, "Printing...") { printerStatus ->
-                if (printerStatus !== PrinterStatus.READY) {
-                    showError(printerStatus.message)
-                }
+            val printerStatus = printer.print(receipt, "Printing...")
+            if (printerStatus !== PrinterStatus.READY) {
+                showError(printerStatus.message)
             }
         }
     }

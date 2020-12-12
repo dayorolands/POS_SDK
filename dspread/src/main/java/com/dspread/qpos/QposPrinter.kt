@@ -1,6 +1,7 @@
 package com.dspread.qpos
 
 import android.Manifest
+import android.content.Context.PRINT_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
@@ -8,7 +9,10 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo
 import android.net.Uri
+import android.print.PrintAttributes
+import android.print.PrintAttributes.Resolution
 import androidx.core.app.ActivityCompat
+import androidx.core.graphics.scale
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.safeRunIO
@@ -55,18 +59,25 @@ class QposPrinter(
         message: String,
         retryOnFail: Boolean
     ): PrinterStatus {
-        val pageWidth = 150
+        val printAttributes =
+            PrintAttributes.Builder().setColorMode(PrintAttributes.COLOR_MODE_COLOR)
+                .setMediaSize(PrintAttributes.MediaSize.NA_LETTER)
+                .setResolution(Resolution("res1", PRINT_SERVICE, 300, 300))
+                .setMinMargins(PrintAttributes.Margins.NO_MARGINS).build()
+        val resolution = printAttributes.resolution
+        val hdpi = resolution!!.horizontalDpi
+        val vdpi = resolution.verticalDpi
+
+        val pageWidth = 100
         val document = PdfDocument()
-        val pageInfo = PageInfo.Builder(pageWidth, 300, 1).create()
+        val pageInfo = PageInfo.Builder(pageWidth, 170, 1).create()
 
         val page = document.startPage(pageInfo)
         val x = 10F
         var y = 25F
         val paint = Paint()
-//        document.initPrinter()
-//        document.setTypeface(Typeface.DEFAULT)
-//        document.setLetterSpacing(5)
-//        document.setGray(GrayLevelEnum.LEVEL_2)
+        val canvas = page.canvas
+        canvas.scale(90f / hdpi, 90f / vdpi)
 
         fun getXFromAlignment(width: Int, alignment: Alignment): Float = when (alignment) {
             Alignment.MIDDLE -> (pageWidth - width) / 2F
@@ -82,24 +93,19 @@ class QposPrinter(
 
         fun printText(node: TextNode) {
             node.text.split("\n").forEach { line ->
-                page.canvas.drawText(line, x, y, paint)
+                canvas.drawText(line, x, y, paint)
                 y += paint.descent() - paint.ascent()
             }
 
-//            appendPrnStr(node.text, node.wordFont, node.align.asAlignEnum, false)
             walkPaper(node.walkPaperAfterPrint)
         }
 
         fun printImage(node: ImageNode) {
-//            val bitmap = BitmapFactory.decodeResource(context.resources, node.drawable)
-//            page.canvas.drawBitmap(
-//                bitmap,
-//                getXFromAlignment(bitmap.getScaledWidth(page.canvas), node.align),
-//                y,
-//                paint
-//            )
-//            y += paint.descent() - paint.ascent()
-//        walkPaper(node.walkPaperAfterPrint)
+            val bitmap = BitmapFactory.decodeResource(context.resources, node.drawable)
+                .scale(100, 100)
+            canvas.drawBitmap(bitmap, x, y, paint)
+            y += paint.descent() - paint.ascent() + bitmap.height
+            walkPaper(node.walkPaperAfterPrint)
         }
 
         for (node in printJob.nodes) when (node) {
