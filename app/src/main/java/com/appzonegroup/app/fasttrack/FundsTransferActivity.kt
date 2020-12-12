@@ -180,10 +180,10 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
             isToRelatedCommercialBank = viewModel.isSameBank.value == true
             externalTransactionReference = transactionReference
             geoLocation = gps.geolocationString
+            beneficiaryAccountNumber = viewModel.receiverAccountNumber.value
 
             if (viewModel.isSameBank.value != true) {
                 beneficiaryInstitutionCode = viewModel.bank.value?.code
-                beneficiaryAccountNumber = viewModel.receiverAccountNumber.value
             }
         }
 
