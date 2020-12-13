@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">GTBank Agents</string>
     <string name="ota_app_name">GTBank</string>
-    <string name="institution_name">GTBank</string>
-    <string name="institution_website">https://www.gtbank.com</string>
+    <string name="institution_name">CreditClub</string>
+    <string name="institution_website">http://www.appzonegroup.com/products/creditclub</string>
     <string name="funds_transfer_same_bank">GTBank</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
