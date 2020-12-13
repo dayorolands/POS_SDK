@@ -66,6 +66,7 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
 
             config.categories.run {
                 loans = resources.getBoolean(R.bool.category_loan)
+                customers = resources.getBoolean(R.bool.category_customer)
             }
 
             config.transactionTypes = resources.getStringArray(R.array.transaction_types).map {
