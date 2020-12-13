@@ -41,8 +41,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="53dp"
                         android:drawableStart="@drawable/ic_person"
-                        android:hint="@string/account_info"
-                        android:text="@{viewModel.accountName}" />
+                        android:editable="false"
+                        android:hint="@string/account_info" />
 
                     <com.appzonegroup.app.fasttrack.ui.EditText
                         android:id="@+id/withdrawal_amount_et"
@@ -77,7 +77,7 @@
                         android:id="@+id/customer_phone_number_et"
                         style="@style/defaultEditText"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="53dp"
                         android:drawableStart="@drawable/ic_phone"
                         android:hint="@string/customer_phone_number"
                         android:inputType="phone"

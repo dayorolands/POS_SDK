@@ -36,6 +36,19 @@ class WithdrawActivity : CustomerBaseActivity() {
 
     override fun onCustomerReady(savedInstanceState: Bundle?) {
         binding.viewModel = viewModel
+
+        with(viewModel) {
+            hasExternalToken.observe(this@WithdrawActivity) {
+                showPhoneNumberInput.value =
+                    hasExternalToken.value == true && accountInfo.value?.phoneNumber == null
+            }
+            accountInfo.observe(this@WithdrawActivity) { accountInfo ->
+                binding.accountInfoEt.setText(accountInfo?.accountName)
+                showPhoneNumberInput.value =
+                    hasExternalToken.value == true && accountInfo?.phoneNumber == null
+            }
+        }
+
         viewModel.hasExternalToken.value = tokenWithdrawalConfig.externalToken
         viewModel.accountInfo.value = accountInfo
 
