@@ -87,7 +87,7 @@ class BillPaymentActivity : BaseActivity() {
             fieldTwoTV.visibility = View.VISIBLE
             fieldTwoET.visibility = View.VISIBLE
         } else {
-            fieldOneIsNeeded = false
+            fieldTwoIsNeeded = false
             fieldTwoTV.visibility = View.GONE
             fieldTwoET.visibility = View.GONE
         }
