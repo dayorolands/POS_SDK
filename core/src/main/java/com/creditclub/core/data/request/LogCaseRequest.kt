@@ -28,4 +28,10 @@ class LogCaseRequest {
 
     @SerialName("CaseReporterEmail")
     var caseReporterEmail: String? = null
+
+    @SerialName("FCMToken")
+    var fcmToken: String? = null
+
+    @SerialName("Blob")
+    var blob: MutableList<String?>? = null
 }

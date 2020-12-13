@@ -1,13 +1,21 @@
 package com.appzonegroup.app.fasttrack
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import com.appzonegroup.app.fasttrack.databinding.ActivityCaseLogBinding
+import com.appzonegroup.app.fasttrack.databinding.ItemAddImageBinding
 import com.appzonegroup.app.fasttrack.fragment.CaseLogViewModel
 import com.creditclub.core.data.request.LogCaseRequest
+import com.creditclub.core.model.CreditClubImage
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
 import com.creditclub.ui.dataBinding
+import com.esafirm.imagepicker.features.ImagePicker
+import com.esafirm.imagepicker.model.Image
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 
@@ -15,9 +23,16 @@ class CaseLogActivity : CreditClubActivity(R.layout.activity_case_log) {
     private val binding: ActivityCaseLogBinding by dataBinding()
     private val caseLogService = creditClubMiddleWareAPI.caseLogService
     private val viewModel: CaseLogViewModel by viewModels()
+    private var imageListener: ImageListenerBlock? = null
+    private val request = LogCaseRequest().apply {
+        blob = mutableListOf(null, null, null, null)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.viewModel = viewModel
         mainScope.launch { loadCaseDependencies() }
@@ -25,9 +40,38 @@ class CaseLogActivity : CreditClubActivity(R.layout.activity_case_log) {
         binding.nextBtn.setOnClickListener {
             mainScope.launch { logCase() }
         }
+
+        listOf(
+            binding.image1, binding.image2,
+            binding.image3, binding.image4
+        ).forEachIndexed { i, imageBinding ->
+
+            createImageListener(imageBinding, onSubmit = { image ->
+                mainScope.launch {
+                    imageBinding.processing = true
+                    val (bitmap) = safeRunIO { image.bitmap }
+                    imageBinding.imageView.setImageBitmap(bitmap)
+
+                    val (bitmapString) = safeRunIO { image.bitmapString }
+                    request.blob?.set(i, bitmapString)
+                    imageBinding.processing = false
+                }
+            })
+        }
     }
 
     private suspend fun loadCaseDependencies() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("LogCase", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+            request.fcmToken = token
+        })
+
         dialogProvider.showProgressBar("Loading products", "Please wait...")
         val (productList) = safeRunIO {
             caseLogService.getProducts()
@@ -64,7 +108,7 @@ class CaseLogActivity : CreditClubActivity(R.layout.activity_case_log) {
         if (pin.isEmpty()) return showError("Please enter your PIN")
         if (pin.length != 4) return showError("PIN must be four digits")
 
-        val request = LogCaseRequest().apply {
+        request.apply {
             institutionCode = localStorage.institutionCode
             agentPin = pin
             agentPhoneNumber = localStorage.agentPhone
@@ -94,5 +138,30 @@ class CaseLogActivity : CreditClubActivity(R.layout.activity_case_log) {
                 }
             }
         } else showError(response.message ?: "An error occurred")
+    }
+
+    private fun createImageListener(
+        imageBinding: ItemAddImageBinding,
+        onSubmit: ImageListenerBlock
+    ) = imageBinding.run {
+        root.setOnClickListener {
+            imageListener = onSubmit
+
+            ImagePicker.cameraOnly().start(this@CaseLogActivity)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
+            try {
+                val image: Image? = ImagePicker.getFirstImageOrNull(data)
+                image ?: return showInternalError()
+                imageListener?.invoke(CreditClubImage(image))
+                imageListener = null
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                showInternalError()
+            }
+        } else super.onActivityResult(requestCode, resultCode, data)
     }
 }
