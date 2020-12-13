@@ -227,7 +227,7 @@ class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingReque
             try {
                 val image: Image? = ImagePicker.getFirstImageOrNull(data)
                 image ?: return showInternalError()
-                imageListener?.invoke(CreditClubImage(image))
+                imageListener?.invoke(CreditClubImage(this, image))
                 imageListener = null
             } catch (ex: Exception) {
                 ex.printStackTrace()

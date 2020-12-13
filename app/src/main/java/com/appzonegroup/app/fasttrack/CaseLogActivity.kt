@@ -23,10 +23,7 @@ class CaseLogActivity : CreditClubActivity(R.layout.activity_case_log) {
     private val binding: ActivityCaseLogBinding by dataBinding()
     private val caseLogService = creditClubMiddleWareAPI.caseLogService
     private val viewModel: CaseLogViewModel by viewModels()
-    private var imageListener: ImageListenerBlock? = null
-    private val request = LogCaseRequest().apply {
-        blob = mutableListOf(null, null, null, null)
-    }
+    private val request = LogCaseRequest()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,24 +36,6 @@ class CaseLogActivity : CreditClubActivity(R.layout.activity_case_log) {
 
         binding.nextBtn.setOnClickListener {
             mainScope.launch { logCase() }
-        }
-
-        listOf(
-            binding.image1, binding.image2,
-            binding.image3, binding.image4
-        ).forEachIndexed { i, imageBinding ->
-
-            createImageListener(imageBinding, onSubmit = { image ->
-                mainScope.launch {
-                    imageBinding.processing = true
-                    val (bitmap) = safeRunIO { image.bitmap }
-                    imageBinding.imageView.setImageBitmap(bitmap)
-
-                    val (bitmapString) = safeRunIO { image.bitmapString }
-                    request.blob?.set(i, bitmapString)
-                    imageBinding.processing = false
-                }
-            })
         }
     }
 
@@ -138,30 +117,5 @@ class CaseLogActivity : CreditClubActivity(R.layout.activity_case_log) {
                 }
             }
         } else showError(response.message ?: "An error occurred")
-    }
-
-    private fun createImageListener(
-        imageBinding: ItemAddImageBinding,
-        onSubmit: ImageListenerBlock
-    ) = imageBinding.run {
-        root.setOnClickListener {
-            imageListener = onSubmit
-
-            ImagePicker.cameraOnly().start(this@CaseLogActivity)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
-            try {
-                val image: Image? = ImagePicker.getFirstImageOrNull(data)
-                image ?: return showInternalError()
-                imageListener?.invoke(CreditClubImage(image))
-                imageListener = null
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                showInternalError()
-            }
-        } else super.onActivityResult(requestCode, resultCode, data)
     }
 }

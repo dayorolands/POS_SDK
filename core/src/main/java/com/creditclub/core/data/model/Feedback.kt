@@ -1,5 +1,7 @@
 package com.creditclub.core.data.model
 
+import com.creditclub.core.model.CreditClubImage
+import com.creditclub.core.serializer.CreditClubImageSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -40,4 +42,13 @@ class Feedback {
 
     @SerialName("LastReadTime")
     var lastReadTime: String? = null
+
+    @SerialName("FCMToken")
+    var fcmToken: String? = null
+
+    @SerialName("IsAttachment")
+    var isAttachment = false
+
+    @SerialName("Blobs")
+    var blobs: List<CreditClubImage>? = null
 }
