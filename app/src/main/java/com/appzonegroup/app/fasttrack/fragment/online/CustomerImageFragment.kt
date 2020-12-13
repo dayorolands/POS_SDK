@@ -386,7 +386,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
             try {
                 val tmpImage: Image? = ImagePicker.getFirstImageOrNull(data)
                 tmpImage ?: return dialogProvider.showError("An internal error occurred")
-                creditClubImage = CreditClubImage(tmpImage)
+                creditClubImage = CreditClubImage(requireContext(), tmpImage)
 
                 mainScope.launch {
                     dialogProvider.showProgressBar("Processing image")

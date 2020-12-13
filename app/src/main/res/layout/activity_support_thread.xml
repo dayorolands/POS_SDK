@@ -39,8 +39,8 @@
             android:id="@+id/notice_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
             android:orientation="horizontal"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/appbar">
 
             <TextView
@@ -94,6 +94,19 @@
                 android:background="@android:color/transparent"
                 android:hint="Enter message"
                 android:maxLines="6" />
+
+            <ImageButton
+                android:id="@+id/camera_btn"
+                style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
+                android:layout_width="40dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                app:srcCompat="@drawable/ic_menu_camera"
+                android:textSize="14sp"
+                app:tint="@color/colorPrimary" />
 
             <Button
                 android:id="@+id/button_chatbox_send"

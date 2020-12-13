@@ -65,7 +65,7 @@ class DocumentUploadFragment : CreditClubFragment(R.layout.fragment_document_upl
             try {
                 val tmpImage: Image? = ImagePicker.getFirstImageOrNull(data)
                 tmpImage ?: return dialogProvider.showInternalError()
-                val image = CreditClubImage(tmpImage)
+                val image = CreditClubImage(requireContext(), tmpImage)
 
                 mainScope.launch {
                     dialogProvider.showProgressBar("Processing image")

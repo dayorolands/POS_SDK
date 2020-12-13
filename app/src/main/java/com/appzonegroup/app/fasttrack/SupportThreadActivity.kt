@@ -1,7 +1,9 @@
 package com.appzonegroup.app.fasttrack
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -10,23 +12,29 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.appzonegroup.app.fasttrack.databinding.ActivitySupportThreadBinding
-import com.appzonegroup.app.fasttrack.databinding.ItemCaseMessageBinding
-import com.appzonegroup.app.fasttrack.databinding.ItemCaseMessageReceivedBinding
+import com.appzonegroup.app.fasttrack.databinding.*
 import com.creditclub.core.data.model.Feedback
 import com.creditclub.core.data.request.CaseMessageThreadRequest
 import com.creditclub.core.data.response.CaseResponse
+import com.creditclub.core.model.CreditClubImage
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.SimpleAdapter
 import com.creditclub.core.ui.widget.DialogListener
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.util.*
-import com.creditclub.core.util.delegates.contentView
+import com.creditclub.ui.dataBinding
+import com.esafirm.imagepicker.features.ImagePicker
+import com.esafirm.imagepicker.model.Image
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 import java.time.Instant
 
-class SupportThreadActivity : BaseActivity() {
+class SupportThreadActivity : CreditClubActivity(R.layout.activity_support_thread) {
 
-    private val binding by contentView<SupportThreadActivity, ActivitySupportThreadBinding>(R.layout.activity_support_thread)
+    private var fcmToken: String? = null
+    private val binding by dataBinding<ActivitySupportThreadBinding>()
     private var messageList: List<Feedback> = emptyList()
     private val adapter = Adapter(messageList)
     private val reference by lazy { intent.getStringExtra("REFERENCE") ?: "" }
@@ -49,12 +57,30 @@ class SupportThreadActivity : BaseActivity() {
                     Toast.LENGTH_LONG
                 ).show()
 
-                sendMessage(message)
+                mainScope.launch { sendMessage(message) }
             }
             closeBtn.setOnClickListener {
                 closeCase()
             }
+            cameraBtn.setOnClickListener {
+//                ImagePicker.create(this@SupportThreadActivity)
+//                    .returnMode(ReturnMode.ALL)
+//                    .folderMode(true)
+//                    .single().single().showCamera(true).start()
+                ImagePicker.cameraOnly().start(this@SupportThreadActivity)
+            }
         }
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("LogCase", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+            fcmToken = token
+        })
 
         loadData {
             onSubmit { thread ->
@@ -98,39 +124,43 @@ class SupportThreadActivity : BaseActivity() {
         }
     }
 
-    private fun sendMessage(newMessage: String) {
-        mainScope.launch {
-            showProgressBar("Sending feedback")
+    private suspend fun sendMessage(newMessage: String?, image: CreditClubImage? = null) {
+        showProgressBar("Sending feedback")
 
-            val request = Feedback().apply {
-                caseReference = reference
-                message = newMessage
-                isAgent = true
-                name = localStorage.agent?.agentName
-            }
+        val request = Feedback().apply {
+            caseReference = reference
+            message = newMessage
+            isAgent = true
+            name = localStorage.agent?.agentName
+        }
+        request.fcmToken = fcmToken
 
-            val (response, error) = safeRunIO {
-                creditClubMiddleWareAPI.caseLogService.saveFeedback(request)
-            }
+        if (image != null) {
+            request.isAttachment = true
+            request.blobs = listOf(image)
+        }
 
-            hideProgressBar()
+        val (response, error) = safeRunIO {
+            creditClubMiddleWareAPI.caseLogService.saveFeedback(request)
+        }
 
-            if (error != null) return@launch showError(error)
-            response ?: return@launch showNetworkError()
+        hideProgressBar()
 
-            request.dateLogged = Instant.now().toString()
+        if (error != null) return showError(error)
+        response ?: return showNetworkError()
 
-            binding.edittextChatbox.setText("")
-            val newMessageList = ArrayList<Feedback>()
-            newMessageList.addAll(messageList)
-            newMessageList.add(request)
-            adapter.setData(newMessageList)
-            binding.container.smoothScrollToPosition(newMessageList.size - 1)
+        request.dateLogged = Instant.now().toString()
 
-            showSuccess<Nothing>("Feedback sent successfully") {
-                onClose {
-                    finish()
-                }
+        binding.edittextChatbox.setText("")
+        val newMessageList = ArrayList<Feedback>()
+        newMessageList.addAll(messageList)
+        newMessageList.add(request)
+        adapter.setData(newMessageList)
+        binding.container.smoothScrollToPosition(newMessageList.size - 1)
+
+        dialogProvider.showSuccess<Nothing>("Feedback sent successfully") {
+            onClose {
+                finish()
             }
         }
     }
@@ -146,7 +176,7 @@ class SupportThreadActivity : BaseActivity() {
             if (error != null) return@launch showError(error)
             response ?: return@launch showNetworkError()
 
-            showSuccess<Unit>("Case closed") {
+            dialogProvider.showSuccess<Nothing>("Case closed") {
                 onClose {
                     finish()
                 }
@@ -163,39 +193,86 @@ class SupportThreadActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
+            try {
+                val image: Image? = ImagePicker.getFirstImageOrNull(data)
+                image ?: return showInternalError()
+                val creditClubImage = CreditClubImage(this, image)
+                mainScope.launch { sendMessage(null, creditClubImage) }
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                showInternalError()
+            }
+        } else super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun loadImage(feedback: Feedback, imageBinding: ItemAddImageBinding) {
+        if (feedback.message != null) {
+            Picasso.get().load(feedback.message).into(imageBinding.imageView)
+        } else {
+            feedback.blobs?.run {
+                if (isNotEmpty()) {
+                    imageBinding.imageView.setImageBitmap(first().bitmap ?: return@run)
+                }
+            }
+        }
+    }
+
     private inner class Adapter(override var values: List<Feedback>) :
         SimpleAdapter<Adapter.ViewHolder, Feedback>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
-            val binding: ViewDataBinding = if (viewType == 0) {
-                DataBindingUtil.inflate(
-                    LayoutInflater.from(parent.context),
-                    R.layout.item_case_message,
-                    parent,
-                    false
-                )
-            } else {
-                DataBindingUtil.inflate(
-                    LayoutInflater.from(parent.context),
-                    R.layout.item_case_message_received,
-                    parent,
-                    false
-                )
+            val binding: ViewDataBinding = when (viewType) {
+                0 -> {
+                    DataBindingUtil.inflate(
+                        LayoutInflater.from(parent.context),
+                        R.layout.item_case_message,
+                        parent,
+                        false
+                    )
+                }
+                1 -> {
+                    DataBindingUtil.inflate(
+                        LayoutInflater.from(parent.context),
+                        R.layout.item_case_image,
+                        parent,
+                        false
+                    )
+                }
+                2 -> {
+                    DataBindingUtil.inflate(
+                        LayoutInflater.from(parent.context),
+                        R.layout.item_case_message_received,
+                        parent,
+                        false
+                    )
+                }
+                else -> {
+                    DataBindingUtil.inflate(
+                        LayoutInflater.from(parent.context),
+                        R.layout.item_case_image_received,
+                        parent,
+                        false
+                    )
+                }
             }
 
             return ViewHolder(binding)
         }
 
         override fun getItemViewType(position: Int): Int {
-            return if (values[position].isAgent) 0 else return 1
+            val feedback = values[position]
+            return when {
+                feedback.isAgent -> if (feedback.isAttachment) 1 else 0
+                else -> return if (feedback.isAttachment) 3 else 2
+            }
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val feedback = values[position]
-
             val instant = feedback.dateLogged?.toInstant(CREDIT_CLUB_DATE_PATTERN)
-
             val duration = instant?.timeAgo()
 
             holder.run {
@@ -205,9 +282,20 @@ class SupportThreadActivity : BaseActivity() {
                         binding.timeTv.text = duration
                     }
 
+                    is ItemCaseImageBinding -> {
+                        loadImage(feedback, binding.image)
+                        binding.timeTv.text = duration
+                    }
+
                     is ItemCaseMessageReceivedBinding -> {
                         binding.nameTv.text = feedback.name
                         binding.messageTv.text = feedback.message
+                        binding.timeTv.text = duration
+                    }
+
+                    is ItemCaseImageReceivedBinding -> {
+                        binding.nameTv.text = feedback.name
+                        loadImage(feedback, binding.image)
                         binding.timeTv.text = duration
                     }
                 }
