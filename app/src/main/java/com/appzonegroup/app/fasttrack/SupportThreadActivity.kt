@@ -1,6 +1,5 @@
 package com.appzonegroup.app.fasttrack
 
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -13,17 +12,17 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.databinding.*
+import com.creditclub.core.data.api.RequestFailureException
 import com.creditclub.core.data.model.Feedback
 import com.creditclub.core.data.request.CaseMessageThreadRequest
 import com.creditclub.core.data.response.CaseResponse
 import com.creditclub.core.model.CreditClubImage
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.SimpleAdapter
-import com.creditclub.core.ui.widget.DialogListener
-import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.util.*
 import com.creditclub.ui.dataBinding
 import com.esafirm.imagepicker.features.ImagePicker
+import com.esafirm.imagepicker.features.ReturnMode
 import com.esafirm.imagepicker.model.Image
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -60,20 +59,39 @@ class SupportThreadActivity : CreditClubActivity(R.layout.activity_support_threa
                 mainScope.launch { sendMessage(message) }
             }
             closeBtn.setOnClickListener {
-                closeCase()
+                mainScope.launch { closeCase() }
             }
             cameraBtn.setOnClickListener {
-//                ImagePicker.create(this@SupportThreadActivity)
-//                    .returnMode(ReturnMode.ALL)
-//                    .folderMode(true)
-//                    .single().single().showCamera(true).start()
-                ImagePicker.cameraOnly().start(this@SupportThreadActivity)
+                ImagePicker.create(this@SupportThreadActivity)
+                    .returnMode(ReturnMode.ALL)
+                    .folderMode(true)
+                    .single().showCamera(true).start()
+//                ImagePicker.cameraOnly().start(this@SupportThreadActivity)
             }
         }
 
+        loadFcmToken()
+
+        mainScope.launch {
+            val thread = loadData() ?: return@launch finish()
+            binding.noticeLayout.visibility =
+                if (thread.isResolved == true) View.VISIBLE else View.GONE
+
+            thread.response?.run {
+                if (isNotEmpty()) {
+                    messageList = this
+                    adapter.setData(this)
+                    binding.container.smoothScrollToPosition(size - 1)
+                }
+            }
+        }
+    }
+
+    private fun loadFcmToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
-                Log.w("LogCase", "Fetching FCM registration token failed", task.exception)
+                Log.e("LogCase", "Fetching FCM registration token failed", task.exception)
+                loadFcmToken()
                 return@OnCompleteListener
             }
 
@@ -81,47 +99,31 @@ class SupportThreadActivity : CreditClubActivity(R.layout.activity_support_threa
             val token = task.result
             fcmToken = token
         })
-
-        loadData {
-            onSubmit { thread ->
-                binding.noticeLayout.visibility =
-                    if (thread.isResolved == true) View.VISIBLE else View.GONE
-
-                thread.response?.run {
-                    if (isNotEmpty()) {
-                        messageList = this
-                        adapter.setData(this)
-                        binding.container.smoothScrollToPosition(size - 1)
-                    }
-                }
-            }
-
-            onClose {
-                finish()
-            }
-        }
     }
 
-    private fun loadData(block: DialogListenerBlock<CaseResponse<List<Feedback>>>) {
+    private suspend fun loadData(): CaseResponse<List<Feedback>>? {
+        showProgressBar("Loading Cases")
 
-        mainScope.launch {
-            showProgressBar("Loading Cases")
-
-            val request = CaseMessageThreadRequest().apply {
-                caseReference = reference
-            }
-
-            val (response, error) = safeRunIO {
-                creditClubMiddleWareAPI.caseLogService.getCaseMessageThread(request)
-            }
-
-            hideProgressBar()
-
-            if (error != null) return@launch showError(error, block)
-            response ?: return@launch showNetworkError(block)
-
-            DialogListener.create(block).submit(Dialog(this@SupportThreadActivity), response)
+        val request = CaseMessageThreadRequest().apply {
+            caseReference = reference
         }
+
+        val (response, error) = safeRunIO {
+            creditClubMiddleWareAPI.caseLogService.getCaseMessageThread(request)
+        }
+
+        hideProgressBar()
+
+        if (error != null) {
+            dialogProvider.showErrorAndWait(error)
+            return null
+        }
+        if (response == null) {
+            dialogProvider.showErrorAndWait(RequestFailureException("No response from server"))
+            return null
+        }
+
+        return response
     }
 
     private suspend fun sendMessage(newMessage: String?, image: CreditClubImage? = null) {
@@ -165,21 +167,19 @@ class SupportThreadActivity : CreditClubActivity(R.layout.activity_support_threa
         }
     }
 
-    private fun closeCase() {
-        mainScope.launch {
-            showProgressBar("Closing case")
-            val (response, error) = safeRunIO {
-                creditClubMiddleWareAPI.caseLogService.closeCase(reference)
-            }
-            hideProgressBar()
+    private suspend fun closeCase() {
+        showProgressBar("Closing case")
+        val (response, error) = safeRunIO {
+            creditClubMiddleWareAPI.caseLogService.closeCase(reference)
+        }
+        hideProgressBar()
 
-            if (error != null) return@launch showError(error)
-            response ?: return@launch showNetworkError()
+        if (error != null) return showError(error)
+        response ?: return showNetworkError()
 
-            dialogProvider.showSuccess<Nothing>("Case closed") {
-                onClose {
-                    finish()
-                }
+        dialogProvider.showSuccess<Nothing>("Case closed") {
+            onClose {
+                finish()
             }
         }
     }
@@ -195,15 +195,10 @@ class SupportThreadActivity : CreditClubActivity(R.layout.activity_support_threa
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
-            try {
-                val image: Image? = ImagePicker.getFirstImageOrNull(data)
-                image ?: return showInternalError()
-                val creditClubImage = CreditClubImage(this, image)
-                mainScope.launch { sendMessage(null, creditClubImage) }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                showInternalError()
-            }
+            val image: Image? = ImagePicker.getFirstImageOrNull(data)
+            image ?: return showInternalError()
+            val creditClubImage = CreditClubImage(this, image)
+            mainScope.launch { sendMessage(null, creditClubImage) }
         } else super.onActivityResult(requestCode, resultCode, data)
     }
 

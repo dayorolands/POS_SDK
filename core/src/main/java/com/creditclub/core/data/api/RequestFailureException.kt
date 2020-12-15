@@ -4,5 +4,5 @@ import java.io.IOException
 
 class RequestFailureException(
     override val message: String,
-    val httpStatusCode: Int?
+    val httpStatusCode: Int? = null
 ) : IOException(message)

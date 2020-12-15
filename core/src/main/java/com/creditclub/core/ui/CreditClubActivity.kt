@@ -151,7 +151,7 @@ abstract class CreditClubActivity : AppCompatActivity {
         dialogProvider.showError(message, block)
     }
 
-    fun showInternalError() = showNetworkError<Nothing>(null)
+    fun showInternalError() = showInternalError<Nothing>(null)
 
     fun <T> showInternalError(block: DialogListenerBlock<T>?) {
         dialogProvider.hideProgressBar()

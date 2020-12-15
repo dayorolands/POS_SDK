@@ -18,6 +18,6 @@ object CreditClubImageSerializer {
     }
 
     override fun serialize(encoder: Encoder, value: CreditClubImage) {
-        encoder.encodeString("data:image/png;base64,${value.bitmapString!!}")
+        encoder.encodeString("data:image/webp;base64,${value.bitmapString!!}")
     }
 }

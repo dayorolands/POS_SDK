@@ -1,22 +1,14 @@
 package com.creditclub.core.model
 
-import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
-import android.provider.OpenableColumns
 import android.util.Base64
-import android.util.Log
-import com.creditclub.core.BuildConfig
 import com.creditclub.core.serializer.CreditClubImageSerializer
 import com.creditclub.core.util.safeRun
 import com.esafirm.imagepicker.model.Image
 import kotlinx.serialization.Serializable
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 
 
 /**
@@ -35,40 +27,18 @@ class CreditClubImage(val context: Context, id: Long, name: String, path: String
         bitmap ?: return@lazy null
 
         val byteArrayOutputStream = ByteArrayOutputStream()
-        bitmap?.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream)
+        bitmap?.compress(Bitmap.CompressFormat.WEBP, 0, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
 
         Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
     private fun compressImage(): Bitmap? {
-
-        val (tempBitmap, error) = safeRun {
-            val fileUri = Uri.fromFile(File(path))
-            val parcelFileDescriptor =
-                context.contentResolver.openFileDescriptor(fileUri, "r", null)
-
-            parcelFileDescriptor?.let {
-                val inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
-                val file = File(context.cacheDir, context.contentResolver.getFileName(fileUri))
-                val outputStream = FileOutputStream(file)
-                inputStream.copyTo(outputStream)
-            }
-            val tempBitmap = BitmapFactory.decodeFile(path)
-            val newBitmap = getResizedBitmap(tempBitmap!!)
-
-            val file = File(path)
-            val fOut = FileOutputStream(file)
-            newBitmap.compress(Bitmap.CompressFormat.JPEG, 50, fOut)
-            fOut.flush()
-            fOut.close()
-
-            newBitmap
-        }
-
-        if (error != null && BuildConfig.DEBUG) {
-            error.printStackTrace()
-            Log.e("Image", "Save file error!")
+        val (tempBitmap) = safeRun {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val tempBitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream?.close()
+            getResizedBitmap(tempBitmap!!)
         }
 
         return tempBitmap
@@ -89,19 +59,5 @@ class CreditClubImage(val context: Context, id: Long, name: String, path: String
         }
 
         return Bitmap.createScaledBitmap(image, width, height, true)
-    }
-
-    private fun ContentResolver.getFileName(fileUri: Uri): String {
-
-        var name = ""
-        val returnCursor = this.query(fileUri, null, null, null, null)
-        if (returnCursor != null) {
-            val nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            returnCursor.moveToFirst()
-            name = returnCursor.getString(nameIndex)
-            returnCursor.close()
-        }
-
-        return name
     }
 }
