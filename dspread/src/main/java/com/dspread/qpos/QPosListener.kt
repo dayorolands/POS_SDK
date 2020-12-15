@@ -12,6 +12,7 @@ import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.util.format
 import com.creditclub.core.util.safeRun
+import com.creditclub.pos.DukptConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
@@ -257,8 +258,18 @@ class QPosListener(
                     pan.length - 13,
                     pan.length - 1
                 )
-                val pin = DUKPK2009_CBC.xor(parsCarN, encryptedPin)
-                cardData.pinBlock = encryptedPinBlock(cardData.pan, pin).hexString
+                val pinTlv = DUKPK2009_CBC.xor(parsCarN, encryptedPin)
+                val pinLength = pinTlv.substring(0, 2).toInt()
+                val pin = pinTlv.substring(2, 2 + pinLength)
+
+                val amount = sessionData.amount / 100.0
+                val dukptConfig = sessionData.getDukptConfig?.invoke(cardData.pan, amount)
+                if (dukptConfig == null) {
+                    cardData.pinBlock = encryptedPinBlock(cardData.pan, pin).hexString
+                } else {
+                    cardData.pinBlock = dukptPinBlock(dukptConfig, cardData.pan, pin).hexString
+                    cardData.ksnData = dukptConfig.ksn
+                }
             }
         }
     }
@@ -927,5 +938,12 @@ class QPosListener(
         val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
         val tripleDesCipher = TripleDesCipher(cipherKey)
         return tripleDesCipher.encrypt(cryptData).copyOf(8)
+    }
+
+    private fun dukptPinBlock(dukptConfig: DukptConfig, pan: String, pin: String): ByteArray {
+        val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
+        val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
+        val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
+        return Dukpt.encryptTripleDes(dukptConfig.ipek.hexBytes, cryptData).copyOf(8)
     }
 }

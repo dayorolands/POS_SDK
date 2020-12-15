@@ -10,7 +10,7 @@
 <9F1B>00000000</9F1B> <!--Terminal Floor Limit-->
 <9F1C>4E4C2D4750373330</9F1C> <!--Terminal Identification-->
 <9F1E>3833323031494343</9F1E> <!--Interface Device (IFD) Serial Number-->
-<9F33>E0F8C8</9F33> <!--Terminal Capabilities-->
+<9F33>E068C8</9F33> <!--Terminal Capabilities-->
 <9F35>22</9F35> <!--Terminal Type-->
 <9F39>05</9F39> <!--Point-of-Service (POS) Entry Mode-->
 <9F3C>0566</9F3C> <!--Transaction Reference Currency Code-->
@@ -38,7 +38,7 @@
 <DF75>01</DF75> <!--Terminal Status Check，Default value = 0-->
 <DF76></DF76> <!--Default Tdol-->
 <DF78>000000000000</DF78> <!--Contactless CVM Required limit-->
-<DF79>E0F8C8</DF79> <!--Contactless Terminal Capabilities-->
+<DF79>E068C8</DF79> <!--Contactless Terminal Capabilities-->
 <DF7A>7000B0A001</DF7A> <!--Contactless Additional Terminal Capabilities-->
 <DF7B>0000000000</DF7B> <!--TAC Default-->
 <DF7C>0000000000</DF7C> <!--TAC Online-->
@@ -58,7 +58,7 @@
 <9F1B>00000000</9F1B> <!--Terminal Floor Limit-->
 <9F1C>4E4C2D4750373330</9F1C> <!--Terminal Identification-->
 <9F1E>3833323031494343</9F1E> <!--Interface Device (IFD) Serial Number-->
-<9F33>E0F8C8</9F33> <!--Terminal Capabilities-->
+<9F33>E068C8</9F33> <!--Terminal Capabilities-->
 <9F35>22</9F35> <!--Terminal Type-->
 <9F39>05</9F39> <!--Point-of-Service (POS) Entry Mode-->
 <9F3C>0566</9F3C> <!--Transaction Reference Currency Code-->
@@ -86,7 +86,7 @@
 <DF75>01</DF75> <!--Terminal Status Check，Default value = 0-->
 <DF76>9F1A0295059A039C01</DF76> <!--Default Tdol-->
 <DF78>000000100000</DF78> <!--ContactlessTerminal Execute Cvm Limit-->
-<DF79>E0F8C8</DF79> <!--ContactlessTerminal Capabilities-->
+<DF79>E068C8</DF79> <!--ContactlessTerminal Capabilities-->
 <DF7A>7000B0A001</DF7A> <!--ContactlessAdditionalTerminal Capabilities-->
 <DF7B>DC4000A800</DF7B> <!--TAC Default-->
 <DF7C>DC4004F800</DF7C> <!--TAC Online-->
@@ -105,7 +105,7 @@
 <9F1B>00000000</9F1B> <!--Terminal Floor Limit-->
 <9F1C>4E4C2D4750373330</9F1C> <!--Terminal Identification-->
 <9F1E>3833323031494343</9F1E> <!--Interface Device (IFD) Serial Number-->
-<9F33>E0F8C8</9F33> <!--Terminal Capabilities-->
+<9F33>E068C8</9F33> <!--Terminal Capabilities-->
 <9F35>22</9F35> <!--Terminal Type-->
 <9F39>05</9F39> <!--Point-of-Service (POS) Entry Mode-->
 <9F3C>0566</9F3C> <!--Transaction Reference Currency Code-->
@@ -133,7 +133,7 @@
 <DF75>01</DF75> <!--Terminal Status Check，Default value = 0-->
 <DF76>9F1A0295059A039C01</DF76> <!--Default Tdol-->
 <DF78>000000100000</DF78> <!--ContactlessTerminal Execute Cvm Limit-->
-<DF79>E0F8C8</DF79> <!--ContactlessTerminal Capabilities-->
+<DF79>E068C8</DF79> <!--ContactlessTerminal Capabilities-->
 <DF7A>7000B0A001</DF7A> <!--ContactlessAdditionalTerminal Capabilities-->
 <DF7B>DC4000A800</DF7B> <!--TAC Default-->
 <DF7C>DC4004F800</DF7C> <!--TAC Online-->
@@ -152,7 +152,7 @@
 <9F1B>00000000</9F1B> <!--Terminal Floor Limit-->
 <9F1C>4E4C2D4750373330</9F1C> <!--Terminal Identification-->
 <9F1E>3833323031494343</9F1E> <!--Interface Device (IFD) Serial Number-->
-<9F33>E0F8C8</9F33> <!--Terminal Capabilities-->
+<9F33>E068C8</9F33> <!--Terminal Capabilities-->
 <9F35>22</9F35> <!--Terminal Type-->
 <9F39>05</9F39> <!--Point-of-Service (POS) Entry Mode-->
 <9F3C>0566</9F3C> <!--Transaction Reference Currency Code-->
@@ -180,7 +180,7 @@
 <DF75>01</DF75> <!--Terminal Status Check，Default value = 0-->
 <DF76>9F1A0295059A039C01</DF76> <!--Default Tdol-->
 <DF78>000000100000</DF78> <!--ContactlessTerminal Execute Cvm Limit-->
-<DF79>E0F8C8</DF79> <!--ContactlessTerminal Capabilities-->
+<DF79>E068C8</DF79> <!--ContactlessTerminal Capabilities-->
 <DF7A>7000B0A001</DF7A> <!--ContactlessAdditionalTerminal Capabilities-->
 <DF7B>DC4000A800</DF7B> <!--TAC Default-->
 <DF7C>DC4004F800</DF7C> <!--TAC Online-->
@@ -199,7 +199,7 @@
 <9F1B>00000000</9F1B> <!--Terminal Floor Limit-->
 <9F1C>4E4C2D4750373330</9F1C> <!--Terminal Identification-->
 <9F1E>3833323031494343</9F1E> <!--Interface Device (IFD) Serial Number-->
-<9F33>E0F8C8</9F33> <!--Terminal Capabilities-->
+<9F33>E068C8</9F33> <!--Terminal Capabilities-->
 <9F35>22</9F35> <!--Terminal Type-->
 <9F39>05</9F39> <!--Point-of-Service (POS) Entry Mode-->
 <9F3C>0566</9F3C> <!--Transaction Reference Currency Code-->
@@ -227,7 +227,7 @@
 <DF75>01</DF75> <!--Terminal Status Check，Default value = 0-->
 <DF76>9F1A0295059A039C01</DF76> <!--Default Tdol-->
 <DF78>000000100000</DF78> <!--ContactlessTerminal Execute Cvm Limit-->
-<DF79>E0F8C8</DF79> <!--ContactlessTerminal Capabilities-->
+<DF79>E068C8</DF79> <!--ContactlessTerminal Capabilities-->
 <DF7A>7000B0A001</DF7A> <!--ContactlessAdditionalTerminal Capabilities-->
 <DF7B>DC4000A800</DF7B> <!--TAC Default-->
 <DF7C>DC4004F800</DF7C> <!--TAC Online-->
@@ -247,7 +247,7 @@
 <9F1C>4E4C2D4750373330</9F1C> <!--Terminal Identification-->
 <9F1D>6C7A800000000000</9F1D>
 <9F1E>3833323031494343</9F1E> <!--Interface Device (IFD) Serial Number-->
-<9F33>E0F8C8</9F33> <!--Terminal Capabilities-->
+<9F33>E068C8</9F33> <!--Terminal Capabilities-->
 <9F35>22</9F35> <!--Terminal Type-->
 <9F39>05</9F39> <!--Point-of-Service (POS) Entry Mode-->
 <9F3C>0566</9F3C> <!--Transaction Reference Currency Code-->
@@ -275,7 +275,7 @@
 <DF75>01</DF75> <!--Terminal Status Check，Default value = 0-->
 <DF76>9F02065F2A029A039C0195059F3704</DF76> <!--Default Tdol-->
 <DF78>000000100000</DF78> <!--ContactlessTerminal Execute Cvm Limit-->
-<DF79>E0F8C8</DF79> <!--ContactlessTerminal Capabilities-->
+<DF79>E068C8</DF79> <!--ContactlessTerminal Capabilities-->
 <DF7A>7000B0A001</DF7A> <!--ContactlessAdditionalTerminal Capabilities-->
 <DF7B>FC50BCA000</DF7B> <!--TAC Default-->
 <DF7C>FC50BCF800</DF7C> <!--TAC Online-->
@@ -297,7 +297,7 @@
 <9F1B>00000000</9F1B> <!--Terminal Floor Limit-->
 <9F1C>4E4C2D4750373330</9F1C> <!--Terminal Identification-->
 <9F1E>3833323031494343</9F1E> <!--Interface Device (IFD) Serial Number-->
-<9F33>E0F8C8</9F33> <!--Terminal Capabilities-->
+<9F33>E068C8</9F33> <!--Terminal Capabilities-->
 <9F35>22</9F35> <!--Terminal Type-->
 <9F39>05</9F39> <!--Point-of-Service (POS) Entry Mode-->
 <9F3C>0566</9F3C> <!--Transaction Reference Currency Code-->
@@ -325,7 +325,7 @@
 <DF75>01</DF75> <!--Terminal Status Check，Default value = 0-->
 <DF76>9F1A0295059A039C01</DF76> <!--Default Tdol-->
 <DF78>000000200001</DF78> <!--ContactlessTerminal Execute Cvm Limit-->
-<DF79>E0F8C8</DF79> <!--ContactlessTerminal Capabilities-->
+<DF79>E068C8</DF79> <!--ContactlessTerminal Capabilities-->
 <DF7A>7000B0A001</DF7A> <!--ContactlessAdditionalTerminal Capabilities-->
 <DF7B>CC00008000</DF7B> <!--TAC Default-->
 <DF7C>CC00008000</DF7C> <!--TAC Online-->
@@ -345,7 +345,7 @@
 <9F1B>00000000</9F1B> <!--Terminal Floor Limit-->
 <9F1C>4E4C2D4750373330</9F1C> <!--Terminal Identification-->
 <9F1E>3833323031494343</9F1E> <!--Interface Device (IFD) Serial Number-->
-<9F33>E0F8C8</9F33> <!--Terminal Capabilities-->
+<9F33>E068C8</9F33> <!--Terminal Capabilities-->
 <9F35>22</9F35> <!--Terminal Type-->
 <9F39>05</9F39> <!--Point-of-Service (POS) Entry Mode-->
 <9F3C>0566</9F3C> <!--Transaction Reference Currency Code-->
@@ -373,7 +373,7 @@
 <DF75>01</DF75> <!--Terminal Status Check，Default value = 0-->
 <DF76>9F1A0295059A039C01</DF76> <!--Default Tdol-->
 <DF78>000000200001</DF78> <!--ContactlessTerminal Execute Cvm Limit-->
-<DF79>E0F8C8</DF79> <!--ContactlessTerminal Capabilities-->
+<DF79>E068C8</DF79> <!--ContactlessTerminal Capabilities-->
 <DF7A>7000B0A001</DF7A> <!--ContactlessAdditionalTerminal Capabilities-->
 <DF7B>DC4000A800</DF7B> <!--TAC Default-->
 <DF7C>DC4004F800</DF7C> <!--TAC Online-->
@@ -392,7 +392,7 @@
 <9F1B>00000000</9F1B> <!--Terminal Floor Limit-->
 <9F1C>4E4C2D4750373330</9F1C> <!--Terminal Identification-->
 <9F1E>3833323031494343</9F1E> <!--Interface Device (IFD) Serial Number-->
-<9F33>E0F8C8</9F33> <!--Terminal Capabilities-->
+<9F33>E068C8</9F33> <!--Terminal Capabilities-->
 <9F35>22</9F35> <!--Terminal Type-->
 <9F39>05</9F39> <!--Point-of-Service (POS) Entry Mode-->
 <9F3C>0566</9F3C> <!--Transaction Reference Currency Code-->
@@ -420,7 +420,7 @@
 <DF75>01</DF75> <!--Terminal Status Check，Default value = 0-->
 <DF76>9F1A0295059A039C01</DF76> <!--Default Tdol-->
 <DF78>000000000000</DF78> <!--ContactlessTerminal Execute Cvm Limit-->
-<DF79>E0F8C8</DF79> <!--ContactlessTerminal Capabilities-->
+<DF79>E068C8</DF79> <!--ContactlessTerminal Capabilities-->
 <DF7A>7000B0A001</DF7A> <!--ContactlessAdditionalTerminal Capabilities-->
 <DF7B>DC4000A800</DF7B> <!--TAC Default-->
 <DF7C>DC4004F800</DF7C> <!--TAC Online-->
@@ -439,7 +439,7 @@
 <9F1B>00000000</9F1B> <!--Terminal Floor Limit-->
 <9F1C>4E4C2D4750373330</9F1C> <!--Terminal Identification-->
 <9F1E>3833323031494343</9F1E> <!--Interface Device (IFD) Serial Number-->
-<9F33>E0F8C8</9F33> <!--Terminal Capabilities-->
+<9F33>E068C8</9F33> <!--Terminal Capabilities-->
 <9F35>22</9F35> <!--Terminal Type-->
 <9F39>05</9F39> <!--Point-of-Service (POS) Entry Mode-->
 <9F3C>0566</9F3C> <!--Transaction Reference Currency Code-->
@@ -467,7 +467,7 @@
 <DF75>01</DF75> <!--Terminal Status Check，Default value = 0-->
 <DF76>9F1A0295059A039C01</DF76> <!--Default Tdol-->
 <DF78>000000200001</DF78> <!--ContactlessTerminal Execute Cvm Limit-->
-<DF79>E0F8C8</DF79> <!--ContactlessTerminal Capabilities-->
+<DF79>E068C8</DF79> <!--ContactlessTerminal Capabilities-->
 <DF7A>7000B0A001</DF7A> <!--ContactlessAdditionalTerminal Capabilities-->
 <DF7B>DC4000A800</DF7B> <!--TAC Default-->
 <DF7C>DC4004F800</DF7C> <!--TAC Online-->
@@ -486,7 +486,7 @@
 <9F1B>00000000</9F1B> <!--Terminal Floor Limit-->
 <9F1C>4E4C2D4750373330</9F1C> <!--Terminal Identification-->
 <9F1E>3833323031494343</9F1E> <!--Interface Device (IFD) Serial Number-->
-<9F33>E0F8C8</9F33> <!--Terminal Capabilities-->
+<9F33>E068C8</9F33> <!--Terminal Capabilities-->
 <9F35>22</9F35> <!--Terminal Type-->
 <9F39>05</9F39> <!--Point-of-Service (POS) Entry Mode-->
 <9F3C>0566</9F3C> <!--Transaction Reference Currency Code-->
@@ -514,7 +514,7 @@
 <DF75>01</DF75> <!--Terminal Status Check，Default value = 0-->
 <DF76>9F0802</DF76> <!--Default Tdol-->
 <DF78>000000200001</DF78> <!--ContactlessTerminal Execute Cvm Limit-->
-<DF79>E0F8C8</DF79> <!--ContactlessTerminal Capabilities-->
+<DF79>E068C8</DF79> <!--ContactlessTerminal Capabilities-->
 <DF7A>7000B0A001</DF7A> <!--ContactlessAdditionalTerminal Capabilities-->
 <DF7B>DC4000A800</DF7B> <!--TAC Default-->
 <DF7C>DC4004F800</DF7C> <!--TAC Online-->
