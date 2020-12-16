@@ -62,11 +62,11 @@ class SupportThreadActivity : CreditClubActivity(R.layout.activity_support_threa
                 mainScope.launch { closeCase() }
             }
             cameraBtn.setOnClickListener {
-                ImagePicker.create(this@SupportThreadActivity)
-                    .returnMode(ReturnMode.ALL)
-                    .folderMode(true)
-                    .single().showCamera(true).start()
-//                ImagePicker.cameraOnly().start(this@SupportThreadActivity)
+//                ImagePicker.create(this@SupportThreadActivity)
+//                    .returnMode(ReturnMode.ALL)
+//                    .folderMode(true)
+//                    .single().showCamera(true).start()
+                ImagePicker.cameraOnly().start(this@SupportThreadActivity)
             }
         }
 

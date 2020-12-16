@@ -143,6 +143,7 @@
                     style="@style/button_style"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
                     android:text="@string/validate_account" />
 
             </LinearLayout>
@@ -214,8 +215,8 @@
                         style="@style/button_style_orange"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="@dimen/two_dp"
                         android:layout_weight="1"
+                        android:margin="@dimen/two_dp"
                         android:onClick="backClicked"
                         android:text="@string/back" />
 
@@ -224,8 +225,8 @@
                         style="@style/button_style"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/two_dp"
                         android:layout_weight="1"
+                        android:margin="@dimen/two_dp"
                         android:text="@string/submit" />
 
                 </LinearLayout>

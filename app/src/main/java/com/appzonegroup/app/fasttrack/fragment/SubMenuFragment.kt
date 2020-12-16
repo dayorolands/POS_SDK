@@ -78,6 +78,10 @@ class SubMenuFragment : CreditClubFragment(R.layout.sub_menu_fragment),
                 if (flows.collectionPayment == null) {
                     binding.collectionPaymentButton.root.visibility = View.GONE
                 }
+
+                if (flows.billPayment == null) {
+                    binding.payBillButton.root.visibility = View.GONE
+                }
             }
 
             AppFunctions.Categories.AGENT_CATEGORY -> {
