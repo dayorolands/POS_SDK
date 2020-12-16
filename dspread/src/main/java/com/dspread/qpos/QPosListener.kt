@@ -191,12 +191,12 @@ class QPosListener(
     }
 
     override fun onRequestOnlineProcess(tlv: String) {
-        safeRun { extractData(tlv) }
-
         if (isPinCanceled) {
+            cardData.ret = CardTransactionStatus.UserCancel.code
             pos.sendOnlineProcessResult(null)
         } else {
             val str = "8A023030"
+            extractData(tlv)
             pos.sendOnlineProcessResult(str)
         }
     }
@@ -241,36 +241,39 @@ class QPosListener(
         val tvr = dates.getValue("95").hexBytes
         if (tvr.isNotEmpty() && tvr.last() == 1.toByte()) {
             cardData.ret = CardTransactionStatus.OfflinePinVerifyError.code
+            return
         }
 
-        if (c1Tlv != null || c7Tlv != null) {
-            val pinKsn: String? = c1Tlv?.value
-            val pinBlock: String? = c7Tlv?.value
-            if (pinKsn != null || pinBlock != null) {
-                val encryptedPin = DUKPK2009_CBC.getDate(
-                    pinKsn,
-                    pinBlock,
-                    DUKPK2009_CBC.Enum_key.PIN,
-                    DUKPK2009_CBC.Enum_mode.CBC
-                )
-                val pan = dates.getValue("5A", hex = false, fpadded = true)
-                val parsCarN = "0000" + pan.substring(
-                    pan.length - 13,
-                    pan.length - 1
-                )
-                val pinTlv = DUKPK2009_CBC.xor(parsCarN, encryptedPin)
-                val pinLength = pinTlv.substring(0, 2).toInt()
-                val pin = pinTlv.substring(2, 2 + pinLength)
+        val pinKsn: String? = c1Tlv?.value
+        val pinBlock: String? = c7Tlv?.value
 
-                val amount = sessionData.amount / 100.0
-                val dukptConfig = sessionData.getDukptConfig?.invoke(cardData.pan, amount)
-                if (dukptConfig == null) {
-                    cardData.pinBlock = encryptedPinBlock(cardData.pan, pin).hexString
-                } else {
-                    cardData.pinBlock = dukptPinBlock(dukptConfig, cardData.pan, pin).hexString
-                    cardData.ksnData = dukptConfig.ksn
-                }
-            }
+        if (pinKsn == null && pinBlock == null) {
+            cardData.ret = CardTransactionStatus.NoPin.code
+            return
+        }
+
+        val encryptedPin = DUKPK2009_CBC.getDate(
+            pinKsn,
+            pinBlock,
+            DUKPK2009_CBC.Enum_key.PIN,
+            DUKPK2009_CBC.Enum_mode.CBC
+        )
+        val pan = dates.getValue("5A", hex = false, fpadded = true)
+        val parsCarN = "0000" + pan.substring(
+            pan.length - 13,
+            pan.length - 1
+        )
+        val pinTlv = DUKPK2009_CBC.xor(parsCarN, encryptedPin)
+        val pinLength = pinTlv.substring(0, 2).toInt()
+        val pin = pinTlv.substring(2, 2 + pinLength)
+
+        val amount = sessionData.amount / 100.0
+        val dukptConfig = sessionData.getDukptConfig?.invoke(cardData.pan, amount)
+        if (dukptConfig == null) {
+            cardData.pinBlock = encryptedPinBlock(cardData.pan, pin).hexString
+        } else {
+            cardData.pinBlock = dukptPinBlock(dukptConfig, cardData.pan, pin).hexString
+            cardData.ksnData = dukptConfig.ksn
         }
     }
 

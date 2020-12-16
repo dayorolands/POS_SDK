@@ -31,7 +31,6 @@ class QPosCardReader(
 ) : CardReader, KoinComponent {
 
     private val keyIndex = 0
-    private val posParameter: PosParameter by inject()
     private val posConfig: PosConfig by inject()
     private var watchJob: Job? = null
     private val dialogProvider = activity.dialogProvider
@@ -42,7 +41,8 @@ class QPosCardReader(
         pos.initListener(handler, listener)
         pos.clearBluetoothBuffer()
         pos.setTerminalID(posConfig.terminalId, 5000)
-        val connected: Boolean = connectDevice()
+        val device = findDevice() ?: return CardReaderEvent.CANCELLED
+        val connected: Boolean = connectDevice(device)
         if (!connected) return suspendCoroutine { continuation ->
             dialogProvider.showError<Nothing>("Could not connect to device") {
                 onClose { continuation.resume(CardReaderEvent.CANCELLED) }
@@ -120,8 +120,7 @@ class QPosCardReader(
         }
     }
 
-    private suspend fun connectDevice(): Boolean {
-        val device = findDevice() ?: return false
+    private suspend fun connectDevice(device: BluetoothDevice): Boolean {
         dialogProvider.showProgressBar("Connecting to mPOS device")
         val connected: Boolean = withContext(Dispatchers.IO) {
             pos.syncConnectBluetooth(true, 25, device.address)
@@ -150,7 +149,11 @@ class QPosCardReader(
             }
         }
         timerTask = Timer().scheduleAtFixedRate(1000, 1000) {
-            activity.runOnUiThread { findDeviceDialog?.updateList(pos.deviceList) }
+            activity.runOnUiThread {
+                findDeviceDialog?.updateList(
+                    pos.deviceList?.filter { it.name.startsWith("MPOS") }
+                )
+            }
         }
         findDeviceDialog?.show()
     }
