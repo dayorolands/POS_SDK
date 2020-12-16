@@ -3,6 +3,7 @@
     <bool name="online_functions_enabled">false</bool>
     <bool name="hla_enabled">false</bool>
     <bool name="collections_enabled">false</bool>
+    <bool name="bill_payment_enabled">true</bool>
     <string-array name="customer_request_options">
         <item>2,Account Number</item>
     </string-array>

@@ -1,4 +1,16 @@
 <resources>
     <string name="app_name">CreditClub Plus</string>
     <string name="funds_transfer_same_bank">Sterling Bank</string>
+    <string-array name="transaction_types">
+        <item>CashIn</item>
+        <item>CashOut</item>
+        <item>POSCashOut</item>
+        <item>Recharge</item>
+        <item>Registration</item>
+        <item>KiaKiaToKiaKia</item>
+        <item>KiaKiaToSterlingBank</item>
+        <item>KiaKiaToOtherBanks</item>
+        <item>FundsTransferCommercialBank</item>
+        <item>LocalFundsTransfer</item>
+    </string-array>
 </resources>

@@ -59,6 +59,10 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
                 if (!resources.getBoolean(R.bool.collections_enabled)) {
                     collectionPayment = null
                 }
+
+                if (!resources.getBoolean(R.bool.bill_payment_enabled)) {
+                    billPayment = null
+                }
             }
 
             config.categories.run {
@@ -72,6 +76,8 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
             // Manual overrides for creditclub variant
             if (BuildConfig.FLAVOR == "creditclub") {
                 val institutionCode = context.localStorage.institutionCode
+                val isTcfBank = institutionCode == "100568" || institutionCode == "100309"
+                val isSterlingBank = institutionCode == "100567"
 
                 config.name = when (institutionCode) {
                     "100567" -> "Sterling Bank"
@@ -79,13 +85,15 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
                     else -> "My Bank"
                 }
 
-                val isTcfBank = institutionCode == "100568" || institutionCode == "100309"
-
                 if (isTcfBank) {
                     config.categories.loans = false
                     config.hasHlaTagging = false
                     config.hasOnlineFunctions = false
                     config.flows.bvnUpdate = null
+                }
+
+                if (isSterlingBank) {
+                    config.flows.billPayment = null
                 }
             }
 
