@@ -75,12 +75,8 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
     }
 
     private suspend fun transferFunds() {
-        val pin = dialogProvider.getPin("Agent PIN") ?: return
-        if (pin.isEmpty()) return showError("Please enter your PIN")
-        if (pin.length != 4) return showError("PIN must be four digits")
-
         val amount = viewModel.amountString.value?.trim { it <= ' ' }
-        if (amount === "") {
+        if (amount.isNullOrBlank()) {
             indicateError("Please enter an Amount", binding.amountEt as View)
             return
         }
@@ -90,6 +86,10 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
             indicateError("Please enter a valid amount", binding.amountEt as View)
             return
         }
+
+        val pin = dialogProvider.getPin("Agent PIN") ?: return
+        if (pin.isEmpty()) return showError("Please enter your PIN")
+        if (pin.length != 4) return showError("PIN must be four digits")
 
         val fundsTransferRequest = FundsTransferRequest().apply {
             agentPhoneNumber = localStorage.agentPhone
