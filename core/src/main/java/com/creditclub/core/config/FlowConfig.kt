@@ -7,4 +7,5 @@ class FlowConfig {
     var customerPinChange: Any? = Any()
     var bvnUpdate: Any? = Any()
     var collectionPayment: Any? = Any()
+    var billPayment: Any? = Any()
 }
