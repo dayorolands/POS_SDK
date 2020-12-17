@@ -5,14 +5,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.appzonegroup.app.fasttrack.databinding.ActivityBannerBinding
 import com.appzonegroup.app.fasttrack.databinding.ItemBannerImageBinding
 import com.creditclub.core.ui.SimpleBindingAdapter
-import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.delegates.jsonStore
 import com.creditclub.core.util.safeRun
+import com.creditclub.ui.dataBinding
 import com.squareup.picasso.Picasso
 
-class BannerActivity : AppCompatActivity() {
+class BannerActivity : AppCompatActivity(R.layout.activity_banner) {
 
-    private val binding by contentView<BannerActivity, ActivityBannerBinding>(R.layout.activity_banner)
+    private val binding: ActivityBannerBinding by dataBinding()
     private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -35,6 +35,7 @@ class WithdrawActivity : CustomerBaseActivity() {
     private val viewModel: WithdrawalViewModel by viewModels()
 
     override fun onCustomerReady(savedInstanceState: Bundle?) {
+        binding.lifecycleOwner = this
         binding.viewModel = viewModel
 
         with(viewModel) {

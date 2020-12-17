@@ -12,25 +12,27 @@ import com.creditclub.core.data.model.State
 import com.creditclub.core.data.model.StatesAndLgas
 import com.creditclub.core.data.request.OfflineHLATaggingRequest
 import com.creditclub.core.model.CreditClubImage
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogOptionItem
-import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.includesSpecialCharacters
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.showError
+import com.creditclub.ui.dataBinding
 import com.esafirm.imagepicker.features.ImagePicker
 import com.esafirm.imagepicker.model.Image
 import kotlinx.coroutines.launch
-import java.time.Instant
 import java.io.IOException
+import java.time.Instant
 
 typealias ImageListenerBlock = (CreditClubImage) -> Unit
 
-class HlaTaggingActivity : BaseActivity(), FormDataHolder<OfflineHLATaggingRequest> {
+class HlaTaggingActivity : CreditClubActivity(R.layout.activity_hla_tagging),
+    FormDataHolder<OfflineHLATaggingRequest> {
 
-    private val binding by contentView<HlaTaggingActivity, ActivityHlaTaggingBinding>(R.layout.activity_hla_tagging)
+    private val binding: ActivityHlaTaggingBinding by dataBinding()
     override val functionId = FunctionIds.HLA_TAGGING
     private var imageListener: ImageListenerBlock? = null
     private val offlineHlaTaggingService: OfflineHlaTaggingService by creditClubMiddleWareAPI.retrofit.service()

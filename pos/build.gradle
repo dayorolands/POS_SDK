@@ -84,6 +84,7 @@ dependencies {
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.lifecycle}"
     implementation "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.lifecycle}"
 
     implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
     implementation "com.google.firebase:firebase-crashlytics:${versions.firebaseCrashlytics}"

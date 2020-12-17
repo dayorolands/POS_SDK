@@ -1,10 +1,6 @@
 package com.creditclub.core.util
 
 import android.util.Patterns
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.regex.Pattern
 
 
@@ -13,26 +9,30 @@ import java.util.regex.Pattern
  * Appzone Ltd
  */
 
-val invalidAddressPattern = Pattern.compile("[\$&+:;=\\\\\\\\?@#|/'<>^*()%!{}]", Pattern.CASE_INSENSITIVE)
-val specialCharsPattern = Pattern.compile("[\$&+:;=\\\\\\\\?@#|/'<>^*()%!{}.,]", Pattern.CASE_INSENSITIVE)
+val invalidAddressPattern =
+    Pattern.compile("[\$&+:;=\\\\\\\\?@#|/'<>^*()%!{}]", Pattern.CASE_INSENSITIVE)
+val specialCharsPattern =
+    Pattern.compile("[\$&+:;=\\\\\\\\?@#|/'<>^*()%!{}.,]", Pattern.CASE_INSENSITIVE)
 
 fun String.includesSpecialCharacters(pattern: Pattern = specialCharsPattern): Boolean {
     return isNotEmpty() && pattern.matcher(this).matches()
 }
 
-fun String.isValidEmail(): Boolean = this.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
+fun String.isValidEmail(): Boolean =
+    this.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
 
-fun String.includesNumbers(): Boolean = this.isNotEmpty() && TextPatterns.includesNumbers.matcher(this).find()
+fun String.includesNumbers(): Boolean =
+    this.isNotEmpty() && TextPatterns.includesNumbers.matcher(this).find()
 
 fun String?.mask(first: Int, last: Int): String {
     if (this == null) return ""
 
     if (length <= first + last) return this
 
-    return "${substring(0, first)}${"*".repeat(length - first - last)}${substring(length - last, length)}"
-}
-
-fun String.toRequestBody(): RequestBody {
-    val mediaType = "application/json".toMediaTypeOrNull()
-    return this.toRequestBody(mediaType)
+    return "${substring(0, first)}${"*".repeat(length - first - last)}${
+        substring(
+            length - last,
+            length
+        )
+    }"
 }

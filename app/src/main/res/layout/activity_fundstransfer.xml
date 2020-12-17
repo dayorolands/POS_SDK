@@ -216,7 +216,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:margin="@dimen/two_dp"
+                        android:layout_margin="@dimen/two_dp"
                         android:onClick="backClicked"
                         android:text="@string/back" />
 
@@ -226,7 +226,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:margin="@dimen/two_dp"
+                        android:layout_margin="@dimen/two_dp"
                         android:text="@string/submit" />
 
                 </LinearLayout>

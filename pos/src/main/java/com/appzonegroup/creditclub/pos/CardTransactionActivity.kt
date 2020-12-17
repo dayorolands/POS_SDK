@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
@@ -30,6 +31,7 @@ import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.util.*
 import com.creditclub.pos.PosManager
+import com.creditclub.pos.PosTransactionViewModel
 import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.card.*
 import com.creditclub.pos.model.ConnectionInfo
@@ -52,17 +54,14 @@ import java.util.*
 import kotlin.concurrent.schedule
 
 @SuppressLint("Registered")
-abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
+abstract class CardTransactionActivity : PosActivity() {
     private val posManager: PosManager by inject { parametersOf(this) }
-    internal val sessionData: PosManager.SessionData get() = posManager.sessionData
-    private var amountText = "0"
+    private val sessionData: PosManager.SessionData get() = posManager.sessionData
+    protected val viewModel: PosTransactionViewModel by viewModels()
     protected var previousMessage: CardIsoMsg? = null
-    private var accountType: AccountType? = null
     abstract var transactionType: TransactionType
     private lateinit var cardData: CardData
-    private var cardReaderEvent: CardReaderEvent = CardReaderEvent.CANCELLED
-
-    internal val canPerformTransaction: Boolean
+    private val canPerformTransaction: Boolean
         get() {
             return parameters.run {
                 pinKey.isNotEmpty() && masterKey.isNotEmpty() && sessionKey.isNotEmpty() && managementDataString.isNotEmpty()
@@ -83,6 +82,14 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         }
 
         registerReceiver(mBatInfoReceiver, filter)
+        viewModel.amount.observe(this) {
+            viewModel.amountCurrencyFormat.value = it?.toCurrencyFormat()
+            viewModel.amountNumberFormat.value = it?.format()
+        }
+        viewModel.amountString.observe(this) {
+            viewModel.longAmount.value = it?.toLongOrNull()
+            viewModel.amount.value = (it?.toDoubleOrNull() ?: 0.0) / 100
+        }
     }
 
     private fun checkParameters() {
@@ -154,7 +161,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                 }
 
                 else -> {
-                    cardReaderEvent = cardEvent
+                    viewModel.cardReaderEvent.value = cardEvent
                     restartTimer()
 //                            accountType = AccountType.Default
 //                            onSelectAccountType()
@@ -163,12 +170,24 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                         R.layout.page_select_account_type
                     )
 
+                    val selectAccountTypeListener = View.OnClickListener { view ->
+                        viewModel.accountType.value = when (view?.id) {
+                            R.id.current_radio_button -> AccountType.Current
+                            R.id.savings_radio_button -> AccountType.Savings
+                            R.id.credit_radio_button -> AccountType.Credit
+                            R.id.default_radio_button -> AccountType.Default
+                            else -> null
+                        }
+
+                        onSelectAccountType()
+                    }
+
                     listOf(
                         binding.creditRadioButton,
                         binding.currentRadioButton,
                         binding.defaultRadioButton,
                         binding.savingsRadioButton
-                    ).forEach { it.root.setOnClickListener(this@CardTransactionActivity) }
+                    ).forEach { it.root.setOnClickListener(selectAccountTypeListener) }
 
                     if (cardEvent == CardReaderEvent.CHIP) {
                         mainScope.launch {
@@ -180,11 +199,14 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         }
     }
 
-    private var isTimerRunning = false
-    private var timeoutTimer: TimerTask? = null
+    private var sessionTimer: TimerTask? = null
 
-    private fun createTimer(): TimerTask {
-        return Timer().schedule(60000) {
+    private fun restartTimer() {
+        if (sessionTimer != null) {
+            sessionTimer?.cancel()
+            sessionTimer = null
+        }
+        sessionTimer = Timer().schedule(60000) {
             runOnUiThread {
                 renderTransactionFailure("Timeout due to card holder inactivity")
                 stopTimer()
@@ -192,38 +214,19 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         }
     }
 
-    private fun restartTimer() {
-        if (!isTimerRunning) {
-            isTimerRunning = true
-            timeoutTimer = createTimer()
-        } else {
-            isTimerRunning = false
-            timeoutTimer?.cancel()
-            timeoutTimer = null
-            restartTimer()
-        }
-    }
-
     private fun stopTimer() {
-        if (isTimerRunning) {
-            isTimerRunning = false
-            timeoutTimer?.cancel()
-            timeoutTimer = null
-        }
+        sessionTimer?.cancel()
+        sessionTimer = null
     }
 
     override fun onDestroy() {
-        try {
+        safeRun {
             stopTimer()
             unregisterReceiver(mBatInfoReceiver)
             posManager.cardReader.endWatch()
             posManager.cleanUpEmv()
-        } catch (e: Exception) {
-//            analyticsHelper.logException(e)
-            e.printStackTrace()
-        } finally {
-            super.onDestroy()
         }
+        super.onDestroy()
     }
 
     fun next(view: View?) {
@@ -233,7 +236,8 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
             }
 
             R.id.cancel_button -> {
-                if (amountText.isNotEmpty() && amountText.toLong() > 0) finish()
+                val longAmount = viewModel.longAmount.value
+                if (longAmount != null && longAmount > 0) finish()
                 else renderTransactionFailure("Please Remove Card", "")
             }
 
@@ -243,7 +247,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                         db.financialTransactionDao().byRRN(rrn_field.input.text.toString())
                     } ?: return@open showError("Retrieval Reference Number error")
 
-                    amountText = trn.isoMsg.transactionAmount4?.toInt().toString()
+                    viewModel.amountString.value = trn.isoMsg.transactionAmount4?.toInt().toString()
                     previousMessage = trn.isoMsg
                     requestCard()
                 }
@@ -252,73 +256,67 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
     }
 
     fun readCard() {
-        try {
-            stopTimer()
-            posManager.sessionData.amount = amountText.toLong()
+        stopTimer()
+        posManager.sessionData.amount = viewModel.longAmount.value!!
 
-            val cardLimit: Double = localStorage.agent?.cardLimit ?: 50000.0
-            if (cardLimit < posManager.sessionData.amount / 100) {
-                showError("The limit for this transaction is NGN${cardLimit}")
-                return
-            }
-            sessionData.getDukptConfig = { pan, amount ->
-                posPreferences.binRoutes?.getSupportedRoute(pan, amount)?.dukptConfig
-            }
-            val amountStr = format(amountText)
+        val cardLimit: Double = localStorage.agent?.cardLimit ?: 50000.0
+        if (cardLimit < posManager.sessionData.amount / 100) {
+            showError("The limit for this transaction is NGN${cardLimit}")
+            return
+        }
+        sessionData.getDukptConfig = { pan, amount ->
+            posPreferences.binRoutes?.getSupportedRoute(pan, amount)?.dukptConfig
+        }
 
-            mainScope.launch {
-                posManager.cardReader.endWatch()
-                val cardData = posManager.cardReader.read(amountStr)
-                cardData ?: return@launch renderTransactionFailure("Transaction Cancelled", "")
-                this@CardTransactionActivity.cardData = cardData
+        mainScope.launch {
+            posManager.cardReader.endWatch()
+            val cardData = posManager.cardReader.read(viewModel.amountCurrencyFormat.value!!)
+            cardData ?: return@launch renderTransactionFailure("Transaction Cancelled", "")
+            this@CardTransactionActivity.cardData = cardData
 
-                when (CardTransactionStatus.find(cardData.ret)) {
-                    CardTransactionStatus.Success -> {
+            when (CardTransactionStatus.find(cardData.ret)) {
+                CardTransactionStatus.Success -> {
 
-                        if (cardData.pan.isEmpty()) {
-                            dialogProvider.hideProgressBar()
-                            renderTransactionFailure("Could not read card")
+                    if (cardData.pan.isEmpty()) {
+                        dialogProvider.hideProgressBar()
+                        renderTransactionFailure("Could not read card")
 
-                            return@launch
-                        }
+                        return@launch
+                    }
 
-                        val thisMonth = Instant.now().format("YYMM").toInt()
+                    val thisMonth = Instant.now().format("YYMM").toInt()
 
-                        if (cardData.exp.substring(0, 4).toInt() < thisMonth) {
-                            dialogProvider.hideProgressBar()
-                            renderTransactionFailure("Invalid Card")
+                    if (cardData.exp.substring(0, 4).toInt() < thisMonth) {
+                        dialogProvider.hideProgressBar()
+                        renderTransactionFailure("Invalid Card")
 
-                            return@launch
-                        }
+                        return@launch
+                    }
 
-                        cardData.pinBlock = posManager.sessionData.pinBlock ?: cardData.pinBlock
+                    cardData.pinBlock = posManager.sessionData.pinBlock ?: cardData.pinBlock
 //                        if (cardData.pinBlock.isNullOrBlank()) {
 //                            dialogProvider.hideProgressBar()
 //                            renderTransactionFailure("Could not validate PIN")
 //                            return@launch
 //                        }
 
-                        onReadCard(cardData)
-                    }
-                    CardTransactionStatus.UserCancel -> renderTransactionFailure("Transaction Cancelled")
-                    CardTransactionStatus.Failure -> renderTransactionFailure("Failed to read card")
-                    CardTransactionStatus.Timeout -> renderTransactionFailure("Timeout while reading card")
-                    CardTransactionStatus.OfflinePinVerifyError -> renderTransactionFailure("Wrong PIN. Card Restricted")
-                    CardTransactionStatus.CardRestricted -> renderTransactionFailure("Card Restricted")
-                    CardTransactionStatus.NoPin -> renderTransactionFailure("No PIN entered")
-                    else -> renderTransactionFailure(EmvErrorMessage[cardData.ret])
+                    onReadCard(cardData)
                 }
+                CardTransactionStatus.UserCancel -> renderTransactionFailure("Transaction Cancelled")
+                CardTransactionStatus.Failure -> renderTransactionFailure("Failed to read card")
+                CardTransactionStatus.Timeout -> renderTransactionFailure("Timeout while reading card")
+                CardTransactionStatus.OfflinePinVerifyError -> renderTransactionFailure("Wrong PIN. Card Restricted")
+                CardTransactionStatus.CardRestricted -> renderTransactionFailure("Card Restricted")
+                CardTransactionStatus.NoPin -> renderTransactionFailure("No PIN entered")
+                else -> renderTransactionFailure(EmvErrorMessage[cardData.ret])
             }
-        } catch (ex: Exception) {
-//            analyticsHelper.logException(ex)
-            renderTransactionFailure(ex.message ?: "An internal error occurred")
         }
     }
 
     fun makeRequest(request: ISOMsg) {
         stopTimer()
-        val amount = amountText.toDouble() / 100
-        val supportedRoute = posPreferences.binRoutes?.getSupportedRoute(request.pan!!, amount)
+        val supportedRoute =
+            posPreferences.binRoutes?.getSupportedRoute(request.pan!!, viewModel.amount.value!!)
         val remoteConnectionInfo = supportedRoute ?: config.remoteConnectionInfo
 
         val posParameter = ParameterService(this, remoteConnectionInfo)
@@ -389,6 +387,8 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                     this@CardTransactionActivity,
                     R.layout.page_verify_cashout
                 )
+                binding.lifecycleOwner = this@CardTransactionActivity
+                binding.viewModel = viewModel
 
                 if (response.isSuccessful) {
                     binding.message.text = getString(R.string.transaction_successful)
@@ -418,8 +418,6 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
                     binding.amountText.text = CurrencyFormatter.format(balance)
                     binding.printMerchantCopy.visibility = View.GONE
                 } else {
-                    binding.amountText.text = format(amountText)
-
                     withContext(Dispatchers.IO) {
                         posDatabase.runInTransaction {
                             val posTransaction = PosTransaction.create(response).apply {
@@ -515,13 +513,12 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         }
     }
 
-    fun processingCode(code: String) = "$code${accountType?.code ?: "00"}00"
-
-    override fun onClick(v: View?) = selectAccountType(v)
+    fun processingCode(code: String) = "$code${viewModel.accountType.value?.code ?: "00"}00"
 
     fun onSelectNumber(view: View) {
         restartTimer()
-        if (amountText.length > 7) return
+        val amountString = viewModel.amountString.value
+        if (amountString != null && amountString.length > 7) return
         val num = when (view.id) {
             R.id.number1 -> 1
             R.id.number2 -> 2
@@ -535,58 +532,35 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
             else -> 0
         }
 
-        amountText = "$amountText$num".toLong().toString()
-        amountTv.text = format(amountText).replace("NGN", "")
+        viewModel.amountString.postValue("$amountString$num".toLong().toString())
     }
 
     fun onBackspacePressed(view: View?) {
         restartTimer()
-//        if (amountText.isEmpty()) return
-//        amountText = amountText.substring(0, amountText.length - 1)
-//        if (amountText.isEmpty())
-        amountText = "0"
-        amountTv.text = format(amountText).replace("NGN", "")
+        viewModel.clearAmount()
     }
-
-    fun format(text: String): String = CurrencyFormatter.format(text)
 
     fun goBack(view: View?) {
         onBackPressed()
-    }
-
-    private fun selectAccountType(view: View?) {
-        accountType = when (view?.id) {
-            R.id.current_radio_button -> AccountType.Current
-            R.id.savings_radio_button -> AccountType.Savings
-            R.id.credit_radio_button -> AccountType.Credit
-            R.id.default_radio_button -> AccountType.Default
-            else -> null
-        }
-
-        onSelectAccountType()
     }
 
     fun showAmountPage() {
         restartTimer()
         val binding =
             DataBindingUtil.setContentView<PageInputAmountBinding>(this, R.layout.page_input_amount)
-
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
         title = "Amount"
-        amountText = "0"
-        binding.amountTv.text = format(amountText).replace("NGN", "")
         binding.cancelButton.setOnClickListener {
-            if (amountText.isNotEmpty() && amountText.toLong() > 0) finish()
+            val amount = viewModel.longAmount.value ?: 0L
+            if (amount > 0) finish()
             else renderTransactionFailure("Please Remove Card", "")
         }
         binding.selectAmountButton.setOnClickListener {
-            sessionData.amount = amountText.toLong()
+            sessionData.amount = viewModel.longAmount.value ?: 0L
             sessionData.transactionType = transactionType
             if (sessionData.amount == 0L) {
                 indicateError("Amount cannot be zero", null)
-                return@setOnClickListener
-            }
-            if (amountText.isEmpty()) {
-                indicateError("Please specify amount", null)
                 return@setOnClickListener
             }
 
@@ -594,14 +568,12 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         }
         val presetNumberClickListener = View.OnClickListener { v ->
             restartTimer()
-            amountText = when (v?.id) {
+            viewModel.amountString.value = when (v?.id) {
                 R.id.number2000 -> "200000"
                 R.id.number5000 -> "500000"
                 R.id.number10000 -> "1000000"
-                else -> ""
+                else -> "0"
             }
-
-            amountTv.text = format(amountText).replace("NGN", "")
         }
         binding.number2000.setOnClickListener(presetNumberClickListener)
         binding.number5000.setOnClickListener(presetNumberClickListener)
@@ -628,7 +600,6 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
 
             title = pageTitle
             binding.title = pageTitle
-            amountText = "0"
         }
     }
 
@@ -639,7 +610,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
         message: String = "",
         subMessage: String = "Please remove card"
     ) {
-
+        val cardReaderEvent = viewModel.cardReaderEvent.value
         val binding = DataBindingUtil.setContentView<PageTransactionErrorBinding>(
             this,
             R.layout.page_transaction_error
@@ -656,7 +627,7 @@ abstract class CardTransactionActivity : PosActivity(), View.OnClickListener {
 
     private fun onTransactionDidFinish() {
         posManager.cardReader.endWatch()
-
+        val cardReaderEvent = viewModel.cardReaderEvent.value
         if (cardReaderEvent == CardReaderEvent.CHIP || cardReaderEvent == CardReaderEvent.CHIP_FAILURE) {
             mainScope.launch {
                 posManager.cardReader.onRemoveCard {

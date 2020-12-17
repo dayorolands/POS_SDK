@@ -87,26 +87,6 @@ abstract class PosActivity : CreditClubActivity {
         }
     }
 
-    inline fun printerDependentAction(closeOnFail: Boolean = false, crossinline block: () -> Unit) {
-        return block()
-
-        printer.checkAsync { printerStatus ->
-            if (printerStatus != PrinterStatus.READY) {
-                if (closeOnFail) {
-                    dialogProvider.showError<Nothing>(printerStatus.message) {
-                        onClose {
-                            finish()
-                        }
-                    }
-                } else dialogProvider.showError(printerStatus.message)
-
-                return@checkAsync
-            }
-
-            block()
-        }
-    }
-
     inline fun adminAction(crossinline next: () -> Unit) {
         val passwordType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
 

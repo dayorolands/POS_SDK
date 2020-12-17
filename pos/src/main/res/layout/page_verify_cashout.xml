@@ -4,6 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".CardTransactionActivity">
 
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.creditclub.pos.PosTransactionViewModel" />
+    </data>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,8 +44,8 @@
                 android:id="@+id/message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="20dp"
                 android:gravity="center"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -82,7 +89,7 @@
                     android:id="@+id/amount_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0.00"
+                    android:text="@{viewModel.amountCurrencyFormat,default=`NGN0.00`}"
                     android:textColor="@color/white"
                     android:textSize="20sp" />
             </LinearLayout>
@@ -97,13 +104,13 @@
             android:gravity="bottom|center">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/print_customer_copy"
                 android:layout_width="0dp"
                 android:layout_height="70dp"
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="10dp"
-                android:id="@+id/print_customer_copy"
                 app:cardElevation="3dp">
 
                 <TextView
@@ -117,9 +124,9 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/print_merchant_copy"
                 android:layout_width="0dp"
                 android:layout_height="70dp"
-                android:id="@+id/print_merchant_copy"
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 app:cardBackgroundColor="#FFFFFF"
