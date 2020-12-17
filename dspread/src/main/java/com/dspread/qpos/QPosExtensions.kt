@@ -23,7 +23,7 @@ fun QPOSService.TransactionResult.getMessage(context: Context): String {
             context.getString(R.string.transaction_approved)
         }
         QPOSService.TransactionResult.TERMINATED -> {
-            context.getString(R.string.transaction_terminated)
+            context.getString(R.string.session_timeout)
         }
         QPOSService.TransactionResult.DECLINED -> {
             context.getString(R.string.transaction_declined)
