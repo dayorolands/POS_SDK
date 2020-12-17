@@ -6,17 +6,18 @@ import android.view.MenuItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.databinding.ActivitySupportBinding
 import com.appzonegroup.app.fasttrack.databinding.ItemCaseBinding
+import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.model.CaseDetail
 import com.creditclub.core.data.request.CaseDetailsRequest
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.SimpleBindingAdapter
 import com.creditclub.core.util.*
-import com.creditclub.core.util.delegates.contentView
 import kotlinx.coroutines.launch
 
-class SupportActivity : BaseActivity() {
+class SupportActivity : CreditClubActivity(R.layout.activity_support) {
 
-    private val binding by contentView<SupportActivity, ActivitySupportBinding>(R.layout.activity_support)
+    private val binding: ActivitySupportBinding by dataBinding()
     private val adapter = Adapter(emptyList())
     override val functionId = FunctionIds.SUPPORT
 
@@ -28,7 +29,9 @@ class SupportActivity : BaseActivity() {
         binding.container.layoutManager = LinearLayoutManager(this)
         binding.container.adapter = adapter
 
-        binding.fab.setOnClickListener { startActivity(CaseLogActivity::class.java) }
+        binding.fab.setOnClickListener {
+            startActivity(Intent(this, CaseLogActivity::class.java))
+        }
 
         loadData()
     }
@@ -75,14 +78,19 @@ class SupportActivity : BaseActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.binding.name.text = values[position].subject
             holder.binding.description.text = values[position].description
-            holder.binding.timeTv.text = values[position].dateLogged?.toInstant(CREDIT_CLUB_DATE_PATTERN)?.timeAgo()
+            holder.binding.timeTv.text =
+                values[position].dateLogged?.toInstant(CREDIT_CLUB_DATE_PATTERN)?.timeAgo()
             holder.binding.referenceTv.text = values[position].caseReference
 
             holder.binding.root.setOnClickListener {
-                startActivity(Intent(this@SupportActivity, SupportThreadActivity::class.java).apply {
-                    putExtra("REFERENCE", values[position].caseReference)
-                    putExtra("TITLE", values[position].subject)
-                })
+                startActivity(
+                    Intent(
+                        this@SupportActivity,
+                        SupportThreadActivity::class.java
+                    ).apply {
+                        putExtra("REFERENCE", values[position].caseReference)
+                        putExtra("TITLE", values[position].subject)
+                    })
             }
         }
     }

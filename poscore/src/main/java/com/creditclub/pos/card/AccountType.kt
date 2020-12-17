@@ -1,4 +1,4 @@
-package com.appzonegroup.creditclub.pos.card
+package com.creditclub.pos.card
 
 enum class AccountType(val code: String) {
     Default("00"),

@@ -13,9 +13,10 @@ import com.appzonegroup.app.fasttrack.databinding.ListItemFaqQuestionBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.model.FaqItem
 import com.creditclub.core.data.response.FaqResponse
-import com.creditclub.core.util.delegates.contentView
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.rawContents
 import com.creditclub.core.util.safeRunIO
+import com.creditclub.ui.dataBinding
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder
@@ -23,9 +24,9 @@ import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
-class FaqActivity : BaseActivity() {
+class FaqActivity : CreditClubActivity(R.layout.activity_faq) {
     override val functionId = FunctionIds.FAQS
-    private val binding by contentView<FaqActivity, ActivityFaqBinding>(R.layout.activity_faq)
+    private val binding: ActivityFaqBinding by dataBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
