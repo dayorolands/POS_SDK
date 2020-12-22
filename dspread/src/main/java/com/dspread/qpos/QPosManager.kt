@@ -22,11 +22,11 @@ class QPosManager(activity: CreditClubActivity) : PosManager,
     DialogProvider by activity.dialogProvider {
     private val mainScope = CoroutineScope(Dispatchers.Main)
 
-    internal val pos = QPOSService.getInstance(QPOSService.CommunicationMode.BLUETOOTH);
+    internal val pos = QPOSService.getInstance(QPOSService.CommunicationMode.BLUETOOTH)
     internal val listener = QPosListener(pos, this)
 
-    override val cardReader: CardReader = QPosCardReader(activity, pos, listener, mainScope)
     override val sessionData = PosManager.SessionData()
+    override val cardReader: CardReader = QPosCardReader(activity, pos, listener, mainScope, sessionData)
 
     override suspend fun loadEmv() {
         pos.setContext(activity)

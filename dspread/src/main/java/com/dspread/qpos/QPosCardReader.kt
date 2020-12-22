@@ -4,12 +4,12 @@ import android.bluetooth.BluetoothDevice
 import android.os.Handler
 import android.os.Looper
 import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.util.format
+import com.creditclub.pos.DukptConfig
 import com.creditclub.pos.PosConfig
-import com.creditclub.pos.PosParameter
-import com.creditclub.pos.card.CardData
-import com.creditclub.pos.card.CardReader
-import com.creditclub.pos.card.CardReaderEvent
-import com.creditclub.pos.card.CardReaderEventListener
+import com.creditclub.pos.PosManager
+import com.creditclub.pos.card.*
+import com.creditclub.pos.utils.TripleDesCipher
 import com.dspread.qpos.utils.Dukpt
 import com.dspread.qpos.utils.FileUtils
 import com.dspread.qpos.utils.hexBytes
@@ -18,6 +18,7 @@ import com.dspread.xpos.QPOSService
 import kotlinx.coroutines.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.time.Instant
 import java.util.*
 import kotlin.concurrent.scheduleAtFixedRate
 import kotlin.coroutines.resume
@@ -27,7 +28,8 @@ class QPosCardReader(
     private val activity: CreditClubActivity,
     private val pos: QPOSService,
     private val listener: QPosListener,
-    private val mainScope: CoroutineScope
+    private val mainScope: CoroutineScope,
+    private val sessionData: PosManager.SessionData
 ) : CardReader, KoinComponent {
 
     private val keyIndex = 0
@@ -56,7 +58,10 @@ class QPosCardReader(
     }
 
     override suspend fun read(amountStr: String): CardData? {
-        loadKeys()
+        val terminalTime = Instant.now().format("HHmmss")
+        val cardNo = listener.waitForString { pos.getIccCardNo(terminalTime) } ?: return null
+        if (cardNo.isBlank()) return QposCardData().apply { status = CardTransactionStatus.Failure }
+        loadKeys(cardNo)
         return suspendCoroutine { continuation ->
             listener.cardDataContinuation = continuation
             pos.doTrade(keyIndex, 60)
@@ -97,13 +102,14 @@ class QPosCardReader(
 //        }
     }
 
-    private suspend fun loadKeys() {
-        val bdk = "0123456789ABCDEFFEDCBA9876543210"
+    private suspend fun loadKeys(cardNo: String) {
+        val amount = sessionData.amount / 100.0
+        val dukptConfig = sessionData.getDukptConfig?.invoke(cardNo, amount)
         val ksn = "09118012400705E00000"
-        val ipek = Dukpt.computeKey(bdk.hexBytes, ksn.hexBytes)
-        val ipekString = ipek.hexString
-        val kcvString = Dukpt.encryptTripleDes(ipek, ByteArray(8)).hexString
+        val ipekString = "C22766F7379DD38AA5E1DA8C6AFA75AC"
+        val kcvString = "B2DE27F60A443944" /*Dukpt.encryptTripleDes(ipek, ByteArray(8)).hexString*/
 
+        listener.dukptConfig = dukptConfig
         listener.waitForUnit {
             pos.doUpdateIPEKOperation(
                 "01",
@@ -113,12 +119,16 @@ class QPosCardReader(
                 ksn,
                 ipekString,
                 kcvString,
-                "09118012400705E00000",
-                "C22766F7379DD38AA5E1DA8C6AFA75AC",
-                "B2DE27F60A443944"
+                dukptConfig?.ksn ?: "09118012400705E00000",
+                dukptConfig?.ipek?.padStart(32) ?: "C22766F7379DD38AA5E1DA8C6AFA75AC",
+                dukptConfig?.kcv ?: "B2DE27F60A443944"
             )
         }
     }
+
+    private inline val DukptConfig.kcv: String
+        get() = TripleDesCipher(ipek.padStart(32, '0').hexBytes).encrypt(ByteArray(8)).hexString
+//        get() = Dukpt.encryptTripleDes(ipek.hexBytes, ByteArray(8)).hexString
 
     private suspend fun connectDevice(device: BluetoothDevice): Boolean {
         dialogProvider.showProgressBar("Connecting to mPOS device")

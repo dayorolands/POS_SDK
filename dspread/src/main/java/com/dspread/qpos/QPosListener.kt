@@ -11,7 +11,6 @@ import android.util.Base64
 import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.util.format
-import com.creditclub.core.util.safeRun
 import com.creditclub.pos.DukptConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardData
@@ -41,10 +40,12 @@ class QPosListener(
     private val pos: QPOSService,
     private val qPosManager: QPosManager
 ) : CQPOSService(), KoinComponent {
+    internal var dukptConfig: DukptConfig? = null
     internal var cardDataContinuation: Continuation<CardData?>? = null
     internal var cardEventContinuation: Continuation<CardReaderEvent>? = null
     internal var posConnectContinuation: Continuation<Boolean>? = null
     internal var unitContinuation: Continuation<Unit>? = null
+    internal var stringContinuation: Continuation<String?>? = null
     private var cardData = QposCardData()
     private fun getString(id: Int) = qPosManager.activity.getString(id)
     private val posParameter: PosParameter by inject()
@@ -247,33 +248,30 @@ class QPosListener(
         val pinKsn: String? = c1Tlv?.value
         val pinBlock: String? = c7Tlv?.value
 
-        if (pinKsn == null && pinBlock == null) {
+        if (pinKsn == null || pinBlock == null) {
             cardData.ret = CardTransactionStatus.NoPin.code
             return
         }
 
-        val encryptedPin = DUKPK2009_CBC.getDate(
-            pinKsn,
-            pinBlock,
-            DUKPK2009_CBC.Enum_key.PIN,
-            DUKPK2009_CBC.Enum_mode.CBC
-        )
-        val pan = dates.getValue("5A", hex = false, fpadded = true)
-        val parsCarN = "0000" + pan.substring(
-            pan.length - 13,
-            pan.length - 1
-        )
-        val pinTlv = DUKPK2009_CBC.xor(parsCarN, encryptedPin)
-        val pinLength = pinTlv.substring(0, 2).toInt()
-        val pin = pinTlv.substring(2, 2 + pinLength)
-
-        val amount = sessionData.amount / 100.0
-        val dukptConfig = sessionData.getDukptConfig?.invoke(cardData.pan, amount)
         if (dukptConfig == null) {
+            val encryptedPin = DUKPK2009_CBC.getDate(
+                pinKsn,
+                pinBlock,
+                DUKPK2009_CBC.Enum_key.PIN,
+                DUKPK2009_CBC.Enum_mode.CBC
+            )
+            val pan = dates.getValue("5A", hex = false, fpadded = true)
+            val parsCarN = "0000" + pan.substring(
+                pan.length - 13,
+                pan.length - 1
+            )
+            val pinTlv = DUKPK2009_CBC.xor(parsCarN, encryptedPin)
+            val pinLength = pinTlv.substring(0, 2).toInt()
+            val pin = pinTlv.substring(2, 2 + pinLength)
             cardData.pinBlock = encryptedPinBlock(cardData.pan, pin).hexString
         } else {
-            cardData.pinBlock = dukptPinBlock(dukptConfig, cardData.pan, pin).hexString
-            cardData.ksnData = dukptConfig.ksn
+            cardData.pinBlock = pinBlock // dukptPinBlock(dukptConfig, cardData.pan, pin).hexString
+            cardData.ksnData = pinKsn // dukptConfig.ksn
         }
     }
 
@@ -447,9 +445,8 @@ class QPosListener(
         statusEditText.setText(content)
     }
 
-    override fun onGetCardNoResult(cardNo: String) { //获取卡号的回调
-        TRACE.d("onGetCardNoResult(String cardNo):$cardNo")
-        statusEditText.setText("cardNo: $cardNo")
+    override fun onGetCardNoResult(cardNo: String?) {
+        handleStringContinuation(cardNo)
     }
 
     override fun onRequestCalculateMac(calMac: String) {
@@ -724,9 +721,9 @@ class QPosListener(
     }
 
     override fun onQposKsnResult(arg0: Hashtable<String, String>) {
-//        val pinKsn = arg0["pinKsn"]
-//        val trackKsn = arg0["trackKsn"]
-//        val emvKsn = arg0["emvKsn"]
+        val pinKsn = arg0["pinKsn"]
+        val trackKsn = arg0["trackKsn"]
+        val emvKsn = arg0["emvKsn"]
     }
 
     override fun onQposDoGetTradeLog(arg0: String, arg1: String) {}
@@ -904,6 +901,12 @@ class QPosListener(
         continuation.resume(Unit)
     }
 
+    private fun handleStringContinuation(string: String?) {
+        val continuation = stringContinuation ?: return
+        stringContinuation = null
+        continuation.resume(string)
+    }
+
     private fun handleCardData() {
         val continuation = cardDataContinuation ?: return
         cardDataContinuation = null
@@ -919,6 +922,12 @@ class QPosListener(
     internal suspend inline fun waitForUnit(crossinline block: () -> Unit) =
         suspendCoroutine<Unit> {
             unitContinuation = it
+            block()
+        }
+
+    internal suspend inline fun waitForString(crossinline block: () -> Unit?) =
+        suspendCoroutine<String?> {
+            stringContinuation = it
             block()
         }
 
@@ -941,12 +950,5 @@ class QPosListener(
         val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
         val tripleDesCipher = TripleDesCipher(cipherKey)
         return tripleDesCipher.encrypt(cryptData).copyOf(8)
-    }
-
-    private fun dukptPinBlock(dukptConfig: DukptConfig, pan: String, pin: String): ByteArray {
-        val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
-        val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
-        val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
-        return Dukpt.encryptTripleDes(dukptConfig.ipek.hexBytes, cryptData).copyOf(8)
     }
 }
