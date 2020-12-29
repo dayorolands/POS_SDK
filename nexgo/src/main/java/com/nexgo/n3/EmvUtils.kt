@@ -9,6 +9,7 @@ import com.google.gson.JsonParser
 import com.nexgo.oaf.apiv3.emv.*
 import java.io.IOException
 import java.util.*
+import kotlin.jvm.Throws
 
 @Throws(IOException::class)
 fun getDefaultCapkList(context: Context): List<CapkEntity> {

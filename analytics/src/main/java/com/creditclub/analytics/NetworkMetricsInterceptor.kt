@@ -19,17 +19,22 @@ class NetworkMetricsInterceptor : Interceptor, KoinComponent {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        val networkMeasurement = NetworkMeasurement().apply {
-            institutionCode = localStorage.institutionCode
-            agentPhoneNumber = localStorage.agentPhone
-            agentCode = localStorage.agent?.agentCode
-            gpsCoordinates = localStorage.lastKnownLocation
-            url = request.url.encodedPath
-            method = request.method
-            requestTime = Instant.now()
-            appName = backendConfig.appName
-            appVersion = backendConfig.versionName
-        }
+        val url = request.url
+        val flowName = url.queryParameter("FlowName")
+        val flowId = url.queryParameter("FlowID")
+        val networkMeasurement = NetworkMeasurement(
+            institutionCode = localStorage.institutionCode,
+            agentPhoneNumber = localStorage.agentPhone,
+            agentCode = localStorage.agent?.agentCode,
+            gpsCoordinates = localStorage.lastKnownLocation,
+            url = url.encodedPath,
+            method = request.method,
+            requestTime = Instant.now(),
+            appName = backendConfig.appName,
+            appVersion = backendConfig.versionName,
+            flowName = flowName,
+            flowId = flowId,
+        )
 
         var response: Response? = null
         var error: Throwable? = null

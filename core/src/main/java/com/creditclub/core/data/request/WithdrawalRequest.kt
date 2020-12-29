@@ -38,11 +38,11 @@ class WithdrawalRequest {
     var retrievalReferenceNumber: String? = generateRRN()
 
     @Serializable
-    class Additional {
+    data class Additional(
         @SerialName("Currency")
-        var currency = ""
+        var currency: String? = "",
 
         @SerialName("CustomerPhoneNumber")
-        var customerPhoneNumber: String? = null
-    }
+        var customerPhoneNumber: String? = null,
+    )
 }

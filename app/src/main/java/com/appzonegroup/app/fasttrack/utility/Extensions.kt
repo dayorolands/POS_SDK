@@ -8,7 +8,6 @@ import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.fragment.HomeFragmentDirections
 import com.appzonegroup.app.fasttrack.fragment.SubMenuFragmentDirections
 import com.appzonegroup.app.fasttrack.model.AppConstants
-import com.appzonegroup.app.fasttrack.model.CustomerAccount
 import com.appzonegroup.creditclub.pos.CardMainMenuActivity
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.model.BillCategory
@@ -125,7 +124,9 @@ fun CreditClubFragment.openPageById(id: Int) {
                 )
             ) {
                 onSubmit { accountInfo ->
-                    (requireActivity() as CreditClubActivity).customerBalanceEnquiry(accountInfo)
+                    mainScope.launch {
+                        (requireActivity() as CreditClubActivity).customerBalanceEnquiry(accountInfo)
+                    }
                 }
             }
         }

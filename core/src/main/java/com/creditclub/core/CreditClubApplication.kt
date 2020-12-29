@@ -14,11 +14,7 @@ import org.koin.android.ext.android.get
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
  * Appzone Ltd
  */
-open class CreditClubApplication : Application(), Configuration.Provider {
-    override fun getWorkManagerConfiguration() =
-        Configuration.Builder()
-            .setMinimumLoggingLevel(if (BuildConfig.DEBUG) android.util.Log.DEBUG else android.util.Log.INFO)
-            .build()
+open class CreditClubApplication : Application() {
 
     open val otaAppName: String get() = getString(R.string.ota_app_name)
 

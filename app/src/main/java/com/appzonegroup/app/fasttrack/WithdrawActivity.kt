@@ -20,7 +20,7 @@ import kotlinx.serialization.json.Json
  * Created by DELL on 2/27/2017.
  */
 
-class WithdrawActivity : CustomerBaseActivity() {
+class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
 
     private val binding by contentView<WithdrawActivity, ActivityWithdrawBinding>(
         R.layout.activity_withdraw
@@ -80,7 +80,7 @@ class WithdrawActivity : CustomerBaseActivity() {
         }
 
         binding.sendTokenBtn.setOnClickListener {
-            mainScope.launch { sendToken() }
+            mainScope.launch { trySendToken() }
         }
 
         binding.withdrawBtn.setOnClickListener {
@@ -92,7 +92,7 @@ class WithdrawActivity : CustomerBaseActivity() {
         }
     }
 
-    private fun sendToken() {
+    private suspend fun trySendToken() {
         val amount = viewModel.amountString.value!!.trim { it <= ' ' }
         if (amount.isEmpty()) {
             dialogProvider.showError(getString(R.string.please_enter_an_amount))
@@ -106,15 +106,12 @@ class WithdrawActivity : CustomerBaseActivity() {
             return
         }
 
-        sendToken(accountInfo, TokenType.Withdrawal, amount.toDouble()) {
-            onSubmit {
-                viewModel.tokenSent.value = true
-                binding.withdrawalAmountEt.isEnabled = false
-                binding.topLayout.isEnabled = false
-                binding.sendTokenBtn.visibility = View.GONE
-                binding.tokenBlock.visibility = View.VISIBLE
-            }
-        }
+        viewModel.tokenSent.value = sendToken(accountInfo, TokenType.Withdrawal, amount.toDouble())
+
+        binding.withdrawalAmountEt.isEnabled = false
+        binding.topLayout.isEnabled = false
+        binding.sendTokenBtn.visibility = View.GONE
+        binding.tokenBlock.visibility = View.VISIBLE
     }
 
     private fun onWithdrawClick() {
@@ -172,12 +169,11 @@ class WithdrawActivity : CustomerBaseActivity() {
         request.institutionCode = localStorage.institutionCode
         request.token = token
 
-        val additionalInformation = WithdrawalRequest.Additional().apply {
-            customerPhoneNumber = accountInfo.phoneNumber ?: viewModel.phoneNumber.value
-        }
         request.additionalInformation = Json.encodeToString(
             WithdrawalRequest.Additional.serializer(),
-            additionalInformation
+            WithdrawalRequest.Additional(
+                customerPhoneNumber = accountInfo.phoneNumber ?: viewModel.phoneNumber.value,
+            )
         )
 
         dialogProvider.requestPIN("Enter agent PIN") {

@@ -22,7 +22,7 @@ import com.creditclub.core.ui.widget.DialogListenerBlock
 
 object Dialogs {
 
-    fun getProgress(activity: Context, header: String?): Dialog {
+    fun getProgress(activity: Context, header: CharSequence?): Dialog {
         val dialog = getDialog(R.layout.dialog_progress_layout, activity)
         header?.also { dialog.findViewById<TextView>(R.id.header_tv).text = header }
 
@@ -44,90 +44,7 @@ object Dialogs {
         return dialog
     }
 
-    fun getErrorDialog(activity: Activity, message: String?): Dialog {
-        val dialog = getDialog(R.layout.dialog_error, activity)
-        message?.also { dialog.findViewById<TextView>(R.id.message_tv).text = message }
-        dialog.findViewById<View>(R.id.close_btn).setOnClickListener { dialog.dismiss() }
-
-        return dialog
-    }
-
-    fun getSuccessDialog(activity: Activity, message: String?): Dialog {
-        val dialog = getDialog(R.layout.dialog_success, activity)
-        message?.also { dialog.findViewById<TextView>(R.id.message_tv).text = message }
-        dialog.findViewById<View>(R.id.close_btn).setOnClickListener { dialog.dismiss() }
-
-        return dialog
-    }
-
-//    fun getProgressDialog(activity: Activity, msg: String): ProgressDialog {
-//        val progressDialog = ProgressDialog(activity)
-//        progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-//        progressDialog.setMessage(msg)
-//        progressDialog.show()
-//
-//        return progressDialog
-//    }
-//
-//    fun getAlertDialog(context: Context, msg: String): AlertDialog {
-//        val builder1 = AlertDialog.Builder(context)
-//        builder1.setMessage(msg)
-//        builder1.setCancelable(true)
-//
-//        builder1.setPositiveButton(
-//            "Ok"
-//        ) { dialog, id -> dialog.cancel() }
-//
-//
-//        return builder1.create()
-//    }
-
-    fun confirm(
-        context: Context,
-        title: String = "Confirm",
-        subtitle: String = "Are you sure?",
-        config: DialogListenerBlock<Boolean>? = null
-    ): Dialog {
-        val dialog = getDialog(context)
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(true)
-        val dialogConfig by lazy {
-            if (config != null) DialogListener.create(config)
-            else null
-        }
-        val binding = DataBindingUtil.inflate<DialogConfirmBinding>(
-            LayoutInflater.from(context),
-            R.layout.dialog_confirm,
-            null,
-            false
-        )
-        dialog.setContentView(binding.root)
-        binding.title = title
-        binding.subtitle = subtitle
-        binding.okButton.setOnClickListener {
-            if (config != null) {
-                dialog.dismiss()
-                dialogConfig?.submit(dialog, true)
-            }
-        }
-        binding.cancelButton.setOnClickListener {
-            if (config != null) {
-                dialog.dismiss()
-                dialogConfig?.close()
-            }
-        }
-        dialog.setOnCancelListener {
-            if (config != null) {
-                dialog.dismiss()
-                dialogConfig?.close()
-            }
-        }
-        dialog.show()
-
-        return dialog
-    }
-
-    fun getInformationDialog(activity: Activity, message: String?, shouldClose: Boolean): Dialog {
+    fun getInformationDialog(activity: Activity, message: CharSequence?, shouldClose: Boolean): Dialog {
         val dialog = getDialog(R.layout.dialog_info_success, activity)
         if (message != null)
             (dialog.findViewById(R.id.message_tv) as TextView).text = message

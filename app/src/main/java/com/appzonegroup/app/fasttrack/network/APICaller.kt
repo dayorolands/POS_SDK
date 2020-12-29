@@ -1,17 +1,14 @@
 package com.appzonegroup.app.fasttrack.network
 
 import android.content.Context
-import com.appzonegroup.app.fasttrack.BuildConfig
 import com.creditclub.core.util.safeRun
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.core.KoinComponent
 import org.koin.core.get
 import org.koin.core.qualifier.named
-import java.util.concurrent.TimeUnit
 
 /**
  * Created by Joseph on 6/3/2016.

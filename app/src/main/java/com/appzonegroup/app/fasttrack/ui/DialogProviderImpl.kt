@@ -1,9 +1,14 @@
 package com.appzonegroup.app.fasttrack.ui
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
+import android.view.Window
 import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.TextView
@@ -42,17 +47,17 @@ interface DialogProviderImpl : DialogProvider {
         }
     }
 
-    override fun showError(message: String?) {
+    override fun showError(message: CharSequence?) {
         activity.runOnUiThread {
             hideProgressBar()
-            Dialogs.getErrorDialog(activity, message).show()
+            getErrorDialog(activity, message).show()
         }
     }
 
-    override fun <T> showError(message: String?, block: DialogListenerBlock<T>?) {
+    override fun <T> showError(message: CharSequence?, block: DialogListenerBlock<T>?) {
         activity.runOnUiThread {
             hideProgressBar()
-            val dialog = Dialogs.getErrorDialog(activity, message)
+            val dialog = getErrorDialog(activity, message)
 
             dialog.close_btn.setOnClickListener {
                 dialog.dismiss()
@@ -63,7 +68,7 @@ interface DialogProviderImpl : DialogProvider {
         }
     }
 
-    override fun <T> showInfo(message: String?, block: DialogListenerBlock<T>?) {
+    override fun <T> showInfo(message: CharSequence?, block: DialogListenerBlock<T>?) {
         val listener = block?.build()
         val dialog = Dialogs.getInformationDialog(activity, message, false)
 
@@ -78,17 +83,17 @@ interface DialogProviderImpl : DialogProvider {
         }
     }
 
-    override fun showSuccess(message: String?) {
+    override fun showSuccess(message: CharSequence?) {
         activity.runOnUiThread {
             hideProgressBar()
-            Dialogs.getSuccessDialog(activity, message).show()
+            getSuccessDialog(activity, message).show()
         }
     }
 
-    override fun <T> showSuccess(message: String?, block: DialogListenerBlock<T>) {
+    override fun <T> showSuccess(message: CharSequence?, block: DialogListenerBlock<T>) {
         activity.runOnUiThread {
             hideProgressBar()
-            val dialog = Dialogs.getSuccessDialog(activity, message)
+            val dialog = getSuccessDialog(activity, message)
             val listener = DialogListener.create(block)
 
             dialog.close_btn.setOnClickListener {
@@ -100,7 +105,7 @@ interface DialogProviderImpl : DialogProvider {
         }
     }
 
-    override fun indicateError(message: String?, view: EditText?) {
+    override fun indicateError(message: CharSequence?, view: EditText?) {
         hideProgressBar()
         view?.also {
             view.isFocusable = true
@@ -114,8 +119,8 @@ interface DialogProviderImpl : DialogProvider {
 
 
     fun <T> handleProgressBar(
-        title: String = activity.resources.getString(R.string.loading),
-        message: String? = activity.resources.getString(R.string.please_wait),
+        title: CharSequence = activity.resources.getString(R.string.loading),
+        message: CharSequence? = activity.resources.getString(R.string.please_wait),
         isCancellable: Boolean = false,
         block: DialogListenerBlock<T>? = null
     ): Dialog {
@@ -146,31 +151,31 @@ interface DialogProviderImpl : DialogProvider {
     }
 
     override fun <T> showProgressBar(
-        title: String,
-        message: String?,
+        title: CharSequence,
+        message: CharSequence?,
         isCancellable: Boolean,
         block: (DialogListenerBlock<T>)?
     ): Dialog {
         return handleProgressBar(title, message, isCancellable, block)
     }
 
-    override fun showProgressBar(title: String): Dialog {
+    override fun showProgressBar(title: CharSequence): Dialog {
         return handleProgressBar<Nothing>(title)
     }
 
-    override fun showProgressBar(title: String, message: String?): Dialog {
+    override fun showProgressBar(title: CharSequence, message: CharSequence?): Dialog {
         return handleProgressBar<Nothing>(title, message)
     }
 
     override fun showProgressBar(
-        title: String,
-        message: String?,
+        title: CharSequence,
+        message: CharSequence?,
         block: (DialogListener<Nothing>.() -> Unit)?
     ): Dialog {
         return handleProgressBar(title, message, block = block)
     }
 
-    override fun requestPIN(title: String, block: DialogListenerBlock<String>) {
+    override fun requestPIN(title: CharSequence, block: DialogListenerBlock<String>) {
         val dialog = Dialogs.getDialog(activity)
         dialog.setCancelable(true)
         dialog.setCanceledOnTouchOutside(false)
@@ -217,7 +222,7 @@ interface DialogProviderImpl : DialogProvider {
     }
 
     override fun showCustomerRequestOptions(
-        title: String,
+        title: CharSequence,
         available: Array<CustomerRequestOption>,
         block: DialogListenerBlock<CustomerRequestOption>
     ) {
@@ -338,7 +343,7 @@ interface DialogProviderImpl : DialogProvider {
     }
 
     override fun showOptions(
-        title: String,
+        title: CharSequence,
         options: List<DialogOptionItem>,
         block: DialogListenerBlock<Int>
     ) {
@@ -421,5 +426,21 @@ interface DialogProviderImpl : DialogProvider {
 
             dialog.show()
         }
+    }
+
+    private fun getErrorDialog(activity: Activity, message: CharSequence?): Dialog {
+        val dialog = Dialogs.getDialog(R.layout.dialog_error, activity)
+        message?.also { dialog.findViewById<TextView>(R.id.message_tv).text = message }
+        dialog.findViewById<View>(R.id.close_btn).setOnClickListener { dialog.dismiss() }
+
+        return dialog
+    }
+
+    private fun getSuccessDialog(activity: Activity, message: CharSequence?): Dialog {
+        val dialog = Dialogs.getDialog(R.layout.dialog_success, activity)
+        message?.also { dialog.findViewById<TextView>(R.id.message_tv).text = message }
+        dialog.findViewById<View>(R.id.close_btn).setOnClickListener { dialog.dismiss() }
+
+        return dialog
     }
 }

@@ -477,7 +477,7 @@ class OfflineTransactionListener(
         Log.d("TransactionListener", "IC card track:" + out.track)
         cardno = out.pan
         Looper.prepare()
-        dialogProvider.confirm(DialogConfirmParams("Confirm card number", cardno?:"")) {
+        dialogProvider.confirm(DialogConfirmParams("Confirm card number", cardno)) {
             onSubmit {
                 try {
                     ServiceManager.getInstence().pboc.confirmCardInfo()

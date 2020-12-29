@@ -9,6 +9,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
+import android.widget.TextView
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.ui.SurveyDialog
 import com.appzonegroup.app.fasttrack.utility.LocalStorage
@@ -31,25 +32,28 @@ import com.creditclub.core.util.delegates.jsonStore
 import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.api.posApiService
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 import retrofit2.create
 
-class LoginActivity : CreditClubActivity() {
+class LoginActivity : CreditClubActivity(R.layout.activity_login) {
 
     private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.navigationBarColor = getColor(R.color.colorPrimary)
         }
+        findViewById<TextView>(R.id.version_tv).text = "Version ${packageInfo?.versionName}"
         debugOnly {
             val debugInfo = "Version ${packageInfo?.versionName}. ${BuildConfig.BUILD_TYPE}"
-            version_tv.text = debugInfo
-            login_phoneNumber.setText(localStorage.agentPhone)
+            findViewById<TextView>(R.id.version_tv).text = debugInfo
+            findViewById<EditText>(R.id.login_phoneNumber).setText(localStorage.agentPhone)
+        }
+        val agentName = localStorage.agent?.agentName
+        if (agentName != null) {
+            findViewById<TextView>(R.id.welcome_message_tv).text = "Welcome back, $agentName"
         }
 
         findViewById<EditText>(R.id.login_phoneNumber).also {

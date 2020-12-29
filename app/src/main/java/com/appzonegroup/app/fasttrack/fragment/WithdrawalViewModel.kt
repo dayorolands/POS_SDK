@@ -14,7 +14,4 @@ class WithdrawalViewModel : ViewModel() {
     val accountInfo: MutableLiveData<AccountInfo> = MutableLiveData()
     val accountName = Transformations.map(accountInfo) { it?.accountName }
     val showPhoneNumberInput = MutableLiveData<Boolean>()
-//    Transformations.map(accountInfo) {
-//        hasExternalToken.value == true && it?.phoneNumber == null
-//    }
 }
