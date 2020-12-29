@@ -13,7 +13,6 @@ import com.appzonegroup.app.fasttrack.adapter.BillerAdapter
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.model.Biller
 import com.appzonegroup.app.fasttrack.network.APICaller
-import com.appzonegroup.app.fasttrack.network.ApiServiceObject.BASE_URL
 import com.appzonegroup.app.fasttrack.scheduler.AndroidSchedulers
 import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
 import com.appzonegroup.app.fasttrack.utility.Dialogs
@@ -203,4 +202,8 @@ class BillerActivity : BaseActivity(), View.OnClickListener {
         })
     }
 
+    companion object {
+        private const val HOST = BuildConfig.API_HOST
+        const val BASE_URL = "$HOST/CreditClubMiddlewareAPI"
+    }
 }

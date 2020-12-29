@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.appzonegroup.app.fasttrack.fragment.WithdrawalViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -32,83 +35,14 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/ten_dp"
-                        app:cardCornerRadius="@dimen/four_dp"
-                        app:cardElevation="@dimen/zero_dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:visibility="gone">
-
-                            <CheckBox
-                                android:id="@+id/phone_no_check_box"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="@dimen/ten_dp"
-                                android:layout_marginRight="@dimen/ten_dp"
-                                android:layout_marginBottom="@dimen/ten_dp"
-                                android:text="@string/use_customer_s_account_number" />
-
-                            <com.appzonegroup.app.fasttrack.ui.EditText
-                                android:id="@+id/wcustomer_account_number_et"
-                                style="@style/defaultEditText"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:drawableStart="@drawable/ic_person"
-                                android:drawableLeft="@drawable/ic_person"
-                                android:hint="@string/accountNumber_hint"
-                                android:inputType="number"
-                                android:maxLength="10"
-                                android:visibility="gone" />
-
-
-                            <com.appzonegroup.app.fasttrack.ui.EditText
-                                android:id="@+id/customer_phone_number_et"
-                                style="@style/defaultEditText"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:drawableStart="@drawable/ic_phone"
-                                android:drawableLeft="@drawable/ic_phone"
-                                android:hint="@string/phoneNumber_hint"
-                                android:inputType="phone"
-                                android:maxLength="11" />
-
-                            <Spinner
-                                android:id="@+id/accounts_spinner"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="@dimen/fifteen_dp"
-                                android:layout_marginRight="@dimen/fifteen_dp"
-                                android:entries="@array/account_selection" />
-
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-
-                    <!-- <com.appzonegroup.app.fasttrack.ui.EditText
-                         android:id="@+id/wcustomer_account_number_et"
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         style="@style/defaultEditText"
-                         android:maxLength="10"
-                         android:hint="@string/accountNumber_hint"
-                         android:inputType="number"/>-->
-
-
                     <com.appzonegroup.app.fasttrack.ui.EditText
                         android:id="@+id/account_info_et"
                         style="@style/defaultEditText"
                         android:layout_width="match_parent"
                         android:layout_height="53dp"
                         android:drawableStart="@drawable/ic_person"
-                        android:drawableLeft="@drawable/ic_person"
-                        android:hint="Account Info"
-                        android:inputType="number" />
+                        android:editable="false"
+                        android:hint="@string/account_info" />
 
                     <com.appzonegroup.app.fasttrack.ui.EditText
                         android:id="@+id/withdrawal_amount_et"
@@ -117,7 +51,8 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/depositAmount_hint"
                         android:inputType="number"
-                        android:maxLength="11" />
+                        android:text="@={viewModel.amountString}"
+                        android:maxLength="7" />
 
 
                     <com.appzonegroup.app.fasttrack.ui.CustomButton
@@ -126,7 +61,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/form_margin_horizontal"
-                        android:onClick="send_token_clicked"
                         android:text="@string/send_token_to_customer" />
 
                 </LinearLayout>
@@ -140,14 +74,26 @@
                     android:visibility="gone">
 
                     <com.appzonegroup.app.fasttrack.ui.EditText
+                        android:id="@+id/customer_phone_number_et"
+                        style="@style/defaultEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="53dp"
+                        android:drawableStart="@drawable/ic_phone"
+                        android:hint="@string/customer_phone_number"
+                        android:inputType="phone"
+                        app:goneUnless="@{viewModel.showPhoneNumberInput}"
+                        android:text="@={viewModel.phoneNumber}"
+                        android:maxLength="11" />
+
+                    <com.appzonegroup.app.fasttrack.ui.EditText
                         android:id="@+id/customer_pin_et"
-                        android:visibility="gone"
                         style="@style/defaultEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/customerPIN"
                         android:inputType="numberPassword"
-                        android:maxLength="4" />
+                        android:maxLength="4"
+                        android:visibility="gone" />
 
                     <com.appzonegroup.app.fasttrack.ui.EditText
                         android:id="@+id/token_et"
@@ -156,8 +102,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/customer_token"
                         android:inputType="number"
-                        android:maxLength="5" />
-
+                        android:maxLength="10" />
 
                     <com.appzonegroup.app.fasttrack.ui.CustomButton
                         android:id="@+id/withdraw_btn"
@@ -166,7 +111,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="@dimen/form_margin_horizontal"
                         android:layout_marginRight="@dimen/form_margin_horizontal"
-                        android:onClick="withdraw_button_click"
                         android:text="@string/withdraw" />
 
                 </LinearLayout>

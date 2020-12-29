@@ -9,6 +9,7 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityBillpaymentBinding
 import com.appzonegroup.app.fasttrack.model.Biller
 import com.appzonegroup.app.fasttrack.model.BillerItem
 import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
+import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.api.BillsPaymentService
@@ -242,5 +243,10 @@ class BillPaymentActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    private fun showNotification(message: String) {
+        dialogProvider.hideProgressBar()
+        dialogProvider.showInfo(message)
     }
 }

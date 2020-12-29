@@ -18,51 +18,57 @@ interface DialogProvider {
 
     fun hideProgressBar()
 
-    fun showError(message: String?)
+    fun showError(message: CharSequence?) = showError<Nothing>(message, null)
 
-    fun <T> showError(message: String?, block: DialogListenerBlock<T>?)
+    fun <T> showError(message: CharSequence?, block: DialogListenerBlock<T>?)
 
-    fun <T> showInfo(message: String?, block: DialogListenerBlock<T>?)
+    fun <T> showInfo(message: CharSequence?, block: DialogListenerBlock<T>?)
 
-    fun showInfo(message: String?) = showInfo<Nothing>(message, null)
+    fun showInfo(message: CharSequence?) = showInfo<Nothing>(message, null)
 
-    fun showSuccess(message: String?)
+    fun showSuccess(message: CharSequence?)
 
-    fun <T> showSuccess(message: String?, block: DialogListenerBlock<T>)
+    fun <T> showSuccess(message: CharSequence?, block: DialogListenerBlock<T>)
 
-    fun indicateError(message: String?, view: EditText?)
+    fun indicateError(message: CharSequence?, view: EditText?)
 
     fun <T> showProgressBar(
-        title: String,
-        message: String?,
+        title: CharSequence,
+        message: CharSequence?,
         isCancellable: Boolean,
         block: DialogListenerBlock<T>?
     ): Dialog
 
-    fun showProgressBar(title: String): Dialog
+    fun showProgressBar(title: CharSequence): Dialog {
+        return showProgressBar<Nothing>(title, null, false, null)
+    }
 
-    fun showProgressBar(title: String, message: String?): Dialog
+    fun showProgressBar(title: CharSequence, message: CharSequence?): Dialog {
+        return showProgressBar<Nothing>(title, message, false, null)
+    }
 
     fun showProgressBar(
-        title: String,
-        message: String?,
+        title: CharSequence,
+        message: CharSequence?,
         block: DialogListenerBlock<Nothing>?
-    ): Dialog
+    ): Dialog {
+        return showProgressBar(title, message, false, block)
+    }
 
-    fun requestPIN(title: String, block: DialogListenerBlock<String>) {
+    fun requestPIN(title: CharSequence, block: DialogListenerBlock<String>) {
         showError("PIN dialog not implemented", block)
     }
 
-    fun requestAgentPIN(title: String, block: DialogListenerBlock<String>) {
+    fun requestAgentPIN(title: CharSequence, block: DialogListenerBlock<String>) {
         requestPIN("Enter agent PIN", block)
     }
 
-    fun requestCustomerPIN(title: String, block: DialogListenerBlock<String>) {
+    fun requestCustomerPIN(title: CharSequence, block: DialogListenerBlock<String>) {
         requestPIN("Enter Customer PIN", block)
     }
 
     fun showCustomerRequestOptions(
-        title: String,
+        title: CharSequence,
         available: Array<CustomerRequestOption>,
         block: DialogListenerBlock<CustomerRequestOption>
     ) {
@@ -78,7 +84,7 @@ interface DialogProvider {
     }
 
     fun showOptions(
-        title: String,
+        title: CharSequence,
         options: List<DialogOptionItem>,
         block: DialogListenerBlock<Int>
     ) {
@@ -89,7 +95,9 @@ interface DialogProvider {
         showError("Confirmation dialog not implemented", block)
     }
 
-    fun confirm(title: String, subtitle: String?, block: DialogListenerBlock<Boolean>?) {
-        confirm(DialogConfirmParams(title, subtitle ?: ""), block)
-    }
+    fun confirm(
+        title: CharSequence,
+        subtitle: CharSequence?,
+        block: DialogListenerBlock<Boolean>?
+    ) = confirm(DialogConfirmParams(title, subtitle), block)
 }

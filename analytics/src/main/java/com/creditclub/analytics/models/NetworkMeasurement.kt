@@ -11,51 +11,57 @@ import java.time.Instant
 
 @Entity
 @Serializable
-class NetworkMeasurement {
+data class NetworkMeasurement(
     @Id
     @SerialName("ID")
-    var id: Long = 0
+    var id: Long = 0,
 
     @SerialName("AgentCode")
-    var agentCode: String? = null
+    var agentCode: String? = null,
 
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null
+    var agentPhoneNumber: String? = null,
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = null
+    var institutionCode: String? = null,
 
     @SerialName("Url")
-    var url: String? = null
+    var url: String? = null,
 
     @SerialName("Method")
-    var method: String? = null
+    var method: String? = null,
 
     @SerialName("GPSCoordinates")
-    var gpsCoordinates: String? = null
+    var gpsCoordinates: String? = null,
 
     @SerialName("StatusCode")
-    var statusCode: Int = 0
+    var statusCode: Int = 0,
 
     @SerialName("AppName")
-    var appName: String? = null
+    var appName: String? = null,
 
     @SerialName("AppVersion")
-    var appVersion: String? = null
+    var appVersion: String? = null,
 
     @SerialName("Message")
-    var message: String? = null
+    var message: String? = null,
 
     @SerialName("Duration")
-    var duration: Long = 0
+    var duration: Long = 0,
+
+    @SerialName("FlowName")
+    var flowName: String? = null,
+
+    @SerialName("FlowID")
+    var flowId: String? = null,
 
     @Serializable(with = TimeInstantSerializer::class)
     @Convert(converter = TimeInstantConverter::class, dbType = String::class)
     @SerialName("RequestTime")
-    var requestTime: Instant? = null
+    var requestTime: Instant? = null,
 
     @Serializable(with = TimeInstantSerializer::class)
     @Convert(converter = TimeInstantConverter::class, dbType = String::class)
     @SerialName("ResponseTime")
-    var responseTime: Instant? = null
-}
+    var responseTime: Instant? = null,
+)

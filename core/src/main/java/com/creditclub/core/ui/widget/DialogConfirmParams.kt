@@ -6,8 +6,8 @@ package com.creditclub.core.ui.widget
  * Appzone Ltd
  */
 data class DialogConfirmParams(
-    val title: String,
-    val subtitle: String = "",
-    val yesButtonTex: String = "Ok",
-    val noButtonTex: String = "Cancel"
+    val title: CharSequence,
+    val subtitle: CharSequence? = null,
+    val yesButtonTex: CharSequence = "Ok",
+    val noButtonTex: CharSequence = "Cancel"
 )

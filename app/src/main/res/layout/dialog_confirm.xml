@@ -6,11 +6,11 @@
 
         <variable
             name="title"
-            type="String" />
+            type="CharSequence" />
 
         <variable
             name="subtitle"
-            type="String" />
+            type="CharSequence" />
     </data>
 
     <LinearLayout

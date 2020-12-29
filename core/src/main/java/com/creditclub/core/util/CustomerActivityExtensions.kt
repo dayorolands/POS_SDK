@@ -13,8 +13,6 @@ import com.creditclub.core.ui.widget.DialogListener
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.ui.widget.TextFieldParams
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import java.security.SecureRandom
@@ -68,7 +66,7 @@ fun CreditClubActivity.requireAccountInfo(
 
             dialogProvider.showInput(params) {
                 onSubmit { text ->
-                    GlobalScope.launch(Dispatchers.Main) {
+                    mainScope.launch {
                         val staticService = creditClubMiddleWareAPI.staticService
                         val institutionCode = localStorage.institutionCode
 
@@ -186,56 +184,51 @@ fun CreditClubActivity.requireAccountInfo(
     }
 }
 
-fun CreditClubActivity.sendToken(
+suspend fun CreditClubActivity.sendToken(
     accountInfo: AccountInfo,
     operationType: TokenType,
     amount: Double = 1.0,
-    block: DialogListenerBlock<Unit>
-) {
+): Boolean {
     val reference = SecureRandom().nextInt(1000000)
-
-    val sendTokenRequest = SendTokenRequest()
-    sendTokenRequest.customerPhoneNumber = accountInfo.phoneNumber
-    sendTokenRequest.customerAccountNumber = accountInfo.number
-    sendTokenRequest.agentPhoneNumber = localStorage.agentPhone
-    sendTokenRequest.agentPin = "0000"
-    sendTokenRequest.institutionCode = localStorage.institutionCode
-    sendTokenRequest.amount = amount
+    val sendTokenRequest = SendTokenRequest(
+        customerPhoneNumber = accountInfo.phoneNumber,
+        customerAccountNumber = accountInfo.number,
+        agentPhoneNumber = localStorage.agentPhone,
+        agentPin = "0000",
+        institutionCode = localStorage.institutionCode,
+        amount = amount,
+        isPinChange = operationType == TokenType.PinChange,
+        operationType = operationType.label,
+    )
 
     if (operationType != TokenType.Withdrawal) {
         sendTokenRequest.referenceNumber = "$reference"
     }
 
-    sendTokenRequest.isPinChange = operationType == TokenType.PinChange
-    sendTokenRequest.operationType = operationType.label
-
-    mainScope.launch {
-        dialogProvider.showProgressBar("Sending Token")
-        val (data, error) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.sendToken(sendTokenRequest)
-        }
-        dialogProvider.hideProgressBar()
-
-        if (error != null) return@launch showError(error, block)
-        if (data == null) {
-            dialogProvider.showError("A network-related error occurred while sending token", block)
-            return@launch
-        }
-
-        if (!data.isSuccessful) {
-            val errorMessage =
-                data.responseMessage ?: "An error occurred while sending token"
-
-            dialogProvider.showError(errorMessage, block)
-
-            return@launch
-        }
-
-        dialogProvider.showSuccess(data.responseMessage)
-
-        val listener = DialogListener.create(block)
-        listener.submit(Dialog(this@sendToken), Unit)
+    dialogProvider.showProgressBar("Sending Token")
+    val (data, error) = safeRunIO {
+        creditClubMiddleWareAPI.staticService.sendToken(sendTokenRequest)
     }
+    dialogProvider.hideProgressBar()
+
+    if (error != null) {
+        dialogProvider.showErrorAndWait(error)
+        return false
+    }
+    if (data == null) {
+        dialogProvider.showErrorAndWait("A network-related error occurred while sending token")
+        return false
+    }
+
+    if (!data.isSuccessful) {
+        val errorMessage = data.responseMessage ?: "An error occurred while sending token"
+        dialogProvider.showErrorAndWait(errorMessage)
+        return false
+    }
+
+    dialogProvider.showSuccess(data.responseMessage)
+
+    return true
 }
 
 
@@ -249,16 +242,17 @@ fun CreditClubActivity.requireAndValidateToken(
 ) {
     val reference = SecureRandom().nextInt(1000000)
 
-    val sendTokenRequest = SendTokenRequest()
-    sendTokenRequest.customerPhoneNumber = accountInfo.phoneNumber
-    sendTokenRequest.customerAccountNumber = accountInfo.number
-    sendTokenRequest.agentPhoneNumber = localStorage.agentPhone
-    sendTokenRequest.agentPin = "0000"
-    sendTokenRequest.institutionCode = localStorage.institutionCode
-    sendTokenRequest.amount = amount
-    sendTokenRequest.referenceNumber = "$reference"
-    sendTokenRequest.isPinChange = isPinChange
-    sendTokenRequest.operationType = operationType.label
+    val sendTokenRequest = SendTokenRequest(
+        customerPhoneNumber = accountInfo.phoneNumber,
+        customerAccountNumber = accountInfo.number,
+        agentPhoneNumber = localStorage.agentPhone,
+        agentPin = "0000",
+        institutionCode = localStorage.institutionCode,
+        amount = amount,
+        referenceNumber = "$reference",
+        isPinChange = isPinChange,
+        operationType = operationType.label,
+    )
 
     mainScope.launch {
         dialogProvider.showProgressBar("Sending Token")
@@ -359,52 +353,42 @@ fun CreditClubActivity.selectAccountNumber(
     }
 }
 
-fun CreditClubActivity.customerBalanceEnquiry(accountInfo: AccountInfo) {
-    dialogProvider.requestPIN("Enter agent PIN") {
-        onSubmit { pin ->
-            hide()
+suspend fun CreditClubActivity.customerBalanceEnquiry(accountInfo: AccountInfo) {
+    val pin = dialogProvider.getPin(getString(R.string.agent_pin)) ?: return
+    if (pin.length != 4) {
+        dialogProvider.showError(getString(R.string.agent_pin_must_be_4_digits))
+        return
+    }
 
-            if (pin.length != 4) {
-                dialogProvider.showError("Agent PIN must be 4 digits", showOnClose)
-                return@onSubmit
-            }
+    val request = BalanceEnquiryRequest(
+        customerAccountNumber = accountInfo.number,
+        agentPin = pin,
+        agentPhoneNumber = localStorage.agentPhone,
+        geoLocation = gps.geolocationString,
+        institutionCode = localStorage.institutionCode,
+    )
 
-            mainScope.launch {
-                dialogProvider.showProgressBar("Sending balance to customer")
+    dialogProvider.showProgressBar("Sending balance to customer")
+    val (response, error) = safeRunIO {
+        creditClubMiddleWareAPI.staticService.balanceEnquiry(request)
+    }
+    dialogProvider.hideProgressBar()
 
-                val request = BalanceEnquiryRequest()
-                request.customerAccountNumber = accountInfo.number
-                request.agentPin = pin
-                request.agentPhoneNumber = localStorage.agentPhone
-                request.geoLocation = gps.geolocationString
-                request.institutionCode = localStorage.institutionCode
+    if (error.isNetworkError()) {
+        showNetworkError()
+        return
+    }
 
-                val staticService = creditClubMiddleWareAPI.staticService
+    if (response == null) {
+        showNetworkError()
+        return
+    }
 
-                val (response, error) = safeRunIO {
-                    staticService.balanceEnquiry(request)
-                }
-
-                dialogProvider.hideProgressBar()
-
-                if (error.isNetworkError()) {
-                    showNetworkError(showOnClose)
-                    return@launch
-                }
-
-                response ?: return@launch showNetworkError()
-
-                if (response.isSussessful) {
-                    dismiss()
-                    dialogProvider.showSuccess("${response.responseMessage}")
-                } else {
-                    dialogProvider.showError(
-                        response.responseMessage
-                            ?: getString(R.string.an_error_occurred_please_try_again_later),
-                        showOnClose
-                    )
-                }
-            }
-        }
+    if (response.isSussessful) {
+        dialogProvider.showSuccessAndWait("${response.responseMessage}")
+    } else {
+        dialogProvider.showErrorAndWait(
+            response.responseMessage ?: getString(R.string.an_error_occurred_please_try_again_later)
+        )
     }
 }

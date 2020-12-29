@@ -76,49 +76,37 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Menu2Activity"
-            android:label="@string/home" />
-        <activity
-            android:name=".OpenAccountActivity"
-            android:label="@string/title_activity_open_account"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
-        </activity>
-        <activity
             android:name=".AirtimeTopupActivity"
             android:label="@string/airtimetopup"
-            android:parentActivityName=".Menu3Activity">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
         </activity>
         <activity
             android:name=".BillsCategoryActivity"
             android:label="@string/Categories"
-            android:parentActivityName=".Menu3Activity">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
         </activity>
         <activity
             android:name=".ReportActivity"
             android:label="@string/reports"
-            android:parentActivityName=".Menu3Activity"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
         </activity>
         <activity
             android:name=".FundsTransferActivity"
             android:label="@string/fund_stransfer"
-            android:parentActivityName=".Menu3Activity">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
         </activity>
         <activity
             android:name=".BillPaymentActivity"
@@ -147,39 +135,30 @@
         <activity
             android:name=".DepositActivity"
             android:label="Cash Deposit"
-            android:parentActivityName=".Menu2Activity">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
+                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
         </activity>
         <activity
             android:name=".WithdrawActivity"
             android:label="Cash Withdrawal"
-            android:parentActivityName=".Menu2Activity">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
+                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
         </activity>
-        <activity android:name=".BOILoanRequestActivity" />
         <activity
             android:name=".CreditClubLoanRequestActivity"
             android:label="@string/title_activity_loan_request"
-            android:parentActivityName=".Menu3Activity">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
         </activity>
         <activity
             android:name=".BalanceEnquiryActivity"
             android:label="Balance Enquiry"
-            android:parentActivityName=".Menu3Activity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
-        </activity>
-        <activity
-            android:name=".AccountDetailsActivity"
-            android:label="Customer Account Balance"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -197,46 +176,14 @@
         <activity
             android:name=".BVNUpdateActivity"
             android:label="@string/title_activity_bvnUpdate"
-            android:parentActivityName=".Menu2Activity">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu2Activity" />
-        </activity>
-        <activity
-            android:name=".Menu3Activity"
-            android:label="@string/title_activity_menu3"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".WithdrawalByTokenActivity"
-            android:label="@string/withdrawal_by_token"
-            android:parentActivityName=".Menu3Activity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
+                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
         </activity>
         <activity
             android:name="com.creditclub.ui.UpdateActivity"
             android:label="@string/update"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".CardHotlistActivity"
-            android:label="@string/title_activity_card_hotlist"
-            android:parentActivityName=".Menu3Activity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
-        </activity>
-        <activity
-            android:name=".TokenCashOutActivity"
-            android:label="@string/title_activity_token_cash_out"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.Menu3Activity" />
-        </activity>
-        <activity
-            android:name=".CashoutMainMenuActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CustomerRequestOpenAccountActivity"
@@ -246,11 +193,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.MainActivity" />
         </activity>
-        <activity
-            android:name=".WithdrawalByAPITokenActivity"
-            android:label="@string/title_activity_withdrawal_by_apitoken"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ChangePinActivity"
             android:label="@string/pin_change">
@@ -406,20 +348,6 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <receiver
-            android:name=".NotificationReceiver"
-            android:enabled="true"
-            android:exported="false" />
-
-<!--        <provider-->
-<!--            android:name="androidx.core.content.FileProvider"-->
-<!--            android:authorities="${applicationId}.imagepicker.provider"-->
-<!--            android:exported="false"-->
-<!--            android:grantUriPermissions="true">-->
-<!--            <meta-data-->
-<!--                android:name="android.support.FILE_PROVIDER_PATHS"-->
-<!--                android:resource="@xml/provider_paths" />-->
-<!--        </provider>-->
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"
             android:authorities="${applicationId}.workmanager-init"

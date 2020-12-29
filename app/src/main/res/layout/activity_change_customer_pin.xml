@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="@color/white"
-    tools:activity="com.appzonegroup.app.fasttrack.OpenAccountActivity">
+    tools:activity="com.appzonegroup.app.fasttrack.ChangeCustomerPinActivity">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs"

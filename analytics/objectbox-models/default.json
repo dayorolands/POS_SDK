@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:5761920719266012762",
-      "lastPropertyId": "17:3430836114913371064",
+      "lastPropertyId": "19:6169108959077200121",
       "name": "NetworkMeasurement",
       "properties": [
         {
@@ -79,6 +79,16 @@
         {
           "id": "17:3430836114913371064",
           "name": "message",
+          "type": 9
+        },
+        {
+          "id": "18:8011508349046652637",
+          "name": "flowName",
+          "type": 9
+        },
+        {
+          "id": "19:6169108959077200121",
+          "name": "flowId",
           "type": 9
         }
       ],

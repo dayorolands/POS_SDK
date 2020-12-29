@@ -33,4 +33,5 @@
     <string name="please_replace">Please replace</string>
     <string name="receivers_account_number">Receiver\'s account number</string>
     <string name="state_hint">Select State</string>
+    <string name="agent_pin_must_be_4_digits">Agent PIN must be 4 digits</string>
 </resources>

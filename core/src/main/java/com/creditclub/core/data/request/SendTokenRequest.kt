@@ -9,31 +9,31 @@ import kotlinx.serialization.Serializable
  * Appzone Ltd
  */
 @Serializable
-class SendTokenRequest {
+data class SendTokenRequest(
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null
+    var agentPhoneNumber: String? = null,
 
     @SerialName("CustomerAccountNumber")
-    var customerAccountNumber: String? = null
+    var customerAccountNumber: String? = null,
 
     @SerialName("CustomerPhoneNumber")
-    var customerPhoneNumber: String? = null
+    var customerPhoneNumber: String? = null,
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = null
+    var institutionCode: String? = null,
 
     @SerialName("AgentPin")
-    var agentPin: String? = null
+    var agentPin: String? = null,
 
     @SerialName("Amount")
-    var amount: Double = 0.0
+    var amount: Double = 0.0,
 
     @SerialName("OperationType")
-    var operationType: String? = null
+    var operationType: String? = null,
 
     @SerialName("ReferenceNumber")
-    var referenceNumber: String? = null
+    var referenceNumber: String? = null,
 
     @SerialName("IsPinChange")
-    var isPinChange: Boolean = false
-}
+    var isPinChange: Boolean = false,
+)

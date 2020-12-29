@@ -10,22 +10,22 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
-class BalanceEnquiryRequest {
+data class BalanceEnquiryRequest(
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = ""
+    var agentPhoneNumber: String? = null,
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = ""
+    var institutionCode: String? = null,
 
     @SerialName("CustomerAccountNumber")
-    var customerAccountNumber: String? = ""
+    var customerAccountNumber: String? = null,
 
     @SerialName("GeoLocation")
-    var geoLocation: String? = null
+    var geoLocation: String? = null,
 
     @SerialName("AgentPin")
-    var agentPin: String? = ""
+    var agentPin: String? = null,
 
     @SerialName("AdditionalInformation")
-    var additionalInformation: String? = null
-}
+    var additionalInformation: String? = null,
+)

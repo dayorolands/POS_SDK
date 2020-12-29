@@ -41,6 +41,9 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
                 tokenWithdrawal.customerPin =
                     resources.getBoolean(R.bool.token_withdrawal_customer_pin)
 
+                tokenWithdrawal.externalToken =
+                    resources.getBoolean(R.bool.token_withdrawal_external_token)
+
                 accountOpening.products =
                     resources.getBoolean(R.bool.account_opening_products)
 
@@ -67,6 +70,7 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
 
             config.categories.run {
                 loans = resources.getBoolean(R.bool.category_loan)
+                customers = resources.getBoolean(R.bool.category_customer)
             }
 
             config.transactionTypes = resources.getStringArray(R.array.transaction_types).map {

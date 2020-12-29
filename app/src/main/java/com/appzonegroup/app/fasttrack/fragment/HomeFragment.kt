@@ -21,6 +21,7 @@ import com.creditclub.core.AppFunctions
 import com.creditclub.core.data.api.NotificationService
 import com.creditclub.core.data.model.NotificationRequest
 import com.creditclub.core.ui.CreditClubFragment
+import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.packageInfo
@@ -161,26 +162,23 @@ class HomeFragment : CreditClubFragment(R.layout.home_fragment),
                 else if (updateIsRequired) "Please update with ${daysOfGraceLeft()} days"
                 else "Please update"
 
-            val dialog =
-                Dialogs.confirm(requireContext(), message, subtitle) {
-                    onSubmit {
-                        if (it) {
-                            startActivity(
-                                Intent(
-                                    requireContext(),
-                                    UpdateActivity::class.java
-                                )
+            dialogProvider.confirm(DialogConfirmParams(message, subtitle)) {
+                onSubmit {
+                    if (it) {
+                        startActivity(
+                            Intent(
+                                requireContext(),
+                                UpdateActivity::class.java
                             )
-                            requireActivity().finish()
-                        } else if (mustUpdate) requireActivity().finish()
-                    }
-
-                    onClose {
-                        if (mustUpdate) requireActivity().finish()
-                    }
+                        )
+                        requireActivity().finish()
+                    } else if (mustUpdate) requireActivity().finish()
                 }
-            dialog.setCancelable(!mustUpdate)
-            dialog.setCanceledOnTouchOutside(false)
+
+                onClose {
+                    if (mustUpdate) requireActivity().finish()
+                }
+            }
         }
     }
 

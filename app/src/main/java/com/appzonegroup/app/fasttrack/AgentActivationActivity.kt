@@ -1,29 +1,32 @@
 package com.appzonegroup.app.fasttrack
 
+import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.text.InputFilter
+import android.text.InputType
 import android.view.View
 import com.android.volley.Response
 import com.appzonegroup.app.fasttrack.databinding.ActivityAgentActivationBinding
 import com.appzonegroup.app.fasttrack.model.AppConstants
-import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
 import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.extension.posSerialNumber
+import com.creditclub.core.data.model.AuthResponse
 import com.creditclub.core.data.request.PinChangeRequest
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.debugOnly
-import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
-import com.google.gson.Gson
+import com.creditclub.ui.dataBinding
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
-class AgentActivationActivity : BaseActivity() {
-    val binding by contentView<AgentActivationActivity, ActivityAgentActivationBinding>(R.layout.activity_agent_activation)
+class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activation) {
+    private val binding by dataBinding<ActivityAgentActivationBinding>()
 
     private var isActivation = false
     internal var url = ""
@@ -50,13 +53,16 @@ class AgentActivationActivity : BaseActivity() {
                 phoneNumber = binding.phoneNumberEt.text.toString().trim(' ')
 
                 if (phoneNumber.isEmpty()) {
-                    indicateError("You did not enter your phone number", binding.phoneNumberEt)
+                    dialogProvider.indicateError(
+                        "You did not enter your phone number",
+                        binding.phoneNumberEt
+                    )
                     return@OnClickListener
                 }
 
                 code = binding.codeEt.value
                 if (code.length < 6) {
-                    indicateError(
+                    dialogProvider.indicateError(
                         "Enter institution code in the verification code input",
                         binding.codeEt
                     )
@@ -65,7 +71,10 @@ class AgentActivationActivity : BaseActivity() {
 
                 localStorage.institutionCode = code
                 localStorage.agentPhone = phoneNumber
-                localStorage.cacheAuth = Gson().toJson(AuthResponse(phoneNumber, code))
+                localStorage.cacheAuth = Json.encodeToString(
+                    AuthResponse.serializer(),
+                    AuthResponse(phoneNumber, code)
+                )
                 localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
                 localStorage.putString(AppConstants.AGENT_CODE, code)
                 localStorage.putString(AppConstants.AGENT_PIN, "1111")
@@ -78,7 +87,7 @@ class AgentActivationActivity : BaseActivity() {
             binding.btnTerminalOptions.visibility = View.VISIBLE
             binding.btnTerminalOptions.setOnClickListener {
                 adminAction {
-                    startActivity(TerminalOptionsActivity::class.java)
+                    startActivity(Intent(this, TerminalOptionsActivity::class.java))
                 }
             }
         }
@@ -90,7 +99,7 @@ class AgentActivationActivity : BaseActivity() {
         phoneNumber = binding.phoneNumberEt.text.toString().trim(' ')
 
         if (phoneNumber.isEmpty()) {
-            indicateError(
+            dialogProvider.indicateError(
                 "You did not enter your phone number",
                 binding.phoneNumberEt
             )
@@ -99,7 +108,7 @@ class AgentActivationActivity : BaseActivity() {
         }
 
         if (code.isEmpty() && !isActivation) {
-            indicateError(
+            dialogProvider.indicateError(
                 "You did not enter your verification code",
                 binding.codeEt
             )
@@ -108,31 +117,34 @@ class AgentActivationActivity : BaseActivity() {
         }
 
         /*if (isActivation && ((EditText)findViewById(R.id.agentActivation_oldPINEt)).getText().toString().length() == 0){
-            indicateError("You did not enter your old PIN", ((EditText)findViewById(R.id.agentActivation_PINEt)));
+            dialogProvider.indicateError("You did not enter your old PIN", ((EditText)findViewById(R.id.agentActivation_PINEt)));
             firebaseCrashlytics.recordException(new Exception("No PIN was entered"));
             return;
         }*/
 
         if (isActivation && binding.newPinEt.text.toString().isEmpty()) {
-            indicateError("You did not enter the PIN", binding.newPinEt)
+            dialogProvider.indicateError("You did not enter the PIN", binding.newPinEt)
             firebaseCrashlytics.recordException(Exception("No PIN was entered"))
             return
         }
 
         if (isActivation && binding.newPinConfirmationEt.text.toString().isEmpty()) {
-            indicateError("You did not confirm the PIN", binding.newPinConfirmationEt)
+            dialogProvider.indicateError(
+                "You did not confirm the PIN",
+                binding.newPinConfirmationEt
+            )
             firebaseCrashlytics.recordException(Exception("PIN entry was not confirmed"))
             return
         }
 
         if (isActivation && binding.newPinEt.text.toString().length != 4) {
-            indicateError("Your PIN must have 4-digit", binding.newPinEt)
+            dialogProvider.indicateError("Your PIN must have 4-digit", binding.newPinEt)
             firebaseCrashlytics.recordException(Exception("Pin was not 4 digits"))
             return
         }
 
         if (isActivation && binding.newPinConfirmationEt.text.toString().length != 4) {
-            indicateError(
+            dialogProvider.indicateError(
                 "Your PIN Confirmation must have 4-digit",
                 binding.newPinConfirmationEt
             )
@@ -141,13 +153,13 @@ class AgentActivationActivity : BaseActivity() {
         }
 
         if (binding.newPinConfirmationEt.text.toString() != binding.newPinEt.text.toString()) {
-            indicateError("PIN mismatch", binding.newPinConfirmationEt)
+            dialogProvider.indicateError("PIN mismatch", binding.newPinConfirmationEt)
             return
         }
 
         pin = binding.newPinEt.text.toString()
 
-        showProgressBar("Processing...")
+        dialogProvider.showProgressBar("Processing...")
 
         mainScope.launch {
             if (isActivation) activate()
@@ -166,11 +178,11 @@ class AgentActivationActivity : BaseActivity() {
         request.oldPin = code
         request.deviceId = deviceId
 
-        showProgressBar("Activating")
+        dialogProvider.showProgressBar("Activating")
         val (response) = safeRunIO {
             creditClubMiddleWareAPI.staticService.completeActivationWithPinChange(request)
         }
-        hideProgressBar()
+        dialogProvider.hideProgressBar()
 
         response ?: return showNetworkError()
 
@@ -178,7 +190,10 @@ class AgentActivationActivity : BaseActivity() {
             localStorage.institutionCode = institutionCode
             localStorage.agentPhone = phoneNumber
 //            localStorage.agentPIN = pin
-            localStorage.cacheAuth = Gson().toJson(AuthResponse(phoneNumber, code))
+            localStorage.cacheAuth = Json.encodeToString(
+                AuthResponse.serializer(),
+                AuthResponse(phoneNumber, code)
+            )
             localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
             localStorage.putString(AppConstants.AGENT_CODE, code)
 
@@ -194,8 +209,7 @@ class AgentActivationActivity : BaseActivity() {
             logout()
         } else {
             response.responseMessage ?: return showNetworkError()
-
-            showError(response.responseMessage)
+            dialogProvider.showError(response.responseMessage)
         }
     }
 
@@ -226,7 +240,7 @@ class AgentActivationActivity : BaseActivity() {
     }
 
     private suspend inline fun verify() {
-        showProgressBar("Verifying")
+        dialogProvider.showProgressBar("Verifying")
         val (response) = safeRunIO {
             creditClubMiddleWareAPI.staticService.agentVerification(
                 code,
@@ -235,7 +249,7 @@ class AgentActivationActivity : BaseActivity() {
                 if (Platform.isPOS) posSerialNumber else deviceId
             )
         }
-        hideProgressBar()
+        dialogProvider.hideProgressBar()
 
         response ?: return showNetworkError()
 
@@ -252,11 +266,11 @@ class AgentActivationActivity : BaseActivity() {
             institutionCode =
                 response.responseMessage ?: if (code.length >= 6) code.substring(0, 6) else code
 
-            showNotification("Verification successful")
+            dialogProvider.showSuccess("Verification successful")
         } else {
             response.responseMessage ?: return showNetworkError()
 
-            showError(response.responseMessage)
+            dialogProvider.showError(response.responseMessage)
         }
     }
 
@@ -264,6 +278,41 @@ class AgentActivationActivity : BaseActivity() {
         dialogProvider.confirm("Cancel Activation", "Are you sure you want to close this page?") {
             onSubmit {
                 if (it) finish()
+            }
+        }
+    }
+
+    private inline fun confirmAdminPassword(
+        password: String,
+        closeOnFail: Boolean = false,
+        crossinline next: (Boolean) -> Unit
+    ) {
+        val status = password == posConfig.adminPin
+        if (!status) {
+            if (closeOnFail) return dialogProvider.showError<Nothing>("Incorrect Password") {
+                onClose {
+                    finish()
+                }
+            }
+
+            dialogProvider.showError("Incorrect Password")
+        }
+        next(status)
+    }
+
+    private inline fun adminAction(crossinline next: () -> Unit) {
+        val passwordType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+
+        com.appzonegroup.creditclub.pos.widget.Dialogs.input(
+            this,
+            "Administrator password",
+            passwordType
+        ) {
+            onSubmit { password ->
+                dismiss()
+                confirmAdminPassword(password) { passed ->
+                    if (passed) next()
+                }
             }
         }
     }
