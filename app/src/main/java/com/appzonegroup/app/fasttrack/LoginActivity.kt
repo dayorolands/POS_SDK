@@ -56,27 +56,6 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             findViewById<TextView>(R.id.welcome_message_tv).text = "Welcome back, $agentName"
         }
 
-        findViewById<EditText>(R.id.login_phoneNumber).also {
-            it.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-
-                }
-
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                    phoneNumberEditTextFilter(it, this)
-                }
-
-                override fun afterTextChanged(s: Editable) {
-
-                }
-            })
-        }
-
         findViewById<View>(R.id.email_sign_in_button).setOnClickListener {
             mainScope.launch { attemptLogin() }
         }
@@ -186,29 +165,6 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
     }
 
-    fun phoneNumberEditTextFilter(editText: EditText, textWatcher: TextWatcher) {
-        val numbers = "0123456789"
-
-        val text = editText.text.toString().trim { it <= ' ' }
-
-        val textToCharArray = text.toCharArray()
-
-        val accumulator = StringBuilder()
-
-        for (c in textToCharArray) {
-            if (numbers.contains(c + "")) {
-                accumulator.append(c)
-            }
-        }
-        editText.removeTextChangedListener(textWatcher)
-
-        //This line without the line before and after will cause endless loop
-        //of call to the text changed listener
-        editText.setText(accumulator)
-        editText.addTextChangedListener(textWatcher)
-        editText.setSelection(accumulator.length)
-    }
-
     override fun onResume() {
         super.onResume()
         ensureLocationEnabled()
@@ -235,13 +191,18 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             return
         }
 
-        if (TextUtils.isEmpty(pin)) {
-            showError("PIN is required", R.id.login_pin)
+        if (phoneNumber.length != 11) {
+            showError("Phone number must be 11 digits", R.id.login_phoneNumber)
             return
         }
 
         if (!isPhoneValid(phoneNumber)) {
             showError("Phone number is incorrect", R.id.login_phoneNumber)
+            return
+        }
+
+        if (TextUtils.isEmpty(pin)) {
+            showError("PIN is required", R.id.login_pin)
             return
         }
 
