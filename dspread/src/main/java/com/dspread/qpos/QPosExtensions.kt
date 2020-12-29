@@ -1,6 +1,7 @@
 package com.dspread.qpos
 
 import android.content.Context
+import android.content.Intent
 import com.creditclub.pos.card.TransactionType
 import com.dspread.R
 import com.dspread.qpos.utils.TLV
@@ -9,6 +10,10 @@ import com.dspread.qpos.utils.hexBytes
 import com.dspread.xpos.QPOSService
 import java.util.*
 import kotlin.coroutines.suspendCoroutine
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import kotlin.coroutines.resume
 
 
 /**
@@ -129,3 +134,11 @@ fun List<TLV>.getValue(
 
     return value.toUpperCase(Locale.getDefault())
 }
+
+suspend fun ComponentActivity.getActivityResult(intent: Intent): ActivityResult =
+    suspendCoroutine { continuation ->
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            continuation.resume(result)
+        }.launch(intent)
+    }
+

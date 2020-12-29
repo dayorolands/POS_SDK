@@ -1,20 +1,26 @@
 package com.dspread.qpos
 
+import android.Manifest
+import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.format
+import com.creditclub.core.util.showErrorAndWait
 import com.creditclub.pos.DukptConfig
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.card.*
 import com.creditclub.pos.utils.TripleDesCipher
-import com.dspread.qpos.utils.Dukpt
 import com.dspread.qpos.utils.FileUtils
 import com.dspread.qpos.utils.hexBytes
 import com.dspread.qpos.utils.hexString
 import com.dspread.xpos.QPOSService
+import com.eazypermissions.common.model.PermissionResult
+import com.eazypermissions.coroutinespermission.PermissionManager
 import kotlinx.coroutines.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -23,6 +29,7 @@ import java.util.*
 import kotlin.concurrent.scheduleAtFixedRate
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
 
 class QPosCardReader(
     private val activity: CreditClubActivity,
@@ -38,6 +45,14 @@ class QPosCardReader(
     private val dialogProvider = activity.dialogProvider
 
     override suspend fun waitForCard(): CardReaderEvent {
+        val canUseBluetooth = checkBluetoothPermission()
+        if (!canUseBluetooth) return CardReaderEvent.CANCELLED
+        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        if (!bluetoothAdapter.isEnabled && !turnOnBluetooth()) {
+            dialogProvider.showErrorAndWait("Could not turn on bluetooth")
+            return CardReaderEvent.CANCELLED
+        }
+
         Looper.myLooper() ?: Looper.prepare()
         val handler = Handler(Looper.myLooper()!!)
         pos.initListener(handler, listener)
@@ -45,16 +60,50 @@ class QPosCardReader(
         pos.setTerminalID(posConfig.terminalId, 5000)
         val device = findDevice() ?: return CardReaderEvent.CANCELLED
         val connected: Boolean = connectDevice(device)
-        if (!connected) return suspendCoroutine { continuation ->
-            dialogProvider.showError<Nothing>("Could not connect to device") {
-                onClose { continuation.resume(CardReaderEvent.CANCELLED) }
-            }
+        if (!connected) {
+            dialogProvider.showErrorAndWait("Could not connect to device")
+            return CardReaderEvent.CANCELLED
         }
         dialogProvider.showProgressBar("Securing Connection")
         updateEmvConfig()
         dialogProvider.hideProgressBar()
 
         return CardReaderEvent.CHIP
+    }
+
+    private suspend fun turnOnBluetooth(): Boolean {
+        val turnOn = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+        val result = ActivityResultManager.getActivityResult(activity, turnOn, 2012)
+        return result.resultCode == Activity.RESULT_OK
+    }
+
+    private suspend fun checkBluetoothPermission(): Boolean {
+        val permissionResult = PermissionManager.requestPermissions(
+            activity,
+            2000,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.BLUETOOTH,
+        )
+
+        when (permissionResult) {
+            is PermissionResult.PermissionGranted -> {
+                return true
+            }
+            is PermissionResult.PermissionDenied -> {
+                dialogProvider.showErrorAndWait("Bluetooth access is required to use mPOS")
+            }
+            is PermissionResult.PermissionDeniedPermanently -> {
+                dialogProvider.showErrorAndWait(
+                    "Bluetooth access is required to use mPOS.\n" +
+                            "Please manually go to settings and enable permission(s)"
+                )
+            }
+            is PermissionResult.ShowRational -> {
+                dialogProvider.showErrorAndWait("Bluetooth access is required to use mPOS")
+            }
+        }
+
+        return false
     }
 
     override suspend fun read(amountStr: String): CardData? {
