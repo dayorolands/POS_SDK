@@ -284,7 +284,7 @@ abstract class CardTransactionActivity : PosActivity() {
                         return@launch
                     }
 
-                    val thisMonth = Instant.now().format("YYMM").toInt()
+                    val thisMonth = Instant.now().format("yyMM").toInt()
 
                     if (cardData.exp.substring(0, 4).toInt() < thisMonth) {
                         dialogProvider.hideProgressBar()
