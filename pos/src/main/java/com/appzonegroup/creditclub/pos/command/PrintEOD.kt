@@ -54,7 +54,7 @@ class PrintEOD(
                 val iso = trn.isoMsg
                 if (iso.isSuccessful) totalAmount += iso.transactionAmount4?.toLong() ?: 0
 
-                text.append("\nTime    ${trn.createdAt.format("dd/MM/YYYY hh:mm", "+0100")}")
+                text.append("\nTime    ${trn.createdAt.format("dd/MM/yyyy hh:mm", "+0100")}")
                 text.append("\nType    ${trn.type}")
                 text.append("\nPAN     ${trn.pan}")
                 text.append("\nAmount  ${CurrencyFormatter.format(iso.transactionAmount4)}")

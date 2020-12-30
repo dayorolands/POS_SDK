@@ -28,7 +28,7 @@ Category ${response.collectionCategoryName}
 Payment Item: ${response.collectionPaymentItemName}
 
 Reference: ${response.collectionReference}
-Transaction Date: ${response.date?.format("dd-MM-YYYY hh:mm")}
+Transaction Date: ${response.date?.format("dd-MM-yyyy hh:mm")}
 """
                 )
             ).apply { addTransactionStatus(); addAll(footerNodes(context)) }.toList()
