@@ -1,14 +1,27 @@
 package com.appzonegroup.app.fasttrack.model;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
 /**
  * Created by Joseph on 6/3/2016.
  */
-public class LoanProduct {
+public class LoanProduct implements Serializable {
 
-    private long ID ;
-    private String Name ;
+    @SerializedName("ID")
+    private long ID;
+
+    @SerializedName("Name")
+    private String Name;
+
+    @SerializedName("MinimumAmount")
     private double MinimumAmount;
+
+    @SerializedName("MaximumAmount")
     private double MaximumAmount;
+
+    @SerializedName("InstitutionCode")
     private String InstitutionCode;
 
     public long getID() {
@@ -44,7 +57,7 @@ public class LoanProduct {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return getName() + " (N" + getMinimumAmount() + " - N" + getMaximumAmount() + ")";
     }
 

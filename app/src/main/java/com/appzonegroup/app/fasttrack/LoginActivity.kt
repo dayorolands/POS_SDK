@@ -33,6 +33,8 @@ import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.api.posApiService
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.*
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 import org.koin.android.ext.android.inject
 import retrofit2.create
 
@@ -101,7 +103,10 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     }
 
     private fun checkLocalSurveyQuestions() {
-        var surveyQuestions by jsonPrefs.jsonStore<List<SurveyQuestion>>("DATA_SURVEY_QUESTIONS")
+        var surveyQuestions by jsonPrefs.jsonStore(
+            "DATA_SURVEY_QUESTIONS",
+            ListSerializer(SurveyQuestion.serializer())
+        )
         val questions = surveyQuestions ?: return
         if (questions.isEmpty()) return
 
@@ -125,7 +130,10 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     }
 
     private fun downloadBannerImages() {
-        var bannerImages by jsonPrefs.jsonStore<List<String>>("DATA_BANNER_IMAGES")
+        var bannerImages by jsonPrefs.jsonStore(
+            "DATA_BANNER_IMAGES",
+            ListSerializer(String.serializer())
+        )
         ioScope.launch {
             val (response) = safeRunIO {
                 creditClubMiddleWareAPI.staticService.getBannerImages(
@@ -146,7 +154,10 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     }
 
     private fun downloadSurveyQuestions() {
-        var surveyQuestions by jsonPrefs.jsonStore<List<SurveyQuestion>>("DATA_SURVEY_QUESTIONS")
+        var surveyQuestions by jsonPrefs.jsonStore<List<SurveyQuestion>>(
+            "DATA_SURVEY_QUESTIONS",
+            ListSerializer(SurveyQuestion.serializer())
+        )
         ioScope.launch {
             val (response) = safeRunIO {
                 creditClubMiddleWareAPI.staticService.getSurveyQuestions(

@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 
 import com.appzonegroup.app.fasttrack.model.Association;
-import com.appzonegroup.app.fasttrack.model.Institution;
 
 import java.util.ArrayList;
 import java.util.List;

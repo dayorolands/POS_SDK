@@ -315,7 +315,6 @@
     <string name="Billers">billers</string>
     <string name="billerItem">Biller item</string>
     <string name="font_name">font/roboto_condensed_light.ttf</string>
-    <string name="font_nexa_bold">font/Nexa Bold.otf</string>
     <string name="pin_hint">Enter your PIN</string>
     <string name="cvv_hint">Enter card CVV</string>
     <string name="card_based_cash_out">Card-based Cashout</string>

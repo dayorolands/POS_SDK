@@ -4,27 +4,59 @@ import android.content.Context;
 
 import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.Misc;
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
 
 /**
  * Created by Joseph on 12/15/2017.
  */
 
-public class DeviceTransactionInformation {
+public class DeviceTransactionInformation implements Serializable {
 
+    @SerializedName("ID")
     private int ID;
+    
+    @SerializedName("DateReceivedString")
     private String DateReceivedString;
+    
+    @SerializedName("DateEndedString")
     private String DateEndedString;
+    
+    @SerializedName("SessionID")
     private String SessionID;
+    
+    @SerializedName("InstitutionCode")
     private String InstitutionCode;
+    
+    @SerializedName("AgentPhoneNumber")
     private String AgentPhoneNumber;
+    
+    @SerializedName("RequestCount")
     private int RequestCount;
+    
+    @SerializedName("SuccessCount")
     private int SuccessCount;
+    
+    @SerializedName("NoInternet")
     private int NoInternet;
+    
+    @SerializedName("NoResponse")
     private int NoResponse;
+    
+    @SerializedName("ErrorResponse")
     private int ErrorResponse;
+    
+    @SerializedName("RamSize")
     private String RamSize;
+    
+    @SerializedName("PercentageLeftOver")
     private float PercentageLeftOver;
+    
+    @SerializedName("MemorySpace")
     private String MemorySpace;
+    
+    @SerializedName("MemorySpaceLeft")
     private String MemorySpaceLeft;
 
     public String getAppName() {

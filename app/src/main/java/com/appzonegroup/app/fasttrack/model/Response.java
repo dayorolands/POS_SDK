@@ -1,12 +1,19 @@
 package com.appzonegroup.app.fasttrack.model;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
 /**
  * Created by Oto-obong on 21/07/2017.
  */
 
-public class Response {
+public class Response implements Serializable {
 
+    @SerializedName("ReponseMessage")
     private String ReponseMessage ;
+
+    @SerializedName("IsSuccessful")
     private boolean IsSuccessful ;
 
     public String getReponseMessage() {

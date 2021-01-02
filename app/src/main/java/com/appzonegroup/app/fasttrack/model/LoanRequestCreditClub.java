@@ -1,25 +1,49 @@
 package com.appzonegroup.app.fasttrack.model;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
 /**
  * Created by Joseph on 3/26/2018.
  */
 
-public class LoanRequestCreditClub {
+public class LoanRequestCreditClub implements Serializable {
 
+    @SerializedName("LoanAmount")
     private double LoanAmount;
 
+    @SerializedName("LoanProductID") 
     private int LoanProductID;
+
+    @SerializedName("AssociationID") 
     private String AssociationID;
+
+    @SerializedName("MemberID") 
     private String MemberID;
 
+    @SerializedName("CustomerAccountNumber") 
     private String CustomerAccountNumber;
+
+    @SerializedName("CustomerPhoneNumber") 
     private String CustomerPhoneNumber;
 
+    @SerializedName("InstitutionCode") 
     private String InstitutionCode;
+
+    @SerializedName("GeoLocation") 
     private String GeoLocation;
+
+    @SerializedName("LoanProductInstitutionCode") 
     private String LoanProductInstitutionCode;
+
+    @SerializedName("AgentPhoneNumber") 
     private String AgentPhoneNumber;
+
+    @SerializedName("AgentPin") 
     private String AgentPin;
+
+    @SerializedName("AdditionalInformation") 
     private String AdditionalInformation;
 
     public double getLoanAmount() {

@@ -3,18 +3,17 @@ package com.appzonegroup.app.fasttrack.utility;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
-import androidx.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+
+import androidx.annotation.NonNull;
 
 import com.appzonegroup.app.fasttrack.BuildConfig;
 import com.appzonegroup.app.fasttrack.R;
@@ -22,7 +21,6 @@ import com.appzonegroup.app.fasttrack.dataaccess.DeviceTransactionInformationDAO
 import com.appzonegroup.app.fasttrack.model.AppConstants;
 import com.appzonegroup.app.fasttrack.model.MainMenuItem;
 import com.appzonegroup.app.fasttrack.model.TransactionCountType;
-import com.appzonegroup.app.fasttrack.model.jsonbody.PayBillItemModel;
 import com.appzonegroup.app.fasttrack.scheduler.BackgroundThread;
 
 import java.io.ByteArrayOutputStream;
@@ -34,7 +32,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -100,18 +97,6 @@ public class Misc {
         String url = BASE_URL + "/PayBills/GetPaymentItems";
 
         return String.format(url, billerIdField);
-    }
-
-    public static String payBillItemUrl(PayBillItemModel model) {
-        String url = BASE_URL + "/BillsPayment/PayBillItem?" + "agentPhone=%s" + "&agentPIN=%s" + "&institutionCode=%s"
-                + "&otp=%s" + "&merchantBillerIdField=%s" + "&billItemID=%s" + "&billCategoryID=%s"
-                + "&customerAccountNumber=%s" + "&amount=%s" + "&email=%s" + "&customerPhoneNumber=%s"
-                + "&customerID=%s";
-
-        return String.format(url, model.getAgentPhone(), model.getAgentPIN(), model.getInstitutionCode(),
-                model.getOtp(), model.getMerchantBillerIdField(), model.getBillItemID(), model.getBillCategoryID(),
-                model.getCustomerAccountNumber(), model.getAmount(), model.getEmail(), model.getCustomerPhoneNumber(),
-                model.getCustomerID());
     }
 
     public static String dateToShortString(Date date) {

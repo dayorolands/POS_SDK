@@ -8,9 +8,9 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
--dontskipnonpubliclibraryclasses
--dontobfuscate
--forceprocessing
+#-dontskipnonpubliclibraryclasses
+#-dontobfuscate
+#-forceprocessing
 -optimizationpasses 5
 
 -assumenosideeffects class android.util.Log {
@@ -73,24 +73,60 @@
 -keepattributes *Annotation*
 # Gson specific classes
 -keep class sun.misc.Unsafe { *; }
-#-keep class com.google.gson.stream.** { *; }
+-keep class com.google.gson.stream.** { *; }
 
+# Kotlin Serializaion
 -keepattributes *Annotation*, InnerClasses
--dontnote kotlinx.serialization.SerializationKt
--keep,includedescriptorclasses class com.creditclub.core.data.**$$serializer { *; }
--keepclassmembers class com.creditclub.core.data.** {
+-dontnote kotlinx.serialization.AnnotationsKt # core serialization annotations
+
+# kotlinx-serialization-json specific. Add this if you have java.lang.NoClassDefFoundError kotlinx.serialization.json.JsonObjectSerializer
+-keepclassmembers class kotlinx.serialization.json.** {
     *** Companion;
 }
--keepclasseswithmembers class com.creditclub.core.data.** {
+-keepclasseswithmembers class kotlinx.serialization.json.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
--keepattributes *Annotation*, InnerClasses
--dontnote kotlinx.serialization.SerializationKt
--keep,includedescriptorclasses class com.appzonegroup.creditclub.pos.models.**$$serializer { *; }
--keepclassmembers class com.appzonegroup.creditclub.pos.models.** {
+-keep,includedescriptorclasses class com.appzonegroup.app.fasttrack.model.**$$serializer { *; }
+-keepclassmembers class com.appzonegroup.app.fasttrack.model.** {
     *** Companion;
 }
--keepclasseswithmembers class com.appzonegroup.creditclub.pos.models.** {
+-keepclasseswithmembers class com.appzonegroup.app.fasttrack.model.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# Kotlin Intrinsics
+-assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+  public static void checkExpressionValueIsNotNull(java.lang.Object, java.lang.String);
+  public static void checkFieldIsNotNull(java.lang.Object, java.lang.String);
+  public static void checkFieldIsNotNull(java.lang.Object, java.lang.String, java.lang.String);
+  public static void checkNotNull(java.lang.Object);
+  public static void checkNotNull(java.lang.Object, java.lang.String);
+  public static void checkNotNullExpressionValue(java.lang.Object, java.lang.String);
+  public static void checkNotNullParameter(java.lang.Object, java.lang.String);
+  public static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
+  public static void checkReturnedValueIsNotNull(java.lang.Object, java.lang.String);
+  public static void checkReturnedValueIsNotNull(java.lang.Object, java.lang.String, java.lang.String);
+  public static void throwUninitializedPropertyAccessException(java.lang.String);
+}
+
+# Core Kotlin Serializaion
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt # core serialization annotations
+-dontnote kotlinx.serialization.SerializationKt
+# kotlinx-serialization-json specific. Add this if you have java.lang.NoClassDefFoundError kotlinx.serialization.json.JsonObjectSerializer
+-keepclassmembers class kotlinx.serialization.json.** {
+    *** Companion;
+}
+-keepclasseswithmembers class kotlinx.serialization.json.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+-keep,includedescriptorclasses class kotlinx.serialization.json.**$$serializer { *; }
+
+-keep,includedescriptorclasses class com.creditclub.core.**$$serializer { *; }
+-keepclassmembers class com.creditclub.core.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.creditclub.core.** {
     kotlinx.serialization.KSerializer serializer(...);
 }

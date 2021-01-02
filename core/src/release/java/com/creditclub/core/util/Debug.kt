@@ -1,3 +1,3 @@
 package com.creditclub.core.util
 
-inline fun debugOnly(ignored: () -> Unit) {}
+inline fun debugOnly(crossinline ignored: () -> Unit) {}
