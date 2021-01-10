@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.widget.doOnTextChanged
 import com.appzonegroup.app.fasttrack.databinding.ActivityFundstransferBinding
 import com.appzonegroup.app.fasttrack.fragment.FundsTransferViewModel
 import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
@@ -40,6 +41,9 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
         }
         binding.validateButton.setOnClickListener {
             mainScope.launch { validateAccount() }
+        }
+        binding.receiverAccountNumberEt.doOnTextChanged { _, _, _, _ ->
+            binding.receiverAccInputLayout.error = null
         }
     }
 
@@ -164,11 +168,8 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
         }
 
         val accountNumber = viewModel.receiverAccountNumber.value
-        if (accountNumber.isNullOrBlank() || accountNumber.length != 10 && accountNumber.length != 11) {
-            indicateError(
-                "Please enter a valid Account number",
-                binding.receiverAccountNumberEt as View
-            )
+        if (accountNumber.isNullOrBlank() || (accountNumber.length != 10 && accountNumber.length != 11)) {
+            binding.receiverAccInputLayout.error = "Please enter a valid Account number"
             return
         }
 

@@ -33,7 +33,7 @@ class ActivityMiniStatementManager(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requestAgentPIN("Enter agent PIN") {
+        requestPIN("Enter agent PIN") {
             onSubmit { pin ->
                 activity.run {
                     agentPIN = pin
