@@ -30,9 +30,9 @@ interface DialogProvider {
 
     fun showInfo(message: CharSequence?) = showInfo<Nothing>(message, null)
 
-    fun showSuccess(message: CharSequence?)
+    fun showSuccess(message: CharSequence?) = showSuccess<Nothing>(message, null)
 
-    fun <T> showSuccess(message: CharSequence?, block: DialogListenerBlock<T>)
+    fun <T> showSuccess(message: CharSequence?, block: DialogListenerBlock<T>?)
 
     fun indicateError(message: CharSequence?, view: EditText?)
 
@@ -44,7 +44,7 @@ interface DialogProvider {
     ): Dialog
 
     fun showProgressBar(title: CharSequence): Dialog {
-        return showProgressBar<Nothing>(title, null, false, null)
+        return showProgressBar<Nothing>(title, "Please wait", false, null)
     }
 
     fun showProgressBar(title: CharSequence, message: CharSequence?): Dialog {
