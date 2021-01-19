@@ -14,6 +14,7 @@ import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.showError
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.api.posApiService
+import com.creditclub.pos.printer.PrinterStatus
 import com.creditclub.ui.dataBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -124,23 +125,23 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu), View
                     startActivity(ReprintMenuActivity::class.java)
                 }
             }
-//                R.id.balance_button -> {
-//                    startActivity(BalanceInquiryActivity::class.java)
-//                }
+            R.id.balance_button -> {
+                startActivity(BalanceInquiryActivity::class.java)
+            }
             R.id.cash_back_button -> {
                 startActivity(CashBackActivity::class.java)
             }
             R.id.cash_adv_button -> startActivity(CashAdvanceActivity::class.java)
-//                R.id.refund_button -> printerDependentAction(false) {
-//                    supervisorAction {
-//                        startActivity(RefundActivity::class.java)
-//                    }
-//                }
-//                R.id.reversal_button -> printerDependentAction(false) {
-//                    supervisorAction {
-//                        startActivity(ReversalActivity::class.java)
-//                    }
-//                }
+            R.id.refund_button -> printerDependentAction {
+                supervisorAction {
+                    startActivity(RefundActivity::class.java)
+                }
+            }
+            R.id.reversal_button -> printerDependentAction {
+                supervisorAction {
+                    startActivity(ReversalActivity::class.java)
+                }
+            }
             R.id.auth_button -> {
                 startActivity(PreAuthActivity::class.java)
             }
@@ -189,6 +190,14 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu), View
             }
 
             else -> showError("This function is disabled.")
+        }
+    }
+
+    private inline fun printerDependentAction(crossinline block: () -> Unit) {
+        mainScope.launch {
+            val status = printer.check()
+            if (status == PrinterStatus.READY) block()
+            else dialogProvider.showError(status.message)
         }
     }
 
