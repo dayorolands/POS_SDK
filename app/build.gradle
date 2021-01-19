@@ -1,11 +1,15 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'androidx.navigation.safeargs.kotlin'
-apply plugin: 'kotlinx-serialization'
-apply plugin: 'com.google.firebase.crashlytics'
-apply plugin: 'com.google.firebase.firebase-perf'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'kotlin-android-extensions'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'kotlinx-serialization'
+    id 'com.google.firebase.crashlytics'
+    id 'com.google.firebase.firebase-perf'
+    id 'io.objectbox'
+    id 'com.google.gms.google-services'
+}
 
 android {
     compileSdkVersion versions.compileSdk
@@ -17,8 +21,8 @@ android {
         targetSdkVersion versions.targetSdk
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 24
-        versionName "1.4.1"
+        versionCode 26
+        versionName "1.4.3"
     }
 
     lintOptions {
@@ -243,6 +247,3 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
 }
-
-apply plugin: 'io.objectbox'
-apply plugin: 'com.google.gms.google-services'

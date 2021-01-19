@@ -12,15 +12,16 @@ import org.junit.Test
 open class StaticApiTest : UnitTest() {
 
     @Test
-    fun `all case details ar fetched successfully`() {
+    fun `all case details are fetched successfully`() {
         mainScope {
             val (response, error) = safeRunIO {
-                middleWareAPI.caseLogService.caseDetails(CaseDetailsRequest().apply {
-                    agentPhoneNumber = "08182709167"
-                    institutionCode = "100287"
-                })
+                middleWareAPI.caseLogService.caseDetails(CaseDetailsRequest(
+                    agentPhoneNumber = "08182709167",
+                    institutionCode = "100287",
+                ))
             }
 
+            assert(error == null)
             assert(response != null)
         }
     }

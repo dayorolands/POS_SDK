@@ -83,7 +83,7 @@ class PosNotification {
                 currency = "NGN"
                 cardScheme = trn.cardType
                 statusCode = trn.isoMsg.responseCode39
-                paymentDate = trn.createdAt.format("dd-MM-YYYY hh:mm:ss")
+                paymentDate = trn.createdAt.format("dd-MM-yyyy hh:mm:ss")
                 retrievalReferenceNumber = trn.isoMsg.retrievalReferenceNumber37
                 maskedPAN = trn.pan
                 nuban = ""

@@ -27,7 +27,7 @@ class NetworkMetricsInterceptor : Interceptor, KoinComponent {
             agentPhoneNumber = localStorage.agentPhone,
             agentCode = localStorage.agent?.agentCode,
             gpsCoordinates = localStorage.lastKnownLocation,
-            url = url.encodedPath,
+            url = url.toString(),
             method = request.method,
             requestTime = Instant.now(),
             appName = backendConfig.appName,

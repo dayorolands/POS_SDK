@@ -43,8 +43,6 @@ fun LocalDate.format(pattern: String, zoneID: String = defaultZone): String {
 
 fun LocalDate.toString(pattern: String, zoneID: String = defaultZone) = format(pattern, zoneID)
 
-fun String.toLocalDate() = LocalDate.parse(this)
-
 fun String.toInstant(pattern: String, zoneID: String = defaultZone): Instant {
     return Instant.from(formatter(pattern, zoneID).parse(this))
 }

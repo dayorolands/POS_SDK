@@ -324,7 +324,10 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             throw PublicKeyDownloadException(isoMsg.responseMessage)
         }
 
-        val capk = isoMsg.managementDataTwo63?.parsePrivateFieldData()
+        val capk = isoMsg.managementDataTwo63?.run {
+            if (contains("~")) parsePrivateFieldData()
+            else "${this}1".parseCapkData()
+        }
 
         capkList = capk ?: throw PublicKeyDownloadException("")
     }
@@ -436,6 +439,29 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         }
 
         return jsonObject
+    }
+
+    private fun String.parseCapkData(): JSONArray {
+        val jsonArray = JSONArray()
+        val strLength = length
+        var index = 0
+        while (index < strLength) {
+            val jsonObject = JSONObject()
+            while (true) {
+                val tag = substring(index, index + 2)
+                index += 2
+                val tagLength = substring(index, index + 3).toInt()
+                index += 3
+                val tagData = substring(index, index + tagLength)
+                index += tagLength
+
+                jsonObject.put(tag, tagData)
+
+                if (tag == "40") break
+            }
+            jsonArray.put(jsonObject)
+        }
+        return jsonArray
     }
 
     class KeyDownloadException(message: String) : Exception("Key Download Failed. $message")

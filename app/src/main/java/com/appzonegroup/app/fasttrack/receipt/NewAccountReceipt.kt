@@ -48,7 +48,7 @@ Account Name: $accountName
 Account Number: ${accountNumber.mask(4, 2)}
 Account Type: ${if (isWalletAccount) "Wallet Account" else "Savings Account"}
 
-Creation Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}
+Creation Date: ${Instant.now().toString("dd-MM-yyyy hh:mm")}
 RRN: $uniqueReferenceID"""
                 )
             ).apply { addTransactionStatus(); addAll(footerNodes(context)) }

@@ -48,7 +48,7 @@ Payment Item Code: ${request.paymentItemCode}
 Biller Name: ${request.billerName}
 Biller Category: ${request.billerCategoryName}
 
-Transaction Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}
+Transaction Date: ${Instant.now().toString("dd-MM-yyyy hh:mm")}
 
 Customer Account: ${request.customerId?.mask(4, 2)}
 Customer Name: ${request.customerName}
