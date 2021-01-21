@@ -48,8 +48,8 @@ val apiModule = module {
         val cache = Cache(androidContext().cacheDir, CACHE_SIZE)
         val builder = OkHttpClient().newBuilder()
             .connectTimeout(2, TimeUnit.MINUTES)
-            .readTimeout(2, TimeUnit.MINUTES)
-            .writeTimeout(2, TimeUnit.MINUTES)
+            .readTimeout(3, TimeUnit.MINUTES)
+            .writeTimeout(3, TimeUnit.MINUTES)
             .cache(cache)
 
         builder
