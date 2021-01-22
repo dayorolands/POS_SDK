@@ -12,8 +12,7 @@ import kotlinx.coroutines.launch
 class BalanceInquiryActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.Balance
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onPosReady() {
         requestCard()
     }
 

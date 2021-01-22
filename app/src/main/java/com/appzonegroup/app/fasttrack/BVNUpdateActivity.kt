@@ -10,7 +10,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.appzonegroup.app.fasttrack.databinding.ActivityBvnupdateBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
-import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.request.BVNRequest
 import com.creditclub.core.type.TokenType
 import com.creditclub.core.ui.CreditClubFragment
@@ -151,7 +150,7 @@ class BVNUpdateActivity : CustomerBaseActivity() {
                             response ?: return@launch activity.showInternalError()
 
                             if (response.isSuccessful) {
-                                activity.dialogProvider.showSuccess<Unit>("BVN was updated successfully") {
+                                activity.dialogProvider.showSuccess("BVN was updated successfully") {
                                     onClose {
                                         activity.finish()
                                     }

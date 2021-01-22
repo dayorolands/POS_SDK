@@ -11,13 +11,7 @@ class JsonStoreDelegate<T : Any>(
     private val prefs: SharedPreferences,
     private val key: String,
     private val serializer: KSerializer<T>,
-    private val json: Json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-                allowSpecialFloatingPointValues = true
-                useArrayPolymorphism = true
-                encodeDefaults = true
-    }
+    private val json: Json,
 ) {
     operator fun getValue(obj: Any?, prop: KProperty<*>): T? {
         val value = prefs.getString(key, null) ?: return null
@@ -36,11 +30,27 @@ class JsonStoreDelegate<T : Any>(
 
 inline fun <reified T : Any> SharedPreferences.jsonStore(
     key: String,
-    serializer: KSerializer<T>
+    serializer: KSerializer<T>,
+    json: Json = Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+        allowSpecialFloatingPointValues = true
+        useArrayPolymorphism = true
+        encodeDefaults = true
+    }
 ): JsonStoreDelegate<T> {
-    return JsonStoreDelegate(this, key, serializer)
+    return JsonStoreDelegate(this, key, serializer, json)
 }
 
-inline fun <reified T : Any> SharedPreferences.jsonStore(key: String): JsonStoreDelegate<T> {
-    return JsonStoreDelegate(this, key, serializer())
+inline fun <reified T : Any> SharedPreferences.jsonStore(
+    key: String,
+    json: Json = Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+        allowSpecialFloatingPointValues = true
+        useArrayPolymorphism = true
+        encodeDefaults = true
+    }
+): JsonStoreDelegate<T> {
+    return JsonStoreDelegate(this, key, serializer(), json)
 }

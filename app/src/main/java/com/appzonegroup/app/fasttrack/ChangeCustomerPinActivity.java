@@ -9,24 +9,19 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.appzonegroup.app.fasttrack.model.AppConstants;
 import com.appzonegroup.app.fasttrack.model.ChangePinRequest;
 import com.appzonegroup.app.fasttrack.model.TokenRequest;
 import com.appzonegroup.app.fasttrack.ui.NonSwipeableViewPager;
 import com.appzonegroup.app.fasttrack.utility.LocalStorage;
-import com.appzonegroup.app.fasttrack.utility.TrackGPS;
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask;
 import com.google.gson.Gson;
 
@@ -48,7 +43,6 @@ public class ChangeCustomerPinActivity extends BaseActivity {
     String confirmNewPin = "";
     String customerToken = "";
     String customerAccount = "";
-    TrackGPS gps;
 
     @Nullable
     @Override
@@ -72,13 +66,7 @@ public class ChangeCustomerPinActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_customer_pin);
 
-        gps = new TrackGPS(ChangeCustomerPinActivity.this);
         gson = new Gson();
-
-        if(!gps.canGetLocation())
-        {
-            gps.showSettingsAlert();
-        }
 
         mSectionsPagerAdapter = new ChangeCustomerPinActivity.SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -161,7 +149,7 @@ public class ChangeCustomerPinActivity extends BaseActivity {
 
     public void change_pin_button_click(View view) {
 
-        String location = gps.getGeolocationString();
+        String location = getGps().getGeolocationString();
 
         oldPin = oldPinET.getText().toString();
 

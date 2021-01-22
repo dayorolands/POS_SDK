@@ -32,12 +32,6 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 7/23/2019.
- * Appzone Ltd
- */
-
 abstract class CreditClubActivity : AppCompatActivity {
 
     constructor() : super()
@@ -75,14 +69,10 @@ abstract class CreditClubActivity : AppCompatActivity {
         super.onCreate(savedInstanceState)
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
-        functionId?.also { id ->
-            AppFunctions[id]?.also { appFunction ->
-                val screenName = getString(appFunction.label)
-                firebaseAnalytics.setCurrentScreen(this, screenName, null)
-
-                mainScope.launch {
-                    logFunctionUsage(id)
-                }
+        val functionId = functionId
+        if (functionId != null && AppFunctions[functionId] != null) {
+            mainScope.launch {
+                logFunctionUsage(functionId)
             }
         }
 
@@ -111,7 +101,9 @@ abstract class CreditClubActivity : AppCompatActivity {
             return
         }
 
-        if (checkPlayServices()) {
+        val apiAvailability = GoogleApiAvailability.getInstance()
+        val resultCode = apiAvailability.isGooglePlayServicesAvailable(this)
+        if (resultCode == ConnectionResult.SUCCESS) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 if (location != null) {
                     localStorage.lastKnownLocation = "${location.latitude};${location.longitude}"
@@ -126,24 +118,9 @@ abstract class CreditClubActivity : AppCompatActivity {
         super.onDestroy()
     }
 
-    private fun checkPlayServices(): Boolean {
-        val apiAvailability = GoogleApiAvailability.getInstance()
-        val resultCode = apiAvailability.isGooglePlayServicesAvailable(this)
-        if (resultCode != ConnectionResult.SUCCESS) {
-//            if (apiAvailability.isUserResolvableError(resultCode)) {
-//                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
-//                    .show()
-//            } else {
-//                finish()
-//            }
-            return false
-        }
-        return true
-    }
+    fun showNetworkError() = showNetworkError(null)
 
-    fun showNetworkError() = showNetworkError<Nothing>(null)
-
-    fun <T> showNetworkError(block: DialogListenerBlock<T>?) {
+    fun showNetworkError(block: DialogListenerBlock<*>?) {
         dialogProvider.hideProgressBar()
         val message = getString(R.string.a_network_error_occurred)
 
@@ -151,9 +128,9 @@ abstract class CreditClubActivity : AppCompatActivity {
         dialogProvider.showError(message, block)
     }
 
-    fun showInternalError() = showInternalError<Nothing>(null)
+    fun showInternalError() = showInternalError(null)
 
-    fun <T> showInternalError(block: DialogListenerBlock<T>?) {
+    fun showInternalError(block: DialogListenerBlock<*>?) {
         dialogProvider.hideProgressBar()
         val message = "An internal error occurred. Please try again later"
 
@@ -161,7 +138,7 @@ abstract class CreditClubActivity : AppCompatActivity {
         dialogProvider.showError(message, block)
     }
 
-    fun <T> showError(exception: Exception, block: DialogListenerBlock<T>?) {
+    fun showError(exception: Exception, block: DialogListenerBlock<*>?) {
         dialogProvider.hideProgressBar()
         val message = exception.getMessage(this)
 
@@ -169,9 +146,5 @@ abstract class CreditClubActivity : AppCompatActivity {
         dialogProvider.showError(message, block)
     }
 
-    fun showError(exception: Exception) = showError<Nothing>(exception, null)
-
-    companion object {
-        private const val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
-    }
+    fun showError(exception: Exception) = showError(exception, null)
 }

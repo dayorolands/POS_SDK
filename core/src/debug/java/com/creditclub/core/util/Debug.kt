@@ -1,5 +1,3 @@
 package com.creditclub.core.util
 
-inline fun debugOnly(block: () -> Unit) {
-    block()
-}
+inline fun debugOnly(crossinline block: () -> Unit) = block()

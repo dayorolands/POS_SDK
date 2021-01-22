@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pos_nav_graph"
+    app:startDestination="@id/cardMenuFragment">
+
+    <fragment
+        android:id="@+id/cardMenuFragment"
+        android:name="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+        android:label="CardMenu"
+        tools:layout="@layout/activity_card_main_menu">
+
+        <argument
+            android:name="showBackButton"
+            android:defaultValue="false"
+            app:argType="boolean" />
+    </fragment>
+</navigation>

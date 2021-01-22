@@ -84,14 +84,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
 
                 if (image != null) {
                     //final CacheHelper ch = new CacheHelper(getActivity());
-                    finalLocation = "0.00;0.00"
-                    val gpsTracker = GPSTracker(activity)
-                    if (gpsTracker.location != null) {
-                        Log.e("CangetLocation", "NULL")
-                        val longitude = gpsTracker.location.longitude.toString()
-                        val latitude = gpsTracker.location.latitude.toString()
-                        finalLocation = "$latitude;$longitude"
-                    }
+                    finalLocation = gps.geolocationString
                     nextOperation()
 
                 } else {
@@ -186,7 +179,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
     }
 
     private fun showDialogWithGoHomeAction(message: String?) {
-        dialogProvider.showError<Nothing>(message) {
+        dialogProvider.showError(message) {
             onClose {
                 (activity as OnlineActivity?)?.goHome()
             }

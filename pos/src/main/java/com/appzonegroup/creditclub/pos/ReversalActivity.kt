@@ -8,8 +8,7 @@ import com.creditclub.pos.card.TransactionType
 class ReversalActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.Reversal
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onPosReady() {
         showReferencePage("Reversal")
     }
 

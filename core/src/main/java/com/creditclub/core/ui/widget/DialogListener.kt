@@ -25,7 +25,7 @@ class DialogListener<T> {
     }
 
     companion object {
-        inline fun <T> create(block: DialogListenerBlock<T>): DialogListener<T> {
+        inline fun <T> create(crossinline block: DialogListenerBlock<T>): DialogListener<T> {
             return DialogListener<T>().apply(block)
         }
     }

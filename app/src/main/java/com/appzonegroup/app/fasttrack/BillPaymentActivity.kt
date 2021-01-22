@@ -203,7 +203,7 @@ class BillPaymentActivity : BaseActivity() {
                     }
                     hideProgressBar()
 
-                    val finishOnClose: DialogListenerBlock<Nothing> = {
+                    val finishOnClose: DialogListenerBlock<*> = {
                         onClose {
                             setResult(1)
                             finish()

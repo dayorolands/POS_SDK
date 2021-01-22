@@ -3,6 +3,7 @@ package com.creditclub.pos
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.creditclub.pos.card.AccountType
+import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
 
 class PosTransactionViewModel : ViewModel() {
@@ -13,6 +14,7 @@ class PosTransactionViewModel : ViewModel() {
     val amountNumberFormat = MutableLiveData("0.00")
     val accountType = MutableLiveData<AccountType>()
     val cardReaderEvent = MutableLiveData<CardReaderEvent>()
+    val cardData = MutableLiveData<CardData>()
 
     private val nextOperation = MutableLiveData<Function0<Unit>>()
 

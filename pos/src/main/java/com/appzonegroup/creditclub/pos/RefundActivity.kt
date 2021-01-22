@@ -8,8 +8,7 @@ import com.creditclub.pos.card.TransactionType
 class RefundActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.Refund
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onPosReady() {
         showReferencePage("Refund")
     }
 

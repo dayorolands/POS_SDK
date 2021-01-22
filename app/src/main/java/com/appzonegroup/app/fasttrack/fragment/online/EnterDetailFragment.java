@@ -35,6 +35,7 @@ import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages;
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson;
 import com.creditclub.core.data.Encryption;
 import com.creditclub.core.ui.CreditClubActivity;
+import com.creditclub.core.ui.CreditClubFragment;
 import com.creditclub.core.ui.widget.DialogProvider;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -48,7 +49,7 @@ import java.util.concurrent.TimeoutException;
  * Contact fdamilola@gmail.com or fdamilola@hextremelabs.com or fdamilola@echurch.ng or fdamilola@cottacush.com
  * +2348166200715
  */
-public class EnterDetailFragment extends Fragment implements View.OnClickListener {
+public class EnterDetailFragment extends CreditClubFragment implements View.OnClickListener {
 
     TextView upperHint;
     EditText textDetail;
@@ -179,10 +180,6 @@ public class EnterDetailFragment extends Fragment implements View.OnClickListene
                 });
             }
         }
-    }
-
-    private DialogProvider getDialogProvider() {
-        return ((CreditClubActivity) getActivity()).getDialogProvider();
     }
 
     private void processData(String result, String txt) {

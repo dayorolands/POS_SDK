@@ -43,7 +43,7 @@ class N3CardReader(
     private var supportsMagStripe = true
 
     override suspend fun waitForCard(): CardReaderEvent {
-        dialogProvider.showProgressBar<Nothing>("Opening device", "Please wait...", true) {
+        dialogProvider.showProgressBar("Opening device", "Please wait...", true) {
             onClose {
                 userCancel = true
                 deviceClose()
@@ -161,7 +161,7 @@ class N3CardReader(
     }
 
     private fun updateCardWaitingProgress(text: String = "Please insert card") {
-        dialogProvider.showProgressBar<Nothing>(text, "Waiting...", isCancellable = true) {
+        dialogProvider.showProgressBar(text, "Waiting...", isCancellable = true) {
             onClose {
                 userCancel = true
                 deviceClose()

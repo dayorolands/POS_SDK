@@ -2,30 +2,63 @@ package com.creditclub.core.util
 
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.creditclub.core.BuildConfig
 
+inline class SafeRunResult<out T>(val value: Any?) {
+
+    inline val data: T?
+        get() = when {
+            isFailure -> null
+            else -> value as? T
+        }
+
+    val error: Exception?
+        get() = when (value) {
+            is Failure -> value.exception
+            else -> null
+        }
+
+    operator fun component1(): T? = data
+
+    operator fun component2(): Exception? = error
+
+
+    /**
+     * Returns `true` if this instance represents a successful outcome.
+     * In this case [isFailure] returns `false`.
+     */
+    val isSuccess: Boolean get() = value !is Failure
+
+    /**
+     * Returns `true` if this instance represents a failed outcome.
+     * In this case [isSuccess] returns `false`.
+     */
+    val isFailure: Boolean get() = value is Failure
+
+    internal class Failure(
+        @JvmField
+        val exception: Exception
+    ) {
+        override fun equals(other: Any?): Boolean = other is Failure && exception == other.exception
+        override fun hashCode(): Int = exception.hashCode()
+        override fun toString(): String = "Failure($exception)"
+    }
+}
 
 /**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 25/09/2019.
- * Appzone Ltd
+ * Creates an instance of internal marker [Result.Failure] class to
+ * make sure that this class is not exposed in ABI.
  */
-
-data class SafeRunResult<T>(val data: T?, val error: Exception?)
+@PublishedApi
+@SinceKotlin("1.3")
+internal fun createFailure(exception: Exception): Any =
+    SafeRunResult.Failure(exception)
 
 inline fun <T> safeRun(crossinline block: () -> T): SafeRunResult<T> {
-    var data: T? = null
-    var error: Exception? = null
-
-    try {
-        data = block()
+    return try {
+        SafeRunResult(block())
     } catch (ex: Exception) {
-        error = ex
         FirebaseCrashlytics.getInstance().recordException(ex)
-        debugOnly {
-            Log.e("safeRun", ex.message, ex)
-            ex.printStackTrace()
-        }
+        debugOnly { Log.e("safeRun", ex.message, ex) }
+        SafeRunResult(createFailure(ex))
     }
-
-    return SafeRunResult(data, error)
 }

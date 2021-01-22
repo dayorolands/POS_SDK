@@ -39,7 +39,7 @@ class ActivityMiniStatementManager(
                     agentPIN = pin
 
                     if (agentPIN.length != 4) {
-                        return@onSubmit showError<Nothing>("Agent PIN must be 4 digits") {
+                        return@onSubmit showError("Agent PIN must be 4 digits") {
                             onClose {
                                 finish()
                             }
@@ -139,7 +139,7 @@ class ActivityMiniStatementManager(
                         showError("You don't have any transaction for this period")
                     } else adapter.setData(response.data)
                 } else {
-                    showError<Nothing>(response.responseMessage) {
+                    showError(response.responseMessage) {
                         onClose {
                             if (closeOnFail) finish()
                         }

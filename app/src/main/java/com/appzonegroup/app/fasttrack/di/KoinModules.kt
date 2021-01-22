@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit
 private const val CACHE_SIZE = 10L * 1024 * 1024 // 10 MB
 
 val dataModule = module {
-    single { LocalStorage.getInstance(androidContext()) }
+    single { LocalStorage(androidContext()) }
     single { AppDataStorage.getInstance(androidContext()) }
     single { CoreDatabase.getInstance(androidContext()) }
 }

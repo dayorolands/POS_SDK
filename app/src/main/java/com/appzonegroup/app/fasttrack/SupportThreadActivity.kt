@@ -22,7 +22,6 @@ import com.creditclub.core.ui.SimpleAdapter
 import com.creditclub.core.util.*
 import com.creditclub.ui.dataBinding
 import com.esafirm.imagepicker.features.ImagePicker
-import com.esafirm.imagepicker.features.ReturnMode
 import com.esafirm.imagepicker.model.Image
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -160,7 +159,7 @@ class SupportThreadActivity : CreditClubActivity(R.layout.activity_support_threa
         adapter.setData(newMessageList)
         binding.container.smoothScrollToPosition(newMessageList.size - 1)
 
-        dialogProvider.showSuccess<Nothing>("Feedback sent successfully") {
+        dialogProvider.showSuccess("Feedback sent successfully") {
             onClose {
                 finish()
             }
@@ -177,7 +176,7 @@ class SupportThreadActivity : CreditClubActivity(R.layout.activity_support_threa
         if (error != null) return showError(error)
         response ?: return showNetworkError()
 
-        dialogProvider.showSuccess<Nothing>("Case closed") {
+        dialogProvider.showSuccess("Case closed") {
             onClose {
                 finish()
             }

@@ -1,10 +1,12 @@
 package com.appzonegroup.creditclub.pos.data
 
 import android.content.Context
+import androidx.fragment.app.Fragment
 import com.creditclub.core.util.delegates.jsonStore
 import com.creditclub.pos.model.BinRoutes
 
 inline val Context.posPreferences get() = PosPreferences(this)
+inline val Fragment.posPreferences get() = PosPreferences(requireContext())
 
 class PosPreferences(context: Context) {
     private val prefs = context.getSharedPreferences("POS_PREFERENCES", 0)

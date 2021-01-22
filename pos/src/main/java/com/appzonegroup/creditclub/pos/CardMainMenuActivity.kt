@@ -12,14 +12,11 @@ import com.creditclub.core.util.format
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.showError
-import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosParameter
-import com.creditclub.pos.RemoteConnectionInfo
 import com.creditclub.pos.api.posApiService
 import com.creditclub.ui.dataBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 import java.time.Instant
 
 

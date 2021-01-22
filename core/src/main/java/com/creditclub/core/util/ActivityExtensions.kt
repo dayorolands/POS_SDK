@@ -29,7 +29,7 @@ fun Context.isMyServiceRunning(serviceClass: Class<*>): Boolean {
     return false
 }
 
-val Activity.finishOnClose: DialogListenerBlock<Nothing>
+inline val Activity.finishOnClose: DialogListenerBlock<*>
     get() = {
         onClose {
             finish()
@@ -51,13 +51,13 @@ fun CreditClubActivity.indicateError(message: String, view: EditText?) {
 
 fun CreditClubActivity.showError(message: String?) = dialogProvider.showError(message)
 
-fun CreditClubActivity.showError(message: String?, block: DialogListenerBlock<Nothing>) {
+fun CreditClubActivity.showError(message: String?, block: DialogListenerBlock<*>) {
     dialogProvider.showError(message, block)
 }
 
 fun CreditClubActivity.showSuccess(message: String?) = dialogProvider.showError(message)
 
-fun CreditClubActivity.showSuccess(message: String?, block: DialogListenerBlock<Nothing>) {
+fun CreditClubActivity.showSuccess(message: String?, block: DialogListenerBlock<*>) {
     dialogProvider.showError(message, block)
 }
 
@@ -67,7 +67,7 @@ fun CreditClubActivity.showProgressBar(
     title: String,
     subtitle: String = "Please wait...",
     isCancellable: Boolean = false,
-    block: DialogListenerBlock<Nothing>? = null
+    block: DialogListenerBlock<*>? = null
 ): Dialog {
     return dialogProvider.showProgressBar(title, subtitle, isCancellable, block)
 }

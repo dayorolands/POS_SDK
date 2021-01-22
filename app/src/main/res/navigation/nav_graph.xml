@@ -5,6 +5,12 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/homeFragment">
 
+    <include app:graph="@navigation/pos_nav_graph" />
+
+    <action
+        android:id="@+id/action_to_pos_nav_graph"
+        app:destination="@id/pos_nav_graph" />
+
     <fragment
         android:id="@+id/billPaymentFragment"
         android:name="com.appzonegroup.app.fasttrack.fragment.BillPaymentFragment"

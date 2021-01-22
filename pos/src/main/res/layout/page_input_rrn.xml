@@ -26,21 +26,30 @@
                 layout="@layout/header"
                 app:subtitle='@{title}' />
 
-            <include
-                android:id="@+id/rrn_field"
-                layout="@layout/text_field"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/rrn_input_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
-                app:hint='@{"Enter RRN"}'
-                app:inputType='@{"number"}' />
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:hint="RRN">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/rrn_input"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_margin="20dp"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp">
+
                 <Button
-                    android:id="@+id/confirm_cashout_button"
+                    android:id="@+id/cancel_button"
                     style="@style/AppButton.RoundOrangeButton"
                     android:layout_width="0dp"
                     android:layout_height="60dp"

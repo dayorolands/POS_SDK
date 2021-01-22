@@ -59,14 +59,14 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         } else currentProgressDialog = null
     }
 
-    override fun <T> showError(message: CharSequence?, block: DialogListenerBlock<T>?) {
+    override fun showError(message: CharSequence?, block: DialogListenerBlock<*>?) {
         activity.runOnUiThread {
             hideProgressBar()
             val dialog = getErrorDialog(activity, message)
 
             dialog.close_btn.setOnClickListener {
                 dialog.dismiss()
-                if (block != null) DialogListener.create(block).close()
+                if (block != null) DialogListener.create<Any>(block).close()
             }
 
             dialog.show()
@@ -87,14 +87,14 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         }
     }
 
-    override fun <T> showSuccess(message: CharSequence?, block: DialogListenerBlock<T>?) {
+    override fun showSuccess(message: CharSequence?, block: DialogListenerBlock<*>?) {
         activity.runOnUiThread {
             hideProgressBar()
             val dialog = getSuccessDialog(activity, message)
 
             dialog.close_btn.setOnClickListener {
                 dialog.dismiss()
-                if (block != null) DialogListener.create(block).close()
+                if (block != null) DialogListener.create<Any>(block).close()
             }
 
             dialog.show()
@@ -113,11 +113,11 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
     }
 
-    override fun <T> showProgressBar(
+    override fun showProgressBar(
         title: CharSequence,
         message: CharSequence?,
         isCancellable: Boolean,
-        block: (DialogListenerBlock<T>)?
+        block: (DialogListenerBlock<*>)?
     ): Dialog {
         activity.runOnUiThread {
             progressDialog.findViewById<TextView>(R.id.message_tv).text = message
@@ -131,7 +131,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
             }
 
             if (block != null) {
-                val listener = DialogListener.create(block)
+                val listener = DialogListener.create<Any>(block)
 
                 progressDialog.findViewById<View>(R.id.cancel_button).setOnClickListener {
                     if (progressDialog.isShowing) progressDialog.hide()

@@ -39,7 +39,7 @@ class QPosCardReader(
         pos.setTerminalID(posConfig.terminalId, 5000)
         val connected: Boolean = connectDevice()
         if (!connected) return suspendCoroutine { continuation ->
-            dialogProvider.showError<Nothing>("Could not connect to device") {
+            dialogProvider.showError("Could not connect to device") {
                 onClose { continuation.resume(CardReaderEvent.CANCELLED) }
             }
         }

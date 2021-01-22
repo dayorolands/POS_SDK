@@ -26,9 +26,9 @@ inline val Dialog.showOnClose: DialogListenerBlock<Nothing>
         }
     }
 
-fun DialogProvider.showNetworkError() = showNetworkError<Nothing>(null)
+fun DialogProvider.showNetworkError() = showNetworkError(null)
 
-fun <T> DialogProvider.showNetworkError(block: DialogListenerBlock<T>?) {
+fun DialogProvider.showNetworkError(block: DialogListenerBlock<*>?) {
     hideProgressBar()
     val message = context.getString(R.string.a_network_error_occurred)
 
@@ -36,9 +36,9 @@ fun <T> DialogProvider.showNetworkError(block: DialogListenerBlock<T>?) {
     showError(message, block)
 }
 
-fun DialogProvider.showInternalError() = showNetworkError<Nothing>(null)
+fun DialogProvider.showInternalError() = showNetworkError(null)
 
-fun <T> DialogProvider.showInternalError(block: DialogListenerBlock<T>?) {
+fun DialogProvider.showInternalError(block: DialogListenerBlock<*>?) {
     hideProgressBar()
     val message = "An internal error occurred. Please try again later"
 
@@ -46,7 +46,7 @@ fun <T> DialogProvider.showInternalError(block: DialogListenerBlock<T>?) {
     showError(message, block)
 }
 
-fun <T> DialogProvider.showError(exception: Exception, block: DialogListenerBlock<T>?) {
+fun DialogProvider.showError(exception: Exception, block: DialogListenerBlock<*>?) {
     hideProgressBar()
     val message = exception.getMessage(context)
 
@@ -54,7 +54,7 @@ fun <T> DialogProvider.showError(exception: Exception, block: DialogListenerBloc
     showError(message, block)
 }
 
-fun DialogProvider.showError(exception: Exception) = showError<Nothing>(exception, null)
+fun DialogProvider.showError(exception: Exception) = showError(exception, null)
 
 fun Context.createDialog(): Dialog {
     val dialog = Dialog(this)

@@ -10,8 +10,6 @@ import android.os.BatteryManager
 import android.os.Looper
 import android.widget.Toast
 import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.core.util.getConfirmation
-import com.creditclub.core.util.showErrorAndWait
 import com.creditclub.pos.printer.*
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
