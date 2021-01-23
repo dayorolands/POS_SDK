@@ -4,13 +4,12 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Looper
 import androidx.activity.ComponentActivity
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.util.*
 import com.creditclub.core.data.prefs.LocalStorage
+import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.delegates.jsonArrayStore
@@ -48,16 +47,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
     private val prefs: SharedPreferences = run {
         val suffix = "${posMode.ip}:${posMode.port}"
         val suffixHash = suffix.toByteArray().sha256String
-        val masterKeyAlias = MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
-        EncryptedSharedPreferences.create(
-            context.applicationContext,
-            "parameter:$suffixHash",
-            masterKeyAlias,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+        context.getEncryptedSharedPreferences("pos_parameters_0:$suffixHash")
     }
     private val config: PosConfig by inject()
     private val database: PosDatabase by inject()

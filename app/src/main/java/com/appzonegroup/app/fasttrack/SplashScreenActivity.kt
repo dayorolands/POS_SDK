@@ -12,8 +12,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.utility.Dialogs
-import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.creditclub.core.util.localStorage
+import com.creditclub.core.util.safeRun
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class SplashScreenActivity : AppCompatActivity() {
@@ -40,27 +40,23 @@ class SplashScreenActivity : AppCompatActivity() {
     }
 
     private fun loadPage() {
-        object : Thread() {
-            override fun run() {
-                try {
-                    sleep(3000)
-                    if (LocalStorage.GetValueFor(
-                            AppConstants.ACTIVATED,
-                            baseContext
-                        ) == null
-                    ) {
-                        val intent =
-                            Intent(this@SplashScreenActivity, AgentActivationActivity::class.java)
-                        startActivity(intent)
-                    } else {
-                        val intent =
-                            Intent(this@SplashScreenActivity, LoginActivity::class.java)
-                        startActivity(intent)
-                    }
-                    finish()
-                } catch (ex: InterruptedException) {
-                    FirebaseCrashlytics.getInstance().recordException(ex)
+        Thread {
+            safeRun {
+                Thread.sleep(3000)
+                if (localStorage.getString(AppConstants.ACTIVATED, null) == null) {
+                    val intent = Intent(
+                        this@SplashScreenActivity,
+                        AgentActivationActivity::class.java
+                    )
+                    startActivity(intent)
+                } else {
+                    val intent = Intent(
+                        this@SplashScreenActivity,
+                        LoginActivity::class.java
+                    )
+                    startActivity(intent)
                 }
+                finish()
             }
         }.start()
     }
@@ -166,6 +162,8 @@ class SplashScreenActivity : AppCompatActivity() {
                 // permission denied, boo! Disable the
                 // functionality that depends on this permission.
             }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
     }
 

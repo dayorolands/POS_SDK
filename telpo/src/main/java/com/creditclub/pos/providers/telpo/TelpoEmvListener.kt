@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.PowerManager
 import android.util.Log
 import androidx.core.content.edit
+import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.format
 import com.creditclub.core.util.toCurrencyFormat
@@ -35,7 +36,7 @@ class TelpoEmvListener(
     internal var cardData: TelpoEmvCardData? = null
     internal var pinBlock: String? = null
     private var bUIThreadisRunning = true
-    private val prefs = context.getSharedPreferences("TelpoPosManager", 0)
+    private val prefs = context.getEncryptedSharedPreferences("com.telpo.manager")
     var status: CardTransactionStatus? = null
         private set
 

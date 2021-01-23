@@ -86,17 +86,17 @@ fun CreditClubFragment.openPageById(id: Int) {
 
             val i = Intent(requireContext(), BillerActivity::class.java).apply {
                 putExtra("categoryId", billCategory.id)
-                LocalStorage.SaveValue(AppConstants.CATEGORYID, billCategory.id, baseContext)
+                BillsLocalStorage.SaveValue(AppConstants.CATEGORYID, billCategory.id, baseContext)
 
                 putExtra("categoryName", billCategory.name)
-                LocalStorage.SaveValue(
+                BillsLocalStorage.SaveValue(
                     AppConstants.CATEGORYNAME,
                     billCategory.name,
                     baseContext
                 )
 
                 putExtra("propertyChanged", billCategory.propertyChanged)
-                LocalStorage.SaveValue(
+                BillsLocalStorage.SaveValue(
                     AppConstants.PROPERTYCHANGED,
                     billCategory.propertyChanged,
                     baseContext

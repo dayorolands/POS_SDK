@@ -7,7 +7,6 @@ import android.widget.EditText;
 import com.appzonegroup.app.fasttrack.model.AppConstants;
 import com.appzonegroup.app.fasttrack.model.ChangePinRequest;
 import com.appzonegroup.app.fasttrack.utility.FunctionIds;
-import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask;
 import com.google.gson.Gson;
 
@@ -87,9 +86,9 @@ public class ChangePinActivity extends BaseActivity {
         if (getPackageName().contains("creditclub"))
         {
             ChangePinRequest changePinRequest = new ChangePinRequest();
-            changePinRequest.setAgentPhoneNumber(LocalStorage.getPhoneNumber(getBaseContext()));
-            changePinRequest.setActivationCode(LocalStorage.GetValueFor(AppConstants.AGENT_CODE, getBaseContext()));
-            changePinRequest.setInstitutionCode(LocalStorage.getInstitutionCode(getBaseContext()));
+            changePinRequest.setAgentPhoneNumber(getLocalStorage().getAgentPhone());
+            changePinRequest.setActivationCode(getLocalStorage().getAgent().getAgentCode());
+            changePinRequest.setInstitutionCode(getLocalStorage().getInstitutionCode());
             changePinRequest.setNewPin(newPin);
             changePinRequest.setConfirmNewPin(confirmNewPin);
             changePinRequest.setOldPin(oldPin);

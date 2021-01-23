@@ -4,14 +4,12 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.Toast
-
 import com.appzonegroup.app.fasttrack.adapter.BillerItemAdapter
 import com.appzonegroup.app.fasttrack.model.Biller
 import com.appzonegroup.app.fasttrack.model.BillerItem
@@ -19,23 +17,14 @@ import com.appzonegroup.app.fasttrack.network.APICaller
 import com.appzonegroup.app.fasttrack.scheduler.AndroidSchedulers
 import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
 import com.appzonegroup.app.fasttrack.ui.Dialogs
-import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.creditclub.core.util.localStorage
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-
-import java.util.ArrayList
-
 import rx.Observable
 import rx.Subscriber
 import rx.functions.Func0
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 4/12/2019.
- * Appzone Ltd
- */
+import java.util.*
 
 class BillerItemActivity : BaseActivity(), View.OnClickListener {
 

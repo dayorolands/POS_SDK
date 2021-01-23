@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import com.appzonegroup.app.fasttrack.BankOneApplication;
 import com.appzonegroup.app.fasttrack.OnlineActivity;
@@ -29,14 +28,11 @@ import com.appzonegroup.app.fasttrack.model.online.AuthResponse;
 import com.appzonegroup.app.fasttrack.model.online.Response;
 import com.appzonegroup.app.fasttrack.network.online.APIHelper;
 import com.appzonegroup.app.fasttrack.utility.GPSTracker;
-import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.Misc;
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages;
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson;
 import com.creditclub.core.data.Encryption;
-import com.creditclub.core.ui.CreditClubActivity;
 import com.creditclub.core.ui.CreditClubFragment;
-import com.creditclub.core.ui.widget.DialogProvider;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
@@ -201,16 +197,16 @@ public class EnterDetailFragment extends CreditClubFragment implements View.OnCl
                         if (resp.contains("IN-CORRECT ACTIVATION CODE") && state == true) {
                             Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.ERROR_RESPONSE_COUNT, authResponse.getSessionId());
                             //Log.e("Case", "Incorrect activation code||Deleted cache auth");
-                            LocalStorage.deleteCacheAuth(getActivity());
+                            getLocalStorage().setCacheAuth(null);
                         } else if (state) {
                             //Log.e("Case", "correct activation code||"+txt);
                             Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.ERROR_RESPONSE_COUNT, authResponse.getSessionId());
-                            AuthResponse ar = LocalStorage.getCachedAuthResponse(getActivity());
+                            AuthResponse ar = ((BankOneApplication) getActivity().getApplication()).getAuthResponse();
                             JSONObject auth = new JSONObject();
                             auth.put("phone_number", ar.getPhoneNumber());
                             auth.put("session_id", ar.getSessionId());
                             auth.put("activation_code", txt);
-                            LocalStorage.saveCacheAuth(auth.toString(), getActivity());
+                            getLocalStorage().setCacheAuth(auth.toString());
                         }
                         if (resp.contains("MenuItem")) {
                             Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.SUCCESS_COUNT, authResponse.getSessionId());
@@ -265,7 +261,7 @@ public class EnterDetailFragment extends CreditClubFragment implements View.OnCl
                                 finalLocation = latitude + ";" + longitude;
                             }
 
-                            AuthResponse authResponse = LocalStorage.getCachedAuthResponse(getActivity());
+                            AuthResponse authResponse = ((BankOneApplication) requireActivity().getApplication()).getAuthResponse();
 
                             new APIHelper(getActivity()).continueNextOperation(authResponse.getPhoneNumber(), authResponse.getSessionId(), txt, finalLocation, new APIHelper.VolleyCallback<String>() {
                                 @Override

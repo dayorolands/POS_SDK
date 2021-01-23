@@ -8,9 +8,9 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.content.edit
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.ui.SurveyDialog
-import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
@@ -197,7 +197,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             return
         }
 
-        if (!isPhoneValid(phoneNumber)) {
+        if (localStorage.agentPhone != phoneNumber) {
             showError("Phone number is incorrect", R.id.login_phoneNumber)
             return
         }
@@ -238,7 +238,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         })
 
         val lastLogin = "Last Login: " + Misc.dateToLongString(Misc.getCurrentDateTime())
-        LocalStorage.SaveValue(AppConstants.LAST_LOGIN, lastLogin, baseContext)
+        localStorage.edit { putString(AppConstants.LAST_LOGIN, lastLogin) }
 
         val intent = Intent(this@LoginActivity, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
@@ -267,11 +267,6 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     private fun showError(message: String, viewId: Int) {
         dialogProvider.showError(message)
         findViewById<View>(viewId).requestFocus()
-    }
-
-    private fun isPhoneValid(phoneNumber: String): Boolean {
-        val storedPhone = LocalStorage.GetValueFor(AppConstants.AGENT_PHONE, baseContext)
-        return phoneNumber == storedPhone
     }
 
     private suspend fun settle() = withContext(Dispatchers.IO) {

@@ -3,6 +3,7 @@ package com.nexgo.n3
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil
+import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.pos.PosManager
@@ -35,7 +36,7 @@ class N3EmvListener(
     private val emvHandler2 = deviceEngine.getEmvHandler2("app2")
     private val cardData = N3CardData()
     private var filed55: String? = null
-    private val prefs = activity.getSharedPreferences("N3PosManager", 0)
+    private val prefs = activity.getEncryptedSharedPreferences("com.nexgo.n3.manager")
     private val posParameter: PosParameter by inject()
 
     override fun onSelApp(

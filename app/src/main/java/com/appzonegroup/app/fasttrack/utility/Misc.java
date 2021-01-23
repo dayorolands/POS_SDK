@@ -3,27 +3,25 @@ package com.appzonegroup.app.fasttrack.utility;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
-import androidx.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import androidx.annotation.NonNull;
+
 import com.appzonegroup.app.fasttrack.BuildConfig;
 import com.appzonegroup.app.fasttrack.R;
-import com.appzonegroup.app.fasttrack.dataaccess.DeviceTransactionInformationDAO;
-import com.appzonegroup.app.fasttrack.model.AppConstants;
 import com.appzonegroup.app.fasttrack.model.MainMenuItem;
 import com.appzonegroup.app.fasttrack.model.TransactionCountType;
 import com.appzonegroup.app.fasttrack.model.jsonbody.PayBillItemModel;
 import com.appzonegroup.app.fasttrack.scheduler.BackgroundThread;
+import com.creditclub.core.util.ContextExtensionsKt;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -34,7 +32,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -390,52 +387,20 @@ public class Misc {
     }
 
     public static int getTransactionMonitorCounter(Context context, String key) {
-        String value = LocalStorage.GetValueFor(key, context);
-        int count = 0;
-        if (value != null)
-            count = Integer.parseInt(value);
-
-        LocalStorage.SaveValue(key, String.valueOf(count), context);
-        return count;
+        return ContextExtensionsKt.getTransactionMonitorCounter(context, key);
     }
 
     public static void increaseTransactionMonitorCounter(Context context, TransactionCountType transactionCountType,
                                                          String sessionID) {
-        String key = "";
-        switch (transactionCountType) {
-            case ERROR_RESPONSE_COUNT:
-                key = AppConstants.getErrorResponseCount();
-                break;
-            case NO_INTERNET_COUNT:
-                key = AppConstants.getNoInternetCount();
-                break;
-            case REQUEST_COUNT:
-                key = AppConstants.getRequestCount();
-                break;
-            case SUCCESS_COUNT:
-                key = AppConstants.getSuccessCount();
-                break;
-            case NO_RESPONSE_COUNT:
-            default:
-                key = AppConstants.getNoResponseCount();
-                break;
-        }
-
-        String value = LocalStorage.GetValueFor(key, context);
-        int count = 0;
-        if (value != null)
-            count = Integer.parseInt(value) + 1;
-
-        LocalStorage.SaveValue(key, String.valueOf(count), context);
-        DeviceTransactionInformationDAO.Insert(context, sessionID);
+        ContextExtensionsKt.increaseTransactionMonitorCounter(
+                context,
+                com.creditclub.core.type.TransactionCountType.valueOf(transactionCountType.name()),
+                sessionID
+        );
     }
 
     public static void resetTransactionMonitorCounter(Context context) {
-        LocalStorage.SaveValue(AppConstants.getRequestCount(), "0", context);
-        LocalStorage.SaveValue(AppConstants.getSuccessCount(), "0", context);
-        LocalStorage.SaveValue(AppConstants.getErrorResponseCount(), "0", context);
-        LocalStorage.SaveValue(AppConstants.getNoInternetCount(), "0", context);
-        LocalStorage.SaveValue(AppConstants.getNoResponseCount(), "0", context);
+        ContextExtensionsKt.resetTransactionMonitorCounter(context);
     }
 
     public static String getRandomString() {

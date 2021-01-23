@@ -3,7 +3,6 @@ package com.creditclub.core.data.prefs
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.creditclub.core.R
 import com.creditclub.core.data.model.AgentInfo
 import com.creditclub.core.data.model.AuthResponse
 import com.creditclub.core.util.delegates.jsonStore
@@ -16,10 +15,7 @@ import kotlinx.serialization.json.Json
  */
 class LocalStorage(
     context: Context,
-    pref: SharedPreferences = context.getSharedPreferences(
-        context.getString(R.string.DATA_SOURCE),
-        Context.MODE_PRIVATE
-    )
+    pref: SharedPreferences = context.getEncryptedSharedPreferences("agent_0")
 ) : SharedPreferences by pref {
     private val json = Json {
         isLenient = true

@@ -17,7 +17,7 @@ import com.appzonegroup.app.fasttrack.network.APICaller
 import com.appzonegroup.app.fasttrack.scheduler.AndroidSchedulers
 import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
-import com.appzonegroup.app.fasttrack.utility.LocalStorage
+import com.appzonegroup.app.fasttrack.utility.BillsLocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
@@ -26,11 +26,6 @@ import rx.Observable
 import rx.Subscriber
 import rx.functions.Func0
 import java.util.*
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 4/12/2019.
- * Appzone Ltd
- */
 
 class BillsCategoryActivity : BaseActivity(), View.OnClickListener {
     internal val backgroundHandler: Handler by lazy { Misc.setupScheduler() }
@@ -136,21 +131,21 @@ class BillsCategoryActivity : BaseActivity(), View.OnClickListener {
                                         "categoryId",
                                         billCategory.id ?: billCategory.billerCategoryId
                                     )
-                                    LocalStorage.SaveValue(
+                                    BillsLocalStorage.SaveValue(
                                         AppConstants.CATEGORYID,
                                         billCategory.id ?: billCategory.billerCategoryId,
                                         baseContext
                                     )
 
                                     putExtra("categoryName", billCategory.name)
-                                    LocalStorage.SaveValue(
+                                    BillsLocalStorage.SaveValue(
                                         AppConstants.CATEGORYNAME,
                                         billCategory.name,
                                         baseContext
                                     )
 
                                     putExtra("propertyChanged", billCategory.propertyChanged)
-                                    LocalStorage.SaveValue(
+                                    BillsLocalStorage.SaveValue(
                                         AppConstants.PROPERTYCHANGED,
                                         billCategory.propertyChanged,
                                         baseContext
@@ -183,10 +178,7 @@ class BillsCategoryActivity : BaseActivity(), View.OnClickListener {
         return Observable.defer(Func0<Observable<String>> {
             var result: String? = ""
             try {
-                val url =
-                    Misc.getCategoryURL() + "?institutionCode=" + LocalStorage.getInstitutionCode(
-                        this
-                    )
+                val url = "${Misc.getCategoryURL()}?institutionCode=${localStorage.institutionCode}"
                 result = APICaller.makeGetRequest2(url)
 
             } catch (e: Exception) {

@@ -15,6 +15,8 @@ import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.type.TransactionCountType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
@@ -38,7 +40,7 @@ fun Context.getTransactionMonitorCounter(key: String): Int {
     return count
 }
 
-suspend inline fun Context.increaseTransactionMonitorCounter(
+fun Context.increaseTransactionMonitorCounter(
     transactionCountType: TransactionCountType,
     sessionID: String
 ) {
@@ -49,12 +51,14 @@ suspend inline fun Context.increaseTransactionMonitorCounter(
 
     localStorage.putString(transactionCountType.key, count.toString())
 
-    withContext(Dispatchers.IO) {
-        val info = DeviceTransactionInformation.getInstance(
-            this@increaseTransactionMonitorCounter,
-            sessionID
-        )
-        coreDatabase.deviceTransactionInformationDao().save(info)
+    GlobalScope.launch(Dispatchers.Main) {
+        withContext(Dispatchers.IO) {
+            val info = DeviceTransactionInformation.getInstance(
+                this@increaseTransactionMonitorCounter,
+                sessionID
+            )
+            coreDatabase.deviceTransactionInformationDao().save(info)
+        }
     }
 }
 

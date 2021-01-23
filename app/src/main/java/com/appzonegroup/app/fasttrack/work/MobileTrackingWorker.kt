@@ -3,12 +3,12 @@ package com.appzonegroup.app.fasttrack.work
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.appzonegroup.app.fasttrack.BuildConfig
-import com.appzonegroup.app.fasttrack.dataaccess.DeviceTransactionInformationDAO
-import com.appzonegroup.app.fasttrack.model.DeviceTransactionInformation
 import com.creditclub.analytics.AnalyticsObjectBox
 import com.creditclub.analytics.api.MobileTrackingService
 import com.creditclub.analytics.models.NetworkMeasurement
+import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.NullOnEmptyConverterFactory
+import com.creditclub.core.data.model.DeviceTransactionInformation
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.delegates.service
@@ -89,9 +89,8 @@ class MobileTrackingWorker(context: Context, params: WorkerParameters) :
         val gson = Gson()
         val localStorage: LocalStorage by inject()
 
-        val transactionInformationDAO = DeviceTransactionInformationDAO(applicationContext)
-        val allInfo = transactionInformationDAO.GetAll()
-
+        val dao = CoreDatabase.getInstance(applicationContext).deviceTransactionInformationDao()
+        val allInfo = dao.findAll()
         if (allInfo.isEmpty()) return
 
         val finishedTransactions = ArrayList<DeviceTransactionInformation>()
@@ -118,13 +117,11 @@ class MobileTrackingWorker(context: Context, params: WorkerParameters) :
         }
 
         if (response?.isSuccessful == true) {
-            transactionInformationDAO.DeleteSentRecords(
+            dao.deleteRange(
                 allInfo[0].id,
                 allInfo[allInfo.size - 1].id
             )
         }
-
-        transactionInformationDAO.close()
     }
 
     private fun <T> Sequence<T>.batch(n: Int): Sequence<List<T>> {

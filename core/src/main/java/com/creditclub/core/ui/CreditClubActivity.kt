@@ -13,11 +13,11 @@ import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.api.BackendConfig
+import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.getMessage
-import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.logFunctionUsage
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -41,6 +41,7 @@ abstract class CreditClubActivity : AppCompatActivity {
     open val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
     open val dialogProvider: DialogProvider by inject { parametersOf(this) }
     open val coreDatabase: CoreDatabase by inject()
+    open val localStorage: LocalStorage by inject()
     open val institutionConfig: IInstitutionConfig by inject()
     open val backendConfig: BackendConfig by inject()
 

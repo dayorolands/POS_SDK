@@ -1,20 +1,14 @@
 package com.appzonegroup.app.fasttrack
 
 import android.app.Application
+import android.os.Build
 import androidx.work.*
 import com.appzonegroup.app.fasttrack.work.IsoRequestLogWorker
-import com.appzonegroup.app.fasttrack.work.TransactionLogWorker
-import com.appzonegroup.creditclub.pos.data.PosDatabase
-import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
-import com.appzonegroup.creditclub.pos.service.CallHomeService
-import com.appzonegroup.creditclub.pos.service.ConfigService
-import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.app.fasttrack.work.ReversalWorker
-import com.creditclub.pos.PosConfig
-import com.creditclub.pos.PosParameter
-import org.koin.android.ext.koin.androidContext
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
+import com.appzonegroup.app.fasttrack.work.TransactionLogWorker
+import com.appzonegroup.creditclub.pos.service.ConfigService
+import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
+import com.creditclub.core.data.prefs.moveTo
 import java.util.concurrent.TimeUnit
 
 
@@ -24,6 +18,8 @@ import java.util.concurrent.TimeUnit
  */
 
 fun Application.startPosApp() {
+    encryptPosConfig()
+
     val workManager = WorkManager.getInstance(this)
 
     val constraints = Constraints.Builder()
@@ -63,4 +59,18 @@ fun Application.startPosApp() {
 //        }
 //        get<CallHomeService>().startCallHomeTimer()
 //    }
+}
+
+private fun Application.encryptPosConfig() {
+    val prefsName = "Config"
+    val prefs = getSharedPreferences(
+        prefsName,
+        Application.MODE_PRIVATE
+    )
+    if (prefs.contains("TERMINAL_ID")) {
+        prefs.moveTo(getEncryptedSharedPreferences(ConfigService.DEFAULT_FILE_NAME))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            deleteSharedPreferences(prefsName)
+        }
+    }
 }
