@@ -1,19 +1,34 @@
 package com.appzonegroup.app.fasttrack.model;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
 /**
  * Created by Joseph on 3/22/2018.
  */
 
-public class TokenRequest {
+public class TokenRequest implements Serializable {
 
+    @SerializedName("AgentPhoneNumber")
     private String AgentPhoneNumber;
+
+    @SerializedName("InstitutionCode")
     private String InstitutionCode;
 
+    @SerializedName("AdditionalInformation")
     private String AdditionalInformation;
+
+    @SerializedName("Amount")
     private String Amount;
 
+    @SerializedName("CustomerAccountNumber")
     private String CustomerAccountNumber;
+
+    @SerializedName("AgentPin")
     private String AgentPin;
+
+    @SerializedName("IsPinChange")
     private boolean IsPinChange;
 
     public String getAgentPhoneNumber() {

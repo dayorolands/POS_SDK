@@ -58,14 +58,32 @@
 # OkHttp platform used only on JVM and when Conscrypt dependency is available.
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
 
+-keepattributes Signature
+
+# Kotlin Serializaion
 -keepattributes *Annotation*, InnerClasses
--dontnote kotlinx.serialization.SerializationKt
--keep,includedescriptorclasses class com.appzonegroup.creditclub.pos.models.**$$serializer { *; }
--keepclassmembers class com.appzonegroup.creditclub.pos.models.* {
+-dontnote kotlinx.serialization.AnnotationsKt # core serialization annotations
+
+# kotlinx-serialization-json specific. Add this if you have java.lang.NoClassDefFoundError kotlinx.serialization.json.JsonObjectSerializer
+-keepclassmembers class kotlinx.serialization.json.** {
     *** Companion;
 }
--keepclasseswithmembers class com.appzonegroup.creditclub.pos.models.* {
+-keepclasseswithmembers class kotlinx.serialization.json.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
--keepattributes Signature
+-keep,includedescriptorclasses class com.appzonegroup.creditclub.pos.**$$serializer { *; }
+-keepclassmembers class com.appzonegroup.creditclub.pos.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.appzonegroup.creditclub.pos.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+-keep,includedescriptorclasses class com.creditclub.pos.**$$serializer { *; }
+-keepclassmembers class com.creditclub.pos.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.creditclub.pos.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}

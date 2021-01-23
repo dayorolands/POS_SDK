@@ -14,7 +14,7 @@ plugins {
 android {
     compileSdkVersion versions.compileSdk
 
-    useLibrary 'org.apache.http.legacy'
+    useLibrary "org.apache.http.legacy"
 
     defaultConfig {
         minSdkVersion versions.minSdk
@@ -23,6 +23,15 @@ android {
         vectorDrawables.useSupportLibrary = true
         versionCode 26
         versionName "1.4.3"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        "room.schemaLocation": "$projectDir/schemas".toString(),
+                        "room.incremental": "true",
+                        "room.expandProjection": "true",
+                ]
+            }
+        }
     }
 
     lintOptions {
@@ -50,37 +59,39 @@ android {
     }
 
     packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/LICENSE'
+        exclude "META-INF/DEPENDENCIES"
+        exclude "META-INF/LICENSE"
     }
 
     buildTypes {
         release {
             shrinkResources false
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "API_HOST", '"https://www.cluster.africa"')
-            buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
+            buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
             manifestPlaceholders = [usesCleartextTraffic: "false"]
             resValue "string", "app_name_suffix", ""
         }
 
         releaseStaging {
             debuggable true
-            buildConfigField("String", "API_HOST", '"https://staging.mybankone.com"')
-            buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            buildConfigField("String", "API_HOST", "\"https://staging.mybankone.com\"")
+            buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (Staging)"
-            matchingFallbacks = ['release', 'debug']
+            matchingFallbacks = ["release", "debug"]
         }
 
         releaseIpnx {
             debuggable true
-            buildConfigField("String", "API_HOST", '"http://62.173.32.17"')
-            buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
+            buildConfigField("String", "API_HOST", "\"http://62.173.32.17\"")
+            buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (IPNX)"
-            matchingFallbacks = ['releaseStaging', 'release', 'debug']
+            matchingFallbacks = ["releaseStaging", "release", "debug"]
         }
 
         debug {
@@ -94,11 +105,11 @@ android {
 
         debugIpnx {
             debuggable true
-            buildConfigField("String", "API_HOST", '"http://62.173.32.17"')
-            buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
+            buildConfigField("String", "API_HOST", "\"http://62.173.32.17\"")
+            buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (IPNX)"
-            matchingFallbacks = ['debug']
+            matchingFallbacks = ["debug"]
         }
     }
 
@@ -128,8 +139,8 @@ android {
     sourceSets {
         main {
             java.srcDirs = [
-                    'src/main',
-                    'src/main/java'
+                    "src/main",
+                    "src/main/java"
             ]
         }
     }
@@ -149,45 +160,63 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion "0.1.0-dev09"
     }
+//    dynamicFeatures = [":nexgo"]
+    splits {
+        // Configures multiple APKs based on ABI.
+        abi {
+            // Enables building multiple APKs per ABI.
+            enable true
+
+            // By default all ABIs are included, so use reset() and include to specify that we only
+            // want APKs for x86, armeabi-v7a, and mips.
+            reset()
+
+            // Specifies a list of ABIs that Gradle should create APKs for.
+            include "armeabi", "armeabi-v7a", "arm64-v8a"
+
+            // Specifies that we want to also generate a universal APK that includes all ABIs.
+            universalApk true
+        }
+    }
 }
 
 dependencies {
-    implementation project(path: ':core')
-    implementation project(path: ':uicentral')
-    implementation project(path: ':poscore')
-    implementation project(path: ':pos')
-    implementation project(path: ':analytics')
+    implementation project(path: ":core")
+    implementation project(path: ":uicentral")
+    implementation project(path: ":poscore")
+    implementation project(path: ":pos")
+    implementation project(path: ":analytics")
 
-    implementation fileTree(dir: 'jniLibs', include: ['*.so'])
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation files('libs/java-json.jar')
+    implementation fileTree(dir: "jniLibs", include: ["*.so"])
+    implementation fileTree(include: ["*.jar"], dir: "libs")
+    implementation files("libs/java-json.jar")
 
     implementation "androidx.activity:activity-ktx:${versions.activityKtx}"
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.lifecycle}"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.lifecycle}"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:${versions.lifecycle}"
     implementation "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}"
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation "androidx.constraintlayout:constraintlayout:2.0.1"
     implementation "com.google.android.material:material:${versions.material}"
-    implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'de.hdodenhof:circleimageview:2.1.0'
-    implementation 'io.reactivex:rxandroid:1.2.1'
-    implementation 'io.reactivex:rxjava:1.3.4'
-    implementation 'com.loopj.android:android-async-http:1.4.10'
-    implementation 'com.android.volley:volley:1.1.0'
+    implementation "com.google.code.gson:gson:2.8.5"
+    implementation "androidx.cardview:cardview:1.0.0"
+    implementation "de.hdodenhof:circleimageview:2.1.0"
+    implementation "io.reactivex:rxandroid:1.2.1"
+    implementation "io.reactivex:rxjava:1.3.4"
+    implementation "com.loopj.android:android-async-http:1.4.10"
+    implementation "com.android.volley:volley:1.1.0"
     implementation "com.google.firebase:firebase-crashlytics:${versions.firebaseCrashlytics}"
     implementation "com.google.firebase:firebase-analytics:${versions.firebase}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
 
-    implementation 'com.google.android:flexbox:2.0.1'
-    implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    implementation "com.google.android:flexbox:2.0.1"
+    implementation "com.amulyakhare:com.amulyakhare.textdrawable:1.0.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serialization}"
-    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+    debugImplementation "com.amitshekhar.android:debug-db:1.0.6"
 
     implementation "androidx.room:room-runtime:${versions.room}"
     kapt "androidx.room:room-compiler:${versions.room}"
@@ -203,29 +232,29 @@ dependencies {
     kapt "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}"
 
     implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
-    implementation 'com.thoughtbot:expandablerecyclerview:1.4'
+    implementation "com.thoughtbot:expandablerecyclerview:1.4"
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation "junit:junit:4.12"
 
     // Core library
-    androidTestImplementation 'androidx.test:core:1.3.0'
+    androidTestImplementation "androidx.test:core:1.3.0"
 
     // AndroidJUnitRunner and JUnit Rules
-    androidTestImplementation 'androidx.test:runner:1.3.0'
-    androidTestImplementation 'androidx.test:rules:1.3.0'
+    androidTestImplementation "androidx.test:runner:1.3.0"
+    androidTestImplementation "androidx.test:rules:1.3.0"
 
     // Assertions
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.ext:truth:1.3.0'
-    androidTestImplementation 'com.google.truth:truth:1.0'
+    androidTestImplementation "androidx.test.ext:junit:1.1.2"
+    androidTestImplementation "androidx.test.ext:truth:1.3.0"
+    androidTestImplementation "com.google.truth:truth:1.0"
 
     // Espresso dependencies
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.3.0"
 
     // Co-routine Tests
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7'
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7"
 
-    implementation 'me.relex:circleindicator:2.1.4'
+    implementation "me.relex:circleindicator:2.1.4"
     implementation "com.squareup.picasso:picasso:2.71828"
 
     // Kotlin
@@ -238,11 +267,12 @@ dependencies {
     // Testing Navigation
     androidTestImplementation "androidx.navigation:navigation-testing:${versions.navigation}"
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${versions.desugarJdk}"
+    implementation "androidx.appcompat:appcompat:1.3.0-alpha02"
     // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:26.1.1')
+    implementation platform("com.google.firebase:firebase-bom:26.1.1")
 
     // Declare the dependencies for the Firebase Cloud Messaging and Analytics libraries
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation 'com.google.firebase:firebase-messaging-ktx'
-    implementation 'com.google.firebase:firebase-analytics-ktx'
+    // When using the BoM, you don"t specify versions in Firebase library dependencies
+    implementation "com.google.firebase:firebase-messaging-ktx"
+    implementation "com.google.firebase:firebase-analytics-ktx"
 }

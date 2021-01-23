@@ -19,3 +19,24 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Kotlin Serializaion
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt # core serialization annotations
+
+# kotlinx-serialization-json specific. Add this if you have java.lang.NoClassDefFoundError kotlinx.serialization.json.JsonObjectSerializer
+-keepclassmembers class kotlinx.serialization.json.** {
+    *** Companion;
+}
+-keepclasseswithmembers class kotlinx.serialization.json.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+-keep,includedescriptorclasses class kotlinx.serialization.json.**$$serializer { *; }
+
+-keep,includedescriptorclasses class com.creditclub.analytics.**$$serializer { *; }
+-keepclassmembers class com.creditclub.analytics.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.creditclub.analytics.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}

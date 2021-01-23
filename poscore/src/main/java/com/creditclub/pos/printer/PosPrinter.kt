@@ -16,16 +16,6 @@ interface PosPrinter {
     val context: Context
     val dialogProvider: DialogProvider
 
-    fun checkAsync(block: (PrinterStatus) -> Unit) {
-        GlobalScope.launch(Dispatchers.Main) {
-            val status = withContext(Dispatchers.Default) {
-                check()
-            }
-
-            block(status)
-        }
-    }
-
     fun check(): PrinterStatus
 
     fun printAsync(

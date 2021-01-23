@@ -19,7 +19,6 @@ import com.appzonegroup.app.fasttrack.BuildConfig;
 import com.appzonegroup.app.fasttrack.R;
 import com.appzonegroup.app.fasttrack.model.MainMenuItem;
 import com.appzonegroup.app.fasttrack.model.TransactionCountType;
-import com.appzonegroup.app.fasttrack.model.jsonbody.PayBillItemModel;
 import com.appzonegroup.app.fasttrack.scheduler.BackgroundThread;
 import com.creditclub.core.util.ContextExtensionsKt;
 
@@ -97,18 +96,6 @@ public class Misc {
         String url = BASE_URL + "/PayBills/GetPaymentItems";
 
         return String.format(url, billerIdField);
-    }
-
-    public static String payBillItemUrl(PayBillItemModel model) {
-        String url = BASE_URL + "/BillsPayment/PayBillItem?" + "agentPhone=%s" + "&agentPIN=%s" + "&institutionCode=%s"
-                + "&otp=%s" + "&merchantBillerIdField=%s" + "&billItemID=%s" + "&billCategoryID=%s"
-                + "&customerAccountNumber=%s" + "&amount=%s" + "&email=%s" + "&customerPhoneNumber=%s"
-                + "&customerID=%s";
-
-        return String.format(url, model.getAgentPhone(), model.getAgentPIN(), model.getInstitutionCode(),
-                model.getOtp(), model.getMerchantBillerIdField(), model.getBillItemID(), model.getBillCategoryID(),
-                model.getCustomerAccountNumber(), model.getAmount(), model.getEmail(), model.getCustomerPhoneNumber(),
-                model.getCustomerID());
     }
 
     public static String dateToShortString(Date date) {
