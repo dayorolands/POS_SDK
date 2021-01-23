@@ -30,16 +30,16 @@ import kotlinx.coroutines.withContext
 import org.jpos.iso.ISOMsg
 
 internal inline fun ComponentActivity.showSelectAccountScreen(crossinline block: (AccountType) -> Unit) {
-    val binding =
-        DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
-            this,
-            R.layout.page_select_account_type
-        )
+    val binding = DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
+        this,
+        R.layout.page_select_account_type
+    )
     binding.lifecycleOwner = this
 
     binding.savingsRadioButton.button.setOnClickListener { block(AccountType.Savings) }
     binding.defaultRadioButton.button.setOnClickListener { block(AccountType.Default) }
     binding.currentRadioButton.button.setOnClickListener { block(AccountType.Current) }
+    binding.creditRadioButton.button.setOnClickListener { block(AccountType.Credit) }
 
     binding.header.goBack.setOnClickListener { onBackPressed() }
 }
@@ -201,7 +201,6 @@ internal fun CardTransactionActivity.showTransactionStatusPage(
 }
 
 internal fun CardTransactionActivity.showReferencePage(dialogTitle: String = "Enter RRN") {
-    requestCard()
     showReferencePage(dialogTitle) { transaction ->
         sessionData.amount = transaction.isoMsg.transactionAmount4?.toLong() ?: 0
         viewModel.amountString.value = sessionData.amount.toString()

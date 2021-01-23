@@ -1,7 +1,10 @@
 package com.appzonegroup.creditclub.pos
 
 import android.app.Application
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.service.ConfigService
@@ -14,10 +17,6 @@ import org.koin.core.KoinComponent
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 6/29/2019.
- * Appzone Ltd
- */
 object Platform : KoinComponent {
 
     @JvmStatic
@@ -62,4 +61,17 @@ val posModule = module {
     }
     single { CallHomeService() }
     single { IsoSocketHelper(get(), get()) }
+    single {
+        val masterKeyAlias = MasterKey.Builder(androidContext())
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+        val prefs = EncryptedSharedPreferences.create(
+            androidContext().applicationContext,
+            "com.creditclub.pos.preferences",
+            masterKeyAlias,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+        PosPreferences(prefs)
+    }
 }

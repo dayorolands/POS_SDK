@@ -19,7 +19,7 @@ suspend inline fun <T> safeRunIO(crossinline block: suspend CoroutineScope.() ->
         } catch (ex: Exception) {
             FirebaseCrashlytics.getInstance().recordException(ex)
             debugOnly { Log.e("safeRunIO", ex.message, ex) }
-            SafeRunResult(SafeRunResult.Failure(ex))
+            SafeRunResult(createFailure(ex))
         }
     }
 
@@ -29,6 +29,6 @@ suspend inline fun <T> safeRunSuspend(crossinline block: suspend () -> T): SafeR
     } catch (ex: Exception) {
         FirebaseCrashlytics.getInstance().recordException(ex)
         debugOnly { Log.e("safeRun", ex.message, ex) }
-        SafeRunResult(SafeRunResult.Failure(ex))
+        SafeRunResult(createFailure(ex))
     }
 }

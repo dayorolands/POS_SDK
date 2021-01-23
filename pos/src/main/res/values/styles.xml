@@ -53,18 +53,18 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <style name="AppTheme.MenuLayout">
-        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginTop">2dp</item>
         <item name="android:orientation">vertical</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
     <style name="AppTheme.MenuFlexLayout">
-        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="alignContent">center</item>
-        <item name="alignItems">center</item>
+        <item name="alignItems">flex_start</item>
+        <item name="android:layout_gravity">center_horizontal</item>
         <item name="flexWrap">wrap</item>
-        <item name="justifyContent">space_evenly</item>
         <item name="layout_flexGrow">1</item>
         <item name="layout_flexShrink">1</item>
         <item name="layout_maxWidth">300dp</item>

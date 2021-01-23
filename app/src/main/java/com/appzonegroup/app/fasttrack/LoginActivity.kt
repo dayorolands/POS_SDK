@@ -4,9 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.text.Editable
 import android.text.TextUtils
-import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -16,7 +14,7 @@ import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
-import com.appzonegroup.creditclub.pos.data.posPreferences
+import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.service.ConfigService
@@ -38,6 +36,7 @@ import retrofit2.create
 
 class LoginActivity : CreditClubActivity(R.layout.activity_login) {
 
+    private val posPreferences: PosPreferences by inject()
     private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,9 +60,11 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
 
         mainScope.launch { (application as CreditClubApplication).getLatestVersion() }
-        mainScope.launch {
-            updateBinRoutes()
-            checkRequirements()
+        if (Platform.isPOS) {
+            mainScope.launch {
+                updateBinRoutes()
+                checkRequirements()
+            }
         }
 
         if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {

@@ -10,10 +10,9 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.viewModels
-import androidx.databinding.DataBindingUtil
 import com.appzonegroup.creditclub.pos.card.*
+import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.data.create
-import com.appzonegroup.creditclub.pos.data.posPreferences
 import com.appzonegroup.creditclub.pos.databinding.*
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
@@ -24,6 +23,7 @@ import com.appzonegroup.creditclub.pos.models.Reversal
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
 import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.service.ParameterService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.util.*
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosTransactionViewModel
@@ -39,7 +39,6 @@ import kotlinx.coroutines.withContext
 import org.jpos.iso.ISOMsg
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
-import retrofit2.create
 import java.net.ConnectException
 import java.time.Instant
 import java.util.*
@@ -53,6 +52,8 @@ abstract class CardTransactionActivity : PosActivity() {
     internal var previousMessage: CardIsoMsg? = null
     abstract var transactionType: TransactionType
     private lateinit var cardData: CardData
+    private val posApiService: PosApiService by retrofitService()
+    private val posPreferences: PosPreferences by inject()
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -154,29 +155,11 @@ abstract class CardTransactionActivity : PosActivity() {
                     restartTimer()
 //                            accountType = AccountType.Default
 //                            onSelectAccountType()
-                    val binding = DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
-                        this@CardTransactionActivity,
-                        R.layout.page_select_account_type
-                    )
 
-                    val selectAccountTypeListener = View.OnClickListener { view ->
-                        viewModel.accountType.value = when (view?.id) {
-                            R.id.current_radio_button -> AccountType.Current
-                            R.id.savings_radio_button -> AccountType.Savings
-                            R.id.credit_radio_button -> AccountType.Credit
-                            R.id.default_radio_button -> AccountType.Default
-                            else -> null
-                        }
-
+                    showSelectAccountScreen { accountType ->
+                        viewModel.accountType.value = accountType
                         onSelectAccountType()
                     }
-
-                    listOf(
-                        binding.creditRadioButton,
-                        binding.currentRadioButton,
-                        binding.defaultRadioButton,
-                        binding.savingsRadioButton
-                    ).forEach { it.root.setOnClickListener(selectAccountTypeListener) }
 
                     if (cardEvent == CardReaderEvent.CHIP) {
                         mainScope.launch {
@@ -364,31 +347,32 @@ abstract class CardTransactionActivity : PosActivity() {
                     }
                 }
 
-                when (transactionType) {
-                    TransactionType.Purchase,
-                    TransactionType.CashAdvance,
-                    TransactionType.CashBack,
-                    TransactionType.PreAuth,
-                    TransactionType.SalesComplete -> {
-                        val posNotification = PosNotification.create(transaction)
-                        posNotification.terminalId = config.terminalId
-                        posNotification.nodeName = remoteConnectionInfo.nodeName
-                        if (remoteConnectionInfo is ConnectionInfo) {
-                            posNotification.connectionInfo = remoteConnectionInfo
+                if (response.isSuccessful) {
+                    when (transactionType) {
+                        TransactionType.Purchase,
+                        TransactionType.CashAdvance,
+                        TransactionType.CashBack,
+                        TransactionType.PreAuth,
+                        TransactionType.SalesComplete -> {
+                            val posNotification = PosNotification.create(transaction)
+                            posNotification.terminalId = config.terminalId
+                            posNotification.nodeName = remoteConnectionInfo.nodeName
+                            if (remoteConnectionInfo is ConnectionInfo) {
+                                posNotification.connectionInfo = remoteConnectionInfo
+                            }
+                            withContext(Dispatchers.IO) {
+                                posDatabase.posNotificationDao().save(posNotification)
+                            }
+                            posApiService.logPosNotification(
+                                posDatabase,
+                                backendConfig,
+                                posConfig,
+                                posNotification
+                            )
                         }
-                        withContext(Dispatchers.IO) {
-                            posDatabase.posNotificationDao().save(posNotification)
-                        }
-                        val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
-                        posApiService.logPosNotification(
-                            posDatabase,
-                            backendConfig,
-                            posConfig,
-                            posNotification
-                        )
-                    }
-                    else -> {
+                        else -> {
 
+                        }
                     }
                 }
 
