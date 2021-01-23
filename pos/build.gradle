@@ -1,7 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlinx-serialization'
 
 android {
@@ -70,6 +69,8 @@ dependencies {
 
     implementation "androidx.room:room-runtime:${versions.room}"
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation "androidx.navigation:navigation-fragment-ktx:${versions.navigation}"
+    implementation "androidx.navigation:navigation-ui-ktx:${versions.navigation}"
     kapt "androidx.room:room-compiler:${versions.room}"
 
     // optional - Kotlin Extensions and Coroutines support for Room

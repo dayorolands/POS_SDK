@@ -17,25 +17,23 @@ import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.appDataStorage
 import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.showError
-import kotlinx.android.synthetic.main.activity_update.*
-import kotlinx.android.synthetic.main.content_update.*
+import com.creditclub.ui.databinding.ActivityUpdateBinding
 import kotlinx.coroutines.launch
 
-class UpdateActivity : CreditClubActivity() {
-
+class UpdateActivity : CreditClubActivity(R.layout.activity_update) {
+    private val binding: ActivityUpdateBinding by dataBinding()
     private var latestVersion = appDataStorage.latestVersion
     private val fileName get() = "${getString(R.string.ota_app_name)}${latestVersion?.version}.apk"
     private var isProcessing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_update)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         checkingState()
 
-        primaryButton.setOnClickListener {
+        binding.primaryButton.setOnClickListener {
             if (latestVersion?.version.isNullOrEmpty()) {
                 if (isProcessing) defaultState() else checkingState()
             } else {
@@ -46,21 +44,21 @@ class UpdateActivity : CreditClubActivity() {
 
     private fun defaultState(status: String = "") {
         isProcessing = false
-        primaryButton.text = "Check for update"
-        statusTv.text = status
-        progressBar.visibility = View.INVISIBLE
+        binding.primaryButton.text = "Check for update"
+        binding.statusTv.text = status
+        binding.progressBar.visibility = View.INVISIBLE
     }
 
     private fun checkingState() {
         isProcessing = true
-        primaryButton.text = "Cancel"
-        statusTv.text = "Checking for updates..."
-        progressBar.visibility = View.VISIBLE
+        binding.primaryButton.text = "Cancel"
+        binding.statusTv.text = "Checking for updates..."
+        binding.progressBar.visibility = View.VISIBLE
 
         mainScope.launch {
             val error = (application as CreditClubApplication).getLatestVersion().error
 
-            if (error != null) return@launch dialogProvider.showError<Nothing>(error) {
+            if (error != null) return@launch dialogProvider.showError(error) {
                 onClose {
                     finish()
                 }
@@ -71,7 +69,7 @@ class UpdateActivity : CreditClubActivity() {
             if (latestVersion?.updateIsAvailable(packageInfo!!.versionName) != true) {
                 val message =
                     "Congratulations. You're on the latest version of ${getString(R.string.app_name)}"
-                dialogProvider.showSuccess<Nothing>(message) {
+                dialogProvider.showSuccess(message) {
                     onClose {
                         finish()
                     }
@@ -82,18 +80,19 @@ class UpdateActivity : CreditClubActivity() {
 
     private fun updatingState() {
         isProcessing = true
-        primaryButton.text = "Cancel"
-        statusTv.text = "Downloading..."
-        progressBar.visibility = View.VISIBLE
+        binding.primaryButton.text = "Cancel"
+        binding.statusTv.text = "Downloading..."
+        binding.progressBar.visibility = View.VISIBLE
 
         download()
     }
 
     private fun availableState() {
         isProcessing = false
-        primaryButton.text = "Download"
-        statusTv.text = "A new version (v${latestVersion?.version}) is available for download"
-        progressBar.visibility = View.INVISIBLE
+        binding.primaryButton.text = "Download"
+        binding.statusTv.text =
+            "A new version (v${latestVersion?.version}) is available for download"
+        binding.progressBar.visibility = View.INVISIBLE
     }
 
     fun goBack(v: View) {
@@ -116,12 +115,12 @@ class UpdateActivity : CreditClubActivity() {
             val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             manager.enqueue(request)
 
-            statusTv.text = "Check your notifications the see download progress"
+            binding.statusTv.text = "Check your notifications the see download progress"
 
             setContentView(R.layout.layout_empty)
             val message =
                 "Download has started. \nPlease check your notifications to see download progress"
-            dialogProvider.showSuccess<Nothing>(message) {
+            dialogProvider.showSuccess(message) {
                 onClose {
                     finish()
                 }

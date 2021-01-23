@@ -15,6 +15,8 @@ import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.type.TransactionCountType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
@@ -23,12 +25,13 @@ import kotlinx.coroutines.withContext
  * Appzone Ltd
  */
 
-inline val Context.localStorage get() = LocalStorage.getInstance(this)
+inline val Context.localStorage get() = LocalStorage(this)
 inline val Context.appDataStorage get() = AppDataStorage.getInstance(this)
 inline val Context.coreDatabase: CoreDatabase get() = CoreDatabase.getInstance(this)
 inline val Context.application get() = applicationContext as CreditClubApplication
 
 fun Context.getTransactionMonitorCounter(key: String): Int {
+    val localStorage = localStorage
     val value = localStorage.getString(key)
     var count = 0
     if (value != null) count = Integer.parseInt(value)
@@ -37,22 +40,25 @@ fun Context.getTransactionMonitorCounter(key: String): Int {
     return count
 }
 
-suspend inline fun Context.increaseTransactionMonitorCounter(
+fun Context.increaseTransactionMonitorCounter(
     transactionCountType: TransactionCountType,
     sessionID: String
 ) {
+    val localStorage = localStorage
     val value = localStorage.getString(transactionCountType.key)
     var count = 0
     if (value != null) count = Integer.parseInt(value) + 1
 
     localStorage.putString(transactionCountType.key, count.toString())
 
-    withContext(Dispatchers.IO) {
-        val info = DeviceTransactionInformation.getInstance(
-            this@increaseTransactionMonitorCounter,
-            sessionID
-        )
-        coreDatabase.deviceTransactionInformationDao().save(info)
+    GlobalScope.launch(Dispatchers.Main) {
+        withContext(Dispatchers.IO) {
+            val info = DeviceTransactionInformation.getInstance(
+                this@increaseTransactionMonitorCounter,
+                sessionID
+            )
+            coreDatabase.deviceTransactionInformationDao().save(info)
+        }
     }
 }
 
@@ -83,51 +89,6 @@ inline val Context.packageInfo: PackageInfo?
             null
         }
     }
-
-//val Context.mainMenuItems: ArrayList<MainMenuItem>
-//    get() {
-//        val mainMenuItems = ArrayList<MainMenuItem>()
-//        mainMenuItems.add(MainMenuItem(R.drawable.open_account, null))
-//        mainMenuItems.add(MainMenuItem(R.drawable.cash_deposit, null))
-//        mainMenuItems.add(MainMenuItem(R.drawable.cash_withdrawal, null))
-//        // mainMenuItems.add(new MainMenuItem(R.drawable.bvn_update, null));
-//        mainMenuItems.add(MainMenuItem(R.drawable.loan_request, null))
-//        // mainMenuItems.add(new MainMenuItem(R.drawable.funds_transfer, null));
-//        mainMenuItems.add(MainMenuItem(R.drawable.conditional_cash_transfer, null))
-//        mainMenuItems.add(MainMenuItem(R.drawable.bills_payment, null))
-//
-//        // New Menu items
-//        mainMenuItems.add(MainMenuItem(R.drawable.interbank_withdrawal, "InterBank Withdrawal"))
-//        mainMenuItems.add(MainMenuItem(R.drawable.intrabank_withdrawal, "Same bank Withdrawal"))
-//
-//        if (packageName.toLowerCase().contains("farepay")) {
-//            // this is for link card... it should be changed to the right image when ready
-//            mainMenuItems.add(MainMenuItem(R.drawable.bg_min, "Link Card"))
-//
-//            // this is for hotlist card... it should be changed to the right image when
-//            // ready
-//            mainMenuItems.add(MainMenuItem(R.drawable.logo, "Hotlist card"))
-//        }
-//
-//        return mainMenuItems
-//    }
-//
-//val Context.cashOutMainMenuItems: ArrayList<MainMenuItem>
-//    get() {
-//        val mainMenuItems = ArrayList<MainMenuItem>()
-//        mainMenuItems.add(MainMenuItem(R.drawable.ic_mail, "Token Cash-Out"))
-//        mainMenuItems.add(MainMenuItem(R.drawable.ic_credit_card, "Card cash-Out"))
-//        mainMenuItems.add(MainMenuItem(R.drawable.ic_money, "Funds Transfer"))
-//
-//        // New Menu items
-//        /*
-//         * mainMenuItems.add(new MainMenuItem(R.drawable.interbank_withdrawal,
-//         * "InterBank Withdrawal")); mainMenuItems.add(new
-//         * MainMenuItem(R.drawable.intrabank_withdrawal, "Same bank Withdrawal"));
-//         */
-//
-//        return mainMenuItems
-//    }
 
 inline val Context.RAMInfo: LongArray
     get() {

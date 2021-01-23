@@ -14,6 +14,7 @@ import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.logFunctionUsage
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -44,6 +45,8 @@ open class CreditClubFragment : Fragment {
     open val mainScope by lazy { CoroutineScope(Dispatchers.Main) }
     open val ioScope by lazy { CoroutineScope(Dispatchers.IO) }
     open val defaultScope by lazy { CoroutineScope(Dispatchers.Default) }
+
+    val firebaseCrashlytics by lazy { FirebaseCrashlytics.getInstance() }
 
     var TextView.value: String
         get() = text.toString().trim { it <= ' ' }

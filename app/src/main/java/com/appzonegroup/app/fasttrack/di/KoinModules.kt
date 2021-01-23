@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit
 private const val CACHE_SIZE = 10L * 1024 * 1024 // 10 MB
 
 val dataModule = module {
-    single { LocalStorage.getInstance(androidContext()) }
+    single { LocalStorage(androidContext()) }
     single { AppDataStorage.getInstance(androidContext()) }
     single { CoreDatabase.getInstance(androidContext()) }
 }
@@ -48,8 +48,8 @@ val apiModule = module {
         val cache = Cache(androidContext().cacheDir, CACHE_SIZE)
         val builder = OkHttpClient().newBuilder()
             .connectTimeout(2, TimeUnit.MINUTES)
-            .readTimeout(2, TimeUnit.MINUTES)
-            .writeTimeout(2, TimeUnit.MINUTES)
+            .readTimeout(3, TimeUnit.MINUTES)
+            .writeTimeout(3, TimeUnit.MINUTES)
             .cache(cache)
 
         builder

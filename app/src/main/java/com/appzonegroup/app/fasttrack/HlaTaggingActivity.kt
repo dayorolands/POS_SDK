@@ -53,7 +53,7 @@ class HlaTaggingActivity : CreditClubActivity(R.layout.activity_hla_tagging),
             }
             dialogProvider.hideProgressBar()
 
-            val finishOnFail: DialogListenerBlock<Nothing> = {
+            val finishOnFail: DialogListenerBlock<*> = {
                 onClose {
                     finish()
                 }
@@ -215,7 +215,7 @@ class HlaTaggingActivity : CreditClubActivity(R.layout.activity_hla_tagging),
             response ?: return@launch showError(IOException())
 
             if (response.status) {
-                dialogProvider.showSuccess<Nothing>("Location tagged successfully") {
+                dialogProvider.showSuccess("Location tagged successfully") {
                     onClose {
                         finish()
                     }

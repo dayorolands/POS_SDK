@@ -1,183 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:weightSum="4">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:weightSum="3">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="4">
 
-        <Button
-            android:id="@+id/number1"
-            style="@style/AppButton.NumberButton"
-            android:onClick="onSelectNumber"
-            android:text="1" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:weightSum="3">
+
+            <Button
+                android:id="@+id/number1"
+                style="@style/AppButton.NumberButton"
+                android:text="1" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#ddd" />
+
+            <Button
+                android:id="@+id/number2"
+                style="@style/AppButton.NumberButton"
+                android:text="2" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#ddd" />
+
+            <Button
+                android:id="@+id/number3"
+                style="@style/AppButton.NumberButton"
+                android:text="3" />
+        </LinearLayout>
 
         <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
             android:background="#ddd" />
 
-        <Button
-            android:id="@+id/number2"
-            style="@style/AppButton.NumberButton"
-            android:onClick="onSelectNumber"
-            android:text="2" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:weightSum="3">
+
+            <Button
+                android:id="@+id/number4"
+                style="@style/AppButton.NumberButton"
+                android:text="4" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#ddd" />
+
+            <Button
+                android:id="@+id/number5"
+                style="@style/AppButton.NumberButton"
+                android:text="5" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#ddd" />
+
+            <Button
+                android:id="@+id/number6"
+                style="@style/AppButton.NumberButton"
+                android:text="6" />
+        </LinearLayout>
 
         <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
             android:background="#ddd" />
 
-        <Button
-            android:id="@+id/number3"
-            style="@style/AppButton.NumberButton"
-            android:onClick="onSelectNumber"
-            android:text="3" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:weightSum="3">
+
+            <Button
+                android:id="@+id/number7"
+                style="@style/AppButton.NumberButton"
+                android:text="7" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#ddd" />
+
+            <Button
+                android:id="@+id/number8"
+                style="@style/AppButton.NumberButton"
+                android:text="8" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#ddd" />
+
+            <Button
+                android:id="@+id/number9"
+                style="@style/AppButton.NumberButton"
+                android:text="9" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#ddd" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical|end"
+            android:weightSum="3">
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#ddd" />
+
+            <Button
+                android:id="@+id/number0"
+                style="@style/AppButton.NumberButton"
+                android:text="0" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#ddd" />
+
+            <Button
+                android:id="@+id/clear_btn"
+                style="@style/AppButton.NumberButton"
+                android:text="Clear"
+                android:textColor="@color/colorAccent" />
+        </LinearLayout>
+
+        <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1dp"-->
+        <!--android:background="#ddd" />-->
+
+        <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight="1"-->
+        <!--android:gravity="center_vertical|end"-->
+        <!--android:weightSum="1">-->
+
+        <!--<Button-->
+        <!--android:id="@+id/select_amount_button"-->
+        <!--style="@style/AppButton.NumberButton"-->
+        <!--android:background="@color/white"-->
+        <!--android:onClick="next"-->
+        <!--android:text="Enter"-->
+        <!--android:textColor="@color/blue" />-->
+        <!--</LinearLayout>-->
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#ddd" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:weightSum="3">
-
-        <Button
-            android:id="@+id/number4"
-            style="@style/AppButton.NumberButton"
-            android:onClick="onSelectNumber"
-            android:text="4" />
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#ddd" />
-
-        <Button
-            android:id="@+id/number5"
-            style="@style/AppButton.NumberButton"
-            android:onClick="onSelectNumber"
-            android:text="5" />
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#ddd" />
-
-        <Button
-            android:id="@+id/number6"
-            style="@style/AppButton.NumberButton"
-            android:onClick="onSelectNumber"
-            android:text="6" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#ddd" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:weightSum="3">
-
-        <Button
-            android:id="@+id/number7"
-            style="@style/AppButton.NumberButton"
-            android:onClick="onSelectNumber"
-            android:text="7" />
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#ddd" />
-
-        <Button
-            android:id="@+id/number8"
-            style="@style/AppButton.NumberButton"
-            android:onClick="onSelectNumber"
-            android:text="8" />
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#ddd" />
-
-        <Button
-            android:id="@+id/number9"
-            style="@style/AppButton.NumberButton"
-            android:onClick="onSelectNumber"
-            android:text="9" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#ddd" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center_vertical|end"
-        android:weightSum="3">
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#ddd" />
-
-        <Button
-            android:id="@+id/number0"
-            style="@style/AppButton.NumberButton"
-            android:onClick="onSelectNumber"
-            android:text="0" />
-
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#ddd" />
-
-        <TextView
-            android:id="@+id/backspace"
-            style="@style/AppButton.NumberButton"
-            android:onClick="onBackspacePressed"
-            android:text="Clear"
-            android:textColor="@color/colorAccent" />
-    </LinearLayout>
-
-    <!--<View-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="1dp"-->
-    <!--android:background="#ddd" />-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="0dp"-->
-    <!--android:layout_weight="1"-->
-    <!--android:gravity="center_vertical|end"-->
-    <!--android:weightSum="1">-->
-
-    <!--<Button-->
-    <!--android:id="@+id/select_amount_button"-->
-    <!--style="@style/AppButton.NumberButton"-->
-    <!--android:background="@color/white"-->
-    <!--android:onClick="next"-->
-    <!--android:text="Enter"-->
-    <!--android:textColor="@color/blue" />-->
-    <!--</LinearLayout>-->
-</LinearLayout>
+</layout>

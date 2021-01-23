@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.appzonegroup.creditclub.pos.util.AppConstants
 import com.appzonegroup.creditclub.pos.util.PosMode
-import com.creditclub.core.util.delegates.booleanStore
+import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.util.delegates.intStore
 import com.creditclub.core.util.delegates.stringStore
 import com.creditclub.pos.PosConfig
@@ -21,7 +21,7 @@ import org.koin.dsl.module
  * Appzone Ltd
  */
 open class ConfigService(context: Context) : PosConfig {
-    private val prefs: SharedPreferences = context.getSharedPreferences("Config", 0)
+    private val prefs: SharedPreferences = context.getEncryptedSharedPreferences(DEFAULT_FILE_NAME)
     override var apn by prefs.nonNullStringStore("APN", AppConstants.APN)
     override var host by prefs.nonNullStringStore("HOST", AppConstants.HOST)
     override var ip by prefs.nonNullStringStore("IP", AppConstants.IP)
@@ -44,4 +44,8 @@ open class ConfigService(context: Context) : PosConfig {
         }
 
     private var posModeStr: String? by prefs.stringStore("POS_MODE", "EPMS")
+
+    companion object {
+        const val DEFAULT_FILE_NAME = "pos_config_0"
+    }
 }

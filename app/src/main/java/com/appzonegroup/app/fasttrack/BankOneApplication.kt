@@ -1,6 +1,10 @@
 package com.appzonegroup.app.fasttrack
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 import com.appzonegroup.app.fasttrack.di.*
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.utility.extensions.registerWorkers
@@ -8,8 +12,12 @@ import com.appzonegroup.app.fasttrack.utility.registerAppFunctions
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.analytics.AnalyticsObjectBox
 import com.creditclub.core.CreditClubApplication
+import com.creditclub.core.R
+import com.creditclub.core.data.prefs.LocalStorage
+import com.creditclub.core.data.prefs.moveTo
 import com.creditclub.core.util.localStorage
 import com.squareup.picasso.Picasso
+import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -57,9 +65,25 @@ class BankOneApplication : CreditClubApplication() {
             )
         }
 
+        encryptAgentInfo()
+
         registerAppFunctions()
         Platform.test(this)
         if (Platform.isPOS) startPosApp()
         registerWorkers()
+    }
+
+    private fun encryptAgentInfo() {
+        val prefsName = getString(R.string.DATA_SOURCE)
+        val prefs = getSharedPreferences(
+            prefsName,
+            MODE_PRIVATE
+        )
+        if (prefs.contains(LocalStorage.AGENT_INFO)) {
+            prefs.moveTo(get<LocalStorage>())
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                deleteSharedPreferences(prefsName)
+            }
+        }
     }
 }

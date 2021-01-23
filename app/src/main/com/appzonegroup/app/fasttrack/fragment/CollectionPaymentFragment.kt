@@ -18,10 +18,7 @@ import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.request.CollectionPaymentRequest
 import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.getPin
 import com.creditclub.core.util.safeRunIO
-import com.creditclub.core.util.showErrorAndWait
-import com.creditclub.core.util.showSuccessAndWait
 import com.creditclub.pos.printer.PosPrinter
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json

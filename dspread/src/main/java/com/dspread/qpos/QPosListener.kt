@@ -125,7 +125,7 @@ class QPosListener(
         if (transactionResult == QPOSService.TransactionResult.APPROVED) {
             handleCardData()
         } else {
-            qPosManager.showError<Nothing>(transactionResult.getMessage(activity)) {
+            qPosManager.showError(transactionResult.getMessage(activity)) {
                 onClose {
                     activity.finish()
                 }

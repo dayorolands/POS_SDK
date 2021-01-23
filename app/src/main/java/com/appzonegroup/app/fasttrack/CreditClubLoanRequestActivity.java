@@ -3,14 +3,25 @@ package com.appzonegroup.app.fasttrack;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.*;
-import android.widget.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
@@ -18,13 +29,16 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.appzonegroup.app.fasttrack.dataaccess.AssociationDAO;
-import com.appzonegroup.app.fasttrack.model.*;
+import com.appzonegroup.app.fasttrack.model.AppConstants;
+import com.appzonegroup.app.fasttrack.model.Association;
+import com.appzonegroup.app.fasttrack.model.LoanProduct;
+import com.appzonegroup.app.fasttrack.model.LoanRequestCreditClub;
+import com.appzonegroup.app.fasttrack.model.Response;
 import com.appzonegroup.app.fasttrack.utility.CustomAutoCompleteAdapter;
 import com.appzonegroup.app.fasttrack.utility.FunctionIds;
-import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.Misc;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -117,7 +131,7 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
     }
 
     public String getNextUrl() {
-        String url = AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/GetAssociations?insti=" + LocalStorage.getInstitutionCode(getBaseContext()) + "&startIndex=" + startIndex + "&limit=" + increment;
+        String url = AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/GetAssociations?insti=" + getLocalStorage().getInstitutionCode() + "&startIndex=" + startIndex + "&limit=" + increment;
         return url;
     }
 
@@ -144,7 +158,7 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
         String url = String.format(Locale.getDefault(),
                 "%s/CreditClubMiddleWareAPI/CreditClubStatic/GetEligibleLoanProducts?institutionCode=%s&associationID=%s&memberID=%s&customerAccountNumber=%s",
                 AppConstants.getBaseUrl(),
-                LocalStorage.getInstitutionCode(getBaseContext()),
+                getLocalStorage().getInstitutionCode(),
                 //associationDAO.Get(selectedAssociationID).getId(),
                 loanRequest_marketAssociations_et.getText().toString().trim(),
                 loanRequest_memberID_et.getText().toString().trim(),
@@ -290,8 +304,8 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
         }
 
 
-        String agentPhoneNumber = LocalStorage.GetValueFor(AppConstants.AGENT_PHONE, getBaseContext());
-        String institutionCode = LocalStorage.GetValueFor(AppConstants.INSTITUTION_CODE, getBaseContext());
+        String agentPhoneNumber = getLocalStorage().getAgentPhone();
+        String institutionCode = getLocalStorage().getInstitutionCode();
 
         //String code = associationDAO.Get(selectedAssociationID).getId();
 
@@ -305,10 +319,10 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
         loanRequest.setMemberID(loanRequest_memberID_et.getText().toString());
         loanRequest.setAgentPhoneNumber(agentPhoneNumber);
         loanRequest.setCustomerAccountNumber(loanRequest_customerAccount_et.getText().toString().trim());
-        loanRequest.setInstitutionCode(LocalStorage.getInstitutionCode(getBaseContext()));
+        loanRequest.setInstitutionCode(getLocalStorage().getInstitutionCode());
         loanRequest.setLoanProductID((int) eligibleLoanProducts.get(loanProductsSpinner.getSelectedItemPosition() - 1).getID());
         loanRequest.setMemberID(loanRequest_memberID_et.getText().toString());
-        loanRequest.setAgentPhoneNumber(LocalStorage.getPhoneNumber(getBaseContext()));
+        loanRequest.setAgentPhoneNumber(getLocalStorage().getAgentPhone());
         //loanRequest.setAssociationID(associationDAO.Get(selectedAssociationID).getId());
         loanRequest.setGeoLocation(getGps().getGeolocationString());
         loanRequest.setAgentPin(agentPIN_et.getText().toString().trim());

@@ -9,10 +9,7 @@ import com.creditclub.core.data.request.SendTokenRequest
 import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.type.TokenType
 import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.ui.widget.DialogListener
-import com.creditclub.core.ui.widget.DialogListenerBlock
-import com.creditclub.core.ui.widget.DialogOptionItem
-import com.creditclub.core.ui.widget.TextFieldParams
+import com.creditclub.core.ui.widget.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import java.security.SecureRandom
@@ -48,19 +45,24 @@ fun CreditClubActivity.requireAccountInfo(
                 CustomerRequestOption.BVN -> TextFieldParams(
                     "Enter customer BVN",
                     type = "number",
-                    maxLength = 11
+                    maxLength = 11,
+                    required = true,
                 )
 
                 CustomerRequestOption.PhoneNumber -> TextFieldParams(
                     "Enter customer phone number",
                     type = "number",
-                    maxLength = 11
+                    maxLength = 11,
+                    minLength = 10,
+                    required = true,
                 )
 
                 CustomerRequestOption.AccountNumber -> TextFieldParams(
                     "Enter customer account number",
                     type = "number",
-                    maxLength = 11
+                    maxLength = 11,
+                    minLength = 10,
+                    required = true,
                 )
             }
 
@@ -77,7 +79,7 @@ fun CreditClubActivity.requireAccountInfo(
                                 dismiss()
                                 dialogProvider.showError(
                                     "Feature unavailable for this version",
-                                    block
+                                    stripType(block)
                                 )
                             }
 
@@ -95,20 +97,23 @@ fun CreditClubActivity.requireAccountInfo(
 
                                 if (error != null && error.isKotlinNPE()) return@launch dialogProvider.showError(
                                     "Phone Number is invalid",
-                                    showOnClose
+                                    stripType(showOnClose)
                                 )
-                                if (error != null) return@launch showError(error, showOnClose)
+                                if (error != null) return@launch showError(
+                                    error,
+                                    stripType(showOnClose)
+                                )
 
                                 response ?: return@launch dialogProvider.showError(
                                     "Phone Number is not registered",
-                                    showOnClose
+                                    stripType(showOnClose)
                                 )
 
                                 response.linkingBankAccounts
                                     ?: return@launch dialogProvider.showError(
                                         response.responseMessage
                                             ?: "Phone Number is not registered",
-                                        showOnClose
+                                        stripType(showOnClose)
                                     )
 
                                 response.linkingBankAccounts?.run {
@@ -144,19 +149,22 @@ fun CreditClubActivity.requireAccountInfo(
                                 if (error != null && (error is SerializationException || error.isKotlinNPE())) {
                                     return@launch dialogProvider.showError(
                                         "Account Number is invalid",
-                                        showOnClose
+                                        stripType(showOnClose)
                                     )
                                 }
-                                if (error != null) return@launch showError(error, showOnClose)
+                                if (error != null) return@launch showError(
+                                    error,
+                                    stripType(showOnClose)
+                                )
 
                                 response ?: return@launch dialogProvider.showError(
                                     "Account Number is invalid",
-                                    showOnClose
+                                    stripType(showOnClose)
                                 )
 
                                 if (response.number.isEmpty()) return@launch dialogProvider.showError(
                                     response.responseMessage ?: "Account number is invalid",
-                                    showOnClose
+                                    stripType(showOnClose)
                                 )
 
                                 dismiss()
@@ -263,8 +271,8 @@ fun CreditClubActivity.requireAndValidateToken(
 
         dialogProvider.hideProgressBar()
 
-        if (error != null) return@launch showError(error, block)
-        response ?: return@launch showNetworkError(block)
+        if (error != null) return@launch showError(error, stripType(block))
+        response ?: return@launch showNetworkError(stripType(block))
 
         if (!response.isSuccessful) {
             dialogProvider.showError(
@@ -299,7 +307,7 @@ fun CreditClubActivity.requireAndValidateToken(
                     if (confirmTokenResponse == null) {
                         dialogProvider.showError(
                             "A network-related error occurred while sending token",
-                            block
+                            stripType(block)
                         )
                         return@launch
                     }
@@ -312,7 +320,7 @@ fun CreditClubActivity.requireAndValidateToken(
                         dialogProvider.showError(
                             confirmTokenResponse.responseMessage
                                 ?: "An error occurred. Please try again later",
-                            block
+                            stripType(block)
                         )
                     }
                 }
@@ -330,7 +338,7 @@ fun CreditClubActivity.selectAccountNumber(
 
     when (accountInfo.size) {
 
-        0 -> dialogProvider.showError("This customer has no linked accounts", block)
+        0 -> dialogProvider.showError("This customer has no linked accounts", stripType(block))
 
         1 -> listener.submit(Dialog(this), accountInfo.first())
 
@@ -390,5 +398,11 @@ suspend fun CreditClubActivity.customerBalanceEnquiry(accountInfo: AccountInfo) 
         dialogProvider.showErrorAndWait(
             response.responseMessage ?: getString(R.string.an_error_occurred_please_try_again_later)
         )
+    }
+}
+
+inline fun <T> stripType(crossinline block: DialogListenerBlock<T>): DialogListenerBlock<*> {
+    return {
+        onClose { DialogListener.create(block).close() }
     }
 }

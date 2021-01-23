@@ -1,46 +1,32 @@
 package com.appzonegroup.app.fasttrack
 
-import android.os.Bundle
 import android.view.View
-import android.widget.EditText
-import com.appzonegroup.app.fasttrack.ui.TextView
+import com.appzonegroup.app.fasttrack.databinding.ActivityBalanceEnquiryBinding
+import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.request.BalanceEnquiryRequest
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
-import kotlinx.android.synthetic.main.activity_balance_enquiry.*
 import kotlinx.coroutines.launch
 
-/**
- * Created by Oto-obong on 11/10/2017.
- */
-
-class BalanceEnquiryActivity : BaseActivity() {
-
-    lateinit var available_balance: TextView
-    lateinit var balance: TextView
+class BalanceEnquiryActivity : CreditClubActivity(R.layout.activity_balance_enquiry) {
+    private val binding: ActivityBalanceEnquiryBinding by dataBinding()
     private var pin = ""
     override val functionId = FunctionIds.AGENT_BALANCE_ENQUIRY
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_balance_enquiry)
-        balance = findViewById<View>(R.id.balance) as TextView
-        available_balance = findViewById<View>(R.id.available_balance) as TextView
-    }
-
 
     fun onClick(view: View) {
-        pin = findViewById<EditText>(R.id.pin_et).value
-        findViewById<EditText>(R.id.pin_et).value = ""
+        pin = binding.pinEt.value
+        binding.pinEt.value = ""
 
         if (pin.isEmpty()) {
-            showError("Please enter your PIN")
+            dialogProvider.showError("Please enter your PIN")
             return
         }
 
         if (pin.length != 4) {
-            showError("Agent PIN must be 4 digits")
+            dialogProvider.showError("Agent PIN must be 4 digits")
             return
         }
 
@@ -56,11 +42,11 @@ class BalanceEnquiryActivity : BaseActivity() {
                 institutionCode = localStorage.institutionCode
             }
 
-            showProgressBar("Getting Balance")
+            dialogProvider.showProgressBar("Getting Balance")
             val (response) = safeRunIO {
                 creditClubMiddleWareAPI.staticService.balanceEnquiry(request)
             }
-            hideProgressBar()
+            dialogProvider.hideProgressBar()
 
             response ?: return@launch showNetworkError()
 
@@ -70,15 +56,15 @@ class BalanceEnquiryActivity : BaseActivity() {
 
 //                localStorage.agentPIN = pin
 
-                agents_bal_btn.visibility = View.VISIBLE
-                available_balance_label.visibility = View.VISIBLE
+                binding.agentsBalBtn.visibility = View.VISIBLE
+                binding.availableBalanceLabel.visibility = View.VISIBLE
 
-                available_balance.text = availableOut
-                balance.text = balanceOut
+                binding.availableBalance.text = availableOut
+                binding.balance.text = balanceOut
             } else {
                 response.responseMessage ?: return@launch showNetworkError()
 
-                showError(response.responseMessage)
+                dialogProvider.showError(response.responseMessage)
             }
         }
     }

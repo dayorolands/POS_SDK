@@ -27,13 +27,11 @@ import com.appzonegroup.app.fasttrack.model.online.Option;
 import com.appzonegroup.app.fasttrack.model.online.Response;
 import com.appzonegroup.app.fasttrack.network.online.APIHelper;
 import com.appzonegroup.app.fasttrack.utility.GPSTracker;
-import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.Misc;
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages;
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson;
 import com.creditclub.core.data.Encryption;
 import com.creditclub.core.ui.CreditClubActivity;
-import com.creditclub.core.ui.CreditClubFragment;
 import com.creditclub.core.ui.widget.DialogListener;
 import com.creditclub.core.ui.widget.DialogProvider;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -129,13 +127,13 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
 
         listView.setAdapter(new OptionsAdapter(getActivity(), R.layout.item_option, getMenuOptions()));
         listView.setOnItemClickListener(this);
-        view = ((CreditClubActivity) getActivity()).getCurrentFocus();
+        view = requireActivity().getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager) ((CreditClubActivity) getActivity()).getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
 
-        authResponse = ((BankOneApplication) ((CreditClubActivity) getActivity()).getApplication()).getAuthResponse();// LocalStorage.getCachedAuthResponse(getActivity());
+        authResponse = ((BankOneApplication) requireActivity().getApplication()).getAuthResponse();// LocalStorage.getCachedAuthResponse(getActivity());
 
     }
 
@@ -206,7 +204,7 @@ public class ListOptionsFragment extends Fragment implements AdapterView.OnItemC
                             finalLocation = latitude + ";" + longitude;
                         }
 
-                        AuthResponse authResponse = LocalStorage.getCachedAuthResponse(getActivity());
+                        AuthResponse authResponse = ((BankOneApplication) getActivity().getApplication()).getAuthResponse();
                         ah.continueNextOperation(authResponse.getPhoneNumber(), authResponse.getSessionId(), selectedOption.getIndex(), finalLocation, new APIHelper.VolleyCallback<String>() {
                             @Override
                             public void onCompleted(Exception e, String result, boolean status) {

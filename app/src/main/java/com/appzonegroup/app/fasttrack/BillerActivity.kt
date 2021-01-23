@@ -16,21 +16,15 @@ import com.appzonegroup.app.fasttrack.network.APICaller
 import com.appzonegroup.app.fasttrack.scheduler.AndroidSchedulers
 import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
 import com.appzonegroup.app.fasttrack.utility.Dialogs
-import com.appzonegroup.app.fasttrack.utility.LocalStorage
+import com.appzonegroup.app.fasttrack.utility.BillsLocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.creditclub.core.util.localStorage
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import rx.Observable
 import rx.Subscriber
 import rx.functions.Func0
 import java.util.*
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 4/12/2019.
- * Appzone Ltd
- */
 
 class BillerActivity : BaseActivity(), View.OnClickListener {
 
@@ -53,11 +47,11 @@ class BillerActivity : BaseActivity(), View.OnClickListener {
             categoryNameField = extras!!.getString("categoryName")
             propertyChanged = extras!!.getString("propertyChanged")
         } else {
-            categoryIdField = LocalStorage.GetValueFor(AppConstants.CATEGORYID, this@BillerActivity)
+            categoryIdField = BillsLocalStorage.GetValueFor(AppConstants.CATEGORYID, this@BillerActivity)
             categoryNameField =
-                LocalStorage.GetValueFor(AppConstants.CATEGORYNAME, this@BillerActivity)
+                BillsLocalStorage.GetValueFor(AppConstants.CATEGORYNAME, this@BillerActivity)
             propertyChanged =
-                LocalStorage.GetValueFor(AppConstants.PROPERTYCHANGED, this@BillerActivity)
+                BillsLocalStorage.GetValueFor(AppConstants.PROPERTYCHANGED, this@BillerActivity)
         }
 
         title = categoryNameField

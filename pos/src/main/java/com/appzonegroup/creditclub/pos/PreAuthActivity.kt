@@ -9,8 +9,7 @@ import com.creditclub.pos.card.TransactionType
 class PreAuthActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.PreAuth
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onPosReady() {
         requestCard()
     }
 

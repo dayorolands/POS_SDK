@@ -124,7 +124,7 @@ class CustomerRequestOpenAccountActivity : CreditClubActivity(R.layout.activity_
         response ?: return dialogProvider.showNetworkError()
 
         if (response.isSuccessful) {
-            dialogProvider.showSuccess<Unit>(getString(R.string.customer_was_created_successfully)) {
+            dialogProvider.showSuccess(getString(R.string.customer_was_created_successfully)) {
                 onClose {
                     finish()
                 }

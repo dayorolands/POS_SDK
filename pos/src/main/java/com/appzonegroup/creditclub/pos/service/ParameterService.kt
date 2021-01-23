@@ -9,9 +9,13 @@ import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.util.*
 import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.util.*
+import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
+import com.creditclub.core.util.TrackGPS
+import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.delegates.jsonArrayStore
 import com.creditclub.core.util.delegates.stringStore
+import com.creditclub.core.util.format
+import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.RemoteConnectionInfo
@@ -30,9 +34,8 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.time.Instant
-import java.io.ByteArrayOutputStream
 import java.security.SecureRandom
+import java.time.Instant
 import java.util.*
 
 /**
@@ -42,8 +45,9 @@ import java.util.*
 class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : PosParameter,
     KoinComponent {
     private val prefs: SharedPreferences = run {
-        val suffix = "${posMode.ip}~${posMode.port}"
-        context.getSharedPreferences("Parameters~$suffix", 0)
+        val suffix = "${posMode.ip}:${posMode.port}"
+        val suffixHash = suffix.toByteArray().sha256String
+        context.getEncryptedSharedPreferences("pos_parameters_0:$suffixHash")
     }
     private val config: PosConfig by inject()
     private val database: PosDatabase by inject()
@@ -52,9 +56,9 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
     private val json = Json {
         isLenient = true
         ignoreUnknownKeys = true
-                allowSpecialFloatingPointValues = true
-                useArrayPolymorphism = true
-                encodeDefaults = true
+        allowSpecialFloatingPointValues = true
+        useArrayPolymorphism = true
+        encodeDefaults = true
     }
 
     override var masterKey by prefs.nonNullStringStore("MasterKey")

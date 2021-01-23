@@ -8,8 +8,7 @@ import com.creditclub.pos.card.TransactionType
 class SalesCompleteActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.SalesComplete
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onPosReady() {
         requestCard()
     }
 

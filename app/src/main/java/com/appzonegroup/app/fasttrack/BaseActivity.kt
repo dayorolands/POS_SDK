@@ -162,11 +162,11 @@ open class BaseActivity : CreditClubActivity(), AsyncResponse {
     }
 
     fun showError(message: String?) = dialogProvider.showError(message)
-    fun <T> showError(message: String?, block: DialogListenerBlock<T>) =
+    fun showError(message: String?, block: DialogListenerBlock<*>) =
         dialogProvider.showError(message, block)
 
     fun showSuccess(message: String?) = dialogProvider.showSuccess(message)
-    fun <T> showSuccess(message: String?, block: DialogListenerBlock<T>) =
+    fun showSuccess(message: String?, block: DialogListenerBlock<*>) =
         dialogProvider.showSuccess(message, block)
 
     open fun indicateError(message: String?, view: EditText?) =

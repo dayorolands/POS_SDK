@@ -3,13 +3,11 @@ package com.appzonegroup.app.fasttrack
 import android.os.Bundle
 import android.widget.EditText
 import com.appzonegroup.app.fasttrack.databinding.ActivityDepositBinding
-import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.request.DepositRequest
-import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.finishOnClose
 import com.creditclub.core.util.localStorage

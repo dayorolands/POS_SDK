@@ -26,21 +26,34 @@
                 layout="@layout/header"
                 app:subtitle='@{title}' />
 
-            <include
-                android:id="@+id/rrn_field"
-                layout="@layout/text_field"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/rrn_input_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
-                app:hint='@{"Enter RRN"}'
-                app:inputType='@{"number"}' />
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:hint="RRN"
+                app:counterEnabled="true"
+                app:counterMaxLength="12">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/rrn_input"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:inputType="number"
+                    android:maxLength="12" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_margin="20dp"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp">
+
                 <Button
-                    android:id="@+id/confirm_cashout_button"
+                    android:id="@+id/cancel_button"
                     style="@style/AppButton.RoundOrangeButton"
                     android:layout_width="0dp"
                     android:layout_height="60dp"
@@ -64,16 +77,5 @@
                     android:textSize="20sp" />
             </LinearLayout>
         </LinearLayout>
-
-        <!--<com.google.android.material.floatingactionbutton.FloatingActionButton-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_margin="20dp"-->
-        <!--android:text="Next"-->
-        <!--app:backgroundTint="@color/colorPrimary"-->
-        <!--app:srcCompat="@drawable/ic_check_circle" />-->
     </RelativeLayout>
 </layout>

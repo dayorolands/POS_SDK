@@ -4,19 +4,17 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.text.Editable
 import android.text.TextUtils
-import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.content.edit
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.ui.SurveyDialog
-import com.appzonegroup.app.fasttrack.utility.LocalStorage
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
-import com.appzonegroup.creditclub.pos.data.posPreferences
+import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.service.ConfigService
@@ -38,6 +36,7 @@ import retrofit2.create
 
 class LoginActivity : CreditClubActivity(R.layout.activity_login) {
 
+    private val posPreferences: PosPreferences by inject()
     private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,9 +60,11 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
 
         mainScope.launch { (application as CreditClubApplication).getLatestVersion() }
-        mainScope.launch {
-            updateBinRoutes()
-            checkRequirements()
+        if (Platform.isPOS) {
+            mainScope.launch {
+                updateBinRoutes()
+                checkRequirements()
+            }
         }
 
         if (intent.getBooleanExtra("SESSION_TIMEOUT", false)) {
@@ -196,7 +197,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             return
         }
 
-        if (!isPhoneValid(phoneNumber)) {
+        if (localStorage.agentPhone != phoneNumber) {
             showError("Phone number is incorrect", R.id.login_phoneNumber)
             return
         }
@@ -237,7 +238,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         })
 
         val lastLogin = "Last Login: " + Misc.dateToLongString(Misc.getCurrentDateTime())
-        LocalStorage.SaveValue(AppConstants.LAST_LOGIN, lastLogin, baseContext)
+        localStorage.edit { putString(AppConstants.LAST_LOGIN, lastLogin) }
 
         val intent = Intent(this@LoginActivity, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
@@ -266,11 +267,6 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     private fun showError(message: String, viewId: Int) {
         dialogProvider.showError(message)
         findViewById<View>(viewId).requestFocus()
-    }
-
-    private fun isPhoneValid(phoneNumber: String): Boolean {
-        val storedPhone = LocalStorage.GetValueFor(AppConstants.AGENT_PHONE, baseContext)
-        return phoneNumber == storedPhone
     }
 
     private suspend fun settle() = withContext(Dispatchers.IO) {

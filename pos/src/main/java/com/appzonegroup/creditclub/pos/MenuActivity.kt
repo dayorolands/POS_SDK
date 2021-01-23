@@ -5,19 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.appzonegroup.creditclub.pos.databinding.ActivityMenuBinding
 import com.appzonegroup.creditclub.pos.databinding.CardMenuButtonBinding
 import com.appzonegroup.creditclub.pos.util.MenuPage
 import com.appzonegroup.creditclub.pos.util.MenuPages
 import com.appzonegroup.creditclub.pos.widget.Dialogs
-import kotlinx.android.synthetic.main.activity_menu.*
-
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 3/1/2019.
- * Appzone Ltd
- */
 
 open class MenuActivity : PosActivity() {
     private val module by lazy { MenuPages[pageNumber] }
@@ -48,11 +42,11 @@ open class MenuActivity : PosActivity() {
                     val menuButton = DataBindingUtil.inflate<CardMenuButtonBinding>(
                         LayoutInflater.from(this),
                         R.layout.card_menu_button,
-                        main_menu, true
+                        findViewById(R.id.main_menu), true
                     )
 
                     menuButton.text = option.value.name
-                    menuButton.src = getDrawable(option.value.icon)
+                    menuButton.src = ContextCompat.getDrawable(this, option.value.icon)
                     menuButton.button.setOnClickListener {
                         when {
                             option.value.isClickable -> option.value.click(this)

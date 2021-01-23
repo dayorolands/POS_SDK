@@ -289,7 +289,7 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
     ) {
         val status = password == posConfig.adminPin
         if (!status) {
-            if (closeOnFail) return dialogProvider.showError<Nothing>("Incorrect Password") {
+            if (closeOnFail) return dialogProvider.showError("Incorrect Password") {
                 onClose {
                     finish()
                 }

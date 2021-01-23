@@ -7,8 +7,6 @@ import android.widget.EditText;
 import com.appzonegroup.app.fasttrack.model.AppConstants;
 import com.appzonegroup.app.fasttrack.model.ChangePinRequest;
 import com.appzonegroup.app.fasttrack.utility.FunctionIds;
-import com.appzonegroup.app.fasttrack.utility.LocalStorage;
-import com.appzonegroup.app.fasttrack.utility.TrackGPS;
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask;
 import com.google.gson.Gson;
 
@@ -24,7 +22,6 @@ public class ChangePinActivity extends BaseActivity {
     String oldPin = "";
     String newPin = "";
     String confirmNewPin = "";
-    TrackGPS gps;
 
     String data;
     Gson gson;
@@ -46,29 +43,12 @@ public class ChangePinActivity extends BaseActivity {
                 findViewById(R.id.new_pin);
         confirmNewPinET = //(EditText)
                 findViewById(R.id.confirm_new_pin);
-        gps = new TrackGPS(ChangePinActivity.this);
         gson = new Gson();
-
-        if(!gps.canGetLocation())
-        {
-            /*Double templongitude = gps.getLongitude();
-            longitude = templongitude.toString();
-
-            Double templatitude = gps.getLatitude();
-            latitude = templatitude.toString();*/
-
-
-            //} else {
-
-            gps.showSettingsAlert();
-        }
-
-
     }
 
     public void change_pin_button_click(View view) {
 
-        String location = gps.getGeolocationString();
+        String location = getGps().getGeolocationString();
 
         oldPin = oldPinET.getText().toString().trim();
 
@@ -106,9 +86,9 @@ public class ChangePinActivity extends BaseActivity {
         if (getPackageName().contains("creditclub"))
         {
             ChangePinRequest changePinRequest = new ChangePinRequest();
-            changePinRequest.setAgentPhoneNumber(LocalStorage.getPhoneNumber(getBaseContext()));
-            changePinRequest.setActivationCode(LocalStorage.GetValueFor(AppConstants.AGENT_CODE, getBaseContext()));
-            changePinRequest.setInstitutionCode(LocalStorage.getInstitutionCode(getBaseContext()));
+            changePinRequest.setAgentPhoneNumber(getLocalStorage().getAgentPhone());
+            changePinRequest.setActivationCode(getLocalStorage().getAgent().getAgentCode());
+            changePinRequest.setInstitutionCode(getLocalStorage().getInstitutionCode());
             changePinRequest.setNewPin(newPin);
             changePinRequest.setConfirmNewPin(confirmNewPin);
             changePinRequest.setOldPin(oldPin);

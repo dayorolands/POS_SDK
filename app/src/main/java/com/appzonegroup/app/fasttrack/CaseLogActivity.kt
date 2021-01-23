@@ -1,19 +1,14 @@
 package com.appzonegroup.app.fasttrack
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import com.appzonegroup.app.fasttrack.databinding.ActivityCaseLogBinding
-import com.appzonegroup.app.fasttrack.databinding.ItemAddImageBinding
 import com.appzonegroup.app.fasttrack.fragment.CaseLogViewModel
 import com.creditclub.core.data.request.LogCaseRequest
-import com.creditclub.core.model.CreditClubImage
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
 import com.creditclub.ui.dataBinding
-import com.esafirm.imagepicker.features.ImagePicker
-import com.esafirm.imagepicker.model.Image
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
@@ -111,7 +106,7 @@ class CaseLogActivity : CreditClubActivity(R.layout.activity_case_log) {
         response ?: return dialogProvider.showError("Unable to log case")
 
         if (response.isSuccessful) {
-            dialogProvider.showSuccess<Nothing>("Cased logged successfully") {
+            dialogProvider.showSuccess("Cased logged successfully") {
                 onClose {
                     finish()
                 }

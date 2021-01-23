@@ -1,11 +1,8 @@
 package com.appzonegroup.app.fasttrack.fragment.online;
 
-import androidx.fragment.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,17 +12,21 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+
 import com.appzonegroup.app.fasttrack.OnlineActivity;
 import com.appzonegroup.app.fasttrack.R;
 import com.appzonegroup.app.fasttrack.model.TransactionCountType;
 import com.appzonegroup.app.fasttrack.model.online.Response;
 import com.appzonegroup.app.fasttrack.network.online.APIHelper;
 import com.appzonegroup.app.fasttrack.utility.GPSTracker;
-import com.appzonegroup.app.fasttrack.utility.LocalStorage;
 import com.appzonegroup.app.fasttrack.utility.Misc;
-import com.creditclub.core.data.Encryption;
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages;
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson;
+import com.creditclub.core.data.Encryption;
+import com.creditclub.core.ui.CreditClubFragment;
 
 import org.json.JSONObject;
 
@@ -34,7 +35,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class FirstActivityAgentFragment extends Fragment implements View.OnClickListener {
+public class FirstActivityAgentFragment extends CreditClubFragment implements View.OnClickListener {
 
     @Nullable
     EditText ePhone;
@@ -126,7 +127,7 @@ public class FirstActivityAgentFragment extends Fragment implements View.OnClick
                                         JSONObject auth = new JSONObject();
                                         auth.put("phone_number", phoneNumber);
                                         auth.put("session_id", sessionId);
-                                        LocalStorage.saveCacheAuth(auth.toString(), getActivity());
+                                        getLocalStorage().setCacheAuth(auth.toString());
                                         if (resp.contains("MenuItem")) {
                                             JSONObject menuWrapper = response_base.getJSONObject("Menu").getJSONObject("Response").getJSONObject("Display");
                                             requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, ListOptionsFragment.instantiate(menuWrapper, false)).commit();
@@ -180,7 +181,7 @@ public class FirstActivityAgentFragment extends Fragment implements View.OnClick
                                                                             JSONObject auth = new JSONObject();
                                                                             auth.put("phone_number", phoneNumber);
                                                                             auth.put("session_id", sessionId);
-                                                                            LocalStorage.saveCacheAuth(auth.toString(), getActivity());
+                                                                            getLocalStorage().setCacheAuth(auth.toString());
                                                                             if (resp.contains("MenuItem")) {
                                                                                 JSONObject menuWrapper = response_base.getJSONObject("Menu").getJSONObject("Response").getJSONObject("Display");
                                                                                 requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, ListOptionsFragment.instantiate(menuWrapper, false)).commit();

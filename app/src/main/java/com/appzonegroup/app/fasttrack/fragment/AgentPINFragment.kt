@@ -11,7 +11,6 @@ import com.appzonegroup.app.fasttrack.databinding.FragmentAgentPinSubmitBtnBindi
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.safeRunIO
-import com.creditclub.core.util.showErrorAndWait
 import kotlinx.coroutines.launch
 
 class AgentPINFragment : CreditClubFragment(R.layout.fragment_agent_pin_submit_btn) {

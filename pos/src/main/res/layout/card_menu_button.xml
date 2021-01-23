@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -13,27 +14,46 @@
     </data>
 
     <LinearLayout
-        android:id="@+id/button"
         style="@style/Widget.AppCompat.Button"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_margin="@dimen/five_dp"
-        android:background="@drawable/round_white_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@color/transparent"
+        android:clickable="true"
+        android:focusable="true"
         android:gravity="center"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:layout_margin="20dp"
-            android:src="@{src, default=@drawable/ic_check_circle}"
-            android:tint="@color/menuButtonIconTint" />
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:id="@+id/button"
+            android:layout_margin="3dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="3dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/five_dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@{src, default=@drawable/ic_check_circle}"
+                android:tint="@color/menuButtonIconTint" />
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:gravity="center"
+            android:lines="2"
             android:text="@{text, default=Button}"
             android:textAlignment="center"
             android:textAllCaps="true"

@@ -5,13 +5,13 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.appzonegroup.creditclub.pos.adapter.PosNotificationAdapter
 import com.appzonegroup.creditclub.pos.models.PosNotification
 import com.appzonegroup.creditclub.pos.models.view.NotificationViewModel
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.showError
 import com.creditclub.pos.api.PosApiService
-import kotlinx.android.synthetic.main.activity_pending_confirmation.*
 import kotlinx.coroutines.launch
 import retrofit2.create
 
@@ -35,6 +35,7 @@ class UnsettledTransactionsActivity : PosActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pending_confirmation)
 
+        val list = findViewById<RecyclerView>(R.id.list)
         list.adapter = rAdapter
         list.layoutManager = LinearLayoutManager(this)
 

@@ -9,22 +9,21 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.appzonegroup.app.fasttrack.databinding.ActivityBvnupdateBinding
+import com.appzonegroup.app.fasttrack.databinding.FragmentAuthorizationBinding
+import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
-import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.request.BVNRequest
 import com.creditclub.core.type.TokenType
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
-import kotlinx.android.synthetic.main.fragment_account_details.view.*
-import kotlinx.android.synthetic.main.fragment_authorization.view.*
 import kotlinx.coroutines.launch
 
 class BVNUpdateActivity : CustomerBaseActivity() {
     private val binding by contentView<BVNUpdateActivity, ActivityBvnupdateBinding>(R.layout.activity_bvnupdate)
     override val functionId = FunctionIds.BVN_UPDATE
 
-    override fun onCustomerReady(savedInstanceState: Bundle?){
+    override fun onCustomerReady(savedInstanceState: Bundle?) {
         binding.container.adapter = SectionsPagerAdapter(supportFragmentManager)
         binding.tabs.setupWithViewPager(binding.container)
         binding.tabs.clearOnTabSelectedListeners()
@@ -74,18 +73,23 @@ class BVNUpdateActivity : CustomerBaseActivity() {
         }
     }
 
-    class AuthorizationFragment : CreditClubFragment() {
+    class AuthorizationFragment : CreditClubFragment(R.layout.fragment_authorization) {
+        private val binding:FragmentAuthorizationBinding by dataBinding()
         val activity get() = getActivity() as BVNUpdateActivity
 
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            val rootView = inflater.inflate(R.layout.fragment_authorization, container, false)
-
-            rootView.accountDetails_bvn_et.addTextChangedListener(object : TextWatcher {
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            binding.accountDetailsBvnEt.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
 
                 }
 
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
 
                 }
 
@@ -96,7 +100,10 @@ class BVNUpdateActivity : CustomerBaseActivity() {
                         activity.showProgressBar("Getting the BVN information...")
 
                         val (response, error) = safeRunIO {
-                            staticService.getCustomerDetailsByBVN(activity.localStorage.institutionCode, "$s")
+                            staticService.getCustomerDetailsByBVN(
+                                activity.localStorage.institutionCode,
+                                "$s"
+                            )
                         }
 
                         activity.hideProgressBar()
@@ -108,23 +115,30 @@ class BVNUpdateActivity : CustomerBaseActivity() {
                             return@launch
                         }
 
-                        rootView.customer_name_et.setText("${response.firstName} ${response.lastName}")
+                        binding.customerNameEt.setText("${response.firstName} ${response.lastName}")
                     }
                 }
             })
 
-            rootView.button_update_bvn.setOnClickListener {
-                if (rootView.accountDetails_bvn_et.text.toString().length != 11) {
-                    activity.errorAction(rootView.accountDetails_bvn_et, "Incorrect BVN inputted", 1)
+            binding.buttonUpdateBvn.setOnClickListener {
+                if (binding.accountDetailsBvnEt.text.toString().length != 11) {
+                    activity.errorAction(
+                        binding.accountDetailsBvnEt,
+                        "Incorrect BVN inputted",
+                        1
+                    )
                     return@setOnClickListener
                 }
 
-                if (rootView.auth_agentPIN_et.text.toString().isEmpty()) {
-                    activity.errorAction(rootView.auth_agentPIN_et, "Enter your PIN", 1)
+                if (binding.authAgentPINEt.text.toString().isEmpty()) {
+                    activity.errorAction(binding.authAgentPINEt, "Enter your PIN", 1)
                     return@setOnClickListener
                 }
 
-                activity.requireAndValidateToken(activity.accountInfo, operationType = TokenType.BVNUpdate) {
+                activity.requireAndValidateToken(
+                    activity.accountInfo,
+                    operationType = TokenType.BVNUpdate
+                ) {
                     onSubmit {
                         val staticService = activity.creditClubMiddleWareAPI.staticService
 
@@ -132,11 +146,12 @@ class BVNUpdateActivity : CustomerBaseActivity() {
 
                         bvnRequest.customerAccountNumber = activity.accountInfo.number
                         bvnRequest.customerPhoneNumber = activity.accountInfo.phoneNumber
-                        bvnRequest.bvn = rootView.accountDetails_bvn_et.text.toString().trim { it <= ' ' }
+                        bvnRequest.bvn =
+                            binding.accountDetailsBvnEt.text.toString().trim { it <= ' ' }
                         bvnRequest.geoLocation = activity.gps.geolocationString
                         bvnRequest.institutionCode = activity.localStorage.institutionCode
                         bvnRequest.agentPhoneNumber = activity.localStorage.agentPhone
-                        bvnRequest.agentPin = rootView.auth_agentPIN_et.text.toString()
+                        bvnRequest.agentPin = binding.authAgentPINEt.text.toString()
 
                         activity.mainScope.launch {
                             activity.showProgressBar("Updating BVN")
@@ -151,34 +166,31 @@ class BVNUpdateActivity : CustomerBaseActivity() {
                             response ?: return@launch activity.showInternalError()
 
                             if (response.isSuccessful) {
-                                activity.dialogProvider.showSuccess<Unit>("BVN was updated successfully") {
+                                activity.dialogProvider.showSuccess("BVN was updated successfully") {
                                     onClose {
                                         activity.finish()
                                     }
                                 }
                             } else activity.showError(
-                                response.responseMessage ?: getString(R.string.network_error_message)
+                                response.responseMessage
+                                    ?: getString(R.string.network_error_message)
                             )
                         }
                     }
                 }
             }
-
-            return rootView
         }
     }
 
-    class AccountDetailsFragment : CreditClubFragment() {
+    class AccountDetailsFragment : CreditClubFragment(R.layout.fragment_account_details) {
         val activity get() = getActivity() as BVNUpdateActivity
 
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            val rootView = inflater.inflate(R.layout.fragment_account_details, container, false)
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
 
-            activity.addValidPhoneNumberListener(rootView.accountDetails_phone_et)
+            activity.addValidPhoneNumberListener(view.findViewById(R.id.accountDetails_phone_et))
 
             if (!activity.gps.canGetLocation()) activity.gps.showSettingsAlert()
-
-            return rootView
         }
     }
 

@@ -16,7 +16,6 @@ import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.printer.PosPrinter
-import com.creditclub.pos.printer.PrinterStatus
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
@@ -49,7 +48,7 @@ abstract class PosActivity : CreditClubActivity {
     ) {
         val status = pin == config.supervisorPin
         if (!status) {
-            if (closeOnFail) return dialogProvider.showError<Nothing>("Authentication Failed") {
+            if (closeOnFail) return dialogProvider.showError("Authentication Failed") {
                 onClose {
                     finish()
                 }
@@ -67,7 +66,7 @@ abstract class PosActivity : CreditClubActivity {
     ) {
         val status = password == config.adminPin
         if (!status) {
-            if (closeOnFail) return dialogProvider.showError<Nothing>("Incorrect Password") {
+            if (closeOnFail) return dialogProvider.showError("Incorrect Password") {
                 onClose {
                     finish()
                 }
@@ -128,7 +127,7 @@ abstract class PosActivity : CreditClubActivity {
 
     fun showError(message: String?) = dialogProvider.showError(message)
 
-    fun showError(message: String?, block: DialogListenerBlock<Nothing>) {
+    fun showError(message: String?, block: DialogListenerBlock<*>) {
         dialogProvider.showError(message, block)
     }
 }

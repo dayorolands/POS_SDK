@@ -9,8 +9,7 @@ import com.creditclub.pos.card.TransactionType
 class CardWithdrawalActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.Purchase
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onPosReady() {
         requestCard()
     }
 

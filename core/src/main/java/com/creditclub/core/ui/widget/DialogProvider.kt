@@ -22,39 +22,39 @@ interface DialogProvider {
 
     fun hideProgressBar()
 
-    fun showError(message: CharSequence?) = showError<Nothing>(message, null)
+    fun showError(message: CharSequence?) = showError(message, null)
 
-    fun <T> showError(message: CharSequence?, block: DialogListenerBlock<T>?)
+    fun showError(message: CharSequence?, block: DialogListenerBlock<*>?)
 
     fun <T> showInfo(message: CharSequence?, block: DialogListenerBlock<T>?)
 
     fun showInfo(message: CharSequence?) = showInfo<Nothing>(message, null)
 
-    fun showSuccess(message: CharSequence?) = showSuccess<Nothing>(message, null)
+    fun showSuccess(message: CharSequence?) = showSuccess(message, null)
 
-    fun <T> showSuccess(message: CharSequence?, block: DialogListenerBlock<T>?)
+    fun showSuccess(message: CharSequence?, block: DialogListenerBlock<*>?)
 
     fun indicateError(message: CharSequence?, view: EditText?)
 
-    fun <T> showProgressBar(
+    fun showProgressBar(
         title: CharSequence,
         message: CharSequence?,
         isCancellable: Boolean,
-        block: DialogListenerBlock<T>?
+        block: DialogListenerBlock<*>?
     ): Dialog
 
     fun showProgressBar(title: CharSequence): Dialog {
-        return showProgressBar<Nothing>(title, "Please wait", false, null)
+        return showProgressBar(title, "Please wait", false, null)
     }
 
     fun showProgressBar(title: CharSequence, message: CharSequence?): Dialog {
-        return showProgressBar<Nothing>(title, message, false, null)
+        return showProgressBar(title, message, false, null)
     }
 
     fun showProgressBar(
         title: CharSequence,
         message: CharSequence?,
-        block: DialogListenerBlock<Nothing>?
+        block: DialogListenerBlock<*>?
     ): Dialog {
         return showProgressBar(title, message, false, block)
     }
@@ -131,21 +131,21 @@ interface DialogProvider {
 
     suspend fun showErrorAndWait(mesage: String) =
         suspendCoroutine<Unit> { continuation ->
-            showError<Nothing>(mesage) {
+            showError(mesage) {
                 onClose { continuation.resume(Unit) }
             }
         }
 
     suspend fun showErrorAndWait(exception: Exception) =
         suspendCoroutine<Unit> { continuation ->
-            showError<Nothing>(exception) {
+            showError(exception) {
                 onClose { continuation.resume(Unit) }
             }
         }
 
     suspend fun showSuccessAndWait(message: String) =
         suspendCoroutine<Unit> { continuation ->
-            showSuccess<Nothing>(message) {
+            showSuccess(message) {
                 onClose { continuation.resume(Unit) }
             }
         }

@@ -1,33 +1,26 @@
 package com.appzonegroup.app.fasttrack;
 
 import android.os.Bundle;
-
-import com.appzonegroup.app.fasttrack.utility.FunctionIds;
-import com.creditclub.core.ui.widget.DialogListener;
-import com.google.android.material.tabs.TabLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.appzonegroup.app.fasttrack.model.AppConstants;
 import com.appzonegroup.app.fasttrack.model.ChangePinRequest;
 import com.appzonegroup.app.fasttrack.model.TokenRequest;
 import com.appzonegroup.app.fasttrack.ui.NonSwipeableViewPager;
-import com.appzonegroup.app.fasttrack.utility.LocalStorage;
-import com.appzonegroup.app.fasttrack.utility.TrackGPS;
+import com.appzonegroup.app.fasttrack.utility.FunctionIds;
 import com.appzonegroup.app.fasttrack.utility.task.PostCallTask;
+import com.creditclub.core.ui.widget.DialogListener;
+import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +41,6 @@ public class ChangeCustomerPinActivity extends BaseActivity {
     String confirmNewPin = "";
     String customerToken = "";
     String customerAccount = "";
-    TrackGPS gps;
 
     @Nullable
     @Override
@@ -72,13 +64,7 @@ public class ChangeCustomerPinActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_customer_pin);
 
-        gps = new TrackGPS(ChangeCustomerPinActivity.this);
         gson = new Gson();
-
-        if(!gps.canGetLocation())
-        {
-            gps.showSettingsAlert();
-        }
 
         mSectionsPagerAdapter = new ChangeCustomerPinActivity.SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -96,19 +82,16 @@ public class ChangeCustomerPinActivity extends BaseActivity {
 
     }
 
-    public void send_customer_token_click(View view)
-    {
+    public void send_customer_token_click(View view) {
 
         customerAccount = customerAccountNoEt.getText().toString().trim();
 
-        if (customerAccount.length() == 0)
-        {
+        if (customerAccount.length() == 0) {
             showError(getString(R.string.please_enter_the_account_number));
             return;
         }
 
-        if (customerAccount.length() != 10)
-        {
+        if (customerAccount.length() != 10) {
             showError(getString(R.string.please_enter_the_complete_account_number));
             return;
         }
@@ -118,16 +101,16 @@ public class ChangeCustomerPinActivity extends BaseActivity {
 //            return;
 //        }
         sendCustomerToken(customerAccount, customerAccountNoEt);
-  }
+    }
 
-    public void sendCustomerToken(String customerPhoneNumber, final EditText phoneNumberET){
+    public void sendCustomerToken(String customerPhoneNumber, final EditText phoneNumberET) {
         //make the phone number EditText uneditable while sending the token
         phoneNumberET.setEnabled(false);
         TokenRequest tkRequest = new TokenRequest();
         tkRequest.setCustomerAccountNumber(customerPhoneNumber);
-        tkRequest.setAgentPhoneNumber(LocalStorage.getPhoneNumber(getBaseContext()));
-        tkRequest.setAgentPin(LocalStorage.getAgentsPin(getBaseContext()));
-        tkRequest.setInstitutionCode(LocalStorage.getInstitutionCode(getBaseContext()));
+        tkRequest.setAgentPhoneNumber(getLocalStorage().getAgentPhone());
+        tkRequest.setAgentPin("0000");
+        tkRequest.setInstitutionCode(getLocalStorage().getInstitutionCode());
         tkRequest.setPinChange(true);
         String data = new Gson().toJson(tkRequest);
         Response.Listener<JSONObject> doOnsuccess = new Response.Listener<JSONObject>() {
@@ -136,12 +119,10 @@ public class ChangeCustomerPinActivity extends BaseActivity {
             public void onResponse(JSONObject object) {
                 String result = object.toString();
                 com.appzonegroup.app.fasttrack.model.Response response = new Gson().fromJson(result, com.appzonegroup.app.fasttrack.model.Response.class);
-                if(response.isSuccessful())
-                {
+                if (response.isSuccessful()) {
                     showSuccess(response.getReponseMessage());
                     mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);
-                }
-                else{
+                } else {
                     indicateError(response.getReponseMessage(), phoneNumberET);
                 }
             }
@@ -155,37 +136,35 @@ public class ChangeCustomerPinActivity extends BaseActivity {
             }
 
         };
-        sendJSONPostRequestWithCallback(AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/SendToken",data,doOnsuccess, doOnError);
+        sendJSONPostRequestWithCallback(AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/SendToken", data, doOnsuccess, doOnError);
 
     }
 
     public void change_pin_button_click(View view) {
 
-        String location = gps.getGeolocationString();
+        String location = getGps().getGeolocationString();
 
         oldPin = oldPinET.getText().toString();
 
-        if (oldPin.length() != 4)
-        {
+        if (oldPin.length() != 4) {
             indicateError("Please enter the old PIN", oldPinET);
             return;
         }
 
         newPin = newPinET.getText().toString().trim();
         if (newPin.length() == 0) {
-            indicateError("Please enter your PIN",newPinET);
+            indicateError("Please enter your PIN", newPinET);
             return;
         }
 
         confirmNewPin = confirmNewPinET.getText().toString();
 
         if (!confirmNewPin.equals(newPin)) {
-            indicateError(getString(R.string.new_pin_confirmation_mismatch),confirmNewPinET);
+            indicateError(getString(R.string.new_pin_confirmation_mismatch), confirmNewPinET);
             return;
         }
 
-        if (customerPhoneEt.getText().toString().trim().length() != 11)
-        {
+        if (customerPhoneEt.getText().toString().trim().length() != 11) {
             indicateError(getString(R.string.please_enter_customers_phone_number), customerPhoneEt);
             return;
         }
@@ -201,14 +180,14 @@ public class ChangeCustomerPinActivity extends BaseActivity {
         //if (getPackageName().endsWith("revamped"))
         {
             ChangePinRequest changePinRequest = new ChangePinRequest();
-            changePinRequest.setAgentPhoneNumber(LocalStorage.getPhoneNumber(getBaseContext()));
-            changePinRequest.setInstitutionCode(LocalStorage.getInstitutionCode(getBaseContext()));
+            changePinRequest.setAgentPhoneNumber(getLocalStorage().getAgentPhone());
+            changePinRequest.setInstitutionCode(getLocalStorage().getInstitutionCode());
             changePinRequest.setNewPin(newPin);
             changePinRequest.setConfirmNewPin(confirmNewPin);
             changePinRequest.setOldPin(oldPin);
             changePinRequest.setGeoLocation(location);
             changePinRequest.setCustomerPhoneNumber(customerPhoneEt.getText().toString().trim());
-            changePinRequest.setAgentPin(LocalStorage.getAgentsPin(getBaseContext()));
+            changePinRequest.setAgentPin("0000");
             changePinRequest.setCustomerToken(customerToken);
 
             data = gson.toJson(changePinRequest);
@@ -225,15 +204,14 @@ public class ChangeCustomerPinActivity extends BaseActivity {
     public void processFinished(String output) {
         super.processFinished(output);
 
-        if (output == null)
-        {
+        if (output == null) {
             showError(getString(R.string.network_error_message));
             return;
         }
 
         com.appzonegroup.app.fasttrack.model.Response response = new Gson().fromJson(output, com.appzonegroup.app.fasttrack.model.Response.class);
 
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             showSuccess("Pin Changed Successfully", new Function1<DialogListener<? extends Object>, Unit>() {
                 @Override
                 public Unit invoke(DialogListener<?> dialogListener) {
@@ -247,8 +225,7 @@ public class ChangeCustomerPinActivity extends BaseActivity {
                     return null;
                 }
             });
-        }
-        else{
+        } else {
             showError(response.getReponseMessage());
         }
 
@@ -256,7 +233,7 @@ public class ChangeCustomerPinActivity extends BaseActivity {
 
     public static class CustomerAccountNumberFragment extends Fragment {
 
-        public CustomerAccountNumberFragment(){
+        public CustomerAccountNumberFragment() {
 
         }
 
@@ -272,14 +249,14 @@ public class ChangeCustomerPinActivity extends BaseActivity {
         }
     }
 
-    public static class ChangePinFragment extends Fragment{
+    public static class ChangePinFragment extends Fragment {
 
-        public ChangePinFragment(){
+        public ChangePinFragment() {
 
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
             View rootView = inflater.inflate(R.layout.fragment_pin_details, container, false);
 
@@ -311,15 +288,14 @@ public class ChangeCustomerPinActivity extends BaseActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            switch (position)
-            {
-                case 0:{
+            switch (position) {
+                case 0: {
                     return new ChangeCustomerPinActivity.CustomerAccountNumberFragment();
                 }
-                case 1:{
+                case 1: {
                     return new ChangeCustomerPinActivity.ChangePinFragment();
                 }
-                default:{
+                default: {
                     return new ChangeCustomerPinActivity.CustomerAccountNumberFragment();
                 }
             }
