@@ -19,7 +19,6 @@ import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.delegates.service
-import kotlinx.android.synthetic.main.activity_billpayment.*
 import kotlinx.coroutines.launch
 
 /**
@@ -174,18 +173,18 @@ class BillPaymentActivity : BaseActivity() {
             billItemID = billerItem.billerItemIdField
             amount = "${amountET.text}"
             billerCategoryID = categoryIdField
-            customerEmail = "${customer_email_et.text}"
+            customerEmail = "${binding.customerEmailEt.text}"
 //                customerPhone = customer.phoneNumber
             accountNumber = localStorage.agentPhone
             billerName = biller.billerNameField
             paymentItemCode = billerItem.paymentCodeField
             paymentItemName = billerItem.billerItemNameField
             billerCategoryName = categoryNameField
-            customerName = name_et.text.toString()
+            customerName = binding.nameEt.text.toString()
 
             customerPhone = if (isAirtime) {
                 fieldOneET.text.toString()
-            } else phone_et.text.toString()
+            } else binding.phoneEt.text.toString()
 
             customerDepositSlipNumber = reference
             geolocation = gps.geolocationString

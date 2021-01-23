@@ -23,7 +23,6 @@ import com.creditclub.core.ui.SimpleAdapter
 import com.creditclub.core.ui.widget.DialogListener
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogOptionItem
-import kotlinx.android.synthetic.main.dialog_survey.*
 
 
 class SurveyDialog private constructor(context: Context, questions: List<SurveyQuestion>) :
@@ -66,6 +65,7 @@ class SurveyDialog private constructor(context: Context, questions: List<SurveyQ
     }
 
     private fun onNext() {
+        val viewPager = binding.viewPager
         if (viewPager.currentItem == viewPager.adapter?.itemCount?.minus(1) ?: 0) {
             DialogListener.create(listener!!).submit(this, answers)
             dismiss()

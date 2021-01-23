@@ -23,7 +23,6 @@ import com.creditclub.pos.card.AccountType
 import com.creditclub.pos.card.CardReaderEvent
 import com.creditclub.pos.card.TransactionType
 import com.creditclub.pos.printer.PrinterStatus
-import kotlinx.android.synthetic.main.number_pad.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

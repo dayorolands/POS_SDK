@@ -9,14 +9,14 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
+import android.widget.DatePicker
+import android.widget.EditText
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.databinding.PosDialogConfirmBinding
 import com.appzonegroup.creditclub.pos.databinding.PosDialogInputBinding
 import com.appzonegroup.creditclub.pos.databinding.PosPinpadBinding
-import kotlinx.android.synthetic.main.pos_dialog_calender.*
-import kotlinx.android.synthetic.main.pos_dialog_input.*
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -196,7 +196,7 @@ object Dialogs {
         binding.submitButton.setOnClickListener {
             if (config != null) Dialogs.Listener<String>().apply(config).submit(
                 dialog,
-                dialog.input.text.toString()
+                dialog.findViewById<EditText>(R.id.input).text.toString()
             )
         }
         binding.cancelButton.setOnClickListener {
@@ -260,14 +260,16 @@ object Dialogs {
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.pos_dialog_calender)
-        dialog.calendarViewButton.setOnClickListener {
+        val calendarViewButton = dialog.findViewById<View>(R.id.calendarViewButton)
+        val datePicker = dialog.findViewById<DatePicker>(R.id.datePicker)
+        calendarViewButton.setOnClickListener {
             if (config != null) {
-                val dayOfMonth = dialog.datePicker.dayOfMonth
-                val month = dialog.datePicker.month + 1
+                val dayOfMonth = datePicker.dayOfMonth
+                val month = datePicker.month + 1
 
                 val dayString = if (dayOfMonth > 9) dayOfMonth.toString() + "" else "0$dayOfMonth"
                 val monthString = if (month > 9) month.toString() + "" else "0$month"
-                val yearString = dialog.datePicker.year.toString()
+                val yearString = datePicker.year.toString()
 
                 dialog.dismiss()
                 Dialogs.Listener<Array<String>>().apply(config)

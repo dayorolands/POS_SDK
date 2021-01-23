@@ -25,7 +25,6 @@ import com.creditclub.core.ui.widget.*
 import com.creditclub.core.util.safeRun
 import com.creditclub.ui.adapter.DialogOptionAdapter
 import com.creditclub.ui.databinding.DialogOptionsBinding
-import kotlinx.android.synthetic.main.dialog_error.*
 import java.time.LocalDate
 import java.time.ZoneId
 
@@ -64,7 +63,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
             hideProgressBar()
             val dialog = getErrorDialog(activity, message)
 
-            dialog.close_btn.setOnClickListener {
+            dialog.findViewById<View>(R.id.close_btn).setOnClickListener {
                 dialog.dismiss()
                 if (block != null) DialogListener.create<Any>(block).close()
             }
@@ -92,7 +91,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
             hideProgressBar()
             val dialog = getSuccessDialog(activity, message)
 
-            dialog.close_btn.setOnClickListener {
+            dialog.findViewById<View>(R.id.close_btn).setOnClickListener {
                 dialog.dismiss()
                 if (block != null) DialogListener.create<Any>(block).close()
             }
