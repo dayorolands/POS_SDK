@@ -19,6 +19,7 @@ android {
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
+        ndkVersion '21.3.6528147'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         versionCode 26

@@ -18,6 +18,10 @@ android {
         release {
             consumerProguardFiles 'proguard-rules.pro'
         }
+        releaseStaging {
+            debuggable true
+            matchingFallbacks = ['release', 'debug']
+        }
     }
 }
 

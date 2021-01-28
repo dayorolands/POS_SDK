@@ -28,5 +28,5 @@
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.stream.** { *; }
 
-# Application classes that will be serialized/deserialized over Gson
--keep class com.nexgo.oaf.apiv3.emv.** { *; }
+-keep class !com.nexgo.n3.**,com.nexgo.** { *; }
+-keepclassmembers class !com.nexgo.n3.**,com.nexgo.** { *; }

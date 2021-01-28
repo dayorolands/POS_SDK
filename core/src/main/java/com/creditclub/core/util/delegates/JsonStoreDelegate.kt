@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 import kotlin.reflect.KProperty
 
 class JsonStoreDelegate<T : Any>(
@@ -40,17 +39,4 @@ inline fun <reified T : Any> SharedPreferences.jsonStore(
     }
 ): JsonStoreDelegate<T> {
     return JsonStoreDelegate(this, key, serializer, json)
-}
-
-inline fun <reified T : Any> SharedPreferences.jsonStore(
-    key: String,
-    json: Json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
-        encodeDefaults = true
-    }
-): JsonStoreDelegate<T> {
-    return JsonStoreDelegate(this, key, serializer(), json)
 }

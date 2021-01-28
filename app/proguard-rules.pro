@@ -9,7 +9,7 @@
 
 # Add any project specific keep options here:
 #-dontskipnonpubliclibraryclasses
-#-dontobfuscate
+-dontobfuscate
 #-forceprocessing
 -optimizationpasses 5
 

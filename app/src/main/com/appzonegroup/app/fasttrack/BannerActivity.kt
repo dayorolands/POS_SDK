@@ -9,6 +9,8 @@ import com.creditclub.core.util.delegates.jsonStore
 import com.creditclub.core.util.safeRun
 import com.creditclub.ui.dataBinding
 import com.squareup.picasso.Picasso
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 
 class BannerActivity : AppCompatActivity(R.layout.activity_banner) {
 
@@ -19,7 +21,10 @@ class BannerActivity : AppCompatActivity(R.layout.activity_banner) {
         super.onCreate(savedInstanceState)
         binding.btnSkip.setOnClickListener { finish() }
 
-        val bannerImageList by jsonPrefs.jsonStore<List<String>>("DATA_BANNER_IMAGES")
+        val bannerImageList: List<String>? by jsonPrefs.jsonStore(
+            "DATA_BANNER_IMAGES",
+            ListSerializer(String.serializer())
+        )
         val data = bannerImageList ?: return finish()
         if (data.isEmpty()) return finish()
 
