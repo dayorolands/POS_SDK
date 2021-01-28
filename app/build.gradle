@@ -1,11 +1,15 @@
-apply plugin: "com.android.application"
-apply plugin: "kotlin-android"
-apply plugin: "kotlin-kapt"
-apply plugin: "kotlin-android-extensions"
-apply plugin: "androidx.navigation.safeargs.kotlin"
-apply plugin: "kotlinx-serialization"
-apply plugin: "com.google.firebase.crashlytics"
-apply plugin: "com.google.firebase.firebase-perf"
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'kotlin-android-extensions'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'kotlinx-serialization'
+    id 'com.google.firebase.crashlytics'
+    id 'com.google.firebase.firebase-perf'
+    id 'io.objectbox'
+    id 'com.google.gms.google-services'
+}
 
 android {
     compileSdkVersion versions.compileSdk
@@ -15,6 +19,7 @@ android {
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
+        ndkVersion '21.3.6528147'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         versionCode 26
@@ -92,9 +97,8 @@ android {
 
         debug {
             debuggable true
-//            buildConfigField("String", "API_HOST", ""https://cluster.africa"")
-            buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
-            buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
+            buildConfigField("String", "API_HOST", '"https://staging.mybankone.com"')
+            buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (Staging)"
             ext.enableCrashlytics = false
@@ -268,6 +272,3 @@ dependencies {
     implementation "com.google.firebase:firebase-messaging-ktx"
     implementation "com.google.firebase:firebase-analytics-ktx"
 }
-
-apply plugin: "io.objectbox"
-apply plugin: "com.google.gms.google-services"

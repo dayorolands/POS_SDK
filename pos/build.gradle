@@ -14,6 +14,7 @@ android {
         versionName ARTIFACT_VERSION
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        consumerProguardFiles 'proguard-rules.pro'
     }
     buildFeatures {
         dataBinding = true
@@ -21,6 +22,10 @@ android {
     buildTypes {
         release {
             consumerProguardFiles 'proguard-rules.pro'
+        }
+        releaseStaging {
+            debuggable true
+            matchingFallbacks = ['release', 'debug']
         }
     }
     kapt {
