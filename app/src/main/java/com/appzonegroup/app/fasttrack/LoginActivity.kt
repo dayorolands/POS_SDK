@@ -20,6 +20,7 @@ import com.appzonegroup.creditclub.pos.data.posPreferences
 import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.service.ConfigService
+import com.appzonegroup.creditclub.pos.util.PosMode
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.api.BackendConfig
@@ -344,7 +345,8 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                     return false
                 }
 
-//                    posConfig.posModeStr = agent.posMode
+                posConfig.remoteConnectionInfo =
+                    PosMode.values().find { it.id == agent.posMode } ?: PosMode.EPMS
                 posConfig.terminalId = agent.terminalID ?: ""
                 posParameter.reset()
             }
