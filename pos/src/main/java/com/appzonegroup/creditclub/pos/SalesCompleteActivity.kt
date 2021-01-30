@@ -1,6 +1,5 @@
 package com.appzonegroup.creditclub.pos
 
-import android.os.Bundle
 import com.appzonegroup.creditclub.pos.models.messaging.FinancialAdviceMessage
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.TransactionType
@@ -9,7 +8,7 @@ class SalesCompleteActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.SalesComplete
 
     override fun onPosReady() {
-        requestCard()
+        showReferencePage("Sales Completion")
     }
 
     override fun onReadCard(cardData: CardData) {
@@ -22,7 +21,11 @@ class SalesCompleteActivity : CardTransactionActivity() {
     }
 
     override fun onSelectAccountType() {
-        showReferencePage("Sales Completion")
+        showAmountPage("Amount") { amount ->
+            viewModel.amountString.value = amount.toString()
+            sessionData.amount = amount
+            readCard()
+        }
     }
 }
 

@@ -15,6 +15,7 @@ import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
 import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.extension.posSerialNumber
+import com.appzonegroup.creditclub.pos.util.PosMode
 import com.creditclub.core.data.model.AuthResponse
 import com.creditclub.core.data.request.PinChangeRequest
 import com.creditclub.core.ui.CreditClubActivity
@@ -231,7 +232,8 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
         firebaseCrashlytics.setCustomKey("terminal_id", agent.terminalID ?: "")
 
         if (Platform.isPOS) {
-//            posConfig.posModeStr = agent.posMode
+            posConfig.remoteConnectionInfo =
+                PosMode.values().find { it.id == agent.posMode } ?: PosMode.EPMS
             posConfig.terminalId = agent.terminalID ?: ""
             posParameter.reset()
         }

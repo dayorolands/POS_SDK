@@ -239,9 +239,11 @@ class TelpoEmvListener(
         get() {
             val pin = String(this)
             val pan = emvService.getValue(0x5A, hex = false, padded = true)
+            val posParameter: PosParameter =
+                sessionData.getPosParameter?.invoke(pan, sessionData.amount / 100.0) ?: get()
             val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
             val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
-            val cipherKey = get<PosParameter>().pinKey.hexBytes
+            val cipherKey = posParameter.pinKey.hexBytes
             val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
             val tripleDesCipher = TripleDesCipher(cipherKey)
             return tripleDesCipher.encrypt(cryptData).copyOf(8)
