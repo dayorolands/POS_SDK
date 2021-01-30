@@ -17,8 +17,8 @@ android {
         targetSdkVersion versions.targetSdk
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 24
-        versionName "1.4.1"
+        versionCode 26
+        versionName "1.4.3"
     }
 
     lintOptions {

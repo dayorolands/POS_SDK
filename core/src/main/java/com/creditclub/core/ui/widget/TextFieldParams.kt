@@ -10,6 +10,7 @@ data class TextFieldParams(
     val maxLength: Int = 100,
     val type: String? = null,
     val helperText: String? = null,
-    val minLength: Int? = null,
-    val initialValue: String? = null
+    val minLength: Int = 0,
+    val initialValue: String = "",
+    val required: Boolean = false,
 )

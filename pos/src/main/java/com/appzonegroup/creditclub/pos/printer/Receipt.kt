@@ -66,7 +66,7 @@ Agent Name: ${context.localStorage.agent?.agentName}
 Agent Code: ${context.localStorage.agent?.agentCode}
 TID: $terminalId
 
-${transaction.createdAt.format("dd/MM/YYYY hh:mm", "+0100")}
+${transaction.createdAt.format("dd/MM/yyyy hh:mm", "+0100")}
 
 $cardType
 Card: ${transaction.pan}

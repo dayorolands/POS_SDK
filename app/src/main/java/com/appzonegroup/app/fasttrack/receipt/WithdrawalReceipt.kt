@@ -44,7 +44,7 @@ Amount : NGN${request.amount}
 Customer Account: ${accountInfo.number.mask(4, 2)}
 Customer Name: ${accountInfo.accountName}
 
-Transaction Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}"""
+Transaction Date: ${Instant.now().toString("dd-MM-yyyy hh:mm")}"""
                 )
             ).apply { addTransactionStatus(); addAll(footerNodes(context)) }
         }

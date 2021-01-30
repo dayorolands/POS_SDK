@@ -135,7 +135,7 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
         }
 
         val phoneNumber = binding.customerPhoneNumberEt.value
-        if (phoneNumber.length != 11) {
+        if (viewModel.showPhoneNumberInput.value == true && phoneNumber.length != 11) {
             indicateError("Please enter a valid phone number", binding.customerPhoneNumberEt)
             return
         }

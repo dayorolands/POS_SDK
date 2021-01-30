@@ -41,7 +41,7 @@ Amount NGN${request.amountInNaira}
 Beneficiary Name: ${request.beneficiaryAccountName}
 Beneficiary Account Number: ${request.beneficiaryAccountNumber.mask(4, 2)}
 
-Transaction Date: ${Instant.now().toString("dd-MM-YYYY hh:mm")}
+Transaction Date: ${Instant.now().toString("dd-MM-yyyy hh:mm")}
 RRN: ${request.externalTransactionReference}"""
                 )
             )

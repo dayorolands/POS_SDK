@@ -3,11 +3,6 @@ package com.creditclub.pos
 import com.creditclub.pos.card.CardReader
 import com.creditclub.pos.card.TransactionType
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 04/12/2019.
- * Appzone Ltd
- */
 interface PosManager {
     val cardReader: CardReader
     val sessionData: SessionData
@@ -24,5 +19,6 @@ interface PosManager {
         open var canManageParameters = false
         open var transactionType: TransactionType = TransactionType.Unknown
         open var getDukptConfig: ((pan: String, amount: Double) -> DukptConfig?)? = null
+        open var getPosParameter: ((pan: String, amount: Double) -> PosParameter?)? = null
     }
 }

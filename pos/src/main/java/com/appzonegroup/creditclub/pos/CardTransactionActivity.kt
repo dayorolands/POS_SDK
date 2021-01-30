@@ -267,6 +267,13 @@ abstract class CardTransactionActivity : PosActivity() {
         sessionData.getDukptConfig = { pan, amount ->
             posPreferences.binRoutes?.getSupportedRoute(pan, amount)?.dukptConfig
         }
+        sessionData.getPosParameter = { pan, amount ->
+            val supportedRoute =
+                posPreferences.binRoutes?.getSupportedRoute(pan, amount)
+            val remoteConnectionInfo = supportedRoute ?: config.remoteConnectionInfo
+
+            ParameterService(this, remoteConnectionInfo)
+        }
 
         mainScope.launch {
             posManager.cardReader.endWatch()
@@ -284,7 +291,7 @@ abstract class CardTransactionActivity : PosActivity() {
                         return@launch
                     }
 
-                    val thisMonth = Instant.now().format("YYMM").toInt()
+                    val thisMonth = Instant.now().format("yyMM").toInt()
 
                     if (cardData.exp.substring(0, 4).toInt() < thisMonth) {
                         dialogProvider.hideProgressBar()
@@ -321,6 +328,7 @@ abstract class CardTransactionActivity : PosActivity() {
 
         val posParameter = ParameterService(this, remoteConnectionInfo)
         request.applyManagementData(posParameter.managementData)
+        request.acquiringInstIdCode32 = localStorage.institutionCode
         val isoSocketHelper = IsoSocketHelper(config, posParameter, remoteConnectionInfo)
         mainScope.launch {
             if (cardData.pinBlock.isEmpty()) {
