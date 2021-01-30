@@ -12,6 +12,7 @@ import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.util.format
 import com.creditclub.pos.DukptConfig
+import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
@@ -23,6 +24,7 @@ import com.dspread.qpos.utils.*
 import com.dspread.xpos.CQPOSService
 import com.dspread.xpos.QPOSService
 import org.koin.core.KoinComponent
+import org.koin.core.get
 import org.koin.core.inject
 import java.time.Instant
 import java.util.*
@@ -48,7 +50,6 @@ class QPosListener(
     internal var stringContinuation: Continuation<String?>? = null
     private var cardData = QposCardData()
     private fun getString(id: Int) = qPosManager.activity.getString(id)
-    private val posParameter: PosParameter by inject()
 
     override fun onRequestWaitingUser() {}
 
@@ -944,6 +945,8 @@ class QPosListener(
     private val updateThread: UpdateThread? = UpdateThread(qPosManager)
 
     private fun encryptedPinBlock(pan: String, pin: String): ByteArray {
+        val posParameter: PosParameter =
+            sessionData.getPosParameter?.invoke(pan, sessionData.amount / 100.0) ?: get()
         val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
         val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
         val cipherKey = posParameter.pinKey.hexBytes
