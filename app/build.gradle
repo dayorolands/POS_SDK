@@ -67,7 +67,7 @@ android {
     buildTypes {
         release {
             shrinkResources false
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
