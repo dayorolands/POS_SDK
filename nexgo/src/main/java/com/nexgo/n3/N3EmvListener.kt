@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.toCurrencyFormat
+import com.creditclub.pos.EmvException
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardData
@@ -14,6 +15,7 @@ import com.creditclub.pos.card.CardTransactionStatus
 import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.extensions.hexString
 import com.creditclub.pos.utils.TripleDesCipher
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.nexgo.R
 import com.nexgo.databinding.NexgoN3PinInputDialogBinding
 import com.nexgo.oaf.apiv3.DeviceEngine
@@ -182,6 +184,10 @@ class N3EmvListener(
     }
 
     override fun onFinish(retCode: Int, entity: EmvProcessResultEntity?) {
+        if (retCode != SdkResult.Success) {
+            FirebaseCrashlytics.getInstance()
+                .recordException(EmvException("Nexgo EMV failed with ret $retCode"))
+        }
         when (retCode) {
             SdkResult.Emv_Success_Arpc_Fail, SdkResult.Success, SdkResult.Emv_Script_Fail -> {
                 val cardDataInfo = emvHandler2.emvCardDataInfo
