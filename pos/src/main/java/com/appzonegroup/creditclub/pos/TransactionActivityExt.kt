@@ -105,7 +105,7 @@ internal inline fun CardTransactionActivity.showAmountPage(
     numberPad.number6.setOnClickListener(numberClickListener(6))
     numberPad.number7.setOnClickListener(numberClickListener(7))
     numberPad.number8.setOnClickListener(numberClickListener(8))
-    numberPad.number9.setOnClickListener(numberClickListener(0))
+    numberPad.number9.setOnClickListener(numberClickListener(9))
 
     numberPad.clearBtn.setOnClickListener {
         amountString = "0"
