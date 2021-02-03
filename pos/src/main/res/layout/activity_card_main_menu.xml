@@ -88,6 +88,7 @@
                     <include
                         android:id="@+id/balance_button"
                         layout="@layout/card_menu_button"
+                        android:visibility="gone"
                         app:src='@{@drawable/ic_reversal}'
                         app:text='@{"Balance Inquiry"}' />
 

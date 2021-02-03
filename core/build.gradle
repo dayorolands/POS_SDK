@@ -97,7 +97,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     api 'com.google.android.play:core-ktx:1.8.1'
 
-    implementation "com.google.firebase:firebase-crashlytics:${versions.firebaseCrashlytics}"
+    api "com.google.firebase:firebase-crashlytics:${versions.firebaseCrashlytics}"
     api "com.google.firebase:firebase-core:${versions.firebase}"
     api "com.google.firebase:firebase-analytics:${versions.firebase}"
     api 'com.google.firebase:firebase-perf:19.0.10'
