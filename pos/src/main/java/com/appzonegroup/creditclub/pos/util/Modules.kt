@@ -54,7 +54,7 @@ object Modules {
         }
 
         MODULE_MAP[REPRINT_LAST] = actionButton {
-            id = R.id.reprint_last_button
+            id = R.id.module_reprint_last
             name = "Reprint Last"
 
             onClick { activity ->
@@ -70,7 +70,7 @@ object Modules {
         }
 
         MODULE_MAP[REPRINT_BY_STAN] = actionButton {
-            id = R.id.reprint_by_stan_button
+            id = R.id.module_reprint_by_stan
             name = "Reprint By Stan"
 
             onClick { activity ->
