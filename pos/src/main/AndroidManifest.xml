@@ -130,10 +130,6 @@
             android:name="com.appzonegroup.creditclub.pos.ReprintMenuActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name="com.appzonegroup.creditclub.pos.ReprintAnyActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

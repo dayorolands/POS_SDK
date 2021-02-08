@@ -336,10 +336,6 @@
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.appzonegroup.creditclub.pos.ReprintAnyActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name="com.esafirm.imagepicker.features.ImagePickerActivity"
             android:theme="@style/AppTheme.NoActionBar"
             tools:replace="android:theme" />
