@@ -160,7 +160,7 @@ class QPosCardReader(
 
         listener.dukptConfig = dukptConfig
         listener.waitForUnit {
-            pos.doUpdateIPEKOperation(
+            pos.updateIPEKOperationByKeyType(
                 "01",
                 ksn,
                 ipekString,
@@ -176,7 +176,7 @@ class QPosCardReader(
     }
 
     private inline val DukptConfig.kcv: String
-        get() = TripleDesCipher(ipek.padStart(32, '0').hexBytes).encrypt(ByteArray(8)).hexString
+        get() = TripleDesCipher(ipek.hexBytes).encrypt(ByteArray(8)).hexString
 //        get() = Dukpt.encryptTripleDes(ipek.hexBytes, ByteArray(8)).hexString
 
     private suspend fun connectDevice(device: BluetoothDevice): Boolean {

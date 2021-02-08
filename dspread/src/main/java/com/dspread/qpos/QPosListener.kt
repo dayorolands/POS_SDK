@@ -713,14 +713,6 @@ class QPosListener(
 
     override fun onAddKey(arg0: Boolean) {}
 
-    override fun onEncryptData(arg0: String?) {
-        if (arg0 != null) {
-            //				pos.getKsn();
-//				pos.addKsn("00");
-//				pos.getEncryptData("fwe".getBytes(), "0", "0", 10);
-        }
-    }
-
     override fun onQposKsnResult(arg0: Hashtable<String, String>) {
         val pinKsn = arg0["pinKsn"]
         val trackKsn = arg0["trackKsn"]
@@ -814,15 +806,6 @@ class QPosListener(
         }
 //        val pubModel = clearKeys.substring(4, 4 + sum * 2)
 //        if (resetIpekFlag || resetMasterKeyFlag) pos.updateKeys(activity, pubModel, configService)
-    }
-
-    override fun onSetPosBlePinCode(b: Boolean) {
-        TRACE.d("onSetPosBlePinCode(b):$b")
-        if (b) {
-            statusEditText.setText("onSetPosBlePinCode success")
-        } else {
-            statusEditText.setText("onSetPosBlePinCode fail")
-        }
     }
 
     override fun onTradeCancelled() {
