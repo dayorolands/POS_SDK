@@ -22,7 +22,7 @@ android {
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         versionCode 28
-        versionName "1.4.6"
+        versionName "1.4.7-rc1"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [
