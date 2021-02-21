@@ -26,9 +26,9 @@ interface DialogProvider {
 
     fun showError(message: CharSequence?, block: DialogListenerBlock<*>?)
 
-    fun <T> showInfo(message: CharSequence?, block: DialogListenerBlock<T>?)
+    fun showInfo(message: CharSequence?, block: DialogListenerBlock<Unit>?)
 
-    fun showInfo(message: CharSequence?) = showInfo<Nothing>(message, null)
+    fun showInfo(message: CharSequence?) = showInfo(message, null)
 
     fun showSuccess(message: CharSequence?) = showSuccess(message, null)
 
@@ -96,7 +96,7 @@ interface DialogProvider {
             }
         }
 
-    suspend fun getSelection(title: String, options: List<DialogOptionItem>) =
+    suspend fun getSelection(title: CharSequence, options: List<DialogOptionItem>) =
         suspendCoroutine<Int?> { continuation ->
             showOptions(title, options) {
                 onSubmit {
@@ -107,7 +107,7 @@ interface DialogProvider {
             }
         }
 
-    suspend fun getPin(title: String) =
+    suspend fun getPin(title: CharSequence) =
         suspendCoroutine<String?> { continuation ->
             requestPIN(title) {
                 onSubmit {
@@ -118,7 +118,7 @@ interface DialogProvider {
             }
         }
 
-    suspend fun getConfirmation(title: String, subtitle: String = "") =
+    suspend fun getConfirmation(title: CharSequence, subtitle: CharSequence = "") =
         suspendCoroutine<Boolean> { continuation ->
             confirm(DialogConfirmParams(title, subtitle)) {
                 onSubmit {
@@ -129,9 +129,9 @@ interface DialogProvider {
             }
         }
 
-    suspend fun showErrorAndWait(mesage: String) =
+    suspend fun showErrorAndWait(message: CharSequence) =
         suspendCoroutine<Unit> { continuation ->
-            showError(mesage) {
+            showError(message) {
                 onClose { continuation.resume(Unit) }
             }
         }
@@ -143,7 +143,7 @@ interface DialogProvider {
             }
         }
 
-    suspend fun showSuccessAndWait(message: String) =
+    suspend fun showSuccessAndWait(message: CharSequence) =
         suspendCoroutine<Unit> { continuation ->
             showSuccess(message) {
                 onClose { continuation.resume(Unit) }

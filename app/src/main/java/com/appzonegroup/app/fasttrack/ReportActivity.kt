@@ -1,61 +1,51 @@
-package com.appzonegroup.app.fasttrack.ui
+package com.appzonegroup.app.fasttrack
 
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.appzonegroup.app.fasttrack.adapter.TransactionReportAdapter
+import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
+import com.appzonegroup.creditclub.pos.Platform
+import com.creditclub.core.data.model.TransactionReport
 import com.creditclub.core.data.request.POSTransactionReportRequest
 import com.creditclub.core.type.TransactionStatus
 import com.creditclub.core.type.TransactionType
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DateInputParams
 import com.creditclub.core.ui.widget.DialogOptionItem
-import com.creditclub.ui.adapter.PosReportAdapter
-import com.appzonegroup.app.fasttrack.adapter.TransactionReportAdapter
-import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
-import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.pos.printer.PosPrinter
-import com.creditclub.core.data.model.TransactionReport
 import com.creditclub.core.util.*
+import com.creditclub.pos.printer.PosPrinter
+import com.creditclub.ui.adapter.PosReportAdapter
+import com.creditclub.ui.dataBinding
 import com.creditclub.ui.databinding.ActivityReportBinding
-import com.creditclub.ui.manager.DataBindingActivityManager
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import java.time.LocalDate
 import java.time.Period
 
-
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 25/09/2019.
  * Appzone Ltd
  */
-class ActivityReportManager(
-    override val activity: CreditClubActivity,
-    override val binding: ActivityReportBinding,
-    private val transactionGroup: List<TransactionType>
-) : DataBindingActivityManager<ActivityReportBinding>(activity) {
-
+class ReportActivity : CreditClubActivity(R.layout.activity_report) {
+    private val binding: ActivityReportBinding by dataBinding()
     private var startIndex = 0
     private val maxSize = 20
     private var totalCount = 0
-    private val dialogProvider = activity.dialogProvider
-    private val posPrinter: PosPrinter by inject { parametersOf(context, dialogProvider) }
+    private val posPrinter: PosPrinter by inject { parametersOf(this, dialogProvider) }
+    private val transactionGroup = institutionConfig.transactionTypes
     private var selectedTransactionType = transactionGroup.first()
     private var selectedTransactionStatus = TransactionStatus.Successful
-    private var transactionAdapter =
-        TransactionReportAdapter(
-            emptyList(),
-            selectedTransactionType
-        )
+    private var transactionAdapter = TransactionReportAdapter(emptyList(), selectedTransactionType)
     private var posReportAdapter = PosReportAdapter(emptyList())
-
     private var endDate = LocalDate.now()
     private var startDate = endDate.minusDays(7)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding.content.container.layoutManager = LinearLayoutManager(activity)
+        binding.content.container.layoutManager = LinearLayoutManager(this)
 
         val reportTypeOptions = transactionGroup.map { DialogOptionItem(it.label) }
         val transactionStatusOptions = TransactionStatus.values().map { DialogOptionItem(it.label) }
@@ -68,7 +58,7 @@ class ActivityReportManager(
                 "Select start date",
                 maxDate = LocalDate.now()
             )
-            showDateInput(dateParams) {
+            dialogProvider.showDateInput(dateParams) {
                 onSubmit { date ->
                     startDate = date
                     binding.content.startDateContentTv.text = date.toString("uuuu-MM-dd")
@@ -82,7 +72,7 @@ class ActivityReportManager(
                 maxDate = LocalDate.now()
             )
 
-            showDateInput(dateParams) {
+            dialogProvider.showDateInput(dateParams) {
                 onSubmit { date ->
                     endDate = date
                     binding.content.endDateContentTv.text = date.toString("uuuu-MM-dd")
@@ -111,7 +101,7 @@ class ActivityReportManager(
         }
 
         binding.content.reportTypeLayout.setOnClickListener {
-            showOptions("Report types", reportTypeOptions) {
+            dialogProvider.showOptions("Report types", reportTypeOptions) {
                 onSubmit {
                     startIndex = 0
                     selectedTransactionType = transactionGroup[it]
@@ -123,7 +113,7 @@ class ActivityReportManager(
         }
 
         binding.content.transactionStatusLayout.setOnClickListener {
-            showOptions("Filter by status", transactionStatusOptions) {
+            dialogProvider.showOptions("Filter by status", transactionStatusOptions) {
                 onSubmit {
                     startIndex = 0
                     selectedTransactionStatus = TransactionStatus.values()[it]
@@ -141,7 +131,7 @@ class ActivityReportManager(
         }
 
         binding.content.home.setOnClickListener {
-            activity.onBackPressed()
+            onBackPressed()
         }
 
         setAdapter()
@@ -149,9 +139,7 @@ class ActivityReportManager(
         fetchReport()
     }
 
-    override fun render() {
-        super.render()
-
+    private fun render() {
         binding.content.nextButton.visibility =
             if (startIndex + maxSize < totalCount) View.VISIBLE else View.INVISIBLE
 
@@ -164,65 +152,63 @@ class ActivityReportManager(
     }
 
     private fun fetchReport() {
-        with(activity) {
-            if (Period.between(startDate, endDate).days > 7) {
-                showError("Date range cannot be more than 7 days")
-                return
-            }
+        if (Period.between(startDate, endDate).days > 7) {
+            showError("Date range cannot be more than 7 days")
+            return
+        }
 
-            mainScope.launch {
+        mainScope.launch {
 
-                when (selectedTransactionType) {
-                    TransactionType.POSCashOut -> {
+            when (selectedTransactionType) {
+                TransactionType.POSCashOut -> {
 
-                        val request = POSTransactionReportRequest().apply {
-                            agentPhoneNumber = localStorage.agentPhone
-                            institutionCode = localStorage.institutionCode
-                            from = binding.content.startDateContentTv.text.toString()
-                            to = binding.content.endDateContentTv.text.toString()
-                            status = selectedTransactionStatus.code
-                        }
-
-                        request.startIndex = "$startIndex"
-                        request.maxSize = "$maxSize"
-
-                        showProgressBar("Getting POS transactions")
-                        val (response, error) = safeRunIO {
-                            creditClubMiddleWareAPI.reportService.getPOSTransactions(request)
-                        }
-                        hideProgressBar()
-
-                        if (error != null) return@launch showError(error)
-                        response ?: return@launch showInternalError()
-
-                        posReportAdapter.setData(response.reports?.toList())
+                    val request = POSTransactionReportRequest().apply {
+                        agentPhoneNumber = localStorage.agentPhone
+                        institutionCode = localStorage.institutionCode
+                        from = binding.content.startDateContentTv.text.toString()
+                        to = binding.content.endDateContentTv.text.toString()
+                        status = selectedTransactionStatus.code
                     }
-                    else -> {
 
-                        showProgressBar("Getting transactions")
-                        val (response, error) = safeRunIO {
-                            creditClubMiddleWareAPI.reportService.getTransactions(
-                                localStorage.agentPhone,
-                                localStorage.institutionCode,
-                                selectedTransactionType.code,
-                                binding.content.startDateContentTv.text.toString(),
-                                binding.content.endDateContentTv.text.toString(),
-                                selectedTransactionStatus.code,
-                                startIndex,
-                                maxSize
-                            )
-                        }
-                        hideProgressBar()
+                    request.startIndex = "$startIndex"
+                    request.maxSize = "$maxSize"
 
-                        if (error != null) return@launch showError(error)
-                        response ?: return@launch showInternalError()
-
-                        transactionAdapter.setData(response.reports?.toList())
+                    showProgressBar("Getting POS transactions")
+                    val (response, error) = safeRunIO {
+                        creditClubMiddleWareAPI.reportService.getPOSTransactions(request)
                     }
+                    hideProgressBar()
+
+                    if (error != null) return@launch showError(error)
+                    response ?: return@launch showInternalError()
+
+                    posReportAdapter.setData(response.reports?.toList())
                 }
+                else -> {
 
-                render()
+                    showProgressBar("Getting transactions")
+                    val (response, error) = safeRunIO {
+                        creditClubMiddleWareAPI.reportService.getTransactions(
+                            localStorage.agentPhone,
+                            localStorage.institutionCode,
+                            selectedTransactionType.code,
+                            binding.content.startDateContentTv.text.toString(),
+                            binding.content.endDateContentTv.text.toString(),
+                            selectedTransactionStatus.code,
+                            startIndex,
+                            maxSize
+                        )
+                    }
+                    hideProgressBar()
+
+                    if (error != null) return@launch showError(error)
+                    response ?: return@launch showInternalError()
+
+                    transactionAdapter.setData(response.reports?.toList())
+                }
             }
+
+            render()
         }
     }
 
@@ -240,7 +226,7 @@ class ActivityReportManager(
             transactionAdapter.setOnPrintClickListener(object :
                 TransactionReportAdapter.OnPrintClickListener {
                 override fun onClick(item: TransactionReport.ReportItem, type: TransactionType) {
-                    activity.mainScope.launch {
+                    mainScope.launch {
                         printReceipt(item, type)
                     }
                 }
@@ -254,7 +240,7 @@ class ActivityReportManager(
                 dialogProvider.showProgressBar("Loading collection reference")
                 val (response, error) = safeRunIO {
                     creditClubMiddleWareAPI.collectionsService.verifyCollectionPayment(
-                        context.localStorage.institutionCode,
+                        localStorage.institutionCode,
                         item.uniqueReference,
                         null,
                         null
@@ -274,7 +260,7 @@ class ActivityReportManager(
                 }
 
                 if (Platform.hasPrinter) {
-                    posPrinter.print(CollectionPaymentReceipt(activity, response))
+                    posPrinter.print(CollectionPaymentReceipt(this, response))
                 }
             }
             else -> {

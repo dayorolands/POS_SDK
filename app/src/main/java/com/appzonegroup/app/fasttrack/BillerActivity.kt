@@ -15,15 +15,15 @@ import com.appzonegroup.app.fasttrack.model.Biller
 import com.appzonegroup.app.fasttrack.network.APICaller
 import com.appzonegroup.app.fasttrack.scheduler.AndroidSchedulers
 import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
-import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.BillsLocalStorage
+import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.Misc
+import com.creditclub.core.util.safeRun
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import rx.Observable
 import rx.Subscriber
-import rx.functions.Func0
 import java.util.*
 
 class BillerActivity : BaseActivity(), View.OnClickListener {
@@ -47,7 +47,8 @@ class BillerActivity : BaseActivity(), View.OnClickListener {
             categoryNameField = extras!!.getString("categoryName")
             propertyChanged = extras!!.getString("propertyChanged")
         } else {
-            categoryIdField = BillsLocalStorage.GetValueFor(AppConstants.CATEGORYID, this@BillerActivity)
+            categoryIdField =
+                BillsLocalStorage.GetValueFor(AppConstants.CATEGORYID, this@BillerActivity)
             categoryNameField =
                 BillsLocalStorage.GetValueFor(AppConstants.CATEGORYNAME, this@BillerActivity)
             propertyChanged =
@@ -85,7 +86,8 @@ class BillerActivity : BaseActivity(), View.OnClickListener {
     }*/
                     //Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
                     Log.e(this@BillerActivity.javaClass.simpleName, e.toString())
-                    FirebaseCrashlytics.getInstance().recordException(Exception("Message: An error just occurred. Please try again later, Cause: " + e.message))
+                    FirebaseCrashlytics.getInstance()
+                        .recordException(Exception("Message: An error just occurred. Please try again later, Cause: " + e.message))
 
                 }
 
@@ -180,20 +182,15 @@ class BillerActivity : BaseActivity(), View.OnClickListener {
         return false
     }
 
-    internal fun myObservable(): Observable<String> {
-        return Observable.defer(Func0<Observable<String>> {
-            var result: String? = ""
-            try {
+    private fun myObservable(): Observable<String> {
+        return Observable.defer {
+            val (result) = safeRun {
                 val url =
                     "${BASE_URL}/api/PayBills/GetBillers?institutionCode=${localStorage.institutionCode}&billerCategoryID=${categoryIdField}"
-                result = APICaller.makeGetRequest2(url)
-            } catch (e: Exception) {
-                Log.e("Register", e.message)
-                FirebaseCrashlytics.getInstance().recordException(Exception(e.message))
+                APICaller.makeGetRequest2(url)
             }
-
             Observable.just(result)
-        })
+        }
     }
 
     companion object {

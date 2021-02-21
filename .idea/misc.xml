@@ -5,6 +5,16 @@
       <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
     </configurations>
   </component>
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="app/src/main/res/layout/bill_payment_fragment.xml" value="0.1578125" />
+        <entry key="app/src/main/res/layout/dialog_input.xml" value="0.1578125" />
+        <entry key="app/src/main/res/layout/pinpad.xml" value="0.1578125" />
+        <entry key="uicentral/src/main/res/layout/content_report.xml" value="0.26666666666666666" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

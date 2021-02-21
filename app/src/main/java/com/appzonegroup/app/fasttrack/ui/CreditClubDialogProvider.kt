@@ -72,7 +72,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         }
     }
 
-    override fun <T> showInfo(message: CharSequence?, block: DialogListenerBlock<T>?) {
+    override fun showInfo(message: CharSequence?, block: DialogListenerBlock<Unit>?) {
         val dialog = Dialogs.getInformationDialog(activity, message, false)
 
         activity.runOnUiThread {

@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
@@ -18,12 +17,12 @@ import com.appzonegroup.app.fasttrack.scheduler.AndroidSchedulers
 import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
 import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.Misc
+import com.creditclub.core.util.safeRun
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import rx.Observable
 import rx.Subscriber
-import rx.functions.Func0
 import java.util.*
 
 class BillerItemActivity : BaseActivity(), View.OnClickListener {
@@ -143,20 +142,13 @@ class BillerItemActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    internal fun myObservable(): Observable<String> {
-        return Observable.defer(Func0<Observable<String>> {
-            var result: String? = ""
-            try {
-
+    private fun myObservable(): Observable<String> {
+        return Observable.defer {
+            val (result) = safeRun {
                 val url = Misc.getBillerItemURL(biller.billerID.toString()) + "?institutionCode=${localStorage.institutionCode}&billerCategoryID=${categoryIdField}&billerID=${biller.billerID}"
-                result = APICaller.makeGetRequest2(url)
-
-            } catch (e: Exception) {
-                Log.e("Register", e.message)
-                FirebaseCrashlytics.getInstance().recordException(Exception(e.message))
+                APICaller.makeGetRequest2(url)
             }
-
             Observable.just(result)
-        })
+        }
     }
 }

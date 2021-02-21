@@ -51,12 +51,12 @@ fun ISOMsg.applyCardData(data: CardData): ISOMsg = apply {
         ksnData120 = data.ksnData
     }
 
-    run {
+    posDataCode123 = run {
         //            val tmpPosDataCode = StringBuilder("511501513344101")
         val tmpPosDataCode = StringBuilder("510101511344101")
         if (data.holder.isNotEmpty()) tmpPosDataCode[4] = '0'
         if (data.cardMethod == CardReaderEvent.MAG_STRIPE) tmpPosDataCode[6] = '2'
-        posDataCode123 = tmpPosDataCode.toString()
+        tmpPosDataCode.toString()
     }
 }
 

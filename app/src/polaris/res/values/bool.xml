@@ -7,5 +7,5 @@
     <bool name="flow_bvn_update">false</bool>
     <bool name="hla_enabled">false</bool>
     <bool name="collections_enabled">true</bool>
-    <bool name="online_functions_enabled">false</bool>
+    <bool name="online_functions_enabled">true</bool>
 </resources>

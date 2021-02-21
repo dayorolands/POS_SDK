@@ -1,8 +1,10 @@
 package com.creditclub.core.util
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -11,23 +13,19 @@ import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import com.creditclub.core.data.prefs.LocalStorage
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
-class TrackGPS(mContext: Context) : LocationListener, KoinComponent {
+class TrackGPS(private val mContext: Context) : LocationListener, KoinComponent {
     private val localStorage: LocalStorage by inject()
-    private val mContext: Context = mContext.applicationContext
 
     private var checkGPS = false
     private var checkNetwork = false
-    internal var canGetLocation = false
+    private var canGetLocation = false
 
     private var loc: Location? = null
-
-    init {
-        location
-    }
 
     var latitude: Double = 0.toDouble()
         get() {
@@ -51,75 +49,6 @@ class TrackGPS(mContext: Context) : LocationListener, KoinComponent {
 
     private var locationManager: LocationManager? = null
 
-    private val location: Location?
-        get() {
-            try {
-                locationManager =
-                    mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                checkGPS = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                checkNetwork = locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-
-                if (!checkGPS && !checkNetwork) {
-                    Toast.makeText(mContext, "No Service Provider Available", Toast.LENGTH_SHORT)
-                        .show()
-                } else {
-                    this.canGetLocation = true
-                    if (checkNetwork) {
-                        try {
-                            locationManager?.requestLocationUpdates(
-                                LocationManager.NETWORK_PROVIDER,
-                                MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this
-                            )
-                            Log.d("Network", "Network")
-                            loc =
-                                locationManager?.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-                                    ?: loc
-
-                            if (loc != null) {
-                                latitude = loc!!.latitude
-                                longitude = loc!!.longitude
-                                localStorage.lastKnownLocation =
-                                    "${loc?.latitude};${loc?.longitude}"
-                            }
-                        } catch (e: SecurityException) {
-
-                        }
-                    }
-                }
-
-                if (checkGPS) {
-                    if (loc == null) {
-                        try {
-                            Looper.myLooper() ?: Looper.prepare()
-                            locationManager!!.requestLocationUpdates(
-                                LocationManager.GPS_PROVIDER,
-                                MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this
-                            )
-                            Log.d("GPS Enabled", "GPS Enabled")
-                            if (locationManager != null) {
-                                loc = locationManager!!
-                                    .getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                                if (loc != null) {
-                                    latitude = loc!!.latitude
-                                    longitude = loc!!.longitude
-                                }
-                            }
-                        } catch (e: SecurityException) {
-
-                        }
-
-                    }
-                }
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            return loc
-        }
-
     fun canGetLocation(): Boolean {
         return this.canGetLocation
     }
@@ -129,18 +58,19 @@ class TrackGPS(mContext: Context) : LocationListener, KoinComponent {
         alertDialog.setTitle("GPS Not Enabled")
         alertDialog.setMessage("Do you wants to turn On GPS")
 
-        alertDialog.setPositiveButton("Yes") { dialog, which ->
+        alertDialog.setPositiveButton("Yes") { _, _ ->
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             mContext.startActivity(intent)
         }
 
-        alertDialog.setNegativeButton("No") { dialog, which -> dialog.cancel() }
+        alertDialog.setNegativeButton("No") { dialog, _ -> dialog.cancel() }
 
         alertDialog.show()
     }
 
-    override fun onLocationChanged(location: Location?) {
-        loc = location ?: loc
+    override fun onLocationChanged(location: Location) {
+        loc = location
+        localStorage.lastKnownLocation = "${location.latitude};${location.longitude}"
     }
 
     override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
@@ -153,6 +83,74 @@ class TrackGPS(mContext: Context) : LocationListener, KoinComponent {
 
     override fun onProviderDisabled(provider: String) {
 
+    }
+
+    init {
+        safeRun {
+            locationManager =
+                mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            checkGPS = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            checkNetwork = locationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+            if (!checkGPS && !checkNetwork) {
+                Toast.makeText(mContext, "No Service Provider Available", Toast.LENGTH_SHORT)
+                    .show()
+            } else {
+                this.canGetLocation = true
+                if (checkNetwork) {
+                    try {
+                        locationManager?.requestLocationUpdates(
+                            LocationManager.NETWORK_PROVIDER,
+                            MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this
+                        )
+                        Log.d("Network", "Network")
+                        loc =
+                            locationManager?.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                                ?: loc
+
+                        if (loc != null) {
+                            latitude = loc!!.latitude
+                            longitude = loc!!.longitude
+                            localStorage.lastKnownLocation =
+                                "${loc?.latitude};${loc?.longitude}"
+                        }
+                    } catch (e: SecurityException) {
+
+                    }
+                }
+            }
+
+            if (checkGPS) {
+                if (loc == null) {
+                    Looper.myLooper() ?: Looper.prepare()
+                    if (ActivityCompat.checkSelfPermission(
+                            mContext,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                            mContext,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        return@safeRun
+                    }
+                    locationManager!!.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        MIN_TIME_BW_UPDATES,
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this
+                    )
+                    Log.d("GPS Enabled", "GPS Enabled")
+                    if (locationManager != null) {
+                        loc = locationManager!!
+                            .getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                        if (loc != null) {
+                            latitude = loc!!.latitude
+                            longitude = loc!!.longitude
+                        }
+                    }
+                }
+            }
+        }
     }
 
     companion object {

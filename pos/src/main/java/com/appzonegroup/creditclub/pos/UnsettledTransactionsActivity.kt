@@ -3,26 +3,29 @@ package com.appzonegroup.creditclub.pos
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.appzonegroup.creditclub.pos.adapter.PosNotificationAdapter
 import com.appzonegroup.creditclub.pos.models.PosNotification
 import com.appzonegroup.creditclub.pos.models.view.NotificationViewModel
+import com.creditclub.core.data.api.retrofitService
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.showError
+import com.creditclub.pos.PosConfig
 import com.creditclub.pos.api.PosApiService
 import kotlinx.coroutines.launch
-import retrofit2.create
+import org.koin.android.ext.android.inject
 
-class UnsettledTransactionsActivity : PosActivity() {
-    private val viewModel by viewModels<NotificationViewModel>()
+class UnsettledTransactionsActivity : CreditClubActivity(R.layout.activity_pending_confirmation) {
+    private val viewModel: NotificationViewModel by viewModels()
+    private val config: PosConfig by inject()
+    private val posApiService: PosApiService by retrofitService()
 
     private val rAdapter by lazy {
-        val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
         PosNotificationAdapter(emptyList()) {
             onSettle { posNotification ->
-                mainScope.launch { posApiService.settleTransaction(posNotification) }
+                mainScope.launch { settleTransaction(posNotification) }
             }
 
             onDelete { posNotification ->
@@ -39,16 +42,13 @@ class UnsettledTransactionsActivity : PosActivity() {
         list.adapter = rAdapter
         list.layoutManager = LinearLayoutManager(this)
 
-        viewModel.unsettledTransactions.observe(
-            this,
-            Observer<List<PosNotification>>(rAdapter::setData)
-        )
+        viewModel.unsettledTransactions.observe(this, rAdapter::setData)
     }
 
-    private suspend fun PosApiService.settleTransaction(notification: PosNotification) {
+    private suspend fun settleTransaction(notification: PosNotification) {
         dialogProvider.showProgressBar("Settling")
         val (response, error) = safeRunIO {
-            posCashOutNotification(
+            posApiService.posCashOutNotification(
                 notification,
                 "iRestrict ${backendConfig.posNotificationToken}",
                 notification.terminalId ?: config.terminalId
@@ -67,8 +67,8 @@ class UnsettledTransactionsActivity : PosActivity() {
         dialogProvider.hideProgressBar()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId != R.id.home) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId != R.id.home) {
             finish()
             return true
         }
