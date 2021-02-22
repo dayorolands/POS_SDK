@@ -22,6 +22,7 @@ import com.appzonegroup.app.fasttrack.utility.CalendarDialog
 import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.*
+import com.creditclub.core.util.getMessage
 import com.creditclub.core.util.safeRun
 import com.creditclub.ui.adapter.DialogOptionAdapter
 import com.creditclub.ui.databinding.DialogOptionsBinding
@@ -56,6 +57,14 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
             }
             currentProgressDialog = null
         } else currentProgressDialog = null
+    }
+
+    override fun showError(error: Throwable, block: DialogListenerBlock<*>?) {
+        hideProgressBar()
+        val message = error.getMessage(context)
+
+        block ?: return showError(message)
+        showError(message, block)
     }
 
     override fun showError(message: CharSequence?, block: DialogListenerBlock<*>?) {

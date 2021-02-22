@@ -1,6 +1,7 @@
 package com.creditclub.core.util
 
 import android.content.Context
+import com.creditclub.core.CreditClubException
 import com.creditclub.core.R
 import com.creditclub.core.data.api.RequestFailureException
 import kotlinx.serialization.SerializationException
@@ -15,16 +16,17 @@ import java.net.SocketTimeoutException
  * Appzone Ltd
  */
 
-inline val Exception?.hasOccurred get() = this !== null
+inline val Throwable?.hasOccurred get() = this !== null
 
-fun Exception?.isNetworkError() = this != null && (this is IOException || this is HttpException)
+fun Throwable?.isNetworkError() = this != null && (this is IOException || this is HttpException)
 
-fun Exception?.isServerError() = this != null && this is HttpException
+fun Throwable?.isServerError() = this != null && this is HttpException
 
-fun Exception?.isKotlinNPE() = this != null && this is KotlinNullPointerException
+fun Throwable?.isKotlinNPE() = this != null && this is KotlinNullPointerException
 
-fun Exception.getMessage(context: Context): String {
+fun Throwable.getMessage(context: Context): String {
     return when {
+        this is CreditClubException -> message
         this is RequestFailureException -> message
         this is ConnectException && cause.toString().contains("ECONNREFUSED") -> context.getString(
             R.string.connection_refused_error

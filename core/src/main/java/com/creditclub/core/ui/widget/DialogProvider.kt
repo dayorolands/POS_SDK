@@ -26,6 +26,10 @@ interface DialogProvider {
 
     fun showError(message: CharSequence?, block: DialogListenerBlock<*>?)
 
+    fun showError(error: Throwable) = showError(error, null)
+
+    fun showError(error: Throwable, block: DialogListenerBlock<*>?)
+
     fun showInfo(message: CharSequence?, block: DialogListenerBlock<Unit>?)
 
     fun showInfo(message: CharSequence?) = showInfo(message, null)

@@ -8,6 +8,7 @@ import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.models.IsoRequestLog
 import com.appzonegroup.creditclub.pos.util.*
+import com.creditclub.core.CreditClubException
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.util.TrackGPS
@@ -295,7 +296,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             set(12, dateParams.localTime)
             set(13, dateParams.localDate)
             set(41, config.terminalId)
-            set(62, "01008${config.terminalId}")
+            set(63, "01008${config.terminalId}")
         }
 
         val packedMsg = isoMsg.pack()
@@ -351,7 +352,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             set(12, dateParams.localTime)
             set(13, dateParams.localDate)
             set(41, config.terminalId)
-            set(62, "01008${config.terminalId}")
+            set(63, "01008${config.terminalId}")
         }
 
         val packedMsg = isoMsg.pack()
@@ -468,16 +469,16 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         return jsonArray
     }
 
-    class KeyDownloadException(message: String) : Exception("Key Download Failed. $message")
+    class KeyDownloadException(message: String) : CreditClubException("Key Download Failed. $message")
 
     class ParameterDownloadException(message: String) :
-        Exception("Parameter Download Failed. $message")
+        CreditClubException("Parameter Download Failed. $message")
 
     class PublicKeyDownloadException(message: String) :
-        Exception("CA Public Key Download Failed. $message")
+        CreditClubException("CA Public Key Download Failed. $message")
 
     class EmvAidDownloadException(message: String) :
-        Exception("EMV Application AID Download Failed. $message")
+        CreditClubException("EMV Application AID Download Failed. $message")
 
     @Serializable
     class ParameterObject : PosParameter.ManagementData {

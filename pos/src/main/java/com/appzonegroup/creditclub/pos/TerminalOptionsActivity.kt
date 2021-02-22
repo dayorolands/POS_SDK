@@ -26,7 +26,7 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
 
-        if (v?.id == R.id.terminal_id_item) {
+        if (v?.id == R.id.terminal_id_item && !BuildConfig.DEBUG) {
             dialogProvider.showError("Terminal ID cannot be set manually. Please contact your administrator")
             return
         }

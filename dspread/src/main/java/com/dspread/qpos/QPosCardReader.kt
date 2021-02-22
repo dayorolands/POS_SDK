@@ -9,7 +9,6 @@ import android.os.Handler
 import android.os.Looper
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.format
-import com.creditclub.core.util.showErrorAndWait
 import com.creditclub.pos.DukptConfig
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosManager
