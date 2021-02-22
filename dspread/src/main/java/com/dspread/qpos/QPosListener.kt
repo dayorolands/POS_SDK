@@ -12,6 +12,7 @@ import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.util.format
 import com.creditclub.pos.DukptConfig
+import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
@@ -23,6 +24,7 @@ import com.dspread.qpos.utils.*
 import com.dspread.xpos.CQPOSService
 import com.dspread.xpos.QPOSService
 import org.koin.core.KoinComponent
+import org.koin.core.get
 import org.koin.core.inject
 import java.time.Instant
 import java.util.*
@@ -48,7 +50,6 @@ class QPosListener(
     internal var stringContinuation: Continuation<String?>? = null
     private var cardData = QposCardData()
     private fun getString(id: Int) = qPosManager.activity.getString(id)
-    private val posParameter: PosParameter by inject()
 
     override fun onRequestWaitingUser() {}
 
@@ -712,14 +713,6 @@ class QPosListener(
 
     override fun onAddKey(arg0: Boolean) {}
 
-    override fun onEncryptData(arg0: String?) {
-        if (arg0 != null) {
-            //				pos.getKsn();
-//				pos.addKsn("00");
-//				pos.getEncryptData("fwe".getBytes(), "0", "0", 10);
-        }
-    }
-
     override fun onQposKsnResult(arg0: Hashtable<String, String>) {
         val pinKsn = arg0["pinKsn"]
         val trackKsn = arg0["trackKsn"]
@@ -813,15 +806,6 @@ class QPosListener(
         }
 //        val pubModel = clearKeys.substring(4, 4 + sum * 2)
 //        if (resetIpekFlag || resetMasterKeyFlag) pos.updateKeys(activity, pubModel, configService)
-    }
-
-    override fun onSetPosBlePinCode(b: Boolean) {
-        TRACE.d("onSetPosBlePinCode(b):$b")
-        if (b) {
-            statusEditText.setText("onSetPosBlePinCode success")
-        } else {
-            statusEditText.setText("onSetPosBlePinCode fail")
-        }
     }
 
     override fun onTradeCancelled() {
@@ -944,6 +928,8 @@ class QPosListener(
     private val updateThread: UpdateThread? = UpdateThread(qPosManager)
 
     private fun encryptedPinBlock(pan: String, pin: String): ByteArray {
+        val posParameter: PosParameter =
+            sessionData.getPosParameter?.invoke(pan, sessionData.amount / 100.0) ?: get()
         val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
         val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
         val cipherKey = posParameter.pinKey.hexBytes
