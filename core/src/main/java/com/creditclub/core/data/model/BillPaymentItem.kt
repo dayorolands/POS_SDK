@@ -1,10 +1,13 @@
 package com.creditclub.core.data.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class BillPaymentItem {
+@Parcelize
+class BillPaymentItem : Parcelable {
     @SerialName("BillerId")
     var billerId: Int? = null
 

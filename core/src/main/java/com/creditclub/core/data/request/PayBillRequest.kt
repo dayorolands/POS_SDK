@@ -4,70 +4,65 @@ import com.creditclub.core.util.generateRRN
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 4/26/2019.
- * Appzone Ltd
- */
-
 @Serializable
-class PayBillRequest {
+data class PayBillRequest(
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null
+    var agentPhoneNumber: String? = null,
 
     @SerialName("AgentPin")
-    var agentPin: String? = null
+    var agentPin: String? = null,
 
     @SerialName("BillerID")
-    var merchantBillerIdField: String? = null
+    var merchantBillerIdField: String? = null,
 
     @SerialName("BillerName")
-    var billerName: String? = null
+    var billerName: String? = null,
 
     @SerialName("BillerCategoryID")
-    var billerCategoryID: String? = null
+    var billerCategoryID: String? = null,
 
     @SerialName("BillerCategoryName")
-    var billerCategoryName: String? = null
+    var billerCategoryName: String? = null,
 
     @SerialName("PaymentItemID")
-    var billItemID: String? = null
+    var billItemID: String? = null,
 
     @SerialName("PaymentItemCode")
-    var paymentItemCode: String? = null
+    var paymentItemCode: String? = null,
 
     @SerialName("PaymentItemName")
-    var paymentItemName: String? = null
+    var paymentItemName: String? = null,
 
     @SerialName("CustomerID")
-    var customerId: String? = null
+    var customerId: String? = null,
 
     @SerialName("CustomerDepositSlipNumber")
-    var customerDepositSlipNumber: String? = null
+    var customerDepositSlipNumber: String? = null,
 
     @SerialName("CustomerName")
-    var customerName: String? = null
+    var customerName: String? = null,
 
     @SerialName("AccountNumber")
-    var accountNumber: String? = null
+    var accountNumber: String? = null,
 
     @SerialName("CustomerEmail")
-    var customerEmail: String? = null
+    var customerEmail: String? = null,
 
     @SerialName("CustomerPhone")
-    var customerPhone: String? = null
+    var customerPhone: String? = null,
 
     @SerialName("Amount")
-    var amount: String? = null
+    var amount: String? = null,
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = null
+    var institutionCode: String? = null,
 
     @SerialName("Geolocation")
-    var geolocation: String? = null
+    var geolocation: String? = null,
 
     @SerialName("IsRecharge")
-    var isRecharge = false
+    var isRecharge: Boolean = false,
 
     @SerialName("RetrievalReferenceNumber")
-    var retrievalReferenceNumber: String? = generateRRN()
-}
+    var retrievalReferenceNumber: String? = generateRRN(),
+)

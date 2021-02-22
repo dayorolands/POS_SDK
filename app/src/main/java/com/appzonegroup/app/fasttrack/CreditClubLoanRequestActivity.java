@@ -1,7 +1,6 @@
 package com.appzonegroup.app.fasttrack;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -50,7 +49,6 @@ import java.util.Locale;
 
 public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
 
-    Handler backgroundHandler;
     //private String accountNumber, amount, phoneNumber, associationID, ;
 
     ArrayList<Association> associations;
@@ -113,7 +111,6 @@ public class CreditClubLoanRequestActivity extends CustomerBaseActivity {
     public void onCustomerReady(Bundle savedInstanceState) {
         setContentView(R.layout.activity_loan_request);
 
-        backgroundHandler = Misc.setupScheduler();
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         mViewPager = (ViewPager) findViewById(R.id.container);

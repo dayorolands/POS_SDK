@@ -13,10 +13,15 @@ import androidx.core.content.ContextCompat
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.creditclub.core.util.localStorage
-import com.creditclub.core.util.safeRun
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SplashScreenActivity : AppCompatActivity() {
+    private val mainScope = CoroutineScope(Dispatchers.Main)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!isTaskRoot) {
@@ -39,26 +44,22 @@ class SplashScreenActivity : AppCompatActivity() {
         checkPermissions()
     }
 
-    private fun loadPage() {
-        Thread {
-            safeRun {
-                Thread.sleep(3000)
-                if (localStorage.getString(AppConstants.ACTIVATED, null) == null) {
-                    val intent = Intent(
-                        this@SplashScreenActivity,
-                        AgentActivationActivity::class.java
-                    )
-                    startActivity(intent)
-                } else {
-                    val intent = Intent(
-                        this@SplashScreenActivity,
-                        LoginActivity::class.java
-                    )
-                    startActivity(intent)
-                }
-                finish()
-            }
-        }.start()
+    private suspend fun loadPage() {
+        delay(3000)
+        if (localStorage.getString(AppConstants.ACTIVATED, null) == null) {
+            val intent = Intent(
+                this@SplashScreenActivity,
+                AgentActivationActivity::class.java
+            )
+            startActivity(intent)
+        } else {
+            val intent = Intent(
+                this@SplashScreenActivity,
+                LoginActivity::class.java
+            )
+            startActivity(intent)
+        }
+        finish()
     }
 
     private fun setPolicy() {
@@ -141,7 +142,7 @@ class SplashScreenActivity : AppCompatActivity() {
                 // result of the request.
             }
         } else {
-            loadPage()
+            mainScope.launch { loadPage() }
         }
     }
 
@@ -152,7 +153,7 @@ class SplashScreenActivity : AppCompatActivity() {
     ) {
         if (requestCode == MY_PERMISSIONS_REQUEST) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                loadPage()
+                mainScope.launch { loadPage() }
             } else {
                 Dialogs.getAlertDialog(
                     this,

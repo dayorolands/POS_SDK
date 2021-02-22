@@ -6,20 +6,19 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import com.appzonegroup.app.fasttrack.databinding.ActivityBillpaymentBinding
-import com.appzonegroup.app.fasttrack.model.Biller
-import com.appzonegroup.app.fasttrack.model.BillerItem
 import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
-import com.appzonegroup.app.fasttrack.ui.Dialogs
-import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.api.BillsPaymentService
-import com.creditclub.pos.printer.PrinterStatus
+import com.creditclub.core.data.model.BillPaymentItem
+import com.creditclub.core.data.model.Biller
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
 import com.creditclub.core.util.delegates.service
+import com.creditclub.pos.printer.PrinterStatus
 import kotlinx.coroutines.launch
+import java.util.*
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 4/12/2019.
@@ -32,9 +31,9 @@ class BillPaymentActivity : BaseActivity() {
     private var amountIsNeeded: Boolean? = false
     private var fieldOneIsNeeded: Boolean? = false
     private var fieldTwoIsNeeded: Boolean? = false
-    private val billerItem: BillerItem by lazy { intent.getSerializableExtra("billeritem") as BillerItem }
+    private val billerItem: BillPaymentItem by lazy { intent.getParcelableExtra("billeritem") as BillPaymentItem }
     private var extras: Bundle? = null
-    private val biller by lazy { intent.getSerializableExtra("biller") as Biller }
+    private val biller by lazy { intent.getParcelableExtra("biller") as Biller }
 
     private val amountTV by lazy { findViewById<TextView>(R.id.billpayment_amount_tv) }
     private val fieldOneTV by lazy { findViewById<TextView>(R.id.fieldone_tv) }
@@ -46,26 +45,26 @@ class BillPaymentActivity : BaseActivity() {
     private val categoryNameField by lazy { extras!!.getString("categoryName") }
 
     private val isAirtime by lazy { extras!!.getBoolean("isAirtime", false) }
-    private val reference = Misc.getRandomString()
+    private val reference = UUID.randomUUID().toString()
     private val billsPaymentService by creditClubMiddleWareAPI.retrofit.service<BillsPaymentService>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding
 
-        title = billerItem.billerItemNameField
+        title = billerItem.name
 
         val i = intent
         extras = i.extras
 
-        if (billerItem.amountField <= 0) {
+        if ((billerItem.amount ?: 0.0) <= 0.0) {
             amountIsNeeded = true
             amountET.clearFocus()
             amountTV.visibility = View.VISIBLE
             amountET.visibility = View.VISIBLE
         } else {
             amountIsNeeded = false
-            amountET.setText(billerItem.amountField.toString())
+            amountET.setText(billerItem.amount.toString())
             amountET.isEnabled = false
             amountET.isFocusable = false
         }
@@ -137,7 +136,7 @@ class BillPaymentActivity : BaseActivity() {
             if (amountET.text.toString().isEmpty()) {
                 return showNotification("Please enter an amount")
             } else {
-                billerItem.amountField = amountET.value.toDouble()
+                billerItem.amount = amountET.value.toDouble()
             }
         }
 
@@ -161,35 +160,37 @@ class BillPaymentActivity : BaseActivity() {
 //            return showNotification("Customer Email is required")
 //        }
 
-        if (binding.customerEmailEt.text.toString().isNotEmpty() && !binding.customerEmailEt.text.toString().isValidEmail()) {
+        if (binding.customerEmailEt.text.toString()
+                .isNotEmpty() && !binding.customerEmailEt.text.toString().isValidEmail()
+        ) {
             return showNotification("Customer Email is invalid")
         }
 
-        val paymentRequest = PayBillRequest().apply {
-            agentPhoneNumber = localStorage.agentPhone
-            institutionCode = localStorage.institutionCode
-            customerId = "${fieldOneET.text}"
-            merchantBillerIdField = "${billerItem.merchantBillerIdField}"
-            billItemID = billerItem.billerItemIdField
-            amount = "${amountET.text}"
-            billerCategoryID = categoryIdField
-            customerEmail = "${binding.customerEmailEt.text}"
-//                customerPhone = customer.phoneNumber
-            accountNumber = localStorage.agentPhone
-            billerName = biller.billerNameField
-            paymentItemCode = billerItem.paymentCodeField
-            paymentItemName = billerItem.billerItemNameField
-            billerCategoryName = categoryNameField
-            customerName = binding.nameEt.text.toString()
+        val paymentRequest = PayBillRequest(
+            agentPhoneNumber = localStorage.agentPhone,
+            institutionCode = localStorage.institutionCode,
+            customerId = "${fieldOneET.text}",
+            merchantBillerIdField = "${billerItem.billerId}",
+            billItemID = billerItem.id,
+            amount = "${amountET.text}",
+            billerCategoryID = categoryIdField,
+            customerEmail = "${binding.customerEmailEt.text}",
+//                customerPhone = customer.phoneNumber,
+            accountNumber = localStorage.agentPhone,
+            billerName = biller.name,
+            paymentItemCode = billerItem.paymentCodeField,
+            paymentItemName = billerItem.name,
+            billerCategoryName = categoryNameField,
+            customerName = binding.nameEt.text.toString(),
 
             customerPhone = if (isAirtime) {
                 fieldOneET.text.toString()
-            } else binding.phoneEt.text.toString()
+            } else binding.phoneEt.text.toString(),
 
-            customerDepositSlipNumber = reference
-            geolocation = gps.geolocationString
-            isRecharge = isAirtime
-        }
+            customerDepositSlipNumber = reference,
+            geolocation = gps.geolocationString,
+            isRecharge = isAirtime,
+        )
 
         requestPIN("Enter Agent Pin") {
             onSubmit { pin ->

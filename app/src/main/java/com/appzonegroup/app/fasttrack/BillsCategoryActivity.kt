@@ -1,43 +1,33 @@
 package com.appzonegroup.app.fasttrack
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.view.Menu
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ListView
-import android.widget.SearchView
-import android.widget.Toast
-import com.appzonegroup.app.fasttrack.adapter.CategoryAdapter
+import android.view.ViewGroup
+import android.widget.*
 import com.appzonegroup.app.fasttrack.model.AppConstants
-import com.appzonegroup.app.fasttrack.model.BillCategory
-import com.appzonegroup.app.fasttrack.network.APICaller
-import com.appzonegroup.app.fasttrack.scheduler.AndroidSchedulers
-import com.appzonegroup.app.fasttrack.scheduler.HandlerScheduler
 import com.appzonegroup.app.fasttrack.utility.BillsLocalStorage
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
-import com.appzonegroup.app.fasttrack.utility.Misc
-import com.creditclub.core.util.safeRun
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import rx.Observable
-import rx.Subscriber
+import com.creditclub.core.data.api.BillsPaymentService
+import com.creditclub.core.data.api.retrofitService
+import com.creditclub.core.data.model.BillCategory
+import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.util.safeRunIO
+import kotlinx.coroutines.launch
 import java.util.*
 
-class BillsCategoryActivity : BaseActivity(), View.OnClickListener {
-    internal val backgroundHandler: Handler by lazy { Misc.setupScheduler() }
+class BillsCategoryActivity : CreditClubActivity(R.layout.activity_category), View.OnClickListener {
     internal val listView: ListView by lazy { findViewById<View>(R.id.category_listview) as ListView }
-    internal var categoryAdapter: CategoryAdapter? = null
+    private var categoryAdapter: CategoryAdapter? = null
     override val functionId = FunctionIds.PAY_BILL
+    private val billsPaymentService: BillsPaymentService by retrofitService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_category)
 
-        showProgressBar("Loading categories")
-        runScheduler()
+        mainScope.launch { runScheduler() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -64,104 +54,56 @@ class BillsCategoryActivity : BaseActivity(), View.OnClickListener {
     }
 
     override fun onClick(view: View) {
-        showProgressBar("Loading categories")
-        runScheduler()
+        mainScope.launch { runScheduler() }
     }
 
-    internal fun runScheduler() {
-        myObservable()
-            // Run on a background thread
-            .subscribeOn(HandlerScheduler.from(backgroundHandler))
-            // Be notified on the main thread
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : Subscriber<String>() {
-                override fun onCompleted() {
+    private suspend fun runScheduler() {
+        dialogProvider.showProgressBar("Loading categories")
+        val (result, error) = safeRunIO {
+            billsPaymentService.getBillerCategories(localStorage.institutionCode)
+        }
+        dialogProvider.hideProgressBar()
+        if (error != null) dialogProvider.showError(error)
+        if (result == null) return
+        categoryAdapter = CategoryAdapter(this@BillsCategoryActivity, result)
 
+        listView.adapter = categoryAdapter
+        listView.onItemClickListener =
+            AdapterView.OnItemClickListener { _, _, position, _ ->
+                val billCategory = result[position]
+
+
+                BillsLocalStorage.SaveValue(
+                    AppConstants.CATEGORYID,
+                    billCategory.id ?: billCategory.id,
+                    baseContext
+                )
+                BillsLocalStorage.SaveValue(
+                    AppConstants.PROPERTYCHANGED,
+                    billCategory.propertyChanged,
+                    baseContext
+                )
+                BillsLocalStorage.SaveValue(
+                    AppConstants.CATEGORYNAME,
+                    billCategory.name,
+                    baseContext
+                )
+
+                val i = Intent(
+                    this@BillsCategoryActivity,
+                    BillerActivity::class.java
+                ).apply {
+                    putExtra("categoryId", billCategory.id ?: billCategory.id)
+                    putExtra("categoryName", billCategory.name)
+                    putExtra("propertyChanged", billCategory.propertyChanged)
+                    putExtra("customer", intent.getSerializableExtra("customer"))
+                    putExtra("isAirtime", billCategory.isAirtime)
                 }
 
-                override fun onError(e: Throwable) {
-                    hideProgressBar()
-                    Toast.makeText(
-                        baseContext,
-                        "An error just occurred. Please try again later",
-                        Toast.LENGTH_LONG
-                    ).show()
+                startActivityForResult(i, 1)
+            }
 
-                    FirebaseCrashlytics.getInstance().recordException(Exception(e.message))
-                }
-
-                override fun onNext(result: String) {
-                    var result = result
-
-                    hideProgressBar()
-
-                    if (result.isEmpty()) {
-                        Toast.makeText(
-                            baseContext,
-                            "You don't seem to have internet... Please ensure that you have internet connection",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        //return;
-                    } else {
-
-                        result = result.replace("\\", "").replace("\n", "").trim { it <= ' ' }
-                        if (result.startsWith("\"") && result.endsWith("\"")) {
-                            result = result.substring(1, result.length - 1)
-                        }
-
-
-                        val typeToken = object : TypeToken<ArrayList<BillCategory>>() {
-
-                        }
-                        val reports =
-                            Gson().fromJson<ArrayList<BillCategory>>(result, typeToken.type)
-                        categoryAdapter = CategoryAdapter(this@BillsCategoryActivity, reports)
-
-                        listView.adapter = categoryAdapter
-                        listView.onItemClickListener =
-                            AdapterView.OnItemClickListener { parent, view, position, id ->
-                                val billCategory = reports[position]
-
-                                val i = Intent(
-                                    this@BillsCategoryActivity,
-                                    BillerActivity::class.java
-                                ).apply {
-                                    putExtra(
-                                        "categoryId",
-                                        billCategory.id ?: billCategory.billerCategoryId
-                                    )
-                                    BillsLocalStorage.SaveValue(
-                                        AppConstants.CATEGORYID,
-                                        billCategory.id ?: billCategory.billerCategoryId,
-                                        baseContext
-                                    )
-
-                                    putExtra("categoryName", billCategory.name)
-                                    BillsLocalStorage.SaveValue(
-                                        AppConstants.CATEGORYNAME,
-                                        billCategory.name,
-                                        baseContext
-                                    )
-
-                                    putExtra("propertyChanged", billCategory.propertyChanged)
-                                    BillsLocalStorage.SaveValue(
-                                        AppConstants.PROPERTYCHANGED,
-                                        billCategory.propertyChanged,
-                                        baseContext
-                                    )
-
-                                    putExtra("customer", intent.getSerializableExtra("customer"))
-                                    putExtra("isAirtime", billCategory.isAirtime)
-                                }
-
-                                startActivityForResult(i, 1)
-                            }
-
-                        listView.invalidate()
-                    }
-
-                }
-            })
+        listView.invalidate()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -173,13 +115,52 @@ class BillsCategoryActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    private fun myObservable(): Observable<String> {
-        return Observable.defer {
-            val result = safeRun {
-                val url = "${Misc.getCategoryURL()}?institutionCode=${localStorage.institutionCode}"
-                APICaller.makeGetRequest2(url)
-            }.data
-            Observable.just(result)
+    private class CategoryAdapter(var activity: Activity, var billCategories: List<BillCategory>) :
+        ArrayAdapter<BillCategory?>(activity, 0, billCategories) {
+        private var originalData: ArrayList<BillCategory> = ArrayList(billCategories)
+        override fun getView(position: Int, view: View?, parent: ViewGroup): View {
+            val itemView = view ?: activity.layoutInflater.inflate(
+                R.layout.category_report_item,
+                parent,
+                false
+            )
+            val billCategory = billCategories[position]
+            itemView.findViewById<TextView>(R.id.category_name_tv).text = billCategory.name
+            itemView.findViewById<TextView>(R.id.category_desc_tv).text = billCategory.description
+            return itemView
+        }
+
+        override fun getFilter(): Filter = object : Filter() {
+            override fun performFiltering(constraint: CharSequence): FilterResults {
+                val constraintString =
+                    constraint.toString().trim { it <= ' ' }.toLowerCase(Locale.getDefault())
+                val result = FilterResults()
+                if (constraintString.isEmpty()) {
+                    result.values = originalData
+                    result.count = originalData.size
+                    return result
+                }
+
+                val founded = ArrayList<BillCategory>()
+                for (item in billCategories) {
+                    if (
+                        item.name.toString().toLowerCase(Locale.ROOT).contains(constraintString)
+                    ) {
+                        founded.add(item)
+                    }
+                }
+                result.values = founded
+                result.count = founded.size
+                return result
+            }
+
+            override fun publishResults(constraint: CharSequence, results: FilterResults) {
+                clear()
+                for (item in results.values as ArrayList<BillCategory?>) {
+                    add(item)
+                }
+                notifyDataSetChanged()
+            }
         }
     }
 }

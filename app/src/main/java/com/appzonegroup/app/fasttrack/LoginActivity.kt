@@ -11,7 +11,6 @@ import android.widget.TextView
 import androidx.core.content.edit
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.ui.SurveyDialog
-import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.data.PosPreferences
@@ -36,6 +35,7 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import org.koin.android.ext.android.inject
 import retrofit2.create
+import java.time.Instant
 
 class LoginActivity : CreditClubActivity(R.layout.activity_login) {
 
@@ -249,8 +249,12 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             putString("terminal_id", agent?.terminalID)
         })
 
-        val lastLogin = "Last Login: " + Misc.dateToLongString(Misc.getCurrentDateTime())
-        localStorage.edit { putString(AppConstants.LAST_LOGIN, lastLogin) }
+        localStorage.edit {
+            putString(
+                AppConstants.LAST_LOGIN,
+                Instant.now().format(CREDIT_CLUB_REQUEST_DATE_PATTERN)
+            )
+        }
 
         val intent = Intent(this@LoginActivity, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
