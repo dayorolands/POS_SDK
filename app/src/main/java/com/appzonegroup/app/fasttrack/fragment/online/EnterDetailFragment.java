@@ -194,7 +194,7 @@ public class EnterDetailFragment extends CreditClubFragment implements View.OnCl
                 if (response_base != null) {
                     int shouldClose = response_base.optInt("ShouldClose", 1);
                     if (shouldClose == 0) {
-                        if (resp.contains("IN-CORRECT ACTIVATION CODE") && state == true) {
+                        if (resp.contains("IN-CORRECT ACTIVATION CODE") && state) {
                             Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.ERROR_RESPONSE_COUNT, authResponse.getSessionId());
                             //Log.e("Case", "Incorrect activation code||Deleted cache auth");
                             getLocalStorage().setCacheAuth(null);

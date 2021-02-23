@@ -63,9 +63,6 @@ class QPosCardReader(
             dialogProvider.showErrorAndWait("Could not connect to device")
             return CardReaderEvent.CANCELLED
         }
-        dialogProvider.showProgressBar("Securing Connection")
-        updateEmvConfig()
-        dialogProvider.hideProgressBar()
 
         return CardReaderEvent.CHIP
     }
@@ -106,6 +103,9 @@ class QPosCardReader(
     }
 
     override suspend fun read(amountStr: String): CardData? {
+        dialogProvider.showProgressBar("Securing Connection")
+        updateEmvConfig()
+        dialogProvider.hideProgressBar()
         val terminalTime = Instant.now().format("HHmmss")
         val cardNo = listener.waitForString { pos.getIccCardNo(terminalTime) } ?: return null
         if (cardNo.isBlank()) return QposCardData().apply { status = CardTransactionStatus.Failure }
@@ -168,7 +168,7 @@ class QPosCardReader(
                 ipekString,
                 kcvString,
                 dukptConfig?.ksn ?: "09118012400705E00000",
-                dukptConfig?.ipek?.padStart(32) ?: "C22766F7379DD38AA5E1DA8C6AFA75AC",
+                dukptConfig?.ipek ?: "C22766F7379DD38AA5E1DA8C6AFA75AC",
                 dukptConfig?.kcv ?: "B2DE27F60A443944"
             )
         }

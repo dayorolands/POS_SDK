@@ -3,8 +3,10 @@
 
     <LinearLayout
         android:id="@+id/fav1"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="start"
         android:background="@drawable/bg_clickable_accent_outline"
         android:padding="5dp">
 
@@ -12,6 +14,7 @@
             android:id="@+id/iconIv"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:layout_margin="8dp"
             android:layout_gravity="center_vertical"
             android:tint="@color/menuButtonIconTint"
             android:src="@drawable/ic_logo_round" />
@@ -26,7 +29,7 @@
             android:maxLines="2"
             android:maxLength="20"
             android:text="Function"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/menuButtonTextColor"
             android:textSize="12sp" />
     </LinearLayout>
 </layout>

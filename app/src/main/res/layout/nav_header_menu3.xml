@@ -11,7 +11,7 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/name_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,7 +20,7 @@
         android:textColor="@color/white"
         android:textAppearance="@style/TextAppearance.AppCompat" />
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/last_login_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

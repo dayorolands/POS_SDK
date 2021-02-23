@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <com.appzonegroup.app.fasttrack.ui.TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/customer_name_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
                 android:textSize="20sp"
                 android:text="Ekene Madunagu"
                 android:maxLines="1"/>
-            <com.appzonegroup.app.fasttrack.ui.TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/time_occurred_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
                 android:maxLines="1"/>
 
         </LinearLayout>
-            <com.appzonegroup.app.fasttrack.ui.TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/phone_no_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
                 android:paddingTop="5dp"
                 android:text="08065708630"
                 android:maxLines="1"/>
-            <com.appzonegroup.app.fasttrack.ui.TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/amount_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             android:orientation="horizontal">
-            <com.appzonegroup.app.fasttrack.ui.TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/from_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
                 android:textSize="13sp"
                 android:text="From: 08065708630"
                 android:maxLines="1"/>
-            <com.appzonegroup.app.fasttrack.ui.TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/to_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -88,7 +88,7 @@
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:orientation="vertical">-->
-            <!--<com.appzonegroup.app.fasttrack.ui.TextView-->
+            <!--<com.google.android.material.textview.MaterialTextView-->
                 <!--android:id="@+id/product_name_tv"-->
                 <!--android:layout_width="match_parent"-->
                 <!--android:layout_height="wrap_content"-->
@@ -97,7 +97,7 @@
                 <!--android:textSize="14sp"-->
                 <!--android:text="Product name: Kia Kia Savings"-->
                 <!--android:maxLines="1"/>-->
-            <!--<com.appzonegroup.app.fasttrack.ui.TextView-->
+            <!--<com.google.android.material.textview.MaterialTextView-->
                 <!--android:id="@+id/product_code"-->
                 <!--android:layout_width="match_parent"-->
                 <!--android:layout_height="wrap_content"-->

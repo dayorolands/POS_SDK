@@ -34,4 +34,5 @@
     <color name="navHeaderLogoTint">@color/colorAccent</color>
     <color name="fundsTransferSameBankTint">@color/colorAccent</color>
     <color name="splashOverlay">@color/transparent</color>
+    <color name="menuButtonTextColor">@color/colorPrimary</color>
 </resources>

@@ -175,7 +175,7 @@ object QPOSUtil {
     fun xor8(src1: ByteArray, src2: ByteArray): ByteArray {
         val results = ByteArray(8)
         for (i in results.indices) {
-            results[i] = (src1[i] xor src2[i]) as Byte
+            results[i] = (src1[i] xor src2[i])
         }
         return results
     }

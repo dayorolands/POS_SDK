@@ -13,7 +13,7 @@
         app:srcCompat="@drawable/ic_001_arrows"
         android:tint="@color/blue"
         android:visibility="gone"/>
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/optionName"
         android:layout_weight="1"
         android:layout_width="match_parent"

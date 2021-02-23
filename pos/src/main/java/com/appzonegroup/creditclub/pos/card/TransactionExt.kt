@@ -44,7 +44,7 @@ fun ISOMsg.applyCardData(data: CardData): ISOMsg = apply {
     retrievalReferenceNumber37 = rrnString
     serviceRestrictionCode40 = data.src
     iccData55 = data.iccString
-    if (!data.pinBlock.isNullOrBlank()) {
+    if (data.pinBlock.isNotBlank()) {
         pinData = data.pinBlock
     }
     if(!data.ksnData.isNullOrBlank()){

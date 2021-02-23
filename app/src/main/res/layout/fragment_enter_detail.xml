@@ -11,7 +11,7 @@
         android:layout_gravity="center"
         android:orientation="vertical">
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/upperHint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

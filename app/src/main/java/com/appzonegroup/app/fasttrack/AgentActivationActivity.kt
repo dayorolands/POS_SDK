@@ -8,7 +8,6 @@ import android.text.InputType
 import android.view.View
 import com.android.volley.Response
 import com.appzonegroup.app.fasttrack.databinding.ActivityAgentActivationBinding
-import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
@@ -20,7 +19,6 @@ import com.creditclub.core.data.model.AuthResponse
 import com.creditclub.core.data.request.PinChangeRequest
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.debugOnly
-import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.ui.dataBinding
 import kotlinx.coroutines.launch
@@ -30,7 +28,6 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
     private val binding by dataBinding<ActivityAgentActivationBinding>()
 
     private var isActivation = false
-    internal var url = ""
     internal var json = ""
     internal var code = ""
     internal var response: Response<*>? = null
@@ -76,9 +73,8 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
                     AuthResponse.serializer(),
                     AuthResponse(phoneNumber, code)
                 )
-                localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
-                localStorage.putString(AppConstants.AGENT_CODE, code)
-                localStorage.putString(AppConstants.AGENT_PIN, "1111")
+                localStorage.putString("ACTIVATED", "ACTIVATED")
+                localStorage.putString("AGENT_CODE", code)
 
                 logout()
             })
@@ -195,8 +191,8 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
                 AuthResponse.serializer(),
                 AuthResponse(phoneNumber, code)
             )
-            localStorage.putString(AppConstants.ACTIVATED, AppConstants.ACTIVATED)
-            localStorage.putString(AppConstants.AGENT_CODE, code)
+            localStorage.putString("ACTIVATED", "ACTIVATED")
+            localStorage.putString("AGENT_CODE", code)
 
             firebaseAnalytics.logEvent("activation", Bundle().apply {
                 putString("agent_code", localStorage.agent?.agentCode)

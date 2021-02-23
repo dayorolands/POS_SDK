@@ -23,7 +23,7 @@ class BillerItemActivity : BaseActivity(), View.OnClickListener {
     internal val listView: ListView by lazy { findViewById<ListView>(R.id.billerItem_listview) }
     internal val categoryIdField by lazy { intent.extras?.getString("categoryId") }
     internal val categoryNameField by lazy { intent.extras?.getString("categoryName") }
-    internal val biller: Biller by lazy { intent.getParcelableExtra("biller") as Biller }
+    internal val biller: Biller by lazy { intent.getParcelableExtra("biller")!!}
     private val billsPaymentService: BillsPaymentService by retrofitService()
 
     override fun onCreate(savedInstanceState: Bundle?) {

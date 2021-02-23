@@ -10,9 +10,9 @@ import java.util.regex.Pattern
  */
 
 val invalidAddressPattern =
-    Pattern.compile("[\$&+:;=\\\\\\\\?@#|/'<>^*()%!{}]", Pattern.CASE_INSENSITIVE)
+    Pattern.compile("[\$&+:;=\\\\?@#|/'<>^*()%!{}]", Pattern.CASE_INSENSITIVE)
 val specialCharsPattern =
-    Pattern.compile("[\$&+:;=\\\\\\\\?@#|/'<>^*()%!{}.,]", Pattern.CASE_INSENSITIVE)
+    Pattern.compile("[\$&+:;=\\\\?@#|/'<>^*()%!{}.,]", Pattern.CASE_INSENSITIVE)
 
 fun String.includesSpecialCharacters(pattern: Pattern = specialCharsPattern): Boolean {
     return isNotEmpty() && pattern.matcher(this).matches()

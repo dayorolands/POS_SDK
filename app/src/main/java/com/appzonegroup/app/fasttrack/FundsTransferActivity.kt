@@ -85,7 +85,7 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
             return
         }
 
-        val amountDouble = amount?.toDoubleOrNull()
+        val amountDouble = amount.toDoubleOrNull()
         if (amountDouble == null) {
             indicateError("Please enter a valid amount", binding.amountEt as View)
             return

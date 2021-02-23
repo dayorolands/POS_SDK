@@ -16,7 +16,7 @@
         android:layout_height="40dp"
         android:layout_alignParentRight="true"/>
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/gmail_item_title"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/forty_dp"

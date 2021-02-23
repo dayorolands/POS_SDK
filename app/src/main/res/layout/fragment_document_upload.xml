@@ -11,7 +11,7 @@
         android:orientation="vertical"
         android:padding="@dimen/activity_horizontal_margin">
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -69,7 +69,7 @@
             android:layout_height="@dimen/two_dp"
             layout="@layout/horizontal_line"/>
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -119,7 +119,7 @@
             android:layout_height="@dimen/two_dp"
             android:layout_margin="@dimen/ten_dp" />
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"

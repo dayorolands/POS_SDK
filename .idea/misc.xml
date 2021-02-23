@@ -8,10 +8,22 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.184375" />
+        <entry key="app/src/main/res/layout/activity_airtime_topup.xml" value="0.262037037037037" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.21944444444444444" />
+        <entry key="app/src/main/res/layout/activity_splashscreen.xml" value="0.2947916666666667" />
         <entry key="app/src/main/res/layout/bill_payment_fragment.xml" value="0.1578125" />
+        <entry key="app/src/main/res/layout/button.xml" value="0.375" />
+        <entry key="app/src/main/res/layout/dialog_customer_details.xml" value="0.335" />
         <entry key="app/src/main/res/layout/dialog_input.xml" value="0.1578125" />
         <entry key="app/src/main/res/layout/pinpad.xml" value="0.1578125" />
+        <entry key="dspread/src/main/res/layout/dspread_dialog_find_bluetooth_device.xml" value="0.2564814814814815" />
+        <entry key="pos/src/main/res/layout/activity_card_main_menu.xml" value="0.2564814814814815" />
+        <entry key="pos/src/main/res/layout/card_menu_button.xml" value="0.375" />
+        <entry key="pos/src/main/res/layout/page_select_account_type.xml" value="0.2953125" />
+        <entry key="uicentral/src/main/res/drawable/bg_splash.xml" value="0.2601851851851852" />
         <entry key="uicentral/src/main/res/layout/content_report.xml" value="0.26666666666666666" />
+        <entry key="uicentral/src/main/res/layout/frequent_function_button.xml" value="0.5" />
       </map>
     </option>
   </component>

@@ -22,7 +22,7 @@
             android:contentDescription="@string/content_description"
             app:srcCompat="@drawable/ic_sentiment_satisfied" />
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -34,7 +34,7 @@
             android:textSize="22sp"
             android:textStyle="bold" />
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/message_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

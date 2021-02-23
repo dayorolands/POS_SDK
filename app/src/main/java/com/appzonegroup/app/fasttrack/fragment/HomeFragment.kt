@@ -187,7 +187,7 @@ class HomeFragment : CreditClubFragment(R.layout.home_fragment),
             listOf(binding.frequent.fn1, binding.frequent.fn2, binding.frequent.fn3)
 
         binding.frequent.root.visibility = View.GONE
-        frequentBindings.forEach { it.root.visibility = View.GONE }
+        frequentBindings.forEach { it.root.visibility = View.INVISIBLE }
 
         val (list) = safeRunIO {
             coreDatabase.appFunctionUsageDao().getMostUsed()

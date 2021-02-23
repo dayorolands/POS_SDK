@@ -9,29 +9,28 @@ import kotlinx.serialization.Serializable
  * Appzone Ltd
  */
 @Serializable
-class MiniStatementRequest {
-
+data class MiniStatementRequest(
     @SerialName("AccountNumber")
-    var accountNumber: String? = null
+    var accountNumber: String? = null,
 
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null
+    var agentPhoneNumber: String? = null,
 
     @SerialName("AgentPin")
-    var agentPin: String? = null
+    var agentPin: String? = null,
 
     @SerialName("StartDate")
-    var startDate: String? = null
+    var startDate: String? = null,
 
     @SerialName("EndDate")
-    var endDate: String? = null
+    var endDate: String? = null,
 
     @SerialName("TransactionCount")
-    var transactionCount = 0
+    var transactionCount: Int = 0,
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = null
+    var institutionCode: String? = null,
 
     @SerialName("GeoLocation")
-    var geoLocation: String? = null
-}
+    var geoLocation: String? = null,
+)

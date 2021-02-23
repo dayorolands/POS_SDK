@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.edit
-import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.ui.SurveyDialog
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
@@ -45,7 +44,8 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            window.navigationBarColor = getColor(R.color.colorPrimary)
+            window.statusBarColor = getColor(R.color.colorLoginBg)
+            window.navigationBarColor = getColor(R.color.colorLoginBg)
         }
         findViewById<TextView>(R.id.version_tv).text = "Version ${packageInfo?.versionName}"
         debugOnly {
@@ -251,7 +251,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
 
         localStorage.edit {
             putString(
-                AppConstants.LAST_LOGIN,
+                "LAST_LOGIN",
                 Instant.now().format(CREDIT_CLUB_REQUEST_DATE_PATTERN)
             )
         }

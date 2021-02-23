@@ -31,9 +31,9 @@ class BillPaymentActivity : BaseActivity() {
     private var amountIsNeeded: Boolean? = false
     private var fieldOneIsNeeded: Boolean? = false
     private var fieldTwoIsNeeded: Boolean? = false
-    private val billerItem: BillPaymentItem by lazy { intent.getParcelableExtra("billeritem") as BillPaymentItem }
+    private val billerItem: BillPaymentItem by lazy { intent.getParcelableExtra("billeritem")!! }
     private var extras: Bundle? = null
-    private val biller by lazy { intent.getParcelableExtra("biller") as Biller }
+    private val biller: Biller by lazy { intent.getParcelableExtra("biller")!! }
 
     private val amountTV by lazy { findViewById<TextView>(R.id.billpayment_amount_tv) }
     private val fieldOneTV by lazy { findViewById<TextView>(R.id.fieldone_tv) }

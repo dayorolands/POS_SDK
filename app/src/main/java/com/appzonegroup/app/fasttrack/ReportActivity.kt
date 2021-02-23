@@ -17,7 +17,7 @@ import com.creditclub.core.util.*
 import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.ui.adapter.PosReportAdapter
 import com.creditclub.ui.dataBinding
-import com.creditclub.ui.databinding.ActivityReportBinding
+import com.appzonegroup.app.fasttrack.databinding.ActivityReportBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf

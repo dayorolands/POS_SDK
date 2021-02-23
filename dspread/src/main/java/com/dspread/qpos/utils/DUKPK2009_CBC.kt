@@ -189,7 +189,7 @@ object DUKPK2009_CBC {
         System.arraycopy(ipek?: byteArrayOf(), 0, key, 0, 16)
         temp = ByteArray(8)
         cnt = ByteArray(3)
-        cnt[0] = (ksn!![7] and 0x1F) as Byte
+        cnt[0] = (ksn!![7] and 0x1F)
         cnt[1] = ksn[8]
         cnt[2] = ksn[9]
         //        Array.Copy(ksn, 2, temp, 0, 6);
@@ -241,7 +241,7 @@ object DUKPK2009_CBC {
         System.arraycopy(key, 0, key_temp, 0, 8)
         i = 0
         while (i < 8) {
-            temp[i] = (ksn[i] xor key[8 + i]) as Byte
+            temp[i] = (ksn[i] xor key[8 + i])
             i++
         }
         //        DES_Enc(temp, key_temp, out key_r);
@@ -264,7 +264,7 @@ object DUKPK2009_CBC {
         key[11] = key[11] xor 0xC0.toByte()
         i = 0
         while (i < 8) {
-            temp[i] = (ksn[i] xor key[8 + i]) as Byte
+            temp[i] = (ksn[i] xor key[8 + i])
             i++
         }
         //        DES_Enc(temp, key_temp, out key_l);
@@ -274,7 +274,7 @@ object DUKPK2009_CBC {
         )!!
         i = 0
         while (i < 8) {
-            key[i] = (key_l[i] xor key[8 + i]) as Byte
+            key[i] = (key_l[i] xor key[8 + i])
             i++
         }
         //        Array.Copy(key_r, 0, key, 8, 8);
@@ -464,7 +464,7 @@ object DUKPK2009_CBC {
             parseHexStr2Byte(key2)
         val arr3 = ByteArray(arr1!!.size)
         for (i in arr1.indices) {
-            arr3[i] = (arr1[i] xor arr2!![i]) as Byte
+            arr3[i] = (arr1[i] xor arr2!![i])
         }
         result =
             parseByte2HexStr(arr3)

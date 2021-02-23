@@ -22,7 +22,7 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_vertical_margin">
 
-                <com.appzonegroup.app.fasttrack.ui.TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/instructionTv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

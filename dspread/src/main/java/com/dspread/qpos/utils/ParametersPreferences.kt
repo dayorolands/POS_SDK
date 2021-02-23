@@ -2,11 +2,12 @@ package com.dspread.qpos.utils
 
 import android.util.Log
 import com.creditclub.core.util.debugOnly
+import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.extensions.*
 import org.json.JSONObject
 
-private inline val String.fixedHex: String?
+private inline val String.fixedHex: String
     get() = if (length % 2 == 1) "0$this"
     else this
 
@@ -14,7 +15,7 @@ val PosParameter.capKeys: List<String>
     get() {
         val capkArray = capkList ?: return emptyList()
         val newCapkList = mutableListOf<String>()
-        try {
+        safeRun {
             val len = capkArray.length()
             for (i in 0 until len) {
                 debugOnly { Log.d("Params", "") }
@@ -22,8 +23,6 @@ val PosParameter.capKeys: List<String>
                 val curr = mapCAPK(obj)
                 if (!newCapkList.contains(curr)) newCapkList.add(curr)
             }
-        } catch (e: Exception) {
-            debugOnly { Log.e("Params", e.message) }
         }
         return newCapkList
     }
@@ -32,7 +31,7 @@ val PosParameter.emvAids: ArrayList<String>
     get() {
         val newAidList = ArrayList<String>()
         val aidArray = emvAidList ?: return newAidList
-        try {
+        safeRun {
             val len = aidArray.length()
             for (i in 0 until len) {
                 debugOnly { Log.d("Params", "") }
@@ -40,23 +39,14 @@ val PosParameter.emvAids: ArrayList<String>
                 val curr = mapAID(obj)
                 if (!newAidList.contains(curr)) newAidList.add(curr)
             }
-        } catch (e: Exception) {
-            debugOnly { Log.e("Params", e.message) }
         }
         return newAidList
     }
 
 val PosParameter.parameters: String
-    get() {
-        var parameter = ""
-        try {
-            val obj = JSONObject(managementDataString)
-            parameter = mapParameter(obj)
-        } catch (e: Exception) {
-            debugOnly { Log.e("Params", e.message) }
-        }
-        return parameter
-    }
+    get() = safeRun {
+        mapParameter(JSONObject(managementDataString))
+    }.data ?: ""
 
 private fun PosParameter.mapAID(obj: JSONObject): String {
     val managementData = managementData
@@ -89,7 +79,11 @@ private fun PosParameter.mapAID(obj: JSONObject): String {
         .appendTlv("9F66", null, "32C04000") // Terminal Default Transaction Qualifiers
         //.appendTlv("9F73", null, "000000") // Currency Conversion Factor
         .appendTlv("9F7B", null, "000000001388") // Electronic Cash Terminal Transaction Limit
-        .appendTlv("DF01", obj.selectionPriority19.fixedHex, "01") // Application Selection Indicator
+        .appendTlv(
+            "DF01",
+            obj.selectionPriority19.fixedHex,
+            "01"
+        ) // Application Selection Indicator
         .appendTlv("DF11", obj.defaultTacValue29)
         .appendTlv("DF12", obj.tacOnline31)
         .appendTlv("DF13", obj.tacDenial30)
@@ -131,7 +125,11 @@ private fun mapCAPK(obj: JSONObject): String {
             mapToTLV(obj.optString("39") ?: "")
 }
 
-fun StringBuilder.appendTlv(tag: String, value: String?, defaultValue: String? = null): StringBuilder {
+fun StringBuilder.appendTlv(
+    tag: String,
+    value: String?,
+    defaultValue: String? = null
+): StringBuilder {
     val newValue =
         if (value != null && value.isBlank() && defaultValue != null) defaultValue
         else value ?: defaultValue ?: return this
@@ -140,19 +138,14 @@ fun StringBuilder.appendTlv(tag: String, value: String?, defaultValue: String? =
 }
 
 private fun mapParameter(obj: JSONObject): String {
-    return try {
-        "9F06" +
-                mapToTLV(obj.optString("03") ?: "") +
-                "9F1A" +
-                mapToTLV(obj.optString("05") ?: "") +
-                "5F2A" +
-                mapToTLV(obj.optString("06") ?: "") +
-                "DF03" +
-                mapToTLV(obj.optString("08") ?: "")
-    } catch (e: Exception) {
-        debugOnly { Log.e("Params", e.message) }
-        ""
-    }
+    return "9F06" +
+            mapToTLV(obj.optString("03") ?: "") +
+            "9F1A" +
+            mapToTLV(obj.optString("05") ?: "") +
+            "5F2A" +
+            mapToTLV(obj.optString("06") ?: "") +
+            "DF03" +
+            mapToTLV(obj.optString("08") ?: "")
 }
 
 private fun mapToTLV(value: String): String {

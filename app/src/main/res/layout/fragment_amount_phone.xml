@@ -7,7 +7,7 @@
     android:layout_gravity="center_horizontal"
     android:layout_height="wrap_content">
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <com.google.android.material.textview.MaterialTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/customer_bank"

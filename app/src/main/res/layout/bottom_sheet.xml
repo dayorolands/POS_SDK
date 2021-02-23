@@ -18,7 +18,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.appzonegroup.app.fasttrack.ui.TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/function_type_text_view"
                 style="@style/TextAppearance.AppCompat.Headline"
                 android:layout_width="match_parent"
@@ -32,7 +32,7 @@
                 android:text="@string/online_functions" />
 
 
-            <com.appzonegroup.app.fasttrack.ui.TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"

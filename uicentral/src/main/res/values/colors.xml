@@ -28,6 +28,7 @@
     <color name="red">#F22613</color>
     <color name="dividerColor">@color/darkGray</color>
     <color name="menuButtonIconTint">@color/colorPrimary</color>
+    <color name="menuButtonTextColor">@color/colorPrimary</color>
     <color name="colorAccentContrast">@color/black</color>
     <color name="menuBackground">@color/white</color>
 </resources>

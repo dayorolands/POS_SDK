@@ -10,7 +10,9 @@
     <color name="colorSplashBg">#FFF</color>
     <color name="colorLoginBg">#D000</color>
     <color name="toolbarLogoTint">#0000</color>
-    <color name="menuBackground">#110A3060</color>
+    <color name="menuBackground">#11D74F00</color>
+    <color name="menuButtonIconTint">#55443A</color>
+    <color name="menuButtonTextColor">#55443A</color>
     <color name="colorAccentContrast">@color/white</color>
     <color name="navHeaderLogoTint">#0000</color>
 </resources>

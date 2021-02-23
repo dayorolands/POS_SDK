@@ -1,8 +1,8 @@
 buildscript {
     ext.versions = [
-            'compileSdk'         : 29,
+            'compileSdk'         : 30,
             'minSdk'             : 21,
-            'targetSdk'          : 29,
+            'targetSdk'          : 30,
             'activityKtx'        : '1.2.0',
             'appcompat'          : '1.2.0',
             'androidx'           : '1.0.0',

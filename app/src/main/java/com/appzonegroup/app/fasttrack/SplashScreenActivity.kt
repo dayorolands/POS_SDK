@@ -29,7 +29,8 @@ class SplashScreenActivity : AppCompatActivity() {
             return
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            window.navigationBarColor = getColor(R.color.colorPrimary)
+            window.statusBarColor = getColor(R.color.colorSplashBg)
+            window.navigationBarColor = getColor(R.color.colorSplashBg)
         }
         val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
         firebaseCrashlytics.setUserId(localStorage.agent?.agentCode ?: "guest")
@@ -46,7 +47,7 @@ class SplashScreenActivity : AppCompatActivity() {
 
     private suspend fun loadPage() {
         delay(3000)
-        if (localStorage.getString(AppConstants.ACTIVATED, null) == null) {
+        if (localStorage.getString("ACTIVATED", null) == null) {
             val intent = Intent(
                 this@SplashScreenActivity,
                 AgentActivationActivity::class.java

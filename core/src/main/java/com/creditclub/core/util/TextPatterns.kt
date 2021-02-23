@@ -8,7 +8,7 @@ import java.util.regex.Pattern
  * Appzone Ltd
  */
 object TextPatterns {
-    val invalidAddress = Pattern.compile("[\$&+:;=\\\\\\\\?@#|/'<>^*()%!{}]", Pattern.CASE_INSENSITIVE)
-    val specialCharsPattern = Pattern.compile("[\$&+:;=\\\\\\\\?@#|/'<>^*()%!{}.,]", Pattern.CASE_INSENSITIVE)
+    val invalidAddress = Pattern.compile("[\$&+:;=\\\\?@#|/'<>^*()%!{}]", Pattern.CASE_INSENSITIVE)
+    val specialCharsPattern = Pattern.compile("[\$&+:;=\\\\?@#|/'<>^*()%!{}.,]", Pattern.CASE_INSENSITIVE)
     val includesNumbers = Pattern.compile("[\$0-9]", Pattern.CASE_INSENSITIVE)
 }

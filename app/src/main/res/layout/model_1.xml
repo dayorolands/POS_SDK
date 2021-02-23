@@ -15,14 +15,14 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/from"
             android:textSize="@dimen/small_sized_text"
             android:layout_weight="1"/>
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/id_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
         android:orientation="horizontal"
         android:layout_marginBottom="@dimen/five_dp">
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/from_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -47,7 +47,7 @@
             android:textStyle="bold"
             android:layout_weight="1"/>
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/to_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -62,14 +62,14 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/phoneNo"
             android:textSize="@dimen/small_sized_text"
             android:layout_weight="1"/>
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/date"
@@ -84,7 +84,7 @@
         android:orientation="horizontal"
         android:layout_marginBottom="@dimen/five_dp">
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/phone_no_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -93,7 +93,7 @@
             android:textStyle="bold"
             android:layout_weight="1"/>
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/date_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

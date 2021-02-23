@@ -39,7 +39,7 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <com.appzonegroup.app.fasttrack.ui.TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/time_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

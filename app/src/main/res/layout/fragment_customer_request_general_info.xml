@@ -271,7 +271,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="show_calendar">
-                <com.appzonegroup.app.fasttrack.ui.TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/dob_tv"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

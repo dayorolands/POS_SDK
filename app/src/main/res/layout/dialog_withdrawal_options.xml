@@ -5,7 +5,7 @@
     android:layout_width="350dp"
     android:padding="@dimen/five_dp"
     android:layout_height="wrap_content">
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <com.google.android.material.textview.MaterialTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"

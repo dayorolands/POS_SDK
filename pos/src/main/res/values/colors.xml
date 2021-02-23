@@ -26,6 +26,7 @@
     <color name="searchDialogResultHighlightColor">#FFED2E47</color>
     <color name="green">#53F30F</color>
     <color name="menuButtonIconTint">@color/transparent</color>
+    <color name="menuButtonTextColor">@color/blue</color>
     <color name="transparent">#0000</color>
     <color name="menuBackground">#EFEFEF</color>
 </resources>

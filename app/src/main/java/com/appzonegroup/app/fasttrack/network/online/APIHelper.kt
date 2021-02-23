@@ -20,6 +20,7 @@ import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -141,12 +142,12 @@ class APIHelper @JvmOverloads constructor(
             ),
             Response.Listener { response ->
                 callback.onCompleted(null, response, true)
-                //  if (response == null)
-                //     Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.ERROR_RESPONSE_COUNT, sessionId);
+                  if (response == null)
+                     Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.ERROR_RESPONSE_COUNT, sessionId);
             },
             Response.ErrorListener { error ->
                 if (error.cause is TimeoutException) {
-                    //       Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.NO_RESPONSE_COUNT, sessionId);
+                           Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.NO_RESPONSE_COUNT, sessionId);
                 }
                 callback.onCompleted(error, null, false)
             })
@@ -179,10 +180,8 @@ class APIHelper @JvmOverloads constructor(
             val mimeType = mimeTypeMap.getMimeTypeFromExtension(
                 MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(image).toString())
             )
-            val requestFile: RequestBody = RequestBody.create(
-                (mimeType ?: "image/jpeg").toMediaTypeOrNull(),
-                image
-            )
+            val requestFile: RequestBody = image
+                .asRequestBody((mimeType ?: "image/jpeg").toMediaTypeOrNull())
 
             val body =
                 MultipartBody.Part.createFormData("file", image.name, requestFile)
@@ -223,13 +222,13 @@ class APIHelper @JvmOverloads constructor(
             ),
             Response.Listener { response ->
                 if (response == null)
-                //       Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.ERROR_RESPONSE_COUNT, sessionId);
+                    Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.ERROR_RESPONSE_COUNT, sessionId)
 
                     callback.onCompleted(null, response, true)
             },
             Response.ErrorListener { error ->
                 if (error.cause is TimeoutException) {
-                    //             Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.NO_RESPONSE_COUNT, sessionId);
+                    Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.NO_RESPONSE_COUNT, sessionId)
                 }
                 callback.onCompleted(error, null, false)
             })
@@ -273,7 +272,7 @@ class APIHelper @JvmOverloads constructor(
         req.headers.forEach { (name, value) -> newHeaders.add(name, value) }
 
         val requestBody = if (req.body != null) {
-            RequestBody.create(null, req.body)
+            req.body.toRequestBody(null)
         } else {
             "{}".toRequestBody(null)
         }

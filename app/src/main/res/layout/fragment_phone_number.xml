@@ -5,7 +5,7 @@
     android:padding="@dimen/ten_dp"
     android:layout_height="match_parent">
 
-    <com.appzonegroup.app.fasttrack.ui.TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/message_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

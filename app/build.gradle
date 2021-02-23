@@ -22,7 +22,7 @@ android {
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         versionCode 28
-        versionName "1.4.7-rc1"
+        versionName "1.4.7-rc2"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [
@@ -88,7 +88,8 @@ android {
 
         debug {
             debuggable true
-            buildConfigField("String", "API_HOST", '"https://staging.mybankone.com"')
+            buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
+//            buildConfigField("String", "API_HOST", '"https://staging.mybankone.com"')
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (Staging)"
