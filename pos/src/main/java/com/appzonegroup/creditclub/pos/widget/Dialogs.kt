@@ -28,13 +28,6 @@ typealias ListenerBlock<T> = Dialogs.Listener<T>.() -> Unit
 
 object Dialogs {
 
-    fun getProgress(activity: Context, header: String?): Dialog {
-        val dialog = getDialog(R.layout.dialog_progress_layout, activity)
-        header?.also { dialog.findViewById<TextView>(R.id.header_tv).text = header }
-
-        return dialog
-    }
-
     private fun getDialog(context: Context): Dialog {
         val dialog = Dialog(context)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -49,44 +42,6 @@ object Dialogs {
         dialog.setContentView(layoutID)
         return dialog
     }
-
-    fun getErrorDialog(activity: Activity, message: String?): Dialog {
-        val dialog = getDialog(R.layout.pos_dialog_error, activity)
-        message?.also { dialog.findViewById<TextView>(R.id.message_tv).text = message }
-        dialog.findViewById<View>(R.id.close_btn).setOnClickListener { dialog.dismiss() }
-
-        return dialog
-    }
-
-    fun getSuccessDialog(activity: Activity, message: String?): Dialog {
-        val dialog = getDialog(R.layout.dialog_success, activity)
-        message?.also { dialog.findViewById<TextView>(R.id.message_tv).text = message }
-        dialog.findViewById<View>(R.id.close_btn).setOnClickListener { dialog.dismiss() }
-
-        return dialog
-    }
-
-//    fun getProgressDialog(activity: Activity, msg: String): ProgressDialog {
-//        val progressDialog = ProgressDialog(activity)
-//        progressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-//        progressDialog.setMessage(msg)
-//        progressDialog.show()
-//
-//        return progressDialog
-//    }
-//
-//    fun getAlertDialog(context: Context, msg: String): AlertDialog {
-//        val builder1 = AlertDialog.Builder(context)
-//        builder1.setMessage(msg)
-//        builder1.setCancelable(true)
-//
-//        builder1.setPositiveButton(
-//            "Ok"
-//        ) { dialog, id -> dialog.cancel() }
-//
-//
-//        return builder1.create()
-//    }
 
     fun requestPin(
         context: Activity,

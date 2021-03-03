@@ -125,4 +125,7 @@ interface PosTransactionDao {
 
     @Query("SELECT * FROM PosTransaction")
     fun all(): List<PosTransaction>
+
+    @Query("SELECT * FROM PosTransaction where responseCode != '00' and dateTime BETWEEN :from AND :to and (stan like :query or retrievalReferenceNumber like :query)")
+    fun failed(query: String, from: Instant, to: Instant): LiveData<List<PosTransaction>>
 }

@@ -37,17 +37,10 @@
             android:layout_marginTop="?attr/actionBarSize"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/list"
-                android:name="com.appzonegroup.app.fasttrack.fragment.NotificationFragment"
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/compose_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                app:layoutManager="LinearLayoutManager"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                tools:context="com.appzonegroup.app.fasttrack.fragment.NotificationFragment"
-                tools:listitem="@layout/notification_item" />
+                android:layout_height="match_parent" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </RelativeLayout>
 </layout>

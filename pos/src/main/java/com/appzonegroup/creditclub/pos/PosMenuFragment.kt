@@ -3,40 +3,46 @@ package com.appzonegroup.creditclub.pos
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.navigation.fragment.findNavController
+import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.creditclub.pos.data.PosPreferences
-import com.appzonegroup.creditclub.pos.databinding.ActivityCardMainMenuBinding
+import com.appzonegroup.creditclub.pos.databinding.PosMenuFragmentBinding
 import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.MenuPage
 import com.appzonegroup.creditclub.pos.util.MenuPages
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.format
-import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.safeRunIO
-import com.creditclub.core.util.showError
+import com.creditclub.pos.PosFragment
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.api.posApiService
-import com.creditclub.ui.dataBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.time.Instant
 
 
-class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu) {
-    private val binding by dataBinding<ActivityCardMainMenuBinding>()
+class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
+    private val binding by dataBinding<PosMenuFragmentBinding>()
 
     //    override val functionId = FunctionIds.CARD_TRANSACTIONS
     private val posPreferences: PosPreferences by inject()
     private val defaultParameterStore: PosParameter by inject()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val creditClubActivity = requireActivity() as CreditClubActivity
+        creditClubActivity.setSupportActionBar(binding.toolbar)
+        creditClubActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.cont.visibility = View.INVISIBLE
-        localStorage.agent ?: return finish()
+        if (localStorage.agent == null) {
+            findNavController().popBackStack()
+        }
         checkRequirements()
     }
 
     private fun checkRequirements() {
         if (config.terminalId.isEmpty()) {
-            return showError(getString(R.string.pos_terminal_id_required)) {
+            return dialogProvider.showError(getString(R.string.pos_terminal_id_required)) {
                 onClose {
                     super.onBackPressed()
                 }
@@ -54,7 +60,7 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu) {
                             updateBinRoutes()
                             checkRequirements()
                         }
-                    } else finish()
+                    } else findNavController().popBackStack()
                 }
             }
         }
@@ -81,17 +87,13 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu) {
     }
 
     private fun bindView() {
-        binding.header.goBack.setOnClickListener {
-            if (intent.getBooleanExtra("SHOW_BACK_BUTTON", false)) onBackPressed()
-        }
-        binding.hideBackButton = !intent.getBooleanExtra("SHOW_BACK_BUTTON", false)
         binding.purchaseButton.button.setOnClickListener {
             startActivity(CardWithdrawalActivity::class.java)
         }
         binding.adminButton.button.setOnClickListener {
             mainScope.launch {
                 adminAction {
-                    val intent = Intent(this@CardMainMenuActivity, MenuActivity::class.java)
+                    val intent = Intent(requireActivity(), MenuActivity::class.java)
                     intent.apply {
                         putExtra(MenuPage.TITLE, MenuPages[MenuPages.ADMIN]?.name)
                         putExtra(MenuPage.PAGE_NUMBER, MenuPages.ADMIN)
@@ -138,7 +140,7 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu) {
         binding.eodButton.button.setOnClickListener {
             supervisorAction {
                 startActivity(Intent(
-                    this,
+                    requireContext(),
                     MenuActivity::class.java
                 ).apply {
                     putExtra(MenuPage.TITLE, MenuPages[MenuPages.REPRINT_EODS]?.name)
@@ -148,6 +150,9 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu) {
         }
         binding.unsettledButton.button.setOnClickListener {
             startActivity(UnsettledTransactionsActivity::class.java)
+        }
+        binding.chargebackButton.button.setOnClickListener {
+            findNavController().navigate(R.id.action_to_chargeback)
         }
         binding.keyDownloadButton.button.setOnClickListener {
             mainScope.launch { downloadKeys() }
@@ -159,7 +164,7 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu) {
             mainScope.launch {
                 dialogProvider.showProgressBar("Downloading CAPK")
                 val (_, error) = safeRunIO {
-                    defaultParameterStore.downloadCapk(this@CardMainMenuActivity)
+                    defaultParameterStore.downloadCapk(requireActivity())
                 }
                 dialogProvider.hideProgressBar()
                 if (error != null) return@launch dialogProvider.showError(error)
@@ -170,7 +175,7 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu) {
             mainScope.launch {
                 dialogProvider.showProgressBar("Downloading EMV AID")
                 val (_, error) = safeRunIO {
-                    defaultParameterStore.downloadAid(this@CardMainMenuActivity)
+                    defaultParameterStore.downloadAid(requireActivity())
                 }
                 dialogProvider.hideProgressBar()
                 if (error != null) return@launch dialogProvider.showError(error)
@@ -186,8 +191,8 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu) {
         dialogProvider.showProgressBar("Downloading Keys and Parameters")
         for (parameterStore in parameterStores) {
             val (_, error) = safeRunIO {
-                parameters.downloadKeys(this@CardMainMenuActivity)
-                parameters.downloadParameters(this@CardMainMenuActivity)
+                parameters.downloadKeys(requireActivity())
+                parameters.downloadParameters(requireActivity())
             }
             if (error != null) {
                 dialogProvider.hideProgressBar()
@@ -206,7 +211,7 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu) {
         dialogProvider.showProgressBar("Downloading Keys")
         for (parameterStore in parameterStores) {
             val (_, error) = safeRunIO {
-                parameterStore.downloadKeys(this@CardMainMenuActivity)
+                parameterStore.downloadKeys(requireActivity())
             }
             if (error != null) {
                 dialogProvider.hideProgressBar()
@@ -225,7 +230,7 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu) {
         dialogProvider.showProgressBar("Downloading Parameters")
         for (parameterStore in parameterStores) {
             val (_, error) = safeRunIO {
-                parameterStore.downloadParameters(this@CardMainMenuActivity)
+                parameterStore.downloadParameters(requireActivity())
             }
             if (error != null) {
                 dialogProvider.hideProgressBar()
@@ -254,6 +259,6 @@ class CardMainMenuActivity : PosActivity(R.layout.activity_card_main_menu) {
 
             return connectionSequence
                 .distinctBy { "${it.ip}:${it.port}" }
-                .map { ParameterService(this, it) }
+                .map { ParameterService(requireContext(), it) }
         }
 }

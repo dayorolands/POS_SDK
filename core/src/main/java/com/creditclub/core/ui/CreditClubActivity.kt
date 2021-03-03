@@ -129,14 +129,9 @@ abstract class CreditClubActivity : AppCompatActivity {
         dialogProvider.showError(message, block)
     }
 
-    fun showInternalError() = showInternalError(null)
-
-    fun showInternalError(block: DialogListenerBlock<*>?) {
+    fun showInternalError() {
         dialogProvider.hideProgressBar()
-        val message = "An internal error occurred. Please try again later"
-
-        block ?: return dialogProvider.showError(message)
-        dialogProvider.showError(message, block)
+        dialogProvider.showError(getString(R.string.an_error_occurred_please_try_again_later))
     }
 
     fun showError(exception: Exception, block: DialogListenerBlock<*>?) {

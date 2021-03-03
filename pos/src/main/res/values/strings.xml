@@ -111,4 +111,6 @@
     <string name="pos_card_transactions">Card Transactions</string>
     <string name="pos_select_mpos_device">Select mPOS device</string>
     <string name="pos_searching_for_mpos_devices">Searching for mPOS devices</string>
+    <string name="settle">Settle</string>
+    <string name="settling">Settling</string>
 </resources>

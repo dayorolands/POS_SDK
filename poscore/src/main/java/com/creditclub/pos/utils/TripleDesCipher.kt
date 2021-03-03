@@ -9,14 +9,7 @@ import javax.crypto.spec.DESedeKeySpec
  * Created by mac on 1/29/19.
  */
 
-class TripleDesCipher @Throws(Exception::class)
-constructor(rawkey: ByteArray) {
-    internal var key: SecretKey
-
-    init {
-        key = readKey(rawkey)
-    }
-
+inline class TripleDesCipher(private val rawkey: ByteArray) {
     @Throws(Exception::class)
     fun readKey(rawkey: ByteArray): SecretKey {
         val keyDes = if (rawkey.size == 8) {
@@ -33,24 +26,24 @@ constructor(rawkey: ByteArray) {
             keyDes
         }
 
-        val keyspec = DESedeKeySpec(keyDes)
-        val keyfactory = SecretKeyFactory.getInstance("DESede")
-        return keyfactory.generateSecret(keyspec)
+        val keySpec = DESedeKeySpec(keyDes)
+        val keyFactory = SecretKeyFactory.getInstance("DESede")
+        return keyFactory.generateSecret(keySpec)
     }
 
     @Throws(Exception::class)
     fun encrypt(plain: ByteArray): ByteArray {
         val cipher = Cipher.getInstance("DESede/ECB/NoPadding")
         //final IvParameterSpec iv = new IvParameterSpec(new byte[8]);
-        cipher.init(Cipher.ENCRYPT_MODE, key)
+        cipher.init(Cipher.ENCRYPT_MODE, readKey(rawkey))
         return cipher.doFinal(plain)
     }
 
     @Throws(Exception::class)
-    fun decrypt(cipher: ByteArray): ByteArray {
-        val dcipher = Cipher.getInstance("DESede/ECB/NoPadding")
+    fun decrypt(encryptedData: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance("DESede/ECB/NoPadding")
         //final IvParameterSpec iv = new IvParameterSpec(new byte[8]);
-        dcipher.init(Cipher.DECRYPT_MODE, key)
-        return dcipher.doFinal(cipher)
+        cipher.init(Cipher.DECRYPT_MODE, readKey(rawkey))
+        return cipher.doFinal(encryptedData)
     }
 }

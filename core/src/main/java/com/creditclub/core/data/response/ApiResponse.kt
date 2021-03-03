@@ -9,16 +9,16 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
-open class ApiResponse<T> {
+data class ApiResponse<T>(
     @SerialName("Status")
-    var status: String = "06"
+    val status: String = "06",
 
     @SerialName("Message")
-    var message: String = ""
+    val message: String? = null,
 
     @SerialName("Data")
-    var data: T? = null
-
+    val data: T? = null,
+) {
     fun isSuccessful() = status == "00"
 }
 

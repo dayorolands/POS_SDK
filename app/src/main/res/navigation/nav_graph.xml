@@ -9,7 +9,11 @@
 
     <action
         android:id="@+id/action_to_pos_nav_graph"
-        app:destination="@id/pos_nav_graph" />
+        app:destination="@id/pos_nav_graph"
+        app:enterAnim="@anim/fade_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/fade_out" />
 
     <fragment
         android:id="@+id/billPaymentFragment"
@@ -30,7 +34,11 @@
         tools:layout="@layout/home_fragment">
         <action
             android:id="@+id/action_home_to_sub_menu"
-            app:destination="@id/subMenuFragment">
+            app:destination="@id/subMenuFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out">
             <argument
                 android:name="category"
                 android:defaultValue="0"
@@ -38,13 +46,25 @@
         </action>
         <action
             android:id="@+id/action_home_to_bill_payment"
-            app:destination="@id/billPaymentFragment" />
+            app:destination="@id/billPaymentFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
         <action
             android:id="@+id/action_home_to_collection_payment"
-            app:destination="@id/collectionGraph" />
+            app:destination="@id/collectionGraph"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
         <action
             android:id="@+id/home_to_notifications"
-            app:destination="@id/notificationFragment" />
+            app:destination="@id/notificationFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
 
     <fragment
@@ -54,10 +74,18 @@
         tools:layout="@layout/sub_menu_fragment">
         <action
             android:id="@+id/action_menu_to_bill_payment"
-            app:destination="@id/billPaymentFragment" />
+            app:destination="@id/billPaymentFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
         <action
             android:id="@+id/action_menu_to_collection_payment"
-            app:destination="@id/collectionGraph" />
+            app:destination="@id/collectionGraph"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
         <argument
             android:name="category"
             android:defaultValue="0"
@@ -74,7 +102,11 @@
             tools:layout="@layout/collection_payment_fragment">
             <action
                 android:id="@+id/action_collection_payment_to_reference_generation"
-                app:destination="@id/collectionReferenceGenerationFragment">
+                app:destination="@id/collectionReferenceGenerationFragment"
+                app:enterAnim="@anim/fade_in"
+                app:exitAnim="@anim/fade_out"
+                app:popEnterAnim="@anim/fade_in"
+                app:popExitAnim="@anim/fade_out">
                 <argument
                     android:name="offline"
                     android:defaultValue="false"

@@ -14,6 +14,7 @@ import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.card.*
 import com.creditclub.pos.utils.TripleDesCipher
+import com.dspread.qpos.injectKey.TDES
 import com.dspread.qpos.utils.FileUtils
 import com.dspread.qpos.utils.hexBytes
 import com.dspread.qpos.utils.hexString

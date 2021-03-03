@@ -2,23 +2,45 @@ package com.appzonegroup.app.fasttrack.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.TextView
-import androidx.core.view.GravityCompat
+import android.view.ViewGroup
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.*
-import com.appzonegroup.app.fasttrack.databinding.HomeFragmentBinding
-import com.appzonegroup.app.fasttrack.ui.Dialogs
-import com.appzonegroup.app.fasttrack.ui.dataBinding
+import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.AppFunctions
 import com.creditclub.core.data.api.NotificationService
+import com.creditclub.core.data.model.AppFunctionUsage
 import com.creditclub.core.data.model.NotificationRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.ui.widget.DialogConfirmParams
@@ -26,118 +48,367 @@ import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.safeRunSuspend
 import com.creditclub.ui.UpdateActivity
-import com.google.android.material.navigation.NavigationView
+import com.creditclub.ui.theme.CreditClubTheme
+import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
+import dev.chrisbanes.accompanist.insets.statusBarsHeight
 import kotlinx.coroutines.launch
 
 
-class HomeFragment : CreditClubFragment(R.layout.home_fragment),
-    NavigationView.OnNavigationItemSelectedListener {
-
-    private val packageInfo get() = requireContext().packageInfo
-    private val binding by dataBinding<HomeFragmentBinding>()
+class HomeFragment : CreditClubFragment() {
     private val notificationViewModel by activityViewModels<NotificationViewModel>()
     private val notificationService by creditClubMiddleWareAPI.retrofit.service<NotificationService>()
+    private val frequentFunctionsLive = MutableLiveData<List<AppFunctionUsage>>(emptyList())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.agentCategoryButton.button.setOnClickListener(categoryClickListener(AppFunctions.Categories.AGENT_CATEGORY))
-        binding.customerCategoryButton.run {
-            if (institutionConfig.categories.customers) {
-                root.visibility = View.VISIBLE
-                button.setOnClickListener(categoryClickListener(AppFunctions.Categories.CUSTOMER_CATEGORY))
-            } else {
-                root.visibility = View.GONE
-            }
-        }
-        binding.loanCategoryButton.run {
-            if (institutionConfig.categories.loans) {
-                root.visibility = View.VISIBLE
-                button.setOnClickListener(categoryClickListener(AppFunctions.Categories.LOAN_CATEGORY))
-            } else {
-                root.visibility = View.GONE
-            }
-        }
-        binding.transactionsCategoryButton.button.setOnClickListener(
-            categoryClickListener(
-                AppFunctions.Categories.TRANSACTIONS_CATEGORY
-            )
-        )
-
-        if (binding.creditClubMainMenuCoordinator.isDrawerOpen(GravityCompat.START)) {
-            binding.creditClubMainMenuCoordinator.closeDrawer(GravityCompat.START)
-        }
-
-        binding.navView.setNavigationItemSelectedListener(this)
-
-        binding.versionTv.value = "v${packageInfo?.versionName}. Powered by CreditClub"
-        debugOnly {
-            binding.versionTv.value = "v${packageInfo?.versionName}. Staging. Powered by CreditClub"
-        }
-
-        binding.logoutButton.setOnClickListener { requireActivity().logout() }
-
-        localStorage.agent?.let { info ->
-            binding.navView.getHeaderView(0).run {
-                findViewById<TextView>(R.id.username_tv).text = info.agentName
-                findViewById<TextView>(R.id.phone_no_tv).text = info.phoneNumber
-            }
-        }
-
         mainScope.launch { getFavorites() }
         mainScope.launch { getNotifications() }
 
-        binding.navView.menu.getItem(0).run {
-            isVisible = institutionConfig.hasOnlineFunctions
-        }
-
-        val hasPosUpdateManager = Platform.isPOS
-
-        binding.navView.menu.findItem(R.id.fn_update)?.isVisible = hasPosUpdateManager
-
-        binding.navView.menu.findItem(R.id.fn_hla_tagging)?.run {
-            isVisible = institutionConfig.hasHlaTagging
-        }
+        val hasPosUpdateManager = Platform.isPOS && Platform.deviceType != 2
 
         if (hasPosUpdateManager) checkForUpdate()
+    }
 
-        binding.drawerToggle.setOnClickListener { openDrawer() }
-        binding.notificationBtn.setOnClickListener {
-            findNavController().navigate(HomeFragmentDirections.homeToNotifications())
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                CreditClubTheme {
+                    ProvideWindowInsets {
+                        HomeContent()
+                    }
+                }
+            }
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-//        notificationViewModel.notificationList.watch {
-//            if (it != null && it.isNotEmpty()) {
-//                val notification=it.first()
-//                val snackbar = Snackbar.make(
-//                    binding.frequent.root,
-//                    notification.message ?: "",
-//                    Snackbar.LENGTH_INDEFINITE
-//                )
-//                snackbar.setAction("Close") {
-//                    snackbar.dismiss()
-//                    mainScope.launch {
-//                        safeRunIO {
-//                            notificationService.markAsRead(
-//                                localStorage.agentPhone,
-//                                localStorage.institutionCode,
-//                                notification.reference
-//                            )
-//                        }
-//                        getNotifications()
-//                    }
-//                }
-//                snackbar.show()
-//            }
-//        }
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    private fun HomeContent() {
+        val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+        val frequentFunctions = frequentFunctionsLive.observeAsState(emptyList())
+        Scaffold(
+            scaffoldState = scaffoldState,
+            topBar = { AppBar(scaffoldState = scaffoldState) },
+            drawerContent = {
+                DrawerContent(scaffoldState)
+            },
+            backgroundColor = colorResource(R.color.menuBackground)
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .wrapContentWidth(Alignment.Start)
+                        .weight(1f),
+                    horizontalArrangement = Arrangement.Start,
+                ) {
+                    LazyVerticalGrid(
+                        cells = GridCells.Adaptive(minSize = 150.dp)
+                    ) {
+                        if (institutionConfig.categories.customers) {
+                            item {
+                                MenuButton(
+                                    text = "Customer",
+                                    icon = painterResource(R.drawable.payday_loan),
+                                    category = AppFunctions.Categories.CUSTOMER_CATEGORY
+                                )
+                            }
+                        }
+
+                        item {
+                            MenuButton(
+                                text = "Agent",
+                                icon = painterResource(R.drawable.income),
+                                category = AppFunctions.Categories.AGENT_CATEGORY
+                            )
+                        }
+
+                        item {
+                            MenuButton(
+                                text = "Transactions",
+                                icon = painterResource(R.drawable.deposit),
+                                category = AppFunctions.Categories.TRANSACTIONS_CATEGORY
+                            )
+                        }
+
+                        if (institutionConfig.categories.loans) {
+                            item {
+                                MenuButton(
+                                    text = "Loans",
+                                    icon = painterResource(R.drawable.personal_income),
+                                    category = AppFunctions.Categories.LOAN_CATEGORY
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if (frequentFunctions.value.isNotEmpty()) {
+                    Text(
+                        text = "Frequently Used",
+                        color = colorResource(R.color.menuButtonTextColor),
+                        style = MaterialTheme.typography.subtitle2,
+                        modifier = Modifier.padding(horizontal = 10.dp)
+                    )
+                    val favModifier = Modifier
+                        .weight(1f)
+                        .widthIn(max = 300.dp, min = 80.dp)
+                        .padding(end = 10.dp)
+                        .border(
+                            BorderStroke(
+                                1.dp,
+                                MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
+                            ),
+                            RoundedCornerShape(15.dp),
+                        )
+                    val menuButtonIconTint=colorResource(R.color.menuButtonIconTint)
+                    val tint = if (menuButtonIconTint.alpha == 0f) {
+                        LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                    } else {
+                        menuButtonIconTint
+                    }
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp, vertical = 10.dp)
+                            .wrapContentWidth()
+                    ) {
+                        frequentFunctions.value.forEach { appFunctionUsage ->
+                            AppFunctions[appFunctionUsage.fid]?.run {
+                                TextButton(
+                                    onClick = { openPageById(id) },
+                                    shape = RoundedCornerShape(15.dp),
+                                    modifier = favModifier
+                                ) {
+                                    if (icon != null) {
+                                        Icon(
+                                            painter = painterResource(icon!!),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(20.dp),
+                                            tint = tint,
+                                        )
+                                    }
+                                    Text(
+                                        text = stringResource(label).toUpperCase(),
+                                        color = colorResource(R.color.menuButtonTextColor),
+                                        style = MaterialTheme.typography.caption,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.padding(start = 5.dp),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun ColumnScope.DrawerContent(scaffoldState: ScaffoldState) {
+        val agent = localStorage.agent
+        val coroutineScope = rememberCoroutineScope()
+        val logoTint = colorResource(R.color.navHeaderLogoTint)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.primary)
+        ) {
+            Spacer(modifier = Modifier.height(50.dp))
+            Image(
+                painter = painterResource(R.drawable.ic_launcher_transparent),
+                colorFilter = if (logoTint == Color.Transparent) null else ColorFilter.tint(logoTint),
+                contentDescription = null,
+                modifier = Modifier
+                    .height(50.dp)
+                    .width(IntrinsicSize.Max)
+                    .padding(16.dp)
+                    .widthIn(),
+            )
+            Text(
+                text = agent?.agentName ?: "",
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp),
+                softWrap = true,
+                style = MaterialTheme.typography.subtitle1,
+                color = MaterialTheme.colors.onPrimary,
+            )
+            Text(
+                text = agent?.phoneNumber ?: "",
+                modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
+                style = MaterialTheme.typography.body1,
+                color = MaterialTheme.colors.onPrimary.copy(0.5f),
+            )
+        }
+
+        if (institutionConfig.hasOnlineFunctions) {
+            DrawerRow(
+                title = stringResource(R.string.online_functions),
+                icon = painterResource(R.drawable.ic_fa_arrow_up),
+                onClick = {
+                    coroutineScope.launch { scaffoldState.drawerState.close() }
+                    startActivity(Intent(requireContext(), OnlineActivity::class.java))
+                }
+            )
+        }
+
+        DrawerRow(
+            title = stringResource(R.string.reports),
+            icon = painterResource(R.drawable.ic_agent_balance),
+            onClick = {
+                coroutineScope.launch { scaffoldState.drawerState.close() }
+                startActivity(Intent(requireContext(), ReportActivity::class.java))
+            }
+        )
+
+        DrawerRow(
+            title = stringResource(R.string.commission),
+            icon = painterResource(R.drawable.ic_agent_balance),
+            onClick = {
+                coroutineScope.launch { scaffoldState.drawerState.close() }
+                startActivity(Intent(requireContext(), CommissionsActivity::class.java))
+            }
+        )
+
+        DrawerRow(
+            title = stringResource(R.string.support),
+            icon = painterResource(R.drawable.ic_chat_bubble_outline),
+            onClick = {
+                coroutineScope.launch { scaffoldState.drawerState.close() }
+                startActivity(Intent(requireContext(), SupportActivity::class.java))
+            }
+        )
+
+        if (institutionConfig.hasHlaTagging) {
+            DrawerRow(
+                title = stringResource(R.string.hla_tagging),
+                icon = painterResource(R.drawable.ic_maps_and_flags),
+                onClick = {
+                    coroutineScope.launch { scaffoldState.drawerState.close() }
+                    startActivity(HlaTaggingActivity::class.java)
+                }
+            )
+        }
+
+        DrawerRow(
+            title = stringResource(R.string.title_activity_faq),
+            icon = painterResource(R.drawable.ic_help),
+            onClick = {
+                coroutineScope.launch { scaffoldState.drawerState.close() }
+                startActivity(FaqActivity::class.java)
+            }
+        )
+
+        if (Platform.isPOS && Platform.deviceType != 2) {
+            DrawerRow(
+                title = stringResource(R.string.update),
+                icon = painterResource(R.drawable.ic_fa_arrow_down),
+                onClick = {
+                    coroutineScope.launch { scaffoldState.drawerState.close() }
+                    startActivity(UpdateActivity::class.java)
+                }
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        debugOnly {
+            Text(
+                text = "For development use only",
+                modifier = Modifier.padding(start = 16.dp, bottom = 5.dp),
+                style = MaterialTheme.typography.caption,
+                color = MaterialTheme.colors.onSurface.copy(0.5f),
+            )
+        }
+
+        Text(
+            text = "v${requireContext().packageInfo?.versionName}. Powered by CreditClub",
+            modifier = Modifier.padding(start = 16.dp),
+            style = MaterialTheme.typography.body1,
+            color = MaterialTheme.colors.onSurface.copy(0.5f),
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { requireActivity().logout() },
+        ) {
+            Text(
+                stringResource(R.string.logout),
+                style = MaterialTheme.typography.h5,
+                color = MaterialTheme.colors.primary,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+            )
+        }
+    }
+
+    @Composable
+    private fun AppBar(scaffoldState: ScaffoldState) {
+        val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
+        val coroutineScope = rememberCoroutineScope()
+        // Draw a scrim over the status bar which matches the app bar
+        Spacer(
+            Modifier
+                .background(appBarColor)
+                .fillMaxWidth()
+                .statusBarsHeight()
+        )
+        TopAppBar(
+            title = {
+                val toolbarLogoTint = colorResource(R.color.toolbarLogoTint)
+                Row {
+                    Image(
+                        painterResource(R.drawable.ic_logo_with_name),
+                        contentDescription = null,
+                        colorFilter = if (toolbarLogoTint == Color.Transparent) null else ColorFilter.tint(
+                            toolbarLogoTint
+                        ),
+                        modifier = Modifier
+                            .heightIn(max = 50.dp)
+                            .widthIn(max = 140.dp)
+                            .weight(1f),
+                    )
+                    IconButton(
+                        onClick = {
+                            findNavController().navigate(HomeFragmentDirections.homeToNotifications())
+                        }
+                    ) {
+                        Icon(
+                            Icons.Filled.Notifications,
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.onPrimary.copy(0.52f)
+                        )
+                    }
+                }
+            },
+            navigationIcon = {
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        safeRunSuspend {
+                            scaffoldState.drawerState.open()
+                        }
+                    }
+                }) {
+                    Icon(
+                        Icons.Default.Menu,
+                        contentDescription = null,
+                        tint = MaterialTheme.colors.onPrimary.copy(0.52f)
+                    )
+                }
+            },
+            elevation = 5.dp
+        )
     }
 
     private suspend fun getNotifications() {
-        val (response, error) = safeRunIO {
+        val (response) = safeRunIO {
             notificationService.getNotifications(
                 NotificationRequest(
                     localStorage.agentPhone,
@@ -148,11 +419,56 @@ class HomeFragment : CreditClubFragment(R.layout.home_fragment),
             )
         }
 
-        if (response != null) notificationViewModel.notificationList.value = response.response
+        if (response != null) notificationViewModel.notificationList.value =
+            response.response ?: emptyList()
+    }
+
+    @Composable
+    private fun MenuButton(
+        text: String,
+        icon: Painter,
+        category: Int,
+    ) {
+        val menuButtonIconTint = colorResource(R.color.menuButtonIconTint)
+        Card(
+            modifier = Modifier
+                .heightIn(150.dp, 200.dp)
+                .widthIn(150.dp, 300.dp)
+                .padding(10.dp),
+            elevation = 2.dp,
+            shape = RoundedCornerShape(20.dp),
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.clickable(
+                    onClick = {
+                        findNavController().navigate(
+                            HomeFragmentDirections.actionHomeToSubMenu(category)
+                        )
+                    }
+                ),
+            ) {
+                Image(
+                    icon,
+                    contentDescription = null,
+                    modifier = Modifier.padding(16.dp),
+                    colorFilter = if (menuButtonIconTint.alpha == 0f) null else ColorFilter.tint(
+                        menuButtonIconTint
+                    )
+                )
+                Text(
+                    text = text.toUpperCase(),
+                    style = MaterialTheme.typography.button,
+                    color = colorResource(R.color.menuButtonTextColor),
+                    modifier = Modifier.padding(10.dp),
+                )
+            }
+        }
     }
 
     private fun checkForUpdate() = appDataStorage.latestVersion?.run {
-        val currentVersion = packageInfo?.versionName
+        val currentVersion = requireContext().packageInfo?.versionName
         if (currentVersion != null && updateIsAvailable(currentVersion)) {
             val updateIsRequired = updateIsRequired(currentVersion)
             val mustUpdate = updateIsRequired && daysOfGraceLeft() < 1
@@ -183,109 +499,37 @@ class HomeFragment : CreditClubFragment(R.layout.home_fragment),
     }
 
     private suspend fun getFavorites() {
-        val frequentBindings =
-            listOf(binding.frequent.fn1, binding.frequent.fn2, binding.frequent.fn3)
-
-        binding.frequent.root.visibility = View.GONE
-        frequentBindings.forEach { it.root.visibility = View.INVISIBLE }
-
         val (list) = safeRunIO {
             coreDatabase.appFunctionUsageDao().getMostUsed()
         }
 
-        if (list == null || list.isEmpty()) return
-
-        binding.frequent.root.visibility = View.VISIBLE
-
-        for (appFunctionUsage in list) {
-
-            AppFunctions[appFunctionUsage.fid]?.run {
-                val index = list.indexOf(appFunctionUsage)
-
-                frequentBindings[index].root.visibility = View.VISIBLE
-                if (icon != null) frequentBindings[index].iconIv.setImageResource(icon!!)
-                frequentBindings[index].nameTv.setText(label)
-                frequentBindings[index].root.setOnClickListener {
-                    openPageById(id)
-                }
-            }
-        }
+        frequentFunctionsLive.value = list
     }
+}
 
-    override fun onBackPressed(): Boolean {
-        try {
-            return if (binding.creditClubMainMenuCoordinator.isDrawerOpen(GravityCompat.START)) {
-                binding.creditClubMainMenuCoordinator.closeDrawer(GravityCompat.START)
-                true
-            } else {
-                super.onBackPressed()
-            }
-        } catch (ex: Exception) {
-//            requireActivity().finish()
-        }
-
-        return super.onBackPressed()
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.logout -> requireActivity().logout()
-            R.id.online_functions -> startActivity(
-                Intent(
-                    requireContext(),
-                    OnlineActivity::class.java
-                )
-            )
-            R.id.reports -> startActivity(
-                Intent(
-                    requireContext(),
-                    ReportActivity::class.java
-                )
-            )
-            R.id.commissions -> startActivity(
-                Intent(
-                    requireContext(),
-                    CommissionsActivity::class.java
-                )
-            )
-            R.id.support -> startActivity(
-                Intent(
-                    requireContext(),
-                    SupportActivity::class.java
-                )
-            )
-            R.id.fn_update -> startActivity(UpdateActivity::class.java)
-            R.id.fn_hla_tagging -> startActivity(HlaTaggingActivity::class.java)
-            R.id.fn_faq -> startActivity(FaqActivity::class.java)
-        }
-
-        return true
-    }
-
-    private inline fun <T> MutableLiveData<T>.watch(crossinline block: (T?) -> Unit) {
-        block(value)
-        var oldValue = value
-        observe(viewLifecycleOwner, Observer {
-            if (value != oldValue) {
-                oldValue = value
-                block(it)
-            }
-        })
-    }
-
-    private fun openDrawer() {
-        binding.creditClubMainMenuCoordinator.run {
-            if (isDrawerOpen(GravityCompat.START)) {
-                closeDrawer(GravityCompat.START)
-            } else {
-                openDrawer(GravityCompat.START)
-            }
-        }
-    }
-
-    private fun categoryClickListener(category: Int): View.OnClickListener? {
-        return View.OnClickListener {
-            findNavController().navigate(HomeFragmentDirections.actionHomeToSubMenu(category))
-        }
+@Composable
+private fun DrawerRow(
+    title: String,
+    icon: Painter,
+    onClick: () -> Unit
+) {
+    val background = Color.Transparent
+    val textColor = MaterialTheme.colors.onSurface.copy(0.5f)
+    Row(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .background(background)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Image(
+            icon,
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(textColor),
+            modifier = Modifier
+                .padding(16.dp)
+                .size(24.dp),
+        )
+        Text(color = textColor, text = title)
     }
 }

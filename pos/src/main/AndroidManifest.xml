@@ -41,7 +41,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.TerminalOptionsActivity"
             android:label="Terminal Options"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity" />
+            android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.MenuActivity"
             android:configChanges="orientation|keyboardHidden"
@@ -55,7 +55,7 @@
             android:exported="true"
             android:label="Make Payment"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
@@ -73,7 +73,7 @@
             android:exported="true"
             android:label="Balance Inquiry"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
@@ -82,7 +82,7 @@
             android:exported="true"
             android:label="Refund"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
@@ -91,7 +91,7 @@
             android:exported="true"
             android:label="Sales Completion"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
@@ -100,7 +100,7 @@
             android:exported="true"
             android:label="Pre Auth"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
@@ -109,7 +109,7 @@
             android:exported="true"
             android:label="Cash Back"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
@@ -118,14 +118,14 @@
             android:exported="true"
             android:label="Cash Advance"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.UnsettledTransactionsActivity"
             android:exported="true"
             android:label="Pending Confirmations"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity" />
+            android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.ReprintMenuActivity"
             android:launchMode="singleTask"

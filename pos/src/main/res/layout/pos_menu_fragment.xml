@@ -3,30 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="hideBackButton"
-            type="Boolean" />
-    </data>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/menuBackground"
         android:orientation="vertical">
 
-        <include
-            android:id="@+id/header"
-            layout="@layout/header"
-            app:hideBackButton='@{hideBackButton}'
-            app:subtitle='@{"Welcome"}' />
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:elevation="0dp"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark"
+                app:title="POS" />
+
+        </com.google.android.material.appbar.AppBarLayout>
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/header"
-            tools:context=".CardMainMenuActivity">
+            android:layout_below="@id/appBar"
+            tools:context=".PosMenuFragment">
 
             <LinearLayout
                 android:id="@+id/cont"
@@ -46,14 +48,12 @@
                     <include
                         android:id="@+id/cash_back_button"
                         layout="@layout/card_menu_button"
-                        android:visibility="gone"
                         app:src='@{@drawable/ic_purchase}'
                         app:text='@{"Purchase with CashBack"}' />
 
                     <include
                         android:id="@+id/refund_button"
                         layout="@layout/card_menu_button"
-                        android:visibility="gone"
                         app:src='@{@drawable/ic_purchase}'
                         app:text='@{"Refund"}' />
 
@@ -67,14 +67,12 @@
                     <include
                         android:id="@+id/auth_button"
                         layout="@layout/card_menu_button"
-                        android:visibility="gone"
                         app:src='@{@drawable/ic_auth}'
                         app:text='@{"Pre auth"}' />
 
                     <include
                         android:id="@+id/sales_completion_button"
                         layout="@layout/card_menu_button"
-                        android:visibility="gone"
                         app:src='@{@drawable/ic_auth}'
                         app:text='@{"Sales Completion"}' />
 
@@ -88,21 +86,18 @@
                     <include
                         android:id="@+id/balance_button"
                         layout="@layout/card_menu_button"
-                        android:visibility="gone"
                         app:src='@{@drawable/ic_reversal}'
                         app:text='@{"Balance Inquiry"}' />
 
                     <include
                         android:id="@+id/bill_pay_button"
                         layout="@layout/card_menu_button"
-                        android:visibility="gone"
                         app:src='@{@drawable/ic_pay_bills}'
                         app:text='@{"bill pay"}' />
 
                     <include
                         android:id="@+id/cash_adv_button"
                         layout="@layout/card_menu_button"
-                        android:visibility="gone"
                         app:src='@{@drawable/ic_cash_out}'
                         app:text='@{"cash adv"}' />
 
@@ -129,6 +124,12 @@
                         layout="@layout/card_menu_button"
                         app:src='@{@drawable/ic_schedule}'
                         app:text='@{"unsettled"}' />
+
+                    <include
+                        android:id="@+id/chargeback_button"
+                        layout="@layout/card_menu_button"
+                        app:src='@{@drawable/ic_purchase}'
+                        app:text='@{"chargeback dispute"}' />
 
                     <include
                         android:id="@+id/key_download_button"

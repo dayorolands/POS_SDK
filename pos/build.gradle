@@ -16,7 +16,8 @@ android {
         consumerProguardFiles 'proguard-rules.pro'
     }
     buildFeatures {
-        dataBinding = true
+        dataBinding true
+        compose true
     }
     buildTypes {
         release {

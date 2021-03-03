@@ -32,12 +32,6 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 07/01/2020.
- * Appzone Ltd
- */
-
 class QPosListener(
     private val pos: QPOSService,
     private val qPosManager: QPosManager

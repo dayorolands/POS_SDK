@@ -1,11 +1,10 @@
 package com.appzonegroup.creditclub.pos
 
 import android.annotation.SuppressLint
-import android.app.ActivityManager
-import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
+import android.view.MenuItem
 import android.view.WindowManager
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
@@ -108,19 +107,6 @@ abstract class PosActivity : CreditClubActivity {
         startActivity(Intent(this, classToStart))
     }
 
-    private fun isMyServiceRunning(serviceClass: Class<*>): Boolean {
-        val manager = getSystemService(Application.ACTIVITY_SERVICE) as ActivityManager?
-        manager?.run {
-            for (service in getRunningServices(Integer.MAX_VALUE)) {
-                if (serviceClass.name == service.service.className) {
-                    return true
-                }
-            }
-        }
-
-        return false
-    }
-
     fun openPage(clazz: Class<*>) {
         startActivity(Intent(this, clazz))
     }
@@ -129,5 +115,15 @@ abstract class PosActivity : CreditClubActivity {
 
     fun showError(message: String?, block: DialogListenerBlock<*>) {
         dialogProvider.showError(message, block)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

@@ -5,15 +5,28 @@
     android:id="@+id/pos_nav_graph"
     app:startDestination="@id/cardMenuFragment">
 
+    <action
+        android:id="@+id/action_to_chargeback"
+        app:destination="@id/chargeBackFragment"
+        app:enterAnim="@anim/fade_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/fade_out"/>
+
     <fragment
         android:id="@+id/cardMenuFragment"
-        android:name="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+        android:name="com.appzonegroup.creditclub.pos.PosMenuFragment"
         android:label="CardMenu"
-        tools:layout="@layout/activity_card_main_menu">
+        tools:layout="@layout/pos_menu_fragment">
 
         <argument
             android:name="showBackButton"
             android:defaultValue="false"
             app:argType="boolean" />
     </fragment>
+
+    <fragment
+        android:id="@+id/chargeBackFragment"
+        android:name="com.creditclub.pos.ChargeBackFragment"
+        android:label="CardMenu" />
 </navigation>

@@ -35,4 +35,5 @@
     <color name="fundsTransferSameBankTint">@color/colorAccent</color>
     <color name="splashOverlay">@color/transparent</color>
     <color name="menuButtonTextColor">@color/colorPrimary</color>
+    <color name="colorOnSecondary">@color/black</color>
 </resources>

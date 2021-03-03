@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.core.content.edit
 import com.appzonegroup.app.fasttrack.BankOneApplication
 import com.appzonegroup.app.fasttrack.OnlineActivity
 import com.appzonegroup.app.fasttrack.R
@@ -19,13 +18,12 @@ import com.appzonegroup.app.fasttrack.model.TransactionCountType
 import com.appzonegroup.app.fasttrack.model.online.Response
 import com.appzonegroup.app.fasttrack.network.online.APIHelper
 import com.appzonegroup.app.fasttrack.network.online.APIHelper.VolleyCallback
-import com.appzonegroup.app.fasttrack.ui.viewBinding
+import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.GPSTracker
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson
 import com.creditclub.core.data.Encryption
-import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.model.CreditClubImage
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.safeRunIO
@@ -42,7 +40,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
     private var creditClubImage: CreditClubImage? = null
     private var imageString: String? = null
     private var image: Bitmap? = null
-    private val binding by viewBinding(FragmentCustomerImageBinding::bind)
+    private val binding by dataBinding<FragmentCustomerImageBinding>()
     private var optionsText: OptionsText? = null
 
     override fun onViewCreated(
@@ -56,10 +54,10 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
         binding.takePhoto.setOnClickListener(this)
         binding.btnActivate.setOnClickListener(this)
 
-        activity?.currentFocus?.let { view ->
+        activity?.currentFocus?.let {
             val imm =
                 activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+            imm?.hideSoftInputFromWindow(it.windowToken, 0)
         }
     }
 
@@ -106,7 +104,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
     }
 
     private fun nextOperation() {
-        val finalFile = File(creditClubImage?.path)
+        val finalFile = File(creditClubImage?.path ?: return)
         val bankOneApplication = activity?.application as BankOneApplication?
         val authResponse = bankOneApplication?.authResponse
         val ah = APIHelper(requireActivity())

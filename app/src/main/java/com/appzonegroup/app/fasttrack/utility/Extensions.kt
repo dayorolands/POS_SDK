@@ -8,22 +8,14 @@ import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.fragment.HomeFragmentDirections
 import com.appzonegroup.app.fasttrack.fragment.SubMenuFragmentDirections
 import com.appzonegroup.app.fasttrack.model.AppConstants
-import com.appzonegroup.creditclub.pos.CardMainMenuActivity
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.model.BillCategory
+import com.creditclub.core.data.request.BalanceEnquiryRequest
 import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.customerBalanceEnquiry
-import com.creditclub.core.util.logFunctionUsage
-import com.creditclub.core.util.requireAccountInfo
+import com.creditclub.core.util.*
 import kotlinx.coroutines.launch
-
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 19/10/2019.
- * Appzone Ltd
- */
 
 fun Activity.logout(block: (Intent.() -> Unit)? = null) {
     val intent = Intent(applicationContext, LoginActivity::class.java)
@@ -56,18 +48,47 @@ fun CreditClubFragment.openPageById(id: Int) {
             if (Platform.isPOS) {
                 ioScope.launch { logFunctionUsage(FunctionIds.CARD_TRANSACTIONS) }
 
-                val intent = Intent(requireContext(), CardMainMenuActivity::class.java)
-                intent.putExtra("SHOW_BACK_BUTTON", true)
-                startActivity(intent)
+                findNavController().navigate(R.id.action_to_pos_nav_graph)
             }
         }
 
         R.id.customer_change_pin_button -> startActivity(ChangeCustomerPinActivity::class.java)
 
         R.id.agent_balance_enquiry_button -> {
-            ioScope.launch { logFunctionUsage(FunctionIds.AGENT_BALANCE_ENQUIRY) }
+            mainScope.launch {
+                val pin = dialogProvider.getPin("Agent PIN") ?: return@launch
+                if (pin.length != 4) {
+                    dialogProvider.showError("Agent PIN must be 4 digits")
+                    return@launch
+                }
+                val request = BalanceEnquiryRequest().apply {
+                    agentPin = pin
+                    agentPhoneNumber = localStorage.agentPhone
+                    institutionCode = localStorage.institutionCode
+                }
 
-            startActivity(BalanceEnquiryActivity::class.java)
+                dialogProvider.showProgressBar("Getting Balance")
+                val (response) = safeRunIO {
+                    creditClubMiddleWareAPI.staticService.balanceEnquiry(request)
+                }
+                dialogProvider.hideProgressBar()
+
+                if (response == null) return@launch
+
+                if (response.isSussessful) {
+                    dialogProvider.showSuccess(
+                        """
+                        |Balance is ${response.availableBalance.toCurrencyFormat()}.
+                        |Available balance is ${response.balance.toCurrencyFormat()}.
+                    """.trimMargin()
+                    )
+                } else {
+                    dialogProvider.showError(
+                        response.responseMessage ?: getString(R.string.a_network_error_occurred)
+                    )
+                }
+                safeRunIO { logFunctionUsage(FunctionIds.AGENT_BALANCE_ENQUIRY) }
+            }
         }
 
         R.id.agent_change_pin_button -> startActivity(ChangePinActivity::class.java)
@@ -104,7 +125,7 @@ fun CreditClubFragment.openPageById(id: Int) {
                 putExtra("isAirtime", true)
             }
 
-            startActivityForResult(i, 1)
+            startActivity(i)
         }
 
         R.id.pay_bill_button -> {
@@ -151,6 +172,10 @@ fun CreditClubFragment.openPageById(id: Int) {
 
         R.id.fn_collections_payment -> {
             findNavController().navigate(R.id.action_home_to_collection_payment)
+        }
+
+        R.id.fn_pos_chargeback -> {
+            findNavController().navigate(R.id.action_to_chargeback)
         }
 
         else -> dialogProvider.showError(

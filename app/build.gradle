@@ -21,8 +21,8 @@ android {
         ndkVersion '21.3.6528147'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 28
-        versionName "1.4.7"
+        versionCode 29
+        versionName "1.4.8-rc1"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [
@@ -43,7 +43,7 @@ android {
 
     buildFeatures {
         dataBinding true
-        viewBinding true
+        compose true
     }
 
     aaptOptions {
@@ -58,7 +58,7 @@ android {
     buildTypes {
         release {
             shrinkResources false
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
@@ -88,8 +88,7 @@ android {
 
         debug {
             debuggable true
-            buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
-//            buildConfigField("String", "API_HOST", '"https://staging.mybankone.com"')
+            buildConfigField("String", "API_HOST", '"https://staging.mybankone.com"')
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (Staging)"
@@ -151,7 +150,7 @@ android {
         }
     }
     composeOptions {
-        kotlinCompilerExtensionVersion "0.1.0-dev09"
+        kotlinCompilerExtensionVersion versions.compose
     }
 //    dynamicFeatures = [":nexgo"]
     splits {

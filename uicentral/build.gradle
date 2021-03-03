@@ -15,7 +15,8 @@ android {
     }
 
     buildFeatures {
-        dataBinding = true
+        dataBinding true
+        compose true
     }
     compileOptions {
         coreLibraryDesugaringEnabled true

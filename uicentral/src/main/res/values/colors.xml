@@ -31,4 +31,5 @@
     <color name="menuButtonTextColor">@color/colorPrimary</color>
     <color name="colorAccentContrast">@color/black</color>
     <color name="menuBackground">@color/white</color>
+    <color name="colorOnSecondary">@color/black</color>
 </resources>

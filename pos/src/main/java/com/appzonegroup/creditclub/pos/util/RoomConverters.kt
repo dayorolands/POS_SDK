@@ -6,20 +6,14 @@ import kotlinx.serialization.json.Json
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 3/21/2019.
- * Appzone Ltd
- */
-
 object RoomConverters {
     private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
     private val json = Json {
         isLenient = true
         ignoreUnknownKeys = true
-                allowSpecialFloatingPointValues = true
-                useArrayPolymorphism = true
-                encodeDefaults = true
+        allowSpecialFloatingPointValues = true
+        useArrayPolymorphism = true
+        encodeDefaults = true
     }
 
     @TypeConverter

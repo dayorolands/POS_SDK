@@ -3,29 +3,24 @@ package com.appzonegroup.app.fasttrack.network.online
 import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
-import com.android.volley.*
-import com.android.volley.toolbox.StringRequest
 import com.appzonegroup.app.fasttrack.model.TransactionCountType
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.creditclub.core.data.CreditClubClient
 import com.creditclub.core.data.Encryption
 import com.creditclub.core.data.api.BankOneService
-import com.creditclub.core.util.localStorage
+import com.creditclub.core.data.prefs.LocalStorage
+import com.creditclub.core.util.SafeRunResult
 import com.creditclub.core.util.safeRunIO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.Headers
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.io.File
-import java.util.*
 import java.util.concurrent.TimeoutException
 
 
@@ -37,7 +32,7 @@ class APIHelper @JvmOverloads constructor(
     private val ctx: Context,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 ) : KoinComponent {
-
+    private val localStorage: LocalStorage by inject()
     private val client: CreditClubClient by inject()
 
     interface VolleyCallback<T> {
@@ -51,8 +46,7 @@ class APIHelper @JvmOverloads constructor(
         location: String,
         state: Boolean,
         callback: VolleyCallback<String>
-    )//, FutureCallback<String> futureCallback)
-    {
+    ) {
         Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId)
         val url = BankOneService.UrlGenerator.operationInit(
             pNumber,
@@ -60,31 +54,12 @@ class APIHelper @JvmOverloads constructor(
             activationCode,
             location,
             state,
-            ctx.localStorage.institutionCode
+            localStorage.institutionCode
         )
 
-        val req = StringRequest(
-            Request.Method.GET,
-            url,
-            Response.Listener { response -> callback.onCompleted(null, response, true) },
-            Response.ErrorListener { error ->
-                //                if (error.getCause() instanceof TimeoutException) {
-                // Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.NO_INTERNET_COUNT, sessionId);
-                //                }
-
-                callback.onCompleted(error, null, false)
-            })
-
-
-        req.retryPolicy = DefaultRetryPolicy(
-            MY_SOCKET_TIMEOUT_MS,
-            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        )
-
-        handleRequest(
-            req,
-            Response.Listener { response -> callback.onCompleted(null, response, true) })
+        handleRequest(url) { (response, error) ->
+            callback.onCompleted(error, response, error == null)
+        }
     }
 
     fun attemptActivation(
@@ -103,23 +78,12 @@ class APIHelper @JvmOverloads constructor(
             activationCode,
             location,
             state,
-            ctx.localStorage.institutionCode
-        )
-        val req = StringRequest(
-            Request.Method.GET,
-            url,
-            Response.Listener { response -> callback.onCompleted(null, response, true) },
-            Response.ErrorListener { error -> callback.onCompleted(error, null, false) })
-
-        req.retryPolicy = DefaultRetryPolicy(
-            MY_SOCKET_TIMEOUT_MS,
-            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+            localStorage.institutionCode
         )
 
-        handleRequest(
-            req,
-            Response.Listener { response -> callback.onCompleted(null, response, true) })
+        handleRequest(url) { (response, error) ->
+            callback.onCompleted(error, response, error == null)
+        }
     }
 
     fun getNextOperation(
@@ -131,37 +95,30 @@ class APIHelper @JvmOverloads constructor(
     ) {
         Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId)
 
-        val req = StringRequest(
-            Request.Method.GET,
-            BankOneService.UrlGenerator.operationNext(
-                pNumber,
-                sessionId,
-                next,
-                location,
-                ctx.localStorage.institutionCode
-            ),
-            Response.Listener { response ->
-                callback.onCompleted(null, response, true)
-                  if (response == null)
-                     Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.ERROR_RESPONSE_COUNT, sessionId);
-            },
-            Response.ErrorListener { error ->
-                if (error.cause is TimeoutException) {
-                           Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.NO_RESPONSE_COUNT, sessionId);
-                }
-                callback.onCompleted(error, null, false)
-            })
-
-        req.retryPolicy = DefaultRetryPolicy(
-            MY_SOCKET_TIMEOUT_MS,
-            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        val url = BankOneService.UrlGenerator.operationNext(
+            pNumber,
+            sessionId,
+            next,
+            location,
+            localStorage.institutionCode
         )
 
-
-        handleRequest(
-            req,
-            Response.Listener { response -> callback.onCompleted(null, response, true) })
+        handleRequest(url) { (response, error) ->
+            if (response == null)
+                Misc.increaseTransactionMonitorCounter(
+                    ctx,
+                    TransactionCountType.ERROR_RESPONSE_COUNT,
+                    sessionId
+                )
+            if (error != null && error.cause is TimeoutException) {
+                Misc.increaseTransactionMonitorCounter(
+                    ctx,
+                    TransactionCountType.NO_RESPONSE_COUNT,
+                    sessionId
+                )
+            }
+            callback.onCompleted(error, response, error == null)
+        }
     }
 
     fun getNextOperationImage(
@@ -191,7 +148,7 @@ class APIHelper @JvmOverloads constructor(
                     pNumber,
                     sessionId,
                     Encryption.encrypt(location),
-                    Encryption.encrypt(ctx.localStorage.institutionCode),
+                    Encryption.encrypt(localStorage.institutionCode),
                     isFullImage,
                     body
                 )
@@ -201,7 +158,6 @@ class APIHelper @JvmOverloads constructor(
         }
     }
 
-    @JvmOverloads
     fun continueNextOperation(
         pNumber: String,
         sessionId: String?,
@@ -211,98 +167,47 @@ class APIHelper @JvmOverloads constructor(
     ) {
         //Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId);
         Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId)
-        val req = StringRequest(
-            Request.Method.GET,
-            BankOneService.UrlGenerator.operationContinue(
-                pNumber,
-                sessionId ?: "nothing",
-                next,
-                location,
-                ctx.localStorage.institutionCode
-            ),
-            Response.Listener { response ->
-                if (response == null)
-                    Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.ERROR_RESPONSE_COUNT, sessionId)
-
-                    callback.onCompleted(null, response, true)
-            },
-            Response.ErrorListener { error ->
-                if (error.cause is TimeoutException) {
-                    Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.NO_RESPONSE_COUNT, sessionId)
-                }
-                callback.onCompleted(error, null, false)
-            })
-
-        req.retryPolicy = DefaultRetryPolicy(
-            MY_SOCKET_TIMEOUT_MS,
-            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        val url = BankOneService.UrlGenerator.operationContinue(
+            pNumber,
+            sessionId ?: "nothing",
+            next,
+            location,
+            localStorage.institutionCode
         )
-
-        handleRequest(
-            req,
-            Response.Listener { response -> callback.onCompleted(null, response, true) })
+        handleRequest(url) { (response, error) ->
+            if (response == null) {
+                Misc.increaseTransactionMonitorCounter(
+                    ctx,
+                    TransactionCountType.ERROR_RESPONSE_COUNT,
+                    sessionId
+                )
+            }
+            if (error != null && error.cause is TimeoutException) {
+                Misc.increaseTransactionMonitorCounter(
+                    ctx,
+                    TransactionCountType.NO_RESPONSE_COUNT,
+                    sessionId
+                )
+            }
+            callback.onCompleted(null, response, true)
+        }
     }
 
-//    fun continueNextOperationImage(
-//        pNumber: String, sessionId: String, image: File, location: String,
-//        callback: FutureCallback<String>
-//    ) {
-//        Ion.with(ctx)
-//            .load(
-//                "POST",
-//                BankOneService.UrlGenerator.operationContinueImage(
-//                    pNumber,
-//                    sessionId,
-//                    location,
-//                    ctx.localStorage.institutionCode
-//                )
-//            )
-//            .setTimeout(180000)
-//            .setMultipartFile("file", image)
-//            .asString().setCallback(callback)
-//    }
-
-    private fun handleRequest(
-        req: StringRequest,
-        listener: Response.Listener<String>
+    private inline fun handleRequest(
+        url: String,
+        crossinline block: (SafeRunResult<String?>) -> Unit
     ) {
-        val newHeaders = Headers.Builder()
-
-        req.headers.forEach { (name, value) -> newHeaders.add(name, value) }
-
-        val requestBody = if (req.body != null) {
-            req.body.toRequestBody(null)
-        } else {
-            "{}".toRequestBody(null)
-        }
-
         scope.launch {
-            val (response, error) = safeRunIO {
-                if (req.method == Request.Method.POST) {
-                    client.bankOneService.operationPost(req.url, requestBody)
-                } else {
-                    client.bankOneService.operationGet(req.url)
-                }
+            val result = safeRunIO {
+                client.bankOneService.operationGet(url)
             }
 
-            if (error != null) req.errorListener.onErrorResponse(VolleyError(error))
-            else listener.onResponse(response)
+            block(result)
         }
     }
 
 
     interface FutureCallback<T> {
-        /**
-         * onCompleted is called by the Future with the result or exception of the asynchronous operation.
-         * @param e Exception encountered by the operation
-         * @param result Result returned from the operation
-         */
         fun onCompleted(e: Exception?, result: T?)
-    }
-
-
-    companion object {
-        private const val MY_SOCKET_TIMEOUT_MS = 300000
     }
 }

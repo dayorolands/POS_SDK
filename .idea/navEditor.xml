@@ -170,11 +170,6 @@
             <LayoutPositions>
               <option name="myPositions">
                 <map>
-                  <entry key="action_purchase">
-                    <value>
-                      <LayoutPositions />
-                    </value>
-                  </entry>
                   <entry key="cardMenuFragment">
                     <value>
                       <LayoutPositions>
@@ -187,13 +182,13 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="purchaseFragment">
+                  <entry key="chargeBackFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="246" />
-                            <option name="y" value="54" />
+                            <option name="x" value="102" />
+                            <option name="y" value="-199" />
                           </Point>
                         </option>
                       </LayoutPositions>

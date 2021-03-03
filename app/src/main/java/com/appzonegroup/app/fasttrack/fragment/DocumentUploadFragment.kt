@@ -7,7 +7,7 @@ import android.view.View
 import androidx.fragment.app.activityViewModels
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.FragmentDocumentUploadBinding
-import com.appzonegroup.app.fasttrack.ui.viewBinding
+import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.creditclub.core.model.CreditClubImage
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.debugOnly
@@ -19,12 +19,12 @@ import com.esafirm.imagepicker.model.Image
 import kotlinx.coroutines.launch
 
 class DocumentUploadFragment : CreditClubFragment(R.layout.fragment_document_upload) {
-    private val binding by viewBinding(FragmentDocumentUploadBinding::bind)
+    private val binding by dataBinding<FragmentDocumentUploadBinding>()
     private val viewModel by activityViewModels<OpenAccountViewModel>()
     private var imageType: ImageType = ImageType.Passport
 
     private enum class ImageType {
-//        IDCard,
+        //        IDCard,
         Passport,
         Signature
     }

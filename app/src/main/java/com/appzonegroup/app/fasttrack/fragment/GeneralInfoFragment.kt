@@ -253,6 +253,8 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
             return
         }
 
-        dialogProvider.showErrorAndWait(response.message)
+        dialogProvider.showErrorAndWait(
+            response.message ?: getString(R.string.an_error_occurred_please_try_again_later)
+        )
     }
 }

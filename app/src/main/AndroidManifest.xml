@@ -64,10 +64,8 @@
             android:name=".CaseLogActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".AirtimeActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".SplashScreenActivity"
+            android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -143,14 +141,6 @@
         <activity
             android:name=".CreditClubLoanRequestActivity"
             android:label="@string/title_activity_loan_request"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
-        </activity>
-        <activity
-            android:name=".BalanceEnquiryActivity"
-            android:label="Balance Enquiry"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -235,21 +225,6 @@
             android:name="com.appzonegroup.creditclub.pos.TerminalOptionsActivity"
             android:label="Terminal Options" />
         <activity
-            android:name="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden">
-            <intent-filter>
-                <action android:name="com.appzonegroup.creditclub.pos.CARD_MENU" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.PAY_APP" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name="com.appzonegroup.creditclub.pos.MenuActivity"
             android:configChanges="orientation|keyboardHidden"
             android:launchMode="singleTask"
@@ -260,9 +235,10 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="Make Payment"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            tools:replace="android:parentActivityName" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.ReversalActivity"
             android:configChanges="orientation|keyboardHidden"
@@ -270,59 +246,67 @@
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.ReversalActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            tools:replace="android:parentActivityName" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.BalanceInquiryActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="Balance Inquiry"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            tools:replace="android:parentActivityName" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.RefundActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="Refund"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            tools:replace="android:parentActivityName" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.SalesCompleteActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="Sales Completion"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            tools:replace="android:parentActivityName" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.PreAuthActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="Pre Auth"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            tools:replace="android:parentActivityName" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.CashBackActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="Cash Back"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            tools:replace="android:parentActivityName" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.CashAdvanceActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="Cash Advance"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity"
+            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            tools:replace="android:parentActivityName" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.UnsettledTransactionsActivity"
             android:label="Pending Confirmations"
-            android:parentActivityName="com.appzonegroup.creditclub.pos.CardMainMenuActivity" />
+            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
+            tools:replace="android:parentActivityName" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.ReprintMenuActivity"
             android:launchMode="singleTask"
