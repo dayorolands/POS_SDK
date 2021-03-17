@@ -442,11 +442,6 @@ abstract class CardTransactionActivity : PosActivity() {
 
     fun processingCode(code: String) = "$code${viewModel.accountType.value?.code ?: "00"}00"
 
-    fun onBackspacePressed(view: View?) {
-        restartTimer()
-        viewModel.clearAmount()
-    }
-
     fun goBack(view: View?) {
         onBackPressed()
     }

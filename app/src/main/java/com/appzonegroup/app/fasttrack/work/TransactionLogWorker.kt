@@ -16,6 +16,8 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import org.koin.core.inject
 import retrofit2.create
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 
 /**
@@ -34,7 +36,7 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
         val backendConfig: BackendConfig by inject()
 
         val posTransactionDao = posDatabase.posTransactionDao()
-
+        posTransactionDao.deleteSyncedBefore(Instant.now().minus(7, ChronoUnit.DAYS))
         val jobs = posTransactionDao.all().map { receipt ->
             if (receipt.nodeName == "EPMS") receipt.nodeName = null
             async {
@@ -47,7 +49,7 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
                 }
 
                 if (response.isSuccessful) {
-                    posTransactionDao.delete(receipt)
+                    posTransactionDao.save(receipt.apply { isSynced = true })
                 }
 
                 firebaseAnalytics.logEvent("transaction_log_attempt", Bundle().apply {

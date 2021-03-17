@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
-                android:text="Device"
+                android:text="@string/device"
                 android:textSize="20sp" />
 
             <include
@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
-                android:text="Security"
+                android:text="@string/security"
                 android:textSize="20sp" />
 
             <include
@@ -96,16 +96,17 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="20dp"
                     android:layout_weight="1"
-                    android:text="Network Parameters"
+                    android:text="@string/network_parameters"
                     android:textSize="20sp" />
 
                 <TextView
+                    android:id="@+id/resetNetworkBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="20dp"
-                    android:onClick="resetNetwork"
-                    android:text="Reset"
+                    android:visibility="gone"
+                    android:text="@string/reset"
                     android:textSize="16sp" />
 
             </LinearLayout>

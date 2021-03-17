@@ -5,25 +5,24 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.CalendarViewMonth
 import androidx.compose.material.icons.outlined.CalendarViewWeek
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.models.PosTransaction
-import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.model.IntValueType
 import com.creditclub.core.util.format
 import com.creditclub.core.util.setResult
@@ -46,7 +45,7 @@ fun ComponentCallbacks.GetPosTransaction(
     onResult: ((PosTransaction) -> Unit)? = null
 ) {
     val posTransactionDao by remember { lazy { get<PosDatabase>().posTransactionDao() } }
-    val (query, setQuery) = remember { mutableStateOf("") }
+    var query by rememberSaveable { mutableStateOf("") }
     val (period, setPeriod) = remember { mutableStateOf(periodList[1]) }
     val endDate = remember { Instant.now() }
     val startDate: Instant = remember(period) {
@@ -86,8 +85,9 @@ fun ComponentCallbacks.GetPosTransaction(
             item {
                 OutlinedTextField(
                     value = query,
-                    onValueChange = setQuery,
+                    onValueChange = { query = it },
                     label = { Text(text = "STAN or RRN") },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
@@ -143,10 +143,11 @@ fun ComponentCallbacks.GetPosTransaction(
             items(transactions.value, key = { it.id }) {
                 TransactionItem(transaction = it, onClick = {
                     onResult?.invoke(it)
-                    navController.setResult(it)
-                    if (popOnSelect) navController.popBackStack()
+                    if (popOnSelect) {
+                        navController.setResult(it)
+                        navController.popBackStack()
+                    }
                 })
-                Divider(startIndent = 16.dp)
             }
         }
     }
@@ -154,37 +155,41 @@ fun ComponentCallbacks.GetPosTransaction(
 
 @Composable
 private fun TransactionItem(transaction: PosTransaction, onClick: () -> Unit) {
-    val amount = remember {
-        CurrencyFormatter.format(transaction.amount?.toInt()?.times(100)?.toString())
-    }
+    val amount = transaction.amount ?: "NGN0.00"
     val prettyTime = remember { transaction.dateTime?.format("MM/dd/uuuu hh:mm:ss") }
     val captionColor = MaterialTheme.colors.onSurface.copy(alpha = 0.52f)
-    Row(
+    Column(
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .fillMaxWidth()
             .clickable(onClick = onClick)
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "${transaction.pan}, ${transaction.cardHolder}",
-                style = MaterialTheme.typography.subtitle1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
-            )
-            Text(
-                text = "$prettyTime \u2022 ${transaction.retrievalReferenceNumber}",
-                style = MaterialTheme.typography.caption,
-                color = captionColor,
-            )
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 10.dp)
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "${transaction.pan}, ${transaction.cardHolder}",
+                    style = MaterialTheme.typography.subtitle1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp)
+                )
+                Text(
+                    text = "$prettyTime \u2022 ${transaction.retrievalReferenceNumber}",
+                    style = MaterialTheme.typography.caption,
+                    color = captionColor,
+                )
+            }
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = amount,
+                    style = MaterialTheme.typography.subtitle1,
+                    color = captionColor,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
         }
-        Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = amount,
-                style = MaterialTheme.typography.subtitle1,
-                color = captionColor,
-                modifier = Modifier.padding(start = 4.dp)
-            )
-        }
+        Divider(startIndent = 16.dp)
     }
 }

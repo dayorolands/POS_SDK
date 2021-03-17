@@ -113,4 +113,11 @@
     <string name="pos_searching_for_mpos_devices">Searching for mPOS devices</string>
     <string name="settle">Settle</string>
     <string name="settling">Settling</string>
+    <string name="resolve_dispute">Resolve Dispute</string>
+    <string name="dispute_token">Dispute Token</string>
+    <string name="log_dispute">Log Dispute</string>
+    <string name="reset">Reset</string>
+    <string name="network_parameters">Network Parameters</string>
+    <string name="security">Security</string>
+    <string name="device">Device</string>
 </resources>

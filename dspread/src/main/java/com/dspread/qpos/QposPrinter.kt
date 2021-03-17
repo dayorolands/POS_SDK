@@ -127,6 +127,7 @@ class QposPrinter(
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
             type = "application/pdf"
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         context.startActivity(
             Intent.createChooser(

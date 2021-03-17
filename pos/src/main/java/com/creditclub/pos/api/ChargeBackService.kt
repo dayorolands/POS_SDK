@@ -12,7 +12,7 @@ interface ChargeBackService {
     suspend fun logDispute(
         @Query("agentPin") agentPin: String,
         @Body request: DisputedPosTransaction,
-    ): ApiResponse<Any>?
+    ): ApiResponse<String>?
 
     @POST("api/ChargeBack/GetDisputeDetailsByToken")
     suspend fun getDisputeDetailsByToken(
@@ -38,5 +38,5 @@ interface ChargeBackService {
         @Query("agentPhoneNumber") agentPhoneNumber: String?,
         @Query("agentPin") agentPin: String,
         @Query("disputeToken") disputeToken: String?,
-    ): ApiResponse<Any>?
+    ): ApiResponse<String>?
 }

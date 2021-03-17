@@ -2,8 +2,12 @@ package com.appzonegroup.creditclub.pos.service
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Resources
 import android.os.Looper
 import androidx.activity.ComponentActivity
+import androidx.annotation.RawRes
+import androidx.core.content.edit
+import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.models.IsoRequestLog
@@ -11,9 +15,8 @@ import com.appzonegroup.creditclub.pos.util.*
 import com.creditclub.core.CreditClubException
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
-import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.debugOnly
-import com.creditclub.core.util.delegates.jsonArrayStore
+import com.creditclub.core.util.delegates.defaultJson
 import com.creditclub.core.util.delegates.stringStore
 import com.creditclub.core.util.format
 import com.creditclub.core.util.safeRun
@@ -28,7 +31,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import org.jpos.iso.ISOMsg
 import org.json.JSONArray
 import org.json.JSONException
@@ -38,6 +40,7 @@ import org.koin.core.inject
 import java.security.SecureRandom
 import java.time.Instant
 import java.util.*
+import kotlin.reflect.KProperty
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/27/2019.
@@ -53,14 +56,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
     private val config: PosConfig by inject()
     private val database: PosDatabase by inject()
     private val localStorage: LocalStorage by inject()
-    private val gps: TrackGPS by inject()
-    private val json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
-        encodeDefaults = true
-    }
+    private val resources = context.resources
 
     override var masterKey by prefs.nonNullStringStore("MasterKey")
     override var sessionKey by prefs.nonNullStringStore("SessionKey")
@@ -68,12 +64,12 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
 
     override var managementDataString by prefs.nonNullStringStore("PFMD", "{}")
     override var updatedAt by prefs.stringStore("UpdatedAt")
-    override var capkList by prefs.jsonArrayStore("CAPK_ARRAY")
-    override var emvAidList by prefs.jsonArrayStore("EMV_APP_ARRAY")
+    override var capkList by ManagementDataDelegate("CAPK_ARRAY", R.raw.capk_data)
+    override var emvAidList by ManagementDataDelegate("EMV_APP_ARRAY", R.raw.emv_app_data)
 
     override val managementData
         get() = safeRun {
-            json.decodeFromString(ParameterObject.serializer(), managementDataString)
+            defaultJson.decodeFromString(ParameterObject.serializer(), managementDataString)
         }.data ?: ParameterObject()
 
     override suspend fun downloadKeys(activity: ComponentActivity) {
@@ -402,7 +398,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         return generateLog().apply {
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
-            gpsCoordinates = gps.geolocationString ?: "0.00;0.00"
+            gpsCoordinates = localStorage.lastKnownLocation ?: "0.00;0.00"
             nodeName = posMode.nodeName
             if (posMode is ConnectionInfo) {
                 connectionInfo = posMode
@@ -469,7 +465,8 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         return jsonArray
     }
 
-    class KeyDownloadException(message: String) : CreditClubException("Key Download Failed. $message")
+    class KeyDownloadException(message: String) :
+        CreditClubException("Key Download Failed. $message")
 
     class ParameterDownloadException(message: String) :
         CreditClubException("Parameter Download Failed. $message")
@@ -496,5 +493,30 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
 
         @SerialName("52")
         override var cardAcceptorLocation = ""
+    }
+
+    private inner class ManagementDataDelegate(
+        private val key: String,
+        @RawRes private val fallbackFileLocation: Int
+    ) {
+        private var jsonArray: JSONArray? = null
+        operator fun getValue(obj: Any, prop: KProperty<*>): JSONArray? {
+            if (jsonArray != null) return jsonArray
+            val value =
+                prefs.getString(key, null) ?: resources.readRawFileText(fallbackFileLocation)
+            jsonArray = JSONArray(value)
+            return jsonArray
+        }
+
+        operator fun setValue(obj: Any, prop: KProperty<*>, newValue: JSONArray?) {
+            jsonArray = newValue
+            prefs.edit {
+                putString(key, newValue?.toString())
+            }
+        }
+    }
+
+    private fun Resources.readRawFileText(@RawRes fileLocation: Int): String {
+        return openRawResource(fileLocation).bufferedReader().use { it.readText() }
     }
 }

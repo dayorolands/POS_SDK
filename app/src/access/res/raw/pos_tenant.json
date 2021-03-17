@@ -1,0 +1,13 @@
+{
+  "Routes": [
+    {
+      "Name": "EPMS",
+      "IPAddress": "196.6.103.73",
+      "Port": 5043,
+      "EnableSSL": true,
+      "Timeout": 60,
+      "Key1": "BF862532E057460B0823F1FD944C08D5",
+      "Key2": "0D3B01DAD0A26E58EAC4EF8662ADD6F2"
+    }
+  ]
+}

@@ -16,7 +16,6 @@ import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.service.ConfigService
-import com.appzonegroup.creditclub.pos.util.PosMode
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.api.BackendConfig
@@ -28,6 +27,7 @@ import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.jsonStore
 import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.api.posApiService
+import com.creditclub.pos.model.PosTenant
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.*
 import kotlinx.serialization.builtins.ListSerializer
@@ -38,6 +38,7 @@ import java.time.Instant
 
 class LoginActivity : CreditClubActivity(R.layout.activity_login) {
 
+    private val posTenant: PosTenant by inject()
     private val posPreferences: PosPreferences by inject()
     private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
 
@@ -339,7 +340,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
 
         if (Platform.isPOS) {
             val configHasChanged =
-                posConfig.terminalId != agent.terminalID // || posConfig.posModeStr != agent.posMode
+                posConfig.terminalId != agent.terminalID // || posConfig.remoteConnectionInfo.id != agent.posMode
 
             if (configHasChanged) {
                 val notificationCount = withContext(Dispatchers.IO) {
@@ -357,7 +358,8 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                 }
 
                 posConfig.remoteConnectionInfo =
-                    PosMode.values().find { it.id == agent.posMode } ?: PosMode.EPMS
+                    posTenant.infoList.find { it.id == agent.posMode }
+                        ?: posTenant.infoList.first()
                 posConfig.terminalId = agent.terminalID ?: ""
                 posParameter.reset()
             }

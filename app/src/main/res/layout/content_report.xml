@@ -86,7 +86,7 @@
                 android:text="Unknown report"
                 android:textAllCaps="true"
                 android:textColor="@color/white"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <ImageView
@@ -181,11 +181,104 @@
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:paddingBottom="100dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/totalCountLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dateSeparatorView" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@id/dateSeparatorView"
+            app:layout_constraintTop_toBottomOf="@id/container" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#2000"
+            app:layout_constraintTop_toBottomOf="@id/container" />
+
+        <LinearLayout
+            android:id="@+id/totalCountLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/spacer"
+            app:layout_constraintEnd_toStartOf="@id/agrSeparatorView"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:id="@+id/totalCountLabelTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:text="Total Count"
+                android:textAllCaps="true"
+                android:textColor="#881C1B1B" />
+
+            <TextView
+                android:id="@+id/totalCountContentTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingBottom="10dp"
+                android:text="0"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/agrSeparatorView"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="#2000"
+            app:layout_constraintBottom_toBottomOf="@id/totalCountLayout"
+            app:layout_constraintBottom_toTopOf="@id/spacer"
+            app:layout_constraintEnd_toStartOf="@id/totalVolumeLayout"
+            app:layout_constraintStart_toEndOf="@id/totalCountLayout"
+            app:layout_constraintTop_toTopOf="@id/totalCountLayout" />
+
+        <LinearLayout
+            android:id="@+id/totalVolumeLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/spacer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintStart_toEndOf="@id/agrSeparatorView">
+
+            <TextView
+                android:id="@+id/totalVolumeLabelTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:text="Total Volume"
+                android:textAllCaps="true"
+                android:textColor="#881C1B1B" />
+
+            <TextView
+                android:id="@+id/totalVolumeContentTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingBottom="10dp"
+                android:text="0"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/spacer"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/prevButton"

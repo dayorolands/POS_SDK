@@ -6,26 +6,25 @@ import android.provider.Settings.ACTION_APN_SETTINGS
 import android.text.InputType
 import android.view.MenuItem
 import android.view.View
-import androidx.databinding.DataBindingUtil
 import com.appzonegroup.creditclub.pos.databinding.ActivityNetworkParametersBinding
-import com.appzonegroup.creditclub.pos.databinding.NetworkSettingsItemBinding
 import com.appzonegroup.creditclub.pos.extension.apnInfo
 import com.appzonegroup.creditclub.pos.util.AppConstants
-import com.appzonegroup.creditclub.pos.util.PosMode
 import com.appzonegroup.creditclub.pos.widget.Dialogs
 import com.creditclub.core.ui.widget.DialogOptionItem
-import com.creditclub.core.ui.widget.TextFieldParams
+import com.creditclub.pos.model.PosTenant
+import com.creditclub.ui.dataBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
-
-class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
-    lateinit var binding: ActivityNetworkParametersBinding
+class TerminalOptionsActivity : PosActivity(R.layout.activity_network_parameters),
+    View.OnClickListener {
+    private val binding: ActivityNetworkParametersBinding by dataBinding()
+    private val posTenant: PosTenant by inject()
 
     override fun onClick(v: View?) {
-
         if (v?.id == R.id.terminal_id_item && !BuildConfig.DEBUG) {
             dialogProvider.showError("Terminal ID cannot be set manually. Please contact your administrator")
             return
@@ -35,12 +34,8 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
         val value: String?
         when (v?.id) {
             R.id.apn_item -> {
-//                hint = "APN"
-//                value = config.apn
-
                 val intent = Intent(ACTION_APN_SETTINGS)
                 startActivityForResult(intent, 0)
-
                 return
             }
             R.id.host_item -> {
@@ -116,18 +111,6 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
         }.show()
     }
 
-    fun resetNetwork(view: View?) {
-        config.run {
-            apn = AppConstants.APN
-            host = AppConstants.HOST
-            terminalId = AppConstants.TID
-            port = AppConstants.PORT
-            ip = AppConstants.IP
-            callHome = AppConstants.CALL_HOME
-        }
-        refresh()
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -140,7 +123,6 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_network_parameters)
 
         refresh()
 
@@ -152,11 +134,11 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
         binding.callHomeItem.cont.setOnClickListener(this)
 
         binding.posModeItem.run {
-            val posModeOptions = PosMode.values().map { DialogOptionItem(it.label) }
+            val posModeOptions = posTenant.infoList.map { DialogOptionItem(it.label) }
             cont.setOnClickListener {
                 dialogProvider.showOptions("Select POS mode", posModeOptions) {
                     onSubmit { position ->
-                        val newPosMode = PosMode.values()[position]
+                        val newPosMode = posTenant.infoList[position]
                         config.remoteConnectionInfo = newPosMode
                         binding.posMode = newPosMode.label
                     }
@@ -170,6 +152,18 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
 //                config.host = value
 //            }
 //        )
+
+        binding.resetNetworkBtn.setOnClickListener {
+            config.run {
+                apn = AppConstants.APN
+                host = AppConstants.HOST
+                terminalId = AppConstants.TID
+                port = AppConstants.PORT
+                ip = AppConstants.IP
+                callHome = AppConstants.CALL_HOME
+            }
+            refresh()
+        }
 
         val passwordType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
 
@@ -230,20 +224,5 @@ class TerminalOptionsActivity : PosActivity(), View.OnClickListener {
             android.R.id.home -> onBackPressed()
         }
         return true
-    }
-
-    private fun NetworkSettingsItemBinding.createValueChangeListener(
-        textFieldParams: TextFieldParams,
-        onChange: (String) -> Unit
-    ) {
-        cont.setOnClickListener {
-            dialogProvider.showInput(textFieldParams) {
-                onSubmit { newValue ->
-                    dismiss()
-                    value = newValue
-                    onChange(newValue)
-                }
-            }
-        }
     }
 }

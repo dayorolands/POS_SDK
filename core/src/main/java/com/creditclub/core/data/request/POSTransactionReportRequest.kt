@@ -8,12 +8,12 @@ import kotlinx.serialization.Serializable
  * Appzone Ltd
  */
 @Serializable
-class POSTransactionReportRequest {
-    var agentPhoneNumber: String? = ""
-    var institutionCode: String? = ""
-    var from: String? = ""
-    var to: String? = ""
-    var startIndex: String? = ""
-    var maxSize: String? = ""
-    var status: Int? = 3
-}
+data class POSTransactionReportRequest(
+    val agentPhoneNumber: String? = "",
+    val institutionCode: String? = "",
+    val from: String? = "",
+    val to: String? = "",
+    val startIndex: String? = "",
+    val maxSize: String? = "",
+    val status: Int? = 3,
+)

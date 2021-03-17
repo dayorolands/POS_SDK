@@ -1,22 +1,24 @@
 package com.creditclub.core.data.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Bank {
-
+@Parcelize
+data class Bank(
     @SerialName("Name")
-    var name: String? = null
+    val name: String? = null,
 
     @SerialName("ShortName")
-    var shortName: String? = null
+    val shortName: String? = null,
 
     @SerialName("BankCode")
-    var bankCode: String? = null
+    val bankCode: String? = null,
 
     @SerialName("Code")
-    var code: String? = null
-
+    val code: String? = null,
+) : Parcelable {
     override fun toString() = name ?: "Unnamed bank"
 }

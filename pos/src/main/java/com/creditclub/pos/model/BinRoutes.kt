@@ -1,8 +1,10 @@
 package com.creditclub.pos.model
 
+import android.os.Parcelable
 import com.creditclub.pos.DukptConfig
 import com.creditclub.pos.RemoteConnectionInfo
 import com.creditclub.pos.RequeryConfig
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -20,6 +22,7 @@ data class Route(
 )
 
 @Serializable
+@Parcelize
 data class ConnectionInfo(
     @SerialName("Name") override val nodeName: String,
     @SerialName("IPAddress") override val ip: String,
@@ -31,24 +34,30 @@ data class ConnectionInfo(
         timeout = 90,
         maxRetries = 1
     ),
-) : RemoteConnectionInfo {
+    @SerialName("Key1") override val key1: String = "3DFB3802940E8A546B3D38610852BA7A",
+    @SerialName("Key2") override val key2: String = "0234E39861D3405E7A6B3185BA675873",
+) : RemoteConnectionInfo, Parcelable {
     override val id: String get() = nodeName
     override val label: String get() = nodeName
-    override val key1: String get() = "3DFB3802940E8A546B3D38610852BA7A"
-    override val key2: String get() = "0234E39861D3405E7A6B3185BA675873"
 }
 
+@Parcelize
 @Serializable
+data class PosTenant(@SerialName("Routes") val infoList: List<ConnectionInfo>) : Parcelable
+
+@Serializable
+@Parcelize
 data class DukptConfigImpl(
     @SerialName("IPEK") override val ipek: String,
     @SerialName("KSN") override val ksn: String
-) : DukptConfig
+) : DukptConfig, Parcelable
 
 @Serializable
+@Parcelize
 data class RequeryConfigImpl(
     @SerialName("Timeout") override val timeout: Int,
     @SerialName("MaxRetries") override val maxRetries: Int
-) : RequeryConfig
+) : RequeryConfig, Parcelable
 
 fun List<BinRoutes>.getSupportedRoute(bin: String, amount: Double): ConnectionInfo? {
     for (binRoutes in this) {

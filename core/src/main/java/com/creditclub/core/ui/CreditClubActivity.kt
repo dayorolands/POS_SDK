@@ -60,7 +60,7 @@ abstract class CreditClubActivity : AppCompatActivity {
 
     protected val firebaseCrashlytics by lazy { FirebaseCrashlytics.getInstance() }
 
-    var TextView.value: String
+    inline var TextView.value: String
         get() = text.toString().trim { it <= ' ' }
         set(value) {
             text = value

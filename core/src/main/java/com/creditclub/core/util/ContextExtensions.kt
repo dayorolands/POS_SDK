@@ -4,8 +4,8 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.net.ConnectivityManager
 import android.util.Log
+import androidx.annotation.RawRes
 import com.creditclub.core.BuildConfig
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.data.CoreDatabase
@@ -14,10 +14,13 @@ import com.creditclub.core.data.model.DeviceTransactionInformation
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.type.TransactionCountType
+import com.creditclub.core.util.delegates.defaultJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.serializer
 
 
 /**
@@ -116,4 +119,13 @@ suspend inline fun Context.logFunctionUsage(fid: Int) = safeRunIO {
     }
 
     if (BuildConfig.DEBUG) Log.d("AppUsage", "Usage for function $fid -> $count")
+}
+
+inline fun <reified T : Any> Context.readRawJsonFile(
+    @RawRes fileLocation: Int,
+    serializer: KSerializer<T> = serializer()
+): T {
+    val fileContents =
+        resources.openRawResource(fileLocation).bufferedReader().use { it.readText() }
+    return defaultJson.decodeFromString(serializer, fileContents)
 }

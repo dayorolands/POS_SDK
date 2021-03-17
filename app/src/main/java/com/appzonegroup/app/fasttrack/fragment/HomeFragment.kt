@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -21,11 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,6 +52,7 @@ import com.creditclub.ui.UpdateActivity
 import com.creditclub.ui.theme.CreditClubTheme
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.statusBarsHeight
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
@@ -91,13 +91,60 @@ class HomeFragment : CreditClubFragment() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     private fun HomeContent() {
+        val coroutineScope = rememberCoroutineScope()
         val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
         val frequentFunctions = frequentFunctionsLive.observeAsState(emptyList())
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = { AppBar(scaffoldState = scaffoldState) },
             drawerContent = {
-                DrawerContent(scaffoldState)
+                LazyColumn(modifier = Modifier.weight(1f)) {
+                    item {
+                        DrawerContent(
+                            scaffoldState = scaffoldState,
+                            coroutineScope = coroutineScope,
+                        )
+                    }
+                }
+
+                if (Platform.isPOS && Platform.deviceType != 2) {
+                    DrawerRow(
+                        title = stringResource(R.string.update),
+                        icon = painterResource(R.drawable.ic_fa_arrow_down),
+                        onClick = {
+                            coroutineScope.launch { scaffoldState.drawerState.close() }
+                            startActivity(UpdateActivity::class.java)
+                        }
+                    )
+                }
+
+                debugOnly {
+                    Text(
+                        text = "For development use only",
+                        modifier = Modifier.padding(start = 16.dp, bottom = 5.dp),
+                        style = MaterialTheme.typography.caption,
+                        color = MaterialTheme.colors.onSurface.copy(0.5f),
+                    )
+                }
+
+                Text(
+                    text = "v${requireContext().packageInfo?.versionName}. Powered by CreditClub",
+                    modifier = Modifier.padding(start = 16.dp),
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.colors.onSurface.copy(0.5f),
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { requireActivity().logout() },
+                ) {
+                    Text(
+                        stringResource(R.string.logout),
+                        style = MaterialTheme.typography.h5,
+                        color = MaterialTheme.colors.primary,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                    )
+                }
             },
             backgroundColor = colorResource(R.color.menuBackground)
         ) {
@@ -168,7 +215,7 @@ class HomeFragment : CreditClubFragment() {
                             ),
                             RoundedCornerShape(15.dp),
                         )
-                    val menuButtonIconTint=colorResource(R.color.menuButtonIconTint)
+                    val menuButtonIconTint = colorResource(R.color.menuButtonIconTint)
                     val tint = if (menuButtonIconTint.alpha == 0f) {
                         LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                     } else {
@@ -212,9 +259,11 @@ class HomeFragment : CreditClubFragment() {
     }
 
     @Composable
-    private fun ColumnScope.DrawerContent(scaffoldState: ScaffoldState) {
+    private fun DrawerContent(
+        scaffoldState: ScaffoldState,
+        coroutineScope: CoroutineScope
+    ) {
         val agent = localStorage.agent
-        val coroutineScope = rememberCoroutineScope()
         val logoTint = colorResource(R.color.navHeaderLogoTint)
         Column(
             modifier = Modifier
@@ -305,48 +354,6 @@ class HomeFragment : CreditClubFragment() {
                 startActivity(FaqActivity::class.java)
             }
         )
-
-        if (Platform.isPOS && Platform.deviceType != 2) {
-            DrawerRow(
-                title = stringResource(R.string.update),
-                icon = painterResource(R.drawable.ic_fa_arrow_down),
-                onClick = {
-                    coroutineScope.launch { scaffoldState.drawerState.close() }
-                    startActivity(UpdateActivity::class.java)
-                }
-            )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        debugOnly {
-            Text(
-                text = "For development use only",
-                modifier = Modifier.padding(start = 16.dp, bottom = 5.dp),
-                style = MaterialTheme.typography.caption,
-                color = MaterialTheme.colors.onSurface.copy(0.5f),
-            )
-        }
-
-        Text(
-            text = "v${requireContext().packageInfo?.versionName}. Powered by CreditClub",
-            modifier = Modifier.padding(start = 16.dp),
-            style = MaterialTheme.typography.body1,
-            color = MaterialTheme.colors.onSurface.copy(0.5f),
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { requireActivity().logout() },
-        ) {
-            Text(
-                stringResource(R.string.logout),
-                style = MaterialTheme.typography.h5,
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-            )
-        }
     }
 
     @Composable

@@ -1,0 +1,55 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.creditclub.gtbank",
+  "variantName": "gtbankReleaseStaging",
+  "elements": [
+    {
+      "type": "UNIVERSAL",
+      "filters": [],
+      "versionCode": 30,
+      "versionName": "1.4.8-rc7",
+      "outputFile": "app-gtbank-universal-releaseStaging.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        }
+      ],
+      "versionCode": 30,
+      "versionName": "1.4.8-rc7",
+      "outputFile": "app-gtbank-armeabi-v7a-releaseStaging.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "arm64-v8a"
+        }
+      ],
+      "versionCode": 30,
+      "versionName": "1.4.8-rc7",
+      "outputFile": "app-gtbank-arm64-v8a-releaseStaging.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi"
+        }
+      ],
+      "versionCode": 30,
+      "versionName": "1.4.8-rc7",
+      "outputFile": "app-gtbank-armeabi-releaseStaging.apk"
+    }
+  ],
+  "elementType": "File"
+}

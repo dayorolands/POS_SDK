@@ -20,6 +20,7 @@ data class ApiResponse<T>(
     val data: T? = null,
 ) {
     fun isSuccessful() = status == "00"
+    fun isFailure() = status != "00"
 }
 
 val ApiResponse<*>?.isSuccessful: Boolean get() = this?.status == "00"

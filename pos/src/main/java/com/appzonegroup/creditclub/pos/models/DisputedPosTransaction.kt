@@ -1,13 +1,11 @@
 package com.appzonegroup.creditclub.pos.models
 
-import androidx.lifecycle.LiveData
-import androidx.room.*
 import com.creditclub.core.serializer.TimeInstantSerializer
-import com.creditclub.pos.model.ConnectionInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.koin.core.KoinComponent
+import java.text.NumberFormat
 import java.time.Instant
+import java.util.*
 
 @Serializable
 data class DisputedPosTransaction(
@@ -101,6 +99,10 @@ data class DisputedPosTransaction(
 )
 
 fun DisputedPosTransaction.Companion.from(posTransaction: PosTransaction) = posTransaction.run {
+    val currentLocale = Locale("ng", "NG")
+    val format: NumberFormat = NumberFormat.getCurrencyInstance(currentLocale)
+    format.currency = Currency.getInstance("NGN")
+    val number: Number? = format.parse(amount ?: "NGN0.0")
     DisputedPosTransaction(
         agentName = agentName,
         agentCode = agentCode,
@@ -110,7 +112,7 @@ fun DisputedPosTransaction.Companion.from(posTransaction: PosTransaction) = posT
         terminalId = terminalId,
         transactionType = transactionType,
         stan = stan,
-        amount = amount?.toDoubleOrNull() ?: 0.0,
+        amount = number?.toDouble() ?: 0.0,
         cardType = cardType,
         expiryDate = expiryDate,
         responseCode = responseCode,

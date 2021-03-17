@@ -22,12 +22,18 @@ class NetworkMetricsInterceptor : Interceptor, KoinComponent {
         val url = request.url
         val flowName = url.queryParameter("FlowName")
         val flowId = url.queryParameter("FlowID")
+        val newUrl = url.newBuilder()
+            .removeAllQueryParameters("FlowName")
+            .removeAllQueryParameters("FlowID")
+            .removeAllQueryParameters("agentPIN")
+            .build()
+
         val networkMeasurement = NetworkMeasurement(
             institutionCode = localStorage.institutionCode,
             agentPhoneNumber = localStorage.agentPhone,
             agentCode = localStorage.agent?.agentCode,
             gpsCoordinates = localStorage.lastKnownLocation,
-            url = url.toString(),
+            url = newUrl.toString().replace(',', '.'),
             method = request.method,
             requestTime = Instant.now(),
             appName = backendConfig.appName,

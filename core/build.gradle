@@ -4,6 +4,10 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlinx-serialization'
 
+kapt {
+    useBuildCache = true
+}
+
 android {
     compileSdkVersion versions.compileSdk
 
@@ -134,7 +138,7 @@ dependencies {
     api "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha03"
     api "androidx.navigation:navigation-compose:1.0.0-alpha08"
     // UI Tests
-    androidTestApi "androidx.compose.ui:ui-test-junit4:${versions.compose}"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:${versions.compose}"
 }
 
 repositories {

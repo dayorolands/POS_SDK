@@ -25,9 +25,9 @@
         android:orientation="vertical">
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/button"
             android:layout_width="100dp"
             android:layout_height="80dp"
-            android:id="@+id/button"
             android:layout_margin="3dp"
             android:clickable="true"
             android:focusable="true"
@@ -56,6 +56,7 @@
             android:textAlignment="center"
             android:textAllCaps="true"
             android:textColor="@color/menuButtonTextColor"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </LinearLayout>
 </layout>

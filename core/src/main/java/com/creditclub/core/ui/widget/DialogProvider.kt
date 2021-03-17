@@ -3,18 +3,14 @@ package com.creditclub.core.ui.widget
 import android.app.Dialog
 import android.content.Context
 import android.widget.EditText
+import androidx.annotation.StringRes
+import com.creditclub.core.R
 import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.util.showError
-import java.lang.Exception
 import java.time.LocalDate
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 6/26/2019.
- * Appzone Ltd
- */
 interface DialogProvider {
     val activity: CreditClubActivity
 
@@ -48,7 +44,11 @@ interface DialogProvider {
     ): Dialog
 
     fun showProgressBar(title: CharSequence): Dialog {
-        return showProgressBar(title, "Please wait", false, null)
+        return showProgressBar(title, context.getString(R.string.please_wait), false, null)
+    }
+
+    fun showProgressBar(@StringRes title: Int): Dialog {
+        return showProgressBar(context.getString(title), context.getString(R.string.please_wait), false, null)
     }
 
     fun showProgressBar(title: CharSequence, message: CharSequence?): Dialog {
@@ -121,6 +121,8 @@ interface DialogProvider {
                 onClose { continuation.resume(null) }
             }
         }
+
+    suspend fun getPin(@StringRes title: Int) = getPin(context.getString(title))
 
     suspend fun getConfirmation(title: CharSequence, subtitle: CharSequence = "") =
         suspendCoroutine<Boolean> { continuation ->

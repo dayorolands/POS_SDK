@@ -6,6 +6,14 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlin.reflect.KProperty
 
+val defaultJson = Json {
+    isLenient = true
+    ignoreUnknownKeys = true
+    allowSpecialFloatingPointValues = true
+    useArrayPolymorphism = true
+    encodeDefaults = true
+}
+
 class JsonStoreDelegate<T : Any>(
     private val prefs: SharedPreferences,
     private val key: String,

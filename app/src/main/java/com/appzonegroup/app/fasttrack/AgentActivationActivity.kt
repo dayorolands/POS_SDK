@@ -14,17 +14,19 @@ import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
 import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.extension.posSerialNumber
-import com.appzonegroup.creditclub.pos.util.PosMode
 import com.creditclub.core.data.model.AuthResponse
 import com.creditclub.core.data.request.PinChangeRequest
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.safeRunIO
+import com.creditclub.pos.model.PosTenant
 import com.creditclub.ui.dataBinding
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import org.koin.android.ext.android.inject
 
 class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activation) {
+    private val posTenant: PosTenant by inject()
     private val binding by dataBinding<ActivityAgentActivationBinding>()
 
     private var isActivation = false
@@ -229,7 +231,8 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
 
         if (Platform.isPOS) {
             posConfig.remoteConnectionInfo =
-                PosMode.values().find { it.id == agent.posMode } ?: PosMode.EPMS
+                posTenant.infoList.find { it.id == agent.posMode }
+                    ?: posTenant.infoList.first()
             posConfig.terminalId = agent.terminalID ?: ""
             posParameter.reset()
         }

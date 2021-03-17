@@ -81,7 +81,6 @@ fun <T> Select(
             modifier = Modifier
                 .matchParentSize()
                 .background(Color.Transparent)
-                .padding(10.dp)
                 .clickable(onClick = { setOpen(true) })
         )
     }

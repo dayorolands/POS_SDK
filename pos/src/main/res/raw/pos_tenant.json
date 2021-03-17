@@ -1,0 +1,40 @@
+{
+  "Routes": [
+    {
+      "Name": "EPMS",
+      "IPAddress": "196.6.103.73",
+      "Port": 5043,
+      "EnableSSL": true,
+      "Timeout": 60,
+      "Key1": "3DFB3802940E8A546B3D38610852BA7A",
+      "Key2": "0234E39861D3405E7A6B3185BA675873"
+    },
+    {
+      "Name": "POSVAS",
+      "IPAddress": "196.6.103.18",
+      "Port": 5023,
+      "EnableSSL": true,
+      "Timeout": 60,
+      "Key1": "C48A1564CBFB3213A485BCE9195D321C",
+      "Key2": "FE169BD37C34B06215E919C4D3F75E79"
+    },
+    {
+      "Name": "EPMS_TEST",
+      "IPAddress": "196.6.103.72",
+      "Port": 55533,
+      "EnableSSL": true,
+      "Timeout": 60,
+      "Key1": "5D25072F04832A2329D93E4F91BA23A2",
+      "Key2": "86CBCDE3B0A22354853E04521686863D"
+    },
+    {
+      "Name": "POSVAS_TEST",
+      "IPAddress": "196.6.103.10",
+      "Port": 55533,
+      "EnableSSL": true,
+      "Timeout": 60,
+      "Key1": "C48A1564CBFB3213A485BCE9195D321C",
+      "Key2": "FE169BD37C34B06215E919C4D3F75E79"
+    }
+  ]
+}

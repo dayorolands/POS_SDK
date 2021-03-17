@@ -89,7 +89,7 @@ fun ChargeBack(
         }
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (appBar, list, fab) = createRefs()
+        val (appBar, list, fab, resolveDisputeFab) = createRefs()
 
         CreditClubAppBar(
             title = "Chargeback Disputes",
@@ -199,7 +199,7 @@ fun ChargeBack(
                     }
                 }
             },
-            icon = { Icon(Icons.Filled.CreditCard, "") },
+//            icon = { Icon(Icons.Filled.CreditCard, "") },
             text = { Text("Log Dispute") },
             backgroundColor = MaterialTheme.colors.primary,
             contentColor = MaterialTheme.colors.onPrimary,
@@ -208,6 +208,30 @@ fun ChargeBack(
                 .constrainAs(fab) {
                     bottom.linkTo(parent.bottom)
                     end.linkTo(parent.end)
+                }
+                .padding(16.dp),
+        )
+
+        ExtendedFloatingActionButton(
+            onClick = {
+                navController.navigate("resolveDispute") {
+                    anim {
+                        popEnter = R.anim.fade_in
+                        popExit = R.anim.fade_out
+                        enter = R.anim.fade_in
+                        exit = R.anim.fade_out
+                    }
+                }
+            },
+//            icon = { Icon(Icons.Filled.CreditCard, "") },
+            text = { Text("Resolve Dispute") },
+            backgroundColor = MaterialTheme.colors.primary,
+            contentColor = MaterialTheme.colors.onPrimary,
+            elevation = FloatingActionButtonDefaults.elevation(8.dp),
+            modifier = Modifier
+                .constrainAs(resolveDisputeFab) {
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
                 }
                 .padding(16.dp),
         )

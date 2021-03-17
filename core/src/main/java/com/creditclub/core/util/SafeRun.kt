@@ -26,13 +26,13 @@ inline class SafeRunResult<out T>(val value: Any?) {
      * Returns `true` if this instance represents a successful outcome.
      * In this case [isFailure] returns `false`.
      */
-    val isSuccess: Boolean get() = value !is Failure
+    inline val isSuccess: Boolean get() = value !is Failure
 
     /**
      * Returns `true` if this instance represents a failed outcome.
      * In this case [isSuccess] returns `false`.
      */
-    val isFailure: Boolean get() = value is Failure
+    inline val isFailure: Boolean get() = value is Failure
 
     internal class Failure(
         @JvmField
@@ -49,9 +49,12 @@ inline class SafeRunResult<out T>(val value: Any?) {
  * make sure that this class is not exposed in ABI.
  */
 @PublishedApi
-@SinceKotlin("1.3")
 internal fun createFailure(exception: Exception): Any =
-    SafeRunResult.Failure(exception)
+    SafeRunResult.Failure(exception)@PublishedApi
+
+internal fun SafeRunResult<*>.throwOnFailure() {
+    if (value is SafeRunResult.Failure) throw value.exception
+}
 
 inline fun <T> safeRun(crossinline block: () -> T): SafeRunResult<T> {
     return try {

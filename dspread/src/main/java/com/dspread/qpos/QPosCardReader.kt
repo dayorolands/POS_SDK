@@ -176,8 +176,7 @@ class QPosCardReader(
     }
 
     private inline val DukptConfig.kcv: String
-        get() = TripleDesCipher(ipek.hexBytes).encrypt(ByteArray(8)).hexString
-//        get() = Dukpt.encryptTripleDes(ipek.hexBytes, ByteArray(8)).hexString
+        get() = TDES.tdesECBEncypt(ipek.padEnd(32,'0').hexBytes, ByteArray(8)).hexString
 
     private suspend fun connectDevice(device: BluetoothDevice): Boolean {
         dialogProvider.showProgressBar("Connecting to mPOS device")

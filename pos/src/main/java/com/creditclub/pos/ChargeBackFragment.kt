@@ -15,6 +15,7 @@ import com.creditclub.pos.api.ChargeBackService
 import com.creditclub.pos.ui.ChargeBack
 import com.creditclub.pos.ui.GetPosTransaction
 import com.creditclub.pos.ui.LogDispute
+import com.creditclub.pos.ui.ResolveDispute
 import com.creditclub.ui.theme.CreditClubTheme
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 
@@ -49,7 +50,13 @@ class ChargeBackFragment : CreditClubFragment() {
                             composable("logDispute") {
                                 LogDispute(
                                     navController = navController,
-//                                    onBackPressed = { findNavController().popBackStack() },
+                                    dialogProvider = dialogProvider,
+                                )
+                            }
+
+                            composable("resolveDispute") {
+                                ResolveDispute(
+                                    navController = navController,
                                     chargeBackService = chargeBackService,
                                     dialogProvider = dialogProvider,
                                     localStorage = localStorage,

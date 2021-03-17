@@ -18,6 +18,9 @@ class PosTransactionReport {
     @SerialName("totalCount")
     var totalCount = 0
 
+    @SerialName("totalAmount")
+    var totalAmount = 0.0
+
     @Serializable
     class Report {
         @SerialName("AgentAccountNumber")

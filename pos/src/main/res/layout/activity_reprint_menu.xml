@@ -10,7 +10,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#fff"
+        android:background="@color/menuBackground"
         tools:context=".ReprintMenuActivity">
 
         <RelativeLayout
@@ -18,16 +18,25 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <include
-                android:id="@+id/header"
-                layout="@layout/header"
-                app:hideBackButton='@{false}'
-                app:subtitle='@{"Reprint Menu"}' />
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:elevation="0dp"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+                    app:title="Reprint Menu" />
+
+            </com.google.android.material.appbar.AppBarLayout>
 
             <LinearLayout
                 android:id="@+id/cont"
                 style="@style/AppTheme.MenuLayout"
-                android:layout_below="@id/header">
+                android:layout_below="@id/appBar">
 
                 <com.google.android.flexbox.FlexboxLayout style="@style/AppTheme.MenuFlexLayout">
 

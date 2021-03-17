@@ -34,7 +34,7 @@ buildscript {
             'mockito'            : '2.23.0',
             'mockito_kotlin'     : '2.0.0-RC3',
             'navigation'         : '2.3.3',
-            'objectBox'          : '2.8.0',
+            'objectBox'          : '2.9.0',
             'okhttp'             : '4.9.0',
             'retrofit'           : '2.9.0',
             'room'               : '2.2.6',

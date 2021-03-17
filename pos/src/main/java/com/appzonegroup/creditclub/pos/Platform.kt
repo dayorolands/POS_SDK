@@ -8,9 +8,12 @@ import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
+import com.creditclub.core.util.readRawJsonFile
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.PosProviders
+import com.creditclub.pos.RemoteConnectionInfo
+import com.creditclub.pos.model.PosTenant
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.KoinComponent
 import org.koin.core.context.loadKoinModules
@@ -50,6 +53,10 @@ object Platform : KoinComponent {
 }
 
 val posModule = module {
+    single {
+        androidContext().readRawJsonFile(R.raw.pos_tenant, PosTenant.serializer())
+    }
+    single<RemoteConnectionInfo>(override = true) { get<PosTenant>().infoList.first() }
     single<PosConfig> { ConfigService(androidContext()) }
     single { PosDatabase.getInstance(androidContext()) }
     single<PosParameter>(override = true) {

@@ -3,6 +3,7 @@ package com.appzonegroup.creditclub.pos
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.databinding.ActivityReprintMenuBinding
 import com.appzonegroup.creditclub.pos.util.MenuPage
@@ -17,6 +18,8 @@ class ReprintMenuActivity : PosActivity(R.layout.activity_reprint_menu) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.reprintAnyButton.button.setOnClickListener {
             startActivity(

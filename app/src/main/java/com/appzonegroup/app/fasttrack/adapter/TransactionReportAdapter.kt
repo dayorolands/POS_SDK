@@ -173,7 +173,7 @@ class TransactionReportAdapter(
 
     inner class ViewHolder(val binding: ViewDataBinding) : SimpleAdapter.ViewHolder(binding.root)
 
-    interface OnPrintClickListener {
+    fun interface OnPrintClickListener {
         fun onClick(item: TransactionReport.ReportItem, type: TransactionType)
     }
 }
