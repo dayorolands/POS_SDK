@@ -20,6 +20,15 @@
     public static *** w(...);
     public static *** e(...);
 }
+# no logging in production
+-assumenosideeffects class android.util.Log {
+  v(...);
+  d(...);
+  i(...);
+  w(...);
+  e(...);
+  println(...);
+}
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:

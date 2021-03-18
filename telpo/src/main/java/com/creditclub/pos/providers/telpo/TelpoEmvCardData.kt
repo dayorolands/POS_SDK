@@ -6,7 +6,7 @@ import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
 import com.telpo.emv.EmvService
 import com.telpo.emv.EmvTLV
-import com.telpo.emv.util.StringUtil
+import com.telpo.emv.util.hexString
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 4/15/2019.
@@ -117,7 +117,7 @@ class TelpoEmvCardData constructor(
         return when (emvService?.Emv_GetTLV(tlv)) {
             EmvService.EMV_TRUE -> when {
                 hex -> String(tlv.Value)
-                else -> StringUtil.bytesToHexString(tlv.Value)
+                else -> tlv.Value.hexString
             }
             else -> ""
         }

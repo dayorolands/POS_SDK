@@ -7,7 +7,6 @@ import com.telpo.emv.EmvService;
 import com.telpo.emv.PaypassResult;
 import com.telpo.emv.util.StringUtil;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 public class StableAPPCAPK {

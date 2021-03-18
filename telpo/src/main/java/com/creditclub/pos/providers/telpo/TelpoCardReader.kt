@@ -13,9 +13,9 @@ import com.creditclub.pos.card.CardReaderEvent
 import com.creditclub.pos.card.CardReaderEventListener
 import com.telpo.emv.EmvParam
 import com.telpo.emv.EmvService
-import com.telpo.emv.util.StringUtil
 import com.telpo.pinpad.PinParam
 import com.telpo.pinpad.PinpadService
+import com.telpo.emv.util.hexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -105,7 +105,7 @@ class TelpoCardReader(
                         WakeUpAndUnlock(flow).run()
 
                         val pinStatusCode = PinpadService.TP_PinpadGetPin(param)
-                        val pinBlock = StringUtil.bytesToHexString(param.Pin_Block)
+                        val pinBlock = param.Pin_Block.hexString
                         log("TP_PinpadGetPin: $pinStatusCode\nPinBlock: $pinBlock")
                         emvListener.pinBlock = pinBlock
 
@@ -119,7 +119,7 @@ class TelpoCardReader(
                                 EmvService.ERR_NOPIN
                             }
                             pinStatusCode == PinpadService.PIN_OK -> {
-                                log("get pin success: " + StringUtil.bytesToHexString(param.Pin_Block))
+                                log("get pin success: ")
                                 EmvService.EMV_TRUE
                             }
                             pinStatusCode == PinpadService.PIN_ERROR_TIMEOUT -> {

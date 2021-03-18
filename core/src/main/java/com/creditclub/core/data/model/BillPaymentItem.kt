@@ -7,31 +7,25 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @Parcelize
-class BillPaymentItem : Parcelable {
+class BillPaymentItem(
     @SerialName("BillerId")
-    var billerId: Int? = null
+    var billerId: Int? = null,
 
     @SerialName("ID")
-    var id: String? = null
+    var id: String? = null,
 
     @SerialName("Code")
-    var paymentCodeField: String? = null
-    var principalAccountNumberField: String? = null
-    var surchargeAccountNumberField: String? = null
-    var narrationPrefixField: String? = null
-    var isCanModifyPriceField = false
+    var paymentCodeField: String? = null,
 
     @SerialName("Amount")
-    var amount: Double? = null
+    var amount: Double? = null,
 
-    var customerFieldOneField: String? = null
+    var customerFieldOneField: String? = null,
 
-    var customerFieldTwoField: String? = null
+    var customerFieldTwoField: String? = null,
 
     @SerialName("Name")
-    var name: String? = null
-
-    var propertyChanged: String? = null
-
+    var name: String? = null,
+) : Parcelable {
     override fun toString() = name ?: "Payment Item $id"
 }

@@ -58,7 +58,7 @@ fun GetBank(
     }
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (appBar, list) = createRefs()
+        val (appBar, list, textField) = createRefs()
 
         CreditClubAppBar(
             title = title,
@@ -76,12 +76,19 @@ fun GetBank(
             onValueChange = { query = it },
             label = { Text(text = "Bank Name") },
             modifier = Modifier
+                .constrainAs(textField) {
+                    top.linkTo(appBar.bottom)
+                    linkTo(
+                        start = parent.start,
+                        end = parent.end,
+                    )
+                }
                 .fillMaxWidth()
                 .padding(16.dp),
         )
         LazyColumn(
             modifier = Modifier.constrainAs(list) {
-                top.linkTo(appBar.bottom)
+                top.linkTo(textField.bottom)
                 linkTo(
                     start = parent.start,
                     end = parent.end,

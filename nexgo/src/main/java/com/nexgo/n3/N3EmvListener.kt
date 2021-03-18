@@ -51,7 +51,7 @@ class N3EmvListener(
     }
 
     override fun onTransInitBeforeGPO() {
-//        emvHandler2.setPureKernelCapab(byteArrayOf(0xE0.toByte(), 0x40.toByte(), 0xC8.toByte()))
+        emvHandler2.setPureKernelCapab(byteArrayOf(0xE0.toByte(), 0x40.toByte(), 0xC8.toByte()))
         emvHandler2.onSetTransInitBeforeGPOResponse(true)
     }
 

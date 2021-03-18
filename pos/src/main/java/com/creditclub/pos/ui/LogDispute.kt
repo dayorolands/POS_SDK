@@ -116,49 +116,51 @@ fun ComponentCallbacks.LogDispute(
                 return@LazyColumn
             }
             item {
-                OutlinedTextField(
-                    label = { Text(text = "Issuing Bank") },
-                    value = issuingBank.name ?: "",
-                    onValueChange = {},
-                    enabled = false,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                )
-                OutlinedTextField(
-                    value = firstName,
-                    onValueChange = { firstName = it },
-                    label = { Text(text = "Customer First Name") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                )
-                OutlinedTextField(
-                    value = lastName,
-                    onValueChange = { lastName = it },
-                    label = { Text(text = "Customer Last Name") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                )
-                OutlinedTextField(
-                    value = phoneNumber,
-                    onValueChange = { phoneNumber = it },
-                    label = { Text(text = "Customer Phone Number") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
-                )
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text(text = "Customer Email") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-                )
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    OutlinedTextField(
+                        label = { Text(text = "Issuing Bank") },
+                        value = issuingBank.name ?: "",
+                        onValueChange = {},
+                        enabled = false,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                    )
+                    OutlinedTextField(
+                        value = firstName,
+                        onValueChange = { firstName = it },
+                        label = { Text(text = "Customer First Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                    )
+                    OutlinedTextField(
+                        value = lastName,
+                        onValueChange = { lastName = it },
+                        label = { Text(text = "Customer Last Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                    )
+                    OutlinedTextField(
+                        value = phoneNumber,
+                        onValueChange = { phoneNumber = it },
+                        label = { Text(text = "Customer Phone Number") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
+                    )
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text(text = "Customer Email") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+                    )
+                }
             }
             if (errorMessage.isNotBlank()) {
                 item {
@@ -169,7 +171,7 @@ fun ComponentCallbacks.LogDispute(
         if (loadingMessage.isBlank()) {
             Button(
                 modifier = Modifier
-                    .padding(vertical = 16.dp)
+                    .padding(16.dp)
                     .height(45.dp)
                     .width(130.dp),
                 onClick = { coroutineScope.launch { logDispute() } }) {

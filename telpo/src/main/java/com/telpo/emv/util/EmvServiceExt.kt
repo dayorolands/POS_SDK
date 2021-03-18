@@ -20,7 +20,7 @@ fun EmvService.getValue(tag: Int, hex: Boolean = false): String {
     return when (Emv_GetTLV(tlv)) {
         EmvService.EMV_TRUE -> when {
             hex -> String(tlv.Value)
-            else -> StringUtil.bytesToHexString(tlv.Value)
+            else -> tlv.Value.hexString
         }
         else -> ""
     }

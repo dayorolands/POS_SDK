@@ -16,9 +16,8 @@ fun getDefaultCapkList(context: Context): List<CapkEntity> {
     val capkEntityList: MutableList<CapkEntity> = ArrayList()
     val gson = Gson()
     val parser = JsonParser()
-    val jsonArray: JsonArray?
-    jsonArray = parser.parse(context.readAssetsTxt("emv_capk.json")).asJsonArray
-    if (jsonArray == null) return emptyList()
+    val jsonArray: JsonArray = parser.parse(context.readAssetsTxt("emv_capk.json")).asJsonArray
+        ?: return emptyList()
     for (user in jsonArray) {
         val userBean = gson.fromJson(user, CapkEntity::class.java)
         capkEntityList.add(userBean)
@@ -31,9 +30,8 @@ fun getDefaultAidList(context: Context): List<AidEntity> {
     val aidEntityList: MutableList<AidEntity> = ArrayList()
     val gson = Gson()
     val parser = JsonParser()
-    val jsonArray: JsonArray?
-    jsonArray = parser.parse(context.readAssetsTxt("emv_aid.json")).asJsonArray
-    if (jsonArray == null) return emptyList()
+    val jsonArray: JsonArray = parser.parse(context.readAssetsTxt("emv_aid.json")).asJsonArray
+        ?: return emptyList()
     for (user in jsonArray) {
         val userBean = gson.fromJson(user, AidEntity::class.java)
         val jsonObject = user.asJsonObject
