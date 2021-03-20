@@ -21,12 +21,11 @@ import com.appzonegroup.creditclub.pos.models.PosTransaction
 import com.appzonegroup.creditclub.pos.models.from
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.includesSpecialCharacters
+import com.creditclub.core.util.isValidEmail
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.pos.api.ChargeBackService
-import com.creditclub.ui.CreditClubAppBar
-import com.creditclub.ui.ErrorFeedback
-import com.creditclub.ui.Loading
-import com.creditclub.ui.rememberRetrofitService
+import com.creditclub.ui.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -49,8 +48,29 @@ fun ComponentCallbacks.LogDispute(
     var errorMessage by remember { mutableStateOf("") }
 
     val logDispute: suspend CoroutineScope.() -> Unit =
-        remember(selectedTransaction, phoneNumber, firstName, lastName, email) {
+        remember(selectedTransaction, phoneNumber, firstName, lastName, email, issuingBank) {
             logDispute@{
+                if (issuingBank == null) {
+                    errorMessage = "Issuing bank is required"
+                    return@logDispute
+                }
+                if (firstName.isBlank() || firstName.includesSpecialCharacters()) {
+                    errorMessage = "Please enter a valid first name"
+                    return@logDispute
+                }
+                if (lastName.isBlank() || lastName.includesSpecialCharacters()) {
+                    errorMessage = "Please enter a valid last name"
+                    return@logDispute
+                }
+                if (phoneNumber.length != 11) {
+                    errorMessage = "Please enter a valid phone number"
+                    return@logDispute
+                }
+                if (email.isBlank() || !email.isValidEmail()) {
+                    errorMessage = "Please enter a valid email"
+                    return@logDispute
+                }
+
                 errorMessage = ""
                 if (selectedTransaction == null) return@logDispute
                 val agentPin = dialogProvider.getPin(R.string.agent_pin) ?: return@logDispute
@@ -60,7 +80,7 @@ fun ComponentCallbacks.LogDispute(
                     chargeBackService.logDispute(
                         agentPin = agentPin,
                         request = DisputedPosTransaction.from(selectedTransaction).copy(
-                            issuingBankName = issuingBank?.name,
+                            issuingBankName = issuingBank.name,
                             customerPhoneNumber = phoneNumber,
                             customerFirstName = firstName,
                             customerLastName = lastName,
@@ -164,7 +184,7 @@ fun ComponentCallbacks.LogDispute(
             }
             if (errorMessage.isNotBlank()) {
                 item {
-                    ErrorFeedback(errorMessage)
+                    ErrorMessage(errorMessage)
                 }
             }
         }

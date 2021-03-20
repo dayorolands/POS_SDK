@@ -12,20 +12,19 @@ import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.ui.widget.DialogOptionItem
 import com.creditclub.core.util.format
 import com.creditclub.pos.DukptConfig
-import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
 import com.creditclub.pos.card.CardTransactionStatus
 import com.creditclub.pos.extensions.hexBytes
-import com.creditclub.pos.utils.TripleDesCipher
+import com.creditclub.pos.utils.asDesEdeKey
+import com.creditclub.pos.utils.encrypt
 import com.dspread.R
 import com.dspread.qpos.utils.*
 import com.dspread.xpos.CQPOSService
 import com.dspread.xpos.QPOSService
 import org.koin.core.KoinComponent
 import org.koin.core.get
-import org.koin.core.inject
 import java.time.Instant
 import java.util.*
 import kotlin.coroutines.Continuation
@@ -926,9 +925,8 @@ class QPosListener(
             sessionData.getPosParameter?.invoke(pan, sessionData.amount / 100.0) ?: get()
         val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
         val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
-        val cipherKey = posParameter.pinKey.hexBytes
         val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
-        val tripleDesCipher = TripleDesCipher(cipherKey)
-        return tripleDesCipher.encrypt(cryptData).copyOf(8)
+        val secretKey = posParameter.pinKey.hexBytes.asDesEdeKey
+        return secretKey.encrypt(cryptData).copyOf(8)
     }
 }

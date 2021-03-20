@@ -54,8 +54,8 @@ fun ChargeBack(
     localStorage: LocalStorage,
     dialogProvider: DialogProvider,
 ) {
-    val (disputeStatus, setDisputeStatus) = rememberSaveable { mutableStateOf(statusList.first()) }
-    val (period, setPeriod) = rememberSaveable { mutableStateOf(periodList[1]) }
+    val (disputeStatus, setDisputeStatus) = remember { mutableStateOf(statusList.first()) }
+    val (period, setPeriod) = remember { mutableStateOf(periodList[1]) }
     val endDate = rememberSaveable(saver = LocalDateSaver) { LocalDate.now() }
     val startDate = remember(period) {
         when (period.value) {

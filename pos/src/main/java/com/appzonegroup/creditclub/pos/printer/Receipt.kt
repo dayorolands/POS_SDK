@@ -75,7 +75,7 @@ PAN Seq No: 01
 Cardholder: $cardHolder
 EXP:$cardExp
 Acquirer: ${context.getString(R.string.pos_acquirer)}
-PTSP:3GEE PAY
+PTSP:${context.getString(R.string.ptsp_name)}
 Verification Mode: PIN"""
                 )
             )

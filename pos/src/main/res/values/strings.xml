@@ -120,4 +120,5 @@
     <string name="network_parameters">Network Parameters</string>
     <string name="security">Security</string>
     <string name="device">Device</string>
+    <string name="ptsp_name">3GEE PAY</string>
 </resources>

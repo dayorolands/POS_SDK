@@ -1,10 +1,7 @@
 package com.creditclub.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -54,6 +51,31 @@ fun ErrorFeedback(errorMessage: String) {
         Text(
             text = errorMessage,
             textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.colors.onSurface.copy(0.52f),
+        )
+    }
+}
+
+@Composable
+fun ErrorMessage(content: String) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(30.dp)
+    ) {
+        Image(
+            painterResource(id = R.drawable.ic_sentiment_very_dissatisfied),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(end = 10.dp)
+                .size(24.dp),
+            colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface.copy(0.52f))
+        )
+        Text(
+            text = content,
             style = MaterialTheme.typography.subtitle1,
             color = MaterialTheme.colors.onSurface.copy(0.52f),
         )

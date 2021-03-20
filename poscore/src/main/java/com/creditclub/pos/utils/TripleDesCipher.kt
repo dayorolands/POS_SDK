@@ -1,27 +1,37 @@
 package com.creditclub.pos.utils
 
-import javax.crypto.Cipher
-import javax.crypto.SecretKey
-import javax.crypto.SecretKeyFactory
+import java.security.InvalidKeyException
+import java.security.NoSuchAlgorithmException
+import java.security.spec.InvalidKeySpecException
+import javax.crypto.*
 import javax.crypto.spec.DESedeKeySpec
 
-/**
- * Created by mac on 1/29/19.
- */
-
-inline class TripleDesCipher(private val rawkey: ByteArray) {
+inline class TripleDesCipher(private val rawKey: ByteArray) {
     @Throws(Exception::class)
-    fun readKey(rawkey: ByteArray): SecretKey {
-        val keyDes = if (rawkey.size == 8) {
+    fun encrypt(plain: ByteArray): ByteArray = rawKey.asDesEdeKey.encrypt(plain)
+
+    @Throws(Exception::class)
+    fun decrypt(encryptedData: ByteArray): ByteArray = rawKey.asDesEdeKey.decrypt(encryptedData)
+}
+
+inline val ByteArray.asDesEdeKey: SecretKey
+    @Throws(
+        InvalidKeyException::class,
+        NoSuchAlgorithmException::class,
+        InvalidKeySpecException::class,
+    )
+    get() {
+        val rawKey = this
+        val keyDes = if (rawKey.size == 8) {
             val keyDes = ByteArray(16)
-            System.arraycopy(rawkey, 0, keyDes, 0, 8)
-            System.arraycopy(rawkey, 0, keyDes, 8, 8)
+            System.arraycopy(rawKey, 0, keyDes, 0, 8)
+            System.arraycopy(rawKey, 0, keyDes, 8, 8)
 
             keyDes
-        } else  {
+        } else {
             val keyDes = ByteArray(24)
-            System.arraycopy(rawkey, 0, keyDes, 0, 16)
-            System.arraycopy(rawkey, 0, keyDes, 16, 8)
+            System.arraycopy(rawKey, 0, keyDes, 0, 16)
+            System.arraycopy(rawKey, 0, keyDes, 16, 8)
 
             keyDes
         }
@@ -31,19 +41,14 @@ inline class TripleDesCipher(private val rawkey: ByteArray) {
         return keyFactory.generateSecret(keySpec)
     }
 
-    @Throws(Exception::class)
-    fun encrypt(plain: ByteArray): ByteArray {
-        val cipher = Cipher.getInstance("DESede/ECB/NoPadding")
-        //final IvParameterSpec iv = new IvParameterSpec(new byte[8]);
-        cipher.init(Cipher.ENCRYPT_MODE, readKey(rawkey))
-        return cipher.doFinal(plain)
-    }
+fun SecretKey.encrypt(data: ByteArray, transformation: String = "DESede/ECB/NoPadding"): ByteArray {
+    val cipher = Cipher.getInstance(transformation)
+    cipher.init(Cipher.ENCRYPT_MODE, this)
+    return cipher.doFinal(data)
+}
 
-    @Throws(Exception::class)
-    fun decrypt(encryptedData: ByteArray): ByteArray {
-        val cipher = Cipher.getInstance("DESede/ECB/NoPadding")
-        //final IvParameterSpec iv = new IvParameterSpec(new byte[8]);
-        cipher.init(Cipher.DECRYPT_MODE, readKey(rawkey))
-        return cipher.doFinal(encryptedData)
-    }
+fun SecretKey.decrypt(data: ByteArray, transformation: String = "DESede/ECB/NoPadding"): ByteArray {
+    val cipher = Cipher.getInstance(transformation)
+    cipher.init(Cipher.DECRYPT_MODE, this)
+    return cipher.doFinal(data)
 }
