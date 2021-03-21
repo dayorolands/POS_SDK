@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,7 +34,7 @@ fun GetBank(
     val context = LocalContext.current
     val fundsTransferService: FundsTransferService by rememberRetrofitService()
     val localStorage: LocalStorage by rememberBean()
-    var query by rememberSaveable { mutableStateOf("") }
+    var query by remember { mutableStateOf("") }
     val (loading, setLoading) = remember { mutableStateOf(false) }
     val (errorMessage, setError) = remember { mutableStateOf("") }
     val issuingBanks by produceState(emptyList<Bank>()) {

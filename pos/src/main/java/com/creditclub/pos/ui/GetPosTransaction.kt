@@ -13,7 +13,6 @@ import androidx.compose.material.icons.outlined.CalendarViewMonth
 import androidx.compose.material.icons.outlined.CalendarViewWeek
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -45,7 +44,7 @@ fun ComponentCallbacks.GetPosTransaction(
     onResult: ((PosTransaction) -> Unit)? = null
 ) {
     val posTransactionDao by remember { lazy { get<PosDatabase>().posTransactionDao() } }
-    var query by rememberSaveable { mutableStateOf("") }
+    var query by remember { mutableStateOf("") }
     val (period, setPeriod) = remember { mutableStateOf(periodList[1]) }
     val endDate = remember { Instant.now() }
     val startDate: Instant = remember(period) {
