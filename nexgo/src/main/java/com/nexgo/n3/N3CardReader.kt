@@ -75,7 +75,7 @@ class N3CardReader(
         withContext(Dispatchers.IO) {
             try {
                 Runtime.getRuntime().exec("logcat -v time -f " + Environment.getExternalStorageDirectory().getPath()+"/" + "emvlog");
-            } catch (IOException e) {
+            } catch (e: IOException) {
                 e.printStackTrace();
             }
         }
