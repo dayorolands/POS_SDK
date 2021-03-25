@@ -1,5 +1,6 @@
 package com.nexgo.n3
 
+import android.os.Environment
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosManager
@@ -19,6 +20,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.text.SimpleDateFormat
 import java.util.*
+import java.lang.Runtime
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -69,6 +71,13 @@ class N3CardReader(
             }
             val emvListener = N3EmvListener(activity, deviceEngine, sessionData, continuation)
             emvHandler2.emvProcess(transData, emvListener)
+        }
+        withContext(Dispatchers.IO) {
+            try {
+                Runtime.getRuntime().exec("logcat -v time -f " + Environment.getExternalStorageDirectory().getPath()+"/" + "emvlog");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         dialogProvider.hideProgressBar()
         return cardData
