@@ -43,7 +43,7 @@ private val statusList = listOf(
 private val periodList = listOf(
     IntValueType(0, "Today"),
     IntValueType(1, "Last 7 days"),
-    IntValueType(2, "Last 30 days"),
+//    IntValueType(2, "Last 30 days"),
 )
 
 @Composable
@@ -60,7 +60,7 @@ fun ChargeBack(
     val startDate = remember(period) {
         when (period.value) {
             1 -> LocalDate.now().minusDays(6)
-            2 -> LocalDate.now().minusDays(30)
+//            2 -> LocalDate.now().minusDays(30)
             else -> LocalDate.now()
         }
     }

@@ -34,7 +34,7 @@ import java.time.temporal.ChronoUnit
 private val periodList = listOf(
     IntValueType(0, "Today"),
     IntValueType(1, "Last 7 days"),
-    IntValueType(2, "Last 30 days"),
+//    IntValueType(2, "Last 30 days"),
 )
 
 @Composable
@@ -50,12 +50,12 @@ fun ComponentCallbacks.GetPosTransaction(
     val startDate: Instant = remember(period) {
         when (period.value) {
             1 -> Instant.now().minus(6, ChronoUnit.DAYS)
-            2 -> Instant.now().minus(30, ChronoUnit.DAYS)
+//            2 -> Instant.now().minus(30, ChronoUnit.DAYS)
             else -> Instant.now()
         }
     }
     val transactions = remember(query, startDate, endDate) {
-        posTransactionDao.failed("%${query}%", startDate, endDate)
+        posTransactionDao.disputable("%${query}%", startDate, endDate)
     }.observeAsState(emptyList())
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
@@ -147,6 +147,10 @@ fun ComponentCallbacks.GetPosTransaction(
                         navController.popBackStack()
                     }
                 })
+            }
+
+            item {
+                Spacer(modifier = Modifier.size(50.dp))
             }
         }
     }

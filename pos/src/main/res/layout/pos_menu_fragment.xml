@@ -60,7 +60,6 @@
                     <include
                         android:id="@+id/reversal_button"
                         layout="@layout/card_menu_button"
-                        android:visibility="gone"
                         app:src='@{@drawable/ic_reversal}'
                         app:text='@{"Reversal"}' />
 
@@ -77,23 +76,10 @@
                         app:text='@{"Sales Completion"}' />
 
                     <include
-                        android:id="@+id/deposit_button"
-                        layout="@layout/card_menu_button"
-                        android:visibility="gone"
-                        app:src='@{@drawable/ic_reversal}'
-                        app:text='@{"deposit"}' />
-
-                    <include
                         android:id="@+id/balance_button"
                         layout="@layout/card_menu_button"
                         app:src='@{@drawable/ic_reversal}'
                         app:text='@{"Balance Inquiry"}' />
-
-                    <include
-                        android:id="@+id/bill_pay_button"
-                        layout="@layout/card_menu_button"
-                        app:src='@{@drawable/ic_pay_bills}'
-                        app:text='@{"bill pay"}' />
 
                     <include
                         android:id="@+id/cash_adv_button"

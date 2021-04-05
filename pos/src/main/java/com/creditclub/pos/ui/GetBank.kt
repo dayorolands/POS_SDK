@@ -49,11 +49,11 @@ fun GetBank(
             return@produceState
         }
         setError("")
-        value = response ?: emptyList()
+        value = response?.distinctBy { "${it.code}${it.bankCode}"  } ?: emptyList()
     }
     val filteredIssuingBanks = remember(query, issuingBanks) {
         if (query.isBlank()) issuingBanks
-        else issuingBanks.filter { it.name?.contains(query) ?: false }
+        else issuingBanks.filter { it.name?.contains(query, ignoreCase = true) ?: false }
     }
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {

@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.fragment.HomeFragmentDirections
-import com.appzonegroup.app.fasttrack.fragment.SubMenuFragmentDirections
 import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.model.BillCategory
@@ -129,7 +128,7 @@ fun CreditClubFragment.openPageById(id: Int) {
         }
 
         R.id.pay_bill_button -> {
-            findNavController().navigate(SubMenuFragmentDirections.actionMenuToBillPayment())
+            findNavController().navigate(R.id.action_to_bill_payment)
         }
 
         R.id.fn_bill_payment -> {
@@ -167,7 +166,7 @@ fun CreditClubFragment.openPageById(id: Int) {
         R.id.fn_faq -> startActivity(FaqActivity::class.java)
 
         R.id.collection_payment_button -> {
-            findNavController().navigate(R.id.action_menu_to_collection_payment)
+            findNavController().navigate(R.id.action_to_collection_payment)
         }
 
         R.id.fn_collections_payment -> {

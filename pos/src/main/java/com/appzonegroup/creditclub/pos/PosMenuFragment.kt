@@ -113,8 +113,6 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
         binding.authButton.button.setOnClickListener {
             startActivity(PreAuthActivity::class.java)
         }
-        binding.depositButton.button.setOnClickListener { showError("This function is disabled.") }
-        binding.billPayButton.button.setOnClickListener { showError("This function is disabled.") }
         binding.cashAdvButton.button.setOnClickListener {
             startActivity(CashAdvanceActivity::class.java)
         }

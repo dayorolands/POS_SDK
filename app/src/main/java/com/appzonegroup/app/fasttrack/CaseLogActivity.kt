@@ -2,6 +2,7 @@ package com.appzonegroup.app.fasttrack
 
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import androidx.activity.viewModels
 import com.appzonegroup.app.fasttrack.databinding.ActivityCaseLogBinding
 import com.appzonegroup.app.fasttrack.fragment.CaseLogViewModel
@@ -112,5 +113,15 @@ class CaseLogActivity : CreditClubActivity(R.layout.activity_case_log) {
                 }
             }
         } else showError(response.message ?: "An error occurred")
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                return true
+            }
+        }
+        return false
     }
 }

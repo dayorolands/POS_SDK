@@ -1,3 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item name="agent_change_pin_button" type="id" />
+    <item name="agent_balance_enquiry_button" type="id" />
+    <item name="case_logging_button" type="id" />
+    <item name="register_button" type="id" />
+    <item name="new_wallet_button" type="id" />
+    <item name="customer_balance_enquiry_button" type="id" />
+    <item name="customer_mini_statement_button" type="id" />
+    <item name="customer_change_pin_button" type="id" />
+    <item name="agent_mini_statement_button" type="id" />
+    <item name="deposit_button" type="id" />
+    <item name="token_withdrawal_button" type="id" />
+    <item name="card_withdrawal_button" type="id" />
+    <item name="pay_bill_button" type="id" />
+    <item name="airtime_button" type="id" />
+    <item name="funds_transfer_button" type="id" />
+    <item name="collection_payment_button" type="id" />
+    <item name="loan_request_button" type="id" />
 </resources>

@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.debug
 import com.creditclub.core.util.debugOnly
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosManagerCompanion
@@ -12,7 +13,7 @@ import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.TransactionType
 import com.creditclub.pos.extensions.*
 import com.creditclub.pos.printer.PosPrinter
-import com.nexgo.BuildConfig
+import com.nexgo.common.LogUtils
 import com.nexgo.oaf.apiv3.APIProxy
 import com.nexgo.oaf.apiv3.DeviceEngine
 import com.nexgo.oaf.apiv3.emv.AidEntity
@@ -29,7 +30,10 @@ class N3PosManager(private val activity: CreditClubActivity) : PosManager, KoinC
     private val posParameter: PosParameter by inject()
 
     override suspend fun loadEmv() {
-        emvHandler2.emvDebugLog(BuildConfig.DEBUG)
+        debugOnly {
+            emvHandler2.emvDebugLog(true)
+            LogUtils.setDebugEnable(true)
+        }
         sessionData.reset()
         injectAid()
         injectCapk()
@@ -63,11 +67,13 @@ class N3PosManager(private val activity: CreditClubActivity) : PosManager, KoinC
                 appVerNum = jsonObject.appVersion18
 //                RiskManData =
 //                    byteArrayOf(0x6C, 0xFF.toByte(), 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
+                onlinePinCap = 1
             }
             aidEntityList.add(aidEntity)
         }
         aidEntityList.addAll(getDefaultAidList(activity))
-        emvHandler2.setAidParaList(aidEntityList)
+        val result = emvHandler2.setAidParaList(aidEntityList)
+        debug("AID Injection result is $result")
     }
 
     private inline val String.prependLength get() = "${length / 2}${this}"
@@ -87,12 +93,13 @@ class N3PosManager(private val activity: CreditClubActivity) : PosManager, KoinC
                 modulus = jsonObject.modulus37.replace("\n", "")
                 exponent = jsonObject.exponent38
                 expireDate = byteArrayOf(37, 18, 49).hexString
-                checkSum = jsonObject.hash39
+//                checkSum = jsonObject.hash39
             }
             capkEntityList.add(capkEntity)
         }
         capkEntityList.addAll(getDefaultCapkList(activity))
-        emvHandler2.setCAPKList(capkEntityList)
+        val result = emvHandler2.setCAPKList(capkEntityList)
+        debug("CAPK Injection result is $result")
     }
 
     override fun cleanUpEmv() {

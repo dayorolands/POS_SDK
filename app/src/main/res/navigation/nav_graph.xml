@@ -15,6 +15,22 @@
         app:popEnterAnim="@anim/fade_in"
         app:popExitAnim="@anim/fade_out" />
 
+    <action
+        android:id="@+id/action_to_bill_payment"
+        app:destination="@id/billPaymentFragment"
+        app:enterAnim="@anim/fade_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/fade_out" />
+
+    <action
+        android:id="@+id/action_to_collection_payment"
+        app:destination="@id/collectionGraph"
+        app:enterAnim="@anim/fade_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/fade_out" />
+
     <fragment
         android:id="@+id/billPaymentFragment"
         android:name="com.appzonegroup.app.fasttrack.fragment.BillPaymentFragment"
@@ -32,18 +48,6 @@
         android:name="com.appzonegroup.app.fasttrack.fragment.HomeFragment"
         android:label="Home"
         tools:layout="@layout/home_fragment">
-        <action
-            android:id="@+id/action_home_to_sub_menu"
-            app:destination="@id/subMenuFragment"
-            app:enterAnim="@anim/fade_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/fade_out">
-            <argument
-                android:name="category"
-                android:defaultValue="0"
-                app:argType="integer" />
-        </action>
         <action
             android:id="@+id/action_home_to_bill_payment"
             app:destination="@id/billPaymentFragment"
@@ -65,31 +69,6 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/fade_out" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/subMenuFragment"
-        android:name="com.appzonegroup.app.fasttrack.fragment.SubMenuFragment"
-        android:label="Home"
-        tools:layout="@layout/sub_menu_fragment">
-        <action
-            android:id="@+id/action_menu_to_bill_payment"
-            app:destination="@id/billPaymentFragment"
-            app:enterAnim="@anim/fade_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/fade_out" />
-        <action
-            android:id="@+id/action_menu_to_collection_payment"
-            app:destination="@id/collectionGraph"
-            app:enterAnim="@anim/fade_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/fade_out" />
-        <argument
-            android:name="category"
-            android:defaultValue="0"
-            app:argType="integer" />
     </fragment>
 
     <navigation
