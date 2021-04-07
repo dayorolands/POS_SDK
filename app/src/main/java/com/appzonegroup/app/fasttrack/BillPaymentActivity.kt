@@ -47,6 +47,7 @@ class BillPaymentActivity : BaseActivity() {
     private val isAirtime by lazy { extras!!.getBoolean("isAirtime", false) }
     private val reference = UUID.randomUUID().toString()
     private val billsPaymentService by creditClubMiddleWareAPI.retrofit.service<BillsPaymentService>()
+    private val retrievalReferenceNumber = generateRRN()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,8 +98,11 @@ class BillPaymentActivity : BaseActivity() {
             binding.phoneEt.visibility = View.GONE
             binding.phoneTv.visibility = View.GONE
         }
-    }
 
+        binding.payBtn.setOnClickListener {
+            mainScope.launch { makeBillPayment() }
+        }
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -110,12 +114,7 @@ class BillPaymentActivity : BaseActivity() {
         return false
     }
 
-    internal fun indicateError(message: String, view: View?) {
-        showError(message)
-        view?.requestFocus()
-    }
-
-    fun makeBillPayment(view: View) {
+    private suspend fun makeBillPayment() {
         if (!isAirtime) {
             binding.nameEt.text.toString().run {
                 if (isEmpty()) return showNotification("Customer Name is required")
@@ -166,6 +165,7 @@ class BillPaymentActivity : BaseActivity() {
             return showNotification("Customer Email is invalid")
         }
 
+        val pin = dialogProvider.getPin("Agent PIN") ?: return
         val paymentRequest = PayBillRequest(
             agentPhoneNumber = localStorage.agentPhone,
             institutionCode = localStorage.institutionCode,
@@ -190,57 +190,52 @@ class BillPaymentActivity : BaseActivity() {
             customerDepositSlipNumber = reference,
             geolocation = gps.geolocationString,
             isRecharge = isAirtime,
+            validationCode = null,
+            agentPin = pin,
+            retrievalReferenceNumber = retrievalReferenceNumber,
         )
 
-        requestPIN("Enter Agent Pin") {
-            onSubmit { pin ->
-                paymentRequest.agentPin = pin
+        showProgressBar("Processing...")
+        val (response, error) = safeRunIO {
+            billsPaymentService.runTransaction(paymentRequest)
+        }
+        hideProgressBar()
 
-                mainScope.launch {
-                    showProgressBar("Processing...")
-                    val (response, error) = safeRunIO {
-                        billsPaymentService.runTransaction(paymentRequest)
-                    }
-                    hideProgressBar()
+        val finishOnClose: DialogListenerBlock<*> = {
+            onClose {
+                setResult(1)
+                finish()
+            }
+        }
 
-                    val finishOnClose: DialogListenerBlock<*> = {
-                        onClose {
-                            setResult(1)
-                            finish()
-                        }
-                    }
+        if (error != null) return dialogProvider.showError(error, finishOnClose)
 
-                    if (error != null) return@launch dialogProvider.showError(error, finishOnClose)
+        if (response == null) {
+            showError("An error occurred", finishOnClose)
+            return
+        }
 
-                    if (response == null) {
-                        showError("An error occurred", finishOnClose)
-                        return@launch
-                    }
+        if (response.isSuccessFul == true) {
+            showSuccess(
+                response.responseMessage ?: "Transaction successful",
+                finishOnClose
+            )
+        } else {
+            showError(
+                response.responseMessage
+                    ?: getString(R.string.an_error_occurred_please_try_again_later),
+                finishOnClose
+            )
+        }
 
-                    if (response.isSuccessFul == true) {
-                        showSuccess(
-                            response.responseMessage ?: "Transaction successful",
-                            finishOnClose
-                        )
-                    } else {
-                        showError(
-                            response.responseMessage
-                                ?: getString(R.string.an_error_occurred_please_try_again_later),
-                            finishOnClose
-                        )
-                    }
+        if (Platform.hasPrinter) {
+            val receipt = BillsPaymentReceipt(
+                this@BillPaymentActivity,
+                paymentRequest
+            ).withResponse(response)
 
-                    if (Platform.hasPrinter) {
-                        val receipt = BillsPaymentReceipt(
-                            this@BillPaymentActivity,
-                            paymentRequest
-                        ).withResponse(response)
-
-                        printer.printAsync(receipt) { printerStatus ->
-                            if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
-                        }
-                    }
-                }
+            printer.printAsync(receipt) { printerStatus ->
+                if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
             }
         }
     }

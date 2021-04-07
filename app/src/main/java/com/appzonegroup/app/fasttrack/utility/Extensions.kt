@@ -2,6 +2,7 @@ package com.appzonegroup.app.fasttrack.utility
 
 import android.app.Activity
 import android.content.Intent
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.*
@@ -98,33 +99,10 @@ fun CreditClubFragment.openPageById(id: Int) {
 
             ioScope.launch { logFunctionUsage(FunctionIds.AIRTIME_RECHARGE) }
 
-            val billCategory = BillCategory().apply {
-                this.id = getString(R.string.bills_airtime_category_id)
-                name = "Mobile Recharge"
-                description = "Recharge your phone"
-            }
-
-            val i = Intent(requireContext(), BillerActivity::class.java).apply {
-                putExtra("categoryId", billCategory.id)
-                BillsLocalStorage.SaveValue(AppConstants.CATEGORYID, billCategory.id, baseContext)
-
-                putExtra("categoryName", billCategory.name)
-                BillsLocalStorage.SaveValue(
-                    AppConstants.CATEGORYNAME,
-                    billCategory.name,
-                    baseContext
-                )
-
-                putExtra("propertyChanged", billCategory.propertyChanged)
-                BillsLocalStorage.SaveValue(
-                    AppConstants.PROPERTYCHANGED,
-                    billCategory.propertyChanged,
-                    baseContext
-                )
-                putExtra("isAirtime", true)
-            }
-
-            startActivity(i)
+            findNavController().navigate(
+                R.id.action_to_bill_payment,
+                bundleOf("isAirtime" to true)
+            )
         }
 
         R.id.pay_bill_button -> {

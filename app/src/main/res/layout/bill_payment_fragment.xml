@@ -26,7 +26,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:elevation="0dp"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark"
-                app:title="IGR Collections" />
+                app:title="Bills Payment" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -50,7 +50,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    android:hint="Category">
+                    android:hint="Category"
+                    app:goneIf="@{viewModel.hideCategoryField}">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/category_input"
@@ -93,12 +94,16 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/field_one_input"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
                     android:hint="@{viewModel.fieldOneLabel}"
-                    app:goneUnless="@{viewModel.fieldOneIsNeeded}">
+                    app:endIconDrawable="@drawable/ic_baseline_search_24"
+                    app:endIconMode="custom"
+                    app:goneUnless="@{viewModel.fieldOneIsNeeded}"
+                    app:showEndIconIfPresent="@{viewModel.fieldOne}">
 
                     <com.google.android.material.textfield.TextInputEditText
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -142,10 +147,11 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginEnd="20dp"
                         android:layout_marginBottom="15dp"
                         android:layout_weight="1"
-                        android:hint="Customer Name">
+                        android:hint="Customer Name"
+                        app:goneIfPresent="@{viewModel.customerValidationName}">
 
                         <com.google.android.material.textfield.TextInputEditText
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -159,7 +165,6 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
                         android:layout_weight="1"
                         android:hint="Phone Number"
                         app:counterEnabled="true"
@@ -221,6 +226,24 @@
                             android:text="@={viewModel.customerEmail}" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Customer Name"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    app:goneUnlessPresent="@{viewModel.customerValidationName}" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.customerValidationName}"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="25sp"
+                    app:goneUnlessPresent="@{viewModel.customerValidationName}" />
+
             </LinearLayout>
         </ScrollView>
 

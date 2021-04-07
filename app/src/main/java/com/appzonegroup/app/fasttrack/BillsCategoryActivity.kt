@@ -72,30 +72,12 @@ class BillsCategoryActivity : CreditClubActivity(R.layout.activity_category), Vi
             AdapterView.OnItemClickListener { _, _, position, _ ->
                 val billCategory = result[position]
 
-
-                BillsLocalStorage.SaveValue(
-                    AppConstants.CATEGORYID,
-                    billCategory.id ?: billCategory.id,
-                    baseContext
-                )
-                BillsLocalStorage.SaveValue(
-                    AppConstants.PROPERTYCHANGED,
-                    billCategory.propertyChanged,
-                    baseContext
-                )
-                BillsLocalStorage.SaveValue(
-                    AppConstants.CATEGORYNAME,
-                    billCategory.name,
-                    baseContext
-                )
-
                 val i = Intent(
                     this@BillsCategoryActivity,
                     BillerActivity::class.java
                 ).apply {
                     putExtra("categoryId", billCategory.id ?: billCategory.id)
                     putExtra("categoryName", billCategory.name)
-                    putExtra("propertyChanged", billCategory.propertyChanged)
                     putExtra("customer", intent.getSerializableExtra("customer"))
                     putExtra("isAirtime", billCategory.isAirtime)
                 }

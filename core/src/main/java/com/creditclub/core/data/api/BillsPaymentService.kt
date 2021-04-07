@@ -1,8 +1,6 @@
 package com.creditclub.core.data.api
 
-import com.creditclub.core.data.model.BillCategory
-import com.creditclub.core.data.model.BillPaymentItem
-import com.creditclub.core.data.model.Biller
+import com.creditclub.core.data.model.*
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.data.response.PayBillResponse
 import retrofit2.http.Body
@@ -34,4 +32,7 @@ interface BillsPaymentService {
 
     @POST("api/PayBills/RunTransaction")
     suspend fun runTransaction(@Body body: PayBillRequest): PayBillResponse?
+
+    @POST("api/PayBills/ValidateCustomerInformation")
+    suspend fun validateCustomerInfo(@Body body: ValidateCustomerInfoRequest): ValidateCustomerInfoResponse?
 }

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.creditclub.core.data.model.BillCategory
 import com.creditclub.core.data.model.BillPaymentItem
 import com.creditclub.core.data.model.Biller
+import com.creditclub.core.data.model.ValidateCustomerInfoResponse
 
 class BillPaymentViewModel : ViewModel() {
     val category: MutableLiveData<BillCategory> = MutableLiveData()
@@ -35,8 +36,13 @@ class BillPaymentViewModel : ViewModel() {
     val fieldTwoLabel = Transformations.map(biller) { it?.customerField2 }
     val fieldTwoIsNeeded = Transformations.map(biller) { !it?.customerField2.isNullOrBlank() }
     val fieldTwo = MutableLiveData<String>()
+    val hideCategoryField = MutableLiveData<Boolean>()
 
     val customerEmail = MutableLiveData<String>()
+    val customerValidationResponse = MutableLiveData<ValidateCustomerInfoResponse>()
+    val customerValidationName = Transformations.map(customerValidationResponse) {
+        it?.customerName
+    }
 
     val isAirtime = Transformations.map(category) { it?.isAirtime == true }
 }

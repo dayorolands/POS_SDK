@@ -7,7 +7,6 @@ import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.BillPaymentFragmentBinding
 import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
@@ -15,6 +14,8 @@ import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.api.BillsPaymentService
+import com.creditclub.core.data.model.BillCategory
+import com.creditclub.core.data.model.ValidateCustomerInfoRequest
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.ui.CreditClubFragment
@@ -31,8 +32,8 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     private val viewModel by viewModels<BillPaymentViewModel>()
     private val binding by dataBinding<BillPaymentFragmentBinding>()
     override val functionId = FunctionIds.PAY_BILL
-    private val request = PayBillRequest()
     private val uniqueReference = UUID.randomUUID().toString()
+    private val retrievalReferenceNumber = generateRRN()
     private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
     private val billsPaymentService by creditClubMiddleWareAPI.retrofit.service<BillsPaymentService>()
 
@@ -45,8 +46,9 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val isAirtime = arguments?.getBoolean("isAirtime") ?: false
         binding.viewModel = viewModel
-        binding.toolbar.title = "Bill Payment"
+        binding.toolbar.title = if (isAirtime) "Airtime Purchase" else "Bill Payment"
 
         binding.completePaymentButton.setOnClickListener {
             mainScope.launch { completePayment() }
@@ -94,17 +96,31 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
                 }
             }
         }
-        mainScope.launch { loadCategories() }
+        if (isAirtime) {
+            viewModel.categoryName.value = "Airtime Purchase"
+            viewModel.hideCategoryField.value = true
+            viewModel.category.value = BillCategory(
+                id = getString(R.string.bills_airtime_category_id),
+                name = "Airtime Purchase",
+                description = "Recharge your phone",
+                isAirtime = true,
+            )
+        } else {
+            mainScope.launch { loadCategories() }
+        }
+        binding.fieldOneInput.setEndIconOnClickListener {
+            mainScope.launch { validateCustomerInformation() }
+        }
     }
 
     private inline fun <T> MutableLiveData<T>.onChange(crossinline block: (value: T?) -> Unit) {
         var oldValue = value
-        observe(viewLifecycleOwner, Observer {
+        observe(viewLifecycleOwner) {
             if (it != oldValue) {
                 oldValue = it
                 block(it)
             }
-        })
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -113,7 +129,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         autoCompleteTextView: AutoCompleteTextView,
         crossinline mapFunction: List<T>.() -> List<Any>
     ) {
-        observe(viewLifecycleOwner, Observer { list ->
+        observe(viewLifecycleOwner) { list ->
             val items = list?.mapFunction() ?: emptyList()
             val adapter = ArrayAdapter(requireContext(), R.layout.list_item, items)
             autoCompleteTextView.setAdapter(adapter)
@@ -122,7 +138,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
                     selectedItemLiveData.postValue(parent.getItemAtPosition(position) as T)
                 }
             }
-        })
+        }
     }
 
     private suspend fun loadCategories() =
@@ -165,8 +181,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         }
     }
 
-    private suspend fun completePayment() {
-        val isAirtime = viewModel.category.value?.isAirtime ?: false
+    private suspend fun validateCustomerInformation() {
         val billerItem = viewModel.item.value
         val category = viewModel.category.value
         val biller = viewModel.biller.value
@@ -232,34 +247,77 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             return dialogProvider.showErrorAndWait("Customer Email is invalid")
         }
 
+        dialogProvider.showProgressBar("Validating customer details")
+        val (response, error) = safeRunIO {
+            billsPaymentService.validateCustomerInfo(
+                ValidateCustomerInfoRequest(
+                    amount = billerItem.amount!!,
+                    billerId = biller.id!!,
+                    customerId = viewModel.fieldOne.value!!,
+                    institutionCode = localStorage.institutionCode!!,
+                )
+            )
+        }
+        dialogProvider.hideProgressBar()
+
+        if (error != null) return dialogProvider.showErrorAndWait(error)
+        if (response == null) {
+            dialogProvider.showErrorAndWait(getString(R.string.an_error_occurred_please_try_again_later))
+            return
+        }
+
+        if (!response.isSuccessful) {
+            val message = response.responseMessage
+            dialogProvider.showErrorAndWait(message)
+            return
+        }
+
+        viewModel.customerValidationResponse.value = response
+    }
+
+
+    private suspend fun completePayment() {
+        if (viewModel.customerValidationResponse.value == null) {
+            validateCustomerInformation()
+            if (viewModel.customerValidationResponse.value == null) {
+                return
+            }
+        }
+
+        val isAirtime = viewModel.category.value?.isAirtime ?: false
+        val billerItem = viewModel.item.value!!
+        val category = viewModel.category.value!!
+        val customerEmailValue = viewModel.customerEmail.value!!
+
         val pin = dialogProvider.getPin("Agent PIN") ?: return
         if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
-        request.apply {
-            agentPin = pin
-            agentPhoneNumber = localStorage.agentPhone
-            institutionCode = localStorage.institutionCode
-            customerId = viewModel.fieldOne.value
-            merchantBillerIdField = viewModel.item.value?.billerId?.toString()
-            billItemID = billerItem.id
-            amount = viewModel.amountString.value
-            billerCategoryID = category.id
-            customerEmail = customerEmailValue
-            accountNumber = localStorage.agentPhone
-            billerName = viewModel.biller.value?.name
-            paymentItemCode = billerItem.paymentCodeField
-            paymentItemName = billerItem.name
-            billerCategoryName = category.name
-            customerName = viewModel.customerName.value
+        val request = PayBillRequest(
+            agentPin = pin,
+            agentPhoneNumber = localStorage.agentPhone,
+            institutionCode = localStorage.institutionCode,
+            customerId = viewModel.fieldOne.value,
+            merchantBillerIdField = viewModel.item.value?.billerId?.toString(),
+            billItemID = billerItem.id,
+            amount = viewModel.amountString.value,
+            billerCategoryID = category.id,
+            customerEmail = customerEmailValue,
+            accountNumber = localStorage.agentPhone,
+            billerName = viewModel.biller.value?.name,
+            paymentItemCode = billerItem.paymentCodeField,
+            paymentItemName = billerItem.name,
+            billerCategoryName = category.name,
+            customerName = viewModel.customerName.value,
 
             customerPhone = if (isAirtime) {
                 viewModel.fieldOne.value
-            } else viewModel.customerPhone.value
-
-            customerDepositSlipNumber = uniqueReference
-            geolocation = gps.geolocationString
-            isRecharge = isAirtime
-        }
+            } else viewModel.customerPhone.value,
+            customerDepositSlipNumber = uniqueReference,
+            geolocation = gps.geolocationString,
+            isRecharge = isAirtime,
+            retrievalReferenceNumber = retrievalReferenceNumber,
+            validationCode = viewModel.customerValidationResponse.value!!.validationCode,
+        )
         dialogProvider.showProgressBar("Processing request")
         val (response, error) = safeRunIO {
             billsPaymentService.runTransaction(request)
@@ -268,7 +326,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         if (error != null) return dialogProvider.showErrorAndWait(error)
         if (response == null) {
             dialogProvider.showErrorAndWait("An error occurred. Please try again later")
-            printReceipt(null)
+            printReceipt(request, null)
             activity?.onBackPressed()
             return
         }
@@ -281,11 +339,11 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             dialogProvider.showErrorAndWait(message)
         }
 
-        printReceipt(response)
+        printReceipt(request, response)
         activity?.onBackPressed()
     }
 
-    private suspend fun printReceipt(response: PayBillResponse?) {
+    private suspend fun printReceipt(request: PayBillRequest, response: PayBillResponse?) {
         if (Platform.hasPrinter) {
             val receipt = BillsPaymentReceipt(requireContext(), request).withResponse(response)
             posPrinter.print(receipt)

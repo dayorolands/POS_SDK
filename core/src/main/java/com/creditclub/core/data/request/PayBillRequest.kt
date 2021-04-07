@@ -1,68 +1,70 @@
 package com.creditclub.core.data.request
 
-import com.creditclub.core.util.generateRRN
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class PayBillRequest(
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null,
+    val agentPhoneNumber: String?,
 
     @SerialName("AgentPin")
-    var agentPin: String? = null,
+    val agentPin: String?,
 
     @SerialName("BillerID")
-    var merchantBillerIdField: String? = null,
+    val merchantBillerIdField: String?,
 
     @SerialName("BillerName")
-    var billerName: String? = null,
+    val billerName: String?,
 
     @SerialName("BillerCategoryID")
-    var billerCategoryID: String? = null,
+    val billerCategoryID: String?,
 
     @SerialName("BillerCategoryName")
-    var billerCategoryName: String? = null,
+    val billerCategoryName: String?,
 
     @SerialName("PaymentItemID")
-    var billItemID: String? = null,
+    val billItemID: String?,
 
     @SerialName("PaymentItemCode")
-    var paymentItemCode: String? = null,
+    val paymentItemCode: String?,
 
     @SerialName("PaymentItemName")
-    var paymentItemName: String? = null,
+    val paymentItemName: String?,
 
     @SerialName("CustomerID")
-    var customerId: String? = null,
+    val customerId: String?,
 
     @SerialName("CustomerDepositSlipNumber")
-    var customerDepositSlipNumber: String? = null,
+    val customerDepositSlipNumber: String?,
 
     @SerialName("CustomerName")
-    var customerName: String? = null,
+    val customerName: String?,
 
     @SerialName("AccountNumber")
-    var accountNumber: String? = null,
+    val accountNumber: String?,
 
     @SerialName("CustomerEmail")
-    var customerEmail: String? = null,
+    val customerEmail: String?,
 
     @SerialName("CustomerPhone")
-    var customerPhone: String? = null,
+    val customerPhone: String?,
 
     @SerialName("Amount")
-    var amount: String? = null,
+    val amount: String?,
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = null,
+    val institutionCode: String?,
 
     @SerialName("Geolocation")
-    var geolocation: String? = null,
+    val geolocation: String?,
 
     @SerialName("IsRecharge")
-    var isRecharge: Boolean = false,
+    val isRecharge: Boolean,
 
     @SerialName("RetrievalReferenceNumber")
-    var retrievalReferenceNumber: String? = generateRRN(),
+    val retrievalReferenceNumber: String?,
+
+    @SerialName("ValidationCode")
+    val validationCode: String?,
 )
