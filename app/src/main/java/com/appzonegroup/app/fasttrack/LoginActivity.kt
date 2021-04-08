@@ -90,16 +90,14 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
     }
 
-    private suspend fun updateBinRoutes(showDialog: Boolean = false) {
+    private suspend fun updateBinRoutes() {
         posPreferences.clearBinRoutes()
-        if (showDialog) dialogProvider.showProgressBar("Downloading pos settings")
         val (response) = safeRunIO {
             creditClubMiddleWareAPI.posApiService.getBinRoutes(
                 localStorage.institutionCode,
                 localStorage.agentPhone
             )
         }
-        if (showDialog) dialogProvider.hideProgressBar()
         if (response?.isSuccessful() == true) {
             posPreferences.binRoutes = response.data
         }

@@ -7,7 +7,7 @@ import com.creditclub.pos.PosParameter
 import com.creditclub.pos.extensions.*
 import org.json.JSONObject
 
-private inline val String.fixedHex: String
+internal inline val String.fixedHex: String
     get() = if (length % 2 == 1) "0$this"
     else this
 
@@ -107,22 +107,15 @@ private fun PosParameter.mapAID(obj: JSONObject): String {
 }
 
 private fun mapCAPK(obj: JSONObject): String {
-    return "9F06" +
-            mapToTLV(obj.optString("35") ?: "") +
-            "9F22" +
-            mapToTLV(obj.optString("32") ?: "") +
+    return "9F06" + mapToTLV(obj.optString("35") ?: "") +
+            "9F22" + mapToTLV(obj.optString("32") ?: "") +
             "DF05" +  // NO VALUE - KEY
             "0" +  // NO VALUE - VALUE
-            "DF04" +
-            mapToTLV(obj.optString("38") ?: "") +
-            "DF02" +
-            mapToTLV(obj.optString("37") ?: "") +
-            "DF06" +
-            mapToTLV(obj.optString("36") ?: "") +
-            "DF07" +
-            mapToTLV(obj.optString("40") ?: "") +
-            "DF03" +
-            mapToTLV(obj.optString("39") ?: "")
+            "DF04" + mapToTLV(obj.optString("38") ?: "") +
+            "DF02" + mapToTLV(obj.optString("37") ?: "") +
+            "DF06" + mapToTLV(obj.optString("36") ?: "") +
+            "DF07" + mapToTLV(obj.optString("40") ?: "")
+//            "DF03" + mapToTLV(obj.optString("39") ?: "")
 }
 
 fun StringBuilder.appendTlv(

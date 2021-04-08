@@ -12,9 +12,9 @@ class RequestFailureInterceptor : Interceptor {
     val json = Json {
         isLenient = true
         ignoreUnknownKeys = true
-                allowSpecialFloatingPointValues = true
-                useArrayPolymorphism = true
-                encodeDefaults = true
+        allowSpecialFloatingPointValues = true
+        useArrayPolymorphism = true
+        encodeDefaults = true
     }
 
     @Throws(IOException::class)

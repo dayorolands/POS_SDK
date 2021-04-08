@@ -1,7 +1,6 @@
 package com.dspread.qpos
 
 import android.content.Context
-import android.content.Intent
 import com.creditclub.pos.card.TransactionType
 import com.dspread.R
 import com.dspread.qpos.utils.TLV
@@ -9,11 +8,6 @@ import com.dspread.qpos.utils.TLVParser
 import com.dspread.qpos.utils.hexBytes
 import com.dspread.xpos.QPOSService
 import java.util.*
-import kotlin.coroutines.suspendCoroutine
-import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import kotlin.coroutines.resume
 
 
 /**
@@ -76,29 +70,6 @@ fun QPOSService.TransactionResult.getMessage(context: Context): String {
     }
 }
 
-//fun QPOSService.updateKeys(context: Context, pubModel: String) {
-//    val keyIndex: Int = 0
-//    var digEnvelopStr: String? = null
-//    var posKeys: Poskeys? = null
-//    try {
-//        if (resetIpekFlag) {
-//            posKeys = DukptKeys()
-//        }
-//        if (resetMasterKeyFlag) {
-//            posKeys = TMKKey()
-//        }
-//        posKeys!!.rsA_public_key = pubModel
-//        digEnvelopStr = Envelope.getDigitalEnvelopStrByKey(
-//            context.assets.open("priva.pem"),
-//            posKeys, Poskeys.RSA_KEY_LEN.RSA_KEY_1024, keyIndex
-//        )
-//    } catch (e: Exception) {
-//        e.printStackTrace()
-//    }
-//
-//    udpateWorkKey(digEnvelopStr)
-//}
-
 inline val TransactionType.asQposTransactionType: QPOSService.TransactionType
     get() = when (this) {
         TransactionType.Purchase -> QPOSService.TransactionType.GOODS
@@ -134,11 +105,3 @@ fun List<TLV>.getValue(
 
     return value.toUpperCase(Locale.getDefault())
 }
-
-suspend fun ComponentActivity.getActivityResult(intent: Intent): ActivityResult =
-    suspendCoroutine { continuation ->
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-            continuation.resume(result)
-        }.launch(intent)
-    }
-

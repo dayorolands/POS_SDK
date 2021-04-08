@@ -13,7 +13,6 @@ import com.creditclub.pos.DukptConfig
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.card.*
-import com.creditclub.pos.utils.TripleDesCipher
 import com.dspread.qpos.injectKey.TDES
 import com.dspread.qpos.utils.FileUtils
 import com.dspread.qpos.utils.hexBytes
@@ -133,22 +132,8 @@ class QPosCardReader(
     }
 
     private suspend fun updateEmvConfig() {
-//        val emvAppCfg = FileUtils.readAssetsLine("emv_app.bin", activity)?.hexString
-//        val emvCapkCfg = FileUtils.readAssetsLine("emv_capk.bin", activity)?.hexString
         val emvProfileTlv = String(FileUtils.readAssetsLine("emv_profile_tlv.xml", activity))
-
-//        listener.waitForUnit { pos.updateEmvConfig(emvAppCfg, emvCapkCfg) }
         listener.waitForUnit { pos.updateEMVConfigByXml(emvProfileTlv) }
-//        for (emvAid in posParameter.emvAids) {
-//            listener.waitForUnit {
-//                pos.updateEmvAPPByTlv(QPOSService.EMVDataOperation.update, emvAid)
-//            }
-//        }
-//        for (capKey in posParameter.capKeys) {
-//            listener.waitForUnit {
-//                pos.updateEmvCAPKByTlv(QPOSService.EMVDataOperation.update, capKey)
-//            }
-//        }
     }
 
     private suspend fun loadKeys(cardNo: String) {
@@ -176,7 +161,7 @@ class QPosCardReader(
     }
 
     private inline val DukptConfig.kcv: String
-        get() = TDES.tdesECBEncypt(ipek.padEnd(32,'0').hexBytes, ByteArray(8)).hexString
+        get() = TDES.tdesECBEncypt(ipek.padEnd(32, '0').hexBytes, ByteArray(8)).hexString
 
     private suspend fun connectDevice(device: BluetoothDevice): Boolean {
         dialogProvider.showProgressBar("Connecting to mPOS device")

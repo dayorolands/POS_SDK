@@ -10,17 +10,19 @@ import android.os.StrictMode.VmPolicy
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.appzonegroup.app.fasttrack.model.AppConstants
-import com.appzonegroup.app.fasttrack.utility.Dialogs
+import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.localStorage
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 class SplashScreenActivity : AppCompatActivity() {
     private val mainScope = CoroutineScope(Dispatchers.Main)
+    private val dialogProvider: DialogProvider by inject { parametersOf(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,16 +155,14 @@ class SplashScreenActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         if (requestCode == MY_PERMISSIONS_REQUEST) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                mainScope.launch { loadPage() }
-            } else {
-                Dialogs.getAlertDialog(
-                    this,
-                    "The app cannot function without the permissions approved."
-                ).show()
-                //finish();
-                // permission denied, boo! Disable the
-                // functionality that depends on this permission.
+            mainScope.launch {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    loadPage()
+                } else {
+                    val message = "The app cannot function without the permissions approved."
+                    dialogProvider.showErrorAndWait(message)
+                    finish()
+                }
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)

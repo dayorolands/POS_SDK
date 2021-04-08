@@ -5,6 +5,7 @@ import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.util.debug
 import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.pos.EmvException
 import com.creditclub.pos.PosManager
@@ -15,6 +16,8 @@ import com.creditclub.pos.card.CardTransactionStatus
 import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.extensions.hexString
 import com.creditclub.pos.utils.TripleDesCipher
+import com.creditclub.pos.utils.asDesEdeKey
+import com.creditclub.pos.utils.encrypt
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.nexgo.R
 import com.nexgo.databinding.NexgoN3PinInputDialogBinding
@@ -25,7 +28,6 @@ import com.nexgo.oaf.apiv3.device.reader.CardInfoEntity
 import com.nexgo.oaf.apiv3.emv.*
 import org.koin.core.KoinComponent
 import org.koin.core.get
-import org.koin.core.inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
@@ -39,7 +41,6 @@ class N3EmvListener(
     private val cardData = N3CardData()
     private var filed55: String? = null
     private val prefs = activity.getEncryptedSharedPreferences("com.nexgo.n3.manager")
-    private val posParameter: PosParameter by inject()
 
     override fun onSelApp(
         appNameList: List<String>?,
@@ -76,30 +77,36 @@ class N3EmvListener(
         if (sessionData.cashBackAmount > 0) amountText = "$amount        " +
                 "Cashback Amount: ${amount.toCurrencyFormat()}"
         val dukptConfig = sessionData.getDukptConfig?.invoke(cardNo, amount)
+        val posParameter: PosParameter =
+            sessionData.getPosParameter?.invoke(cardNo, sessionData.amount / 100.0) ?: get()
         if (dukptConfig != null) {
-            val paddedIpek = dukptConfig.ipek.padStart(20, '0')
-            val paddedKsn = dukptConfig.ksn.padStart(20, '0')
+            val ipekBytes = dukptConfig.ipek.hexBytes
+            val ksnBytes = dukptConfig.ksn.hexBytes
 
-            val ipekBytes = paddedIpek.hexBytes
-            val ksnBytes = paddedKsn.hexBytes
-
-            val xorValue = ipekBytes xor ksnBytes
-            val kcv = xorValue.hexString.takeLast(6)
+            val cipheyKey = dukptConfig.ipek.padEnd(32, '0').hexBytes.asDesEdeKey
+            val kcv = cipheyKey.encrypt(ByteArray(8)).hexString
+            pinPad.setAlgorithmMode(AlgorithmModeEnum.DUKPT)
             if (prefs.getString("kcv", null) != kcv) {
-                pinPad.dukptKeyInject(
+                val result = pinPad.dukptKeyInject(
                     0,
                     DukptKeyTypeEnum.IPEK,
                     ipekBytes,
-                    ipekBytes.size, ksnBytes
+                    ipekBytes.size,
+                    ksnBytes
                 )
+                debug("Dukpt inject result is $result")
                 prefs.edit { putString("kcv", kcv) }
             }
             pinPad.dukptKsnIncrease(0)
         } else {
+            pinPad.setAlgorithmMode(AlgorithmModeEnum.DES)
             val masterKey = posParameter.masterKey.hexBytes
             pinPad.writeMKey(0, masterKey, masterKey.size)
             val pinKey = posParameter.pinKey.hexBytes
+            pinPad.writeWKey(0, WorkKeyTypeEnum.MACKEY, pinKey, pinKey.size)
             pinPad.writeWKey(0, WorkKeyTypeEnum.PINKEY, pinKey, pinKey.size)
+            pinPad.writeWKey(0, WorkKeyTypeEnum.TDKEY, pinKey, pinKey.size)
+            pinPad.writeWKey(0, WorkKeyTypeEnum.ENCRYPTIONKEY, pinKey, pinKey.size)
         }
         activity.runOnUiThread {
             var pwdText = ""
@@ -120,15 +127,22 @@ class N3EmvListener(
                 override fun onInputResult(retCode: Int, data: ByteArray?) {
                     dialog.dismiss()
                     if (retCode == SdkResult.Success || retCode == SdkResult.PinPad_No_Pin_Input || retCode == SdkResult.PinPad_Input_Cancel) {
-                        if (data != null && isOnlinePin) {
+                        if (retCode == SdkResult.Success && data != null && isOnlinePin) {
                             val temp = ByteArray(8)
                             System.arraycopy(data, 0, temp, 0, 8)
-//                        if (dukptConfig != null) {
-//                            val pinBlock =
-//                                pinPad.dukptEncrypt(0, DukptKeyModeEnum.REQUEST, data, data.size)
-//                            cardData.pinBlock = pinBlock.hexString
-//                            cardData.ksnData = pinPad.dukptCurrentKsn(0)?.hexString
-//                        }
+                            if (dukptConfig != null) {
+                                cardData.pinBlock = data.hexString
+                                cardData.ksnData = pinPad.dukptCurrentKsn(0)?.hexString
+                            } else {
+//                                val pan = emvHandler2.getValue(0x5A, hex = false, fPadded = true)
+//                                val pin = String(data)
+//                                val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
+//                                val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
+//                                val cipherKey = posParameter.pinKey.hexBytes
+//                                val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
+//                                val tripleDesCipher = TripleDesCipher(cipherKey)
+//                                val encryptedPinBlock = tripleDesCipher.encrypt(cryptData).copyOf(8)
+                            }
                         }
                         emvHandler2.onSetPinInputResponse(
                             retCode != SdkResult.PinPad_Input_Cancel,
@@ -154,8 +168,12 @@ class N3EmvListener(
             pinPad.setPinKeyboardMode(PinKeyboardModeEnum.RANDOM)
             if (isOnlinePin) {
                 pinPad.inputOnlinePin(
-                    intArrayOf(0x04), 60, cardNo.toByteArray(), 10,
-                    PinAlgorithmModeEnum.ISO9564FMT1, pinPadInputListener
+                    intArrayOf(0x04),
+                    60,
+                    cardNo.toByteArray(),
+                    0,
+                    PinAlgorithmModeEnum.ISO9564FMT1,
+                    pinPadInputListener,
                 )
             } else {
                 pinPad.inputOfflinePin(intArrayOf(0x04), 60, pinPadInputListener)
@@ -191,16 +209,13 @@ class N3EmvListener(
         when (retCode) {
             SdkResult.Emv_Success_Arpc_Fail, SdkResult.Success, SdkResult.Emv_Script_Fail -> {
                 val cardDataInfo = emvHandler2.emvCardDataInfo
+                if (filed55 == null) filed55 = getFiled55String()
+                cardData.mIccString = filed55!!
                 cardData.apply {
                     pan = cardDataInfo.cardNo
                     track2 = cardDataInfo.tk2
                     src = cardDataInfo.serviceCode
 //                    track1 = cardDataInfo.tk1
-                }
-                if (filed55 == null) filed55 = getFiled55String()
-                cardData.mIccString = filed55!!
-
-                cardData.apply {
                     status = CardTransactionStatus.Success
                     transactionAmount = emvHandler2.getValue(0x9F02)
 //                    pan = emvHandler2.getValue(0x5A, hex = false, fPadded = true)
@@ -270,16 +285,4 @@ class N3EmvListener(
         )
         return emvHandler2.getTlvByTags(tags)
     }
-
-    private inline val ByteArray.encryptedPinBlock: ByteArray
-        get() {
-            val pin = String(this)
-            val pan = emvHandler2.getValue(0x5A, hex = false, fPadded = true)
-            val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
-            val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
-            val cipherKey = get<PosParameter>().pinKey.hexBytes
-            val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
-            val tripleDesCipher = TripleDesCipher(cipherKey)
-            return tripleDesCipher.encrypt(cryptData).copyOf(8)
-        }
 }

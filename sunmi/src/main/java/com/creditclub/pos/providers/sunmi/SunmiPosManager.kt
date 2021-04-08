@@ -14,7 +14,8 @@ import com.creditclub.pos.card.CardReader
 import com.creditclub.pos.printer.MockPosPrinter
 import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.pos.providers.sunmi.emv.EmvUtil
-import com.creditclub.pos.providers.sunmi.utils.ThreadPoolUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.koin.dsl.module
 import sunmi.paylib.SunmiPayKernel
 import sunmi.paylib.SunmiPayKernel.ConnectCallback
@@ -28,7 +29,6 @@ class SunmiPosManager(private val context: Context) :
     PosManager {
     private val payKernel: SunmiPayKernel by lazy { SunmiPayKernel.getInstance() }
     private var isConnected = false
-    private var configMap: Map<String, String> = mapOf()
 
     override val cardReader: CardReader by lazy { SunmiCardReader() }
 
@@ -36,9 +36,14 @@ class SunmiPosManager(private val context: Context) :
 
     override suspend fun loadEmv() {
         payKernel.initPaySDK(context, connectCallback)
-        configMap = EmvUtil.getConfig("Nigeria")
+        val configMap = mapOf(
+            "countryCode" to "0566",
+            "capability" to "E040C8",
+            "5F2A" to "0566",
+            "5F36" to "00",
+        )
 
-        ThreadPoolUtil.executeInCachePool {
+        withContext(Dispatchers.IO) {
             EmvUtil.initKey(payKernel)
             EmvUtil.initAidAndRid(payKernel)
             EmvUtil.setTerminalParam(payKernel, configMap)

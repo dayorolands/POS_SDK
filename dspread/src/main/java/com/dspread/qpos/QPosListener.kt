@@ -706,11 +706,7 @@ class QPosListener(
 
     override fun onAddKey(arg0: Boolean) {}
 
-    override fun onQposKsnResult(arg0: Hashtable<String, String>) {
-        val pinKsn = arg0["pinKsn"]
-        val trackKsn = arg0["trackKsn"]
-        val emvKsn = arg0["emvKsn"]
-    }
+    override fun onQposKsnResult(arg0: Hashtable<String, String>) {}
 
     override fun onQposDoGetTradeLog(arg0: String, arg1: String) {}
 
@@ -719,13 +715,11 @@ class QPosListener(
         return usbManager.deviceList.values.map { it }
     }
 
-    private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
-
     private val mUsbReceiver: BroadcastReceiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
-            if (ACTION_USB_PERMISSION == action) {
+            if (Companion.ACTION_USB_PERMISSION == action) {
                 synchronized(this) {
                     val device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE) as UsbDevice?
                     if (intent.getBooleanExtra(
@@ -928,5 +922,9 @@ class QPosListener(
         val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
         val secretKey = posParameter.pinKey.hexBytes.asDesEdeKey
         return secretKey.encrypt(cryptData).copyOf(8)
+    }
+
+    companion object {
+        private const val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
     }
 }

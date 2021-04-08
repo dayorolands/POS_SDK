@@ -7,6 +7,7 @@ import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.*
+import com.creditclub.pos.extensions.hexBytes
 import com.nexgo.oaf.apiv3.DeviceEngine
 import com.nexgo.oaf.apiv3.device.reader.CardInfoEntity
 import com.nexgo.oaf.apiv3.device.reader.CardSlotTypeEnum
@@ -73,10 +74,7 @@ class N3CardReader(
                 }
             }
             val emvListener = N3EmvListener(activity, deviceEngine, sessionData, continuation)
-            emvHandler2.setTlv(
-                byteArrayOf(0x9F33.toByte()),
-                byteArrayOf(0xE0.toByte(), 0x40.toByte(), 0xC8.toByte())
-            )
+            emvHandler2.setTlv("9F33".hexBytes, "E040C8".hexBytes)
             emvHandler2.emvProcess(transData, emvListener)
         }
         withContext(Dispatchers.IO) {

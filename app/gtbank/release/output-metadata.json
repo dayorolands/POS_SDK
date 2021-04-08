@@ -5,14 +5,15 @@
     "kind": "Directory"
   },
   "applicationId": "com.creditclub.gtbank",
-  "variantName": "gtbankReleaseStaging",
+  "variantName": "gtbankRelease",
   "elements": [
     {
       "type": "UNIVERSAL",
       "filters": [],
+      "attributes": [],
       "versionCode": 30,
-      "versionName": "1.4.8-rc13",
-      "outputFile": "app-gtbank-universal-releaseStaging.apk"
+      "versionName": "1.4.8-rc14",
+      "outputFile": "app-gtbank-universal-release.apk"
     },
     {
       "type": "ONE_OF_MANY",
@@ -22,9 +23,10 @@
           "value": "armeabi"
         }
       ],
+      "attributes": [],
       "versionCode": 30,
-      "versionName": "1.4.8-rc13",
-      "outputFile": "app-gtbank-armeabi-releaseStaging.apk"
+      "versionName": "1.4.8-rc14",
+      "outputFile": "app-gtbank-armeabi-release.apk"
     },
     {
       "type": "ONE_OF_MANY",
@@ -34,9 +36,10 @@
           "value": "armeabi-v7a"
         }
       ],
+      "attributes": [],
       "versionCode": 30,
-      "versionName": "1.4.8-rc13",
-      "outputFile": "app-gtbank-armeabi-v7a-releaseStaging.apk"
+      "versionName": "1.4.8-rc14",
+      "outputFile": "app-gtbank-armeabi-v7a-release.apk"
     },
     {
       "type": "ONE_OF_MANY",
@@ -46,9 +49,10 @@
           "value": "arm64-v8a"
         }
       ],
+      "attributes": [],
       "versionCode": 30,
-      "versionName": "1.4.8-rc13",
-      "outputFile": "app-gtbank-arm64-v8a-releaseStaging.apk"
+      "versionName": "1.4.8-rc14",
+      "outputFile": "app-gtbank-arm64-v8a-release.apk"
     }
   ],
   "elementType": "File"
