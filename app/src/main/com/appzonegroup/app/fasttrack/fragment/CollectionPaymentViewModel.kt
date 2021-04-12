@@ -84,8 +84,10 @@ class CollectionPaymentViewModel : ViewModel() {
         @JvmStatic
         @BindingAdapter("app:showEndIconIfPresent")
         fun showEndIconIfPresent(textInputLayout: TextInputLayout, data: LiveData<*>) {
-            textInputLayout.isEndIconVisible = when (data.value) {
-                is String? -> !(data.value as? String).isNullOrBlank()
+            val value = data.value
+            textInputLayout.isEndIconVisible = when (value) {
+                is String? -> !value.isNullOrBlank()
+                is Boolean? -> value == true
                 else -> data.value != null
             }
         }

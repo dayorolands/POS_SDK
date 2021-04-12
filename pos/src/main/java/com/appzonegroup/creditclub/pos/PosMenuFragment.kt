@@ -186,11 +186,11 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
         val localDate = Instant.now().format("MMdd")
         if (localDate == parameters.updatedAt) return
 
-        dialogProvider.showProgressBar("Downloading Keys and Parameters")
+        dialogProvider.showProgressBar("Downloading Keys")
         for (parameterStore in parameterStores) {
             val (_, error) = safeRunIO {
-                parameters.downloadKeys(requireActivity())
-                parameters.downloadParameters(requireActivity())
+                parameterStore.downloadKeys(requireActivity())
+                parameterStore.downloadParameters(requireActivity())
             }
             if (error != null) {
                 dialogProvider.hideProgressBar()

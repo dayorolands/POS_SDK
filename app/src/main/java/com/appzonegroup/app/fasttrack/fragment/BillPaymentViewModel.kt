@@ -31,6 +31,9 @@ class BillPaymentViewModel : ViewModel() {
 
     val fieldOneLabel = Transformations.map(biller) { it?.customerField1 }
     val fieldOneIsNeeded = Transformations.map(biller) { !it?.customerField1.isNullOrBlank() }
+    val requiresValidation = Transformations.map(biller) {
+        !it?.customerField1.isNullOrBlank() && biller.value?.isAirtime == false
+    }
     val fieldOne = MutableLiveData<String>()
 
     val fieldTwoLabel = Transformations.map(biller) { it?.customerField2 }

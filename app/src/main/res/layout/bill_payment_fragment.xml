@@ -103,7 +103,7 @@
                     app:endIconDrawable="@drawable/ic_baseline_search_24"
                     app:endIconMode="custom"
                     app:goneUnless="@{viewModel.fieldOneIsNeeded}"
-                    app:showEndIconIfPresent="@{viewModel.fieldOne}">
+                    app:showEndIconIfPresent="@{viewModel.requiresValidation}">
 
                     <com.google.android.material.textfield.TextInputEditText
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

@@ -264,7 +264,10 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             return dialogProvider.showError("Please select an item")
         }
 
-        if (viewModel.customerValidationResponse.value == null && viewModel.fieldOneIsNeeded.value == true) {
+        if (viewModel.category.value?.isAirtime != true &&
+            viewModel.customerValidationResponse.value == null &&
+            viewModel.fieldOneIsNeeded.value == true
+        ) {
             validateCustomerInformation()
             if (viewModel.customerValidationResponse.value == null) {
                 return

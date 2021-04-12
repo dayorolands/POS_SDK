@@ -15,6 +15,7 @@ import com.appzonegroup.creditclub.pos.util.*
 import com.creditclub.core.CreditClubException
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
+import com.creditclub.core.util.debug
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.delegates.defaultJson
 import com.creditclub.core.util.delegates.stringStore
@@ -112,13 +113,13 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
         }
 
-        println("MESSAGE: " + String(output))
+        debug("MESSAGE: " + String(output))
         isoMsg.unpack(output)
 
         isoMsg.log()
 
         if (isoMsg.hasFailed) {
-            println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
+            debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw KeyDownloadException(isoMsg.responseMessage)
         }
         val cryptKey = posMode.key1.hexBytes xor posMode.key2.hexBytes
@@ -161,12 +162,12 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
         }
 
-        println("MESSAGE: " + String(output))
+        debug("MESSAGE: " + String(output))
         isoMsg.unpack(output)
         isoMsg.log()
 
         if (isoMsg.hasFailed) {
-            println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
+            debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw KeyDownloadException(isoMsg.responseMessage)
         }
         val cryptKey = masterKey.hexBytes
@@ -208,12 +209,12 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
         }
 
-        println("MESSAGE: " + String(output))
+        debug("MESSAGE: " + String(output))
         isoMsg.unpack(output)
 
         isoMsg.log()
         if (isoMsg.hasFailed) {
-            println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
+            debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw KeyDownloadException(isoMsg.responseMessage)
         }
 
@@ -268,11 +269,9 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
-            debugOnly { println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}") }
+            debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw ParameterDownloadException(isoMsg.responseMessage)
         }
-
-        println("Secured connection performed successfully")
 
         managementDataString = isoMsg.getString(62)?.parsePrivateFieldDataBlock()?.toString()
             ?: throw ParameterDownloadException("")
@@ -321,7 +320,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
-            debugOnly { println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}") }
+            debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw PublicKeyDownloadException(isoMsg.responseMessage)
         }
 
@@ -376,9 +375,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
-            debugOnly {
-                println("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
-            }
+            debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw EmvAidDownloadException(isoMsg.responseMessage)
         }
 
