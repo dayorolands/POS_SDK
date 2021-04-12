@@ -139,3 +139,7 @@
 -keepclasseswithmembers class com.creditclub.core.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
+-keep class org.json.** { *;}
+-keepclassmembers class * {
+   public <init> (org.json.JSONObject);
+}

@@ -10,21 +10,10 @@
     {
       "type": "UNIVERSAL",
       "filters": [],
+      "attributes": [],
       "versionCode": 30,
-      "versionName": "1.4.8-rc13",
+      "versionName": "1.4.8-rc15",
       "outputFile": "app-gtbank-universal-releaseStaging.apk"
-    },
-    {
-      "type": "ONE_OF_MANY",
-      "filters": [
-        {
-          "filterType": "ABI",
-          "value": "armeabi"
-        }
-      ],
-      "versionCode": 30,
-      "versionName": "1.4.8-rc13",
-      "outputFile": "app-gtbank-armeabi-releaseStaging.apk"
     },
     {
       "type": "ONE_OF_MANY",
@@ -34,9 +23,23 @@
           "value": "armeabi-v7a"
         }
       ],
+      "attributes": [],
       "versionCode": 30,
-      "versionName": "1.4.8-rc13",
+      "versionName": "1.4.8-rc15",
       "outputFile": "app-gtbank-armeabi-v7a-releaseStaging.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 30,
+      "versionName": "1.4.8-rc15",
+      "outputFile": "app-gtbank-armeabi-releaseStaging.apk"
     },
     {
       "type": "ONE_OF_MANY",
@@ -46,8 +49,9 @@
           "value": "arm64-v8a"
         }
       ],
+      "attributes": [],
       "versionCode": 30,
-      "versionName": "1.4.8-rc13",
+      "versionName": "1.4.8-rc15",
       "outputFile": "app-gtbank-arm64-v8a-releaseStaging.apk"
     }
   ],

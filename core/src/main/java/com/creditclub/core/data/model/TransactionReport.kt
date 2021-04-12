@@ -4,72 +4,70 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class TransactionReport {
-
+data class TransactionReport(
     @SerialName("Reports")
-    var reports: Array<ReportItem>? = null
+    val reports: List<ReportItem>? = null,
 
     @SerialName("totalCount")
-    var totalCount: Int = 0
-
+    val totalCount: Int = 0
+) {
     @Serializable
-    class ReportItem {
-
+    data class ReportItem(
         @SerialName("To")
-        var to: String? = null
+        val to: String? = null,
 
         @SerialName("From")
-        var from: String? = null
+        val from: String? = null,
 
         @SerialName("CustomerID")
-        var customerID: String? = null
+        val customerID: String? = null,
 
         @SerialName("CustomerName")
-        var customerName: String? = null
+        val customerName: String? = null,
 
         @SerialName("CustomerPhone")
-        var customerPhone: String? = null
+        val customerPhone: String? = null,
 
         @SerialName("ProductName")
-        var productName: String? = null
+        val productName: String? = null,
 
         @SerialName("ProductCode")
-        var productCode: String? = null
+        val productCode: String? = null,
 
         @SerialName("Amount")
-        var amount: Double? = null
+        val amount: Double? = null,
 
         @SerialName("Date")
-        var date: String? = null
+        val date: String? = null,
 
         @SerialName("TransactionTypeID")
-        var transactionTypeID: Int = 0
+        val transactionTypeID: Int = 0,
 
         @SerialName("TransactionTypeName")
-        var transactionTypeName: Int = 0
+        val transactionTypeName: Int = 0,
 
         @SerialName("FromPhoneNumber")
-        var fromPhoneNumber: String? = null
+        val fromPhoneNumber: String? = null,
 
         @SerialName("EncryptedPIN")
-        var encryptedPIN: String? = null
+        val encryptedPIN: String? = null,
 
         @SerialName("STAN")
-        var stan: String? = null
+        val stan: String? = null,
 
         @SerialName("SwitchTransactionTime")
-        var switchTransactionTime: String? = null
+        val switchTransactionTime: String? = null,
 
         @SerialName("IsActive")
-        var isActive: Boolean = false
+        val isActive: Boolean = false,
 
         @SerialName("DisplayMessage")
-        var displayMessage: String? = null
+        val displayMessage: String? = null,
 
         @SerialName("UniqueReference")
-        var uniqueReference: String? = null
+        val uniqueReference: String? = null,
 
         @SerialName("ID")
-        var id: Long = 0
-    }
+        val id: Long = 0
+    )
 }

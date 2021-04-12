@@ -108,7 +108,6 @@ class N3PosManager(private val activity: CreditClubActivity) : PosManager, KoinC
 
     private fun PosManager.SessionData.reset() {
         amount = 0L
-        pinBlock = null
         canRunTransaction = true
         canManageParameters = false
         transactionType = TransactionType.Unknown

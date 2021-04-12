@@ -15,7 +15,6 @@ import com.creditclub.pos.card.CardReaderEvent
 import com.creditclub.pos.card.CardTransactionStatus
 import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.extensions.hexString
-import com.creditclub.pos.utils.TripleDesCipher
 import com.creditclub.pos.utils.asDesEdeKey
 import com.creditclub.pos.utils.encrypt
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -102,11 +101,12 @@ class N3EmvListener(
             pinPad.setAlgorithmMode(AlgorithmModeEnum.DES)
             val masterKey = posParameter.masterKey.hexBytes
             pinPad.writeMKey(0, masterKey, masterKey.size)
-            val pinKey = posParameter.pinKey.hexBytes
-            pinPad.writeWKey(0, WorkKeyTypeEnum.MACKEY, pinKey, pinKey.size)
+            val tempPinKey = posParameter.pinKey.hexBytes
+            val pinKey = ByteArray(24)
+            System.arraycopy(tempPinKey, 0, pinKey, 0, 16)
+            System.arraycopy(tempPinKey, 0, pinKey, 16, 8)
+
             pinPad.writeWKey(0, WorkKeyTypeEnum.PINKEY, pinKey, pinKey.size)
-            pinPad.writeWKey(0, WorkKeyTypeEnum.TDKEY, pinKey, pinKey.size)
-            pinPad.writeWKey(0, WorkKeyTypeEnum.ENCRYPTIONKEY, pinKey, pinKey.size)
         }
         activity.runOnUiThread {
             var pwdText = ""
@@ -128,20 +128,21 @@ class N3EmvListener(
                     dialog.dismiss()
                     if (retCode == SdkResult.Success || retCode == SdkResult.PinPad_No_Pin_Input || retCode == SdkResult.PinPad_Input_Cancel) {
                         if (retCode == SdkResult.Success && data != null && isOnlinePin) {
-                            val temp = ByteArray(8)
-                            System.arraycopy(data, 0, temp, 0, 8)
                             if (dukptConfig != null) {
                                 cardData.pinBlock = data.hexString
                                 cardData.ksnData = pinPad.dukptCurrentKsn(0)?.hexString
                             } else {
-//                                val pan = emvHandler2.getValue(0x5A, hex = false, fPadded = true)
-//                                val pin = String(data)
-//                                val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
-//                                val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
-//                                val cipherKey = posParameter.pinKey.hexBytes
-//                                val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
-//                                val tripleDesCipher = TripleDesCipher(cipherKey)
-//                                val encryptedPinBlock = tripleDesCipher.encrypt(cryptData).copyOf(8)
+                                val secretKey = posParameter.pinKey.hexBytes.asDesEdeKey
+                                val pinPanXor = pinPad.desByWKey(
+                                    0,
+                                    WorkKeyTypeEnum.PINKEY,
+                                    data,
+                                    data.size,
+                                    DesKeyModeEnum.KEY_ALL,
+                                    CalcModeEnum.DECRYPT,
+                                )
+                                val encryptedPinBlock = secretKey.encrypt(pinPanXor).copyOf(8)
+                                cardData.pinBlock = encryptedPinBlock.hexString
                             }
                         }
                         emvHandler2.onSetPinInputResponse(

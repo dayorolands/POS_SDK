@@ -18,6 +18,8 @@ import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.ui.adapter.PosReportAdapter
 import com.creditclub.ui.dataBinding
 import com.appzonegroup.app.fasttrack.databinding.ActivityReportBinding
+import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
+import com.creditclub.core.data.request.FundsTransferRequest
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
@@ -190,7 +192,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                         binding.content.endDateContentTv.text.toString(),
                         selectedTransactionStatus.code,
                         startIndex,
-                        maxSize
+                        maxSize,
                     )
                 }
                 dialogProvider.hideProgressBar()
@@ -254,6 +256,23 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                 if (Platform.hasPrinter) {
                     posPrinter.print(CollectionPaymentReceipt(this, response))
                 }
+            }
+            TransactionType.FundsTransferCommercialBank,
+            TransactionType.LocalFundsTransfer -> {
+                val fundsTransferRequest = FundsTransferRequest(
+                    agentPhoneNumber = localStorage.agentPhone,
+                    institutionCode = localStorage.institutionCode,
+                    beneficiaryAccountName = item.to,
+                    amountInNaira = item.amount ?: 0.0,
+                    externalTransactionReference = item.uniqueReference,
+                )
+                posPrinter.print(
+                    FundsTransferReceipt(
+                        this,
+                        fundsTransferRequest,
+                        item.date?.replace("T", " ") ?: "",
+                    )
+                )
             }
             else -> {
             }

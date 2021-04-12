@@ -14,7 +14,6 @@ interface PosManager {
     open class SessionData {
         open var amount = 0L
         open var cashBackAmount = 0L
-        open var pinBlock: String? = null
         open var canRunTransaction = false
         open var canManageParameters = false
         open var transactionType: TransactionType = TransactionType.Unknown

@@ -9,8 +9,6 @@ import com.appzonegroup.creditclub.pos.receipt.TransactionReceipt
 import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
-import com.creditclub.core.util.toString
-import java.time.Instant
 
 
 /**
@@ -18,7 +16,11 @@ import java.time.Instant
  * Appzone Ltd
  */
 
-class FundsTransferReceipt(context: Context, val request: FundsTransferRequest) :
+class FundsTransferReceipt(
+    context: Context,
+    private val request: FundsTransferRequest,
+    private val transactionDate: String,
+) :
     TransactionReceipt(context) {
 
     override val nodes: List<PrintNode>
@@ -38,10 +40,9 @@ Agent Phone: ${request.agentPhoneNumber}
 --------------------------
 Amount NGN${request.amountInNaira}
 
-Beneficiary Name: ${request.beneficiaryAccountName}
-Beneficiary Account Number: ${request.beneficiaryAccountNumber.mask(4, 2)}
+Beneficiary: ${request.beneficiaryAccountName} ${request.beneficiaryAccountNumber.mask(4, 2)}
 
-Transaction Date: ${Instant.now().toString("dd-MM-yyyy hh:mm")}
+Transaction Date: $transactionDate
 RRN: ${request.externalTransactionReference}"""
                 )
             )

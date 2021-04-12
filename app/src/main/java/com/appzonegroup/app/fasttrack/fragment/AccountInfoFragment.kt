@@ -71,7 +71,7 @@ class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
 
     private fun next() {
         if (viewModel.bvn.value?.length != 11) {
-            dialogProvider.showError("Please enter the BVN")
+            dialogProvider.showError("Please enter a valid BVN")
             return
         }
 

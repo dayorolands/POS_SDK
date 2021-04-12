@@ -103,6 +103,14 @@
 
         </LinearLayout>
 
+        <Button
+            android:id="@+id/print_receipt_button"
+            style="@style/AppButton.Round.Primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="Print Receipt" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

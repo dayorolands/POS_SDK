@@ -82,6 +82,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
                 mainScope.launch {
                     item.value = null
                     itemName.value = null
+                    customerValidationResponse.value = null
                     if (newBiller != null) {
                         loadItems()
                     }
@@ -183,33 +184,25 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
     private suspend fun validateCustomerInformation() {
         val billerItem = viewModel.item.value
-        val category = viewModel.category.value
         val biller = viewModel.biller.value
 
-        if (category == null) {
-            return dialogProvider.showErrorAndWait("Please select a category")
-        }
-
-        if (biller == null) {
-            return dialogProvider.showError("Please select a biller")
-        }
-
-        if (billerItem == null) {
-            return dialogProvider.showError("Please select an item")
-        }
-
-        if (viewModel.category.value?.isAirtime != true) {
-            val customerName = viewModel.customerName.value
-            if (customerName.isNullOrBlank()) return dialogProvider.showError("Customer Name is required")
-            if (customerName.includesSpecialCharacters() || customerName.includesNumbers()) {
-                return dialogProvider.showError("Customer Name is invalid")
+        if (viewModel.fieldOneIsNeeded.value == true) {
+            val fieldOne = viewModel.fieldOne.value
+            if (fieldOne.isNullOrBlank()) {
+                return dialogProvider.showError("${viewModel.fieldOneLabel.value} should not be empty")
+            } else {
+                billerItem!!.customerFieldOneField = fieldOne
             }
-
-            val customerPhone = viewModel.customerPhone.value
-            if (customerPhone.isNullOrBlank()) return dialogProvider.showError("Customer Phone is required")
-            if (customerPhone.length != 11) return dialogProvider.showError("Customer Phone must be 11 digits")
         }
 
+        if (viewModel.fieldTwoIsNeeded.value == true) {
+            val fieldTwo = viewModel.fieldTwo.value
+            if (fieldTwo.isNullOrBlank()) {
+                return dialogProvider.showError("${viewModel.fieldTwoLabel.value} should not be empty")
+            } else {
+                billerItem!!.customerFieldOneField = fieldTwo
+            }
+        }
 
         if (viewModel.amountString.value.isNullOrBlank()) {
             return dialogProvider.showErrorAndWait("Amount is required")
@@ -220,39 +213,16 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             if (amountString.isNullOrBlank()) {
                 return dialogProvider.showError("Please enter an amount")
             } else {
-                billerItem.amount = amountString.toDoubleOrNull()
+                billerItem!!.amount = amountString.toDoubleOrNull()
             }
-        }
-
-        if (viewModel.fieldOneIsNeeded.value == true) {
-            val fieldOne = viewModel.fieldOne.value
-            if (fieldOne.isNullOrBlank()) {
-                return dialogProvider.showError("${viewModel.fieldOneLabel.value} should not be empty")
-            } else {
-                billerItem.customerFieldOneField = fieldOne
-            }
-        }
-
-        if (viewModel.fieldTwoIsNeeded.value == true) {
-            val fieldTwo = viewModel.fieldTwo.value
-            if (fieldTwo.isNullOrBlank()) {
-                return dialogProvider.showError("${viewModel.fieldTwoLabel.value} should not be empty")
-            } else {
-                billerItem.customerFieldOneField = fieldTwo
-            }
-        }
-
-        val customerEmailValue = viewModel.customerEmail.value
-        if (!customerEmailValue.isNullOrBlank() && !customerEmailValue.isValidEmail()) {
-            return dialogProvider.showErrorAndWait("Customer Email is invalid")
         }
 
         dialogProvider.showProgressBar("Validating customer details")
         val (response, error) = safeRunIO {
             billsPaymentService.validateCustomerInfo(
                 ValidateCustomerInfoRequest(
-                    amount = billerItem.amount!!,
-                    billerId = biller.id!!,
+                    amount = billerItem!!.amount!!,
+                    billerId = biller!!.id!!,
                     customerId = viewModel.fieldOne.value!!,
                     institutionCode = localStorage.institutionCode!!,
                 )
@@ -267,7 +237,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         }
 
         if (!response.isSuccessful) {
-            val message = response.responseMessage
+            val message = response.responseMessage ?: getString(R.string.network_error_message)
             dialogProvider.showErrorAndWait(message)
             return
         }
@@ -277,17 +247,46 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
 
     private suspend fun completePayment() {
-        if (viewModel.customerValidationResponse.value == null) {
+        val billerItem = viewModel.item.value
+        val category = viewModel.category.value
+        val isAirtime = viewModel.category.value?.isAirtime ?: false
+        val biller = viewModel.biller.value
+
+        if (category == null) {
+            return dialogProvider.showErrorAndWait("Please select a category")
+        }
+
+        if (biller == null) {
+            return dialogProvider.showError("Please select a biller")
+        }
+
+        if (billerItem == null) {
+            return dialogProvider.showError("Please select an item")
+        }
+
+        if (viewModel.customerValidationResponse.value == null && viewModel.fieldOneIsNeeded.value == true) {
             validateCustomerInformation()
             if (viewModel.customerValidationResponse.value == null) {
                 return
             }
         }
 
-        val isAirtime = viewModel.category.value?.isAirtime ?: false
-        val billerItem = viewModel.item.value!!
-        val category = viewModel.category.value!!
-        val customerEmailValue = viewModel.customerEmail.value!!
+        if (viewModel.category.value?.isAirtime != true) {
+            val customerName = viewModel.customerName.value
+            if (customerName.isNullOrBlank()) return dialogProvider.showError("Customer Name is required")
+            if (customerName.includesSpecialCharacters() || customerName.includesNumbers()) {
+                return dialogProvider.showError("Customer Name is invalid")
+            }
+
+            val customerPhone = viewModel.customerPhone.value
+            if (customerPhone.isNullOrBlank()) return dialogProvider.showError("Customer Phone is required")
+            if (customerPhone.length != 11) return dialogProvider.showError("Customer Phone must be 11 digits")
+        }
+
+        val customerEmailValue = viewModel.customerEmail.value
+        if (!customerEmailValue.isNullOrBlank() && !customerEmailValue.isValidEmail()) {
+            return dialogProvider.showErrorAndWait("Customer Email is invalid")
+        }
 
         val pin = dialogProvider.getPin("Agent PIN") ?: return
         if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
@@ -316,7 +315,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             geolocation = gps.geolocationString,
             isRecharge = isAirtime,
             retrievalReferenceNumber = retrievalReferenceNumber,
-            validationCode = viewModel.customerValidationResponse.value!!.validationCode,
+            validationCode = viewModel.customerValidationResponse.value?.validationCode,
         )
         dialogProvider.showProgressBar("Processing request")
         val (response, error) = safeRunIO {

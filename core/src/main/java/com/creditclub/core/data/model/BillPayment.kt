@@ -18,27 +18,27 @@ data class ValidateCustomerInfoRequest(
 @Serializable
 data class ValidateCustomerInfoResponse(
     @SerialName("AdditionalInformation")
-    val additionalInformation: String = "",
+    val additionalInformation: String? = null,
     @SerialName("CustomerAccountNumber")
-    val customerAccountNumber: String = "",
+    val customerAccountNumber: String? = null,
     @SerialName("CustomerAddress")
-    val customerAddress: String = "",
+    val customerAddress: String? = null,
     @SerialName("CustomerEmail")
-    val customerEmail: String = "",
+    val customerEmail: String? = null,
     @SerialName("CustomerID")
-    val customerID: String = "",
+    val customerID: String? = null,
     @SerialName("CustomerName")
-    val customerName: String = "",
+    val customerName: String? = null,
     @SerialName("CustomerPhone")
-    val customerPhone: String = "",
+    val customerPhone: String? = null,
     @SerialName("CustomerType")
-    val customerType: String = "",
+    val customerType: String? = null,
     @SerialName("IsSuccessful")
     val isSuccessful: Boolean = false,
     @SerialName("ResponseCode")
-    val responseCode: String = "",
+    val responseCode: String? = null,
     @SerialName("ResponseMessage")
-    val responseMessage: String = "",
+    val responseMessage: String? = null,
     @SerialName("ValidationCode")
-    val validationCode: String = "",
+    val validationCode: String? = null,
 )

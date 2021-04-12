@@ -17,15 +17,6 @@ class PayBillResponse {
     @SerialName("Reference")
     var reference: String? = ""
 
-    @SerialName("RequestStatus")
-    var requestStatus: Boolean? = false
-
-    @SerialName("ResponseDescription")
-    var responseDescription: String? = ""
-
-    @SerialName("ResponseStatus")
-    var responseStatus: String? = ""
-
     @SerialName("AdditionalInformation")
     var additionalInformation: String? = ""
 

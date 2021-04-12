@@ -121,6 +121,16 @@ class TransactionReportAdapter(
                     amountTv.text = item.amount?.toCurrencyFormat()
                     dateTv.text = item.date?.replace("T", " ")
                     phoneNoTv.text = item.fromPhoneNumber
+
+                    if ((transactionType == TransactionType.FundsTransferCommercialBank
+                                || transactionType == TransactionType.LocalFundsTransfer)
+                        && Platform.hasPrinter
+                    ) {
+                        printReceiptButton.visibility = View.VISIBLE
+                        printReceiptButton.setOnClickListener {
+                            listener?.onClick(item, transactionType)
+                        }
+                    } else printReceiptButton.visibility = View.GONE
                 }
 
                 is ItemReport3Binding -> {

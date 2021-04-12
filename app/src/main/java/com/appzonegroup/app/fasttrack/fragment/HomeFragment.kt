@@ -18,6 +18,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,18 +48,19 @@ import com.creditclub.core.AppFunctions
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.api.NotificationService
+import com.creditclub.core.data.api.StaticService
 import com.creditclub.core.data.model.AppFunctionUsage
 import com.creditclub.core.data.model.NotificationRequest
 import com.creditclub.core.data.prefs.LocalStorage
+import com.creditclub.core.data.request.BalanceEnquiryRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.ui.widget.DialogConfirmParams
-import com.creditclub.core.util.debugOnly
+import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.service
-import com.creditclub.core.util.packageInfo
-import com.creditclub.core.util.safeRunIO
-import com.creditclub.core.util.safeRunSuspend
 import com.creditclub.ui.UpdateActivity
 import com.creditclub.ui.rememberBean
+import com.creditclub.ui.rememberDialogProvider
+import com.creditclub.ui.rememberRetrofitService
 import com.creditclub.ui.theme.CreditClubTheme
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.statusBarsHeight
@@ -140,7 +143,6 @@ class HomeFragment : CreditClubFragment() {
             scaffoldState = scaffoldState,
             topBar = {
                 AppBar(
-                    title = title,
                     scaffoldState = scaffoldState,
                     mainNavController = mainNavController
                 )
@@ -200,9 +202,16 @@ class HomeFragment : CreditClubFragment() {
             Column(
                 modifier = Modifier.fillMaxSize(),
             ) {
+                Text(
+                    title,
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+                    style = MaterialTheme.typography.h4,
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp, vertical = 10.dp)
+                )
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 10.dp)
                         .weight(1f),
                 ) {
                     NavHost(
@@ -210,40 +219,77 @@ class HomeFragment : CreditClubFragment() {
                         startDestination = BottomNavScreens.Home.route
                     ) {
                         composable(BottomNavScreens.Home.route) {
-                            SubMenu {
-                                if (institutionConfig.categories.customers) {
+                            Column(modifier = Modifier.fillMaxSize()) {
+                                BalanceCard()
+                                LazyVerticalGrid(
+                                    cells = GridCells.Adaptive(minSize = 100.dp)
+                                ) {
+                                    if (institutionConfig.categories.customers) {
+                                        item {
+                                            SmallMenuButton(
+                                                text = "Customer",
+                                                icon = painterResource(R.drawable.payday_loan),
+                                                onClick = {
+                                                    homeNavController.navigate(
+                                                        BottomNavScreens.Customer.route
+                                                    ) {
+                                                        launchSingleTop = true
+                                                        popUpTo(BottomNavScreens.Home.route) {
+                                                            inclusive = false
+                                                        }
+                                                    }
+                                                },
+                                            )
+                                        }
+                                    }
+
                                     item {
-                                        MenuButton(
-                                            text = "Customer",
-                                            icon = painterResource(R.drawable.payday_loan),
-                                            onClick = { homeNavController.navigate(BottomNavScreens.Customer.route) },
+                                        SmallMenuButton(
+                                            text = "Agent",
+                                            icon = painterResource(R.drawable.income),
+                                            onClick = {
+                                                homeNavController.navigate(BottomNavScreens.Agent.route) {
+                                                    launchSingleTop = true
+                                                    popUpTo(BottomNavScreens.Home.route) {
+                                                        inclusive = false
+                                                    }
+                                                }
+                                            },
                                         )
                                     }
-                                }
 
-                                item {
-                                    MenuButton(
-                                        text = "Agent",
-                                        icon = painterResource(R.drawable.income),
-                                        onClick = { homeNavController.navigate(BottomNavScreens.Agent.route) },
-                                    )
-                                }
-
-                                item {
-                                    MenuButton(
-                                        text = "Transactions",
-                                        icon = painterResource(R.drawable.deposit),
-                                        onClick = { homeNavController.navigate(BottomNavScreens.Transactions.route) },
-                                    )
-                                }
-
-                                if (institutionConfig.categories.loans) {
                                     item {
-                                        MenuButton(
-                                            text = "Loans",
-                                            icon = painterResource(R.drawable.personal_income),
-                                            onClick = { homeNavController.navigate(BottomNavScreens.Loans.route) },
+                                        SmallMenuButton(
+                                            text = "Transactions",
+                                            icon = painterResource(R.drawable.deposit),
+                                            onClick = {
+                                                homeNavController.navigate(BottomNavScreens.Transactions.route) {
+                                                    launchSingleTop = true
+                                                    popUpTo(BottomNavScreens.Home.route) {
+                                                        inclusive = false
+                                                    }
+                                                }
+                                            },
                                         )
+                                    }
+
+                                    if (institutionConfig.categories.loans) {
+                                        item {
+                                            SmallMenuButton(
+                                                text = "Loans",
+                                                icon = painterResource(R.drawable.personal_income),
+                                                onClick = {
+                                                    homeNavController.navigate(
+                                                        BottomNavScreens.Loans.route
+                                                    ) {
+                                                        launchSingleTop = true
+                                                        popUpTo(BottomNavScreens.Home.route) {
+                                                            inclusive = false
+                                                        }
+                                                    }
+                                                },
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -271,13 +317,6 @@ class HomeFragment : CreditClubFragment() {
                                         onClick = { openPageById(R.id.agent_balance_enquiry_button) }
                                     )
                                 }
-                                item {
-                                    MenuButton(
-                                        text = "Case Logging",
-                                        icon = painterResource(R.drawable.income),
-                                        onClick = { openPageById(R.id.case_logging_button) }
-                                    )
-                                }
                             }
                         }
                         composable(BottomNavScreens.Customer.route) {
@@ -303,13 +342,6 @@ class HomeFragment : CreditClubFragment() {
                                         text = "Balance Enquiry",
                                         icon = painterResource(R.drawable.income),
                                         onClick = { openPageById(R.id.customer_balance_enquiry_button) }
-                                    )
-                                }
-                                item {
-                                    MenuButton(
-                                        text = "Mini Statement",
-                                        icon = painterResource(R.drawable.deposit),
-                                        onClick = { openPageById(R.id.customer_mini_statement_button) }
                                     )
                                 }
                                 if (flows.customerPinChange != null) {
@@ -568,7 +600,7 @@ private fun DrawerContent(
 }
 
 @Composable
-private fun AppBar(title: String, scaffoldState: ScaffoldState, mainNavController: NavController) {
+private fun AppBar(scaffoldState: ScaffoldState, mainNavController: NavController) {
     val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
     val coroutineScope = rememberCoroutineScope()
     // Draw a scrim over the status bar which matches the app bar
@@ -581,10 +613,7 @@ private fun AppBar(title: String, scaffoldState: ScaffoldState, mainNavControlle
     TopAppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = title,
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
-                    style = MaterialTheme.typography.h6,
+                Spacer(
                     modifier = Modifier
                         .weight(1f),
                 )
@@ -628,7 +657,12 @@ private fun SubMenuBottomNavigation(
     bottomNavigationItems: List<BottomNavScreens>
 ) {
     val currentRoute = currentRoute(navController)
-    BottomNavigation {
+    Divider()
+    BottomNavigation(
+        backgroundColor = colorResource(R.color.menuBackground),
+        contentColor = MaterialTheme.colors.onSurface,
+        elevation = 0.dp,
+    ) {
         for (screen in bottomNavigationItems) {
             BottomNavigationItem(
                 icon = {
@@ -644,7 +678,12 @@ private fun SubMenuBottomNavigation(
                     // This if check gives us a "singleTop" behavior where we do not create a
                     // second instance of the composable if we are already on that destination
                     if (currentRoute != screen.route) {
-                        navController.navigate(screen.route)
+                        navController.navigate(screen.route) {
+                            launchSingleTop = true
+                            popUpTo(BottomNavScreens.Home.route) {
+                                inclusive = screen.route == BottomNavScreens.Home.route
+                            }
+                        }
                     }
                 }
             )
@@ -751,6 +790,55 @@ private fun MenuButton(
 }
 
 @Composable
+private fun SmallMenuButton(
+    text: String,
+    icon: Painter,
+    onClick: () -> Unit,
+) {
+    val menuButtonIconTint = colorResource(R.color.menuButtonIconTint)
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .heightIn(100.dp, 150.dp)
+            .widthIn(120.dp, 200.dp)
+            .padding(8.dp),
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp)
+                .weight(1f)
+                .clickable(onClick = onClick),
+            elevation = 2.dp,
+            shape = RoundedCornerShape(20.dp),
+        ) {
+            Image(
+                icon,
+                contentDescription = null,
+                alignment = Alignment.Center,
+                modifier = Modifier
+                    .padding(30.dp)
+                    .size(35.dp),
+                colorFilter = if (menuButtonIconTint.alpha == 0f) null else ColorFilter.tint(
+                    menuButtonIconTint
+                )
+            )
+        }
+
+        Text(
+            text = text.toUpperCase(),
+            style = MaterialTheme.typography.button,
+            color = colorResource(R.color.menuButtonTextColor),
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
 private fun FrequentlyUsed(onItemClick: (id: Int) -> Unit) {
     val coreDatabase: CoreDatabase by rememberBean()
     val frequentFunctions = produceState(emptyList<AppFunctionUsage>()) {
@@ -813,6 +901,110 @@ private fun FrequentlyUsed(onItemClick: (id: Int) -> Unit) {
                                 modifier = Modifier.padding(start = 5.dp),
                             )
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BalanceCard() {
+    var balance by remember { mutableStateOf(0.0) }
+    var availableBalance by remember { mutableStateOf(0.0) }
+    var loading by remember { mutableStateOf(false) }
+    var visible by remember { mutableStateOf(false) }
+    val balanceFormatted = remember(availableBalance, visible) {
+        if (visible) availableBalance.toCurrencyFormat()
+        else "XXX,XXX.XX"
+    }
+    val ledgerBalanceFormatted = remember(balance, visible) {
+        if (visible) balance.toCurrencyFormat()
+        else "XX,XXX.XX"
+    }
+    val dialogProvider by rememberDialogProvider()
+    val localStorage: LocalStorage by rememberBean()
+    val staticService: StaticService by rememberRetrofitService()
+    val networkErrorMessage = stringResource(R.string.a_network_error_occurred)
+    val loadBalance: suspend CoroutineScope.() -> Unit = remember {
+        loadBalance@{
+            val pin = dialogProvider.getPin("Agent PIN") ?: return@loadBalance
+            if (pin.length != 4) {
+                dialogProvider.showError("Agent PIN must be 4 digits")
+                return@loadBalance
+            }
+            val request = BalanceEnquiryRequest().apply {
+                agentPin = pin
+                agentPhoneNumber = localStorage.agentPhone
+                institutionCode = localStorage.institutionCode
+            }
+
+            loading = true
+            val (response) = safeRunIO { staticService.balanceEnquiry(request) }
+            loading = false
+
+            if (response == null) return@loadBalance
+            if (!response.isSussessful) {
+                dialogProvider.showError(response.responseMessage ?: networkErrorMessage)
+                return@loadBalance
+            }
+
+            availableBalance = response.availableBalance
+            balance = response.balance
+            visible = true
+        }
+    }
+    val coroutineScope = rememberCoroutineScope()
+    Card(
+        modifier = Modifier
+            .heightIn(100.dp, 170.dp)
+            .fillMaxWidth()
+            .padding(6.dp),
+        elevation = 2.dp,
+        backgroundColor = MaterialTheme.colors.secondary,
+        contentColor = MaterialTheme.colors.onSecondary,
+        shape = RoundedCornerShape(20.dp),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .padding(16.dp),
+        ) {
+            Text(
+                text = balanceFormatted,
+                style = MaterialTheme.typography.h3,
+                color = MaterialTheme.colors.onSecondary,
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .weight(1f),
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "LEDGER BALANCE: $ledgerBalanceFormatted",
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onSecondary,
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .weight(1f),
+                )
+                if (loading) {
+                    CircularProgressIndicator(
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colors.onSecondary,
+                        modifier = Modifier
+                            .size(20.dp)
+                    )
+                } else {
+                    IconButton(
+                        onClick = {
+                            if (visible) visible = false
+                            else coroutineScope.launch(block = loadBalance)
+                        },
+                    ) {
+                        Icon(
+                            imageVector = if (visible) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
+                            contentDescription = null
+                        )
                     }
                 }
             }

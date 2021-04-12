@@ -103,7 +103,19 @@ abstract class CardTransactionActivity : PosActivity() {
                 finishWithError("Please perform EMV AID download before proceeding")
                 return
             }
-            else -> onPosReady()
+            else -> {
+                sessionData.getDukptConfig = { pan, amount ->
+                    posPreferences.binRoutes?.getSupportedRoute(pan, amount)?.dukptConfig
+                }
+                sessionData.getPosParameter = { pan, amount ->
+                    val supportedRoute =
+                        posPreferences.binRoutes?.getSupportedRoute(pan, amount)
+                    val remoteConnectionInfo = supportedRoute ?: config.remoteConnectionInfo
+                    debug("Using $remoteConnectionInfo")
+                    ParameterService(this, remoteConnectionInfo)
+                }
+                onPosReady()
+            }
         }
     }
 
@@ -220,16 +232,6 @@ abstract class CardTransactionActivity : PosActivity() {
             showError("The limit for this transaction is NGN${cardLimit}")
             return
         }
-        sessionData.getDukptConfig = { pan, amount ->
-            posPreferences.binRoutes?.getSupportedRoute(pan, amount)?.dukptConfig
-        }
-        sessionData.getPosParameter = { pan, amount ->
-            val supportedRoute =
-                posPreferences.binRoutes?.getSupportedRoute(pan, amount)
-            val remoteConnectionInfo = supportedRoute ?: config.remoteConnectionInfo
-
-            ParameterService(this, remoteConnectionInfo)
-        }
 
         mainScope.launch {
             posManager.cardReader.endWatch()
@@ -256,12 +258,11 @@ abstract class CardTransactionActivity : PosActivity() {
                         return@launch
                     }
 
-                    cardData.pinBlock = posManager.sessionData.pinBlock ?: cardData.pinBlock
-//                        if (cardData.pinBlock.isNullOrBlank()) {
-//                            dialogProvider.hideProgressBar()
-//                            renderTransactionFailure("Could not validate PIN")
-//                            return@launch
-//                        }
+                    if (cardData.pinBlock.isBlank()) {
+                        dialogProvider.hideProgressBar()
+                        renderTransactionFailure("Could not validate PIN")
+                        return@launch
+                    }
 
                     onReadCard(cardData)
                 }

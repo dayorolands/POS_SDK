@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import org.koin.android.ext.android.get
 import org.koin.core.parameter.parametersOf
+import java.time.Instant
 import java.util.*
 
 class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer) {
@@ -131,7 +132,8 @@ class FundsTransferActivity : CreditClubActivity(R.layout.activity_fundstransfer
 
         val receipt = FundsTransferReceipt(
             this@FundsTransferActivity,
-            fundsTransferRequest
+            fundsTransferRequest,
+            Instant.now().toString("dd-MM-yyyy hh:mm")
         ).apply {
             isSuccessful = response.isSuccessful
             reason = response.responseMessage
