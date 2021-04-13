@@ -33,7 +33,6 @@ class IsoRequestLogWorker(context: Context, params: WorkerParameters) :
         val agentPhone = localStorage.agentPhone
 
         val jobs = isoRequestLogDao.all().map { requestLog ->
-            if (requestLog.nodeName == "EPMS") requestLog.nodeName = null
             async {
                 val (response) = safeRunSuspend {
                     posApiService.logToGrafanaForPOSTransactions(

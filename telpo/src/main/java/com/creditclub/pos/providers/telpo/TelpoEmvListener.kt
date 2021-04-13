@@ -14,6 +14,8 @@ import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardTransactionStatus
 import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.utils.TripleDesCipher
+import com.creditclub.pos.utils.asDesEdeKey
+import com.creditclub.pos.utils.encrypt
 import com.telpo.emv.*
 import com.telpo.emv.util.getPinTextInfo
 import com.telpo.emv.util.getValue
@@ -32,7 +34,7 @@ class TelpoEmvListener(
     private val emvService: EmvService,
     private val sessionData: PosManager.SessionData
 ) : EmvServiceListener(), KoinComponent {
-    internal var ksnData: String? = null
+    private var ksnData: String? = null
     internal var cardData: TelpoEmvCardData? = null
     internal var pinBlock: String? = null
     private var bUIThreadisRunning = true
@@ -73,6 +75,9 @@ class TelpoEmvListener(
                 Amount = amount.toCurrencyFormat()
             }
             val dukptConfig = sessionData.getDukptConfig?.invoke(param.CardNo, amount)
+            val posParameter: PosParameter =
+                sessionData.getPosParameter?.invoke(param.CardNo, sessionData.amount / 100.0)
+                    ?: get()
             PinpadService.Open(context)
             wakeUpAndUnlock(context)
             if (dukptConfig != null) {
@@ -92,6 +97,12 @@ class TelpoEmvListener(
                     prefs.edit { putString("kcv", kcv) }
                 }
                 PinpadService.TP_PinpadDukptSessionStart(0)
+            } else {
+                val pinKey = posParameter.pinKey.hexBytes
+                PinpadService.TP_WriteMasterKey(0, pinKey, PinpadService.KEY_WRITE_DIRECT)
+
+                val masterKey = posParameter.masterKey.hexBytes
+                PinpadService.TP_WritePinKey(1, masterKey, PinpadService.KEY_WRITE_DECRYPT, 0)
             }
             var ret: Int
             val pinText = PinData.getPinTextInfo(param)
@@ -107,7 +118,13 @@ class TelpoEmvListener(
                 if (dukptConfig == null) {
                     ret = PinpadService.TP_PinpadGetPlainPin(param, 0, 0, 0)
                     if (ret == PinpadService.PIN_OK) {
-                        pinBlock = param.Pin_Block.encryptedPinBlock.hexString
+                        val pin = String(param.Pin_Block)
+                        val pan = param.CardNo
+                        val pinDetails = "0${pin.length}$pin".padEnd(16, 'F')
+                        val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
+                        val secretKey = posParameter.pinKey.hexBytes.asDesEdeKey
+                        val cryptData = pinDetails.hexBytes xor panBlock.hexBytes
+                        pinBlock = secretKey.encrypt(cryptData).copyOf(8).hexString
                         PinData.Pin = param.Pin_Block
                     }
                 } else {
@@ -199,8 +216,7 @@ class TelpoEmvListener(
     override fun onRequireDatetime(datetime: ByteArray): Int {
         return try {
             val str = Instant.now().format("yyyyMMddHHmmss")
-            val time: ByteArray
-            time = str.toByteArray(charset("ascii"))
+            val time = str.toByteArray(charset("ascii"))
             System.arraycopy(time, 0, datetime, 0, datetime.size)
             EmvService.EMV_TRUE
         } catch (e: UnsupportedEncodingException) {
@@ -234,18 +250,4 @@ class TelpoEmvListener(
         AmountData.ReferCurrCon = 0
         return EmvService.EMV_TRUE
     }
-
-    private inline val ByteArray.encryptedPinBlock: ByteArray
-        get() {
-            val pin = String(this)
-            val pan = emvService.getValue(0x5A, hex = false, padded = true)
-            val posParameter: PosParameter =
-                sessionData.getPosParameter?.invoke(pan, sessionData.amount / 100.0) ?: get()
-            val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
-            val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
-            val cipherKey = posParameter.pinKey.hexBytes
-            val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
-            val tripleDesCipher = TripleDesCipher(cipherKey)
-            return tripleDesCipher.encrypt(cryptData).copyOf(8)
-        }
 }
