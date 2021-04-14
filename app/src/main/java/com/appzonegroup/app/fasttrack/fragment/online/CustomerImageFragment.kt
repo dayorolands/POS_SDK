@@ -22,7 +22,7 @@ import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.GPSTracker
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages
-import com.appzonegroup.app.fasttrack.utility.online.XmlToJson
+import com.appzonegroup.app.fasttrack.utility.online.convertXmlToJson
 import com.creditclub.core.data.Encryption
 import com.creditclub.core.model.CreditClubImage
 import com.creditclub.core.ui.CreditClubFragment
@@ -213,8 +213,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
                         try {
                             val answer = Response.fixResponse(result)
                             val decryptedAnswer = Encryption.decrypt(answer)
-                            val response =
-                                XmlToJson.convertXmlToJson(decryptedAnswer)
+                            val response = convertXmlToJson(decryptedAnswer)
                             if (response == null) {
                                 dialogProvider.showError("Connection lost")
                                 Misc.increaseTransactionMonitorCounter(
