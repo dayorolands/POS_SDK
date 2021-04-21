@@ -262,7 +262,8 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                 val fundsTransferRequest = FundsTransferRequest(
                     agentPhoneNumber = localStorage.agentPhone,
                     institutionCode = localStorage.institutionCode,
-                    beneficiaryAccountName = item.to,
+                    beneficiaryAccountName = item.customerName,
+                    beneficiaryAccountNumber = item.to,
                     amountInNaira = item.amount ?: 0.0,
                     externalTransactionReference = item.uniqueReference,
                 )

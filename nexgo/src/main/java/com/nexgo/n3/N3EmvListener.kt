@@ -1,11 +1,13 @@
 package com.nexgo.n3
 
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.debug
+import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.pos.EmvException
 import com.creditclub.pos.PosManager
@@ -204,8 +206,9 @@ class N3EmvListener(
 
     override fun onFinish(retCode: Int, entity: EmvProcessResultEntity?) {
         if (retCode != SdkResult.Success) {
-            FirebaseCrashlytics.getInstance()
-                .recordException(EmvException("Nexgo EMV failed with ret $retCode"))
+            val exception = EmvException("Nexgo EMV failed with ret $retCode")
+            debugOnly { Log.e("N3", exception.message, exception) }
+            FirebaseCrashlytics.getInstance().recordException(exception)
         }
         when (retCode) {
             SdkResult.Emv_Success_Arpc_Fail, SdkResult.Success, SdkResult.Emv_Script_Fail -> {

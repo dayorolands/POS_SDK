@@ -10,7 +10,7 @@
 <9F1B>00000000</9F1B> <!--Terminal Floor Limit-->
 <9F1C>4E4C2D4750373330</9F1C> <!--Terminal Identification-->
 <9F1E>3833323031494343</9F1E> <!--Interface Device (IFD) Serial Number-->
-<9F33>E068C8</9F33> <!--Terminal Capabilities-->
+<9F33>E040C8</9F33> <!--Terminal Capabilities-->
 <9F35>22</9F35> <!--Terminal Type-->
 <9F39>05</9F39> <!--Point-of-Service (POS) Entry Mode-->
 <9F3C>0566</9F3C> <!--Transaction Reference Currency Code-->
@@ -38,7 +38,7 @@
 <DF75>01</DF75> <!--Terminal Status Check，Default value = 0-->
 <DF76></DF76> <!--Default Tdol-->
 <DF78>000000000000</DF78> <!--Contactless CVM Required limit-->
-<DF79>E068C8</DF79> <!--Contactless Terminal Capabilities-->
+<DF79>E040C8</DF79> <!--Contactless Terminal Capabilities-->
 <DF7A>7000B0A001</DF7A> <!--Contactless Additional Terminal Capabilities-->
 <DF7B>0000000000</DF7B> <!--TAC Default-->
 <DF7C>0000000000</DF7C> <!--TAC Online-->
