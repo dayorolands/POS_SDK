@@ -127,8 +127,7 @@ class HomeFragment : CreditClubFragment() {
             when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
                 in 0..11 -> "Good Morning"
                 in 12..15 -> "Good Afternoon"
-                in 16..20 -> "Good Evening"
-                in 21..23 -> "Good Night"
+                in 16..23 -> "Good Evening"
                 else -> "Good Day"
             }
         }
@@ -389,7 +388,7 @@ class HomeFragment : CreditClubFragment() {
                                         )
                                     }
                                 }
-                                if (flows.collectionPayment != null) {
+                                if (flows.billPayment != null) {
                                     item {
                                         MenuButton(
                                             text = "Bills Payment",
