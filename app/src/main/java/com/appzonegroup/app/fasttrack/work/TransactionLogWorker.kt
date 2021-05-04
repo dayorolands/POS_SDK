@@ -37,14 +37,14 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
 
         val posTransactionDao = posDatabase.posTransactionDao()
         posTransactionDao.deleteSyncedBefore(Instant.now().minus(7, ChronoUnit.DAYS))
-        val jobs = posTransactionDao.all().map { receipt ->
+        val jobs = posTransactionDao.unSynced().map { receipt ->
             if (receipt.nodeName == "EPMS") receipt.nodeName = null
             async {
                 val (response) = safeRunSuspend {
                     posApiService.transactionLog(
                         receipt,
                         "iRestrict ${backendConfig.posNotificationToken}",
-                        receipt.terminalId
+                        receipt.terminalId,
                     )
                 }
 
