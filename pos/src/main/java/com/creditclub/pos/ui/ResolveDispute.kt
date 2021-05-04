@@ -57,7 +57,12 @@ fun ResolveDispute(
                 dialogProvider.showErrorAndWait(result.error!!)
                 return@resolveDispute
             }
-            dialogProvider.showSuccessAndWait(result.data!!.message ?: "Your claim has been logged")
+            val response = result.data!!
+            if (response.isFailure()) {
+                dialogProvider.showErrorAndWait(response.message!!)
+                return@resolveDispute
+            }
+            dialogProvider.showSuccessAndWait(response.message ?: "Your claim has been logged")
             navController.popBackStack()
         }
     }
