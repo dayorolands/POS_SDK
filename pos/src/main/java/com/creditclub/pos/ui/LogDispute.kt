@@ -1,7 +1,6 @@
 package com.creditclub.pos.ui
 
 
-import android.content.ComponentCallbacks
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,7 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun ComponentCallbacks.LogDispute(
+fun LogDispute(
     navController: NavHostController,
     dialogProvider: DialogProvider,
 ) {

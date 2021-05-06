@@ -59,6 +59,7 @@ fun ErrorFeedback(errorMessage: String) {
 
 @Composable
 fun ErrorMessage(content: String) {
+    if (content.isBlank()) return
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,

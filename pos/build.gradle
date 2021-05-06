@@ -45,6 +45,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion versions.compose
+    }
     sourceSets {
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }

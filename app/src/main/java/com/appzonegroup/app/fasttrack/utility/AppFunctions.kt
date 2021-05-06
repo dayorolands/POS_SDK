@@ -48,7 +48,7 @@ fun registerAppFunctions() {
     AppFunctions.register(FunctionIds.CUSTOMER_MINI_STATEMENT, AppFunction(R.id.customer_mini_statement_button, R.string.title_activity_basic_mini_statement, R.drawable.deposit))
     AppFunctions.register(FunctionIds.AGENT_MINI_STATEMENT, AppFunction(R.id.agent_mini_statement_button, R.string.title_activity_basic_mini_statement, R.drawable.deposit))
     AppFunctions.register(FunctionIds.AIRTIME_RECHARGE, AppFunction(R.id.airtime_button, R.string.airtimetopup, R.drawable.payday_loan))
-    AppFunctions.register(FunctionIds.SUPPORT, AppFunction(R.id.fn_support, R.string.title_activity_support, R.drawable.ic_logo_round))
+    AppFunctions.register(FunctionIds.SUPPORT, AppFunction(R.id.fn_support, R.string.title_activity_support, R.drawable.ic_chat_bubble_outline))
     AppFunctions.register(FunctionIds.CARD_TRANSACTIONS, AppFunction(R.id.card_withdrawal_button, R.string.pos_card_transactions, R.drawable.withdrawal))
     AppFunctions.register(FunctionIds.FUNDS_TRANSFER, AppFunction(R.id.funds_transfer_button, R.string.fund_stransfer, R.drawable.deposit))
     AppFunctions.register(FunctionIds.HLA_TAGGING, AppFunction(R.id.fn_hla_tagging, R.string.hla_tagging, R.drawable.ic_maps_and_flags))

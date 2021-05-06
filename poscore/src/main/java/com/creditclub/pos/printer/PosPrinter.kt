@@ -2,16 +2,7 @@ package com.creditclub.pos.printer
 
 import android.content.Context
 import com.creditclub.core.ui.widget.DialogProvider
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 1/14/2019.
- * Appzone Ltd
- */
 interface PosPrinter {
     val context: Context
     val dialogProvider: DialogProvider

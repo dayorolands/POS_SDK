@@ -1,5 +1,6 @@
-package com.creditclub.pos.ui
+package com.creditclub.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,54 +10,70 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.creditclub.core.data.api.FundsTransferService
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.getMessage
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.setResult
-import com.creditclub.ui.CreditClubAppBar
-import com.creditclub.ui.ErrorFeedback
-import com.creditclub.ui.rememberBean
-import com.creditclub.ui.rememberRetrofitService
+import java.util.*
 
 @Composable
 fun GetBank(
     title: String,
     popOnSelect: Boolean = true,
     onResult: ((Bank) -> Unit)? = null,
-    navController: NavHostController
+    navController: NavController
 ) {
     val context = LocalContext.current
     val fundsTransferService: FundsTransferService by rememberRetrofitService()
     val localStorage: LocalStorage by rememberBean()
     var query by remember { mutableStateOf("") }
-    val (loading, setLoading) = remember { mutableStateOf(false) }
-    val (errorMessage, setError) = remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
     val issuingBanks by produceState(emptyList<Bank>()) {
-        setLoading(true)
+        loading = true
         val (response, error) = safeRunIO {
             fundsTransferService.getBanks(localStorage.institutionCode)
         }
-        setLoading(false)
+        loading = false
         if (error != null) {
-            setError(error.getMessage(context))
+            errorMessage = error.getMessage(context)
             value = emptyList()
             return@produceState
         }
-        setError("")
-        value = response?.distinctBy { "${it.code}${it.bankCode}"  } ?: emptyList()
+        errorMessage = ""
+        if (response == null) {
+            value = emptyList()
+            return@produceState
+        }
+        value = response
+            .asSequence()
+            .distinctBy { "${it.code}${it.bankCode}" }
+            .map { bank ->
+                bank.copy(
+                    name = bank.name?.trim { it <= ' ' }?.toUpperCase(Locale.ROOT),
+                    shortName = bank.shortName?.trim { it <= ' ' }?.toUpperCase(Locale.ROOT),
+                )
+            }
+            .toList()
     }
     val filteredIssuingBanks = remember(query, issuingBanks) {
         if (query.isBlank()) issuingBanks
         else issuingBanks.filter { it.name?.contains(query, ignoreCase = true) ?: false }
     }
 
-    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(R.color.menuBackground)),
+    ) {
         val (appBar, list, textField) = createRefs()
 
         CreditClubAppBar(
@@ -73,7 +90,7 @@ fun GetBank(
         OutlinedTextField(
             value = query,
             onValueChange = { query = it },
-            label = { Text(text = "Bank Name") },
+            label = { Text(text = stringResource(R.string.search)) },
             modifier = Modifier
                 .constrainAs(textField) {
                     top.linkTo(appBar.bottom)
@@ -104,7 +121,7 @@ fun GetBank(
                     ) {
                         CircularProgressIndicator(modifier = Modifier.padding(bottom = 10.dp))
                         Text(
-                            text = "Loading Banks",
+                            text = stringResource(R.string.loading_banks),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.subtitle1,
                             color = MaterialTheme.colors.onSurface.copy(0.52f),
@@ -146,7 +163,7 @@ private fun BankItem(bank: Bank, onClick: () -> Unit) {
                 .padding(horizontal = 16.dp, vertical = 16.dp)
         ) {
             Text(
-                text = bank.name ?: "Unnamed Bank",
+                text = bank.name ?: bank.shortName ?: "",
                 style = MaterialTheme.typography.subtitle1,
                 modifier = Modifier
                     .fillMaxWidth()

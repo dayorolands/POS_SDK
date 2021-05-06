@@ -96,7 +96,7 @@ class N3EmvListener(
                     ksnBytes
                 )
                 debug("Dukpt inject result is $result")
-                prefs.edit { putString("kcv", kcv) }
+                if (result == 0) prefs.edit { putString("kcv", kcv) }
             }
             pinPad.dukptKsnIncrease(0)
         } else {

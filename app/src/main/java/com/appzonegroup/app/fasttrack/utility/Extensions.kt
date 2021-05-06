@@ -7,9 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.fragment.HomeFragmentDirections
-import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.core.data.model.BillCategory
 import com.creditclub.core.data.request.BalanceEnquiryRequest
 import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.ui.CreditClubActivity
@@ -133,7 +131,9 @@ fun CreditClubFragment.openPageById(id: Int) {
 
         R.id.bvn_update_button -> startActivity(BVNUpdateActivity::class.java)
 
-        R.id.funds_transfer_button -> startActivity(FundsTransferActivity::class.java)
+        R.id.funds_transfer_button -> {
+            findNavController().navigate(R.id.action_to_funds_transfer)
+        }
 
         R.id.agent_mini_statement_button -> startActivity(MiniStatementActivity::class.java)
 

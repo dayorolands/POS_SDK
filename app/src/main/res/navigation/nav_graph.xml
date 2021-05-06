@@ -24,6 +24,14 @@
         app:popExitAnim="@anim/fade_out" />
 
     <action
+        android:id="@+id/action_to_funds_transfer"
+        app:destination="@id/fundsTransferFragment"
+        app:enterAnim="@anim/fade_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/fade_out" />
+
+    <action
         android:id="@+id/action_to_collection_payment"
         app:destination="@id/collectionGraph"
         app:enterAnim="@anim/fade_in"
@@ -36,6 +44,11 @@
         android:name="com.appzonegroup.app.fasttrack.fragment.BillPaymentFragment"
         android:label="Bill Payment"
         tools:layout="@layout/bill_payment_fragment" />
+
+    <fragment
+        android:id="@+id/fundsTransferFragment"
+        android:name="com.appzonegroup.app.fasttrack.FundsTransferFragment"
+        android:label="Funds Transfer" />
 
     <fragment
         android:id="@+id/notificationFragment"

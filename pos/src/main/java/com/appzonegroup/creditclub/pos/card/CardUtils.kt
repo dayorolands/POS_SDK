@@ -40,3 +40,5 @@ fun cardTransactionType(msg: ISOMsg) = when (msg.mti) {
     "0420", "0421", "0430" -> TransactionType.Reversal
     else -> TransactionType.Unknown
 }
+
+fun ISOMsg.getTransactionType() = cardTransactionType(this)

@@ -20,6 +20,10 @@ class FundsTransferReceipt(
     context: Context,
     private val request: FundsTransferRequest,
     private val transactionDate: String,
+    override var isSuccessful: Boolean = false,
+    override var isCustomerCopy: Boolean = true,
+    override var isReprint: Boolean = false,
+    override var reason: String? = null,
 ) :
     TransactionReceipt(context) {
 

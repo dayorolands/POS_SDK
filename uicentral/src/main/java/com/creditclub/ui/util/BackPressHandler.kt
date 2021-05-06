@@ -7,8 +7,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 
 @Composable
-fun backPressHandler(onBackPressed: () -> Unit, enabled: Boolean = true) {
-    val dispatcher = LocalOnBackPressedDispatcherOwner.current.onBackPressedDispatcher
+fun BackPressHandler(onBackPressed: () -> Unit, enabled: Boolean = true) {
+    val dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     val backCallback = remember {
         object : OnBackPressedCallback(enabled) {
@@ -19,7 +19,7 @@ fun backPressHandler(onBackPressed: () -> Unit, enabled: Boolean = true) {
     }
 
     DisposableEffect(dispatcher) { // dispose/relaunch if dispatcher changes
-        dispatcher.addCallback(backCallback)
+        dispatcher?.addCallback(backCallback)
         onDispose {
             backCallback.remove() // avoid leaks!
         }

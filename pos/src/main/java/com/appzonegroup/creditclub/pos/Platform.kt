@@ -15,11 +15,10 @@ import com.creditclub.pos.PosProviders
 import com.creditclub.pos.RemoteConnectionInfo
 import com.creditclub.pos.model.PosTenant
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.KoinComponent
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 
-object Platform : KoinComponent {
+object Platform {
 
     @JvmStatic
     var isPOS = false

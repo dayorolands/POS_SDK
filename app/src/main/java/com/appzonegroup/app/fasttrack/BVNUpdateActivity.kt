@@ -189,8 +189,6 @@ class BVNUpdateActivity : CustomerBaseActivity() {
             super.onViewCreated(view, savedInstanceState)
 
             activity.addValidPhoneNumberListener(view.findViewById(R.id.accountDetails_phone_et))
-
-            if (!activity.gps.canGetLocation()) activity.gps.showSettingsAlert()
         }
     }
 

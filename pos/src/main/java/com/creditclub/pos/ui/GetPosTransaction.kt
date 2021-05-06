@@ -1,6 +1,5 @@
 package com.creditclub.pos.ui
 
-import android.content.ComponentCallbacks
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,6 +18,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavHostController
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.models.PosTransaction
@@ -27,7 +28,9 @@ import com.creditclub.core.util.format
 import com.creditclub.core.util.setResult
 import com.creditclub.ui.CreditClubAppBar
 import com.creditclub.ui.Select
-import org.koin.android.ext.android.get
+import com.creditclub.ui.rememberBean
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -38,12 +41,12 @@ private val periodList = listOf(
 )
 
 @Composable
-fun ComponentCallbacks.GetPosTransaction(
+fun GetPosTransaction(
     navController: NavHostController,
     popOnSelect: Boolean = true,
     onResult: ((PosTransaction) -> Unit)? = null
 ) {
-    val posTransactionDao by remember { lazy { get<PosDatabase>().posTransactionDao() } }
+    val posDatabase: PosDatabase by rememberBean()
     var query by remember { mutableStateOf("") }
     val (period, setPeriod) = remember { mutableStateOf(periodList[1]) }
     val endDate = remember { Instant.now() }
@@ -54,9 +57,12 @@ fun ComponentCallbacks.GetPosTransaction(
             else -> Instant.now()
         }
     }
-    val transactions = remember(query, startDate, endDate) {
-        posTransactionDao.disputable("%${query}%", startDate, endDate)
-    }.observeAsState(emptyList())
+    val transactions =
+        produceState<LiveData<List<PosTransaction>>>(MutableLiveData(), query, startDate, endDate) {
+            withContext(Dispatchers.IO) {
+                value = posDatabase.posTransactionDao().disputable("%${query}%", startDate, endDate)
+            }
+        }.value.observeAsState(emptyList())
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (appBar, list) = createRefs()

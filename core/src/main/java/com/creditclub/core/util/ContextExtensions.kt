@@ -4,7 +4,6 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.annotation.RawRes
 import com.creditclub.core.BuildConfig
 import com.creditclub.core.CreditClubApplication
@@ -21,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
+import org.koin.core.context.GlobalContext
 
 
 /**
@@ -102,23 +102,20 @@ inline val Context.RAMInfo: LongArray
     }
 
 suspend inline fun Context.logFunctionUsage(fid: Int) = safeRunIO {
-    val count = run {
-        val appFunctionUsageDao = coreDatabase.appFunctionUsageDao()
-        val appFunction = appFunctionUsageDao.getFunction(fid)
+    val appFunctionUsageDao = coreDatabase.appFunctionUsageDao()
+    val appFunction = appFunctionUsageDao.getFunction(fid)
 
-        if (appFunction == null) {
-            appFunctionUsageDao.insert(AppFunctionUsage(fid))
+    val count = if (appFunction == null) {
+        appFunctionUsageDao.insert(AppFunctionUsage(fid))
+        1
+    } else {
+        appFunction.usage++
+        appFunctionUsageDao.update(appFunction)
 
-            return@run 1
-        } else {
-            appFunction.usage++
-            appFunctionUsageDao.update(appFunction)
-
-            return@run appFunction.usage
-        }
+        appFunction.usage
     }
 
-    if (BuildConfig.DEBUG) Log.d("AppUsage", "Usage for function $fid -> $count")
+    debug("Usage for function $fid -> $count")
 }
 
 inline fun <reified T : Any> Context.readRawJsonFile(
@@ -129,3 +126,5 @@ inline fun <reified T : Any> Context.readRawJsonFile(
         resources.openRawResource(fileLocation).bufferedReader().use { it.readText() }
     return defaultJson.decodeFromString(serializer, fileContents)
 }
+
+fun getAndroidContext() = GlobalContext.get().koin.get<Context>()

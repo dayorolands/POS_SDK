@@ -62,7 +62,7 @@ fun ResolveDispute(
                 dialogProvider.showErrorAndWait(response.message!!)
                 return@resolveDispute
             }
-            dialogProvider.showSuccessAndWait(response.message ?: "Your claim has been logged")
+            dialogProvider.showSuccessAndWait(response.message ?: "Your claim has been resolved")
             navController.popBackStack()
         }
     }

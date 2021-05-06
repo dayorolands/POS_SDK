@@ -61,10 +61,6 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
             binding.tokenBlock.visibility = View.VISIBLE
         }
 
-        if (!gps.canGetLocation()) {
-            gps.showSettingsAlert()
-        }
-
         val chooseAnotherAccount = {
             requireAccountInfo(options = customerRequestOptions) {
                 onSubmit { accountInfo ->

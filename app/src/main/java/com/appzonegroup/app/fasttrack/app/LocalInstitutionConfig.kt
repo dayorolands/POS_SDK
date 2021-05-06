@@ -27,6 +27,8 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
 
     override var categories: CategoryConfig = CategoryConfig()
 
+    override var bankAccountNumberLength: Int = 10
+
     companion object {
 
         fun create(context: Context): LocalInstitutionConfig {

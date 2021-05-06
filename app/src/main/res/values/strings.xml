@@ -446,6 +446,12 @@
     <string name="customer">Customer</string>
     <string name="transactions">Transactions</string>
     <string name="loans">Loans</string>
+    <string name="funds_transfer">Funds Transfer</string>
+    <string name="make_transfer">Make Transfer</string>
+    <string name="other_bank">Other Bank</string>
+    <string name="confirm">Confirm</string>
+    <string name="select_bank">Select Bank</string>
+    <string name="enter_account">Enter Account</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>

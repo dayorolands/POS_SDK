@@ -33,13 +33,13 @@ fun Application.startPosApp() {
 
     workManager.enqueueUniquePeriodicWork(
         "APP_TRANSACTION_LOG",
-        ExistingPeriodicWorkPolicy.REPLACE,
+        ExistingPeriodicWorkPolicy.KEEP,
         transactionLogRequest
     )
 
     workManager.enqueueUniquePeriodicWork(
         "APP_ISO_REQUEST_LOG",
-        ExistingPeriodicWorkPolicy.REPLACE,
+        ExistingPeriodicWorkPolicy.KEEP,
         PeriodicWorkRequestBuilder<IsoRequestLogWorker>(15, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
@@ -47,7 +47,7 @@ fun Application.startPosApp() {
 
     workManager.enqueueUniquePeriodicWork(
         "APP_REVERSAL",
-        ExistingPeriodicWorkPolicy.REPLACE,
+        ExistingPeriodicWorkPolicy.KEEP,
         PeriodicWorkRequestBuilder<ReversalWorker>(15, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()

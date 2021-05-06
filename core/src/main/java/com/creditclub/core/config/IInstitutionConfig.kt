@@ -15,4 +15,6 @@ interface IInstitutionConfig {
     var flows: FlowConfig
 
     var categories: CategoryConfig
+
+    var bankAccountNumberLength: Int
 }

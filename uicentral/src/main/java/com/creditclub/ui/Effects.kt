@@ -7,7 +7,9 @@ import androidx.compose.ui.platform.LocalContext
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.ui.widget.DialogProvider
 import org.koin.android.ext.android.inject
+import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.Qualifier
 
 @Composable
 inline fun <reified T : Any> rememberRetrofitService(): Lazy<T> {
@@ -19,11 +21,14 @@ inline fun <reified T : Any> rememberRetrofitService(): Lazy<T> {
 }
 
 @Composable
-inline fun <reified T : Any> rememberBean(): Lazy<T> {
+inline fun <reified T : Any> rememberBean(
+    qualifier: Qualifier? = null,
+    noinline parameters: ParametersDefinition? = null
+): Lazy<T> {
     val localContext = LocalContext.current
     return remember {
         val application = localContext.applicationContext as Application
-        application.inject()
+        application.inject(qualifier, parameters)
     }
 }
 

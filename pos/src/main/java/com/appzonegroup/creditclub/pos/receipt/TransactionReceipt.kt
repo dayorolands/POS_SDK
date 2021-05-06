@@ -16,10 +16,10 @@ import java.util.*
 abstract class TransactionReceipt(val context: Context) :
     PrintJob {
 
-    var isSuccessful = false
-    var isCustomerCopy = true
-    var isReprint = false
-    var reason: String? = null
+    open var isSuccessful = false
+    open var isCustomerCopy = true
+    open var isReprint = false
+    open var reason: String? = null
 
     open val statusMessage
         get() = (if (isSuccessful) context.getString(R.string.pos_transaction_approved)
@@ -30,9 +30,9 @@ abstract class TransactionReceipt(val context: Context) :
         add(
             TextNode(statusMessage.toUpperCase(Locale.getDefault()))
                 .apply {
-            align = Alignment.MIDDLE
-            wordFont = 30
-        })
+                    align = Alignment.MIDDLE
+                    wordFont = 30
+                })
 
         if (!isSuccessful) {
             add(TextNode(reason ?: "Error").apply {

@@ -3,6 +3,8 @@ package com.nexgo.n3
 import android.os.Environment
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.debugOnly
+import com.creditclub.core.util.safeRun
+import com.creditclub.core.util.safeRunIO
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosParameter
@@ -21,10 +23,8 @@ import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.text.SimpleDateFormat
-import java.util.*
-import java.io.IOException
-import java.lang.Runtime
 import java.time.LocalDateTime
+import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -77,16 +77,12 @@ class N3CardReader(
             emvHandler2.setTlv("9F33".hexBytes, "E040C8".hexBytes)
             emvHandler2.emvProcess(transData, emvListener)
         }
-        withContext(Dispatchers.IO) {
+        safeRunIO {
             debugOnly {
-                try {
-                    Runtime.getRuntime().exec(
-                        "logcat -v time -f " + Environment.getExternalStorageDirectory()
-                            .path + "/" + "emvlog_" + LocalDateTime.now().toString()
-                    )
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
+                Runtime.getRuntime().exec(
+                    "logcat -v time -f " + Environment.getExternalStorageDirectory()
+                        .path + "/" + "emvlog_" + LocalDateTime.now().toString()
+                )
             }
         }
         dialogProvider.hideProgressBar()
