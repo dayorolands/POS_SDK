@@ -83,7 +83,7 @@ class APIHelper @JvmOverloads constructor(
 
     fun getNextOperation(
         pNumber: String,
-        sessionId: String,
+        sessionId: String?,
         next: String,
         location: String,
         callback: VolleyCallback<String>
@@ -92,7 +92,7 @@ class APIHelper @JvmOverloads constructor(
 
         val url = BankOneService.UrlGenerator.operationNext(
             pNumber,
-            sessionId,
+            sessionId ?: "nothing",
             next,
             location,
             localStorage.institutionCode

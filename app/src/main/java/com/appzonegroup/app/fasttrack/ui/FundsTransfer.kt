@@ -371,7 +371,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 ErrorMessage(errorMessage)
             }
         }
-        if (loadingMessage.isBlank() && accountNumberIsValid && amountIsValid) {
+        if (loadingMessage.isBlank() && accountNumberIsValid && amountIsValid && !showConfirmation) {
             AppButton(
                 onClick = { coroutineScope.launch { if (isVerified) transferFunds() else validateAccount() } }) {
                 Text(

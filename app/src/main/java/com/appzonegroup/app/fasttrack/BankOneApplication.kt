@@ -1,10 +1,7 @@
 package com.appzonegroup.app.fasttrack
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.edit
 import com.appzonegroup.app.fasttrack.di.*
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.utility.extensions.registerWorkers
@@ -32,12 +29,14 @@ class BankOneApplication : CreditClubApplication() {
         val newAuth = localStorage.authResponse
             ?: return@lazy AuthResponse(
                 phoneNumber,
-                localStorage.getString("AGENT_CODE")
+                localStorage.getString("AGENT_CODE") ?: "",
+                localStorage.getString("AGENT_CODE") ?: ""
             )
 
         return@lazy AuthResponse(
             newAuth.phoneNumber ?: phoneNumber,
-            newAuth.activationCode ?: localStorage.getString("AGENT_CODE")
+            newAuth.sessionId ?: localStorage.getString("AGENT_CODE") ?: "",
+            newAuth.activationCode ?: localStorage.getString("AGENT_CODE") ?: ""
         )
     }
 

@@ -59,7 +59,7 @@ class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
                 phoneNumber,
                 sessionId,
                 verificationCode,
-                (finalLocation),
+                finalLocation,
                 false
             ) { e, result, _ ->
                 dialogProvider.hideProgressBar()

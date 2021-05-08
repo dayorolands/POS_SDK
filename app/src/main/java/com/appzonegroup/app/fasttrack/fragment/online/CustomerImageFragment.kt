@@ -17,7 +17,6 @@ import com.appzonegroup.app.fasttrack.fragment.online.EnterDetailFragment.Option
 import com.appzonegroup.app.fasttrack.model.TransactionCountType
 import com.appzonegroup.app.fasttrack.model.online.Response
 import com.appzonegroup.app.fasttrack.network.online.APIHelper
-import com.appzonegroup.app.fasttrack.network.online.APIHelper.VolleyCallback
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.GPSTracker
 import com.appzonegroup.app.fasttrack.utility.Misc
@@ -205,7 +204,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
             dialogProvider.hideProgressBar()
             if (status) {
                 try {
-                    val answer = Response.fixResponse(result)
+                    val answer = Response.fixResponse(result!!)
                     val decryptedAnswer = Encryption.decrypt(answer)
                     val response = convertXmlToJson(decryptedAnswer)
                     if (response == null) {
