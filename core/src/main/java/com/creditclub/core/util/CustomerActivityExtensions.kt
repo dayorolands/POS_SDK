@@ -45,23 +45,23 @@ fun CreditClubActivity.requireAccountInfo(
                 CustomerRequestOption.BVN -> TextFieldParams(
                     "Enter customer BVN",
                     type = "number",
-                    maxLength = 11,
+                    maxLength = institutionConfig.bankAccountNumberLength,
                     required = true,
                 )
 
                 CustomerRequestOption.PhoneNumber -> TextFieldParams(
                     "Enter customer phone number",
                     type = "number",
-                    maxLength = 11,
-                    minLength = 10,
+                    maxLength = institutionConfig.bankAccountNumberLength,
+                    minLength = institutionConfig.bankAccountNumberLength,
                     required = true,
                 )
 
                 CustomerRequestOption.AccountNumber -> TextFieldParams(
                     "Enter customer account number",
                     type = "number",
-                    maxLength = 11,
-                    minLength = 10,
+                    maxLength = institutionConfig.bankAccountNumberLength,
+                    minLength = institutionConfig.bankAccountNumberLength,
                     required = true,
                 )
             }

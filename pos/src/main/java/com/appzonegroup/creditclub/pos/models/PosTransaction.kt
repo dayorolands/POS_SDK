@@ -10,7 +10,6 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.koin.core.KoinComponent
 import java.time.Instant
 
 @Entity
@@ -98,9 +97,7 @@ data class PosTransaction(
 
     @SerialName("IsSynced")
     var isSynced: Boolean = false,
-) : Parcelable {
-    companion object : KoinComponent
-}
+) : Parcelable
 
 @Dao
 interface PosTransactionDao {

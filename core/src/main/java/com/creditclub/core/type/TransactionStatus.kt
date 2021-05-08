@@ -11,7 +11,8 @@ import com.creditclub.core.R
  */
 enum class TransactionStatus(
     val code: Int,
-    val label: String, @StringRes val labelRes: Int = R.string.please_replace
+    val label: String,
+    @StringRes val labelRes: Int = R.string.please_replace
 ) {
     Pending(1, "Pending"),
     Failed(2, "Failed"),

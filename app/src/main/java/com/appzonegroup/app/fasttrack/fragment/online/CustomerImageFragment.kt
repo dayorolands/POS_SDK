@@ -84,7 +84,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
                 if (image != null) {
                     //final CacheHelper ch = new CacheHelper(getActivity());
                     finalLocation = gps.geolocationString
-                    nextOperation()
+                    mainScope.launch { nextOperation() }
 
                 } else {
                     Toast.makeText(
@@ -103,78 +103,77 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
         }
     }
 
-    private fun nextOperation() {
+    private suspend fun nextOperation() {
         val finalFile = File(creditClubImage?.path ?: return)
         val bankOneApplication = activity?.application as BankOneApplication?
         val authResponse = bankOneApplication?.authResponse
-        val ah = APIHelper(requireActivity())
+        val ah = APIHelper(requireContext())
+
         dialogProvider.showProgressBar("Uploading")
-        ah.getNextOperationImage(authResponse?.phoneNumber ?: "",
+        val (result, e) = ah.getNextOperationImage(
+            authResponse?.phoneNumber ?: "",
             authResponse?.sessionId ?: "nothing",
             finalFile,
             finalLocation ?: "",
             optionsText?.isShouldCompress ?: false,
-            mainScope,
-            object : APIHelper.FutureCallback<String> {
-                override fun onCompleted(e: Exception?, result: String?) {
-                    dialogProvider.hideProgressBar()
-                    if (e == null && result != null) {
-                        try {
-                            val answer = Response.fixResponse(result)
-                            Log.e("Answer", answer)
-                            Log.e("AnswerLength", answer.length.toString() + "")
-                            if (TextUtils.isEmpty(answer.trim { it <= ' ' })) {
-                                Toast.makeText(
-                                    activity,
-                                    "Upload successful!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                Misc.increaseTransactionMonitorCounter(
-                                    activity,
-                                    TransactionCountType.SUCCESS_COUNT,
-                                    authResponse?.sessionId
-                                )
-                                moveToNext()
-                            }
-                        } catch (c: Exception) {
-                            c.printStackTrace()
-                            showDialogWithGoHomeAction("Something went wrong! Please try again.")
-                            Misc.increaseTransactionMonitorCounter(
-                                activity,
-                                TransactionCountType.NO_RESPONSE_COUNT,
-                                authResponse?.sessionId
-                            )
-                        }
-                    } else {
-                        if (e != null) {
-                            Log.e("ErrorResponse", e.toString())
-                            e.printStackTrace()
-                            if (e is TimeoutException) {
-                                showDialogWithGoHomeAction("Something went wrong! Please try again.")
-                                Misc.increaseTransactionMonitorCounter(
-                                    activity,
-                                    TransactionCountType.NO_RESPONSE_COUNT,
-                                    authResponse?.sessionId
-                                )
-                            } else {
-                                Misc.increaseTransactionMonitorCounter(
-                                    activity,
-                                    TransactionCountType.NO_INTERNET_COUNT,
-                                    authResponse?.sessionId
-                                )
-                                dialogProvider.showError("Connection lost")
-                            }
-                        } else {
-                            dialogProvider.showError("Connection lost")
-                            Misc.increaseTransactionMonitorCounter(
-                                activity,
-                                TransactionCountType.NO_INTERNET_COUNT,
-                                authResponse?.sessionId
-                            )
-                        }
-                    }
+        )
+        dialogProvider.hideProgressBar()
+
+        if (e == null && result != null) {
+            try {
+                val answer = Response.fixResponse(result)
+                Log.e("Answer", answer)
+                Log.e("AnswerLength", answer.length.toString() + "")
+                if (TextUtils.isEmpty(answer.trim { it <= ' ' })) {
+                    Toast.makeText(
+                        activity,
+                        "Upload successful!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Misc.increaseTransactionMonitorCounter(
+                        activity,
+                        TransactionCountType.SUCCESS_COUNT,
+                        authResponse?.sessionId
+                    )
+                    moveToNext()
                 }
-            })
+            } catch (c: Exception) {
+                c.printStackTrace()
+                showDialogWithGoHomeAction("Something went wrong! Please try again.")
+                Misc.increaseTransactionMonitorCounter(
+                    activity,
+                    TransactionCountType.NO_RESPONSE_COUNT,
+                    authResponse?.sessionId
+                )
+            }
+        } else {
+            if (e != null) {
+                Log.e("ErrorResponse", e.toString())
+                e.printStackTrace()
+                if (e is TimeoutException) {
+                    showDialogWithGoHomeAction("Something went wrong! Please try again.")
+                    Misc.increaseTransactionMonitorCounter(
+                        activity,
+                        TransactionCountType.NO_RESPONSE_COUNT,
+                        authResponse?.sessionId
+                    )
+                } else {
+                    Misc.increaseTransactionMonitorCounter(
+                        activity,
+                        TransactionCountType.NO_INTERNET_COUNT,
+                        authResponse?.sessionId
+                    )
+                    dialogProvider.showError("Connection lost")
+                }
+            } else {
+                dialogProvider.showError("Connection lost")
+                Misc.increaseTransactionMonitorCounter(
+                    activity,
+                    TransactionCountType.NO_INTERNET_COUNT,
+                    authResponse?.sessionId
+                )
+            }
+        }
     }
 
     private fun showDialogWithGoHomeAction(message: String?) {
@@ -201,168 +200,162 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
         ah.getNextOperation(authResponse.phoneNumber,
             authResponse.sessionId,
             creditClubImage?.path ?: "",
-            finalLocation,
-            object : VolleyCallback<String> {
-                override fun onCompleted(
-                    e: Exception?,
-                    result: String?,
-                    status: Boolean
-                ) {
-                    dialogProvider.hideProgressBar()
-                    if (status) {
-                        try {
-                            val answer = Response.fixResponse(result)
-                            val decryptedAnswer = Encryption.decrypt(answer)
-                            val response = convertXmlToJson(decryptedAnswer)
-                            if (response == null) {
-                                dialogProvider.showError("Connection lost")
+            finalLocation
+        ) { e, result, status ->
+            dialogProvider.hideProgressBar()
+            if (status) {
+                try {
+                    val answer = Response.fixResponse(result)
+                    val decryptedAnswer = Encryption.decrypt(answer)
+                    val response = convertXmlToJson(decryptedAnswer)
+                    if (response == null) {
+                        dialogProvider.showError("Connection lost")
+                        Misc.increaseTransactionMonitorCounter(
+                            activity,
+                            TransactionCountType.NO_INTERNET_COUNT,
+                            authResponse.sessionId
+                        )
+                    } else {
+                        val resp = response.toString()
+                        Log.e("ResponseJsonText", resp)
+                        val responseBase =
+                            response.getJSONObject("Response")
+                        if (responseBase != null) {
+                            val shouldClose = responseBase.optInt("ShouldClose", 1)
+                            if (shouldClose == 0) {
+                                if (resp.contains("IN-CORRECT ACTIVATION CODE") && state) {
+                                    Log.e(
+                                        "Case",
+                                        "Incorrect activation code||Deleted cache auth"
+                                    )
+                                    localStorage.cacheAuth = null
+                                } else if (state) {
+                                    Log.e(
+                                        "Case",
+                                        "correct activation code||" + creditClubImage?.path
+                                    )
+                                    val auth = JSONObject()
+                                    auth.put("phone_number", authResponse.phoneNumber)
+                                    auth.put("session_id", authResponse.sessionId)
+                                    auth.put(
+                                        "activation_code",
+                                        creditClubImage?.path
+                                    )
+                                    localStorage.cacheAuth = auth.toString()
+                                }
                                 Misc.increaseTransactionMonitorCounter(
                                     activity,
-                                    TransactionCountType.NO_INTERNET_COUNT,
+                                    TransactionCountType.SUCCESS_COUNT,
                                     authResponse.sessionId
                                 )
-                            } else {
-                                val resp = response.toString()
-                                Log.e("ResponseJsonText", resp)
-                                val responseBase =
-                                    response.getJSONObject("Response")
-                                if (responseBase != null) {
-                                    val shouldClose = responseBase.optInt("ShouldClose", 1)
-                                    if (shouldClose == 0) {
-                                        if (resp.contains("IN-CORRECT ACTIVATION CODE") && state) {
-                                            Log.e(
-                                                "Case",
-                                                "Incorrect activation code||Deleted cache auth"
+                                if (resp.contains("MenuItem")) {
+                                    val menuWrapper =
+                                        responseBase.getJSONObject("Menu")
+                                            .getJSONObject("Response")
+                                            .getJSONObject("Display")
+                                    requireActivity().supportFragmentManager
+                                        .beginTransaction().replace(
+                                            R.id.container,
+                                            ListOptionsFragment.instantiate(
+                                                menuWrapper,
+                                                false
                                             )
-                                            localStorage.cacheAuth = null
-                                        } else if (state) {
-                                            Log.e(
-                                                "Case",
-                                                "correct activation code||" + creditClubImage?.path
-                                            )
-                                            val auth = JSONObject()
-                                            auth.put("phone_number", authResponse.phoneNumber)
-                                            auth.put("session_id", authResponse.sessionId)
-                                            auth.put(
-                                                "activation_code",
-                                                creditClubImage?.path
-                                            )
-                                            localStorage.cacheAuth = auth.toString()
-                                        }
-                                        Misc.increaseTransactionMonitorCounter(
-                                            activity,
-                                            TransactionCountType.SUCCESS_COUNT,
-                                            authResponse.sessionId
+                                        ).commit()
+                                } else {
+                                    val menuWrapper =
+                                        responseBase.getJSONObject("Menu")
+                                            .getJSONObject("Response")["Display"]
+                                    if (menuWrapper is String && resp.contains("ShouldMask") && !resp.contains(
+                                            "Invalid Response"
                                         )
-                                        if (resp.contains("MenuItem")) {
-                                            val menuWrapper =
-                                                responseBase.getJSONObject("Menu")
-                                                    .getJSONObject("Response")
-                                                    .getJSONObject("Display")
+                                    ) {
+                                        val data =
+                                            responseBase.getJSONObject("Menu")
+                                                .getJSONObject("Response")
+                                        if (resp.contains("\"IsImage\":true")) {
                                             requireActivity().supportFragmentManager
                                                 .beginTransaction().replace(
                                                     R.id.container,
-                                                    ListOptionsFragment.instantiate(
-                                                        menuWrapper,
-                                                        false
+                                                    instantiate(
+                                                        data
                                                     )
                                                 ).commit()
                                         } else {
-                                            val menuWrapper =
-                                                responseBase.getJSONObject("Menu")
-                                                    .getJSONObject("Response")["Display"]
-                                            if (menuWrapper is String && resp.contains("ShouldMask") && !resp.contains(
-                                                    "Invalid Response"
-                                                )
-                                            ) {
-                                                val data =
-                                                    responseBase.getJSONObject("Menu")
-                                                        .getJSONObject("Response")
-                                                if (resp.contains("\"IsImage\":true")) {
-                                                    requireActivity().supportFragmentManager
-                                                        .beginTransaction().replace(
-                                                            R.id.container,
-                                                            instantiate(
-                                                                data
-                                                            )
-                                                        ).commit()
-                                                } else {
-                                                    requireActivity().supportFragmentManager
-                                                        .beginTransaction().replace(
-                                                            R.id.container,
-                                                            EnterDetailFragment.instantiate(data)
-                                                        ).commit()
-                                                }
-                                            } else {
-                                                val message =
-                                                    responseBase.getJSONObject("Menu")
-                                                        .getJSONObject("Response")
-                                                        .getString("Display")
-                                                dialogProvider.showError(message)
-                                            }
+                                            requireActivity().supportFragmentManager
+                                                .beginTransaction().replace(
+                                                    R.id.container,
+                                                    EnterDetailFragment.instantiate(data)
+                                                ).commit()
                                         }
                                     } else {
-                                        Misc.increaseTransactionMonitorCounter(
-                                            activity,
-                                            TransactionCountType.ERROR_RESPONSE_COUNT,
-                                            authResponse.sessionId
-                                        )
-                                        if (responseBase.toString().contains("Display")) {
-                                            showDialogWithGoHomeAction(
-                                                responseBase.getJSONObject("Menu")
-                                                    .getJSONObject("Response")
-                                                    .optString(
-                                                        "Display",
-                                                        ErrorMessages.OPERATION_NOT_COMPLETED
-                                                    )
-                                            )
-                                        } else {
-                                            dialogProvider.showError(
-                                                responseBase.optString(
-                                                    "Menu",
-                                                    ErrorMessages.PHONE_NOT_REGISTERED
-                                                )
-                                            )
-                                        }
+                                        val message =
+                                            responseBase.getJSONObject("Menu")
+                                                .getJSONObject("Response")
+                                                .getString("Display")
+                                        dialogProvider.showError(message)
                                     }
                                 }
-                            }
-                        } catch (c: Exception) {
-                            showDialogWithGoHomeAction("Something went wrong! Please try again.")
-                            Misc.increaseTransactionMonitorCounter(
-                                activity,
-                                TransactionCountType.ERROR_RESPONSE_COUNT,
-                                authResponse.sessionId
-                            )
-                        }
-                    } else {
-                        if (e != null) {
-                            if (e is TimeoutException) {
-                                showDialogWithGoHomeAction("Something went wrong! Please try again.")
-                                Misc.increaseTransactionMonitorCounter(
-                                    activity,
-                                    TransactionCountType.NO_INTERNET_COUNT,
-                                    authResponse.sessionId
-                                )
                             } else {
-                                dialogProvider.showError("Connection lost")
                                 Misc.increaseTransactionMonitorCounter(
                                     activity,
                                     TransactionCountType.ERROR_RESPONSE_COUNT,
                                     authResponse.sessionId
                                 )
+                                if (responseBase.toString().contains("Display")) {
+                                    showDialogWithGoHomeAction(
+                                        responseBase.getJSONObject("Menu")
+                                            .getJSONObject("Response")
+                                            .optString(
+                                                "Display",
+                                                ErrorMessages.OPERATION_NOT_COMPLETED
+                                            )
+                                    )
+                                } else {
+                                    dialogProvider.showError(
+                                        responseBase.optString(
+                                            "Menu",
+                                            ErrorMessages.PHONE_NOT_REGISTERED
+                                        )
+                                    )
+                                }
                             }
-                        } else {
-                            dialogProvider.showError("Connection lost")
-                            Misc.increaseTransactionMonitorCounter(
-                                activity,
-                                TransactionCountType.ERROR_RESPONSE_COUNT,
-                                authResponse.sessionId
-                            )
                         }
                     }
+                } catch (c: Exception) {
+                    showDialogWithGoHomeAction("Something went wrong! Please try again.")
+                    Misc.increaseTransactionMonitorCounter(
+                        activity,
+                        TransactionCountType.ERROR_RESPONSE_COUNT,
+                        authResponse.sessionId
+                    )
                 }
-            })
+            } else {
+                if (e != null) {
+                    if (e is TimeoutException) {
+                        showDialogWithGoHomeAction("Something went wrong! Please try again.")
+                        Misc.increaseTransactionMonitorCounter(
+                            activity,
+                            TransactionCountType.NO_INTERNET_COUNT,
+                            authResponse.sessionId
+                        )
+                    } else {
+                        dialogProvider.showError("Connection lost")
+                        Misc.increaseTransactionMonitorCounter(
+                            activity,
+                            TransactionCountType.ERROR_RESPONSE_COUNT,
+                            authResponse.sessionId
+                        )
+                    }
+                } else {
+                    dialogProvider.showError("Connection lost")
+                    Misc.increaseTransactionMonitorCounter(
+                        activity,
+                        TransactionCountType.ERROR_RESPONSE_COUNT,
+                        authResponse.sessionId
+                    )
+                }
+            }
+        }
     }
 
     override fun onActivityResult(

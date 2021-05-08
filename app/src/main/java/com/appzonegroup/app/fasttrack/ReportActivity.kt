@@ -272,6 +272,8 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                         this,
                         fundsTransferRequest,
                         item.date?.replace("T", " ") ?: "",
+                        isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
+                        reason = selectedTransactionStatus.label,
                     )
                 )
             }

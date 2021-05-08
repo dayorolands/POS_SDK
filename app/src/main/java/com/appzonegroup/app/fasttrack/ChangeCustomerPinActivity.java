@@ -96,10 +96,6 @@ public class ChangeCustomerPinActivity extends BaseActivity {
             return;
         }
 
-//        if (customerAccount.length()!=11) {
-//            indicateError("Invalid Phone Number Length",customerPhoneET);
-//            return;
-//        }
         sendCustomerToken(customerAccount, customerAccountNoEt);
     }
 
@@ -288,17 +284,10 @@ public class ChangeCustomerPinActivity extends BaseActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            switch (position) {
-                case 0: {
-                    return new ChangeCustomerPinActivity.CustomerAccountNumberFragment();
-                }
-                case 1: {
-                    return new ChangeCustomerPinActivity.ChangePinFragment();
-                }
-                default: {
-                    return new ChangeCustomerPinActivity.CustomerAccountNumberFragment();
-                }
+            if (position == 1) {
+                return new ChangePinFragment();
             }
+            return new CustomerAccountNumberFragment();
         }
 
         @Override

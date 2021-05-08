@@ -18,24 +18,19 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.context.GlobalContext
 import java.io.File
 import java.util.concurrent.TimeoutException
 
-
-/**
- * @author fdamilola on 9/5/15.
- * @contact fdamilola@gmail.com +2348166200715
- */
 class APIHelper @JvmOverloads constructor(
     private val ctx: Context,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
-) : KoinComponent {
-    private val localStorage: LocalStorage by inject()
-    private val client: CreditClubClient by inject()
+) {
+    private val koin = GlobalContext.get().koin
+    private val localStorage: LocalStorage by koin.inject()
+    private val client: CreditClubClient by koin.inject()
 
-    interface VolleyCallback<T> {
+    fun interface VolleyCallback<T> {
         fun onCompleted(e: Exception?, result: T?, status: Boolean)
     }
 
@@ -121,40 +116,34 @@ class APIHelper @JvmOverloads constructor(
         }
     }
 
-    fun getNextOperationImage(
+    suspend fun getNextOperationImage(
         pNumber: String,
         sessionId: String,
         image: File,
         location: String,
         isFullImage: Boolean,
-        scope: CoroutineScope,
-        callback: FutureCallback<String>
-    ) {
+    ): SafeRunResult<String?> {
         Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId)
 
-        scope.launch {
-            val mimeTypeMap = MimeTypeMap.getSingleton()
-            val mimeType = mimeTypeMap.getMimeTypeFromExtension(
-                MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(image).toString())
+        val mimeTypeMap = MimeTypeMap.getSingleton()
+        val mimeType = mimeTypeMap.getMimeTypeFromExtension(
+            MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(image).toString())
+        )
+        val requestFile: RequestBody = image
+            .asRequestBody((mimeType ?: "image/jpeg").toMediaTypeOrNull())
+
+        val body =
+            MultipartBody.Part.createFormData("file", image.name, requestFile)
+
+        return safeRunIO {
+            client.bankOneService.operationNextImage(
+                pNumber,
+                sessionId,
+                Encryption.encrypt(location),
+                Encryption.encrypt(localStorage.institutionCode),
+                isFullImage,
+                body
             )
-            val requestFile: RequestBody = image
-                .asRequestBody((mimeType ?: "image/jpeg").toMediaTypeOrNull())
-
-            val body =
-                MultipartBody.Part.createFormData("file", image.name, requestFile)
-
-            val (response, error) = safeRunIO {
-                client.bankOneService.operationNextImage(
-                    pNumber,
-                    sessionId,
-                    Encryption.encrypt(location),
-                    Encryption.encrypt(localStorage.institutionCode),
-                    isFullImage,
-                    body
-                )
-            }
-
-            callback.onCompleted(error, response)
         }
     }
 
@@ -204,10 +193,5 @@ class APIHelper @JvmOverloads constructor(
 
             block(result)
         }
-    }
-
-
-    interface FutureCallback<T> {
-        fun onCompleted(e: Exception?, result: T?)
     }
 }

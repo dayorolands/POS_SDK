@@ -1,83 +1,48 @@
-package com.appzonegroup.app.fasttrack.utility.task;
+package com.appzonegroup.app.fasttrack.utility.task
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.os.AsyncTask;
+import android.app.Activity
+import android.os.AsyncTask
+import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.safeRun
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.koin.core.context.GlobalContext
+import org.koin.core.qualifier.named
 
-import com.appzonegroup.app.fasttrack.network.APICaller;
-import com.creditclub.core.ui.widget.DialogProvider;
+class PostCallTask(
+    var dialogProvider: DialogProvider,
+    activity: Activity,
+    asyncResponse: AsyncResponse?
+) : AsyncTask<String, Void?, String?>() {
+    var delegate: AsyncResponse? = asyncResponse
+    private val koin = GlobalContext.get().koin
 
-
-/**
- * Created by Joseph on 7/3/2018.
- */
-
-public class PostCallTask extends AsyncTask<String, Void, String>
-{
-
-    DialogProvider dialogProvider;
-    public AsyncResponse delegate = null;
-    private Activity activity;
-    public PostCallTask(DialogProvider dialogProvider, Activity activity, AsyncResponse asyncResponse)
-    {
-        this.dialogProvider = dialogProvider;
-        this.activity = activity;
-        delegate = asyncResponse;
+    override fun onPreExecute() {
+        super.onPreExecute()
+        dialogProvider.showProgressBar("Loading")
     }
 
-    /**
-     * Runs on the UI thread before {@link #doInBackground}.
-     *
-     * @see #onPostExecute
-     * @see #doInBackground
-     */
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        if (dialogProvider != null)
-            dialogProvider.showProgressBar("Loading");
+    override fun onPostExecute(s: String?) {
+        super.onPostExecute(s)
+        dialogProvider.hideProgressBar()
+        delegate?.processFinished(s)
     }
 
-    /**
-     * <p>Runs on the UI thread after {@link #doInBackground}. The
-     * specified result is the value returned by {@link #doInBackground}.</p>
-     * <p>
-     * <p>This method won't be invoked if the task was cancelled.</p>
-     *
-     * @param s The result of the operation computed by {@link #doInBackground}.
-     * @see #onPreExecute
-     * @see #doInBackground
-     */
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-
-        if (dialogProvider != null) {
-            dialogProvider.hideProgressBar();
-        }
-
-        delegate.processFinished(s);
-    }
-
-    /**
-     * Override this method to perform a computation on a background thread. The
-     * specified parameters are the parameters passed to {@link #execute}
-     * by the caller of this task.
-     * <p>
-     * This method can call {@link #publishProgress} to publish updates
-     * on the UI thread.
-     *
-     * @param params The parameters of the task.
-     * @return A result, defined by the subclass of this task.
-     * @see #onPreExecute()
-     * @see #onPostExecute
-     * @see #publishProgress
-     */
-    @Override
-    protected String doInBackground(String... params) {
-        String url = params[0];
-        String paramater = params[1];
-
-        return APICaller.postRequest(activity, url, paramater);
+    override fun doInBackground(vararg params: String): String? {
+        val url = params[0]
+        val parameter = params[1]
+        return safeRun {
+            val mediaType = "application/json".toMediaTypeOrNull()
+            val client = koin.get<OkHttpClient>(named("middleware"))
+            val body = parameter.toRequestBody(mediaType)
+            val request = Request.Builder()
+                .url(url)
+                .post(body)
+                .build()
+            val response = client.newCall(request).execute()
+            response.body?.string()
+        }.data
     }
 }

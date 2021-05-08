@@ -1,56 +1,27 @@
-package com.appzonegroup.app.fasttrack.model.online;
+package com.appzonegroup.app.fasttrack.model.online
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.JSONObject
+import kotlin.Throws
+import org.json.JSONArray
+import java.lang.Exception
+import java.util.*
 
-import java.util.ArrayList;
-import java.util.UUID;
+class Option(item: JSONObject) {
+    var name: String? = item.optString("content")
+        private set
+    var index: String? = item.optString("Index")
+        private set
 
-/**
- * Created by fdamilola on 8/13/15.
- */
-public class Option {
-    private String name;
-    private String index;
-    private String optionSessionId;
-
-    public Option(JSONObject item){
-        setName(item.optString("content"));
-        setIndex(item.optString("Index"));
-        String uuid = UUID.randomUUID().toString();
-        setOptionSessionId(uuid.replace("-", ""));
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    private void setName(String name) {
-        this.name = name;
-    }
-
-    public String getIndex() {
-        return index;
-    }
-
-    private void setIndex(String index) {
-        this.index = index;
-    }
-
-    public static ArrayList<Option> parseMenu(JSONArray data) throws Exception{
-        ArrayList<Option> menuItems = new ArrayList<>();
-        for(int i = 0; i < data.length(); i++){
-            JSONObject menuItem = data.getJSONObject(i);
-            menuItems.add(new Option(menuItem));
+    companion object {
+        @JvmStatic
+        @Throws(Exception::class)
+        fun parseMenu(data: JSONArray): ArrayList<Option> {
+            val menuItems = ArrayList<Option>()
+            for (i in 0 until data.length()) {
+                val menuItem = data.getJSONObject(i)
+                menuItems.add(Option(menuItem))
+            }
+            return menuItems
         }
-        return menuItems;
-    }
-
-    public String getOptionSessionId() {
-        return optionSessionId;
-    }
-
-    public void setOptionSessionId(String optionSessionId) {
-        this.optionSessionId = optionSessionId;
     }
 }

@@ -1,33 +1,27 @@
 package com.appzonegroup.creditclub.pos.data
 
-import com.appzonegroup.creditclub.pos.card.cardTransactionType
+import com.appzonegroup.creditclub.pos.card.getTransactionType
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.models.PosTransaction
-import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.mask
+import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.pos.card.TransactionType
 import org.jpos.iso.ISOMsg
-import org.koin.core.KoinComponent
-import org.koin.core.get
-
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 05/02/2020.
- * Appzone Ltd
- */
-
-private inline val KoinComponent.localStorage get() = get<LocalStorage>()
-private inline val KoinComponent.agent get() = localStorage.agent
+import org.koin.core.context.GlobalContext
 
 fun PosTransaction.Companion.create(isoMsg: ISOMsg): PosTransaction {
-    val transactionType = cardTransactionType(isoMsg)
-    val amount =
-        if (transactionType == TransactionType.Balance) CurrencyFormatter.format(isoMsg.additionalAmounts54)
-        else CurrencyFormatter.format(isoMsg.transactionAmount4)
+    val koin = GlobalContext.get().koin
+    val localStorage = koin.get<LocalStorage>()
+    val agent = localStorage.agent
+    val transactionType = isoMsg.getTransactionType()
+    val amountString =
+        if (transactionType == TransactionType.Balance) isoMsg.additionalAmounts54
+        else isoMsg.transactionAmount4
+
     return PosTransaction(
         institutionCode = localStorage.institutionCode,
-        agentPhoneNumber = localStorage.agent?.phoneNumber,
+        agentPhoneNumber = agent?.phoneNumber,
         agentName = agent?.agentName,
         agentCode = agent?.agentCode,
         appName = "CreditClub POS v1.0.1",
@@ -46,6 +40,6 @@ fun PosTransaction.Companion.create(isoMsg: ISOMsg): PosTransaction {
         responseCode = isoMsg.responseCode39,
 //                cardHolder = isoMsg.cardHolder,
         transactionType = transactionType.type,
-        amount = amount,
+        amount = amountString?.toLongOrNull()?.toCurrencyFormat() ?: "NGN0.00",
     )
 }

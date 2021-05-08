@@ -9,52 +9,52 @@ import kotlinx.serialization.Serializable
  * Appzone Ltd
  */
 @Serializable
-class Customer {
+data class Customer(
     @SerialName("ProductCode")
-    var productCode: String? = null
+    var productCode: String? = null,
 
     @SerialName("ProductName")
-    var productName: String? = null
+    var productName: String? = null,
 
     @SerialName("AccountNumber")
-    var accountNumber: String? = null
+    var accountNumber: String? = null,
 
     @SerialName("PIN")
-    var PIN: String? = null
+    var pin: String? = null,
 
     @SerialName("CustomerLastName")
-    var customerLastName: String? = null
+    var customerLastName: String? = null,
 
     @SerialName("CustomerFirstName")
-    var customerFirstName: String? = null
+    var customerFirstName: String? = null,
 
     @SerialName("CustomerPhoneNumber")
-    var customerPhoneNumber: String? = null
+    var customerPhoneNumber: String? = null,
 
     @SerialName("Gender")
-    var gender: String? = null
+    var gender: String? = null,
 
     @SerialName("StarterPackNumber")
-    var starterPackNumber: String? = null
+    var starterPackNumber: String? = null,
 
     @SerialName("BVN")
-    var BVN: String? = null
+    var BVN: String? = null,
 
     @SerialName("Address")
-    var address: String? = null
+    var address: String? = null,
 
     @SerialName("NOKPhone")
-    var NOKPhone: String? = null
+    var NOKPhone: String? = null,
 
     @SerialName("NOKName")
-    var NOKName: String? = null
+    var NOKName: String? = null,
 
     @SerialName("PlaceOfBirth")
-    var placeOfBirth: String? = null
+    var placeOfBirth: String? = null,
 
     @SerialName("DateOfBirth")
-    var dateOfBirth: String? = null
+    var dateOfBirth: String? = null,
 
     @SerialName("GeoLocation")
-    var geoLocation: String? = null
-}
+    var geoLocation: String? = null,
+)
