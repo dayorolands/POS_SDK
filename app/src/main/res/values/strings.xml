@@ -2,7 +2,7 @@
     <string name="app_name">CreditClub Plus</string>
     <string name="ota_app_name">CreditClub</string>
     <string name="institution_name">CreditClub</string>
-    <string name="institution_website">http://www.appzonegroup.com/products/creditclub</string>
+    <string name="institution_website">https://www.appzonegroup.com/group/appzone-pos</string>
     <string name="home">Home</string>
     <string name="title_activity_login">Login</string>
     <string name="register_customer">Open Account</string>

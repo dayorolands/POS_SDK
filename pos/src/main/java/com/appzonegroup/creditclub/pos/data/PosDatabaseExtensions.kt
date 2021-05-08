@@ -26,7 +26,7 @@ fun PosTransaction.Companion.create(isoMsg: ISOMsg): PosTransaction {
         agentCode = agent?.agentCode,
         appName = "CreditClub POS v1.0.1",
         ptsp = "3GEE PAY",
-        website = "http://www.appzonegroup.com/products/creditclub",
+        website = "https://www.appzonegroup.com/group/appzone-pos",
         pan = isoMsg.pan.mask(6, 4),
         merchantDetails = isoMsg.cardAcceptorNameLocation43,
         merchantId = isoMsg.cardAcceptorIdCode42,
