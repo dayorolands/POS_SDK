@@ -134,6 +134,11 @@ android {
             dimension "flavor"
             applicationId "com.creditclub.gtbank"
         }
+
+        purple {
+            dimension "flavor"
+            applicationId "com.creditclub.purple"
+        }
     }
     sourceSets {
         main {
