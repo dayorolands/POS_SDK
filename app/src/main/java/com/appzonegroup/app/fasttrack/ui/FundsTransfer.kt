@@ -1,5 +1,7 @@
 package com.appzonegroup.app.fasttrack.ui
 
+import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,8 +16,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -44,6 +49,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import java.time.Instant
 import java.util.*
+import kotlin.math.roundToInt
 
 @Composable
 fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) {
@@ -76,7 +82,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     val formattedAmount = remember(amountString, amountIsValid) {
         if (amountIsValid) amountString.toDouble().toCurrencyFormat() else ""
     }
-    var errorMessage by remember(receiverAccountNumber, amountString, loadingMessage) {
+    var errorMessage by remember(receiverAccountNumber, amountString) {
         mutableStateOf("")
     }
     var showConfirmation by remember(nameEnquiryResponse, isSameBank) { mutableStateOf(false) }
@@ -88,6 +94,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
             transactionReference,
         ) {
             validateAccount@{
+                errorMessage = ""
                 val nameEnquiryRequest = FundsTransferRequest(
                     agentPhoneNumber = localStorage.agentPhone,
                     institutionCode = localStorage.institutionCode,
@@ -137,6 +144,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
             showConfirmation,
         ) {
             makeTransfer@{
+                errorMessage = ""
                 val pin = dialogProvider.getPin("Agent PIN") ?: return@makeTransfer
                 if (pin.isEmpty()) return@makeTransfer dialogProvider.showError("Please enter your PIN")
                 if (pin.length != 4) return@makeTransfer dialogProvider.showError("PIN must be four digits")
@@ -252,12 +260,12 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     ) {
                         SmallMenuButton(
                             text = stringResource(R.string.funds_transfer_same_bank),
-                            icon = painterResource(R.drawable.ic_bank_building),
+                            icon = R.drawable.funds_transfer_same_bank,
                             onClick = { isSameBank = true },
                         )
                         SmallMenuButton(
                             text = stringResource(R.string.other_bank),
-                            icon = painterResource(R.drawable.ic_bank_building),
+                            icon = R.drawable.ic_bank_building,
                             onClick = { isSameBank = false },
                         )
                     }
@@ -401,10 +409,13 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
 @Composable
 private fun RowScope.SmallMenuButton(
     text: String,
-    icon: Painter,
+    @DrawableRes icon: Int,
     onClick: () -> Unit,
+    draw: Boolean = false,
     tint: Color = colorResource(R.color.colorAccent)
 ) {
+    val context = LocalContext.current
+    val drawable = AppCompatResources.getDrawable(context, icon)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -422,15 +433,36 @@ private fun RowScope.SmallMenuButton(
             elevation = 2.dp,
             shape = RoundedCornerShape(20.dp),
         ) {
-            Image(
-                icon,
-                contentDescription = null,
-                alignment = Alignment.Center,
-                modifier = Modifier
-                    .padding(30.dp)
-                    .size(35.dp),
-                colorFilter = if (tint.alpha == 0f) null else ColorFilter.tint(tint),
-            )
+            if (draw) {
+                Box(
+                    modifier = Modifier
+                        .padding(30.dp)
+                        .requiredSize(45.dp)
+                        .drawBehind {
+                            drawIntoCanvas { canvas ->
+                                drawable?.let {
+                                    it.setBounds(
+                                        0,
+                                        0,
+                                        size.width.roundToInt(),
+                                        size.height.roundToInt()
+                                    )
+                                    it.draw(canvas.nativeCanvas)
+                                }
+                            }
+                        }
+                )
+            } else {
+                Image(
+                    painterResource(id = icon),
+                    contentDescription = null,
+                    alignment = Alignment.Center,
+                    modifier = Modifier
+                        .padding(30.dp)
+                        .size(35.dp),
+                    colorFilter = if (tint.alpha == 0f) null else ColorFilter.tint(tint),
+                )
+            }
         }
 
         Text(

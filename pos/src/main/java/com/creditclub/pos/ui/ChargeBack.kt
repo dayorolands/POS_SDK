@@ -27,6 +27,7 @@ import com.creditclub.core.model.IntValueType
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.format
 import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.pos.api.ChargeBackService
 import com.creditclub.ui.CreditClubAppBar
 import com.creditclub.ui.Select
@@ -240,9 +241,7 @@ fun ChargeBack(
 
 @Composable
 private fun DisputeTransactionItem(transaction: DisputedPosTransaction) {
-    val amount = remember {
-        CurrencyFormatter.format(transaction.amount.toString())
-    }
+    val amount = remember { transaction.amount.toCurrencyFormat() }
     val prettyTime = remember { transaction.transactionDate?.format("MM/dd/uuuu hh:mm:ss") }
     val captionColor = MaterialTheme.colors.onSurface.copy(alpha = 0.52f)
     Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {

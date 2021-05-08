@@ -40,6 +40,6 @@ fun PosTransaction.Companion.create(isoMsg: ISOMsg): PosTransaction {
         responseCode = isoMsg.responseCode39,
 //                cardHolder = isoMsg.cardHolder,
         transactionType = transactionType.type,
-        amount = amountString?.toLongOrNull()?.toCurrencyFormat() ?: "NGN0.00",
+        amount = amountString?.toDoubleOrNull()?.div(100)?.toCurrencyFormat() ?: "NGN0.00",
     )
 }
