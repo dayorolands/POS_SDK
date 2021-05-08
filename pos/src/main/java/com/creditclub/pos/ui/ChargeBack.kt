@@ -241,7 +241,7 @@ fun ChargeBack(
 @Composable
 private fun DisputeTransactionItem(transaction: DisputedPosTransaction) {
     val amount = remember {
-        CurrencyFormatter.format(transaction.amount.times(100).toString())
+        CurrencyFormatter.format(transaction.amount.toString())
     }
     val prettyTime = remember { transaction.transactionDate?.format("MM/dd/uuuu hh:mm:ss") }
     val captionColor = MaterialTheme.colors.onSurface.copy(alpha = 0.52f)

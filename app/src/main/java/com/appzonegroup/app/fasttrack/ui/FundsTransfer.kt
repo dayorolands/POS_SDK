@@ -137,10 +137,6 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
             showConfirmation,
         ) {
             makeTransfer@{
-                if (!showConfirmation) {
-                    showConfirmation = true
-                    return@makeTransfer
-                }
                 val pin = dialogProvider.getPin("Agent PIN") ?: return@makeTransfer
                 if (pin.isEmpty()) return@makeTransfer dialogProvider.showError("Please enter your PIN")
                 if (pin.length != 4) return@makeTransfer dialogProvider.showError("PIN must be four digits")
@@ -220,16 +216,22 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     ) {
         CreditClubAppBar(
             title = when {
-                showConfirmation -> stringResource(R.string.confirm)
-                bank == null -> stringResource(R.string.select_bank)
+                isSameBank == null -> stringResource(R.string.funds_transfer)
                 !isVerified -> stringResource(R.string.enter_account)
+                showConfirmation -> stringResource(R.string.confirm)
                 else -> stringResource(R.string.funds_transfer)
             },
             onBackPressed = {
-                if (isSameBank == null) {
+                if (isSameBank == null || receipt != null) {
                     navController.popBackStack()
                 } else {
                     isSameBank = null
+                    bank = null
+                    nameEnquiryResponse = null
+                    showConfirmation = false
+                    receiverAccountNumber = ""
+                    narration = ""
+                    amountString = ""
                     loadingMessage = ""
                 }
             },
@@ -262,7 +264,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 }
             }
             if (bank != null && !showConfirmation) {
-                item {
+                item(key = "bank") {
                     OutlinedTextField(
                         label = { Text(text = "Bank") },
                         value = bank!!.name ?: bank!!.shortName ?: "",
@@ -277,7 +279,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 }
             }
             if (isSameBank != null && !showConfirmation) {
-                item {
+                item(key = "account-number") {
                     OutlinedTextField(
                         label = { Text(text = "Recipient Account Number") },
                         value = receiverAccountNumber,
@@ -307,7 +309,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     )
                 }
                 if (isVerified && !showConfirmation) {
-                    item {
+                    item(key = "account-name") {
                         Text(
                             nameEnquiryResponse!!.beneficiaryAccountName ?: "",
                             modifier = Modifier
@@ -319,7 +321,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 }
             }
             if (nameEnquiryResponse != null && !showConfirmation) {
-                item {
+                item(key = "amount") {
                     OutlinedTextField(
                         label = { Text(text = "Amount") },
                         value = amountString,
@@ -332,12 +334,13 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                         singleLine = true,
                     )
                 }
-                item {
+                item(key = "narration") {
                     OutlinedTextField(
                         value = narration,
                         onValueChange = { narration = it },
                         label = { Text(text = "Narration") },
                         maxLines = 1,
+                        singleLine = true,
                         modifier = Modifier
                             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                             .fillMaxWidth(),
@@ -346,23 +349,23 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
             }
 
             if (showConfirmation) {
-                item {
+                item(key = "confirm-beneficiary") {
                     DataItem(
                         label = "Beneficiary",
                         value = "${nameEnquiryResponse!!.beneficiaryAccountName}, $receiverAccountNumber"
                     )
                 }
-                item {
+                item(key = "confirm-bank") {
                     DataItem(
                         label = "Beneficiary Bank",
                         value = if (isSameBank == true) stringResource(R.string.funds_transfer_same_bank) else bank!!.shortName
                             ?: ""
                     )
                 }
-                item {
+                item(key = "confirm-amount") {
                     DataItem(label = "Amount", value = formattedAmount)
                 }
-                item {
+                item(key = "narration") {
                     DataItem(label = "Narration", value = narration)
                 }
             }
@@ -371,9 +374,18 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 ErrorMessage(errorMessage)
             }
         }
-        if (loadingMessage.isBlank() && accountNumberIsValid && amountIsValid && !showConfirmation) {
+        if (loadingMessage.isBlank() && accountNumberIsValid && amountIsValid && receipt == null) {
             AppButton(
-                onClick = { coroutineScope.launch { if (isVerified) transferFunds() else validateAccount() } }) {
+                onClick = {
+                    coroutineScope.launch {
+                        when {
+                            !showConfirmation -> showConfirmation = true
+                            isVerified -> transferFunds()
+                            else -> validateAccount()
+                        }
+                    }
+                }
+            ) {
                 Text(
                     text = when {
                         showConfirmation -> stringResource(R.string.confirm)
@@ -387,19 +399,18 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
 }
 
 @Composable
-private fun SmallMenuButton(
+private fun RowScope.SmallMenuButton(
     text: String,
     icon: Painter,
     onClick: () -> Unit,
     tint: Color = colorResource(R.color.colorAccent)
 ) {
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .heightIn(100.dp, 150.dp)
-            .widthIn(120.dp, 200.dp)
+            .weight(1f)
             .padding(8.dp),
     ) {
         Card(

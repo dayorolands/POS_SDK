@@ -5,18 +5,19 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
 import java.time.Period
+import kotlin.math.max
 
 @Serializable
 data class AppVersion(
 
     @SerialName("Link")
-    var link: String? = null,
+    val link: String,
 
     @SerialName("Version")
-    var version: String? = null,
+    val version: String,
 
     @SerialName("GracePeriod")
-    var gracePeriod: Int? = null
+    val gracePeriod: Int? = null,
 ) {
 
     @SerialName("NotifiedAt")
@@ -28,9 +29,38 @@ data class AppVersion(
     }
 
     fun updateIsAvailable(currentVersion: String): Boolean {
-        return version ?: "0" > currentVersion
+        return Version(version ?: "0") > Version(currentVersion)
     }
 
     fun daysOfGraceLeft(): Int =
         (gracePeriod ?: 365) - Period.between(notifiedAt, LocalDate.now()).days
+}
+
+class Version(private val version: String) : Comparable<Version?> {
+
+    fun get() = version
+
+    override operator fun compareTo(other: Version?): Int {
+        if (other == null) return 1
+        val thisParts = this.get().split("\\.".toRegex()).toTypedArray()
+        val thatParts = other.get().split("\\.".toRegex()).toTypedArray()
+        val length = max(thisParts.size, thatParts.size)
+        for (i in 0 until length) {
+            val thisPart = if (i < thisParts.size) thisParts[i].toInt() else 0
+            val thatPart = if (i < thatParts.size) thatParts[i].toInt() else 0
+            if (thisPart < thatPart) return -1
+            if (thisPart > thatPart) return 1
+        }
+        return 0
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null) return false
+        return if (this.javaClass != other.javaClass) false else this.compareTo(other as Version) == 0
+    }
+
+    init {
+        require(version.matches(Regex("[0-9]+(\\.[0-9]+)*"))) { "Invalid version format" }
+    }
 }
