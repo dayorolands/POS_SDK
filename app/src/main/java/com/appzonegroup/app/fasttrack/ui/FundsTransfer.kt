@@ -262,6 +262,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                             text = stringResource(R.string.funds_transfer_same_bank),
                             icon = R.drawable.funds_transfer_same_bank,
                             onClick = { isSameBank = true },
+                            draw = true,
                         )
                         SmallMenuButton(
                             text = stringResource(R.string.other_bank),
