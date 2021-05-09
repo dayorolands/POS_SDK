@@ -15,6 +15,7 @@ import com.telpo.emv.EmvApp
 import com.telpo.emv.EmvCAPK
 import com.telpo.emv.EmvService
 import com.telpo.pinpad.PinpadService
+import com.telpo.tps550.api.util.StringUtil.DeviceModelEnum
 import com.telpo.tps550.api.util.SystemUtil
 import org.koin.core.KoinComponent
 import org.koin.core.get
@@ -123,8 +124,9 @@ class TelpoPosManager(private val activity: CreditClubActivity) : PosManager, Ko
 
         override fun isCompatible(context: Context): Boolean {
             try {
-                SystemUtil.getDeviceType()
-                return true
+                return SystemUtil.getDeviceType() == DeviceModelEnum.TPS900.ordinal
+                        || SystemUtil.getDeviceType() == DeviceModelEnum.TPS900B.ordinal
+                        || SystemUtil.getDeviceType() == DeviceModelEnum.TPS900MB.ordinal
             } catch (ex: Exception) {
                 debugOnly { Log.e("TelpoPosManager", ex.message, ex) }
             } catch (err: UnsatisfiedLinkError) {

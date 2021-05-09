@@ -196,6 +196,7 @@ dependencies {
     creditclubImplementation project(path: ':telpo')
     polarisImplementation project(path: ':nexgo')
     polarisImplementation project(path: ':telpo')
+    polarisImplementation project(path: ':sunmi')
     accessImplementation project(path: ':telpo')
     gtbankImplementation project(path: ':dspread')
 
