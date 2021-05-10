@@ -217,7 +217,7 @@ public class EnterDetailFragment extends CreditClubFragment implements View.OnCl
                             if (menuWrapper instanceof String && resp.contains("ShouldMask") && !resp.contains("Invalid Response")) {
                                 Misc.increaseTransactionMonitorCounter(getActivity(), TransactionCountType.SUCCESS_COUNT, authResponse.getSessionId());
                                 JSONObject data = response_base.getJSONObject("Menu").getJSONObject("Response");
-                                if (resp.contains("\"IsImage\":true")) {
+                                if (resp.contains("\"IsImage\":\"true\"")) {
                                     requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, CustomerImageFragment.instantiate(data)).commit();
                                 } else {
                                     requireActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, EnterDetailFragment.instantiate(data)).commit();

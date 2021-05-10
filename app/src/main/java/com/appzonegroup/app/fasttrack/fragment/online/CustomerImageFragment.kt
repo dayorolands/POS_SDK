@@ -37,7 +37,6 @@ import java.util.concurrent.TimeoutException
 class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_image),
     View.OnClickListener {
     private var creditClubImage: CreditClubImage? = null
-    private var imageString: String? = null
     private var image: Bitmap? = null
     private val binding by dataBinding<FragmentCustomerImageBinding>()
     private var optionsText: OptionsText? = null
@@ -271,7 +270,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
                                         val data =
                                             responseBase.getJSONObject("Menu")
                                                 .getJSONObject("Response")
-                                        if (resp.contains("\"IsImage\":true")) {
+                                        if (resp.contains("\"IsImage\":\"true\"")) {
                                             requireActivity().supportFragmentManager
                                                 .beginTransaction().replace(
                                                     R.id.container,
@@ -375,7 +374,6 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
                     image = bitmap
                     binding.image.setImageBitmap(bitmap)
 
-                    imageString = safeRunIO { creditClubImage?.bitmapString }.data
                     dialogProvider.hideProgressBar()
                 }
             } catch (ex: Exception) {
