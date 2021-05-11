@@ -84,19 +84,20 @@ class N3EmvListener(
             val ipekBytes = dukptConfig.ipek.hexBytes
             val ksnBytes = dukptConfig.ksn.hexBytes
 
-            val cipheyKey = dukptConfig.ipek.padEnd(32, '0').hexBytes.asDesEdeKey
-            val kcv = cipheyKey.encrypt(ByteArray(8)).hexString
+            val cipherKey = dukptConfig.ipek.padEnd(32, '0').hexBytes.asDesEdeKey
+            val oldKcv = prefs.getString("kcv", null)
+            val newKcv = cipherKey.encrypt(ByteArray(8)).hexString
             pinPad.setAlgorithmMode(AlgorithmModeEnum.DUKPT)
-            if (prefs.getString("kcv", null) != kcv) {
+            if (oldKcv != newKcv) {
                 val result = pinPad.dukptKeyInject(
                     0,
                     DukptKeyTypeEnum.IPEK,
                     ipekBytes,
                     ipekBytes.size,
-                    ksnBytes
+                    ksnBytes,
                 )
                 debug("Dukpt inject result is $result")
-                if (result == 0) prefs.edit { putString("kcv", kcv) }
+                if (result == 0) prefs.edit { putString("kcv", newKcv) }
             }
             pinPad.dukptKsnIncrease(0)
         } else {
