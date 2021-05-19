@@ -320,12 +320,14 @@ class HomeFragment : CreditClubFragment() {
                         }
                         composable(BottomNavScreens.Customer.route) {
                             SubMenu {
-                                item {
-                                    MenuButton(
-                                        text = "Register",
-                                        icon = painterResource(R.drawable.payday_loan),
-                                        onClick = { openPageById(R.id.register_button) }
-                                    )
+                                if (flows.accountOpening != null) {
+                                    item {
+                                        MenuButton(
+                                            text = "Register",
+                                            icon = painterResource(R.drawable.payday_loan),
+                                            onClick = { openPageById(R.id.register_button) }
+                                        )
+                                    }
                                 }
                                 if (flows.walletOpening != null) {
                                     item {
@@ -372,12 +374,14 @@ class HomeFragment : CreditClubFragment() {
                                         onClick = { openPageById(R.id.deposit_button) }
                                     )
                                 }
-                                item {
-                                    MenuButton(
-                                        text = "Token Withdrawal",
-                                        icon = painterResource(R.drawable.withdraw),
-                                        onClick = { openPageById(R.id.token_withdrawal_button) }
-                                    )
+                                if (flows.tokenWithdrawal != null) {
+                                    item {
+                                        MenuButton(
+                                            text = "Token Withdrawal",
+                                            icon = painterResource(R.drawable.withdraw),
+                                            onClick = { openPageById(R.id.token_withdrawal_button) }
+                                        )
+                                    }
                                 }
                                 if (Platform.isPOS) {
                                     item {
@@ -397,12 +401,14 @@ class HomeFragment : CreditClubFragment() {
                                         )
                                     }
                                 }
-                                item {
-                                    MenuButton(
-                                        text = "Airtime Topup",
-                                        icon = painterResource(R.drawable.payday_loan),
-                                        onClick = { openPageById(R.id.airtime_button) }
-                                    )
+                                if (flows.airtime != null) {
+                                    item {
+                                        MenuButton(
+                                            text = "Airtime Topup",
+                                            icon = painterResource(R.drawable.payday_loan),
+                                            onClick = { openPageById(R.id.airtime_button) }
+                                        )
+                                    }
                                 }
                                 item {
                                     MenuButton(
