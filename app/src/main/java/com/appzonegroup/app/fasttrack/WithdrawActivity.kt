@@ -50,10 +50,10 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
             }
         }
 
-        viewModel.hasExternalToken.value = tokenWithdrawalConfig.externalToken
+        viewModel.hasExternalToken.value = tokenWithdrawalConfig?.externalToken == true
         viewModel.accountInfo.value = accountInfo
 
-        if (tokenWithdrawalConfig.externalToken) {
+        if (tokenWithdrawalConfig?.externalToken == true) {
             viewModel.tokenSent.value = true
             binding.withdrawalAmountEt.isEnabled = true
             binding.topLayout.isEnabled = false
@@ -83,7 +83,7 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
             mainScope.launch { onWithdrawClick() }
         }
 
-        if (tokenWithdrawalConfig.customerPin) {
+        if (tokenWithdrawalConfig?.customerPin == true) {
             binding.customerPinEt.visibility = View.VISIBLE
         }
     }
@@ -136,7 +136,7 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
             return
         }
 
-        if (tokenWithdrawalConfig.customerPin) {
+        if (tokenWithdrawalConfig?.customerPin == true) {
             request.customerPin = binding.customerPinEt.value
 
             if (request.customerPin.isNullOrEmpty()) {

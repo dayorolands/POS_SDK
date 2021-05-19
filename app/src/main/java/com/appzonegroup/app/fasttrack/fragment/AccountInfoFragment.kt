@@ -15,7 +15,6 @@ import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.isKotlinNPE
 import com.creditclub.core.util.requireAndValidateToken
 import com.creditclub.core.util.safeRunIO
-import com.creditclub.core.util.showError
 import kotlinx.coroutines.launch
 
 class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_request_account_info) {
@@ -27,7 +26,7 @@ class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
         binding.accountInfoNextBtn.setOnClickListener { next() }
-        val requiresProducts = institutionConfig.flows.accountOpening.products
+        val requiresProducts = institutionConfig.flows.accountOpening?.products == true
         viewModel.requiresProduct.value = requiresProducts
         if (requiresProducts) {
             mainScope.launch { loadProducts() }
@@ -35,11 +34,6 @@ class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
     }
 
     private suspend fun loadProducts() {
-//        val productDAO = ProductDAO(requireContext())
-//        val products= productDAO.GetAll()
-//        productDAO.close()
-//        var productNames = products.map { it.name }
-
         dialogProvider.showProgressBar("Getting Products...")
         val (response, error) = safeRunIO {
             creditClubMiddleWareAPI.staticService.getAllProducts(
@@ -50,8 +44,6 @@ class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
         dialogProvider.hideProgressBar()
         if (error != null) return dialogProvider.showError(error)
         response ?: return dialogProvider.showError("No products available")
-
-//        productDAO.Insert(response)
 
         val productNames = response.map { it.name }
         val adapter = ArrayAdapter(requireContext(), R.layout.list_item, productNames)
