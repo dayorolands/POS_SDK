@@ -11,4 +11,8 @@
     <bool name="account_opening_products">false</bool>
     <bool name="token_withdrawal_external_token">false</bool>
     <bool name="bill_payment_enabled">true</bool>
+    <bool name="flow_account_opening">true</bool>
+    <bool name="flow_airtime">true</bool>
+    <bool name="flow_token_withdrawal">true</bool>
+    <bool name="flow_customer_balance">true</bool>
 </resources>

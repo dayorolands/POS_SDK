@@ -3,9 +3,7 @@ package com.appzonegroup.app.fasttrack.app
 import android.content.Context
 import com.appzonegroup.app.fasttrack.BuildConfig
 import com.appzonegroup.app.fasttrack.R
-import com.creditclub.core.config.CategoryConfig
-import com.creditclub.core.config.FlowConfig
-import com.creditclub.core.config.IInstitutionConfig
+import com.creditclub.core.config.*
 import com.creditclub.core.type.TransactionType
 import com.creditclub.core.util.localStorage
 
@@ -40,40 +38,52 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
             config.name = resources.getString(R.string.institution_name)
 
             config.flows.run {
-                tokenWithdrawal.customerPin =
-                    resources.getBoolean(R.bool.token_withdrawal_customer_pin)
-
-                tokenWithdrawal.externalToken =
-                    resources.getBoolean(R.bool.token_withdrawal_external_token)
-
-                accountOpening.products =
-                    resources.getBoolean(R.bool.account_opening_products)
-
-                if (!resources.getBoolean(R.bool.flow_bvn_update)) {
-                    bvnUpdate = null
+                if (resources.getBoolean(R.bool.flow_token_withdrawal)) {
+                    tokenWithdrawal = TokenWithdrawalConfig(
+                        customerPin = resources.getBoolean(R.bool.token_withdrawal_customer_pin),
+                        externalToken = resources.getBoolean(R.bool.token_withdrawal_external_token),
+                    )
                 }
 
-                if (!resources.getBoolean(R.bool.flow_customer_pin_change)) {
-                    customerPinChange = null
+                if (resources.getBoolean(R.bool.flow_token_withdrawal)) {
+                    accountOpening = AccountOpeningConfig(
+                        products = resources.getBoolean(R.bool.account_opening_products),
+                    )
                 }
 
-                if (!resources.getBoolean(R.bool.flow_wallet_opening)) {
-                    walletOpening = null
+                if (resources.getBoolean(R.bool.flow_bvn_update)) {
+                    bvnUpdate = Any()
                 }
 
-                if (!resources.getBoolean(R.bool.collections_enabled)) {
-                    collectionPayment = null
+                if (resources.getBoolean(R.bool.flow_customer_pin_change)) {
+                    customerPinChange = Any()
                 }
 
-                if (!resources.getBoolean(R.bool.bill_payment_enabled)) {
-                    billPayment = null
+                if (resources.getBoolean(R.bool.flow_wallet_opening)) {
+                    walletOpening = AccountOpeningConfig()
+                }
+
+                if (resources.getBoolean(R.bool.flow_customer_balance)) {
+                    customerBalance = Any()
+                }
+
+                if (resources.getBoolean(R.bool.flow_airtime)) {
+                    airtime = Any()
+                }
+
+                if (resources.getBoolean(R.bool.collections_enabled)) {
+                    collectionPayment = Any()
+                }
+
+                if (resources.getBoolean(R.bool.bill_payment_enabled)) {
+                    billPayment = Any()
                 }
             }
 
-            config.categories.run {
-                loans = resources.getBoolean(R.bool.category_loan)
-                customers = resources.getBoolean(R.bool.category_customer)
-            }
+            config.categories = config.categories.copy(
+                loans = resources.getBoolean(R.bool.category_loan),
+                customers = resources.getBoolean(R.bool.category_customer),
+            )
 
             config.transactionTypes = resources.getStringArray(R.array.transaction_types).map {
                 TransactionType.valueOf(it)
@@ -92,7 +102,7 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
                 }
 
                 if (isTcfBank) {
-                    config.categories.loans = false
+                    config.categories = config.categories.copy(loans = false)
                     config.hasHlaTagging = false
                     config.hasOnlineFunctions = false
                     config.flows.bvnUpdate = null

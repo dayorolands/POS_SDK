@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CreditClub Plus</string>
+    <string name="app_name">Purple Money</string>
     <string name="funds_transfer_same_bank">Purple Money</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
