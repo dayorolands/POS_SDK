@@ -52,8 +52,8 @@ fun CreditClubActivity.requireAccountInfo(
                 CustomerRequestOption.PhoneNumber -> TextFieldParams(
                     "Enter customer phone number",
                     type = "number",
-                    maxLength = institutionConfig.bankAccountNumberLength,
-                    minLength = institutionConfig.bankAccountNumberLength,
+                    maxLength = 11,
+                    minLength = 11,
                     required = true,
                 )
 

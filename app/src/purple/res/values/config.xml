@@ -13,4 +13,5 @@
     <bool name="flow_airtime">false</bool>
     <bool name="flow_token_withdrawal">false</bool>
     <bool name="flow_customer_balance">false</bool>
+    <bool name="category_customer">false</bool>
 </resources>
