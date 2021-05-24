@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Fast Track</string>
+    <string name="ota_app_name">Access</string>
     <string name="institution_name">Access Bank</string>
     <string name="institution_website">https://www.accessbankplc.com</string>
     <string name="funds_transfer_same_bank">Access Bank</string>
