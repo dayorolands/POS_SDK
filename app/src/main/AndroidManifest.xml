@@ -49,19 +49,6 @@
             android:label="@string/title_activity_hla_tagging"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SupportThreadActivity"
-            android:label="@string/support"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".SupportActivity"
-            android:label="@string/support"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
-        </activity>
-        <activity
             android:name=".CaseLogActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -159,6 +146,10 @@
         <activity
             android:name="com.creditclub.ui.UpdateActivity"
             android:label="@string/update"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.creditclub.activity.ReceiptActivity"
+            android:label="@string/receipt"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CustomerRequestOpenAccountActivity"

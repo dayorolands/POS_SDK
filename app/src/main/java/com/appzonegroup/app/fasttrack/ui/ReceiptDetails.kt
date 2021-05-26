@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 fun ReceiptDetails(
     navController: NavController,
     printJob: PrintJob,
+    onBackPressed: () -> Unit = { navController.popBackStack() },
 ) {
     val coroutineScope = rememberCoroutineScope()
     val posPrinter by rememberPosPrinter()
@@ -37,7 +38,7 @@ fun ReceiptDetails(
             .fillMaxSize()
             .background(MaterialTheme.colors.surface),
     ) {
-        CreditClubAppBar(title = "", onBackPressed = { navController.popBackStack() })
+        CreditClubAppBar(title = "", onBackPressed = onBackPressed)
 
         LazyColumn(modifier = Modifier.weight(1f)) {
             item {
@@ -90,17 +91,15 @@ fun ReceiptDetails(
 
         ErrorMessage(content = errorMessage)
 
-        if (Platform.hasPrinter) {
-            AppButton(
-                modifier = Modifier.padding(horizontal = 10.dp),
-                onClick = {
-                    coroutineScope.launch {
-                        val status = posPrinter.print(printJob)
-                        errorMessage = if (status != PrinterStatus.READY) status.message else ""
-                    }
-                }) {
-                Text(text = "Print Receipt")
-            }
+        AppButton(
+            modifier = Modifier.padding(horizontal = 10.dp),
+            onClick = {
+                coroutineScope.launch {
+                    val status = posPrinter.print(printJob)
+                    errorMessage = if (status != PrinterStatus.READY) status.message else ""
+                }
+            }) {
+            Text(text = if (Platform.isPOS) "PRINT RECEIPT" else "SHARE RECEIPT")
         }
     }
 }

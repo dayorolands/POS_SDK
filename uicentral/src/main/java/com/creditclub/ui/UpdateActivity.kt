@@ -105,7 +105,6 @@ class UpdateActivity : CreditClubActivity(R.layout.activity_update) {
             val request = DownloadManager.Request(Uri.parse(url))
             request.setDescription("Downloading")
             request.setTitle("${getString(R.string.app_name)} application update")
-            request.allowScanningByMediaScanner()
             request.setAllowedOverMetered(true)
             request.setMimeType("application/vnd.android.package-archive")
             request.setAllowedOverRoaming(true)

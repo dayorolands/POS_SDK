@@ -17,7 +17,7 @@ import com.creditclub.pos.ui.GetPosTransaction
 import com.creditclub.pos.ui.LogDispute
 import com.creditclub.pos.ui.ResolveDispute
 import com.creditclub.ui.theme.CreditClubTheme
-import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.ProvideWindowInsets
 
 class ChargeBackFragment : CreditClubFragment() {
     private val chargeBackService: ChargeBackService by retrofitService()
@@ -27,7 +27,7 @@ class ChargeBackFragment : CreditClubFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return ComposeView(requireContext()).apply {
+        return ComposeView(inflater.context).apply {
             setContent {
                 CreditClubTheme {
                     ProvideWindowInsets {

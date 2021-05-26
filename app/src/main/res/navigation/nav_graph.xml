@@ -32,6 +32,15 @@
         app:popExitAnim="@anim/fade_out" />
 
     <action
+        android:id="@+id/action_to_receipt"
+        app:destination="@id/receiptFragment"
+        app:enterAnim="@anim/fade_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/fade_out">
+    </action>
+
+    <action
         android:id="@+id/action_to_collection_payment"
         app:destination="@id/collectionGraph"
         app:enterAnim="@anim/fade_in"
@@ -55,6 +64,12 @@
         android:name="com.appzonegroup.app.fasttrack.fragment.NotificationFragment"
         android:label="Notification"
         tools:layout="@layout/notification_fragment" />
+
+    <fragment
+        android:id="@+id/receiptFragment"
+        android:name="com.appzonegroup.app.fasttrack.fragment.ReceiptFragment"
+        android:label="Receipt">
+    </fragment>
 
     <fragment
         android:id="@+id/homeFragment"
@@ -99,10 +114,6 @@
                 app:exitAnim="@anim/fade_out"
                 app:popEnterAnim="@anim/fade_in"
                 app:popExitAnim="@anim/fade_out">
-                <argument
-                    android:name="offline"
-                    android:defaultValue="false"
-                    app:argType="boolean" />
             </action>
         </fragment>
 
@@ -111,10 +122,6 @@
             android:name="com.appzonegroup.app.fasttrack.fragment.CollectionReferenceGenerationFragment"
             android:label="Generate Collection Reference"
             tools:layout="@layout/fragment_collection_reference_generation">
-            <argument
-                android:name="offline"
-                android:defaultValue="false"
-                app:argType="boolean" />
         </fragment>
     </navigation>
 </navigation>

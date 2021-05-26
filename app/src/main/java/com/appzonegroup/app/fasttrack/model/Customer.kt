@@ -38,16 +38,10 @@ data class Customer(
     var starterPackNumber: String? = null,
 
     @SerialName("BVN")
-    var BVN: String? = null,
+    var bvn: String? = null,
 
     @SerialName("Address")
     var address: String? = null,
-
-    @SerialName("NOKPhone")
-    var NOKPhone: String? = null,
-
-    @SerialName("NOKName")
-    var NOKName: String? = null,
 
     @SerialName("PlaceOfBirth")
     var placeOfBirth: String? = null,

@@ -15,12 +15,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Loading(message: String) {
+fun Loading(message: String, modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 30.dp)
+            .then(modifier),
     ) {
         CircularProgressIndicator(modifier = Modifier.padding(bottom = 10.dp))
         Text(
@@ -33,12 +34,13 @@ fun Loading(message: String) {
 }
 
 @Composable
-fun ErrorFeedback(errorMessage: String) {
+fun ErrorFeedback(errorMessage: String, modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 30.dp)
+            .then(modifier),
     ) {
         Image(
             painterResource(id = R.drawable.ic_sentiment_very_dissatisfied),

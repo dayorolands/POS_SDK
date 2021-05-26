@@ -1,5 +1,6 @@
 package com.appzonegroup.app.fasttrack
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -7,8 +8,10 @@ import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
 import com.appzonegroup.app.fasttrack.databinding.TransactionStatusFragmentBinding
 import com.appzonegroup.creditclub.pos.Platform
+import com.creditclub.activity.ReceiptActivity
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.toCurrencyFormat
+import com.creditclub.pos.printer.ParcelablePrintJob
 import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.pos.printer.PrintJob
 import com.creditclub.pos.printer.PrinterStatus
@@ -62,4 +65,11 @@ internal fun CreditClubActivity.renderTransactionStatusPage(
 
     val closeListener = View.OnClickListener { finish() }
     binding.goBack.setOnClickListener(closeListener)
+}
+
+fun CreditClubActivity.startReceiptActivity(receipt: ParcelablePrintJob) {
+    val intent = Intent(this, ReceiptActivity::class.java).apply {
+        putExtra("receipt", receipt)
+    }
+    startActivity(intent)
 }

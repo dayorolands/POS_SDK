@@ -3,13 +3,13 @@ package com.creditclub.core.config
 import com.creditclub.core.type.TransactionType
 
 interface IInstitutionConfig {
-    var name: String
-    var hasOnlineFunctions: Boolean
-    var hasHlaTagging: Boolean
-    var transactionTypes: List<TransactionType>
-    var flows: FlowConfig
-    var categories: CategoryConfig
-    var bankAccountNumberLength: Int
+    val name: String
+    val hasOnlineFunctions: Boolean
+    val hasHlaTagging: Boolean
+    val transactionTypes: List<TransactionType>
+    val flows: FlowConfig
+    val categories: CategoryConfig
+    val bankAccountNumberLength: Int
 }
 
 data class FlowConfig(

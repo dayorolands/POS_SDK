@@ -11,31 +11,34 @@ import com.creditclub.core.util.localStorage
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 17/10/2019.
  * Appzone Ltd
  */
-class LocalInstitutionConfig private constructor() : IInstitutionConfig {
-
-    override lateinit var name: String
-
-    override var hasOnlineFunctions: Boolean = false
-
-    override var hasHlaTagging: Boolean = false
-
-    override var transactionTypes: List<TransactionType> = emptyList()
-
-    override var flows: FlowConfig = FlowConfig()
-
-    override var categories: CategoryConfig = CategoryConfig()
-
-    override var bankAccountNumberLength: Int = 10
+class LocalInstitutionConfig private constructor(
+    override var name: String,
+    override var hasOnlineFunctions: Boolean,
+    override var hasHlaTagging: Boolean,
+    override var transactionTypes: List<TransactionType>,
+    override var flows: FlowConfig,
+    override var categories: CategoryConfig,
+    override var bankAccountNumberLength: Int,
+) : IInstitutionConfig {
 
     companion object {
 
         fun create(context: Context): LocalInstitutionConfig {
-            val config = LocalInstitutionConfig()
             val resources = context.resources
-
-            config.hasOnlineFunctions = resources.getBoolean(R.bool.online_functions_enabled)
-            config.hasHlaTagging = resources.getBoolean(R.bool.hla_enabled)
-            config.name = resources.getString(R.string.institution_name)
+            val config = LocalInstitutionConfig(
+                hasOnlineFunctions = resources.getBoolean(R.bool.online_functions_enabled),
+                hasHlaTagging = resources.getBoolean(R.bool.hla_enabled),
+                name = resources.getString(R.string.institution_name),
+                categories = CategoryConfig(
+                    loans = resources.getBoolean(R.bool.category_loan),
+                    customers = resources.getBoolean(R.bool.category_customer),
+                ),
+                transactionTypes = resources.getStringArray(R.array.transaction_types).map {
+                    TransactionType.valueOf(it)
+                },
+                bankAccountNumberLength = 10,
+                flows = FlowConfig(),
+            )
 
             config.flows.run {
                 if (resources.getBoolean(R.bool.flow_token_withdrawal)) {
@@ -78,15 +81,6 @@ class LocalInstitutionConfig private constructor() : IInstitutionConfig {
                 if (resources.getBoolean(R.bool.bill_payment_enabled)) {
                     billPayment = Any()
                 }
-            }
-
-            config.categories = config.categories.copy(
-                loans = resources.getBoolean(R.bool.category_loan),
-                customers = resources.getBoolean(R.bool.category_customer),
-            )
-
-            config.transactionTypes = resources.getStringArray(R.array.transaction_types).map {
-                TransactionType.valueOf(it)
             }
 
             // Manual overrides for creditclub variant

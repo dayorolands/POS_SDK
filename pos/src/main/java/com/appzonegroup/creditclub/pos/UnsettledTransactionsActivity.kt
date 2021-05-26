@@ -32,7 +32,7 @@ import com.creditclub.core.util.safeRunIO
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.api.PosApiService
 import com.creditclub.ui.theme.CreditClubTheme
-import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.ProvideWindowInsets
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 

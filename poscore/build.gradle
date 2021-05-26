@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdkVersion versions.compileSdk
@@ -7,8 +8,6 @@ android {
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -19,7 +18,6 @@ android {
             consumerProguardFiles 'proguard-rules.pro'
         }
         releaseStaging {
-            debuggable true
             matchingFallbacks = ['release', 'debug']
         }
     }

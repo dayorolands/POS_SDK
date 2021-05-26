@@ -1,10 +1,17 @@
 package com.creditclub.pos.printer
 
+import android.os.Parcelable
 import androidx.annotation.DrawableRes
+import kotlinx.parcelize.Parcelize
 
 interface PrintJob {
     val nodes: List<PrintNode>
 }
+
+interface ParcelablePrintJob : PrintJob, Parcelable
+
+@Parcelize
+inline class SimplePrintJob(override val nodes: List<PrintNode>) : ParcelablePrintJob
 
 class PrintJobScope {
     private var nodes = mutableListOf<PrintNode>()
@@ -51,11 +58,9 @@ class PrintJobScope {
         nodes.add(WalkPaper(distance))
     }
 
-    fun build() = object : PrintJob {
-        override val nodes: List<PrintNode> = this@PrintJobScope.nodes
-    }
+    fun build(): ParcelablePrintJob = SimplePrintJob(this@PrintJobScope.nodes)
 }
 
-inline fun printJob(crossinline init: PrintJobScope.() -> Unit): PrintJob {
+inline fun printJob(crossinline init: PrintJobScope.() -> Unit): ParcelablePrintJob {
     return PrintJobScope().apply(init).build()
 }

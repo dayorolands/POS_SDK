@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.models.PosTransaction
 import com.creditclub.core.model.IntValueType
@@ -42,7 +42,7 @@ private val periodList = listOf(
 
 @Composable
 fun GetPosTransaction(
-    navController: NavHostController,
+    navController: NavController,
     popOnSelect: Boolean = true,
     onResult: ((PosTransaction) -> Unit)? = null
 ) {

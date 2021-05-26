@@ -116,6 +116,41 @@ class APIHelper @JvmOverloads constructor(
         }
     }
 
+    suspend fun getNextOperation(
+        pNumber: String,
+        sessionId: String?,
+        next: String,
+        location: String,
+    ): SafeRunResult<String?> {
+        Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId)
+
+        val url = BankOneService.UrlGenerator.operationNext(
+            pNumber,
+            sessionId ?: "nothing",
+            next,
+            location,
+            localStorage.institutionCode
+        )
+        val result = safeRunIO {
+            client.bankOneService.operationGet(url)
+        }
+        if (result.data == null)
+            Misc.increaseTransactionMonitorCounter(
+                ctx,
+                TransactionCountType.ERROR_RESPONSE_COUNT,
+                sessionId
+            )
+        if (result.error != null && result.error!!.cause is TimeoutException) {
+            Misc.increaseTransactionMonitorCounter(
+                ctx,
+                TransactionCountType.NO_RESPONSE_COUNT,
+                sessionId
+            )
+        }
+
+        return result
+    }
+
     suspend fun getNextOperationImage(
         pNumber: String,
         sessionId: String,
@@ -147,13 +182,12 @@ class APIHelper @JvmOverloads constructor(
         }
     }
 
-    fun continueNextOperation(
+    suspend fun continueNextOperation(
         pNumber: String,
         sessionId: String?,
         next: String,
         location: String,
-        callback: VolleyCallback<String>
-    ) {
+    ): SafeRunResult<String?> {
         //Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId);
         Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId)
         val url = BankOneService.UrlGenerator.operationContinue(
@@ -163,23 +197,25 @@ class APIHelper @JvmOverloads constructor(
             location,
             localStorage.institutionCode
         )
-        handleRequest(url) { (response, error) ->
-            if (response == null) {
-                Misc.increaseTransactionMonitorCounter(
-                    ctx,
-                    TransactionCountType.ERROR_RESPONSE_COUNT,
-                    sessionId
-                )
-            }
-            if (error != null && error.cause is TimeoutException) {
-                Misc.increaseTransactionMonitorCounter(
-                    ctx,
-                    TransactionCountType.NO_RESPONSE_COUNT,
-                    sessionId
-                )
-            }
-            callback.onCompleted(null, response, true)
+        val result = safeRunIO {
+            client.bankOneService.operationGet(url)
         }
+        if (result.data == null) {
+            Misc.increaseTransactionMonitorCounter(
+                ctx,
+                TransactionCountType.ERROR_RESPONSE_COUNT,
+                sessionId
+            )
+        }
+        if (result.error != null && result.error!!.cause is TimeoutException) {
+            Misc.increaseTransactionMonitorCounter(
+                ctx,
+                TransactionCountType.NO_RESPONSE_COUNT,
+                sessionId
+            )
+        }
+
+        return result
     }
 
     private inline fun handleRequest(

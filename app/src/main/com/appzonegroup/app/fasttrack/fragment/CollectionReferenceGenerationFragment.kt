@@ -23,7 +23,10 @@ import java.util.*
 class CollectionReferenceGenerationFragment :
     CreditClubFragment(R.layout.fragment_collection_reference_generation) {
 
-    private val args by navArgs<CollectionReferenceGenerationFragmentArgs>()
+    private val args = object {
+        val offline by lazy { requireArguments().getBoolean("offline") }
+    }
+
     private val request = CollectionReferenceGenerationRequest()
 
     private val binding by dataBinding<FragmentCollectionReferenceGenerationBinding>()

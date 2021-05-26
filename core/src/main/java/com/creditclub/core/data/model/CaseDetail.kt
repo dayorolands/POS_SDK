@@ -1,40 +1,47 @@
 package com.creditclub.core.data.model
 
+import android.os.Parcelable
+import com.creditclub.core.data.InstantParceler
+import com.creditclub.core.serializer.TimeInstantSerializer
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.TypeParceler
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.Instant
 
 @Serializable
-class CaseDetail {
-    @SerialName("ID")
-    var id = ""
-
+@Parcelize
+@TypeParceler<Instant, InstantParceler>
+@TypeParceler<Instant?, InstantParceler>
+data class CaseDetail(
     @SerialName("Description")
-    var description: String? = null
+    val description: String? = null,
 
     @SerialName("Subject")
-    var subject = "test"
+    val subject: String,
 
     @SerialName("DateLogged")
-    var dateLogged: String? = null
+    @Serializable(with = TimeInstantSerializer::class)
+    val dateLogged: Instant,
 
     @SerialName("CaseReporterEmail")
-    var caseReporterEmail: String? = null
+    val caseReporterEmail: String? = null,
 
     @SerialName("CaseReference")
-    var caseReference = ""
+    val caseReference: String,
 
     @SerialName("CategoryName")
-    var categoryName = ""
+    val categoryName: String = "",
 
     @SerialName("InstitutionCode")
-    var institutionCode = ""
+    val institutionCode: String = "",
 
     @SerialName("Product")
-    var product = ""
+    val product: String = "",
 
     @SerialName("IsResolved")
-    var isResolved: Boolean? = null
+    val isResolved: Boolean? = null,
 
     @SerialName("IsClosed")
-    var isClosed: Boolean? = null
-}
+    val isClosed: Boolean? = null,
+) : Parcelable

@@ -16,12 +16,13 @@ import java.io.ByteArrayOutputStream
  * Appzone Ltd
  */
 @Serializable(with = CreditClubImageSerializer::class)
-class CreditClubImage(val context: Context, id: Long, name: String, path: String) :
-    Image(id, name, path) {
+class CreditClubImage(context: Context, private val image: Image) {
 
-    constructor(context: Context, image: Image) : this(context, image.id, image.name, image.path)
-
-    val bitmap: Bitmap? by lazy { compressImage() }
+    val bitmap: Bitmap? by lazy { context.compressImage() }
+    val path get() = image.path
+    val id get() = image.id
+    val name get() = image.name
+    val uri get() = image.uri
 
     val bitmapString: String? by lazy {
         bitmap ?: return@lazy null
@@ -33,9 +34,9 @@ class CreditClubImage(val context: Context, id: Long, name: String, path: String
         Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
-    private fun compressImage(): Bitmap? {
+    private fun Context.compressImage(): Bitmap? {
         val (tempBitmap) = safeRun {
-            val inputStream = context.contentResolver.openInputStream(uri)
+            val inputStream = contentResolver.openInputStream(image.uri)
             val tempBitmap = BitmapFactory.decodeStream(inputStream)
             inputStream?.close()
             getResizedBitmap(tempBitmap!!)

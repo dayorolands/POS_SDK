@@ -24,7 +24,7 @@ class Account {
             customerFirstName = firstName,
             customerPhoneNumber = phoneNo,
             gender = gender,
-            BVN = bvn,
+            bvn = bvn,
             address = address,
             placeOfBirth = placeOfBirth,
             dateOfBirth = dateOfBirth,

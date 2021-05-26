@@ -1,12 +1,12 @@
 package com.appzonegroup.app.fasttrack
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.text.InputFilter
 import android.text.InputType
 import android.view.View
-import com.android.volley.Response
 import com.appzonegroup.app.fasttrack.databinding.ActivityAgentActivationBinding
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.creditclub.pos.Platform
@@ -32,12 +32,12 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
     private var isActivation = false
     internal var json = ""
     internal var code = ""
-    internal var response: Response<*>? = null
     internal var institutionCode: String = ""
     var phoneNumber = ""
     var pin = ""
     override val hasLogoutTimer get() = false
     private val deviceId
+        @SuppressLint("HardwareIds")
         get() = Settings.Secure.getString(
             contentResolver,
             Settings.Secure.ANDROID_ID
@@ -45,7 +45,6 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding
 
         debugOnly {
             binding.skipButton.visibility = View.VISIBLE
@@ -90,9 +89,13 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
                 }
             }
         }
+
+        binding.submitBtn.setOnClickListener {
+            mainScope.launch { submit() }
+        }
     }
 
-    fun submit_click(view: View) {
+    private suspend fun submit() {
 
         code = binding.codeEt.text.toString().trim(' ')
         phoneNumber = binding.phoneNumberEt.text.toString().trim(' ')
@@ -160,22 +163,21 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
 
         dialogProvider.showProgressBar("Processing...")
 
-        mainScope.launch {
-            if (isActivation) activate()
-            else verify()
-        }
+        if (isActivation) activate()
+        else verify()
     }
 
     private suspend inline fun activate() {
-        val request = PinChangeRequest()
-        request.activationCode = code
-        request.institutionCode = institutionCode
-        request.agentPhoneNumber = phoneNumber
-        request.confirmNewPin = pin
-        request.newPin = pin
-        request.geoLocation = ""
-        request.oldPin = code
-        request.deviceId = deviceId
+        val request = PinChangeRequest(
+            activationCode = code,
+            institutionCode = institutionCode,
+            agentPhoneNumber = phoneNumber,
+            confirmNewPin = pin,
+            newPin = pin,
+            geoLocation = localStorage.lastKnownLocation,
+            oldPin = code,
+            deviceId = deviceId,
+        )
 
         dialogProvider.showProgressBar("Activating")
         val (response) = safeRunIO {

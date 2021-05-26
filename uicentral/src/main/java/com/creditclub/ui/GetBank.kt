@@ -72,7 +72,7 @@ fun GetBank(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(R.color.menuBackground)),
+            .background(MaterialTheme.colors.surface),
     ) {
         val (appBar, list, textField) = createRefs()
 

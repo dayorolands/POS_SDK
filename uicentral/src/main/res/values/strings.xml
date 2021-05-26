@@ -21,4 +21,25 @@
     <string name="processing">Processing</string>
     <string name="search">Search</string>
     <string name="loading_banks">Loading Banks</string>
+    <string name="textfield_hint">Compose Message</string>
+    <string name="emojis_label">Emojis</string>
+    <!-- Accessibility descriptions -->
+
+    <string name="emoji_selector_desc">Emoji selector</string>
+    <string name="emoji_selector_bt_desc">Show Emoji selector</string>
+    <string name="dm_desc">Direct Message</string>
+    <string name="attach_photo_desc">Attach Photo</string>
+    <string name="map_selector_desc">Location selector</string>
+    <string name="videochat_desc">Start videochat</string>
+    <string name="textfield_desc">Text input</string>
+    <string name="not_available">Functionality currently not available</string>
+    <string name="not_available_subtitle">Grab a beverage and check back later!</string>
+    <string name="back">Navigate up</string>
+    <string name="attached_image">Attached image</string>
+    <string name="info">Information</string>
+    <string name="more_options">More options</string>
+    <string name="send">Send</string>
+    <string name="jumpBottom">Jump to bottom</string>
+    <string name="author_me">me</string>
+    <string name="receipt">Receipt</string>
 </resources>

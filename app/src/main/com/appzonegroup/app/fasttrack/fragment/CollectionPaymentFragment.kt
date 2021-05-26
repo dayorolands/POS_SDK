@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -199,7 +200,8 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
 
         findNavController().navigate(
-            CollectionPaymentFragmentDirections.actionCollectionPaymentToReferenceGeneration(offline)
+            R.id.action_collection_payment_to_reference_generation,
+            bundleOf("offline" to true),
         )
     }
 

@@ -7,37 +7,37 @@ import kotlinx.serialization.Serializable
  * Created by Joseph on 7/18/2018.
  */
 @Serializable
-class PinChangeRequest {
+data class PinChangeRequest(
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null
+    val agentPhoneNumber: String? = null,
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = null
+    val institutionCode: String? = null,
 
     @SerialName("ActivationCode")
-    var activationCode: String? = null
+    val activationCode: String? = null,
 
     @SerialName("NewPin")
-    var newPin: String? = null
+    val newPin: String? = null,
 
     @SerialName("ConfirmNewPin")
-    var confirmNewPin: String? = null
+    val confirmNewPin: String? = null,
 
     @SerialName("GeoLocation")
-    var geoLocation: String? = null
+    val geoLocation: String? = null,
 
     @SerialName("OldPin")
-    var oldPin: String? = null
+    val oldPin: String? = null,
 
     @SerialName("CustomerPhoneNumber")
-    var customerPhoneNumber: String? = null
+    val customerPhoneNumber: String? = null,
 
     @SerialName("AgentPin")
-    var agentPin: String? = null
+    val agentPin: String? = null,
 
     @SerialName("CustomerToken")
-    var customerToken: String? = null
+    val customerToken: String? = null,
 
     @SerialName("DeviceID")
-    var deviceId: String? = null
-}
+    val deviceId: String? = null,
+)

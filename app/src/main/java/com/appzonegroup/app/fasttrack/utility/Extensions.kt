@@ -2,18 +2,27 @@ package com.appzonegroup.app.fasttrack.utility
 
 import android.app.Activity
 import android.content.Intent
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.fragment.HomeFragmentDirections
 import com.appzonegroup.creditclub.pos.Platform
+import com.creditclub.Routes
+import com.creditclub.core.data.CoreDatabase
+import com.creditclub.core.data.model.AppFunctionUsage
 import com.creditclub.core.data.request.BalanceEnquiryRequest
 import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
+import com.creditclub.ui.rememberBean
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 fun Activity.logout(block: (Intent.() -> Unit)? = null) {
     val intent = Intent(applicationContext, LoginActivity::class.java)
@@ -29,8 +38,37 @@ fun Activity.logout(block: (Intent.() -> Unit)? = null) {
     startActivity(intent)
 }
 
-private val Fragment.baseContext get() = requireContext()
 private suspend fun Fragment.logFunctionUsage(fid: Int) = requireContext().logFunctionUsage(fid)
+
+@Composable
+fun FunctionId(fid: Int) {
+    val coreDatabase: CoreDatabase by rememberBean()
+
+    LaunchedEffect(fid) {
+        withContext(Dispatchers.IO) {
+            val appFunctionUsageDao = coreDatabase.appFunctionUsageDao()
+            val appFunction = appFunctionUsageDao.getFunction(fid)
+
+            val count = if (appFunction == null) {
+                appFunctionUsageDao.insert(AppFunctionUsage(fid))
+                1
+            } else {
+                appFunction.usage++
+                appFunctionUsageDao.update(appFunction)
+
+                appFunction.usage
+            }
+
+            debug("Usage for function $fid -> $count")
+        }
+    }
+}
+
+fun NavController.openPageById(id: Int) {
+    when (id) {
+        R.id.agent_change_pin_button -> navigate(Routes.PinChange)
+    }
+}
 
 fun CreditClubFragment.openPageById(id: Int) {
     when (id) {
@@ -59,11 +97,11 @@ fun CreditClubFragment.openPageById(id: Int) {
                     dialogProvider.showError("Agent PIN must be 4 digits")
                     return@launch
                 }
-                val request = BalanceEnquiryRequest().apply {
-                    agentPin = pin
-                    agentPhoneNumber = localStorage.agentPhone
-                    institutionCode = localStorage.institutionCode
-                }
+                val request = BalanceEnquiryRequest(
+                    agentPin = pin,
+                    agentPhoneNumber = localStorage.agentPhone,
+                    institutionCode = localStorage.institutionCode,
+                )
 
                 dialogProvider.showProgressBar("Getting Balance")
                 val (response) = safeRunIO {
@@ -136,8 +174,6 @@ fun CreditClubFragment.openPageById(id: Int) {
         }
 
         R.id.agent_mini_statement_button -> startActivity(MiniStatementActivity::class.java)
-
-        R.id.fn_support, R.id.support -> startActivity(SupportActivity::class.java)
 
         R.id.fn_hla_tagging -> startActivity(HlaTaggingActivity::class.java)
 

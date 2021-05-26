@@ -14,14 +14,12 @@ import android.widget.EditText;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
 
 import com.appzonegroup.app.fasttrack.OnlineActivity;
 import com.appzonegroup.app.fasttrack.R;
 import com.appzonegroup.app.fasttrack.model.TransactionCountType;
 import com.appzonegroup.app.fasttrack.model.online.Response;
 import com.appzonegroup.app.fasttrack.network.online.APIHelper;
-import com.appzonegroup.app.fasttrack.utility.GPSTracker;
 import com.appzonegroup.app.fasttrack.utility.Misc;
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages;
 import com.appzonegroup.app.fasttrack.utility.online.XmlToJson;
@@ -70,7 +68,6 @@ public class FirstActivityAgentFragment extends CreditClubFragment implements Vi
         btnActivate.setOnClickListener(this);
     }
 
-    String finalLocation;
     @Override
     public void onClick(View v) {
         if (v == btnActivate) {
@@ -92,17 +89,10 @@ public class FirstActivityAgentFragment extends CreditClubFragment implements Vi
                 loading.show();
                 final APIHelper ah = new APIHelper(getActivity());
                 final String sessionId = Encryption.generateSessionId(phoneNumber);
-                finalLocation = "0.00;0.00";
-                final GPSTracker gpsTracker = new GPSTracker(getActivity());
-                if(gpsTracker.getLocation() != null){
-                    String longitude = String.valueOf(gpsTracker.getLocation().getLongitude());
-                    String latitude = String.valueOf(gpsTracker.getLocation().getLatitude());
-                    finalLocation = latitude+";"+longitude;
-                }
 
                 Misc.resetTransactionMonitorCounter(getActivity());
 
-                ah.attemptActivation(phoneNumber, sessionId, verificationCode, finalLocation, true, new APIHelper.VolleyCallback<String>() {
+                ah.attemptActivation(phoneNumber, sessionId, verificationCode, getLocalStorage().getLastKnownLocation(), true, new APIHelper.VolleyCallback<String>() {
                     @Override
                     public void onCompleted(Exception e, String result,boolean status) {
                     loading.dismiss();
@@ -157,7 +147,7 @@ public class FirstActivityAgentFragment extends CreditClubFragment implements Vi
                                             String responseString = response_base.optString("Menu", ErrorMessages.PHONE_NOT_REGISTERED);
                                             if (responseString.equalsIgnoreCase("1")) {
                                                 loading.show();
-                                                ah.attemptValidation(phoneNumber, sessionId, verificationCode, finalLocation, true, new APIHelper.VolleyCallback<String>() {
+                                                ah.attemptValidation(phoneNumber, sessionId, verificationCode, getLocalStorage().getLastKnownLocation(), true, new APIHelper.VolleyCallback<String>() {
                                                     @Override
                                                     public void onCompleted(Exception e, String result, boolean status) {
                                                         loading.dismiss();

@@ -1,36 +1,37 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-        android:background="@color/white"
-             tools:context=".fragment.online.ListOptionsFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:background="@color/white"
+        tools:context=".fragment.online.ListOptionsFragment">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/optionsName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="3dp"
-            android:textColor="@color/blue"
-            android:layout_margin="@dimen/ten_dp"
-            android:singleLine="false"
-            android:textSize="16sp"
-            android:textStyle="normal" />
-
-        <ListView
-            android:id="@+id/listView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:dividerHeight="@dimen/two_dp"
-            android:background="@color/background_floating_material_light"
-            android:divider="@color/white"
-            >
-        </ListView>
-    </LinearLayout>
+            android:orientation="vertical">
 
-</FrameLayout>
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/optionsName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="3dp"
+                android:textColor="@color/blue"
+                android:layout_margin="@dimen/ten_dp"
+                android:singleLine="false"
+                android:textSize="16sp"
+                android:textStyle="normal" />
+
+            <ListView
+                android:id="@+id/listView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:dividerHeight="@dimen/two_dp"
+                android:background="@color/background_floating_material_light"
+                android:divider="@color/white" />
+        </LinearLayout>
+
+    </FrameLayout>
+</layout>

@@ -452,6 +452,11 @@
     <string name="confirm">Confirm</string>
     <string name="select_bank">Select Bank</string>
     <string name="enter_account">Enter Account</string>
+    <string name="share_receipt_to">Share receipt to</string>
+    <string name="log_case">Log case</string>
+    <string name="support_cases">Support Cases</string>
+    <string name="loading_cases">Loading cases</string>
+    <string name="change_pin">Change PIN</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>

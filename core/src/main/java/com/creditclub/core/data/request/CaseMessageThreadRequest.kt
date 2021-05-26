@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
-class CaseMessageThreadRequest {
+data class CaseMessageThreadRequest(
     @SerialName("CaseReference")
-    var caseReference = ""
-}
+    val caseReference: String,
+)

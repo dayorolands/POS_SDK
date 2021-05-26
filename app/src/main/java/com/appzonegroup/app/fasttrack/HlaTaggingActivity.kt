@@ -22,6 +22,8 @@ import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.showError
 import com.creditclub.ui.dataBinding
 import com.esafirm.imagepicker.features.ImagePicker
+import com.esafirm.imagepicker.features.cameraonly.CameraOnlyConfig
+import com.esafirm.imagepicker.features.registerImagePicker
 import com.esafirm.imagepicker.model.Image
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -39,6 +41,17 @@ class HlaTaggingActivity : CreditClubActivity(R.layout.activity_hla_tagging),
 
     override val formData: OfflineHLATaggingRequest = OfflineHLATaggingRequest().apply {
         pictures = mutableListOf(null, null, null, null)
+    }
+
+    private val launcher = registerImagePicker {
+        try {
+            val image = it.firstOrNull() ?: return@registerImagePicker showInternalError()
+            imageListener?.invoke(CreditClubImage(this, image))
+            imageListener = null
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            showInternalError()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -198,7 +211,7 @@ class HlaTaggingActivity : CreditClubActivity(R.layout.activity_hla_tagging),
             root.setOnClickListener {
                 imageListener = onSubmit
 
-                ImagePicker.cameraOnly().start(this@HlaTaggingActivity)
+                launcher.launch(CameraOnlyConfig())
             }
         }
     }
@@ -222,19 +235,5 @@ class HlaTaggingActivity : CreditClubActivity(R.layout.activity_hla_tagging),
                 }
             } else dialogProvider.showError(response.message)
         }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
-            try {
-                val image: Image? = ImagePicker.getFirstImageOrNull(data)
-                image ?: return showInternalError()
-                imageListener?.invoke(CreditClubImage(this, image))
-                imageListener = null
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                showInternalError()
-            }
-        } else super.onActivityResult(requestCode, resultCode, data)
     }
 }

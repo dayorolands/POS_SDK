@@ -97,7 +97,8 @@ android {
 
         debug {
             debuggable true
-            buildConfigField("String", "API_HOST", "\"https://staging.mybankone.com\"")
+            buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
+//            buildConfigField("String", "API_HOST", "\"https://staging.mybankone.com\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (Staging)"
@@ -193,7 +194,7 @@ dependencies {
     accessImplementation project(path: ':telpo')
     gtbankImplementation project(path: ':dspread')
     purpleImplementation project(path: ':dspread')
-    purpleImplementation project(path: ':telpo')
+//    purpleImplementation project(path: ':telpo')
 
     implementation fileTree(dir: "jniLibs", include: ["*.so"])
     implementation fileTree(include: ["*.jar"], dir: "libs")
@@ -201,7 +202,6 @@ dependencies {
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
 
     // Lifecycle components
-    implementation "androidx.lifecycle:lifecycle-extensions:${versions.lifecycle}"
     kapt "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.lifecycle}"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.lifecycle}"

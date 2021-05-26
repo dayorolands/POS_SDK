@@ -10,8 +10,6 @@ android {
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
-        versionCode 1
-        versionName ARTIFACT_VERSION
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         consumerProguardFiles 'proguard-rules.pro'
@@ -25,7 +23,6 @@ android {
             consumerProguardFiles 'proguard-rules.pro'
         }
         releaseStaging {
-            debuggable true
             matchingFallbacks = ['release', 'debug']
         }
     }
@@ -70,7 +67,7 @@ dependencies {
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
     implementation "com.google.android.material:material:${versions.material}"
     implementation "androidx.cardview:cardview:1.0.0"
-    implementation "androidx.recyclerview:recyclerview:1.1.0"
+    implementation "androidx.recyclerview:recyclerview:1.2.0"
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
     implementation 'com.google.android:flexbox:2.0.1'
@@ -91,7 +88,6 @@ dependencies {
     androidTestImplementation "androidx.room:room-testing:${versions.room}"
 
     // Lifecycle components
-    implementation "androidx.lifecycle:lifecycle-extensions:${versions.lifecycle}"
     implementation "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.lifecycle}"
 

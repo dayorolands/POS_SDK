@@ -12,20 +12,20 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BalanceEnquiryRequest(
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null,
+    val agentPhoneNumber: String? = null,
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = null,
+    val institutionCode: String? = null,
 
     @SerialName("CustomerAccountNumber")
-    var customerAccountNumber: String? = null,
+    val customerAccountNumber: String? = null,
 
     @SerialName("GeoLocation")
-    var geoLocation: String? = null,
+    val geoLocation: String? = null,
 
     @SerialName("AgentPin")
-    var agentPin: String? = null,
+    val agentPin: String? = null,
 
     @SerialName("AdditionalInformation")
-    var additionalInformation: String? = null,
+    val additionalInformation: String? = null,
 )

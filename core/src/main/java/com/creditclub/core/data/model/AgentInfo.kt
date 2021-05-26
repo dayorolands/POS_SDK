@@ -4,29 +4,28 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class AgentInfo {
-
+data class AgentInfo(
     @SerialName("Message")
-    var message: String? = null
+    val message: String? = null,
 
     @SerialName("Status")
-    var status: Boolean = false
+    val status: Boolean = false,
 
     @SerialName("AgentName")
-    var agentName: String? = null
+    val agentName: String? = null,
 
     @SerialName("AgentCode")
-    var agentCode: String? = null
+    val agentCode: String? = null,
 
     @SerialName("PhoneNumber")
-    var phoneNumber: String? = null
+    val phoneNumber: String? = null,
 
     @SerialName("TerminalID")
-    var terminalID: String? = null
+    val terminalID: String? = null,
 
     @SerialName("PosMode")
-    var posMode: String? = null
+    val posMode: String? = null,
 
     @SerialName("CardLimit")
-    var cardLimit: Double? = null
-}
+    val cardLimit: Double? = null,
+)

@@ -1,5 +1,6 @@
 package com.appzonegroup.app.fasttrack.di
 
+import android.app.Activity
 import android.content.Context
 import com.appzonegroup.app.fasttrack.BuildConfig
 import com.appzonegroup.app.fasttrack.R
@@ -17,6 +18,8 @@ import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.debugOnly
+import com.creditclub.pos.printer.PosPrinter
+import com.creditclub.receipt.PdfPrinter
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -86,5 +89,11 @@ val configModule = module {
             override val versionName = BuildConfig.VERSION_NAME
             override val versionCode = BuildConfig.VERSION_CODE
         }
+    }
+}
+
+val sharingModule = module {
+    factory<PosPrinter>(override = true) { (context: Activity, dialogProvider: DialogProvider) ->
+        PdfPrinter(context, dialogProvider)
     }
 }

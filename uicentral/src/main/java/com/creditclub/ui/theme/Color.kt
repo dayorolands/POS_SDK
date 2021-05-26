@@ -1,12 +1,14 @@
 package com.creditclub.ui.theme
 
 import androidx.compose.material.Colors
+import androidx.compose.material.LocalElevationOverlay
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.Dp
 import com.creditclub.ui.R
 
 /**
@@ -31,3 +33,22 @@ val CreditClubColors
         error = Red300,
         onError = Color.Black
     )
+
+/**
+ * Calculates the color of an elevated `surface` in dark mode. Returns `surface` in light mode.
+ */
+@Composable
+fun Colors.elevatedSurface(elevation: Dp): Color {
+    return LocalElevationOverlay.current?.apply(
+        color = this.surface,
+        elevation = elevation
+    ) ?: this.surface
+}
+
+@Composable
+fun Colors.elevatedColor(color: Color, elevation: Dp): Color {
+    return LocalElevationOverlay.current?.apply(
+        color = color,
+        elevation = elevation
+    ) ?: color
+}

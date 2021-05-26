@@ -59,7 +59,8 @@ class BankOneApplication : CreditClubApplication() {
                     locationModule,
                     dataModule,
                     uiModule,
-                    configModule
+                    configModule,
+                    sharingModule,
                 )
             )
         }

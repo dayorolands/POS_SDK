@@ -1,27 +1,25 @@
 package com.appzonegroup.app.fasttrack
 
-import com.creditclub.core.data.Encryption.generateSessionId
-import com.creditclub.core.data.Encryption.decrypt
-import com.appzonegroup.app.fasttrack.utility.online.convertXmlToJson
-import com.appzonegroup.app.fasttrack.network.online.APIHelper
-import android.os.Bundle
-import com.appzonegroup.app.fasttrack.utility.GPSTracker
-import com.appzonegroup.app.fasttrack.fragment.online.ListOptionsFragment
-import com.appzonegroup.app.fasttrack.fragment.online.EnterDetailFragment
-import android.text.Html
 import android.content.DialogInterface
+import android.os.Bundle
+import android.text.Html
 import android.view.Menu
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import com.appzonegroup.app.fasttrack.fragment.online.EnterDetailFragment
+import com.appzonegroup.app.fasttrack.fragment.online.ListOptionsFragment
 import com.appzonegroup.app.fasttrack.model.TransactionCountType
 import com.appzonegroup.app.fasttrack.model.online.Response
+import com.appzonegroup.app.fasttrack.network.online.APIHelper
 import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages
+import com.appzonegroup.app.fasttrack.utility.online.convertXmlToJson
+import com.creditclub.core.data.Encryption.decrypt
+import com.creditclub.core.data.Encryption.generateSessionId
 import com.creditclub.core.ui.CreditClubActivity
-import java.lang.Exception
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import java.util.concurrent.TimeoutException
 
 class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
@@ -46,20 +44,13 @@ class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
             val phoneNumber = authResponse.phoneNumber
             val verificationCode = authResponse.activationCode
             val sessionId = generateSessionId(phoneNumber)
-            var finalLocation: String = "0.00;0.00"
-            val gpsTracker = GPSTracker(this)
-            if (gpsTracker.location != null) {
-                val longitude = gpsTracker.location.longitude.toString()
-                val latitude = gpsTracker.location.latitude.toString()
-                finalLocation = "$latitude;$longitude"
-            }
             dialogProvider.showProgressBar("Loading")
             Misc.resetTransactionMonitorCounter(baseContext)
             APIHelper(baseContext).attemptValidation(
                 phoneNumber,
                 sessionId,
                 verificationCode,
-                finalLocation,
+                localStorage.lastKnownLocation ?: "0.00;0.00",
                 false
             ) { e, result, _ ->
                 dialogProvider.hideProgressBar()

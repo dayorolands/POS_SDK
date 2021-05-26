@@ -2,76 +2,71 @@ package com.appzonegroup.app.fasttrack.fragment
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyGridScope
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.R
+import com.appzonegroup.app.fasttrack.ui.FundsTransfer
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.core.AppFunctions
+import com.creditclub.Routes
+import com.creditclub.components.*
+import com.creditclub.conversation.ConversationContent
+import com.creditclub.conversation.LocalBackPressedDispatcher
 import com.creditclub.core.config.IInstitutionConfig
-import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.api.NotificationService
-import com.creditclub.core.data.api.StaticService
-import com.creditclub.core.data.model.AppFunctionUsage
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.NotificationRequest
-import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.data.request.BalanceEnquiryRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.util.*
-import com.creditclub.core.util.delegates.service
+import com.creditclub.screen.PinChange
+import com.creditclub.screen.SupportCases
 import com.creditclub.ui.UpdateActivity
 import com.creditclub.ui.rememberBean
-import com.creditclub.ui.rememberDialogProvider
-import com.creditclub.ui.rememberRetrofitService
 import com.creditclub.ui.theme.CreditClubTheme
-import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
-import dev.chrisbanes.accompanist.insets.statusBarsHeight
-import kotlinx.coroutines.CoroutineScope
+import com.creditclub.viewmodel.AppViewModel
+import com.google.accompanist.flowlayout.FlowColumn
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.insets.*
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 import java.util.*
 
+private val composableRouteFunctionIds = mapOf(
+    R.id.agent_change_pin_button to Routes.PinChange,
+    R.id.funds_transfer_button to Routes.FundsTransfer,
+    R.id.fn_support to Routes.SupportCases,
+)
 
 class HomeFragment : CreditClubFragment() {
-    private val notificationViewModel by activityViewModels<NotificationViewModel>()
-    private val notificationService by creditClubMiddleWareAPI.retrofit.service<NotificationService>()
+    private val notificationViewModel: NotificationViewModel by activityViewModels()
+    private val appViewModel: AppViewModel by viewModels()
+    private val notificationService: NotificationService by retrofitService()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -81,19 +76,79 @@ class HomeFragment : CreditClubFragment() {
         val hasPosUpdateManager = Platform.isPOS && Platform.deviceType != 2
 
         if (hasPosUpdateManager) checkForUpdate()
+
+        loadFcmToken()
     }
 
+    @OptIn(ExperimentalAnimatedInsets::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val mainNavController = findNavController()
-        return ComposeView(requireContext()).apply {
+        val fragmentNavController = findNavController()
+        return ComposeView(inflater.context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            )
+
+            // Create a ViewWindowInsetObserver using this view, and call start() to
+            // start listening now. The WindowInsets instance is returned, allowing us to
+            // provide it to AmbientWindowInsets in our content below.
+            val windowInsets = ViewWindowInsetObserver(this)
+                // We use the `windowInsetsAnimationsEnabled` parameter to enable animated
+                // insets support. This allows our `ConversationContent` to animate with the
+                // on-screen keyboard (IME) as it enters/exits the screen.
+                .start(windowInsetsAnimationsEnabled = true)
+
             setContent {
-                CreditClubTheme {
-                    ProvideWindowInsets {
-                        HomeContent(mainNavController = mainNavController)
+                val composeNavController = rememberNavController()
+                CompositionLocalProvider(
+                    LocalBackPressedDispatcher provides requireActivity().onBackPressedDispatcher,
+                    LocalWindowInsets provides windowInsets,
+                ) {
+                    CreditClubTheme {
+                        ProvideWindowInsets {
+                            NavHost(navController = composeNavController, Routes.Home) {
+                                composable(Routes.Home) {
+                                    HomeContent(
+                                        mainNavController = fragmentNavController,
+                                        composeNavController = composeNavController,
+                                    )
+                                }
+                                composable(Routes.FundsTransfer) {
+                                    FundsTransfer(
+                                        navController = composeNavController,
+                                        dialogProvider = dialogProvider,
+                                    )
+                                }
+                                composable(Routes.PinChange) {
+                                    PinChange(navController = composeNavController)
+                                }
+                                composable(Routes.SupportCases) {
+                                    SupportCases(navController = composeNavController)
+                                }
+                                composable(Routes.SupportConversation) { backStackEntry ->
+                                    val fcmToken by appViewModel.fcmToken
+                                    val arguments = backStackEntry.arguments!!
+                                    val reference = arguments.getString("reference")!!
+                                    val title = arguments.getString("title")
+
+                                    ConversationContent(
+                                        title = title ?: "Case",
+                                        fcmToken = fcmToken,
+                                        reference = reference,
+                                        onNavIconPressed = { composeNavController.popBackStack() },
+                                        navController = composeNavController,
+                                        // Add padding so that we are inset from any left/right navigation bars
+                                        // (usually shown when in landscape orientation)
+                                        modifier = Modifier.navigationBarsPadding(bottom = false),
+                                        navigateToProfile = {},
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -102,7 +157,10 @@ class HomeFragment : CreditClubFragment() {
 
     @OptIn(ExperimentalFoundationApi::class, ExperimentalStdlibApi::class)
     @Composable
-    private fun HomeContent(mainNavController: NavController) {
+    private fun HomeContent(
+        mainNavController: NavController,
+        composeNavController: NavHostController,
+    ) {
         val institutionConfig: IInstitutionConfig by rememberBean()
         val flows = institutionConfig.flows
         val homeNavController = rememberNavController()
@@ -141,9 +199,9 @@ class HomeFragment : CreditClubFragment() {
         Scaffold(
             scaffoldState = scaffoldState,
             topBar = {
-                AppBar(
+                HomeAppBar(
                     scaffoldState = scaffoldState,
-                    mainNavController = mainNavController
+                    mainNavController = mainNavController,
                 )
             },
             bottomBar = { SubMenuBottomNavigation(homeNavController, bottomNavigationItems) },
@@ -153,19 +211,15 @@ class HomeFragment : CreditClubFragment() {
                         DrawerContent(
                             scaffoldState = scaffoldState,
                             coroutineScope = coroutineScope,
+                            openPage = {
+                                if (composableRouteFunctionIds.containsKey(it)) {
+                                    composeNavController.navigate(composableRouteFunctionIds[it]!!)
+                                } else {
+                                    openPageById(it)
+                                }
+                            },
                         )
                     }
-                }
-
-                if (Platform.isPOS && Platform.deviceType != 2) {
-                    DrawerRow(
-                        title = stringResource(R.string.update),
-                        icon = painterResource(R.drawable.ic_fa_arrow_down),
-                        onClick = {
-                            coroutineScope.launch { scaffoldState.drawerState.close() }
-                            startActivity(UpdateActivity::class.java)
-                        }
-                    )
                 }
 
                 debugOnly {
@@ -201,18 +255,18 @@ class HomeFragment : CreditClubFragment() {
             Column(
                 modifier = Modifier.fillMaxSize(),
             ) {
-                Text(
-                    title,
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
-                    style = MaterialTheme.typography.h4,
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp, vertical = 10.dp)
-                )
                 Column(
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
                         .weight(1f),
                 ) {
+                    Text(
+                        title,
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+                        style = MaterialTheme.typography.h4,
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp, vertical = 10.dp)
+                    )
                     NavHost(
                         homeNavController,
                         startDestination = BottomNavScreens.Home.route
@@ -306,15 +360,19 @@ class HomeFragment : CreditClubFragment() {
                                     MenuButton(
                                         text = "Change PIN",
                                         icon = painterResource(R.drawable.login_password),
-                                        onClick = { openPageById(R.id.agent_change_pin_button) }
+                                        onClick = {
+                                            composeNavController.navigate(Routes.PinChange)
+                                        }
                                     )
                                 }
-                                item {
-                                    MenuButton(
-                                        text = "Balance Enquiry",
-                                        icon = painterResource(R.drawable.income),
-                                        onClick = { openPageById(R.id.agent_balance_enquiry_button) }
-                                    )
+                                if (flows.customerBalance != null) {
+                                    item {
+                                        MenuButton(
+                                            text = "Balance Enquiry",
+                                            icon = painterResource(R.drawable.income),
+                                            onClick = { openPageById(R.id.agent_balance_enquiry_button) }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -443,7 +501,13 @@ class HomeFragment : CreditClubFragment() {
                 }
 
                 if (currentRoute == BottomNavScreens.Home.route) {
-                    FrequentlyUsed(onItemClick = ::openPageById)
+                    FrequentlyUsed(onItemClick = {
+                        if (composableRouteFunctionIds.containsKey(it)) {
+                            composeNavController.navigate(composableRouteFunctionIds[it]!!)
+                        } else {
+                            openPageById(it)
+                        }
+                    })
                 }
 
                 Spacer(
@@ -467,8 +531,10 @@ class HomeFragment : CreditClubFragment() {
             )
         }
 
-        if (response != null) notificationViewModel.notificationList.value =
-            response.response ?: emptyList()
+        if (response?.response != null) {
+            notificationViewModel.notificationList.value = response.response!!
+            appViewModel.notificationList.value = response.response!!
+        }
     }
 
     private fun checkForUpdate() = appDataStorage.latestVersion?.run {
@@ -501,246 +567,20 @@ class HomeFragment : CreditClubFragment() {
             }
         }
     }
-}
 
-@Composable
-private fun DrawerContent(
-    scaffoldState: ScaffoldState,
-    coroutineScope: CoroutineScope
-) {
-    val localStorage: LocalStorage by rememberBean()
-    val institutionConfig: IInstitutionConfig by rememberBean()
-    val agent = localStorage.agent
-    val context = LocalContext.current
-    val logoTint = colorResource(R.color.navHeaderLogoTint)
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colors.primary)
-    ) {
-        Spacer(modifier = Modifier.height(50.dp))
-        Image(
-            painter = painterResource(R.drawable.ic_launcher_transparent),
-            colorFilter = if (logoTint == Color.Transparent) null else ColorFilter.tint(logoTint),
-            contentDescription = null,
-            modifier = Modifier
-                .height(50.dp)
-                .width(IntrinsicSize.Max)
-                .padding(16.dp)
-                .widthIn(),
-        )
-        Text(
-            text = agent?.agentName ?: "",
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp),
-            softWrap = true,
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.onPrimary,
-        )
-        Text(
-            text = agent?.phoneNumber ?: "",
-            modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
-            style = MaterialTheme.typography.body1,
-            color = MaterialTheme.colors.onPrimary.copy(0.5f),
-        )
-    }
-
-    if (institutionConfig.hasOnlineFunctions) {
-        DrawerRow(
-            title = stringResource(R.string.online_functions),
-            icon = painterResource(R.drawable.ic_fa_arrow_up),
-            onClick = {
-                coroutineScope.launch { scaffoldState.drawerState.close() }
-                context.startActivity(Intent(context, OnlineActivity::class.java))
+    private fun loadFcmToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.e("Support", "Fetching FCM registration token failed", task.exception)
+                loadFcmToken()
+                return@addOnCompleteListener
             }
-        )
-    }
 
-    DrawerRow(
-        title = stringResource(R.string.reports),
-        icon = painterResource(R.drawable.ic_agent_balance),
-        onClick = {
-            coroutineScope.launch { scaffoldState.drawerState.close() }
-            context.startActivity(Intent(context, ReportActivity::class.java))
-        }
-    )
-
-    DrawerRow(
-        title = stringResource(R.string.commission),
-        icon = painterResource(R.drawable.ic_agent_balance),
-        onClick = {
-            coroutineScope.launch { scaffoldState.drawerState.close() }
-            context.startActivity(Intent(context, CommissionsActivity::class.java))
-        }
-    )
-
-    DrawerRow(
-        title = stringResource(R.string.support),
-        icon = painterResource(R.drawable.ic_chat_bubble_outline),
-        onClick = {
-            coroutineScope.launch { scaffoldState.drawerState.close() }
-            context.startActivity(Intent(context, SupportActivity::class.java))
-        }
-    )
-
-    if (institutionConfig.hasHlaTagging) {
-        DrawerRow(
-            title = stringResource(R.string.hla_tagging),
-            icon = painterResource(R.drawable.ic_maps_and_flags),
-            onClick = {
-                coroutineScope.launch { scaffoldState.drawerState.close() }
-                context.startActivity(Intent(context, HlaTaggingActivity::class.java))
-            }
-        )
-    }
-
-    DrawerRow(
-        title = stringResource(R.string.title_activity_faq),
-        icon = painterResource(R.drawable.ic_help),
-        onClick = {
-            coroutineScope.launch { scaffoldState.drawerState.close() }
-            context.startActivity(Intent(context, FaqActivity::class.java))
-        }
-    )
-}
-
-@Composable
-private fun AppBar(scaffoldState: ScaffoldState, mainNavController: NavController) {
-    val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
-    val coroutineScope = rememberCoroutineScope()
-    // Draw a scrim over the status bar which matches the app bar
-    Spacer(
-        Modifier
-            .background(appBarColor)
-            .fillMaxWidth()
-            .statusBarsHeight()
-    )
-    TopAppBar(
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(
-                    modifier = Modifier
-                        .weight(1f),
-                )
-                IconButton(
-                    onClick = {
-                        mainNavController.navigate(HomeFragmentDirections.homeToNotifications())
-                    }
-                ) {
-                    Icon(
-                        Icons.Filled.Notifications,
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.primary.copy(0.52f)
-                    )
-                }
-            }
-        },
-        backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0f),
-        navigationIcon = {
-            IconButton(onClick = {
-                coroutineScope.launch {
-                    safeRunSuspend {
-                        scaffoldState.drawerState.open()
-                    }
-                }
-            }) {
-                Icon(
-                    Icons.Default.Menu,
-                    contentDescription = null,
-                    tint = MaterialTheme.colors.primary.copy(0.52f)
-                )
-            }
-        },
-        elevation = 0.dp
-    )
-}
-
-
-@Composable
-private fun SubMenuBottomNavigation(
-    navController: NavHostController,
-    bottomNavigationItems: List<BottomNavScreens>
-) {
-    val currentRoute = currentRoute(navController)
-    Divider()
-    BottomNavigation(
-        backgroundColor = colorResource(R.color.menuBackground),
-        contentColor = MaterialTheme.colors.onSurface,
-        elevation = 0.dp,
-    ) {
-        for (screen in bottomNavigationItems) {
-            BottomNavigationItem(
-                icon = {
-                    Icon(
-                        painter = painterResource(screen.icon),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                    )
-                },
-                label = { Text(stringResource(id = screen.resourceId)) },
-                selected = currentRoute == screen.route,
-                onClick = {
-                    // This if check gives us a "singleTop" behavior where we do not create a
-                    // second instance of the composable if we are already on that destination
-                    if (currentRoute != screen.route) {
-                        navController.navigate(screen.route) {
-                            launchSingleTop = true
-                            popUpTo(BottomNavScreens.Home.route) {
-                                inclusive = screen.route == BottomNavScreens.Home.route
-                            }
-                        }
-                    }
-                }
-            )
+            // Get new FCM registration token
+            val token = task.result
+            appViewModel.fcmToken.value = token
         }
     }
-}
-
-@Composable
-private fun DrawerRow(
-    title: String,
-    icon: Painter,
-    onClick: () -> Unit
-) {
-    val background = Color.Transparent
-    val textColor = MaterialTheme.colors.onSurface.copy(0.5f)
-    Row(
-        modifier = Modifier
-            .clickable(onClick = onClick)
-            .background(background)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Image(
-            icon,
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(textColor),
-            modifier = Modifier
-                .padding(16.dp)
-                .size(24.dp),
-        )
-        Text(color = textColor, text = title)
-    }
-}
-
-@Composable
-private fun currentRoute(navController: NavHostController): String? {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.arguments?.getString(KEY_ROUTE)
-}
-
-private sealed class BottomNavScreens(
-    val route: String,
-    @StringRes val resourceId: Int,
-    @DrawableRes val icon: Int
-) {
-    object Home : BottomNavScreens("Home", R.string.home, R.drawable.ic_home)
-    object Agent : BottomNavScreens("Agent", R.string.agent, R.drawable.income)
-    object Customer : BottomNavScreens("Customer", R.string.customer, R.drawable.payday_loan)
-    object Transactions :
-        BottomNavScreens("Transactions", R.string.transactions, R.drawable.deposit)
-
-    object Loans : BottomNavScreens("Loans", R.string.loans, R.drawable.personal_income)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -753,266 +593,4 @@ private fun SubMenu(content: LazyGridScope.() -> Unit) {
     }
 }
 
-@Composable
-private fun MenuButton(
-    text: String,
-    icon: Painter,
-    onClick: () -> Unit,
-) {
-    val menuButtonIconTint = colorResource(R.color.menuButtonIconTint)
-    Card(
-        modifier = Modifier
-            .heightIn(150.dp, 200.dp)
-            .widthIn(150.dp, 300.dp)
-            .padding(10.dp),
-        elevation = 2.dp,
-        shape = RoundedCornerShape(20.dp),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.clickable(onClick = onClick),
-        ) {
-            Image(
-                icon,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(35.dp),
-                colorFilter = if (menuButtonIconTint.alpha == 0f) null else ColorFilter.tint(
-                    menuButtonIconTint
-                )
-            )
-            Text(
-                text = text.toUpperCase(),
-                style = MaterialTheme.typography.button,
-                color = colorResource(R.color.menuButtonTextColor),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(10.dp),
-            )
-        }
-    }
-}
 
-@Composable
-private fun SmallMenuButton(
-    text: String,
-    icon: Painter,
-    onClick: () -> Unit,
-) {
-    val menuButtonIconTint = colorResource(R.color.menuButtonIconTint)
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .heightIn(100.dp, 150.dp)
-            .widthIn(120.dp, 200.dp)
-            .padding(8.dp),
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp)
-                .weight(1f)
-                .clickable(onClick = onClick),
-            elevation = 2.dp,
-            shape = RoundedCornerShape(20.dp),
-        ) {
-            Image(
-                icon,
-                contentDescription = null,
-                alignment = Alignment.Center,
-                modifier = Modifier
-                    .padding(30.dp)
-                    .size(35.dp),
-                colorFilter = if (menuButtonIconTint.alpha == 0f) null else ColorFilter.tint(
-                    menuButtonIconTint
-                )
-            )
-        }
-
-        Text(
-            text = text.toUpperCase(),
-            style = MaterialTheme.typography.button,
-            color = colorResource(R.color.menuButtonTextColor),
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
-}
-
-@Composable
-private fun FrequentlyUsed(onItemClick: (id: Int) -> Unit) {
-    val coreDatabase: CoreDatabase by rememberBean()
-    val frequentFunctions = produceState(emptyList<AppFunctionUsage>()) {
-        val (list) = safeRunIO {
-            coreDatabase.appFunctionUsageDao().getMostUsed()
-        }
-        value = list ?: emptyList()
-    }
-    if (frequentFunctions.value.isNotEmpty()) {
-        Column {
-            Text(
-                text = "Frequently Used",
-                color = colorResource(R.color.menuButtonTextColor),
-                style = MaterialTheme.typography.subtitle2,
-                modifier = Modifier.padding(horizontal = 10.dp)
-            )
-            val favModifier = Modifier
-                .weight(1f)
-                .widthIn(max = 300.dp, min = 80.dp)
-                .padding(end = 10.dp)
-                .border(
-                    BorderStroke(
-                        1.dp,
-                        MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
-                    ),
-                    RoundedCornerShape(15.dp),
-                )
-            val menuButtonIconTint = colorResource(R.color.menuButtonIconTint)
-            val tint = if (menuButtonIconTint.alpha == 0f) {
-                LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-            } else {
-                menuButtonIconTint
-            }
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp, vertical = 10.dp)
-                    .wrapContentWidth()
-            ) {
-                frequentFunctions.value.forEach { appFunctionUsage ->
-                    AppFunctions[appFunctionUsage.fid]?.run {
-                        TextButton(
-                            onClick = { onItemClick(id) },
-                            shape = RoundedCornerShape(15.dp),
-                            modifier = favModifier
-                        ) {
-                            if (icon != null) {
-                                Icon(
-                                    painter = painterResource(icon!!),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp),
-                                    tint = tint,
-                                )
-                            }
-                            Text(
-                                text = stringResource(label).toUpperCase(),
-                                color = colorResource(R.color.menuButtonTextColor),
-                                style = MaterialTheme.typography.caption,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(start = 5.dp),
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun BalanceCard() {
-    var balance by remember { mutableStateOf(0.0) }
-    var availableBalance by remember { mutableStateOf(0.0) }
-    var loading by remember { mutableStateOf(false) }
-    var visible by remember { mutableStateOf(false) }
-    val balanceFormatted = remember(availableBalance, visible) {
-        if (visible) availableBalance.toCurrencyFormat()
-        else "XXX,XXX.XX"
-    }
-    val ledgerBalanceFormatted = remember(balance, visible) {
-        if (visible) balance.toCurrencyFormat()
-        else "XX,XXX.XX"
-    }
-    val dialogProvider by rememberDialogProvider()
-    val localStorage: LocalStorage by rememberBean()
-    val staticService: StaticService by rememberRetrofitService()
-    val networkErrorMessage = stringResource(R.string.a_network_error_occurred)
-    val loadBalance: suspend CoroutineScope.() -> Unit = remember {
-        loadBalance@{
-            val pin = dialogProvider.getPin("Agent PIN") ?: return@loadBalance
-            if (pin.length != 4) {
-                dialogProvider.showError("Agent PIN must be 4 digits")
-                return@loadBalance
-            }
-            val request = BalanceEnquiryRequest().apply {
-                agentPin = pin
-                agentPhoneNumber = localStorage.agentPhone
-                institutionCode = localStorage.institutionCode
-            }
-
-            loading = true
-            val (response) = safeRunIO { staticService.balanceEnquiry(request) }
-            loading = false
-
-            if (response == null) return@loadBalance
-            if (!response.isSussessful) {
-                dialogProvider.showError(response.responseMessage ?: networkErrorMessage)
-                return@loadBalance
-            }
-
-            availableBalance = response.availableBalance
-            balance = response.balance
-            visible = true
-        }
-    }
-    val coroutineScope = rememberCoroutineScope()
-    Card(
-        modifier = Modifier
-            .heightIn(100.dp, 170.dp)
-            .fillMaxWidth()
-            .padding(6.dp),
-        elevation = 2.dp,
-        backgroundColor = MaterialTheme.colors.secondary,
-        contentColor = MaterialTheme.colors.onSecondary,
-        shape = RoundedCornerShape(20.dp),
-    ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .padding(16.dp),
-        ) {
-            Text(
-                text = balanceFormatted,
-                style = MaterialTheme.typography.h3,
-                color = MaterialTheme.colors.onSecondary,
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .weight(1f),
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "LEDGER BALANCE: $ledgerBalanceFormatted",
-                    style = MaterialTheme.typography.button,
-                    color = MaterialTheme.colors.onSecondary,
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .weight(1f),
-                )
-                if (loading) {
-                    CircularProgressIndicator(
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colors.onSecondary,
-                        modifier = Modifier
-                            .size(20.dp)
-                    )
-                } else {
-                    IconButton(
-                        onClick = {
-                            if (visible) visible = false
-                            else coroutineScope.launch(block = loadBalance)
-                        },
-                    ) {
-                        Icon(
-                            imageVector = if (visible) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
-                            contentDescription = null
-                        )
-                    }
-                }
-            }
-        }
-    }
-}

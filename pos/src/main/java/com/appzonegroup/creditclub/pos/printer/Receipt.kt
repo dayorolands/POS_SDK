@@ -1,7 +1,6 @@
 package com.appzonegroup.creditclub.pos.printer
 
 import android.content.Context
-import com.appzonegroup.creditclub.pos.BuildConfig
 import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter

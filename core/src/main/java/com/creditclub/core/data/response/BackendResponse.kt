@@ -19,4 +19,6 @@ open class BackendResponse {
 
     @SerialName("Message")
     private val message: String? = null
+
+    fun isFailure() = !isSuccessful
 }

@@ -18,7 +18,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.navigate
 import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.models.DisputedPosTransaction
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter

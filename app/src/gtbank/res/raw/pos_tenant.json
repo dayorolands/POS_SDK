@@ -17,6 +17,24 @@
       "Timeout": 60,
       "Key1": "25F7432326081AA82520647C61DCC83D",
       "Key2": "F270D5A76ED6FB9298CD580E6D986723"
+    },
+    {
+      "Name": "EPMS Test",
+      "IPAddress": "196.6.103.72",
+      "Port": 5043,
+      "EnableSSL": true,
+      "Timeout": 60,
+      "Key1": "5D25072F04832A2329D93E4F91BA23A2",
+      "Key2": "86CBCDE3B0A22354853E04521686863D"
+    },
+    {
+      "Name": "POSVAS Test",
+      "IPAddress": "196.6.103.10",
+      "Port": 55533,
+      "EnableSSL": true,
+      "Timeout": 60,
+      "Key1": "5D25072F04832A2329D93E4F91BA23A2",
+      "Key2": "86CBCDE3B0A22354853E04521686863D"
     }
   ]
 }

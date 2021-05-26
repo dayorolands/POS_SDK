@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,9 +42,10 @@ import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.timeAgo
 import com.creditclub.ui.theme.CreditClubTheme
-import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.ProvideWindowInsets
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.util.*
 
 class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) {
     private val binding by dataBinding<NotificationFragmentBinding>()
@@ -117,6 +119,9 @@ class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) 
 
 @Composable
 private fun NotificationItem(notification: Notification, onClick: () -> Unit) {
+    val formattedDate = remember(notification.dateLogged) {
+        notification.dateLogged?.timeAgo() ?: ""
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -127,10 +132,11 @@ private fun NotificationItem(notification: Notification, onClick: () -> Unit) {
             )
     ) {
         Row(
-            modifier = Modifier.padding(start = 16.dp, top = 10.dp, end = 16.dp)
+            modifier = Modifier.padding(start = 16.dp, top = 10.dp, end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                notification.header?.toUpperCase() ?: "",
+                notification.header?.toUpperCase(Locale.ROOT) ?: "",
                 color = colorResource(id = R.color.colorPrimary),
                 maxLines = 1,
                 style = MaterialTheme.typography.subtitle1,
@@ -138,7 +144,7 @@ private fun NotificationItem(notification: Notification, onClick: () -> Unit) {
                 modifier = Modifier.weight(1f),
             )
             Text(
-                text = notification.dateLogged?.timeAgo() ?: "",
+                text = formattedDate,
                 maxLines = 1,
                 style = MaterialTheme.typography.caption,
                 color = colorResource(R.color.ef_grey),

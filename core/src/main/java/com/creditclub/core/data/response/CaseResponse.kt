@@ -8,16 +8,16 @@ import kotlinx.serialization.Serializable
  * Appzone Ltd
  */
 @Serializable
-class CaseResponse<T> {
+data class CaseResponse<T>(
     @SerialName("Response")
-    var response: T? = null
+    val response: T? = null,
 
     @SerialName("Status")
-    var status: Boolean = false
+    val status: Boolean = false,
 
     @SerialName("IsResolved")
-    var isResolved: Boolean? = null
+    val isResolved: Boolean = false,
 
     @SerialName("IsClosed")
-    var isClosed: Boolean? = null
-}
+    val isClosed: Boolean = false,
+)

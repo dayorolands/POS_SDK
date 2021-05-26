@@ -1,7 +1,6 @@
 package com.appzonegroup.app.fasttrack.fragment.online
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.TextUtils
@@ -9,16 +8,18 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.Fragment
 import com.appzonegroup.app.fasttrack.BankOneApplication
 import com.appzonegroup.app.fasttrack.OnlineActivity
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.FragmentCustomerImageBinding
 import com.appzonegroup.app.fasttrack.fragment.online.EnterDetailFragment.OptionsText
 import com.appzonegroup.app.fasttrack.model.TransactionCountType
+import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.model.online.Response
 import com.appzonegroup.app.fasttrack.network.online.APIHelper
 import com.appzonegroup.app.fasttrack.ui.dataBinding
-import com.appzonegroup.app.fasttrack.utility.GPSTracker
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages
 import com.appzonegroup.app.fasttrack.utility.online.convertXmlToJson
@@ -26,13 +27,30 @@ import com.creditclub.core.data.Encryption
 import com.creditclub.core.model.CreditClubImage
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.safeRunIO
-import com.esafirm.imagepicker.features.ImagePicker
-import com.esafirm.imagepicker.features.ReturnMode
+import com.esafirm.imagepicker.features.*
+import com.esafirm.imagepicker.features.cameraonly.CameraOnlyConfig
+import com.esafirm.imagepicker.features.common.BaseConfig
+import com.esafirm.imagepicker.helper.ConfigUtils
 import com.esafirm.imagepicker.model.Image
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.File
 import java.util.concurrent.TimeoutException
+
+fun CreditClubFragment.registerImagePicker(callback: suspend CoroutineScope.(List<Image>) -> Unit): (BaseConfig) -> Unit {
+    val activityResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val images = ImagePicker.getImages(it.data) ?: emptyList()
+            mainScope.launch { callback(images) }
+        }
+    return { config: BaseConfig ->
+        val finalConfig =
+            if (config is ImagePickerConfig) ConfigUtils.checkConfig(config) else config
+        val intent = createImagePickerIntent(requireContext(), finalConfig)
+        activityResult.launch(intent)
+    }
+}
 
 class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_image),
     View.OnClickListener {
@@ -40,6 +58,28 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
     private var image: Bitmap? = null
     private val binding by dataBinding<FragmentCustomerImageBinding>()
     private var optionsText: OptionsText? = null
+    private val authResponse: AuthResponse by lazy {
+        (requireActivity().application as BankOneApplication).authResponse
+    }
+    private val ah by lazy { APIHelper(requireActivity()) }
+    private val launcher = registerImagePicker {
+        try {
+            val tmpImage = it.firstOrNull()
+                ?: return@registerImagePicker dialogProvider.showError("An internal error occurred")
+            creditClubImage = CreditClubImage(requireContext(), tmpImage)
+
+            dialogProvider.showProgressBar("Processing image")
+
+            val (bitmap) = safeRunIO { creditClubImage?.bitmap }
+            image = bitmap
+            binding.image.setImageBitmap(bitmap)
+
+            dialogProvider.hideProgressBar()
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            dialogProvider.showError("An internal error occurred")
+        }
+    }
 
     override fun onViewCreated(
         view: View,
@@ -59,45 +99,31 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
         }
     }
 
-    private fun openCamera() {
-        ImagePicker.cameraOnly().start(this)
-    }
-
-    private fun openGallery() {
-        ImagePicker.create(this).returnMode(ReturnMode.ALL)
-            .folderMode(true)
-            .single().single().showCamera(false).start()
-    }
-
-    var finalLocation: String? = null
-
     override fun onClick(view: View) {
-        try {
-            if (view === binding.gallery) {
-                openGallery()
-            } else if (view === binding.takePhoto) {
-                openCamera()
-            } else {
+        when (view) {
+            binding.gallery -> launcher(
+                ImagePickerConfig(
+                    mode = ImagePickerMode.SINGLE,
+                    isShowCamera = false,
+                    isFolderMode = true,
+                    returnMode = ReturnMode.ALL,
+                )
+            )
 
-                if (image != null) {
-                    //final CacheHelper ch = new CacheHelper(getActivity());
-                    finalLocation = gps.geolocationString
-                    mainScope.launch { nextOperation() }
+            binding.takePhoto -> launcher(CameraOnlyConfig())
 
-                } else {
+            else -> {
+                if (image == null) {
                     Toast.makeText(
                         activity,
                         "Please select or take a picture!",
                         Toast.LENGTH_SHORT
                     ).show()
+                    return
                 }
+
+                mainScope.launch { nextOperation() }
             }
-        } catch (ex: Exception) {
-            Toast.makeText(
-                activity,
-                "An error just occurred. Please try again later.",
-                Toast.LENGTH_LONG
-            ).show()
         }
     }
 
@@ -112,7 +138,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
             authResponse?.phoneNumber ?: "",
             authResponse?.sessionId ?: "nothing",
             finalFile,
-            finalLocation ?: "",
+            localStorage.lastKnownLocation ?: "0.00;0.00",
             optionsText?.isShouldCompress ?: false,
         )
         dialogProvider.hideProgressBar()
@@ -184,21 +210,11 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
 
     private fun moveToNext() {
         dialogProvider.showProgressBar("Loading")
-        //final AuthResponse authResponse = bankOneApplication.getAuthResponse();// LocalStorage.getCachedAuthResponse(getActivity());
-        val authResponse =
-            (requireActivity().application as BankOneApplication).authResponse
-        val ah = APIHelper(requireActivity())
-        var finalLocation = "0.00;0.00"
-        val gpsTracker = GPSTracker(activity)
-        if (gpsTracker.location != null) {
-            val longitude = gpsTracker.location.longitude.toString()
-            val latitude = gpsTracker.location.latitude.toString()
-            finalLocation = "$latitude;$longitude"
-        }
-        ah.getNextOperation(authResponse.phoneNumber,
+        ah.getNextOperation(
+            authResponse.phoneNumber,
             authResponse.sessionId,
             creditClubImage?.path ?: "",
-            finalLocation
+            localStorage.lastKnownLocation ?: "0.00;0.00",
         ) { e, result, status ->
             dialogProvider.hideProgressBar()
             if (status) {
@@ -218,104 +234,102 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
                         Log.e("ResponseJsonText", resp)
                         val responseBase =
                             response.getJSONObject("Response")
-                        if (responseBase != null) {
-                            val shouldClose = responseBase.optInt("ShouldClose", 1)
-                            if (shouldClose == 0) {
-                                if (resp.contains("IN-CORRECT ACTIVATION CODE") && state) {
-                                    Log.e(
-                                        "Case",
-                                        "Incorrect activation code||Deleted cache auth"
-                                    )
-                                    localStorage.cacheAuth = null
-                                } else if (state) {
-                                    Log.e(
-                                        "Case",
-                                        "correct activation code||" + creditClubImage?.path
-                                    )
-                                    val auth = JSONObject()
-                                    auth.put("phone_number", authResponse.phoneNumber)
-                                    auth.put("session_id", authResponse.sessionId)
-                                    auth.put(
-                                        "activation_code",
-                                        creditClubImage?.path
-                                    )
-                                    localStorage.cacheAuth = auth.toString()
-                                }
-                                Misc.increaseTransactionMonitorCounter(
-                                    activity,
-                                    TransactionCountType.SUCCESS_COUNT,
-                                    authResponse.sessionId
+                        val shouldClose = responseBase.optInt("ShouldClose", 1)
+                        if (shouldClose == 0) {
+                            if (resp.contains("IN-CORRECT ACTIVATION CODE") && state) {
+                                Log.e(
+                                    "Case",
+                                    "Incorrect activation code||Deleted cache auth"
                                 )
-                                if (resp.contains("MenuItem")) {
-                                    val menuWrapper =
-                                        responseBase.getJSONObject("Menu")
-                                            .getJSONObject("Response")
-                                            .getJSONObject("Display")
-                                    requireActivity().supportFragmentManager
-                                        .beginTransaction().replace(
-                                            R.id.container,
-                                            ListOptionsFragment.instantiate(
-                                                menuWrapper,
-                                                false
-                                            )
-                                        ).commit()
-                                } else {
-                                    val menuWrapper =
-                                        responseBase.getJSONObject("Menu")
-                                            .getJSONObject("Response")["Display"]
-                                    if (menuWrapper is String && resp.contains("ShouldMask") && !resp.contains(
-                                            "Invalid Response"
+                                localStorage.cacheAuth = null
+                            } else if (state) {
+                                Log.e(
+                                    "Case",
+                                    "correct activation code||" + creditClubImage?.path
+                                )
+                                val auth = JSONObject()
+                                auth.put("phone_number", authResponse.phoneNumber)
+                                auth.put("session_id", authResponse.sessionId)
+                                auth.put(
+                                    "activation_code",
+                                    creditClubImage?.path
+                                )
+                                localStorage.cacheAuth = auth.toString()
+                            }
+                            Misc.increaseTransactionMonitorCounter(
+                                activity,
+                                TransactionCountType.SUCCESS_COUNT,
+                                authResponse.sessionId
+                            )
+                            if (resp.contains("MenuItem")) {
+                                val menuWrapper =
+                                    responseBase.getJSONObject("Menu")
+                                        .getJSONObject("Response")
+                                        .getJSONObject("Display")
+                                requireActivity().supportFragmentManager
+                                    .beginTransaction().replace(
+                                        R.id.container,
+                                        ListOptionsFragment.instantiate(
+                                            menuWrapper,
+                                            false
                                         )
-                                    ) {
-                                        val data =
-                                            responseBase.getJSONObject("Menu")
-                                                .getJSONObject("Response")
-                                        if (resp.contains("\"IsImage\":\"true\"")) {
-                                            requireActivity().supportFragmentManager
-                                                .beginTransaction().replace(
-                                                    R.id.container,
-                                                    instantiate(
-                                                        data
-                                                    )
-                                                ).commit()
-                                        } else {
-                                            requireActivity().supportFragmentManager
-                                                .beginTransaction().replace(
-                                                    R.id.container,
-                                                    EnterDetailFragment.instantiate(data)
-                                                ).commit()
-                                        }
-                                    } else {
-                                        val message =
-                                            responseBase.getJSONObject("Menu")
-                                                .getJSONObject("Response")
-                                                .getString("Display")
-                                        dialogProvider.showError(message)
-                                    }
-                                }
+                                    ).commit()
                             } else {
-                                Misc.increaseTransactionMonitorCounter(
-                                    activity,
-                                    TransactionCountType.ERROR_RESPONSE_COUNT,
-                                    authResponse.sessionId
-                                )
-                                if (responseBase.toString().contains("Display")) {
-                                    showDialogWithGoHomeAction(
+                                val menuWrapper =
+                                    responseBase.getJSONObject("Menu")
+                                        .getJSONObject("Response")["Display"]
+                                if (menuWrapper is String && resp.contains("ShouldMask") && !resp.contains(
+                                        "Invalid Response"
+                                    )
+                                ) {
+                                    val data =
                                         responseBase.getJSONObject("Menu")
                                             .getJSONObject("Response")
-                                            .optString(
-                                                "Display",
-                                                ErrorMessages.OPERATION_NOT_COMPLETED
-                                            )
-                                    )
+                                    if (resp.contains("\"IsImage\":\"true\"")) {
+                                        requireActivity().supportFragmentManager
+                                            .beginTransaction().replace(
+                                                R.id.container,
+                                                instantiate(
+                                                    data
+                                                )
+                                            ).commit()
+                                    } else {
+                                        requireActivity().supportFragmentManager
+                                            .beginTransaction().replace(
+                                                R.id.container,
+                                                EnterDetailFragment.instantiate(data)
+                                            ).commit()
+                                    }
                                 } else {
-                                    dialogProvider.showError(
-                                        responseBase.optString(
-                                            "Menu",
-                                            ErrorMessages.PHONE_NOT_REGISTERED
-                                        )
-                                    )
+                                    val message =
+                                        responseBase.getJSONObject("Menu")
+                                            .getJSONObject("Response")
+                                            .getString("Display")
+                                    dialogProvider.showError(message)
                                 }
+                            }
+                        } else {
+                            Misc.increaseTransactionMonitorCounter(
+                                activity,
+                                TransactionCountType.ERROR_RESPONSE_COUNT,
+                                authResponse.sessionId
+                            )
+                            if (responseBase.toString().contains("Display")) {
+                                showDialogWithGoHomeAction(
+                                    responseBase.getJSONObject("Menu")
+                                        .getJSONObject("Response")
+                                        .optString(
+                                            "Display",
+                                            ErrorMessages.OPERATION_NOT_COMPLETED
+                                        )
+                                )
+                            } else {
+                                dialogProvider.showError(
+                                    responseBase.optString(
+                                        "Menu",
+                                        ErrorMessages.PHONE_NOT_REGISTERED
+                                    )
+                                )
                             }
                         }
                     }
@@ -356,39 +370,10 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
         }
     }
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ) {
-        if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
-            try {
-                val tmpImage: Image? = ImagePicker.getFirstImageOrNull(data)
-                tmpImage ?: return dialogProvider.showError("An internal error occurred")
-                creditClubImage = CreditClubImage(requireContext(), tmpImage)
-
-                mainScope.launch {
-                    dialogProvider.showProgressBar("Processing image")
-
-                    val (bitmap) = safeRunIO { creditClubImage?.bitmap }
-                    image = bitmap
-                    binding.image.setImageBitmap(bitmap)
-
-                    dialogProvider.hideProgressBar()
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                dialogProvider.showError("An internal error occurred")
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
     companion object {
 
         @JvmStatic
-        fun instantiate(data: JSONObject?): CustomerImageFragment {
+        fun instantiate(data: JSONObject): CustomerImageFragment {
             return CustomerImageFragment().apply {
                 optionsText = OptionsText(data)
             }

@@ -1,54 +1,47 @@
 package com.creditclub.core.data.model
 
 import com.creditclub.core.model.CreditClubImage
-import com.creditclub.core.serializer.CreditClubImageSerializer
+import com.creditclub.core.serializer.TimeInstantSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 09/09/2019.
- * Appzone Ltd
- */
+import java.time.Instant
 
 @Serializable
-class Feedback {
+data class Feedback(
     @SerialName("ID")
-    var id: Int? = null
+    val id: Int? = null,
 
     @SerialName("DisplayMessage")
-    var displayMessage: Int? = null
+    val displayMessage: Int? = null,
 
     @SerialName("DateLogged")
-    var dateLogged: String? = null
+    @Serializable(with = TimeInstantSerializer::class)
+    val dateLogged: Instant,
 
     @SerialName("CaseReference")
-    var caseReference: String? = null
+    val caseReference: String? = null,
 
     @SerialName("Message")
-    var message: String? = null
+    val message: String? = null,
 
     @SerialName("IsAgent")
-    var isAgent = true
+    val isAgent: Boolean = true,
 
     @SerialName("IsActive")
-    var isActive = true
-
-    @SerialName("IsASystemChange")
-    var isASystemChange = true
+    val isActive: Boolean = true,
 
     @SerialName("Name")
-    var name: String? = null
+    val name: String,
 
     @SerialName("LastReadTime")
-    var lastReadTime: String? = null
+    val lastReadTime: String? = null,
 
     @SerialName("FCMToken")
-    var fcmToken: String? = null
+    val fcmToken: String? = null,
 
     @SerialName("IsAttachment")
-    var isAttachment = false
+    val isAttachment: Boolean = false,
 
     @SerialName("Blobs")
-    var blobs: List<CreditClubImage>? = null
-}
+    val blobs: List<CreditClubImage>? = null,
+)
