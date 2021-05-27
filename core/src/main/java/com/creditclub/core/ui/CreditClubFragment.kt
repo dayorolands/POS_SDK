@@ -4,11 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
-import com.creditclub.core.data.api.BackendConfig
+import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogProvider
@@ -39,7 +38,7 @@ open class CreditClubFragment : Fragment {
     open val localStorage: LocalStorage by inject()
     open val appDataStorage: AppDataStorage by inject()
     open val institutionConfig: IInstitutionConfig by inject()
-    open val backendConfig: BackendConfig by inject()
+    open val appConfig: AppConfig by inject()
     open val coreDatabase: CoreDatabase by inject()
 
     open val mainScope by lazy { CoroutineScope(Dispatchers.Main) }

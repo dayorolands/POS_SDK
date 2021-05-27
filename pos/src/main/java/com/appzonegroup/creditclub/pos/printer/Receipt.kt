@@ -4,7 +4,7 @@ import android.content.Context
 import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
-import com.creditclub.core.data.api.BackendConfig
+import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.util.format
 import com.creditclub.core.util.localStorage
 import com.creditclub.pos.printer.Alignment
@@ -21,7 +21,7 @@ import org.koin.core.inject
  */
 class Receipt(val context: Context, val transaction: FinancialTransaction) :
     PrintJob, KoinComponent {
-    private val backendConfig by inject<BackendConfig>()
+    private val backendConfig by inject<AppConfig>()
     var isCustomerCopy = true
     var isReprint = false
 

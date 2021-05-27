@@ -77,7 +77,7 @@ class UnsettledTransactionsActivity : CreditClubActivity() {
         val (response, error) = safeRunIO {
             posApiService.posCashOutNotification(
                 notification,
-                "iRestrict ${backendConfig.posNotificationToken}",
+                "iRestrict ${appConfig.posNotificationToken}",
                 notification.terminalId ?: config.terminalId
             )
         }

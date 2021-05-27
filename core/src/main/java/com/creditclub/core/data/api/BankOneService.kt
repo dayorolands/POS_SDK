@@ -40,7 +40,7 @@ interface BankOneService {
     suspend fun operationPost(@Url url: String?, @Body requestBody: RequestBody): String?
 
     object UrlGenerator : KoinComponent {
-        private val apiHost get() = get<BackendConfig>().apiHost
+        private val apiHost get() = get<AppConfig>().apiHost
 
         private val BASE_URL =
             "${apiHost}/CreditClubClient/HttpJavaClient/BankOneService.aspx?"

@@ -11,7 +11,7 @@ import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubClient
 import com.creditclub.core.data.CreditClubMiddleWareAPI
-import com.creditclub.core.data.api.BackendConfig
+import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.api.RequestFailureInterceptor
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
@@ -68,9 +68,9 @@ val apiModule = module {
         return@single builder.build()
     }
 
-    single { CreditClubMiddleWareAPI(get(named("middleware")), get<BackendConfig>().apiHost) }
+    single { CreditClubMiddleWareAPI(get(named("middleware")), get<AppConfig>().apiHost) }
 
-    single { CreditClubClient(get(named("middleware")), get<BackendConfig>().apiHost) }
+    single { CreditClubClient(get(named("middleware")), get<AppConfig>().apiHost) }
 }
 
 val uiModule = module {
@@ -81,13 +81,14 @@ val uiModule = module {
 
 val configModule = module {
     single<IInstitutionConfig> { LocalInstitutionConfig.create(androidContext()) }
-    single<BackendConfig> {
-        object : BackendConfig {
+    single<AppConfig> {
+        object : AppConfig {
             override val apiHost = BuildConfig.API_HOST
             override val posNotificationToken = BuildConfig.NOTIFICATION_TOKEN
             override val appName = androidContext().getString(R.string.app_name)
             override val versionName = BuildConfig.VERSION_NAME
             override val versionCode = BuildConfig.VERSION_CODE
+            override val fileProviderAuthority = "${BuildConfig.APPLICATION_ID}.provider"
         }
     }
 }

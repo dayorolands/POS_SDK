@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
-import com.creditclub.core.data.api.BackendConfig
+import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.util.safeRunSuspend
 import com.creditclub.pos.api.PosApiService
@@ -33,7 +33,7 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
         val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
         val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
         val posDatabase: PosDatabase by inject()
-        val backendConfig: BackendConfig by inject()
+        val appConfig: AppConfig by inject()
 
         val posTransactionDao = posDatabase.posTransactionDao()
         posTransactionDao.deleteSyncedBefore(Instant.now().minus(7, ChronoUnit.DAYS))
@@ -43,7 +43,7 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
                 val (response) = safeRunSuspend {
                     posApiService.transactionLog(
                         receipt,
-                        "iRestrict ${backendConfig.posNotificationToken}",
+                        "iRestrict ${appConfig.posNotificationToken}",
                         receipt.terminalId,
                     )
                 }

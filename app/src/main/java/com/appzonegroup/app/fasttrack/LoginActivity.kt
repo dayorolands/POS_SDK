@@ -18,7 +18,7 @@ import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.data.CreditClubMiddleWareAPI
-import com.creditclub.core.data.api.BackendConfig
+import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.model.SurveyQuestion
 import com.creditclub.core.data.request.SubmitSurveyRequest
 import com.creditclub.core.data.response.isSuccessful
@@ -287,7 +287,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     private suspend fun settle() = withContext(Dispatchers.IO) {
         val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
         val posDatabase: PosDatabase = PosDatabase.getInstance(this@LoginActivity)
-        val backendConfig: BackendConfig by inject()
+        val appConfig: AppConfig by inject()
         val configService: ConfigService by inject()
         val posNotificationDao = posDatabase.posNotificationDao()
         val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
@@ -297,7 +297,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                 val (response) = safeRunSuspend {
                     posApiService.posCashOutNotification(
                         notification,
-                        "iRestrict ${backendConfig.posNotificationToken}",
+                        "iRestrict ${appConfig.posNotificationToken}",
                         notification.terminalId ?: configService.terminalId
                     )
                 }

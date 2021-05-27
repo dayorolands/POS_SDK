@@ -9,26 +9,33 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo
 import android.net.Uri
+import android.os.Build
 import android.print.PrintAttributes
 import android.print.PrintAttributes.Resolution
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.core.graphics.scale
+import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.format
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.pos.printer.*
 import com.dspread.R
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.io.File
 import java.io.FileOutputStream
-import java.util.*
+import java.time.Instant
 
 
 class QposPrinter(
     override val context: CreditClubActivity,
     override val dialogProvider: DialogProvider = context.dialogProvider
-) : PosPrinter {
+) : PosPrinter, KoinComponent {
+    private val appConfig: AppConfig by inject()
     override fun check(): PrinterStatus {
         ActivityCompat.requestPermissions(
             context,
@@ -115,8 +122,10 @@ class QposPrinter(
         }
 
         document.finishPage(page)
+        val time = Instant.now().format("ddMMHHmmss")
+        val fileName = "/${appConfig.appName} Receipt ${time}.pdf"
         val file = safeRunIO {
-            val myFilePath = context.externalCacheDir?.path + "/receipt-${UUID.randomUUID()}.pdf"
+            val myFilePath = context.externalCacheDir?.path + fileName
             val myFile = File(myFilePath)
             document.writeTo(FileOutputStream(myFile))
             myFile
@@ -125,9 +134,18 @@ class QposPrinter(
 
         val shareIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
             type = "application/pdf"
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val uri = FileProvider.getUriForFile(
+                    context.applicationContext,
+                    appConfig.fileProviderAuthority,
+                    file,
+                )
+                putExtra(Intent.EXTRA_STREAM, uri)
+            } else {
+                putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
+            }
         }
         context.startActivity(
             Intent.createChooser(

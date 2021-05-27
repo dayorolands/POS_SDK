@@ -374,7 +374,7 @@ abstract class CardTransactionActivity : PosActivity() {
                             }
                             posApiService.logPosNotification(
                                 posDatabase,
-                                backendConfig,
+                                appConfig,
                                 posConfig,
                                 posNotification
                             )
