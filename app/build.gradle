@@ -192,8 +192,8 @@ dependencies {
     polarisImplementation project(path: ':sunmi')
     accessImplementation project(path: ':telpo')
     gtbankImplementation project(path: ':dspread')
-    purpleImplementation project(path: ':dspread')
-//    purpleImplementation project(path: ':telpo')
+//    purpleImplementation project(path: ':dspread')
+    purpleImplementation project(path: ':telpo')
 
     implementation fileTree(dir: "jniLibs", include: ["*.so"])
     implementation fileTree(include: ["*.jar"], dir: "libs")
