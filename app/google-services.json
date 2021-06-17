@@ -153,6 +153,35 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:374244995616:android:67d1fdff1cfb1144114245",
+        "android_client_info": {
+          "package_name": "com.creditclub.grooming"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "374244995616-r5b0hcls5cbcritv8unbids9934uau4m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxV_Hi6_sN84FD9Ha3rAFRcuK2FT2Zozs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "374244995616-r5b0hcls5cbcritv8unbids9934uau4m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:374244995616:android:a46de8068c9fdc94114245",
         "android_client_info": {
           "package_name": "com.creditclub.gtbank"
