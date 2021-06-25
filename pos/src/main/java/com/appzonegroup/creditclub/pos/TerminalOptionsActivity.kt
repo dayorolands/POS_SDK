@@ -115,7 +115,7 @@ class TerminalOptionsActivity : PosActivity(R.layout.activity_network_parameters
         super.onActivityResult(requestCode, resultCode, data)
 
         binding.apn = "Retrieving..."
-        GlobalScope.launch(Dispatchers.Main) {
+        mainScope.launch {
             delay(5000)
             binding.apn = apnInfo
         }

@@ -13,15 +13,16 @@ import android.view.MenuItem
 import android.view.View
 import androidx.core.app.ActivityCompat
 import com.creditclub.core.CreditClubApplication
+import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.util.appDataStorage
 import com.creditclub.core.util.packageInfo
-import com.creditclub.core.util.showError
 import com.creditclub.ui.databinding.ActivityUpdateBinding
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 class UpdateActivity : CreditClubActivity(R.layout.activity_update) {
     private val binding: ActivityUpdateBinding by dataBinding()
+    private val appDataStorage: AppDataStorage by inject()
     private var latestVersion = appDataStorage.latestVersion
     private val fileName get() = "${getString(R.string.ota_app_name)}${latestVersion?.version}.apk"
     private var isProcessing = false

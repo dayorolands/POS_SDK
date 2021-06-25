@@ -29,7 +29,6 @@ import org.koin.core.context.GlobalContext
  */
 
 inline val Context.localStorage get() = LocalStorage(this)
-inline val Context.appDataStorage get() = AppDataStorage.getInstance(this)
 inline val Context.coreDatabase: CoreDatabase get() = CoreDatabase.getInstance(this)
 inline val Context.application get() = applicationContext as CreditClubApplication
 

@@ -22,9 +22,14 @@ import java.time.Instant
 class WithdrawalReceipt(
     context: Context,
     val request: WithdrawalRequest,
-    val accountInfo: AccountInfo
+    val accountInfo: AccountInfo,
+    private val transactionDate: String,
+    override var isCustomerCopy: Boolean = true,
+    override var isReprint: Boolean = false,
+    override var isSuccessful: Boolean = false,
+    override var reason: String? = null,
 ) :
-    TransactionReceipt(context) {
+    TransactionReceipt(context, isSuccessful, isCustomerCopy, isReprint, reason) {
 
     override val nodes: MutableList<PrintNode>
         get() {
@@ -44,7 +49,7 @@ Amount : NGN${request.amount}
 Customer Account: ${accountInfo.number.mask(4, 2)}
 Customer Name: ${accountInfo.accountName}
 
-Transaction Date: ${Instant.now().toString("dd-MM-yyyy hh:mm")}"""
+Transaction Date: $transactionDate"""
                 )
             ).apply { addTransactionStatus(); addAll(footerNodes(context)) }
         }

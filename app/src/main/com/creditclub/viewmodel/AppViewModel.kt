@@ -1,6 +1,7 @@
 package com.creditclub.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.creditclub.core.data.model.CaseDetail
 import com.creditclub.core.data.model.Notification
@@ -10,4 +11,5 @@ class AppViewModel : ViewModel() {
     val notificationList = MutableStateFlow<List<Notification>>(emptyList())
     val caseDetails = mutableStateOf<List<CaseDetail>>(emptyList())
     val fcmToken = mutableStateOf("")
+    val sessionTimedOut = MutableLiveData(false)
 }

@@ -10,34 +10,23 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
-class CustomerAccount {
+data class CustomerAccount(
     @SerialName("Name")
-    var name: String? = null
+    val name: String? = null,
 
     @SerialName("PhoneNumber")
-    var phoneNumber: String? = null
+    val phoneNumber: String? = null,
 
     @SerialName("LinkingBankAccounts")
-    var linkingBankAccounts: ArrayList<AccountInfo>? = null
-
-    @SerialName("ReponseMessage")
-    var responseMessage: String? = null
-        get() = if (field?.isEmpty() == true) message ?: "" else field
+    val linkingBankAccounts: List<AccountInfo>? = null,
 
     @SerialName("IsSuccessful")
-    var isSuccessful: Boolean = false
+    val isSuccessful: Boolean = false,
 
     @SerialName("Message")
-    private val message: String? = null
-
-    fun getAccountNames(): ArrayList<String>? {
-        return linkingBankAccounts?.run {
-            val names = ArrayList<String>()
-            for (accountInfo in this) {
-                names.add("${accountInfo.accountName} - ${accountInfo.number}")
-            }
-
-            return names
-        }
-    }
+    private val message: String? = null,
+) {
+    @SerialName("ReponseMessage")
+    val responseMessage: String? = null
+        get() = if (field?.isEmpty() == true) message ?: "" else field
 }

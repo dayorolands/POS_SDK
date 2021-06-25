@@ -1,6 +1,12 @@
 package com.appzonegroup.app.fasttrack
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build
+import android.telephony.TelephonyManager
 import androidx.appcompat.app.AppCompatDelegate
 import com.appzonegroup.app.fasttrack.di.*
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
@@ -70,6 +76,7 @@ class BankOneApplication : CreditClubApplication() {
         registerAppFunctions()
         Platform.test(this)
         if (Platform.isPOS) startPosApp()
+        observeNetworkState()
         registerWorkers()
     }
 
@@ -85,5 +92,34 @@ class BankOneApplication : CreditClubApplication() {
                 deleteSharedPreferences(prefsName)
             }
         }
+    }
+
+    private fun observeNetworkState() {
+        val networkRequest = NetworkRequest.Builder()
+            .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .build()
+        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val manager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        appDataStorage.networkCarrier = manager.networkOperatorName
+        cm.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                appDataStorage.networkState = "AVAILABLE"
+                appDataStorage.networkCarrier = manager.networkOperatorName
+            }
+
+            override fun onUnavailable() {
+                super.onUnavailable()
+                appDataStorage.networkState = "UNAVAILABLE"
+                appDataStorage.networkCarrier = manager.networkOperatorName
+            }
+
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                appDataStorage.networkState = "LOST"
+                appDataStorage.networkCarrier = manager.networkOperatorName
+            }
+        })
     }
 }

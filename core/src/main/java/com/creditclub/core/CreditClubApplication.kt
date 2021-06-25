@@ -4,10 +4,11 @@ import android.app.Application
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.creditclub.core.data.CreditClubMiddleWareAPI
-import com.creditclub.core.util.appDataStorage
+import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.util.safeRunIO
 import com.google.android.play.core.missingsplits.MissingSplitsManagerFactory
 import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 
 
 /**
@@ -17,6 +18,7 @@ import org.koin.android.ext.android.get
 open class CreditClubApplication : Application() {
 
     open val otaAppName: String get() = getString(R.string.ota_app_name)
+    val appDataStorage: AppDataStorage by inject()
 
     override fun onCreate() {
         super.onCreate()

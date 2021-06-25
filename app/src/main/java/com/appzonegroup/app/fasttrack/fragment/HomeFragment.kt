@@ -50,8 +50,6 @@ import com.creditclub.ui.UpdateActivity
 import com.creditclub.ui.rememberBean
 import com.creditclub.ui.theme.CreditClubTheme
 import com.creditclub.viewmodel.AppViewModel
-import com.google.accompanist.flowlayout.FlowColumn
-import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.*
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch

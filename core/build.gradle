@@ -113,7 +113,7 @@ dependencies {
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${versions.desugarJdk}"
 
     api "androidx.compose.ui:ui:${versions.compose}"
-    api "androidx.compose.ui:ui-util:1.0.0-beta04"
+    api "androidx.compose.ui:ui-util:1.0.0-beta09"
     // Tooling support (Previews, etc.)
     api "androidx.compose.ui:ui-tooling:${versions.compose}"
     // Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)

@@ -6,7 +6,6 @@ package com.creditclub.core.type
  * Appzone Ltd
  */
 enum class CustomerRequestOption {
-    BVN,
     PhoneNumber,
     AccountNumber
 }

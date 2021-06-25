@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.type.CustomerRequestOption
-import com.creditclub.core.util.requireAccountInfo
 import java.util.*
 
 

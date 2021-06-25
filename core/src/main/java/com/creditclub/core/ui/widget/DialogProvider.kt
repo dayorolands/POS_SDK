@@ -5,7 +5,6 @@ import android.content.Context
 import android.widget.EditText
 import androidx.annotation.StringRes
 import com.creditclub.core.R
-import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.ui.CreditClubActivity
 import java.time.LocalDate
 import kotlin.coroutines.resume
@@ -64,12 +63,6 @@ interface DialogProvider {
     }
 
     fun requestPIN(title: CharSequence, block: DialogListenerBlock<String>)
-
-    fun showCustomerRequestOptions(
-        title: CharSequence,
-        available: Array<CustomerRequestOption>,
-        block: DialogListenerBlock<CustomerRequestOption>
-    )
 
     fun showInput(params: TextFieldParams, block: DialogListenerBlock<String>)
 

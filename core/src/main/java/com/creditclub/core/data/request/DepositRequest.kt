@@ -5,32 +5,31 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class DepositRequest {
-
+data class DepositRequest(
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null
+    val agentPhoneNumber: String? = null,
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = null
+    val institutionCode: String? = null,
 
     @SerialName("GeoLocation")
-    var geoLocation: String? = null
+    val geoLocation: String? = null,
 
     @SerialName("CustomerAccountNumber")
-    var customerAccountNumber: String? = null
+    val customerAccountNumber: String? = null,
 
     @SerialName("Amount")
-    var amount: String? = null
+    val amount: String? = null,
 
     @SerialName("AgentPin")
-    var agentPin: String? = null
+    val agentPin: String? = null,
 
     @SerialName("AdditionalInformation")
-    var additionalInformation: String? = null
+    val additionalInformation: String? = null,
 
     @SerialName("RetrievalReferenceNumber")
-    var retrievalReferenceNumber: String? = generateRRN()
+    val retrievalReferenceNumber: String? = generateRRN(),
 
     @SerialName("UniqueReferenceID")
-    var uniqueReferenceID: String? = null
-}
+    val uniqueReferenceID: String? = null,
+)

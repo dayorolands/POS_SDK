@@ -12,10 +12,8 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.appzonegroup.app.fasttrack.ui.Dialogs
 import com.appzonegroup.app.fasttrack.utility.task.AsyncResponse
 import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.pos.printer.PosPrinter
 import com.google.gson.Gson
 import org.json.JSONObject
@@ -30,16 +28,6 @@ import org.koin.core.parameter.parametersOf
 open class BaseActivity : CreditClubActivity(), AsyncResponse {
 
     val printer: PosPrinter by inject { parametersOf(this, dialogProvider) }
-    override val hasLogoutTimer get() = true
-
-    fun showNotification(message: String, shouldClose: Boolean) {
-        dialogProvider.hideProgressBar()
-        Dialogs.getInformationDialog(this, message, shouldClose).show()
-    }
-
-    fun startActivity(classToStart: Class<*>) {
-        startActivity(Intent(this, classToStart))
-    }
 
     @JvmOverloads
     fun sendJSONPostRequestWithCallback(
@@ -162,22 +150,13 @@ open class BaseActivity : CreditClubActivity(), AsyncResponse {
     }
 
     fun showError(message: String?) = dialogProvider.showError(message)
-    fun showError(message: String?, block: DialogListenerBlock<*>) =
-        dialogProvider.showError(message, block)
 
     fun showSuccess(message: String?) = dialogProvider.showSuccess(message)
-    fun showSuccess(message: String?, block: DialogListenerBlock<*>) =
-        dialogProvider.showSuccess(message, block)
 
     open fun indicateError(message: String?, view: EditText?) =
         dialogProvider.indicateError(message, view)
 
     fun showProgressBar(title: String) = dialogProvider.showProgressBar(title)
-    fun showProgressBar(title: String, message: String?) =
-        dialogProvider.showProgressBar(title, message)
 
     fun hideProgressBar() = dialogProvider.hideProgressBar()
-
-    fun requestPIN(title: String, block: DialogListenerBlock<String>) =
-        dialogProvider.requestPIN(title, block)
 }

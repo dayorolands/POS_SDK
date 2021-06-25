@@ -29,7 +29,6 @@ import com.creditclub.core.ui.CreditClubFragment
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.*
 import java.util.concurrent.TimeoutException
 
 class ListOptionsFragment : CreditClubFragment(R.layout.fragment_listview), OnItemClickListener,
@@ -44,7 +43,11 @@ class ListOptionsFragment : CreditClubFragment(R.layout.fragment_listview), OnIt
         super.onViewCreated(view, savedInstanceState)
         binding.optionsName.text = title
         OnlineActivity.isHome = arguments != null
-        binding.listView.adapter = OptionsAdapter(activity, R.layout.item_option, menuOptions)
+        binding.listView.adapter = OptionsAdapter(
+            requireContext(),
+            R.layout.item_option,
+            menuOptions ?: emptyList(),
+        )
         binding.listView.onItemClickListener = this
         requireActivity().currentFocus?.run {
             val imm =
@@ -180,7 +183,7 @@ class ListOptionsFragment : CreditClubFragment(R.layout.fragment_listview), OnIt
                             responseBase.optString(
                                 "Menu",
                                 ErrorMessages.PHONE_NOT_REGISTERED
-                            )
+                            ),
                         )
                         dialogProvider.showError(span.toString())
                     }
@@ -230,7 +233,7 @@ class ListOptionsFragment : CreditClubFragment(R.layout.fragment_listview), OnIt
     }
 
     companion object {
-        private var menuOptions: ArrayList<Option>? = null
+        private var menuOptions: List<Option>? = null
         private var title: String? = null
 
         @JvmStatic

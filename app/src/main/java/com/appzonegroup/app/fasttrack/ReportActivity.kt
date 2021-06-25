@@ -5,7 +5,6 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.adapter.TransactionReportAdapter
 import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
-import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.model.TransactionReport
 import com.creditclub.core.data.request.POSTransactionReportRequest
 import com.creditclub.core.type.TransactionStatus
@@ -18,8 +17,13 @@ import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.ui.adapter.PosReportAdapter
 import com.creditclub.ui.dataBinding
 import com.appzonegroup.app.fasttrack.databinding.ActivityReportBinding
+import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
 import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
+import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
+import com.creditclub.core.data.model.AccountInfo
+import com.creditclub.core.data.request.DepositRequest
 import com.creditclub.core.data.request.FundsTransferRequest
+import com.creditclub.core.data.request.WithdrawalRequest
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
@@ -253,9 +257,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
                 }
 
-                if (Platform.hasPrinter) {
-                    posPrinter.print(CollectionPaymentReceipt(this, response))
-                }
+                posPrinter.print(CollectionPaymentReceipt(this, response))
             }
             TransactionType.FundsTransferCommercialBank,
             TransactionType.LocalFundsTransfer -> {
@@ -274,6 +276,54 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                         item.date?.replace("T", " ") ?: "",
                         isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
                         reason = selectedTransactionStatus.label,
+                    )
+                )
+            }
+            TransactionType.CashIn -> {
+                val depositRequest = DepositRequest(
+                    agentPhoneNumber = localStorage.agentPhone,
+                    institutionCode = localStorage.institutionCode,
+                    customerAccountNumber = item.to,
+                    amount = item.amount?.toString() ?: "0.0",
+                    uniqueReferenceID = item.uniqueReference,
+                )
+                posPrinter.print(
+                    DepositReceipt(
+                        this,
+                        depositRequest,
+                        accountInfo = AccountInfo(
+                            accountName = item.customerName ?: "",
+                            number = item.to ?: "",
+                            phoneNumber = item.customerPhone,
+                            isSuccessful = true,
+                        ),
+                        isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
+                        reason = selectedTransactionStatus.label,
+                        transactionDate = item.date?.replace("T", " ") ?: "",
+                    )
+                )
+            }
+            TransactionType.CashOut -> {
+                val withdrawalRequest = WithdrawalRequest(
+                    agentPhoneNumber = localStorage.agentPhone,
+                    institutionCode = localStorage.institutionCode,
+                    customerAccountNumber = item.to,
+                    amount = item.amount?.toString() ?: "0.0",
+                    retrievalReferenceNumber = item.uniqueReference,
+                )
+                posPrinter.print(
+                    WithdrawalReceipt(
+                        this,
+                        withdrawalRequest,
+                        accountInfo = AccountInfo(
+                            accountName = item.customerName ?: "",
+                            number = item.to ?: "",
+                            phoneNumber = item.customerPhone,
+                            isSuccessful = true,
+                        ),
+                        isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
+                        reason = selectedTransactionStatus.label,
+                        transactionDate = item.date?.replace("T", " ") ?: "",
                     )
                 )
             }

@@ -208,7 +208,7 @@ public class ChangeCustomerPinActivity extends BaseActivity {
         com.appzonegroup.app.fasttrack.model.Response response = new Gson().fromJson(output, com.appzonegroup.app.fasttrack.model.Response.class);
 
         if (response.isSuccessful()) {
-            showSuccess("Pin Changed Successfully", new Function1<DialogListener<? extends Object>, Unit>() {
+            getDialogProvider().showSuccess("Pin Changed Successfully", new Function1<DialogListener<? extends Object>, Unit>() {
                 @Override
                 public Unit invoke(DialogListener<?> dialogListener) {
                     dialogListener.onClose(new Function0<Unit>() {

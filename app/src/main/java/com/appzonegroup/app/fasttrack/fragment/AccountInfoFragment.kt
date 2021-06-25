@@ -13,7 +13,7 @@ import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.type.TokenType
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.isKotlinNPE
-import com.creditclub.core.util.requireAndValidateToken
+import com.appzonegroup.app.fasttrack.requireAndValidateToken
 import com.creditclub.core.util.safeRunIO
 import kotlinx.coroutines.launch
 
@@ -100,8 +100,7 @@ class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
             middleName.value = result.otherNames
         }
 
-        val accountInfo = AccountInfo()
-        accountInfo.phoneNumber = result.phoneNumber
+        val accountInfo = AccountInfo(phoneNumber = result.phoneNumber)
 
         activity.requireAndValidateToken(accountInfo, operationType = TokenType.AccountOpening) {
             onSubmit {

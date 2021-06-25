@@ -30,12 +30,10 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
     private val binding by dataBinding<ActivityAgentActivationBinding>()
 
     private var isActivation = false
-    internal var json = ""
-    internal var code = ""
-    internal var institutionCode: String = ""
-    var phoneNumber = ""
-    var pin = ""
-    override val hasLogoutTimer get() = false
+    private var code = ""
+    private var institutionCode: String = ""
+    private var phoneNumber = ""
+    private var pin = ""
     private val deviceId
         @SuppressLint("HardwareIds")
         get() = Settings.Secure.getString(

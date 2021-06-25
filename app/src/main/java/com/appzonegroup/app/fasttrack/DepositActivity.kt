@@ -3,17 +3,15 @@ package com.appzonegroup.app.fasttrack
 import android.os.Bundle
 import android.widget.EditText
 import com.appzonegroup.app.fasttrack.databinding.ActivityDepositBinding
-import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
+import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.request.DepositRequest
+import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
-import com.creditclub.core.util.finishOnClose
-import com.creditclub.core.util.localStorage
-import com.creditclub.core.util.requireAccountInfo
-import com.creditclub.core.util.safeRunIO
+import com.creditclub.pos.printer.PrinterStatus
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 
 /**
@@ -23,8 +21,6 @@ import kotlinx.coroutines.launch
 class DepositActivity : CustomerBaseActivity() {
     private val binding by contentView<DepositActivity, ActivityDepositBinding>(R.layout.activity_deposit)
     override val functionId = FunctionIds.DEPOSIT
-
-    private val depositRequest by lazy { DepositRequest() }
 
     override fun onCustomerReady(savedInstanceState: Bundle?) {
 
@@ -82,39 +78,42 @@ class DepositActivity : CustomerBaseActivity() {
             indicateError("Please enter your PIN", binding.agentPinEt)
             return
         }
-
-        depositRequest.agentPhoneNumber = localStorage.agentPhone
-        depositRequest.institutionCode = localStorage.institutionCode
-        depositRequest.agentPin = agentPIN
-        depositRequest.customerAccountNumber = accountInfo.number
-        depositRequest.amount = amount
-        depositRequest.geoLocation = gps.geolocationString
+        val depositRequest = DepositRequest(
+            agentPhoneNumber = localStorage.agentPhone,
+            institutionCode = localStorage.institutionCode,
+            agentPin = agentPIN,
+            customerAccountNumber = accountInfo.number,
+            amount = amount,
+            geoLocation = gps.geolocationString,
+        )
 
         mainScope.launch {
-            showProgressBar("Processing Transaction", "Please wait...")
+            dialogProvider.showProgressBar("Processing Transaction", "Please wait...")
             val (response) = safeRunIO {
-                creditClubMiddleWareAPI.staticService.deposit(this@DepositActivity.depositRequest)
+                creditClubMiddleWareAPI.staticService.deposit(depositRequest)
             }
             response ?: return@launch showNetworkError(finishOnClose)
 
             if (response.isSuccessful) {
-                showSuccess("The deposit was successful", finishOnClose)
+                dialogProvider.showSuccess("The deposit was successful", finishOnClose)
             } else {
                 val message =
                     response.responseMessage ?: "An error occurred. Please try again later"
-                showError(message, finishOnClose)
+                dialogProvider.showError(message, finishOnClose)
             }
 
             if (Platform.hasPrinter) {
                 printer.printAsync(
                     DepositReceipt(
                         this@DepositActivity,
-                        this@DepositActivity.depositRequest,
-                        accountInfo
-                    ).apply {
-                        isSuccessful = response.isSuccessful
-                        reason = response.responseMessage
-                    }
+                        depositRequest,
+                        accountInfo,
+                        isSuccessful = response.isSuccessful,
+                        reason = response.responseMessage,
+                        transactionDate = Instant.now()
+                            .toString(CREDIT_CLUB_REQUEST_DATE_PATTERN)
+                            .replace("T", " "),
+                    )
                 ) { printerStatus ->
                     if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
                 }

@@ -3,7 +3,8 @@ package com.creditclub.core.util
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
-inline class SafeRunResult<out T>(val value: Any?) {
+@JvmInline
+value class SafeRunResult<out T>(val value: Any?) {
 
     inline val data: T?
         get() = when {
