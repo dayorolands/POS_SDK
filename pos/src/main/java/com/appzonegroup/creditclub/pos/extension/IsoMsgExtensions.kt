@@ -64,7 +64,7 @@ fun ISOMsg.prepare(sessionKeyString: String): ByteArray {
     }
 
     val output = sessionKeyString.hexBytes + packedMsg
-    val mac = output.sha256String.toUpperCase(Locale.getDefault())
+    val mac = output.sha256String.uppercase(Locale.getDefault())
     return packedMsg + mac.toByteArray()
 }
 

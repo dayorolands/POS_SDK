@@ -13,7 +13,7 @@
     <string name="institution_code">Institution Code</string>
     <string name="customer_account_number">Customer Account Number</string>
     <string name="amount">Amount</string>
-    <string name="agent_pin">Agent Pin</string>
+    <string name="agent_pin">Agent PIN</string>
     <string name="DATA_SOURCE" translatable="false">Credit_Club_Offline_Data_Source</string>
     <string name="APP_DATA_SOURCE" translatable="false">Credit_Club_App_Data_Source</string>
     <string name="please_select_a_customer_account">Please select a customer account</string>

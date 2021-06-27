@@ -21,6 +21,13 @@ data class ApiResponse<T>(
 ) {
     fun isSuccessful() = status == "00"
     fun isFailure() = status != "00"
+
+    companion object {
+        const val Success = "00"
+        const val Failed = "01"
+        const val BadRequest = "03"
+        const val ServerError = "04"
+    }
 }
 
 val ApiResponse<*>?.isSuccessful: Boolean get() = this?.status == "00"

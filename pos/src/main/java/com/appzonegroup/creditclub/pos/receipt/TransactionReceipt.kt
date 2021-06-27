@@ -27,7 +27,7 @@ abstract class TransactionReceipt(
     open fun MutableList<PrintNode>.addTransactionStatus() {
 
         add(
-            TextNode(statusMessage.toUpperCase(Locale.getDefault()))
+            TextNode(statusMessage.uppercase(Locale.getDefault()))
                 .apply {
                     align = Alignment.MIDDLE
                     wordFont = 30
@@ -53,7 +53,7 @@ fun PrintJobScope.transactionStatus(
     statusMessage: String,
     reason: String? = null,
 ) {
-    text(statusMessage.toUpperCase(Locale.getDefault()), align = Alignment.MIDDLE, fontSize = 30)
+    text(statusMessage.uppercase(Locale.getDefault()), align = Alignment.MIDDLE, fontSize = 30)
 
     if (!isSuccessful) {
         text(reason ?: "Error", align = Alignment.MIDDLE)

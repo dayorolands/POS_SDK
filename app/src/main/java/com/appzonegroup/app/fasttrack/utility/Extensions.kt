@@ -64,12 +64,6 @@ fun FunctionId(fid: Int) {
     }
 }
 
-fun NavController.openPageById(id: Int) {
-    when (id) {
-        R.id.agent_change_pin_button -> navigate(Routes.PinChange)
-    }
-}
-
 fun CreditClubFragment.openPageById(id: Int) {
     when (id) {
         R.id.register_button -> startActivity(CustomerRequestOpenAccountActivity::class.java)

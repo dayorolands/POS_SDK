@@ -457,6 +457,9 @@
     <string name="support_cases">Support Cases</string>
     <string name="loading_cases">Loading cases</string>
     <string name="change_pin">Change PIN</string>
+    <string name="ussd_withdrawal">USSD Withdrawal</string>
+    <string name="generate_reference">Generate Reference</string>
+    <string name="ive_made_payment">I\'ve made payment</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>

@@ -538,7 +538,7 @@ private fun Map<String, TLV>.getValue(
     hex: Boolean = false,
     fPadded: Boolean = false,
 ): String {
-    val tagString = tag.toString(16).toUpperCase(Locale.ROOT)
+    val tagString = tag.toString(16).uppercase(Locale.ROOT)
     val rawValue = get(tagString)!!.value//.substring(tagString.length + 2)
 
     val value = when {

@@ -67,7 +67,7 @@ open class BaseIsoMsg : ISOMsg() {
         }
 
         val output = sessionKeyString + packedMsg
-        val mac = output.toByteArray().sha256String.toUpperCase(Locale.getDefault())
+        val mac = output.toByteArray().sha256String.uppercase(Locale.getDefault())
         return packedMsg + mac.toByteArray()
     }
 

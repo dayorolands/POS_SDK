@@ -16,28 +16,28 @@ import com.creditclub.pos.printer.TextNode
 
 fun footerNodes(context: Context) = listOf<PrintNode>(
 
-    TextNode("-----------------------------").apply {
-        align = Alignment.MIDDLE
-        wordFont = 15
-    },
+    TextNode(
+        "-----------------------------",
+        align = Alignment.MIDDLE,
+        wordFont = 15,
+    ),
 
     TextNode(
         "${context.getString(R.string.app_name)} v${BuildConfig.VERSION_NAME}. Powered by ${
             context.getString(
                 R.string.institution_name
             )
-        }"
-    ).apply {
-        align = Alignment.MIDDLE
-        wordFont = 15
-    },
+        }",
+        align = Alignment.MIDDLE,
+        wordFont = 15,
+    ),
 
-    TextNode(context.getString(R.string.institution_website))
-        .apply {
-            align = Alignment.MIDDLE
-            walkPaperAfterPrint = 10
-            wordFont = 15
-        }
+    TextNode(
+        context.getString(R.string.institution_website),
+        align = Alignment.MIDDLE,
+        walkPaperAfterPrint = 10,
+        wordFont = 15,
+    )
 )
 
 fun PrintJobScope.footerNodes(context: Context) {

@@ -20,7 +20,6 @@ import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.DialogConfirmBinding
 import com.appzonegroup.app.fasttrack.databinding.DialogInputBinding
 import com.appzonegroup.app.fasttrack.databinding.PinpadBinding
-import com.appzonegroup.app.fasttrack.utility.CalendarDialog
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.*
 import com.creditclub.core.util.getMessage
@@ -288,7 +287,10 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         params: DateInputParams,
         block: DialogListenerBlock<LocalDate>
     ) {
-        val dialog = CalendarDialog.showCalendarDialog(activity)
+        val dialog = Dialog(activity)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.calendar_dialog)
+        dialog.show()
         val datePicker = dialog.findViewById<DatePicker>(R.id.datePicker)
         val listener = DialogListener.create(block)
 

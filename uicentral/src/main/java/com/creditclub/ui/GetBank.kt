@@ -58,8 +58,8 @@ fun GetBank(
             .distinctBy { "${it.code}${it.bankCode}" }
             .map { bank ->
                 bank.copy(
-                    name = bank.name?.trim { it <= ' ' }?.toUpperCase(Locale.ROOT),
-                    shortName = bank.shortName?.trim { it <= ' ' }?.toUpperCase(Locale.ROOT),
+                    name = bank.name?.trim { it <= ' ' }?.uppercase(Locale.ROOT),
+                    shortName = bank.shortName?.trim { it <= ' ' }?.uppercase(Locale.ROOT),
                 )
             }
             .toList()

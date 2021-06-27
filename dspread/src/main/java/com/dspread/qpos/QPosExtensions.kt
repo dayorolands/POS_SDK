@@ -100,8 +100,8 @@ fun List<TLV>.getValue(
         if (stringBuffer[stringBuffer.toString().length - 1] == 'F') {
             stringBuffer.deleteCharAt(stringBuffer.toString().length - 1)
         }
-        return stringBuffer.toString().toUpperCase(Locale.getDefault())
+        return stringBuffer.toString().uppercase(Locale.getDefault())
     }
 
-    return value.toUpperCase(Locale.getDefault())
+    return value.uppercase(Locale.getDefault())
 }

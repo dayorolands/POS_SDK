@@ -247,7 +247,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         packedMsg[19]++
 
         val baos = sessionKey.hexBytes + packedMsg
-        val field64 = baos.sha256String.toUpperCase(Locale.getDefault())
+        val field64 = baos.sha256String.uppercase(Locale.getDefault())
         isoMsg.set(64, field64)
 
         val finalMsgBytes = packedMsg + field64.toByteArray()
@@ -298,7 +298,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         packedMsg[19]++
 
         val baos = sessionKey.hexBytes + packedMsg
-        val field64 = baos.sha256String.toUpperCase(Locale.getDefault())
+        val field64 = baos.sha256String.uppercase(Locale.getDefault())
         isoMsg.set(64, field64)
 
         val finalMsgBytes = packedMsg + field64.toByteArray()
@@ -354,7 +354,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         packedMsg[19]++
 
         val baos = sessionKey.hexBytes + packedMsg
-        val field64 = baos.sha256String.toUpperCase(Locale.getDefault())
+        val field64 = baos.sha256String.uppercase(Locale.getDefault())
         isoMsg.set(64, field64)
 
         val finalMsgBytes = packedMsg + field64.toByteArray()

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.appzonegroup.app.fasttrack.R
 import java.util.*
 
@@ -51,7 +52,7 @@ fun MenuButton(
                 )
             )
             Text(
-                text = text.toUpperCase(Locale.ROOT),
+                text = text.uppercase(Locale.ROOT),
                 style = MaterialTheme.typography.button,
                 color = colorResource(R.color.menuButtonTextColor),
                 textAlign = TextAlign.Center,
@@ -102,8 +103,9 @@ fun SmallMenuButton(
         }
 
         Text(
-            text = text.toUpperCase(Locale.ROOT),
+            text = text.uppercase(Locale.ROOT),
             style = MaterialTheme.typography.button,
+            fontSize = 12.sp,
             color = colorResource(R.color.menuButtonTextColor),
             textAlign = TextAlign.Center,
             maxLines = 1,

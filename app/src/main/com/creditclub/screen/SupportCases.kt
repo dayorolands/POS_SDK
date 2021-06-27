@@ -81,8 +81,8 @@ fun SupportCases(navController: NavController) {
             .map { caseDetail ->
                 caseDetail.copy(
                     description = caseDetail.description?.trim { it <= ' ' }
-                        ?.toUpperCase(Locale.ROOT),
-                    subject = caseDetail.subject.trim { it <= ' ' }.toUpperCase(Locale.ROOT),
+                        ?.uppercase(Locale.ROOT),
+                    subject = caseDetail.subject.trim { it <= ' ' }.uppercase(Locale.ROOT),
                 )
             }
             .toList()
@@ -156,7 +156,7 @@ fun SupportCases(navController: NavController) {
                 )
             },
             icon = { Icon(Icons.Filled.Add, "") },
-            text = { Text(stringResource(id = R.string.log_case).toUpperCase(Locale.ROOT)) },
+            text = { Text(stringResource(id = R.string.log_case).uppercase(Locale.ROOT)) },
             backgroundColor = MaterialTheme.colors.primary,
             contentColor = MaterialTheme.colors.onPrimary,
             elevation = FloatingActionButtonDefaults.elevation(8.dp),

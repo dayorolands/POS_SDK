@@ -68,8 +68,7 @@ class PrintEOD(
             text.append("\nTotal Card Transactions ${transactions.size}")
             text.append("\nTotal Cash Transactions 0")
 
-            val node = TextNode(text.toString())
-            node.walkPaperAfterPrint = 20
+            val node = TextNode(text.toString(), walkPaperAfterPrint = 20)
 
             get<PosPrinter> { parametersOf(context, dialogProvider) }.printAsync(
                 node,

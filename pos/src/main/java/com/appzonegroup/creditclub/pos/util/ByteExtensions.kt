@@ -39,5 +39,5 @@ inline val ByteArray.hexString: String
             buffer[1] = Character.forDigit(get(i).toInt() and 0x0F, 16)
             stringBuilder.append(buffer)
         }
-        return stringBuilder.toString().toUpperCase(Locale.getDefault())
+        return stringBuilder.toString().uppercase(Locale.getDefault())
     }

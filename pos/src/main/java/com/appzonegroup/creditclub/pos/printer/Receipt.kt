@@ -122,12 +122,13 @@ RRN: $rrn"""
                 wordFont = 15
             })
 
-            nodes.add(TextNode(context.getString(R.string.institution_website))
-                .apply {
-                    align = Alignment.MIDDLE
-                    walkPaperAfterPrint = 10
-                    wordFont = 15
-                }
+            nodes.add(
+                TextNode(
+                    context.getString(R.string.institution_website),
+                    align = Alignment.MIDDLE,
+                    walkPaperAfterPrint = 10,
+                    wordFont = 15,
+                )
             )
 
             return nodes
