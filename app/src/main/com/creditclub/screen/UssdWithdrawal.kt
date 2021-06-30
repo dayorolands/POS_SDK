@@ -44,7 +44,7 @@ fun UssdWithdrawal(navController: NavController) {
 
     val coroutineScope = rememberCoroutineScope()
     var loadingMessage by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
+    var errorMessage: String? by remember { mutableStateOf(null) }
     val context = LocalContext.current
     val coralPayService: CoralPayService by rememberRetrofitService()
     val localStorage: LocalStorage by rememberBean()
@@ -182,9 +182,9 @@ fun UssdWithdrawal(navController: NavController) {
                     Loading(message = loadingMessage)
                 }
             }
-            if (errorMessage.isNotBlank()) {
+            if (!errorMessage.isNullOrBlank()) {
                 item {
-                    ErrorMessage(errorMessage)
+                    ErrorMessage(errorMessage!!)
                 }
             }
         }
