@@ -70,7 +70,7 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.2.0"
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
-    implementation 'com.google.android:flexbox:2.0.1'
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
     implementation "androidx.room:room-runtime:${versions.room}"
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'

@@ -14,11 +14,14 @@ data class CoraPayReference(
 @Serializable
 data class CoraPayTransactionStatus(
     @SerialName("Status")
-    val status: String,
+    val status: Int,
 ) {
     companion object {
-        const val Success = "0"
-        const val Failed = "1"
-        const val Pending = "2"
+        const val Pending = 1
+        const val Failed = 2
+        const val Successful = 3
+        const val Reversed = 4
+        const val ThirdPartyFailure = 5
+        const val NotFound = 6
     }
 }

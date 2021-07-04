@@ -18,7 +18,8 @@ enum class TransactionStatus(
     Failed(2, "Failed"),
     Successful(3, "Successful"),
     Reversed(4, "Reversed"),
-    ThirdPartyFailure(5, "Third Party Failure");
+    ThirdPartyFailure(5, "Third Party Failure"),
+    NotFound(6, "Not Found");
 
     fun label(context: Context): String = context.getString(labelRes)
 

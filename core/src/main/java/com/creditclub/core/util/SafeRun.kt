@@ -51,7 +51,7 @@ value class SafeRunResult<out T>(val value: Any?) {
  */
 @PublishedApi
 internal fun createFailure(exception: Exception): Any =
-    SafeRunResult.Failure(exception)@PublishedApi
+    SafeRunResult.Failure(exception)
 
 internal fun SafeRunResult<*>.throwOnFailure() {
     if (value is SafeRunResult.Failure) throw value.exception

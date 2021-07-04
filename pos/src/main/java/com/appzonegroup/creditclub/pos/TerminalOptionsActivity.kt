@@ -104,7 +104,7 @@ class TerminalOptionsActivity : PosActivity(R.layout.activity_network_parameters
                         binding.portItem.value = param
                         callHomeService.stopCallHomeTimer()
                         callHomeService.startCallHomeTimer()
-                        callHomeService.callHome()
+                        mainScope.launch { callHomeService.callHome() }
                     }
                 }
             }

@@ -6,13 +6,9 @@ import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.service.ConfigService
-import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.util.readRawJsonFile
-import com.creditclub.pos.PosConfig
-import com.creditclub.pos.PosParameter
-import com.creditclub.pos.PosProviders
-import com.creditclub.pos.RemoteConnectionInfo
+import com.creditclub.pos.*
 import com.creditclub.pos.model.PosTenant
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
@@ -55,16 +51,17 @@ val posModule = module {
     single {
         androidContext().readRawJsonFile(R.raw.pos_tenant, PosTenant.serializer())
     }
-    single<RemoteConnectionInfo>(override = true) { get<PosTenant>().infoList.first() }
+    single(override = true) {
+        val infoList = get<PosTenant>().infoList
+        if (infoList.isEmpty()) InvalidRemoteConnectionInfo
+        else infoList[1]
+    }
     single<PosConfig> { ConfigService(androidContext()) }
     single { PosDatabase.getInstance(androidContext()) }
-    single<PosParameter>(override = true) {
-        ParameterService(
-            androidContext(),
-            get<PosConfig>().remoteConnectionInfo
-        )
+    single(override = true) {
+        get<PosConfig>().remoteConnectionInfo.getParameter(androidContext())
     }
-    single { CallHomeService() }
+    single { CallHomeService(get(), get()) }
     single { IsoSocketHelper(get(), get()) }
     single {
         PosPreferences(androidContext().getEncryptedSharedPreferences("com.creditclub.pos.preferences"))

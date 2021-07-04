@@ -14,7 +14,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/4/2019.
  * Appzone Ltd
  */
-open class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) {
+class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) {
     private val contentType = "application/json".toMediaType()
 
     val retrofit: Retrofit = Retrofit.Builder()
@@ -36,7 +36,6 @@ open class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) 
     val staticService: StaticService by retrofit.service()
     val caseLogService: CaseLogService by retrofit.service()
     val reportService: ReportService by retrofit.service()
-    val fundsTransferService: FundsTransferService by retrofit.service()
     val versionService: VersionService by retrofit.service()
     val collectionsService: CollectionsService by retrofit.service()
 }

@@ -92,8 +92,9 @@ fun List<TLV>.getValue(
     hex: Boolean = false,
     fpadded: Boolean = false
 ): String {
-    val value = if (hex) String(getTlv(tag)?.value?.hexBytes ?: byteArrayOf())
+    var value = if (hex) String(getTlv(tag)?.value?.hexBytes ?: byteArrayOf())
     else getTlv(tag)?.value ?: ""
+    value = value.uppercase()
 
     if (fpadded) {
         val stringBuffer = StringBuffer(value)

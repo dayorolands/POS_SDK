@@ -18,9 +18,8 @@ abstract class CustomerBaseActivity(protected var flowName: String? = null) : Ba
     protected var flowId: String? = UUID.randomUUID().toString().substring(0, 8)
 
     inline val customerRequestOptions: Array<CustomerRequestOption>
-        get() = resources.getStringArray(R.array.customer_request_options).map {
-            val indexAndLabel = it.split(",")
-            CustomerRequestOption.values()[indexAndLabel.first().toInt()]
+        get() = resources.getStringArray(R.array.customer_request_options).mapIndexed { index, _ ->
+            CustomerRequestOption.values()[index]
         }.toTypedArray()
 
     override fun onCreate(savedInstanceState: Bundle?) {

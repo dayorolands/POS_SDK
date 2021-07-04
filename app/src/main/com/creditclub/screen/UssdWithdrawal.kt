@@ -27,6 +27,7 @@ import com.appzonegroup.app.fasttrack.utility.FunctionId
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.api.CoralPayService
 import com.creditclub.core.data.model.CoraPayReference
+import com.creditclub.core.data.model.CoraPayTransactionStatus
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.request.CoralPayReferenceRequest
 import com.creditclub.core.util.SuspendCallback
@@ -36,6 +37,7 @@ import com.creditclub.pos.printer.ParcelablePrintJob
 import com.creditclub.pos.printer.printJob
 import com.creditclub.ui.*
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 @Composable
@@ -106,7 +108,25 @@ fun UssdWithdrawal(navController: NavController) {
                     return@checkTransactionStatus
                 }
                 printJob = printJob {
-                    text(response.data?.status ?: "")
+                    val middleAlignment = com.creditclub.pos.printer.Alignment.MIDDLE
+                    image(R.drawable.cc_printer_logo)
+                    text("USSD withdrawal", fontSize = 2, align = middleAlignment)
+                    val status = when (response.data?.status) {
+                        CoraPayTransactionStatus.Pending -> "Pending"
+                        CoraPayTransactionStatus.Failed -> "Failed"
+                        CoraPayTransactionStatus.Successful -> "Successful"
+                        CoraPayTransactionStatus.Reversed -> "Reversed"
+                        CoraPayTransactionStatus.ThirdPartyFailure -> "Third Party Failure"
+                        CoraPayTransactionStatus.NotFound -> "Not Found"
+                        else -> "Error"
+                    }
+                    text(status)
+                    text(
+                        response.message?.uppercase(Locale.getDefault()) ?: "",
+                        fontSize = 2,
+                        walkPaperAfterPrint = 20,
+                        align = middleAlignment,
+                    )
                     footerNodes(context)
                 }
             }

@@ -43,11 +43,6 @@ val PosParameter.emvAids: ArrayList<String>
         return newAidList
     }
 
-val PosParameter.parameters: String
-    get() = safeRun {
-        mapParameter(JSONObject(managementDataString))
-    }.data ?: ""
-
 private fun PosParameter.mapAID(obj: JSONObject): String {
     val managementData = managementData
     return StringBuilder().appendTlv("9F06", obj.aid15)

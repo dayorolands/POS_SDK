@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:5761920719266012762",
-      "lastPropertyId": "22:7947175201431584916",
+      "lastPropertyId": "23:3324717315818261296",
       "name": "NetworkMeasurement",
       "properties": [
         {
@@ -100,6 +100,12 @@
           "id": "22:7947175201431584916",
           "name": "networkCarrier",
           "type": 9
+        },
+        {
+          "id": "23:3324717315818261296",
+          "name": "deviceType",
+          "type": 5,
+          "flags": 2
         }
       ],
       "relations": []

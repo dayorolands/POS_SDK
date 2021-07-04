@@ -10,13 +10,15 @@ import org.jpos.iso.ISOMsg
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 6/26/2019.
  * Appzone Ltd
  */
-fun <T : CardIsoMsg> cardIsoMsg(cardData: CardData, factory: () -> T, block: (T.() -> Unit)? = null): T {
+inline fun <T : CardIsoMsg> cardIsoMsg(
+    cardData: CardData,
+    crossinline factory: () -> T,
+    crossinline block: T.() -> Unit,
+): T {
     return factory().apply {
         init()
         apply(cardData)
-        block?.also {
-            apply(block)
-        }
+        apply(block)
     }
 }
 

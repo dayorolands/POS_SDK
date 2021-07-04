@@ -60,8 +60,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:onClick="next"
-                    android:text="Cancel"
+                    android:text="@string/cancel"
                     android:textSize="20sp" />
 
                 <Button
@@ -72,8 +71,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
-                    android:onClick="next"
-                    android:text="Proceed"
+                    android:text="@string/proceed"
                     android:textSize="20sp" />
             </LinearLayout>
         </LinearLayout>

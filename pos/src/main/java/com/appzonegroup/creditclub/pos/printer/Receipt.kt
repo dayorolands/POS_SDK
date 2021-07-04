@@ -2,6 +2,10 @@ package com.appzonegroup.creditclub.pos.printer
 
 import android.content.Context
 import com.appzonegroup.creditclub.pos.R
+import com.appzonegroup.creditclub.pos.extension.additionalAmounts54
+import com.appzonegroup.creditclub.pos.extension.cardAcceptorIdCode42
+import com.appzonegroup.creditclub.pos.extension.cardAcceptorNameLocation43
+import com.appzonegroup.creditclub.pos.extension.cardExpirationDate14
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.data.api.AppConfig
@@ -11,6 +15,7 @@ import com.creditclub.pos.printer.Alignment
 import com.creditclub.pos.printer.PrintJob
 import com.creditclub.pos.printer.PrintNode
 import com.creditclub.pos.printer.TextNode
+import org.jpos.iso.ISOMsg
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -134,3 +139,10 @@ RRN: $rrn"""
             return nodes
         }
 }
+
+inline val ISOMsg.additionalAmount: String
+    get() = try {
+        additionalAmounts54?.substring(8, 20) ?: "0"
+    } catch (ex: Exception) {
+        "0"
+    }

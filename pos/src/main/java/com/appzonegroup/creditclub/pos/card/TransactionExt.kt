@@ -1,16 +1,11 @@
 package com.appzonegroup.creditclub.pos.card
 
 import com.appzonegroup.creditclub.pos.extension.*
-import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
-import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardData
 import com.creditclub.pos.card.CardReaderEvent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import org.jpos.iso.ISOMsg
 import java.security.SecureRandom
 

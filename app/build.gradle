@@ -192,8 +192,8 @@ dependencies {
     polarisImplementation project(path: ':sunmi')
     accessImplementation project(path: ':telpo')
     gtbankImplementation project(path: ':dspread')
-//    purpleImplementation project(path: ':dspread')
-    purpleImplementation project(path: ':telpo')
+    purpleImplementation project(path: ':dspread')
+//    purpleImplementation project(path: ':telpo')
 
     implementation fileTree(dir: "jniLibs", include: ["*.so"])
     implementation fileTree(include: ["*.jar"], dir: "libs")
@@ -220,10 +220,9 @@ dependencies {
     implementation "com.google.firebase:firebase-analytics:${versions.firebase}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
 
-    implementation "com.google.android:flexbox:2.0.1"
+    implementation "com.google.android.flexbox:flexbox:3.0.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.serialization}"
-    debugImplementation "com.amitshekhar.android:debug-db:1.0.6"
 
     implementation "androidx.room:room-runtime:${versions.room}"
     kapt "androidx.room:room-compiler:${versions.room}"

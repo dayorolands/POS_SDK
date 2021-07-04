@@ -15,12 +15,9 @@ import com.appzonegroup.creditclub.pos.util.*
 import com.creditclub.core.CreditClubException
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
-import com.creditclub.core.util.debug
-import com.creditclub.core.util.debugOnly
+import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.defaultJson
 import com.creditclub.core.util.delegates.stringStore
-import com.creditclub.core.util.format
-import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.RemoteConnectionInfo
@@ -74,7 +71,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         }.data ?: ParameterObject()
 
     override suspend fun downloadKeys(activity: ComponentActivity) {
-        withContext(Dispatchers.Default) {
+        withContext(Dispatchers.IO) {
             downloadMasterKey()
             downloadSessionKey()
             downloadPinKey()
@@ -475,22 +472,22 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         CreditClubException("EMV Application AID Download Failed. $message")
 
     @Serializable
-    class ParameterObject : PosParameter.ManagementData {
+    data class ParameterObject(
         @SerialName("03")
-        override var cardAcceptorId = ""
+        override val cardAcceptorId: String = "",
 
         @SerialName("05")
-        override var currencyCode = ""
+        override val currencyCode: String = "",
 
         @SerialName("06")
-        override var countryCode = ""
+        override val countryCode: String = "",
 
         @SerialName("08")
-        override var merchantCategoryCode = ""
+        override val merchantCategoryCode: String = "",
 
         @SerialName("52")
-        override var cardAcceptorLocation = ""
-    }
+        override val cardAcceptorLocation: String = "",
+    ) : PosParameter.ManagementData
 
     private inner class ManagementDataDelegate(
         private val key: String,
@@ -511,9 +508,5 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
                 putString(key, newValue?.toString())
             }
         }
-    }
-
-    private fun Resources.readRawFileText(@RawRes fileLocation: Int): String {
-        return openRawResource(fileLocation).bufferedReader().use { it.readText() }
     }
 }

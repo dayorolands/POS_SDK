@@ -15,7 +15,7 @@ open class VersionApiTest : UnitTest() {
     fun `fetches app latest version`() {
         mainScope {
             val (response, error) = safeRunIO {
-                middleWareAPI.versionService.getLatestVersionAndDownloadLink("CreditClub")
+                middleWareAPI.versionService.getLatestVersionAndDownloadLink("AccessPOS")
             }
 
             assert(error == null)

@@ -7,15 +7,18 @@ import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.databinding.PosMenuFragmentBinding
-import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.appzonegroup.creditclub.pos.util.MenuPage
 import com.appzonegroup.creditclub.pos.util.MenuPages
 import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.ui.widget.TextFieldParams
 import com.creditclub.core.util.format
 import com.creditclub.core.util.safeRunIO
+import com.creditclub.pos.InvalidRemoteConnectionInfo
 import com.creditclub.pos.PosFragment
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.api.posApiService
+import com.creditclub.pos.getParameter
+import com.creditclub.pos.model.PosTenant
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.time.Instant
@@ -23,8 +26,7 @@ import java.time.Instant
 
 class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
     private val binding by dataBinding<PosMenuFragmentBinding>()
-
-    //    override val functionId = FunctionIds.CARD_TRANSACTIONS
+    private val posTenant: PosTenant by inject()
     private val posPreferences: PosPreferences by inject()
     private val defaultParameterStore: PosParameter by inject()
 
@@ -92,13 +94,18 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
         }
         binding.adminButton.button.setOnClickListener {
             mainScope.launch {
-                adminAction {
+                val params = TextFieldParams(hint = "Administrator password", type = "textPassword")
+                val password = dialogProvider.getInput(params) ?: return@launch
+                val passed = password == config.adminPin
+                if (passed) {
                     val intent = Intent(requireActivity(), MenuActivity::class.java)
                     intent.apply {
                         putExtra(MenuPage.TITLE, MenuPages[MenuPages.ADMIN]?.name)
                         putExtra(MenuPage.PAGE_NUMBER, MenuPages.ADMIN)
                     }
                     startActivity(intent)
+                } else {
+                    dialogProvider.showError("Incorrect Password")
                 }
             }
         }
@@ -242,10 +249,41 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
         dialogProvider.showSuccess("Download successful")
     }
 
+    private inline fun supervisorAction(crossinline next: () -> Unit) {
+        dialogProvider.requestPIN(getString(R.string.pos_enter_supervisor_pin)) {
+            onSubmit { pin ->
+                confirmSupervisorPin(pin) { passed ->
+                    if (passed) next()
+                }
+            }
+        }
+    }
+
+    private inline fun confirmSupervisorPin(
+        pin: String,
+        closeOnFail: Boolean = false,
+        crossinline next: (Boolean) -> Unit
+    ) {
+        val status = pin == config.supervisorPin
+        if (!status) {
+            if (closeOnFail) return dialogProvider.showError("Authentication Failed") {
+                onClose {
+                    findNavController().popBackStack()
+                }
+            }
+
+            dialogProvider.showError("Authentication Failed")
+        }
+        next(status)
+    }
+
     private inline val parameterStores: Sequence<PosParameter>
         get() {
+            val context = requireContext()
             val connectionSequence = sequence {
-                yield(config.remoteConnectionInfo)
+                if (config.remoteConnectionInfo != InvalidRemoteConnectionInfo) {
+                    yield(config.remoteConnectionInfo)
+                }
                 posPreferences.binRoutes?.run {
                     for (binRoutes in this) {
                         for (route in binRoutes.routes) {
@@ -257,6 +295,6 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
 
             return connectionSequence
                 .distinctBy { "${it.ip}:${it.port}" }
-                .map { ParameterService(requireContext(), it) }
+                .map { it.getParameter(context) }
         }
 }

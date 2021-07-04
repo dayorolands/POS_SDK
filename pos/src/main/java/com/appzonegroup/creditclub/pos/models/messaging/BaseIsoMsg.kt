@@ -7,7 +7,6 @@ import com.appzonegroup.creditclub.pos.util.sha256String
 import com.creditclub.pos.extensions.hexBytes
 import org.jpos.iso.ISOMsg
 import java.util.*
-import kotlin.experimental.or
 
 open class BaseIsoMsg : ISOMsg() {
 
@@ -71,7 +70,7 @@ open class BaseIsoMsg : ISOMsg() {
         return packedMsg + mac.toByteArray()
     }
 
-    fun <T : BaseIsoMsg> convert(factory: () -> T): T {
+    inline fun <T : BaseIsoMsg> convert(crossinline factory: () -> T): T {
         val obj = factory()
         obj.unpack(pack())
         return obj
@@ -169,13 +168,4 @@ open class BaseIsoMsg : ISOMsg() {
             return "${"0".repeat(length - text.length)}$text"
         }
     }
-}
-
-fun <T : BaseIsoMsg> isoMsg(factory: () -> T, block: (T.() -> Unit)? = null): T {
-    val obj = factory()
-    obj.init()
-
-    block?.also { obj.apply(block) }
-
-    return obj
 }

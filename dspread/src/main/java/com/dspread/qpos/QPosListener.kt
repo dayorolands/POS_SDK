@@ -443,14 +443,8 @@ class QPosListener(
         handleStringContinuation(cardNo)
     }
 
-    override fun onRequestCalculateMac(calMac: String) {
-        var calMac: String? = calMac
-        TRACE.d("onRequestCalculateMac(String calMac):$calMac")
-        if (calMac != null && "" != calMac) {
-            calMac = QPOSUtil.byteArray2Hex(calMac.toByteArray())
-        }
-        statusEditText.setText("calMac: $calMac")
-        TRACE.d("calMac_result: calMac=> e: $calMac")
+    override fun onRequestCalculateMac(calMac: String?) {
+//        calMac?.toByteArray()?.hexString
     }
 
     override fun onRequestSignatureResult(arg0: ByteArray) {
@@ -607,7 +601,7 @@ class QPosListener(
         TRACE.d("onGetInputAmountResult(boolean arg0, String arg1):" + arg0 + TRACE.NEW_LINE + arg1)
     }
 
-    override fun onCbcMacResult(result: String) {
+    override fun onCbcMacResult(result: String?) {
         TRACE.d("onCbcMacResult(String result):$result")
         if (result == null || "" == result) {
             statusEditText.setText("cbc_mac:false")

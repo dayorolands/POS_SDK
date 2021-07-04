@@ -11,7 +11,6 @@ import android.view.View
 import android.view.Window
 import android.widget.DatePicker
 import android.widget.EditText
-import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.databinding.PosDialogConfirmBinding
@@ -34,12 +33,6 @@ object Dialogs {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCanceledOnTouchOutside(false)
         dialog.setCancelable(false)
-        return dialog
-    }
-
-    private fun getDialog(layoutID: Int, context: Context): Dialog {
-        val dialog = getDialog(context)
-        dialog.setContentView(layoutID)
         return dialog
     }
 
@@ -227,12 +220,13 @@ object Dialogs {
                 val yearString = datePicker.year.toString()
 
                 dialog.dismiss()
-                Dialogs.Listener<Array<String>>().apply(config)
+                Listener<Array<String>>()
+                    .apply(config)
                     .submit(dialog, arrayOf(dayString, monthString, yearString))
             }
         }
         dialog.setOnCancelListener {
-            if (config != null) Dialogs.Listener<Array<String>>().apply(config).close()
+            if (config != null) Listener<Array<String>>().apply(config).close()
         }
         return dialog
     }

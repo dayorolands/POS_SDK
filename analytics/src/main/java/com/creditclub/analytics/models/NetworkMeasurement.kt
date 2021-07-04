@@ -70,4 +70,7 @@ data class NetworkMeasurement(
 
     @SerialName("NetworkCarrier")
     var networkCarrier: String? = null,
+
+    @SerialName("DeviceType")
+    var deviceType: Int? = null,
 )
