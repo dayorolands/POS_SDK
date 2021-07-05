@@ -19,23 +19,25 @@ open class FinancialMessage : CardIsoMsg() {
         processingCode3 = "000000"
     }
 
-    @Throws(ISOException::class, IOException::class, NoSuchAlgorithmException::class, JSONException::class)
+    @Throws(
+        ISOException::class,
+        IOException::class,
+        NoSuchAlgorithmException::class,
+        JSONException::class
+    )
     override fun apply(data: CardData): FinancialMessage {
         super.apply(data)
 
         return this
     }
 
-    fun generateRefund(cardData: CardData): FinancialMessage {
-        val refundMsg = cardIsoMsg(cardData, ::FinancialMessage)
-
-        refundMsg.transactionAmount4 = transactionAmount4
-        refundMsg.stan11 = stan11
-        refundMsg.localTransactionDate13 = localTransactionDate13
-        refundMsg.localTransactionTime12 = localTransactionTime12
-        refundMsg.retrievalReferenceNumber37 = retrievalReferenceNumber37
-        refundMsg.messageReasonCode56 = "4000"
-
-        return refundMsg
-    }
+    fun generateRefund(cardData: CardData) =
+        cardIsoMsg(cardData, ::FinancialMessage) {
+            transactionAmount4 = transactionAmount4
+            stan11 = stan11
+            localTransactionDate13 = localTransactionDate13
+            localTransactionTime12 = localTransactionTime12
+            retrievalReferenceNumber37 = retrievalReferenceNumber37
+            messageReasonCode56 = "4000"
+        }
 }

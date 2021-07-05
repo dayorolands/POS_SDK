@@ -4,7 +4,6 @@ import android.os.Looper
 import com.appzonegroup.creditclub.pos.card.CardIsoMsg
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.extension.*
-import com.appzonegroup.creditclub.pos.models.messaging.BaseIsoMsg
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.SocketJob
 import com.creditclub.core.data.prefs.LocalStorage
@@ -14,16 +13,9 @@ import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.RemoteConnectionInfo
 import com.creditclub.pos.model.ConnectionInfo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.jpos.iso.ISOException
 import org.jpos.iso.ISOMsg
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.io.IOException
-import java.net.ConnectException
 import java.time.Instant
 
 /**
@@ -38,16 +30,6 @@ class IsoSocketHelper(
     private val database: PosDatabase by inject()
     private val localStorage: LocalStorage by inject()
     private val gps: TrackGPS by inject()
-
-    @Throws(ISOException::class, IOException::class, ConnectException::class)
-    inline fun sendAsync(isoMsg: BaseIsoMsg, crossinline next: (Result) -> Unit) {
-        GlobalScope.launch(Dispatchers.Main) {
-            val result = withContext(Dispatchers.IO) {
-                send(isoMsg)
-            }
-            next(result)
-        }
-    }
 
     fun send(request: ISOMsg, isRetry: Boolean = false): Result {
         request.terminalId41 = config.terminalId

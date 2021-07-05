@@ -467,7 +467,7 @@ private fun RowScope.SmallMenuButton(
         }
 
         Text(
-            text = text.toUpperCase(Locale.ROOT),
+            text = text.uppercase(Locale.ROOT),
             style = MaterialTheme.typography.button,
             color = colorResource(R.color.menuButtonTextColor),
             textAlign = TextAlign.Center,

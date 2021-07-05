@@ -4,19 +4,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class AuthResponse {
+data class AuthResponse(
     @SerialName("phone_number")
-    var phoneNumber: String? = null
-        private set
-
+    val phoneNumber: String? = null,
     @SerialName("session_id")
-    var sessionId: String? = null
-
+    val sessionId: String? = null,
     @SerialName("activationCode")
-    var activationCode: String? = null
-
-    constructor(phoneNumber: String, activationCode: String) {
-        this.phoneNumber = phoneNumber
-        this.activationCode = activationCode
-    }
-}
+    val activationCode: String? = null,
+)

@@ -211,17 +211,17 @@ class BillPaymentActivity : BaseActivity() {
         if (error != null) return dialogProvider.showError(error, finishOnClose)
 
         if (response == null) {
-            showError("An error occurred", finishOnClose)
+            dialogProvider.showError("An error occurred", finishOnClose)
             return
         }
 
         if (response.isSuccessFul == true) {
-            showSuccess(
+            dialogProvider.showSuccess(
                 response.responseMessage ?: "Transaction successful",
                 finishOnClose
             )
         } else {
-            showError(
+            dialogProvider.showError(
                 response.responseMessage
                     ?: getString(R.string.an_error_occurred_please_try_again_later),
                 finishOnClose

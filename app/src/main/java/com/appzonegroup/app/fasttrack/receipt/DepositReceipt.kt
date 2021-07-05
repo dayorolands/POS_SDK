@@ -20,8 +20,17 @@ import java.time.Instant
  * Appzone Ltd
  */
 
-class DepositReceipt(context: Context, val request: DepositRequest, val accountInfo: AccountInfo) :
-    TransactionReceipt(context) {
+class DepositReceipt(
+    context: Context,
+    private val request: DepositRequest,
+    private val accountInfo: AccountInfo,
+    private val transactionDate: String,
+    override var isCustomerCopy: Boolean = true,
+    override var isReprint: Boolean = false,
+    override var isSuccessful: Boolean = false,
+    override var reason: String? = null,
+) :
+    TransactionReceipt(context, isSuccessful, isCustomerCopy, isReprint, reason) {
 
     override val nodes: MutableList<PrintNode>
         get() {
@@ -43,7 +52,7 @@ Amount ${CurrencyFormatter.format("${request.amount}00")}
 Customer Account: ${accountInfo.number.mask(4, 2)}
 Customer Name: ${accountInfo.accountName}
 
-Transaction Date: ${Instant.now().toString("dd-MM-yyyy hh:mm")}
+Transaction Date: $transactionDate}
 RRN: ${request.retrievalReferenceNumber}"""
                 )
             ).apply { addTransactionStatus(); addAll(footerNodes(context)) }

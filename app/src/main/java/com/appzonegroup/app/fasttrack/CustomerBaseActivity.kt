@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.type.CustomerRequestOption
-import com.creditclub.core.util.requireAccountInfo
 import java.util.*
 
 
@@ -19,9 +18,8 @@ abstract class CustomerBaseActivity(protected var flowName: String? = null) : Ba
     protected var flowId: String? = UUID.randomUUID().toString().substring(0, 8)
 
     inline val customerRequestOptions: Array<CustomerRequestOption>
-        get() = resources.getStringArray(R.array.customer_request_options).map {
-            val indexAndLabel = it.split(",")
-            CustomerRequestOption.values()[indexAndLabel.first().toInt()]
+        get() = resources.getStringArray(R.array.customer_request_options).mapIndexed { index, _ ->
+            CustomerRequestOption.values()[index]
         }.toTypedArray()
 
     override fun onCreate(savedInstanceState: Bundle?) {

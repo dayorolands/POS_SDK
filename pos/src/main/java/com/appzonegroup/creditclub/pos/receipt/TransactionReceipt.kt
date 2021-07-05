@@ -2,24 +2,23 @@ package com.appzonegroup.creditclub.pos.receipt
 
 import android.content.Context
 import com.appzonegroup.creditclub.pos.R
-import com.creditclub.pos.printer.Alignment
-import com.creditclub.pos.printer.PrintJob
-import com.creditclub.pos.printer.PrintNode
-import com.creditclub.pos.printer.TextNode
 import com.creditclub.core.data.response.BackendResponse
+import com.creditclub.pos.printer.*
 import java.util.*
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 05/10/2019.
  * Appzone Ltd
  */
-abstract class TransactionReceipt(val context: Context) :
+@Suppress("UNCHECKED_CAST")
+abstract class TransactionReceipt(
+    val context: Context,
+    open var isSuccessful: Boolean = false,
+    open var isCustomerCopy: Boolean = true,
+    open var isReprint: Boolean = false,
+    open var reason: String? = null,
+) :
     PrintJob {
-
-    open var isSuccessful = false
-    open var isCustomerCopy = true
-    open var isReprint = false
-    open var reason: String? = null
 
     open val statusMessage
         get() = (if (isSuccessful) context.getString(R.string.pos_transaction_approved)
@@ -28,7 +27,7 @@ abstract class TransactionReceipt(val context: Context) :
     open fun MutableList<PrintNode>.addTransactionStatus() {
 
         add(
-            TextNode(statusMessage.toUpperCase(Locale.getDefault()))
+            TextNode(statusMessage.uppercase(Locale.getDefault()))
                 .apply {
                     align = Alignment.MIDDLE
                     wordFont = 30
@@ -46,5 +45,17 @@ abstract class TransactionReceipt(val context: Context) :
         reason = response?.responseMessage
 
         return this as T
+    }
+}
+
+fun PrintJobScope.transactionStatus(
+    isSuccessful: Boolean,
+    statusMessage: String,
+    reason: String? = null,
+) {
+    text(statusMessage.uppercase(Locale.getDefault()), align = Alignment.MIDDLE, fontSize = 30)
+
+    if (!isSuccessful) {
+        text(reason ?: "Error", align = Alignment.MIDDLE)
     }
 }

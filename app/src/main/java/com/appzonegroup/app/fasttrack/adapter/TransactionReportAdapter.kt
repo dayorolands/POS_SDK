@@ -87,7 +87,10 @@ class TransactionReportAdapter(
             TransactionType.LocalFundsTransfer -> 2
 
             TransactionType.Registration -> 3
-            TransactionType.BillsPayment, TransactionType.CashIn, TransactionType.CashOut, TransactionType.Recharge -> 4
+            TransactionType.BillsPayment,
+            TransactionType.CashIn,
+            TransactionType.CashOut,
+            TransactionType.Recharge -> 4
             TransactionType.PINChange, TransactionType.PINReset -> 5
             TransactionType.BalanceEnquiry -> 6
             TransactionType.CollectionPayment -> 7
@@ -148,6 +151,13 @@ class TransactionReportAdapter(
                     amountTv.text = item.amount?.toCurrencyFormat()
                     customerPhoneNoTv.text = item.customerPhone
                     customerNameTv.text = item.customerName
+
+                    if (Platform.hasPrinter) {
+                        printReceiptButton.visibility = View.VISIBLE
+                        printReceiptButton.setOnClickListener {
+                            listener?.onClick(item, transactionType)
+                        }
+                    } else printReceiptButton.visibility = View.GONE
                 }
 
                 is ItemReport5Binding -> {

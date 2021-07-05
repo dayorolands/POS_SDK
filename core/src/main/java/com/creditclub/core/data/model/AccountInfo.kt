@@ -10,25 +10,26 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
-class AccountInfo {
+data class AccountInfo(
     @SerialName("AccountName")
-    var accountName: String = ""
+    val accountName: String = "",
 
     @SerialName("Number")
-    var number: String = ""
+    val number: String = "",
 
     @SerialName("PhoneNumber")
-    var phoneNumber: String? = ""
-
-    @SerialName("ReponseMessage")
-    var responseMessage: String? = ""
-        get() = if (field?.isEmpty() == true) message ?: "" else field
+    val phoneNumber: String? = "",
 
     @SerialName("IsSuccessful")
-    var isSuccessful: Boolean = false
+    val isSuccessful: Boolean = false,
 
     @SerialName("Message")
-    private val message: String? = null
+    private val message: String? = null,
+) {
+
+    @SerialName("ReponseMessage")
+    val responseMessage: String? = null
+        get() = if (field?.isEmpty() == true) message ?: "" else field
 
     fun displayName() = "$${accountName.mask(4, 2)} - $number"
 }

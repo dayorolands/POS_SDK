@@ -46,12 +46,11 @@ import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.util.*
 import com.creditclub.screen.PinChange
 import com.creditclub.screen.SupportCases
+import com.creditclub.screen.UssdWithdrawal
 import com.creditclub.ui.UpdateActivity
 import com.creditclub.ui.rememberBean
 import com.creditclub.ui.theme.CreditClubTheme
 import com.creditclub.viewmodel.AppViewModel
-import com.google.accompanist.flowlayout.FlowColumn
-import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.*
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
@@ -61,6 +60,7 @@ private val composableRouteFunctionIds = mapOf(
     R.id.agent_change_pin_button to Routes.PinChange,
     R.id.funds_transfer_button to Routes.FundsTransfer,
     R.id.fn_support to Routes.SupportCases,
+    R.id.ussd_withdrawal_button to Routes.UssdWithdrawal,
 )
 
 class HomeFragment : CreditClubFragment() {
@@ -146,6 +146,9 @@ class HomeFragment : CreditClubFragment() {
                                         modifier = Modifier.navigationBarsPadding(bottom = false),
                                         navigateToProfile = {},
                                     )
+                                }
+                                composable(Routes.UssdWithdrawal) {
+                                    UssdWithdrawal(navController = composeNavController)
                                 }
                             }
                         }
@@ -424,9 +427,11 @@ class HomeFragment : CreditClubFragment() {
                             }
                         }
                         composable(BottomNavScreens.Transactions.route) {
-                            SubMenu {
+                            LazyVerticalGrid(
+                                cells = GridCells.Adaptive(minSize = 100.dp)
+                            ) {
                                 item {
-                                    MenuButton(
+                                    SmallMenuButton(
                                         text = "Deposit",
                                         icon = painterResource(R.drawable.deposit),
                                         onClick = { openPageById(R.id.deposit_button) }
@@ -434,16 +439,27 @@ class HomeFragment : CreditClubFragment() {
                                 }
                                 if (flows.tokenWithdrawal != null) {
                                     item {
-                                        MenuButton(
+                                        SmallMenuButton(
                                             text = "Token Withdrawal",
                                             icon = painterResource(R.drawable.withdraw),
                                             onClick = { openPageById(R.id.token_withdrawal_button) }
                                         )
                                     }
                                 }
+                                if (flows.tokenWithdrawal != null) {
+                                    item {
+                                        SmallMenuButton(
+                                            text = "USSD Withdrawal",
+                                            icon = painterResource(R.drawable.withdraw),
+                                            onClick = {
+                                                composeNavController.navigate(Routes.UssdWithdrawal)
+                                            }
+                                        )
+                                    }
+                                }
                                 if (Platform.isPOS) {
                                     item {
-                                        MenuButton(
+                                        SmallMenuButton(
                                             text = "Card Transactions",
                                             icon = painterResource(R.drawable.withdraw),
                                             onClick = { openPageById(R.id.card_withdrawal_button) }
@@ -452,7 +468,7 @@ class HomeFragment : CreditClubFragment() {
                                 }
                                 if (flows.billPayment != null) {
                                     item {
-                                        MenuButton(
+                                        SmallMenuButton(
                                             text = "Bills Payment",
                                             icon = painterResource(R.drawable.payday_loan),
                                             onClick = { openPageById(R.id.pay_bill_button) }
@@ -461,7 +477,7 @@ class HomeFragment : CreditClubFragment() {
                                 }
                                 if (flows.airtime != null) {
                                     item {
-                                        MenuButton(
+                                        SmallMenuButton(
                                             text = "Airtime Topup",
                                             icon = painterResource(R.drawable.payday_loan),
                                             onClick = { openPageById(R.id.airtime_button) }
@@ -469,7 +485,7 @@ class HomeFragment : CreditClubFragment() {
                                     }
                                 }
                                 item {
-                                    MenuButton(
+                                    SmallMenuButton(
                                         text = "Funds Transfer",
                                         icon = painterResource(R.drawable.payday_loan),
                                         onClick = { openPageById(R.id.funds_transfer_button) }
@@ -477,7 +493,7 @@ class HomeFragment : CreditClubFragment() {
                                 }
                                 if (flows.collectionPayment != null) {
                                     item {
-                                        MenuButton(
+                                        SmallMenuButton(
                                             text = "IGR Collections",
                                             icon = painterResource(R.drawable.payday_loan),
                                             onClick = { openPageById(R.id.collection_payment_button) }

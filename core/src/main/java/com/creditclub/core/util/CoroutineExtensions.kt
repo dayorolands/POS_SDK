@@ -12,6 +12,8 @@ import kotlinx.coroutines.withContext
  * Appzone Ltd
  */
 
+typealias SuspendCallback = suspend CoroutineScope.() -> Unit
+
 suspend inline fun <T> safeRunIO(crossinline block: suspend CoroutineScope.() -> T): SafeRunResult<T> =
     withContext(Dispatchers.IO) {
         try {

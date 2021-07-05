@@ -21,10 +21,14 @@ import java.util.*
  */
 
 private const val TAG = "IsoMsgExt"
-val ISOMsg.isSuccessful get() = responseCode39 == "00"
-val ISOMsg.hasFailed get() = responseCode39 != "00"
 
-val ISOMsg.responseMessage: String
+inline val ISOMsg.isSuccessful: Boolean
+    get() = responseCode39 == "00"
+
+inline val ISOMsg.hasFailed: Boolean
+    get() = responseCode39 != "00"
+
+inline val ISOMsg.responseMessage: String
     get() = NibssResponseMessage[responseCode39]
 
 fun ISOMsg.log() = debugOnly {
@@ -64,7 +68,7 @@ fun ISOMsg.prepare(sessionKeyString: String): ByteArray {
     }
 
     val output = sessionKeyString.hexBytes + packedMsg
-    val mac = output.sha256String.toUpperCase(Locale.getDefault())
+    val mac = output.sha256String.uppercase(Locale.getDefault())
     return packedMsg + mac.toByteArray()
 }
 

@@ -64,4 +64,13 @@ data class NetworkMeasurement(
     @Convert(converter = TimeInstantConverter::class, dbType = String::class)
     @SerialName("ResponseTime")
     var responseTime: Instant? = null,
+
+    @SerialName("NetworkState")
+    var networkState: String? = null,
+
+    @SerialName("NetworkCarrier")
+    var networkCarrier: String? = null,
+
+    @SerialName("DeviceType")
+    var deviceType: Int? = null,
 )

@@ -136,7 +136,7 @@ private fun NotificationItem(notification: Notification, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                notification.header?.toUpperCase(Locale.ROOT) ?: "",
+                notification.header?.uppercase(Locale.ROOT) ?: "",
                 color = colorResource(id = R.color.colorPrimary),
                 maxLines = 1,
                 style = MaterialTheme.typography.subtitle1,

@@ -19,6 +19,7 @@ import com.creditclub.core.data.request.PinChangeRequest
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.safeRunIO
+import com.creditclub.pos.InvalidRemoteConnectionInfo
 import com.creditclub.pos.model.PosTenant
 import com.creditclub.ui.dataBinding
 import kotlinx.coroutines.launch
@@ -26,16 +27,13 @@ import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
 
 class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activation) {
-    private val posTenant: PosTenant by inject()
     private val binding by dataBinding<ActivityAgentActivationBinding>()
 
     private var isActivation = false
-    internal var json = ""
-    internal var code = ""
-    internal var institutionCode: String = ""
-    var phoneNumber = ""
-    var pin = ""
-    override val hasLogoutTimer get() = false
+    private var code = ""
+    private var institutionCode: String = ""
+    private var phoneNumber = ""
+    private var pin = ""
     private val deviceId
         @SuppressLint("HardwareIds")
         get() = Settings.Secure.getString(
@@ -232,9 +230,9 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
         firebaseCrashlytics.setCustomKey("terminal_id", agent.terminalID ?: "")
 
         if (Platform.isPOS) {
+            val posTenant: PosTenant by inject()
             posConfig.remoteConnectionInfo =
-                posTenant.infoList.find { it.id == agent.posMode }
-                    ?: posTenant.infoList.first()
+                posTenant.infoList.find { it.id == agent.posMode } ?: InvalidRemoteConnectionInfo
             posConfig.terminalId = agent.terminalID ?: ""
             posParameter.reset()
         }

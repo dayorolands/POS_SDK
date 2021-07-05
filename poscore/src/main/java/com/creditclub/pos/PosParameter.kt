@@ -21,10 +21,10 @@ interface PosParameter {
     suspend fun downloadKeys(activity: ComponentActivity)
 
     interface ManagementData {
-        var cardAcceptorId: String
-        var currencyCode: String
-        var countryCode: String
-        var merchantCategoryCode: String
-        var cardAcceptorLocation: String
+        val cardAcceptorId: String
+        val currencyCode: String
+        val countryCode: String
+        val merchantCategoryCode: String
+        val cardAcceptorLocation: String
     }
 }

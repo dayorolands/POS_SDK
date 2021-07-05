@@ -46,7 +46,6 @@ abstract class CreditClubActivity : AppCompatActivity {
     open val institutionConfig: IInstitutionConfig by inject()
     open val appConfig: AppConfig by inject()
 
-    open val hasLogoutTimer = false
     open val functionId: Int? = null
 
     open val mainScope by lazy { CoroutineScope(Dispatchers.Main) }

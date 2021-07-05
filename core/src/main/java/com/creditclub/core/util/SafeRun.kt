@@ -3,7 +3,8 @@ package com.creditclub.core.util
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
-inline class SafeRunResult<out T>(val value: Any?) {
+@JvmInline
+value class SafeRunResult<out T>(val value: Any?) {
 
     inline val data: T?
         get() = when {
@@ -50,7 +51,7 @@ inline class SafeRunResult<out T>(val value: Any?) {
  */
 @PublishedApi
 internal fun createFailure(exception: Exception): Any =
-    SafeRunResult.Failure(exception)@PublishedApi
+    SafeRunResult.Failure(exception)
 
 internal fun SafeRunResult<*>.throwOnFailure() {
     if (value is SafeRunResult.Failure) throw value.exception

@@ -11,6 +11,7 @@
     <item name="agent_mini_statement_button" type="id" />
     <item name="deposit_button" type="id" />
     <item name="token_withdrawal_button" type="id" />
+    <item name="ussd_withdrawal_button" type="id" />
     <item name="card_withdrawal_button" type="id" />
     <item name="pay_bill_button" type="id" />
     <item name="airtime_button" type="id" />

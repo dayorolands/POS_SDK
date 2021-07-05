@@ -41,7 +41,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/fifteen_dp"
                     android:drawableStart="@drawable/ic_phone"
-                    android:drawableLeft="@drawable/ic_phone"
                     android:hint="@string/phoneNumber_hint"
                     android:inputType="phone"
                     android:maxLength="11" />
@@ -53,7 +52,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/fifteen_dp"
                     android:drawableStart="@drawable/ic_help"
-                    android:drawableLeft="@drawable/ic_help"
                     android:hint="@string/enter_verification_code"
                     android:inputType="number"
                     android:maxLength="16" />
@@ -72,7 +70,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/fifteen_dp"
                         android:drawableStart="@drawable/ic_password"
-                        android:drawableLeft="@drawable/ic_password"
                         android:hint="@string/old_pin"
                         android:inputType="numberPassword"
                         android:maxLength="4"
@@ -85,7 +82,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/fifteen_dp"
                         android:drawableStart="@drawable/ic_password"
-                        android:drawableLeft="@drawable/ic_password"
                         android:hint="@string/enterPIN"
                         android:inputType="numberPassword"
                         android:maxLength="4" />
@@ -98,7 +94,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/fifteen_dp"
                         android:drawableStart="@drawable/ic_password"
-                        android:drawableLeft="@drawable/ic_password"
                         android:hint="@string/confirmPIN"
                         android:inputType="numberPassword"
                         android:maxLength="4" />

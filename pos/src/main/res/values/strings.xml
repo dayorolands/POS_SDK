@@ -121,4 +121,6 @@
     <string name="security">Security</string>
     <string name="device">Device</string>
     <string name="ptsp_name">3GEE PAY</string>
+    <string name="cancel">Cancel</string>
+    <string name="proceed">Proceed</string>
 </resources>

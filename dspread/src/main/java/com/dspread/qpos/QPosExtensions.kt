@@ -92,16 +92,17 @@ fun List<TLV>.getValue(
     hex: Boolean = false,
     fpadded: Boolean = false
 ): String {
-    val value = if (hex) String(getTlv(tag)?.value?.hexBytes ?: byteArrayOf())
+    var value = if (hex) String(getTlv(tag)?.value?.hexBytes ?: byteArrayOf())
     else getTlv(tag)?.value ?: ""
+    value = value.uppercase()
 
     if (fpadded) {
         val stringBuffer = StringBuffer(value)
         if (stringBuffer[stringBuffer.toString().length - 1] == 'F') {
             stringBuffer.deleteCharAt(stringBuffer.toString().length - 1)
         }
-        return stringBuffer.toString().toUpperCase(Locale.getDefault())
+        return stringBuffer.toString().uppercase(Locale.getDefault())
     }
 
-    return value.toUpperCase(Locale.getDefault())
+    return value.uppercase(Locale.getDefault())
 }

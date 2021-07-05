@@ -8,6 +8,7 @@ object Routes {
     const val SupportCases = "support/cases"
     const val SupportConversation = "support/cases/{reference}/{title}/thread"
     const val LogCase = "support/cases/new"
+    const val UssdWithdrawal = "transactions/ussd/new"
 
     val supportConversation = { reference: String, title: String ->
         "support/cases/${reference}/${title}/thread"

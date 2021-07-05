@@ -31,7 +31,7 @@ class RequestFailureInterceptor : Interceptor {
                 response.close()
                 throw RequestFailureException(
                     "A server error has occurred. Please try again later",
-                    statusCode
+                    statusCode,
                 )
             }
             val message = failureResponse.message ?: return response

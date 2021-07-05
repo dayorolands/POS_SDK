@@ -3,8 +3,11 @@ package com.appzonegroup.app.fasttrack.ui
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
+import android.view.Window
 import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.TextView
@@ -15,11 +18,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.DialogConfirmBinding
-import com.appzonegroup.app.fasttrack.databinding.DialogCustomerRequestOptionsBinding
 import com.appzonegroup.app.fasttrack.databinding.DialogInputBinding
 import com.appzonegroup.app.fasttrack.databinding.PinpadBinding
-import com.appzonegroup.app.fasttrack.utility.CalendarDialog
-import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.*
 import com.creditclub.core.util.getMessage
@@ -35,7 +35,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         get() = when (context) {
             is CreditClubActivity -> context
             is Fragment -> context.activity as CreditClubActivity
-            else -> throw IllegalStateException("Dialog provider context must either be a fragment or activity")
+            else -> throw IllegalStateException("Dialog provider context must either be a fragment or CreditClubActivity")
         }
 
     private var currentProgressDialog: Dialog? = null
@@ -43,7 +43,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
     private val progressDialog: Dialog
         get() {
             if (currentProgressDialog == null) {
-                currentProgressDialog = Dialogs.getProgress(activity, null)
+                currentProgressDialog = getDialog(R.layout.dialog_progress_layout, activity)
             }
             return currentProgressDialog!!
         }
@@ -82,8 +82,13 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
     }
 
     override fun showInfo(message: CharSequence?, block: DialogListenerBlock<Unit>?) {
-        val dialog = Dialogs.getInformationDialog(activity, message, false)
+        val dialog = getDialog(R.layout.dialog_info_success, activity)
+        if (message != null)
+            (dialog.findViewById(R.id.message_tv) as TextView).text = message
 
+        dialog.findViewById<View>(R.id.ok_btn).setOnClickListener {
+            dialog.dismiss()
+        }
         activity.runOnUiThread {
             hideProgressBar()
             dialog.findViewById<View>(R.id.ok_btn).setOnClickListener {
@@ -154,7 +159,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
     }
 
     override fun requestPIN(title: CharSequence, block: DialogListenerBlock<String>) {
-        val dialog = Dialogs.getDialog(activity)
+        val dialog = getDialog(activity)
         dialog.setCancelable(true)
         dialog.setCanceledOnTouchOutside(false)
 
@@ -168,6 +173,23 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
 
         binding.pinChangeHandler = object : Dialogs.PinChangeHandler {
             val pin = mutableListOf<Byte>()
+
+            override fun onSelectNumber(view: View) {
+                onChange(
+                    when (view.id) {
+                        R.id.number1 -> 1
+                        R.id.number2 -> 2
+                        R.id.number3 -> 3
+                        R.id.number4 -> 4
+                        R.id.number5 -> 5
+                        R.id.number6 -> 6
+                        R.id.number7 -> 7
+                        R.id.number8 -> 8
+                        R.id.number9 -> 9
+                        else -> 0
+                    }
+                )
+            }
 
             override fun onChange(digit: Byte) {
                 if (pin.size > 3) return
@@ -199,58 +221,8 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         dialog.show()
     }
 
-    override fun showCustomerRequestOptions(
-        title: CharSequence,
-        available: Array<CustomerRequestOption>,
-        block: DialogListenerBlock<CustomerRequestOption>
-    ) {
-        val dialog = Dialogs.getDialog(activity)
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(false)
-
-        val listener = DialogListener.create(block)
-        val inflater = LayoutInflater.from(activity)
-        val binding = DataBindingUtil.inflate<DialogCustomerRequestOptionsBinding>(
-            inflater, R.layout.dialog_customer_request_options,
-            null,
-            false
-        )
-        binding.title = title
-
-        if (available.contains(CustomerRequestOption.AccountNumber)) {
-            binding.buttonAccountNumber.setOnClickListener {
-                listener.submit(dialog, CustomerRequestOption.AccountNumber)
-            }
-        } else binding.buttonAccountNumber.visibility = View.GONE
-
-        if (available.contains(CustomerRequestOption.BVN)) {
-            binding.buttonBvn.setOnClickListener {
-                listener.submit(dialog, CustomerRequestOption.BVN)
-            }
-        } else binding.buttonBvn.visibility = View.GONE
-
-
-        if (available.contains(CustomerRequestOption.PhoneNumber)) {
-            binding.buttonPhoneNumber.setOnClickListener {
-                listener.submit(dialog, CustomerRequestOption.PhoneNumber)
-            }
-        } else binding.buttonPhoneNumber.visibility = View.GONE
-
-
-        dialog.setContentView(binding.root)
-        binding.buttonCancel.setOnClickListener {
-            dialog.dismiss()
-            listener.close()
-        }
-        dialog.setOnCancelListener {
-            dialog.dismiss()
-            listener.close()
-        }
-        dialog.show()
-    }
-
     override fun showInput(params: TextFieldParams, block: DialogListenerBlock<String>) {
-        val dialog = Dialogs.getDialog(activity)
+        val dialog = getDialog(activity)
         val listener = DialogListener.create(block)
 
         dialog.setCancelable(true)
@@ -315,7 +287,10 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         params: DateInputParams,
         block: DialogListenerBlock<LocalDate>
     ) {
-        val dialog = CalendarDialog.showCalendarDialog(activity)
+        val dialog = Dialog(activity)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.calendar_dialog)
+        dialog.show()
         val datePicker = dialog.findViewById<DatePicker>(R.id.datePicker)
         val listener = DialogListener.create(block)
 
@@ -342,7 +317,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         block: DialogListenerBlock<Int>
     ) {
         activity.runOnUiThread {
-            val dialog = Dialogs.getDialog(activity)
+            val dialog = getDialog(activity)
             val listener = DialogListener.create(block)
 
             dialog.setCancelable(true)
@@ -380,7 +355,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
 
     override fun confirm(params: DialogConfirmParams, block: DialogListenerBlock<Boolean>?) {
         activity.runOnUiThread {
-            val dialog = Dialogs.getDialog(context)
+            val dialog = getDialog(context)
 
             dialog.setCancelable(true)
             dialog.setCanceledOnTouchOutside(false)
@@ -423,7 +398,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
     }
 
     private fun getErrorDialog(activity: Activity, message: CharSequence?): Dialog {
-        val dialog = Dialogs.getDialog(R.layout.dialog_error, activity)
+        val dialog = getDialog(R.layout.dialog_error, activity)
         message?.also { dialog.findViewById<TextView>(R.id.message_tv).text = message }
         dialog.findViewById<View>(R.id.close_btn).setOnClickListener { dialog.dismiss() }
 
@@ -431,10 +406,25 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
     }
 
     private fun getSuccessDialog(activity: Activity, message: CharSequence?): Dialog {
-        val dialog = Dialogs.getDialog(R.layout.dialog_success, activity)
+        val dialog = getDialog(R.layout.dialog_success, activity)
         message?.also { dialog.findViewById<TextView>(R.id.message_tv).text = message }
         dialog.findViewById<View>(R.id.close_btn).setOnClickListener { dialog.dismiss() }
 
+        return dialog
+    }
+
+    private fun getDialog(layoutID: Int, context: Context): Dialog {
+        val dialog = getDialog(context)
+        dialog.setContentView(layoutID)
+        return dialog
+    }
+
+    private fun getDialog(context: Context): Dialog {
+        val dialog = Dialog(context)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(false)
         return dialog
     }
 }

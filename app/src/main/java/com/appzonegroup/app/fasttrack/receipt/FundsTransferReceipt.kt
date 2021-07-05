@@ -43,9 +43,7 @@ Agent Code: ${context.localStorage.agent?.agentCode}
 Agent Phone: ${request.agentPhoneNumber}
 --------------------------
 Amount NGN${request.amountInNaira}
-
 Beneficiary: ${request.beneficiaryAccountName} ${request.beneficiaryAccountNumber.mask(4, 2)}
-
 Transaction Date: $transactionDate
 RRN: ${request.externalTransactionReference}"""
                 )

@@ -15,6 +15,7 @@ import com.creditclub.core.util.delegates.contentView
 import com.creditclub.pos.printer.PrinterStatus
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import java.time.Instant
 
 /**
  * Created by DELL on 2/27/2017.
@@ -27,10 +28,7 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
     )
     override val functionId = FunctionIds.TOKEN_WITHDRAWAL
     private val tokenWithdrawalConfig by lazy { institutionConfig.flows.tokenWithdrawal }
-
-    private val request = WithdrawalRequest().apply {
-        retrievalReferenceNumber = generateRRN()
-    }
+    private val retrievalReferenceNumber = generateRRN()
 
     private val viewModel: WithdrawalViewModel by viewModels()
 
@@ -110,7 +108,7 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
         binding.tokenBlock.visibility = View.VISIBLE
     }
 
-    private fun onWithdrawClick() {
+    private suspend fun onWithdrawClick() {
 
         if (viewModel.tokenSent.value != true) {
             dialogProvider.showError("No token has been sent to the customer. Click the \"Send Token\" button to continue")
@@ -136,51 +134,46 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
             return
         }
 
+        val customerPin: String
         if (tokenWithdrawalConfig?.customerPin == true) {
-            request.customerPin = binding.customerPinEt.value
+            customerPin = binding.customerPinEt.value
 
-            if (request.customerPin.isNullOrEmpty()) {
+            if (customerPin.isEmpty()) {
                 indicateError("Please enter a valid customer PIN", binding.customerPinEt)
                 return
             }
 
-            if (request.customerPin?.length != 4) {
+            if (customerPin.length != 4) {
                 indicateError("Customer PIN must be 4 digits", binding.customerPinEt)
                 return
             }
         } else {
-            request.customerPin = "0000"
+            customerPin = "0000"
         }
 
         val token = binding.tokenEt.value
-
         if (token.length < 5) {
             indicateError("Please enter a valid token", binding.tokenEt)
             return
         }
 
-        request.agentPhoneNumber = localStorage.agent?.phoneNumber
-        request.customerAccountNumber = accountInfo.number
-        request.amount = amount
-        request.institutionCode = localStorage.institutionCode
-        request.token = token
-
-        request.additionalInformation = Json.encodeToString(
-            WithdrawalRequest.Additional.serializer(),
-            WithdrawalRequest.Additional(
-                customerPhoneNumber = accountInfo.phoneNumber ?: viewModel.phoneNumber.value,
-            )
+        val agentPin = dialogProvider.getPin("Enter agent PIN") ?: return
+        val request = WithdrawalRequest(
+            agentPhoneNumber = localStorage.agent?.phoneNumber,
+            customerAccountNumber = accountInfo.number,
+            amount = amount,
+            institutionCode = localStorage.institutionCode,
+            token = token,
+            agentPin = agentPin,
+            customerPin = customerPin,
+            retrievalReferenceNumber = retrievalReferenceNumber,
+            additionalInformation = Json.encodeToString(
+                WithdrawalRequest.Additional.serializer(),
+                WithdrawalRequest.Additional(
+                    customerPhoneNumber = accountInfo.phoneNumber ?: viewModel.phoneNumber.value,
+                )
+            ),
         )
-
-        dialogProvider.requestPIN("Enter agent PIN") {
-            onSubmit { pin ->
-                request.agentPin = pin
-                mainScope.launch { withdraw() }
-            }
-        }
-    }
-
-    private suspend fun withdraw() {
         dialogProvider.showProgressBar("Processing transaction")
         val (response, error) = safeRunIO {
             creditClubMiddleWareAPI.staticService.withdrawal(request)
@@ -201,11 +194,14 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
         }
 
         if (Platform.hasPrinter) {
-            val receipt = WithdrawalReceipt(this@WithdrawActivity, request, accountInfo)
-            receipt.apply {
-                isSuccessful = response.isSuccessful
-                reason = response.responseMessage
-            }
+            val receipt = WithdrawalReceipt(
+                this@WithdrawActivity,
+                request,
+                accountInfo,
+                Instant.now().toString("dd-MM-yyyy hh:mm"),
+                isSuccessful = response.isSuccessful,
+                reason = response.responseMessage,
+            )
 
             val printerStatus = printer.print(receipt, "Printing...")
             if (printerStatus !== PrinterStatus.READY) {

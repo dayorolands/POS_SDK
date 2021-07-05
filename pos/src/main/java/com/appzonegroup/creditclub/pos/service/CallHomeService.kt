@@ -1,11 +1,10 @@
 package com.appzonegroup.creditclub.pos.service
 
+import com.appzonegroup.creditclub.pos.extension.processingCode3
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
-import com.appzonegroup.creditclub.pos.models.messaging.NetworkManagement
-import com.appzonegroup.creditclub.pos.models.messaging.isoMsg
 import com.creditclub.pos.PosConfig
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import kotlinx.coroutines.*
+import org.jpos.iso.ISOMsg
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -15,13 +14,11 @@ import kotlin.concurrent.schedule
  * Appzone Ltd
  */
 
-class CallHomeService : KoinComponent {
+class CallHomeService(private val posConfig: PosConfig, private val connection: IsoSocketHelper) {
 
-    private val posConfig: PosConfig by inject()
-    private val period get() = 1000L * posConfig.callHome.toLong()
     private var isCallHomeTimerRunning = false
-    private val connection: IsoSocketHelper by inject()
     private var callHomeTask = createTimer()
+    private val mainScope = CoroutineScope(Dispatchers.Main)
 
     fun startCallHomeTimer() {
         if (!isCallHomeTimerRunning) {
@@ -34,23 +31,28 @@ class CallHomeService : KoinComponent {
         if (isCallHomeTimerRunning) {
             isCallHomeTimerRunning = !isCallHomeTimerRunning
             callHomeTask.cancel()
+            mainScope.cancel()
         }
     }
 
-    fun callHome() {
-        val message = isoMsg(::NetworkManagement) {
+    suspend fun callHome() {
+        val isoMsg = ISOMsg().apply {
+            mti = "0800"
             processingCode3 = "9D0000"
         }
 
-        connection.sendAsync(message) { (response) ->
-            response ?: return@sendAsync println("CallHome failed")
+        withContext(Dispatchers.IO) {
+            connection.send(isoMsg)
         }
     }
 
     private fun createTimer(): TimerTask {
         isCallHomeTimerRunning = true
+        val period = 1000L * posConfig.callHome.toLong()
         return Timer().schedule(period, period) {
-            callHome()
+            mainScope.launch {
+                callHome()
+            }
         }
     }
 }

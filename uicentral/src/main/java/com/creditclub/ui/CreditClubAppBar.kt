@@ -14,7 +14,8 @@ import com.google.accompanist.insets.statusBarsHeight
 fun CreditClubAppBar(
     title: String,
     modifier: Modifier = Modifier,
-    onBackPressed: (() -> Unit)? = null
+    onBackPressed: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
 
@@ -48,6 +49,7 @@ fun CreditClubAppBar(
                 }
             }
         } else null,
-        elevation = 5.dp
+        elevation = 5.dp,
+        actions = actions,
     )
 }

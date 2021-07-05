@@ -77,7 +77,7 @@ fun FrequentlyUsed(onItemClick: (id: Int) -> Unit) {
                                 )
                             }
                             Text(
-                                text = stringResource(label).toUpperCase(Locale.ROOT),
+                                text = stringResource(label).uppercase(Locale.ROOT),
                                 color = colorResource(R.color.menuButtonTextColor),
                                 style = MaterialTheme.typography.caption,
                                 maxLines = 1,

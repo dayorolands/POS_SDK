@@ -63,15 +63,6 @@
                 android:text="Account Number"
                 android:textStyle="normal" />
 
-            <Button
-                android:id="@+id/button_bvn"
-                style="@style/AppButton.RoundBlueButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:text="BVN"
-                android:textStyle="normal" />
-
             <View
                 android:layout_width="50dp"
                 android:layout_height="1dp"

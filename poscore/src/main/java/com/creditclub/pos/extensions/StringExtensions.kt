@@ -7,7 +7,7 @@ inline val String.hexBytes: ByteArray
         if (isBlank()) return byteArrayOf()
         val len = length / 2
         val result = ByteArray(len)
-        val achar = toUpperCase(Locale.getDefault()).toCharArray()
+        val achar = uppercase(Locale.getDefault()).toCharArray()
         for (i in 0 until len) {
             val pos = i * 2
             result[i] = (achar[pos].index shl 4 or achar[pos + 1].index).toByte()
@@ -18,8 +18,8 @@ inline val String.hexBytes: ByteArray
 inline val String.hexByte: Byte
     get() {
         if (length == 0) return 0
-        if (length == 1) return toUpperCase(Locale.getDefault())[0].index.toByte()
-        val achar = toUpperCase(Locale.getDefault()).toCharArray()
+        if (length == 1) return uppercase(Locale.getDefault())[0].index.toByte()
+        val achar = uppercase(Locale.getDefault()).toCharArray()
         return (achar[0].index shl 4 or achar[1].index).toByte()
     }
 
@@ -35,5 +35,5 @@ inline val ByteArray.hexString: String
             buffer[1] = Character.forDigit(get(i).toInt() and 0x0F, 16)
             stringBuilder.append(buffer)
         }
-        return stringBuilder.toString().toUpperCase(Locale.getDefault())
+        return stringBuilder.toString().uppercase(Locale.getDefault())
     }

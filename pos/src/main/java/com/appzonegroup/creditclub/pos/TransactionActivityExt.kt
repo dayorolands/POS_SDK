@@ -49,8 +49,8 @@ internal inline fun CardTransactionActivity.showAmountPage(
     crossinline block: (amount: Long) -> Unit
 ) {
     restartTimer()
-    val binding =
-        DataBindingUtil.setContentView<PageInputAmountBinding>(this, R.layout.page_input_amount)
+    val binding: PageInputAmountBinding =
+        DataBindingUtil.setContentView(this, R.layout.page_input_amount)
     binding.lifecycleOwner = this
     binding.header.subtitle = title
 

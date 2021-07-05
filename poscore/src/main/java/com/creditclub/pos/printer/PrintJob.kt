@@ -11,11 +11,11 @@ interface PrintJob {
 interface ParcelablePrintJob : PrintJob, Parcelable
 
 @Parcelize
-inline class SimplePrintJob(override val nodes: List<PrintNode>) : ParcelablePrintJob
+@JvmInline
+value class SimplePrintJob(override val nodes: List<PrintNode>) : ParcelablePrintJob
 
-class PrintJobScope {
-    private var nodes = mutableListOf<PrintNode>()
-
+@JvmInline
+value class PrintJobScope(private val nodes: MutableList<PrintNode> = mutableListOf()) {
     fun image(
         @DrawableRes drawable: Int,
         walkPaperAfterPrint: Int = 20,

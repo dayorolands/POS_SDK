@@ -4,6 +4,7 @@ import android.content.Context
 import com.appzonegroup.app.fasttrack.BuildConfig
 import com.appzonegroup.app.fasttrack.R
 import com.creditclub.pos.printer.Alignment
+import com.creditclub.pos.printer.PrintJobScope
 import com.creditclub.pos.printer.PrintNode
 import com.creditclub.pos.printer.TextNode
 
@@ -15,24 +16,45 @@ import com.creditclub.pos.printer.TextNode
 
 fun footerNodes(context: Context) = listOf<PrintNode>(
 
-    TextNode("-----------------------------").apply {
-        align = Alignment.MIDDLE
-        wordFont = 15
-    },
+    TextNode(
+        "-----------------------------",
+        align = Alignment.MIDDLE,
+        wordFont = 15,
+    ),
 
     TextNode(
-        "${context.getString(R.string.app_name)} v${BuildConfig.VERSION_NAME}. Powered by ${context.getString(
-            R.string.institution_name
-        )}"
-    ).apply {
-        align = Alignment.MIDDLE
-        wordFont = 15
-    },
+        "${context.getString(R.string.app_name)} v${BuildConfig.VERSION_NAME}. Powered by ${
+            context.getString(
+                R.string.institution_name
+            )
+        }",
+        align = Alignment.MIDDLE,
+        wordFont = 15,
+    ),
 
-    TextNode(context.getString(R.string.institution_website))
-        .apply {
-        align = Alignment.MIDDLE
-        walkPaperAfterPrint = 10
-        wordFont = 15
-    }
+    TextNode(
+        context.getString(R.string.institution_website),
+        align = Alignment.MIDDLE,
+        walkPaperAfterPrint = 10,
+        wordFont = 15,
+    )
 )
+
+fun PrintJobScope.footerNodes(context: Context) {
+    text(
+        "-----------------------------", align = Alignment.MIDDLE,
+        fontSize = 15,
+    )
+    text(
+        "${context.getString(R.string.app_name)} " +
+                "v${BuildConfig.VERSION_NAME}. " +
+                "Powered by ${context.getString(R.string.institution_name)}",
+        align = Alignment.MIDDLE,
+        fontSize = 15,
+    )
+    text(
+        context.getString(R.string.institution_website), align = Alignment.MIDDLE,
+        walkPaperAfterPrint = 10,
+        fontSize = 15,
+    )
+}

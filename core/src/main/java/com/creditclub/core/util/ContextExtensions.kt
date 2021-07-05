@@ -4,13 +4,12 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import androidx.annotation.RawRes
 import com.creditclub.core.BuildConfig
-import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.model.AppFunctionUsage
 import com.creditclub.core.data.model.DeviceTransactionInformation
-import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.type.TransactionCountType
 import com.creditclub.core.util.delegates.defaultJson
@@ -28,20 +27,7 @@ import org.koin.core.context.GlobalContext
  * Appzone Ltd
  */
 
-inline val Context.localStorage get() = LocalStorage(this)
-inline val Context.appDataStorage get() = AppDataStorage.getInstance(this)
-inline val Context.coreDatabase: CoreDatabase get() = CoreDatabase.getInstance(this)
-inline val Context.application get() = applicationContext as CreditClubApplication
-
-fun Context.getTransactionMonitorCounter(key: String): Int {
-    val localStorage = localStorage
-    val value = localStorage.getString(key)
-    var count = 0
-    if (value != null) count = Integer.parseInt(value)
-
-    localStorage.putString(key, count.toString())
-    return count
-}
+inline val Context.localStorage get() = GlobalContext.get().koin.get<LocalStorage>()
 
 fun Context.increaseTransactionMonitorCounter(
     transactionCountType: TransactionCountType,
@@ -53,7 +39,7 @@ fun Context.increaseTransactionMonitorCounter(
     if (value != null) count = Integer.parseInt(value) + 1
 
     localStorage.putString(transactionCountType.key, count.toString())
-
+    val coreDatabase = GlobalContext.get().koin.get<CoreDatabase>()
     GlobalScope.launch(Dispatchers.Main) {
         withContext(Dispatchers.IO) {
             val info = DeviceTransactionInformation.getInstance(
@@ -102,6 +88,7 @@ inline val Context.RAMInfo: LongArray
     }
 
 suspend inline fun Context.logFunctionUsage(fid: Int) = safeRunIO {
+    val coreDatabase = GlobalContext.get().koin.get<CoreDatabase>()
     val appFunctionUsageDao = coreDatabase.appFunctionUsageDao()
     val appFunction = appFunctionUsageDao.getFunction(fid)
 
@@ -128,3 +115,7 @@ inline fun <reified T : Any> Context.readRawJsonFile(
 }
 
 fun getAndroidContext() = GlobalContext.get().koin.get<Context>()
+
+fun Resources.readRawFileText(@RawRes fileLocation: Int): String {
+    return openRawResource(fileLocation).bufferedReader().use { it.readText() }
+}

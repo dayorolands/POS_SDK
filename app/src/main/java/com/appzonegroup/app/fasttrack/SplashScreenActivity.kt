@@ -42,7 +42,6 @@ class SplashScreenActivity : AppCompatActivity() {
         )
         firebaseCrashlytics.setCustomKey("environment", BuildConfig.API_HOST)
         setContentView(R.layout.activity_splashscreen)
-        setPolicy()
 
         checkPermissions()
     }
@@ -63,13 +62,6 @@ class SplashScreenActivity : AppCompatActivity() {
             startActivity(intent)
         }
         finish()
-    }
-
-    private fun setPolicy() {
-        val builder = VmPolicy.Builder()
-        StrictMode.setVmPolicy(builder.build())
-        //builder.detectFileUriExposure();
-        builder.detectAll()
     }
 
     private fun checkPermissions() {

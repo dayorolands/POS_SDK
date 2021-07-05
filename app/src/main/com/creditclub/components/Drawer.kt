@@ -2,10 +2,14 @@ package com.creditclub.components
 
 
 import android.content.Intent
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,19 +20,15 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.*
 import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.util.*
 import com.creditclub.ui.UpdateActivity
 import com.creditclub.ui.rememberBean
-import com.google.accompanist.insets.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.*
 
 @Composable
 fun DrawerContent(

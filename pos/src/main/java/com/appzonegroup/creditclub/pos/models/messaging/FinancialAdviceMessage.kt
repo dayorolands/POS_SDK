@@ -3,24 +3,15 @@ package com.appzonegroup.creditclub.pos.models.messaging
 import com.creditclub.pos.card.CardData
 import com.appzonegroup.creditclub.pos.card.CardIsoMsg
 import com.appzonegroup.creditclub.pos.card.cardIsoMsg
+import com.appzonegroup.creditclub.pos.extension.acquiringInstIdCode32
+import com.appzonegroup.creditclub.pos.extension.forwardingInstIdCode33
+import com.appzonegroup.creditclub.pos.extension.transactionFee28
 import org.jpos.iso.ISOException
 import org.json.JSONException
 import java.io.IOException
 import java.security.NoSuchAlgorithmException
 
 open class FinancialAdviceMessage : CardIsoMsg() {
-    var authAgentIdCode: String?
-        get() = getString(58)
-        set(value) = set(58, value)
-
-    var extendedPaymentCode: String?
-        get() = getString(67)
-        set(value) = set(67, value)
-
-    var payee: String?
-        get() = getString(98)
-        set(value) = set(98, value)
-
     var originalDataElements: String?
         get() = getString(90)
         set(value) = set(90, value)
@@ -35,7 +26,12 @@ open class FinancialAdviceMessage : CardIsoMsg() {
         processingCode3 = "000000"
     }
 
-    @Throws(ISOException::class, IOException::class, NoSuchAlgorithmException::class, JSONException::class)
+    @Throws(
+        ISOException::class,
+        IOException::class,
+        NoSuchAlgorithmException::class,
+        JSONException::class
+    )
     override fun apply(data: CardData): FinancialAdviceMessage {
         super.apply(data)
 
@@ -48,18 +44,28 @@ open class FinancialAdviceMessage : CardIsoMsg() {
             return generate(financialResponse.convert(::AuthorizationRequest), cardData)
         }
 
-        fun generate(financialMessage: AuthorizationRequest, cardData: CardData): FinancialAdviceMessage {
+        fun generate(
+            financialMessage: AuthorizationRequest,
+            cardData: CardData
+        ): FinancialAdviceMessage {
             val elements = financialMessage.run {
-                "0100$stan11$transmissionDateTime7${padZeros(acquiringInstIdCode32, 11)}${padZeros(
-                    forwardingInstIdCode33,
-                    11
-                )}"
+                "0100$stan11$transmissionDateTime7${padZeros(acquiringInstIdCode32, 11)}${
+                    padZeros(
+                        forwardingInstIdCode33,
+                        11
+                    )
+                }"
             }
 
             return cardIsoMsg(cardData, ::FinancialAdviceMessage) {
                 transactionAmount4 = financialMessage.transactionAmount4
                 replacementAmounts =
-                    "${padZeros(transactionAmount4, 12)}000000000000${padZeros(transactionFee28, 9)}000000000"
+                    "${padZeros(transactionAmount4, 12)}000000000000${
+                        padZeros(
+                            transactionFee28,
+                            9
+                        )
+                    }000000000"
 
                 originalDataElements = elements
                 stan11 = financialMessage.stan11

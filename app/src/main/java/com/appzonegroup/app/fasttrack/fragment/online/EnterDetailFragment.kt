@@ -308,7 +308,7 @@ class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
             safeRun {
                 isNumeric = jo.getJSONObject("IsNumeric").getBoolean("IsNumeric")
                 isShouldMask = jo.getJSONObject("ShouldMask").getBoolean("Mask")
-                hintText = jo.optString("Display").toUpperCase(Locale.ROOT)
+                hintText = jo.optString("Display").uppercase(Locale.ROOT)
             }
         }
     }

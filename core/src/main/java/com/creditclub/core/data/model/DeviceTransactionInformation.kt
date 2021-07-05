@@ -5,10 +5,10 @@ import androidx.room.*
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.Misc
 import com.creditclub.core.util.RAMInfo
-import com.creditclub.core.util.getTransactionMonitorCounter
 import com.creditclub.core.util.localStorage
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.koin.core.context.GlobalContext
 
 @Serializable
 @Entity(indices = [Index("sessionID")])
@@ -107,15 +107,26 @@ class DeviceTransactionInformation {
             information.ramSize = Misc.formatMemorySize(ramInfo[0])
             information.percentageLeftOver = ramInfo[0].toFloat() / ramInfo[1].toFloat() * 100.toFloat()
 
-            information.noInternet = context.getTransactionMonitorCounter(LocalStorage.NoInternetCount)
-            information.errorResponse = context.getTransactionMonitorCounter(LocalStorage.ErrorResponseCount)
-            information.noResponse = context.getTransactionMonitorCounter(LocalStorage.NoResponseCount)
-            information.requestCount = context.getTransactionMonitorCounter(LocalStorage.RequestCount)
-            information.successCount = context.getTransactionMonitorCounter(LocalStorage.SuccessCount)
+            information.noInternet = getTransactionMonitorCounter(LocalStorage.NoInternetCount)
+            information.errorResponse =
+                getTransactionMonitorCounter(LocalStorage.ErrorResponseCount)
+            information.noResponse = getTransactionMonitorCounter(LocalStorage.NoResponseCount)
+            information.requestCount = getTransactionMonitorCounter(LocalStorage.RequestCount)
+            information.successCount = getTransactionMonitorCounter(LocalStorage.SuccessCount)
 
             return information
         }
     }
+}
+
+private fun getTransactionMonitorCounter(key: String): Int {
+    val localStorage = GlobalContext.get().koin.get<LocalStorage>()
+    val value = localStorage.getString(key)
+    var count = 0
+    if (value != null) count = Integer.parseInt(value)
+
+    localStorage.putString(key, count.toString())
+    return count
 }
 
 @Dao

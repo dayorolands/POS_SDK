@@ -22,11 +22,9 @@ import com.appzonegroup.creditclub.pos.models.PosTransaction
 import com.appzonegroup.creditclub.pos.models.Reversal
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
 import com.appzonegroup.creditclub.pos.printer.Receipt
-import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.util.*
-import com.creditclub.pos.PosManager
-import com.creditclub.pos.PosTransactionViewModel
+import com.creditclub.pos.*
 import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.card.*
 import com.creditclub.pos.model.ConnectionInfo
@@ -95,25 +93,11 @@ abstract class CardTransactionActivity : PosActivity() {
                 finishWithError("Please perform parameter download before proceeding")
                 return
             }
-            parameters.capkList == null -> {
-                finishWithError("Please perform CAPK download before proceeding")
-                return
-            }
-            parameters.emvAidList == null -> {
-                finishWithError("Please perform EMV AID download before proceeding")
-                return
-            }
             else -> {
                 sessionData.getDukptConfig = { pan, amount ->
                     posPreferences.binRoutes?.getSupportedRoute(pan, amount)?.dukptConfig
                 }
-                sessionData.getPosParameter = { pan, amount ->
-                    val supportedRoute =
-                        posPreferences.binRoutes?.getSupportedRoute(pan, amount)
-                    val remoteConnectionInfo = supportedRoute ?: config.remoteConnectionInfo
-                    debug("Using $remoteConnectionInfo")
-                    ParameterService(this, remoteConnectionInfo)
-                }
+                sessionData.getPosParameter = ::getPosParameter
                 onPosReady()
             }
         }
@@ -213,16 +197,6 @@ abstract class CardTransactionActivity : PosActivity() {
         super.onDestroy()
     }
 
-    fun next(view: View?) {
-        when (view?.id) {
-            R.id.cancel_button -> {
-                val longAmount = viewModel.longAmount.value
-                if (longAmount != null && longAmount > 0) finish()
-                else renderTransactionFailure("Please Remove Card", "")
-            }
-        }
-    }
-
     fun readCard() {
         stopTimer()
         posManager.sessionData.amount = viewModel.longAmount.value!!
@@ -264,6 +238,13 @@ abstract class CardTransactionActivity : PosActivity() {
                         return@launch
                     }
 
+                    val route = getSupportedRoute(cardData.pan, viewModel.amount.value!!)
+                    if (route != InvalidRemoteConnectionInfo) {
+                        dialogProvider.hideProgressBar()
+                        renderTransactionFailure("No supported route for this card/amount combination")
+                        return@launch
+                    }
+
                     onReadCard(cardData)
                 }
                 CardTransactionStatus.UserCancel -> renderTransactionFailure("Transaction Cancelled")
@@ -277,13 +258,21 @@ abstract class CardTransactionActivity : PosActivity() {
         }
     }
 
+    private fun getPosParameter(pan: String, amount: Double): PosParameter {
+        return getSupportedRoute(pan, amount).getParameter(this)
+    }
+
+    private fun getSupportedRoute(pan: String, amount: Double): RemoteConnectionInfo {
+        val supportedRoute = posPreferences.binRoutes?.getSupportedRoute(pan, amount)
+        return supportedRoute ?: config.remoteConnectionInfo
+    }
+
     fun makeRequest(request: ISOMsg) {
         stopTimer()
         val supportedRoute =
             posPreferences.binRoutes?.getSupportedRoute(request.pan!!, viewModel.amount.value!!)
         val remoteConnectionInfo = supportedRoute ?: config.remoteConnectionInfo
-
-        val posParameter = ParameterService(this, remoteConnectionInfo)
+        val posParameter = remoteConnectionInfo.getParameter(this)
         request.applyManagementData(posParameter.managementData)
         request.acquiringInstIdCode32 = localStorage.institutionCode
         val isoSocketHelper = IsoSocketHelper(config, posParameter, remoteConnectionInfo)
@@ -484,3 +473,20 @@ abstract class CardTransactionActivity : PosActivity() {
     }
 }
 
+inline val CardData.type: String
+    get() = when (aid) {
+        "A0000000032020" -> "VISA"
+        // "A0000000031010" -> "VISA Debit Credit Classic"
+        "A0000000031010" -> "VISA Debit"
+        // "A0000000031010" -> "VISA Credit"
+        // "A0000000032010" -> "VISA Electron"
+        "A0000004540010" -> "Etranzact Genesis Card"
+        "A0000004540011" -> "Etranzact Genesis Card"
+        "A0000000042203" -> "MasterCard US"
+        "A0000000041010" -> "MasterCard"
+        "A0000000042010" -> "MasterCard Specific"
+        "A0000000043010" -> "MasterCard Specific"
+        "A0000000045010" -> "MasterCard Specific"
+        "A0000003710001" -> "InterSwitch Verve Card"
+        else -> "Unknown Card"
+    }

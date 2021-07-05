@@ -25,6 +25,7 @@ import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.jsonStore
+import com.creditclub.pos.InvalidRemoteConnectionInfo
 import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.api.posApiService
 import com.creditclub.pos.model.PosTenant
@@ -356,8 +357,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                 }
 
                 posConfig.remoteConnectionInfo =
-                    posTenant.infoList.find { it.id == agent.posMode }
-                        ?: posTenant.infoList.first()
+                    posTenant.infoList.find { it.id == agent.posMode } ?: InvalidRemoteConnectionInfo
                 posConfig.terminalId = agent.terminalID ?: ""
                 posParameter.reset()
             }

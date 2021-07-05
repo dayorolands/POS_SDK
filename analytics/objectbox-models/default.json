@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:5761920719266012762",
-      "lastPropertyId": "19:6169108959077200121",
+      "lastPropertyId": "23:3324717315818261296",
       "name": "NetworkMeasurement",
       "properties": [
         {
@@ -90,6 +90,22 @@
           "id": "19:6169108959077200121",
           "name": "flowId",
           "type": 9
+        },
+        {
+          "id": "21:1932337738424329419",
+          "name": "networkState",
+          "type": 9
+        },
+        {
+          "id": "22:7947175201431584916",
+          "name": "networkCarrier",
+          "type": 9
+        },
+        {
+          "id": "23:3324717315818261296",
+          "name": "deviceType",
+          "type": 5,
+          "flags": 2
         }
       ],
       "relations": []
@@ -106,7 +122,8 @@
   "retiredPropertyUids": [
     4660447320361124302,
     2181047505308306484,
-    7453503750613910945
+    7453503750613910945,
+    5735376259393781471
   ],
   "retiredRelationUids": [],
   "version": 1

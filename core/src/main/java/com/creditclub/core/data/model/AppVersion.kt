@@ -29,7 +29,7 @@ data class AppVersion(
     }
 
     fun updateIsAvailable(currentVersion: String): Boolean {
-        return Version(version ?: "0") > Version(currentVersion)
+        return Version(version) > Version(currentVersion)
     }
 
     fun daysOfGraceLeft(): Int =

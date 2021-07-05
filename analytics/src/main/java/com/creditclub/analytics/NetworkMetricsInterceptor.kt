@@ -3,6 +3,7 @@ package com.creditclub.analytics
 import com.creditclub.analytics.models.NetworkMeasurement
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.api.RequestFailureException
+import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import io.objectbox.kotlin.boxFor
 import okhttp3.Interceptor
@@ -14,6 +15,7 @@ import java.time.Instant
 
 class NetworkMetricsInterceptor : Interceptor, KoinComponent {
     private val localStorage: LocalStorage by inject()
+    private val appDataStorage: AppDataStorage by inject()
     private val appConfig: AppConfig by inject()
     private val metricsBox by lazy { AnalyticsObjectBox.boxStore.boxFor<NetworkMeasurement>() }
 
@@ -40,6 +42,8 @@ class NetworkMetricsInterceptor : Interceptor, KoinComponent {
             appVersion = appConfig.versionName,
             flowName = flowName,
             flowId = flowId,
+            networkState = appDataStorage.networkState,
+            networkCarrier = appDataStorage.networkCarrier,
         )
 
         var response: Response? = null
