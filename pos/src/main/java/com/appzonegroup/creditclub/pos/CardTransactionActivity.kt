@@ -239,7 +239,7 @@ abstract class CardTransactionActivity : PosActivity() {
                     }
 
                     val route = getSupportedRoute(cardData.pan, viewModel.amount.value!!)
-                    if (route != InvalidRemoteConnectionInfo) {
+                    if (route == InvalidRemoteConnectionInfo) {
                         dialogProvider.hideProgressBar()
                         renderTransactionFailure("No supported route for this card/amount combination")
                         return@launch
