@@ -54,10 +54,7 @@ class PdfPrinter(
         block: ((PrinterStatus) -> Unit)?
     ) {
         GlobalScope.launch {
-            val printJob = object : PrintJob {
-                override val nodes = nodes
-            }
-            print(printJob, message, false)
+            print(printJob(nodes), message, false)
         }
     }
 

@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -283,8 +282,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                             .fillMaxWidth(),
                         singleLine = true,
-
-                        )
+                    )
                 }
             }
             if (isSameBank != null && !showConfirmation) {

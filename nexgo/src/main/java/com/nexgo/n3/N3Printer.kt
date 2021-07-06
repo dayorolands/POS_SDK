@@ -32,10 +32,7 @@ class N3Printer(override val context: Context, override val dialogProvider: Dial
         block: ((PrinterStatus) -> Unit)?
     ) {
         mainScope.launch {
-            val status = print(object : PrintJob {
-                override val nodes: List<PrintNode>
-                    get() = nodes
-            })
+            val status = print(printJob(nodes))
             block?.invoke(status)
         }
     }

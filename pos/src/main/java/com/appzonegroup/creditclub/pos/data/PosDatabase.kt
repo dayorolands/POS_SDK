@@ -5,15 +5,19 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.appzonegroup.creditclub.pos.models.*
 import com.appzonegroup.creditclub.pos.util.RoomConverters
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 @Database(
-    entities = [FinancialTransaction::class, Reversal::class, PosNotification::class, IsoRequestLog::class, PosTransaction::class],
+    entities = [
+        FinancialTransaction::class,
+        Reversal::class,
+        PosNotification::class,
+        IsoRequestLog::class,
+        PosTransaction::class
+    ],
     version = 12,
     exportSchema = true
 )
@@ -51,10 +55,10 @@ abstract class PosDatabase : RoomDatabase() {
             }
         }
 
-        fun <T> open(
+        inline fun <T> open(
             context: Context,
             dispatcher: CoroutineContext = Dispatchers.Main,
-            block: suspend CoroutineScope.(PosDatabase) -> T
+            crossinline block: suspend CoroutineScope.(PosDatabase) -> T
         ) {
             GlobalScope.launch(dispatcher) {
                 val inst = withContext(Dispatchers.Default) {

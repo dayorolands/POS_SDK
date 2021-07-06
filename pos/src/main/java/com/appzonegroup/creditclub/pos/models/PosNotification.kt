@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.creditclub.core.util.format
 import com.creditclub.pos.model.ConnectionInfo
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -119,7 +120,7 @@ interface PosNotificationDao {
     fun delete(id: Int)
 
     @Query("SELECT * FROM PosNotification")
-    fun allAsync(): LiveData<List<PosNotification>>
+    fun allAsync(): Flow<List<PosNotification>>
 
     @Query("SELECT * FROM PosNotification")
     suspend fun all(): List<PosNotification>

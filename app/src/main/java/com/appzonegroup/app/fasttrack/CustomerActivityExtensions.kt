@@ -35,8 +35,18 @@ val tokenParams = TextFieldParams(
     "Enter Token",
     maxLength = 10,
     type = "number",
-    helperText = "A token has been sent to the customer's phone number"
+    helperText = "A token has been sent to the customer's phone number",
 )
+
+/***
+ * Show this [Dialog] when [DialogListener.onClose] is called
+ */
+inline val Dialog.showOnClose: DialogListenerBlock<*>
+    get() = {
+        onClose {
+            show()
+        }
+    }
 
 fun CreditClubActivity.requireAccountInfo(
     title: String = "Get customer by...",
@@ -118,16 +128,16 @@ fun CreditClubActivity.requestAccountInfo(
 
                         if (error != null && error.isKotlinNPE()) return@launch dialogProvider.showError(
                             "Phone Number is invalid",
-                            stripType(showOnClose)
+                            showOnClose,
                         )
                         if (error != null) return@launch showError(
                             error,
-                            stripType(showOnClose)
+                            showOnClose,
                         )
 
                         response ?: return@launch dialogProvider.showError(
                             "Phone Number is not registered",
-                            stripType(showOnClose)
+                            showOnClose,
                         )
 
                         var linkingBankAccounts = response.linkingBankAccounts
@@ -135,7 +145,7 @@ fun CreditClubActivity.requestAccountInfo(
                             dialogProvider.showError(
                                 response.responseMessage
                                     ?: "Phone Number is not registered",
-                                stripType(showOnClose)
+                                showOnClose,
                             )
                             return@launch
                         }
@@ -165,22 +175,22 @@ fun CreditClubActivity.requestAccountInfo(
                         if (error != null && (error is SerializationException || error.isKotlinNPE())) {
                             return@launch dialogProvider.showError(
                                 "Account Number is invalid",
-                                stripType(showOnClose)
+                                showOnClose,
                             )
                         }
                         if (error != null) return@launch showError(
                             error,
-                            stripType(showOnClose)
+                            showOnClose,
                         )
 
                         response ?: return@launch dialogProvider.showError(
                             "Account Number is invalid",
-                            stripType(showOnClose)
+                            showOnClose,
                         )
 
                         if (response.number.isEmpty()) return@launch dialogProvider.showError(
                             response.responseMessage ?: "Account number is invalid",
-                            stripType(showOnClose)
+                            showOnClose,
                         )
 
                         dismiss()
@@ -403,34 +413,35 @@ suspend fun CreditClubActivity.showCustomerRequestOptions(
     title: CharSequence,
     available: Array<CustomerRequestOption>,
 ): CustomerRequestOption? = suspendCoroutine { continuation ->
-    val dialog = Dialog(this)
-    dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-    dialog.setCanceledOnTouchOutside(false)
-    dialog.setCancelable(false)
-    dialog.setCancelable(true)
-    dialog.setCanceledOnTouchOutside(false)
+    val dialog = Dialog(this).apply {
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        setCanceledOnTouchOutside(false)
+        setCancelable(false)
+    }
 
     val inflater = LayoutInflater.from(this)
     val binding = DataBindingUtil.inflate<DialogCustomerRequestOptionsBinding>(
-        inflater, com.appzonegroup.app.fasttrack.R.layout.dialog_customer_request_options,
+        inflater,
+        com.appzonegroup.app.fasttrack.R.layout.dialog_customer_request_options,
         null,
-        false
+        false,
     )
     binding.title = title
 
     if (available.contains(CustomerRequestOption.AccountNumber)) {
         binding.buttonAccountNumber.setOnClickListener {
+            dialog.dismiss()
             continuation.resume(CustomerRequestOption.AccountNumber)
         }
     } else binding.buttonAccountNumber.visibility = View.GONE
 
     if (available.contains(CustomerRequestOption.PhoneNumber)) {
         binding.buttonPhoneNumber.setOnClickListener {
+            dialog.dismiss()
             continuation.resume(CustomerRequestOption.PhoneNumber)
         }
     } else binding.buttonPhoneNumber.visibility = View.GONE
-
 
     dialog.setContentView(binding.root)
     binding.buttonCancel.setOnClickListener {

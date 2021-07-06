@@ -116,12 +116,6 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
             return
         }
 
-        /*if (isActivation && ((EditText)findViewById(R.id.agentActivation_oldPINEt)).getText().toString().length() == 0){
-            dialogProvider.indicateError("You did not enter your old PIN", ((EditText)findViewById(R.id.agentActivation_PINEt)));
-            firebaseCrashlytics.recordException(new Exception("No PIN was entered"));
-            return;
-        }*/
-
         if (isActivation && binding.newPinEt.text.toString().isEmpty()) {
             dialogProvider.indicateError("You did not enter the PIN", binding.newPinEt)
             firebaseCrashlytics.recordException(Exception("No PIN was entered"))
@@ -188,7 +182,6 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
         if (response.isSuccessful) {
             localStorage.institutionCode = institutionCode
             localStorage.agentPhone = phoneNumber
-//            localStorage.agentPIN = pin
             localStorage.cacheAuth = Json.encodeToString(
                 AuthResponse.serializer(),
                 AuthResponse(phoneNumber, code)
@@ -283,24 +276,6 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
         }
     }
 
-    private inline fun confirmAdminPassword(
-        password: String,
-        closeOnFail: Boolean = false,
-        crossinline next: (Boolean) -> Unit
-    ) {
-        val status = password == posConfig.adminPin
-        if (!status) {
-            if (closeOnFail) return dialogProvider.showError("Incorrect Password") {
-                onClose {
-                    finish()
-                }
-            }
-
-            dialogProvider.showError("Incorrect Password")
-        }
-        next(status)
-    }
-
     private inline fun adminAction(crossinline next: () -> Unit) {
         val passwordType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
 
@@ -311,9 +286,8 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
         ) {
             onSubmit { password ->
                 dismiss()
-                confirmAdminPassword(password) { passed ->
-                    if (passed) next()
-                }
+                if (password == posConfig.adminPin) next()
+                else dialogProvider.showError("Incorrect Password")
             }
         }
     }
