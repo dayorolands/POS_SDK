@@ -61,7 +61,7 @@ val apiModule = module {
             .cache(cache)
 
         builder
-            .addInterceptor(NetworkMetricsInterceptor())
+            .addInterceptor(NetworkMetricsInterceptor(get(), get(), get()))
             .addInterceptor(RequestFailureInterceptor())
 
         debugOnly {
