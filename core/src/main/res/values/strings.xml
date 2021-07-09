@@ -24,7 +24,7 @@
     <string name="special_characters_not_permitted">%1$s is invalid. Only hyphens(-) are allowed</string>
     <string name="please_enter_a_valid_customer_address">Please enter a valid customer address. Only commas(,), hyphens(-), and periods(.) are allowed</string>
     <string name="an_error_occurred_please_try_again_later">An error occurred. Please try again later</string>
-    <string name="account_opening">Account Opening</string>
+    <string name="account_opening">Open Account</string>
     <string name="a_network_error_occurred">A network error occurred. Please try again later</string>
     <string name="an_internal_error_occurred">An internal error occurred. Please try again later or contact your administrator</string>
     <string name="request_time_out">The request timed-out. Please try again later</string>

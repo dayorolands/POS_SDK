@@ -81,6 +81,10 @@ class LocalInstitutionConfig private constructor(
                 if (resources.getBoolean(R.bool.bill_payment_enabled)) {
                     billPayment = Any()
                 }
+
+                if (resources.getBoolean(R.bool.flow_ussd_withdrawal)) {
+                    ussdWithdrawal = Any()
+                }
             }
 
             // Manual overrides for creditclub variant
