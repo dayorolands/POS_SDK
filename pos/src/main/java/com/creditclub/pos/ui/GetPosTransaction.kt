@@ -11,15 +11,12 @@ import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.CalendarViewMonth
 import androidx.compose.material.icons.outlined.CalendarViewWeek
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.models.PosTransaction
@@ -30,6 +27,8 @@ import com.creditclub.ui.CreditClubAppBar
 import com.creditclub.ui.Select
 import com.creditclub.ui.rememberBean
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -58,11 +57,11 @@ fun GetPosTransaction(
         }
     }
     val transactions =
-        produceState<LiveData<List<PosTransaction>>>(MutableLiveData(), query, startDate, endDate) {
+        produceState<Flow<List<PosTransaction>>>(MutableSharedFlow(), query, startDate, endDate) {
             withContext(Dispatchers.IO) {
                 value = posDatabase.posTransactionDao().disputable("%${query}%", startDate, endDate)
             }
-        }.value.observeAsState(emptyList())
+        }.value.collectAsState(emptyList())
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (appBar, list) = createRefs()

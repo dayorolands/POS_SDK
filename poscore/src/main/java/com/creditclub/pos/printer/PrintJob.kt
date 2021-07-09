@@ -61,6 +61,8 @@ value class PrintJobScope(private val nodes: MutableList<PrintNode> = mutableLis
     fun build(): ParcelablePrintJob = SimplePrintJob(this@PrintJobScope.nodes)
 }
 
+fun printJob(nodes: List<PrintNode>) = SimplePrintJob(nodes)
+
 inline fun printJob(crossinline init: PrintJobScope.() -> Unit): ParcelablePrintJob {
     return PrintJobScope().apply(init).build()
 }

@@ -16,16 +16,6 @@ import com.creditclub.core.ui.widget.DialogProvider
  * Appzone Ltd
  */
 
-/***
- * Show this [Dialog] when [DialogListener.onClose] is called
- */
-inline val Dialog.showOnClose: DialogListenerBlock<Nothing>
-    get() = {
-        onClose {
-            show()
-        }
-    }
-
 fun DialogProvider.showNetworkError() = showNetworkError(null)
 
 fun DialogProvider.showNetworkError(block: DialogListenerBlock<*>?) {

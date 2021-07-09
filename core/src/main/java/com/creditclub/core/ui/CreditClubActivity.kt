@@ -38,18 +38,18 @@ abstract class CreditClubActivity : AppCompatActivity {
     constructor() : super()
     constructor(layout: Int) : super(layout)
 
-    open val gps: TrackGPS by inject()
-    open val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
-    open val dialogProvider: DialogProvider by inject { parametersOf(this) }
-    open val coreDatabase: CoreDatabase by inject()
-    open val localStorage: LocalStorage by inject()
-    open val institutionConfig: IInstitutionConfig by inject()
-    open val appConfig: AppConfig by inject()
+    val gps: TrackGPS by inject()
+    val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
+    val dialogProvider: DialogProvider by inject { parametersOf(this) }
+    val coreDatabase: CoreDatabase by inject()
+    val localStorage: LocalStorage by inject()
+    val institutionConfig: IInstitutionConfig by inject()
+    val appConfig: AppConfig by inject()
 
     open val functionId: Int? = null
 
-    open val mainScope by lazy { CoroutineScope(Dispatchers.Main) }
-    open val ioScope by lazy { CoroutineScope(Dispatchers.IO) }
+    val mainScope by lazy { CoroutineScope(Dispatchers.Main) }
+    val ioScope by lazy { CoroutineScope(Dispatchers.IO) }
 
     private val fusedLocationClient: FusedLocationProviderClient by lazy {
         LocationServices.getFusedLocationProviderClient(this)

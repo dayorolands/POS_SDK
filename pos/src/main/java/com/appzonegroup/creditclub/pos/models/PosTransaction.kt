@@ -6,6 +6,7 @@ import androidx.room.*
 import com.creditclub.core.data.InstantParceler
 import com.creditclub.core.serializer.TimeInstantSerializer
 import com.creditclub.pos.model.ConnectionInfo
+import kotlinx.coroutines.flow.Flow
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler
 import kotlinx.serialization.SerialName
@@ -129,7 +130,7 @@ interface PosTransactionDao {
     fun unSynced(): List<PosTransaction>
 
     @Query("SELECT * FROM PosTransaction where responseCode in ('06', '09', '20', '22', '68', '91', '96') and dateTime BETWEEN :from AND :to and (stan like :query or retrievalReferenceNumber like :query)")
-    fun disputable(query: String, from: Instant, to: Instant): LiveData<List<PosTransaction>>
+    fun disputable(query: String, from: Instant, to: Instant): Flow<List<PosTransaction>>
 
     @Query("DELETE FROM PosTransaction where dateTime < :instant AND isSynced = 1")
     fun deleteSyncedBefore(instant: Instant)

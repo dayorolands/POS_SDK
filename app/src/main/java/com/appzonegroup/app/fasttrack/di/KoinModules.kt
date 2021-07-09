@@ -26,6 +26,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 
@@ -34,7 +35,7 @@ import java.util.concurrent.TimeUnit
  * Appzone Ltd
  */
 
-private const val CACHE_SIZE = 10L * 1024 * 1024 // 10 MB
+private const val CACHE_SIZE = 50L * 1024L * 1024L // 50 MB
 
 val dataModule = module {
     single { LocalStorage(androidContext()) }
@@ -48,7 +49,10 @@ val locationModule = module {
 
 val apiModule = module {
     single(named("middleware")) {
-        val cache = Cache(androidContext().cacheDir, CACHE_SIZE)
+        val cache = Cache(
+            directory = File(androidContext().cacheDir, "http_cache"),
+            maxSize = CACHE_SIZE,
+        )
         val builder = OkHttpClient().newBuilder()
             .connectTimeout(2, TimeUnit.MINUTES)
             .readTimeout(3, TimeUnit.MINUTES)

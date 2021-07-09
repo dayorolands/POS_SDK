@@ -54,11 +54,13 @@ fun UssdWithdrawal(navController: NavController) {
 
     var reference: CoraPayReference? by remember { mutableStateOf(null) }
     var printJob: ParcelablePrintJob? by remember { mutableStateOf(null) }
-    var amount by remember { mutableStateOf("200") }
+    var amount by remember { mutableStateOf("") }
     val amountIsValid = remember(amount) {
         amount.isNotBlank() && (amount.toDoubleOrNull() ?: 0.0) > 0.0
     }
-    val ussdCode = remember(reference) { "*737*000*${reference?.transactionReference}#" }
+    val ussdCode = remember(reference) {
+        if (reference != null) "*737*000*${reference!!.transactionReference}#" else null
+    }
 
     val generateReference: SuspendCallback =
         remember(amount) {
@@ -120,13 +122,26 @@ fun UssdWithdrawal(navController: NavController) {
                         CoraPayTransactionStatus.NotFound -> "Not Found"
                         else -> "Error"
                     }
-                    text(status)
+                    text(
+                        status,
+                        align = middleAlignment,
+                    )
                     text(
                         response.message?.uppercase(Locale.getDefault()) ?: "",
                         fontSize = 2,
                         walkPaperAfterPrint = 20,
                         align = middleAlignment,
                     )
+                    if (reference != null) {
+                        text(
+                            "transaction reference: ${reference?.transactionReference}",
+                            align = middleAlignment,
+                        )
+                        text(
+                            "request reference: ${reference?.transactionReference}",
+                            align = middleAlignment,
+                        )
+                    }
                     footerNodes(context)
                 }
             }
@@ -159,41 +174,43 @@ fun UssdWithdrawal(navController: NavController) {
                     enabled = reference == null,
                 )
             }
-            item {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-
-                        },
-                ) {
-                    Text(
-                        text = ussdCode,
-                        fontSize = 40.sp,
-                        textAlign = TextAlign.Center,
+            if (ussdCode != null) {
+                item {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(top = 20.dp),
-                    )
+                            .fillMaxWidth()
+                            .clickable {
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(bottom = 20.dp),
+                            },
                     ) {
                         Text(
-                            text = "Tap to copy",
-                            fontSize = 20.sp,
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                            text = ussdCode,
+                            fontSize = 40.sp,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .padding(end = 10.dp),
+                                .align(Alignment.CenterHorizontally)
+                                .padding(top = 20.dp),
                         )
-                        Icon(
-                            imageVector = Icons.Outlined.CopyAll,
-                            contentDescription = null,
-                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
-                        )
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(bottom = 20.dp),
+                        ) {
+                            Text(
+                                text = "Tap to copy",
+                                fontSize = 20.sp,
+                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .padding(end = 10.dp),
+                            )
+                            Icon(
+                                imageVector = Icons.Outlined.CopyAll,
+                                contentDescription = null,
+                                tint = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                            )
+                        }
                     }
                 }
             }

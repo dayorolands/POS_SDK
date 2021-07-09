@@ -102,14 +102,16 @@ fun SmallMenuButton(
             )
         }
 
-        Text(
-            text = text.uppercase(Locale.ROOT),
-            style = MaterialTheme.typography.button,
-            fontSize = 12.sp,
-            color = colorResource(R.color.menuButtonTextColor),
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        Column(modifier = Modifier.height(20.dp)) {
+            Text(
+                text = text.uppercase(Locale.ROOT),
+                style = MaterialTheme.typography.button,
+                fontSize = 12.sp,
+                color = colorResource(R.color.menuButtonTextColor),
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }

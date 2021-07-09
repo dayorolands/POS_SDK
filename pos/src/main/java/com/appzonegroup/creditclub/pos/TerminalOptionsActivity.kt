@@ -11,10 +11,9 @@ import com.appzonegroup.creditclub.pos.extension.apnInfo
 import com.appzonegroup.creditclub.pos.util.AppConstants
 import com.appzonegroup.creditclub.pos.widget.Dialogs
 import com.creditclub.core.ui.widget.DialogOptionItem
+import com.creditclub.pos.InvalidRemoteConnectionInfo
 import com.creditclub.pos.model.PosTenant
 import com.creditclub.ui.dataBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -146,12 +145,9 @@ class TerminalOptionsActivity : PosActivity(R.layout.activity_network_parameters
             }
         }
 
-//        binding.hostItem.createValueChangeListener(
-//            TextFieldParams("Enter Host", initialValue = config.host),
-//            onChange = { value ->
-//                config.host = value
-//            }
-//        )
+        if (config.remoteConnectionInfo == InvalidRemoteConnectionInfo) {
+            binding.posModeItem.root.visibility = View.GONE
+        }
 
         binding.resetNetworkBtn.setOnClickListener {
             config.run {
