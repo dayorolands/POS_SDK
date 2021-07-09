@@ -6,12 +6,14 @@
         <item>1,Phone Number</item>
         <item>2,Account Number</item>
     </string-array>
-    <bool name="category_loan">true</bool>
+    <bool name="category_loan">false</bool>
     <bool name="account_opening_products">true</bool>
     <bool name="bill_payment_enabled">true</bool>
     <bool name="flow_account_opening">true</bool>
     <bool name="flow_airtime">true</bool>
     <bool name="flow_token_withdrawal">true</bool>
+    <bool name="flow_ussd_withdrawal">false</bool>
     <bool name="flow_customer_balance">true</bool>
+    <bool name="flow_customer_pin_change">false</bool>
     <bool name="category_customer">true</bool>
 </resources>

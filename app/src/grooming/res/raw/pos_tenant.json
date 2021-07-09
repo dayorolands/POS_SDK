@@ -6,8 +6,8 @@
       "Port": 5006,
       "EnableSSL": true,
       "Timeout": 60,
-      "Key1": "25F7432326081AA82520647C61DCC83D",
-      "Key2": "F270D5A76ED6FB9298CD580E6D986723"
+      "Key1": "3DFB3802940E8A546B3D38610852BA7A",
+      "Key2": "0234E39861D3405E7A6B3185BA675873"
     },
     {
       "Name": "POSVAS",
@@ -15,8 +15,8 @@
       "Port": 5007,
       "EnableSSL": true,
       "Timeout": 60,
-      "Key1": "25F7432326081AA82520647C61DCC83D",
-      "Key2": "F270D5A76ED6FB9298CD580E6D986723"
+      "Key1": "C48A1564CBFB3213A485BCE9195D321C",
+      "Key2": "FE169BD37C34B06215E919C4D3F75E79"
     }
   ]
 }

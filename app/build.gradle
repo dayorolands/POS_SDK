@@ -195,6 +195,7 @@ dependencies {
     purpleImplementation project(path: ':dspread')
 //    purpleImplementation project(path: ':telpo')
     groomingImplementation project(path: ':telpo')
+    groomingImplementation project(path: ':nexgo')
 
     implementation fileTree(dir: "jniLibs", include: ["*.so"])
     implementation fileTree(include: ["*.jar"], dir: "libs")
