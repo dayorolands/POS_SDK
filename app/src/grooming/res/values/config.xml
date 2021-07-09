@@ -16,4 +16,7 @@
     <bool name="flow_customer_balance">true</bool>
     <bool name="flow_customer_pin_change">false</bool>
     <bool name="category_customer">true</bool>
+    <bool name="token_withdrawal_customer_pin">true</bool>
+    <bool name="flow_wallet_opening">false</bool>
+    <bool name="flow_bvn_update">false</bool>
 </resources>
