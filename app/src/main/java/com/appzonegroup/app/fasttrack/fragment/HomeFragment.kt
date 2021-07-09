@@ -384,7 +384,7 @@ class HomeFragment : CreditClubFragment() {
                                 if (flows.accountOpening != null) {
                                     item {
                                         MenuButton(
-                                            text = "Register",
+                                            text = stringResource(R.string.account_opening),
                                             icon = painterResource(R.drawable.payday_loan),
                                             onClick = { openPageById(R.id.register_button) }
                                         )
@@ -393,7 +393,7 @@ class HomeFragment : CreditClubFragment() {
                                 if (flows.walletOpening != null) {
                                     item {
                                         MenuButton(
-                                            text = "New Wallet",
+                                            text = stringResource(R.string.title_activity_new_wallet),
                                             icon = painterResource(R.drawable.payday_loan),
                                             onClick = { openPageById(R.id.new_wallet_button) }
                                         )
@@ -446,7 +446,7 @@ class HomeFragment : CreditClubFragment() {
                                         )
                                     }
                                 }
-                                if (flows.tokenWithdrawal != null) {
+                                if (flows.ussdWithdrawal != null) {
                                     item {
                                         SmallMenuButton(
                                             text = "USSD Withdrawal",

@@ -16,6 +16,7 @@ data class FlowConfig(
     var accountOpening: AccountOpeningConfig? = null,
     var walletOpening: AccountOpeningConfig? = null,
     var tokenWithdrawal: TokenWithdrawalConfig? = null,
+    var ussdWithdrawal: Any? = null,
     var customerPinChange: Any? = null,
     var customerBalance: Any? = null,
     var airtime: Any? = null,

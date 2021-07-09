@@ -15,4 +15,5 @@
     <bool name="flow_airtime">true</bool>
     <bool name="flow_token_withdrawal">true</bool>
     <bool name="flow_customer_balance">true</bool>
+    <bool name="flow_ussd_withdrawal">false</bool>
 </resources>
