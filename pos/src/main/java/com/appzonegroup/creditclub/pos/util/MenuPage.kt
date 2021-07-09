@@ -1,17 +1,20 @@
 package com.appzonegroup.creditclub.pos.util
 
+import com.appzonegroup.creditclub.pos.R
+
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 3/1/2019.
  * Appzone Ltd
  */
 
-open class MenuPage : ActionButton() {
-    var options: Lazy<LinkedHashMap<Int, ActionButton>>? = null
-    var isSecure: Boolean = false
-
-//    fun options(vararg pairs: Pair<Int, ActionButton>) {
-//        this.options = lazy { HashMap<Int, ActionButton>().apply { putAll(pairs) } }
-//    }
+open class MenuPage(
+    var options: Lazy<LinkedHashMap<Int, ActionButton>>? = null,
+    val isSecure: Boolean = false,
+    override var id: Int = 0,
+    override var icon: Int = R.mipmap.ic_launcher_round,
+    override var name: String = "",
+    override var activityClass: Class<*>? = null,
+) : ActionButton(id = id, icon = icon, name = name, activityClass = activityClass) {
 
     companion object {
         const val PAGE_NUMBER = "PAGE_NUMBER"
@@ -20,4 +23,5 @@ open class MenuPage : ActionButton() {
     }
 }
 
-fun menuPage(block: MenuPage.() -> Unit) = MenuPage().apply(block)
+inline fun menuPage(isSecure: Boolean = false, crossinline block: MenuPage.() -> Unit) =
+    MenuPage(isSecure = isSecure).apply(block)

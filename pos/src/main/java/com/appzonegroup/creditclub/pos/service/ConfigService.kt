@@ -5,11 +5,7 @@ import android.content.SharedPreferences
 import com.appzonegroup.creditclub.pos.util.AppConstants
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.util.delegates.intStore
-import com.creditclub.core.util.delegates.stringStore
-import com.creditclub.pos.PosConfig
-import com.creditclub.pos.PosParameter
-import com.creditclub.pos.RemoteConnectionInfo
-import com.creditclub.pos.getParameter
+import com.creditclub.pos.*
 import com.creditclub.pos.utils.nonNullStringStore
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.KoinComponent
@@ -35,7 +31,10 @@ open class ConfigService(context: Context) : PosConfig, KoinComponent {
     override var adminPin by prefs.nonNullStringStore("ADMIN_PIN", "asdfg")
 
     override var remoteConnectionInfo: RemoteConnectionInfo
-        get() = get()
+        get() {
+            if (terminalId.uppercase().startsWith("2APP")) return InvalidRemoteConnectionInfo
+            return get()
+        }
         set(value) {
             loadKoinModules(module {
                 single(override = true) { value }

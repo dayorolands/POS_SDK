@@ -66,9 +66,8 @@ object MenuPages : KoinComponent {
             }
         }
 
-        PAGE_MAP[ADMIN] = menuPage {
+        PAGE_MAP[ADMIN] = menuPage(isSecure = true) {
             name = "Admin"
-            isSecure = true
             options = lazy {
                 linkedMapOf(
                     Modules.NETWORK_PARAMETERS to actionButton {

@@ -239,7 +239,7 @@ internal inline fun CardTransactionActivity.showReferencePage(
                         .byRRN(rrn)
                 }
                 if (trn == null) {
-                    showError("Unable to locate record") {
+                    dialogProvider.showError("Unable to locate record") {
                         finish()
                     }
                     return@launch
