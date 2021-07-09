@@ -40,82 +40,12 @@ abstract class PosActivity : CreditClubActivity {
         }
     }
 
-    inline fun confirmSupervisorPin(
-        pin: String,
-        closeOnFail: Boolean = false,
-        crossinline next: (Boolean) -> Unit
-    ) {
-        val status = pin == config.supervisorPin
-        if (!status) {
-            if (closeOnFail) return dialogProvider.showError("Authentication Failed") {
-                onClose {
-                    finish()
-                }
-            }
-
-            dialogProvider.showError("Authentication Failed")
-        }
-        next(status)
-    }
-
-    inline fun confirmAdminPassword(
-        password: String,
-        closeOnFail: Boolean = false,
-        crossinline next: (Boolean) -> Unit
-    ) {
-        val status = password == config.adminPin
-        if (!status) {
-            if (closeOnFail) return dialogProvider.showError("Incorrect Password") {
-                onClose {
-                    finish()
-                }
-            }
-
-            dialogProvider.showError("Incorrect Password")
-        }
-        next(status)
-    }
-
-    inline fun supervisorAction(crossinline next: () -> Unit) {
-        Dialogs.requestPin(this, getString(R.string.pos_enter_supervisor_pin)) { pin ->
-            if (pin == null) return@requestPin
-            confirmSupervisorPin(pin) { passed ->
-                if (passed) next()
-            }
-        }
-    }
-
-    inline fun adminAction(crossinline next: () -> Unit) {
-        val passwordType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-
-        Dialogs.input(this, "Administrator password", passwordType) {
-            onSubmit { password ->
-                dismiss()
-                confirmAdminPassword(password) { passed ->
-                    if (passed) next()
-                }
-            }
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         callHomeService.startCallHomeTimer()
     }
 
-    fun startActivity(classToStart: Class<*>) {
-        startActivity(Intent(this, classToStart))
-    }
-
-    fun openPage(clazz: Class<*>) {
-        startActivity(Intent(this, clazz))
-    }
-
     fun showError(message: String?) = dialogProvider.showError(message)
-
-    fun showError(message: String?, block: DialogListenerBlock<*>) {
-        dialogProvider.showError(message, block)
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {

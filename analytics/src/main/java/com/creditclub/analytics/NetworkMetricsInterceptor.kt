@@ -8,15 +8,14 @@ import com.creditclub.core.data.prefs.LocalStorage
 import io.objectbox.kotlin.boxFor
 import okhttp3.Interceptor
 import okhttp3.Response
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.time.Duration
 import java.time.Instant
 
-class NetworkMetricsInterceptor : Interceptor, KoinComponent {
-    private val localStorage: LocalStorage by inject()
-    private val appDataStorage: AppDataStorage by inject()
-    private val appConfig: AppConfig by inject()
+class NetworkMetricsInterceptor(
+    private val appConfig: AppConfig,
+    private val appDataStorage: AppDataStorage,
+    private val localStorage: LocalStorage,
+) : Interceptor {
     private val metricsBox by lazy { AnalyticsObjectBox.boxStore.boxFor<NetworkMeasurement>() }
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -29,11 +28,12 @@ class NetworkMetricsInterceptor : Interceptor, KoinComponent {
             .removeAllQueryParameters("FlowID")
             .removeAllQueryParameters("agentPIN")
             .build()
+        val agent = localStorage.agent
 
         val networkMeasurement = NetworkMeasurement(
             institutionCode = localStorage.institutionCode,
             agentPhoneNumber = localStorage.agentPhone,
-            agentCode = localStorage.agent?.agentCode,
+            agentCode = agent?.agentCode,
             gpsCoordinates = localStorage.lastKnownLocation,
             url = newUrl.toString().replace(',', '.'),
             method = request.method,
@@ -44,6 +44,7 @@ class NetworkMetricsInterceptor : Interceptor, KoinComponent {
             flowId = flowId,
             networkState = appDataStorage.networkState,
             networkCarrier = appDataStorage.networkCarrier,
+            terminalId = agent?.terminalID,
         )
 
         var response: Response? = null

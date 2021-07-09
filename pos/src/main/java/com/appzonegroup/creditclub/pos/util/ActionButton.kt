@@ -10,25 +10,18 @@ import com.appzonegroup.creditclub.pos.R
  * Appzone Ltd
  */
 
-open class ActionButton {
-    open var id: Int = 0
-    open var icon: Int = R.mipmap.ic_launcher_round
-    open var name: String = ""
-    var activityClass: Class<*>? = null
+open class ActionButton(
+    open var id: Int = 0,
+    open var icon: Int = R.mipmap.ic_launcher_round,
+    open var name: String = "",
+    open var activityClass: Class<*>? = null,
+) {
     val isClickable get() = action != null || activityClass != null
     private var action: ((PosActivity) -> Unit)? = null
 
     fun onClick(listener: (PosActivity) -> Unit) {
         action = listener
     }
-
-//    fun <T : PosCommand> onClick(commandFactory: () -> T) {
-//        action = {
-//            val instance = commandFactory()
-//
-//            instance.run()
-//        }
-//    }
 
     fun click(activity: PosActivity) {
         action?.invoke(activity)
@@ -38,4 +31,9 @@ open class ActionButton {
     }
 }
 
-fun actionButton(block: ActionButton.() -> Unit) = ActionButton().apply(block)
+inline fun actionButton(
+    id: Int = 0,
+    icon: Int = R.mipmap.ic_launcher_round,
+    name: String = "",
+    activityClass: Class<*>? = null, crossinline block: ActionButton.() -> Unit
+) = ActionButton(id = id, icon = icon, name = name, activityClass = activityClass).apply(block)

@@ -73,4 +73,7 @@ data class NetworkMeasurement(
 
     @SerialName("DeviceType")
     var deviceType: Int? = null,
+
+    @SerialName("TerminalID")
+    var terminalId: String? = null,
 )
