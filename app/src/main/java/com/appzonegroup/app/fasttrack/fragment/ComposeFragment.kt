@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.ui.FundsTransfer
-import com.appzonegroup.app.fasttrack.ui.TransactionSummary
 import com.creditclub.Routes
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.screen.UssdWithdrawal
@@ -37,7 +36,7 @@ class ComposeFragment : CreditClubFragment() {
                                 )
                             }
                             composable(Routes.UssdWithdrawal) {
-                                UssdWithdrawal(navController = composeNavController)
+                                UssdWithdrawal(navController = mainNavController)
                             }
                         }
                     }
