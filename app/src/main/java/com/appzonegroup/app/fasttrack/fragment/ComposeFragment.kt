@@ -36,11 +36,6 @@ class ComposeFragment : CreditClubFragment() {
                                     dialogProvider = dialogProvider,
                                 )
                             }
-                            composable(Routes.TransactionSummary) {
-                                TransactionSummary(
-                                    navController = mainNavController,
-                                )
-                            }
                             composable(Routes.UssdWithdrawal) {
                                 UssdWithdrawal(navController = composeNavController)
                             }
