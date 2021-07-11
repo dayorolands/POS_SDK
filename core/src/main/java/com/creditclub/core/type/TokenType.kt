@@ -1,6 +1,6 @@
 package com.creditclub.core.type
 
-enum class TokenType(label: String? = null) {
+enum class TokenType {
     AccountOpening,
     Withdrawal,
     Deposit,
@@ -11,6 +11,5 @@ enum class TokenType(label: String? = null) {
     BVNUpdate,
     PinChange;
 
-    var label: String? = label
-        get() = field ?: toString()
+    val label: String get() = toString()
 }

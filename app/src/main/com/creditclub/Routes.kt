@@ -3,6 +3,7 @@ package com.creditclub
 object Routes {
     const val Home = "home"
     const val FundsTransfer = "transactions/funds-transfer"
+    const val TransactionSummary = "transactions/summary"
     const val PinChange = "agent/pin-change"
     const val Receipt = "transactions/receipt"
     const val SupportCases = "support/cases"

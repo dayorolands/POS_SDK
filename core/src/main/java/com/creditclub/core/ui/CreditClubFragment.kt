@@ -23,7 +23,7 @@ import org.koin.core.parameter.parametersOf
 
 
 /**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 28/08/2019.
+ * Created by Emmanuel Nosakhare <enosakhare@app zonegroup.com> on 28/08/2019.
  * Appzone Ltd
  */
 open class CreditClubFragment : Fragment {

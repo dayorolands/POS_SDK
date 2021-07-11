@@ -8,7 +8,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.fragment.findNavController
+import com.appzonegroup.app.fasttrack.ui.FundsTransfer
+import com.appzonegroup.app.fasttrack.ui.TransactionSummary
+import com.creditclub.Routes
 import com.creditclub.core.ui.CreditClubFragment
+import com.creditclub.screen.UssdWithdrawal
 import com.creditclub.ui.theme.CreditClubTheme
 import com.google.accompanist.insets.ProvideWindowInsets
 
@@ -26,7 +30,20 @@ class ComposeFragment : CreditClubFragment() {
                     ProvideWindowInsets {
                         val navController = rememberNavController()
                         NavHost(navController = navController, route) {
-                            
+                            composable(Routes.FundsTransfer) {
+                                FundsTransfer(
+                                    navController = mainNavController,
+                                    dialogProvider = dialogProvider,
+                                )
+                            }
+                            composable(Routes.TransactionSummary) {
+                                TransactionSummary(
+                                    navController = mainNavController,
+                                )
+                            }
+                            composable(Routes.UssdWithdrawal) {
+                                UssdWithdrawal(navController = composeNavController)
+                            }
                         }
                     }
                 }
