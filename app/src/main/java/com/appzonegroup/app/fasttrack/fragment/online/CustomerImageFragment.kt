@@ -38,7 +38,9 @@ import org.json.JSONObject
 import java.io.File
 import java.util.concurrent.TimeoutException
 
-fun CreditClubFragment.registerImagePicker(callback: suspend CoroutineScope.(List<Image>) -> Unit): (BaseConfig) -> Unit {
+inline fun CreditClubFragment.registerImagePicker(
+    crossinline callback: suspend CoroutineScope.(List<Image>) -> Unit
+): (BaseConfig) -> Unit {
     val activityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val images = ImagePicker.getImages(it.data) ?: emptyList()

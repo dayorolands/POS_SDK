@@ -62,14 +62,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BillsCategoryActivity"
-            android:label="@string/Categories"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
-        </activity>
-        <activity
             android:name=".ReportActivity"
             android:label="@string/reports"
             android:parentActivityName=".MainActivity"
@@ -77,30 +69,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.appzonegroup.app.fasttrack.MainActivity" />
-        </activity>
-        <activity
-            android:name=".BillPaymentActivity"
-            android:label="@string/billpayment"
-            android:parentActivityName=".BillerItemActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.BillerActivity" />
-        </activity>
-        <activity
-            android:name=".BillerActivity"
-            android:label="@string/billpayment"
-            android:parentActivityName=".BillsCategoryActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.BillsCategoryActivity" />
-        </activity>
-        <activity
-            android:name=".BillerItemActivity"
-            android:label="@string/billerItem"
-            android:parentActivityName=".BillerActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.BillerActivity" />
         </activity>
         <activity
             android:name=".DepositActivity"

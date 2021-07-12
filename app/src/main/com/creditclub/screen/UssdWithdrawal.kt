@@ -1,5 +1,6 @@
 package com.creditclub.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,7 +26,7 @@ import com.appzonegroup.app.fasttrack.receipt.footerNodes
 import com.appzonegroup.app.fasttrack.ui.ReceiptDetails
 import com.appzonegroup.app.fasttrack.utility.FunctionId
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
-import com.creditclub.core.data.api.CoralPayService
+import com.creditclub.core.data.api.UssdCashoutService
 import com.creditclub.core.data.model.CoraPayReference
 import com.creditclub.core.data.model.CoraPayTransactionStatus
 import com.creditclub.core.data.prefs.LocalStorage
@@ -48,33 +49,32 @@ fun UssdWithdrawal(navController: NavController) {
     var loadingMessage by remember { mutableStateOf("") }
     var errorMessage: String? by remember { mutableStateOf(null) }
     val context = LocalContext.current
-    val coralPayService: CoralPayService by rememberRetrofitService()
+    val ussdCashoutService: UssdCashoutService by rememberRetrofitService()
     val localStorage: LocalStorage by rememberBean()
     val dialogProvider by rememberDialogProvider()
 
     var reference: CoraPayReference? by remember { mutableStateOf(null) }
     var printJob: ParcelablePrintJob? by remember { mutableStateOf(null) }
-    var amount by remember { mutableStateOf("") }
-    val amountIsValid = remember(amount) {
-        amount.isNotBlank() && (amount.toDoubleOrNull() ?: 0.0) > 0.0
-    }
+    var amountString by remember { mutableStateOf("") }
+    val amount = remember(amountString) { amountString.toIntOrNull() ?: 0 }
+    val amountIsValid = amount > 0
     val ussdCode = remember(reference) {
-        if (reference != null) "*737*000*${reference!!.transactionReference}#" else null
+        if (reference != null) reference!!.transactionReference else null
     }
 
     val generateReference: SuspendCallback =
-        remember(amount) {
+        remember(amountString) {
             generateReference@{
                 val agentPin = dialogProvider.getPin(R.string.agent_pin) ?: return@generateReference
                 errorMessage = ""
                 loadingMessage = context.getString(R.string.processing)
                 val (response, error) = safeRunIO {
-                    coralPayService.generateReference(
+                    ussdCashoutService.generateReference(
                         CoralPayReferenceRequest(
                             institutionCode = localStorage.institutionCode!!,
                             agentPhoneNumber = localStorage.agentPhone!!,
                             agentPin = agentPin,
-                            amount = amount.toInt(),
+                            amount = amount,
                             geoLocation = localStorage.lastKnownLocation,
                         )
                     )
@@ -92,12 +92,12 @@ fun UssdWithdrawal(navController: NavController) {
         }
 
     val checkTransactionStatus: SuspendCallback =
-        remember(amount) {
+        remember(amountString) {
             checkTransactionStatus@{
                 errorMessage = ""
-                loadingMessage = context.getString(R.string.processing)
+                loadingMessage = context.getString(R.string.checking_transaction_status)
                 val (response, error) = safeRunIO {
-                    coralPayService.getTransactionStatus(
+                    ussdCashoutService.getTransactionStatus(
                         requestReference = reference!!.requestReference,
                         institutionCode = localStorage.institutionCode,
                     )
@@ -109,21 +109,27 @@ fun UssdWithdrawal(navController: NavController) {
                     errorMessage = response.message
                     return@checkTransactionStatus
                 }
+                val status = response.data?.data
+                if (status == CoraPayTransactionStatus.Pending) {
+                    Toast.makeText(context, "Transaction is still pending", Toast.LENGTH_SHORT)
+                        .show()
+                    return@checkTransactionStatus
+                }
+                val statusText = when (status) {
+                    CoraPayTransactionStatus.Pending -> "Pending"
+                    CoraPayTransactionStatus.Failed -> "Failed"
+                    CoraPayTransactionStatus.Successful -> "Successful"
+                    CoraPayTransactionStatus.Reversed -> "Reversed"
+                    CoraPayTransactionStatus.ThirdPartyFailure -> "Third Party Failure"
+                    CoraPayTransactionStatus.NotFound -> "Not Found"
+                    else -> "Error"
+                }
                 printJob = printJob {
                     val middleAlignment = com.creditclub.pos.printer.Alignment.MIDDLE
                     image(R.drawable.cc_printer_logo)
                     text("USSD withdrawal", fontSize = 2, align = middleAlignment)
-                    val status = when (response.data?.status) {
-                        CoraPayTransactionStatus.Pending -> "Pending"
-                        CoraPayTransactionStatus.Failed -> "Failed"
-                        CoraPayTransactionStatus.Successful -> "Successful"
-                        CoraPayTransactionStatus.Reversed -> "Reversed"
-                        CoraPayTransactionStatus.ThirdPartyFailure -> "Third Party Failure"
-                        CoraPayTransactionStatus.NotFound -> "Not Found"
-                        else -> "Error"
-                    }
                     text(
-                        status,
+                        statusText,
                         align = middleAlignment,
                     )
                     text(
@@ -164,17 +170,17 @@ fun UssdWithdrawal(navController: NavController) {
             item {
                 OutlinedTextField(
                     label = { Text(text = stringResource(id = R.string.amount)) },
-                    value = amount,
+                    value = amountString,
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    onValueChange = { amount = it },
+                    onValueChange = { amountString = it },
                     modifier = Modifier
                         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                         .fillMaxWidth(),
                     singleLine = true,
-                    enabled = reference == null,
+                    enabled = reference == null && loadingMessage.isBlank(),
                 )
             }
-            if (ussdCode != null) {
+            if (loadingMessage.isBlank() && ussdCode != null) {
                 item {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,

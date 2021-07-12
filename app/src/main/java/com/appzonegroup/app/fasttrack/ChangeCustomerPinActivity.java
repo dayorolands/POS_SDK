@@ -13,7 +13,6 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.appzonegroup.app.fasttrack.model.AppConstants;
 import com.appzonegroup.app.fasttrack.model.ChangePinRequest;
 import com.appzonegroup.app.fasttrack.model.TokenRequest;
 import com.appzonegroup.app.fasttrack.ui.NonSwipeableViewPager;
@@ -132,7 +131,7 @@ public class ChangeCustomerPinActivity extends BaseActivity {
             }
 
         };
-        sendJSONPostRequestWithCallback(AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/SendToken", data, doOnsuccess, doOnError);
+        sendJSONPostRequestWithCallback(BuildConfig.API_HOST + "/CreditClubMiddleWareAPI/CreditClubStatic/SendToken", data, doOnsuccess, doOnError);
 
     }
 
@@ -188,7 +187,7 @@ public class ChangeCustomerPinActivity extends BaseActivity {
 
             data = gson.toJson(changePinRequest);
             showProgressBar("Processing");
-            String url = AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/PinChange";
+            String url = BuildConfig.API_HOST + "/CreditClubMiddleWareAPI/CreditClubStatic/PinChange";
             //sendPostRequest(url,data);
             new PostCallTask(getDialogProvider(), this, this).execute(url, data);
 

@@ -84,22 +84,27 @@ fun SmallMenuButton(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 10.dp)
-                .weight(1f)
-                .clickable(onClick = onClick),
+                .weight(1f),
             elevation = 2.dp,
             shape = RoundedCornerShape(20.dp),
         ) {
-            Image(
-                icon,
-                contentDescription = null,
-                alignment = Alignment.Center,
-                modifier = Modifier
-                    .padding(30.dp)
-                    .size(35.dp),
-                colorFilter = if (menuButtonIconTint.alpha == 0f) null else ColorFilter.tint(
-                    menuButtonIconTint
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.clickable(onClick = onClick),
+            ) {
+                Image(
+                    icon,
+                    contentDescription = null,
+                    alignment = Alignment.Center,
+                    modifier = Modifier
+                        .padding(30.dp)
+                        .size(35.dp),
+                    colorFilter = if (menuButtonIconTint.alpha == 0f) null else ColorFilter.tint(
+                        menuButtonIconTint
+                    )
                 )
-            )
+            }
         }
 
         Column(modifier = Modifier.height(20.dp)) {
