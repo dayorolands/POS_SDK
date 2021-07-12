@@ -9,10 +9,16 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
-class GenericResponse {
+data class GenericResponse<T>(
     @SerialName("ResponseCode")
-    var responseCode = ""
+    val responseCode: String = "",
 
     @SerialName("ResponseMessage")
-    var responseMessage = ""
-}
+    val responseMessage: String = "",
+
+    @SerialName("IsSuccessful")
+    val isSuccessful: Boolean = false,
+
+    @SerialName("Data")
+    val data: T? = null,
+)

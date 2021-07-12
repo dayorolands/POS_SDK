@@ -6,6 +6,8 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityDepositBinding
 import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
+import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.request.DepositRequest
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
@@ -21,6 +23,7 @@ import java.time.Instant
 class DepositActivity : CustomerBaseActivity() {
     private val binding by contentView<DepositActivity, ActivityDepositBinding>(R.layout.activity_deposit)
     override val functionId = FunctionIds.DEPOSIT
+    private val staticService: StaticService by retrofitService()
 
     override fun onCustomerReady(savedInstanceState: Bundle?) {
 
@@ -49,11 +52,11 @@ class DepositActivity : CustomerBaseActivity() {
         }
 
         binding.depositBtn.setOnClickListener {
-            attemptDeposit()
+            mainScope.launch { onDepositClick() }
         }
     }
 
-    private fun attemptDeposit() {
+    private suspend fun onDepositClick() {
         val amount = binding.depositAmountEt.value
         if (amount.isEmpty()) {
             indicateError("Amount should be greater than 0", binding.depositAmountEt)
@@ -78,6 +81,7 @@ class DepositActivity : CustomerBaseActivity() {
             indicateError("Please enter your PIN", binding.agentPinEt)
             return
         }
+
         val depositRequest = DepositRequest(
             agentPhoneNumber = localStorage.agentPhone,
             institutionCode = localStorage.institutionCode,
@@ -86,46 +90,53 @@ class DepositActivity : CustomerBaseActivity() {
             amount = amount,
             geoLocation = gps.geolocationString,
         )
-
-        mainScope.launch {
-            dialogProvider.showProgressBar("Processing Transaction", "Please wait...")
-            val (response) = safeRunIO {
-                creditClubMiddleWareAPI.staticService.deposit(depositRequest)
+        renderTransactionSummary(
+            amount = amount.toDouble(),
+            onProceed = {
+                attemptDeposit(depositRequest)
+            },
+            fetchFeeAgent = {
+                staticService.getDepositFee(request = depositRequest)
             }
-            response ?: return@launch showNetworkError(finishOnClose)
+        )
+    }
 
-            if (response.isSuccessful) {
-                dialogProvider.showSuccess("The deposit was successful", finishOnClose)
-            } else {
-                val message =
-                    response.responseMessage ?: "An error occurred. Please try again later"
-                dialogProvider.showError(message, finishOnClose)
-            }
+    private suspend fun attemptDeposit(depositRequest: DepositRequest) {
+        dialogProvider.showProgressBar("Processing Transaction", "Please wait...")
+        val (response) = safeRunIO {
+            staticService.deposit(depositRequest)
+        }
+        dialogProvider.hideProgressBar()
 
-            if (Platform.hasPrinter) {
-                printer.printAsync(
-                    DepositReceipt(
-                        this@DepositActivity,
-                        depositRequest,
-                        accountInfo,
-                        isSuccessful = response.isSuccessful,
-                        reason = response.responseMessage,
-                        transactionDate = Instant.now()
-                            .toString(CREDIT_CLUB_REQUEST_DATE_PATTERN)
-                            .replace("T", " "),
-                    )
-                ) { printerStatus ->
-                    if (printerStatus != PrinterStatus.READY) showError(printerStatus.message)
-                }
+        if (response == null) return showNetworkError(finishOnClose)
+        if (response.isSuccessful) {
+            dialogProvider.showSuccess("The deposit was successful", finishOnClose)
+        } else {
+            val message = response.responseMessage ?: "An error occurred. Please try again later"
+            dialogProvider.showError(message, finishOnClose)
+        }
+
+        if (Platform.hasPrinter) {
+            val printerStatus = printer.print(
+                DepositReceipt(
+                    this@DepositActivity,
+                    depositRequest,
+                    accountInfo,
+                    isSuccessful = response.isSuccessful,
+                    reason = response.responseMessage,
+                    transactionDate = Instant.now()
+                        .toString(CREDIT_CLUB_REQUEST_DATE_PATTERN)
+                        .replace("T", " "),
+                )
+            )
+            if (printerStatus != PrinterStatus.READY) {
+                dialogProvider.showError(printerStatus.message)
             }
         }
     }
 
     override fun indicateError(message: String?, view: EditText?) {
         view?.error = message
-
-        binding.depositBtn.isClickable = true
-
         view?.requestFocus()
     }
 }

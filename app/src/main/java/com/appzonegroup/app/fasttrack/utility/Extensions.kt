@@ -6,12 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.fragment.HomeFragmentDirections
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.Routes
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.model.AppFunctionUsage
 import com.creditclub.core.data.request.BalanceEnquiryRequest
@@ -24,15 +22,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-fun Activity.logout(block: (Intent.() -> Unit)? = null) {
+fun Activity.logout() {
     val intent = Intent(applicationContext, LoginActivity::class.java)
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
     intent.putExtra("LOGGED_OUT", true)
-
-    if (block != null) intent.apply(block)
 
     finish()
     startActivity(intent)
@@ -147,7 +143,7 @@ fun CreditClubFragment.openPageById(id: Int) {
             ioScope.launch { logFunctionUsage(FunctionIds.CUSTOMER_BALANCE_ENQUIRY) }
 //                startActivity(AccountDetailsActivity::class.java)
             (requireActivity() as CreditClubActivity).requireAccountInfo(
-                options = arrayOf(
+                options = listOf(
                     CustomerRequestOption.AccountNumber
                 )
             ) {

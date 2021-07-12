@@ -57,7 +57,6 @@ val apiModule = module {
             .connectTimeout(2, TimeUnit.MINUTES)
             .readTimeout(3, TimeUnit.MINUTES)
             .writeTimeout(3, TimeUnit.MINUTES)
-            .retryOnConnectionFailure(false)
             .cache(cache)
 
         builder

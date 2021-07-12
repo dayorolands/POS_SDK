@@ -50,7 +50,7 @@ inline val Dialog.showOnClose: DialogListenerBlock<*>
 
 fun CreditClubActivity.requireAccountInfo(
     title: String = "Get customer by...",
-    options: Array<CustomerRequestOption> = arrayOf(
+    options: List<CustomerRequestOption> = listOf(
         CustomerRequestOption.PhoneNumber,
         CustomerRequestOption.AccountNumber
     ),
@@ -66,9 +66,9 @@ fun CreditClubActivity.requireAccountInfo(
 
 suspend fun CreditClubActivity.requireAccountInfo(
     title: String = "Get customer by...",
-    options: Array<CustomerRequestOption> = arrayOf(
+    options: List<CustomerRequestOption> = listOf(
         CustomerRequestOption.PhoneNumber,
-        CustomerRequestOption.AccountNumber
+        CustomerRequestOption.AccountNumber,
     ),
 ): AccountInfo? {
     if (options.size == 1) {
@@ -85,7 +85,7 @@ suspend fun CreditClubActivity.requireAccountInfo(
 
 fun CreditClubActivity.requestAccountInfo(
     option: CustomerRequestOption,
-    continuation: Continuation<AccountInfo?>
+    continuation: Continuation<AccountInfo?>,
 ) {
     val params = when (option) {
         CustomerRequestOption.PhoneNumber -> TextFieldParams(
@@ -411,7 +411,7 @@ inline fun <T> stripType(crossinline block: DialogListenerBlock<T>): DialogListe
 
 suspend fun CreditClubActivity.showCustomerRequestOptions(
     title: CharSequence,
-    available: Array<CustomerRequestOption>,
+    available: List<CustomerRequestOption>,
 ): CustomerRequestOption? = suspendCoroutine { continuation ->
     val dialog = Dialog(this).apply {
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

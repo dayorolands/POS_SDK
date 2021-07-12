@@ -98,7 +98,8 @@ fun ReceiptDetails(
                     val status = posPrinter.print(printJob)
                     errorMessage = if (status != PrinterStatus.READY) status.message else ""
                 }
-            }) {
+            },
+        ) {
             Text(text = if (Platform.isPOS) "PRINT RECEIPT" else "SHARE RECEIPT")
         }
     }

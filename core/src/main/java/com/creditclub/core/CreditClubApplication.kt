@@ -3,11 +3,11 @@ package com.creditclub.core
 import android.app.Application
 import androidx.work.Configuration
 import androidx.work.WorkManager
-import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.api.VersionService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.util.safeRunIO
 import com.google.android.play.core.missingsplits.MissingSplitsManagerFactory
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 
 
@@ -35,9 +35,8 @@ open class CreditClubApplication : Application() {
     }
 
     open suspend fun getLatestVersion() = safeRunIO {
-        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI = get()
-        val newVersion =
-            creditClubMiddleWareAPI.versionService.getLatestVersionAndDownloadLink(otaAppName)
+        val versionService: VersionService by retrofitService()
+        val newVersion = versionService.getLatestVersionAndDownloadLink(otaAppName)
 
         if (newVersion != null) {
             val previousVersion = appDataStorage.latestVersion
