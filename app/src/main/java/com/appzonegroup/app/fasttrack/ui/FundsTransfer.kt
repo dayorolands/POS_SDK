@@ -532,9 +532,9 @@ private fun FundsTransferSummary(
     }
     val formattedAgentFee = remember(agentFee) { agentFee?.totalFee?.toCurrencyFormat() }
     if (agentFee == null) {
-        Loading(message = "Loading Agent Fee")
+        Loading(message = "Loading service charge")
     } else {
-        DataItem(label = "Agent Fee", value = formattedAgentFee ?: "NA")
+        DataItem(label = "Service charge", value = formattedAgentFee ?: "NA")
     }
 
     ErrorMessage(errorMessage)

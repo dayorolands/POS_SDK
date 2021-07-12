@@ -11,29 +11,29 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SendTokenRequest(
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null,
+    val agentPhoneNumber: String? = null,
 
     @SerialName("CustomerAccountNumber")
-    var customerAccountNumber: String? = null,
+    val customerAccountNumber: String? = null,
 
     @SerialName("CustomerPhoneNumber")
-    var customerPhoneNumber: String? = null,
+    val customerPhoneNumber: String? = null,
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = null,
+    val institutionCode: String? = null,
 
     @SerialName("AgentPin")
-    var agentPin: String? = null,
+    val agentPin: String? = null,
 
     @SerialName("Amount")
-    var amount: Double = 0.0,
+    val amount: Double = 0.0,
 
     @SerialName("OperationType")
-    var operationType: String? = null,
+    val operationType: String? = null,
 
     @SerialName("ReferenceNumber")
-    var referenceNumber: String? = null,
+    val referenceNumber: String? = null,
 
     @SerialName("IsPinChange")
-    var isPinChange: Boolean = false,
+    val isPinChange: Boolean = false,
 )

@@ -221,11 +221,8 @@ suspend fun CreditClubActivity.sendToken(
         amount = amount,
         isPinChange = operationType == TokenType.PinChange,
         operationType = operationType.label,
+        referenceNumber = if (operationType != TokenType.Withdrawal) "$reference" else null,
     )
-
-    if (operationType != TokenType.Withdrawal) {
-        sendTokenRequest.referenceNumber = "$reference"
-    }
 
     dialogProvider.showProgressBar("Sending Token")
     val (data, error) = safeRunIO {
