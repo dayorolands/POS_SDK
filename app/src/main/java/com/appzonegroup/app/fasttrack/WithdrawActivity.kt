@@ -188,40 +188,27 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
     }
 
     private suspend fun withdraw(request: WithdrawalRequest) {
-
         dialogProvider.showProgressBar("Processing transaction")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.withdrawal(request)
+            staticService.withdrawal(request)
         }
         dialogProvider.hideProgressBar()
 
-        if (error != null) return dialogProvider.showError(error, finishOnClose)
-        response ?: return dialogProvider.showError(
+        if (error != null) return dialogProvider.showError(error)
+        if (response == null) return dialogProvider.showError(
             "Transaction failed. Please try again later",
             finishOnClose
         )
 
-        if (response.isSuccessful) {
-            dialogProvider.showSuccess("The withdrawal was successful", finishOnClose)
-        } else {
-            dialogProvider.showError(response.responseMessage, finishOnClose)
-        }
-
-        if (Platform.hasPrinter) {
-            val receipt = WithdrawalReceipt(
-                this@WithdrawActivity,
-                request,
-                accountInfo,
-                Instant.now().toString("dd-MM-yyyy hh:mm"),
-                isSuccessful = response.isSuccessful,
-                reason = response.responseMessage,
-            )
-
-            val printerStatus = printer.print(receipt, "Printing...")
-            if (printerStatus !== PrinterStatus.READY) {
-                showError(printerStatus.message)
-            }
-        }
+        val receipt = WithdrawalReceipt(
+            this@WithdrawActivity,
+            request,
+            accountInfo,
+            Instant.now().toString("dd-MM-yyyy hh:mm"),
+            isSuccessful = response.isSuccessful,
+            reason = response.responseMessage,
+        )
+        renderReceiptDetails(receipt)
     }
 }
 

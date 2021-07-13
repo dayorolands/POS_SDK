@@ -457,40 +457,45 @@ private fun RowScope.SmallMenuButton(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 10.dp)
-                .weight(1f)
-                .clickable(onClick = onClick),
+                .weight(1f),
             elevation = 2.dp,
             shape = RoundedCornerShape(20.dp),
         ) {
-            if (draw) {
-                Box(
-                    modifier = Modifier
-                        .padding(30.dp)
-                        .requiredSize(45.dp)
-                        .drawBehind {
-                            drawIntoCanvas { canvas ->
-                                drawable?.let {
-                                    it.setBounds(
-                                        0,
-                                        0,
-                                        size.width.roundToInt(),
-                                        size.height.roundToInt()
-                                    )
-                                    it.draw(canvas.nativeCanvas)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.clickable(onClick = onClick),
+            ) {
+                if (draw) {
+                    Box(
+                        modifier = Modifier
+                            .padding(30.dp)
+                            .requiredSize(45.dp)
+                            .drawBehind {
+                                drawIntoCanvas { canvas ->
+                                    drawable?.let {
+                                        it.setBounds(
+                                            0,
+                                            0,
+                                            size.width.roundToInt(),
+                                            size.height.roundToInt()
+                                        )
+                                        it.draw(canvas.nativeCanvas)
+                                    }
                                 }
                             }
-                        }
-                )
-            } else {
-                Image(
-                    painterResource(id = icon),
-                    contentDescription = null,
-                    alignment = Alignment.Center,
-                    modifier = Modifier
-                        .padding(30.dp)
-                        .size(35.dp),
-                    colorFilter = if (tint.alpha == 0f) null else ColorFilter.tint(tint),
-                )
+                    )
+                } else {
+                    Image(
+                        painterResource(id = icon),
+                        contentDescription = null,
+                        alignment = Alignment.Center,
+                        modifier = Modifier
+                            .padding(30.dp)
+                            .size(35.dp),
+                        colorFilter = if (tint.alpha == 0f) null else ColorFilter.tint(tint),
+                    )
+                }
             }
         }
 
@@ -527,9 +532,9 @@ private fun FundsTransferSummary(
     }
     val formattedAgentFee = remember(agentFee) { agentFee?.totalFee?.toCurrencyFormat() }
     if (agentFee == null) {
-        Loading(message = "Loading Agent Fee")
+        Loading(message = "Loading service charge")
     } else {
-        DataItem(label = "Agent Fee", value = formattedAgentFee ?: "NA")
+        DataItem(label = "Service charge", value = formattedAgentFee ?: "NA")
     }
 
     ErrorMessage(errorMessage)

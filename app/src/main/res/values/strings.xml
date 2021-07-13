@@ -2,6 +2,7 @@
     <string name="app_name">CreditClub Plus</string>
     <string name="ota_app_name">CreditClub</string>
     <string name="institution_name">CreditClub</string>
+    <string name="activation_instructions" />
     <string name="institution_website">https://www.appzonegroup.com/group/appzone-pos</string>
     <string name="home">Home</string>
     <string name="title_activity_login">Login</string>
@@ -460,6 +461,7 @@
     <string name="ussd_withdrawal">USSD Withdrawal</string>
     <string name="generate_reference">Generate Reference</string>
     <string name="ive_made_payment">I\'ve made payment</string>
+    <string name="checking_transaction_status">Checking transaction status</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>

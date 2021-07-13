@@ -9,11 +9,11 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-interface CoralPayService {
-    @POST("CoralpayCashout/GenerateReference")
+interface UssdCashoutService {
+    @POST("USSDCashout/GenerateReference")
     suspend fun generateReference(@Body request: CoralPayReferenceRequest): ApiResponse<CoraPayReference>?
 
-    @GET("CoralpayCashout/GetTransactionStatus")
+    @GET("USSDCashout/GetTransactionStatus")
     suspend fun getTransactionStatus(
         @Query("RequestReference") requestReference: String,
         @Query("InstitutionCode") institutionCode: String?,

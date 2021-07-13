@@ -34,6 +34,17 @@
                     android:textColor="@color/blue"
                     android:textSize="25dp" />
 
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/form_margin_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="@dimen/form_margin_horizontal"
+                    android:layout_marginBottom="@dimen/ten_dp"
+                    android:text="@string/activation_instructions"
+                    android:textColor="@color/blue"
+                    android:textSize="14sp" />
+
                 <com.appzonegroup.app.fasttrack.ui.EditText
                     android:id="@+id/phone_number_et"
                     style="@style/defaultEditText"

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Polaris Agents</string>
     <string name="ota_app_name">Polaris</string>
+    <string name="activation_instructions">To activate the SurePadi app. Kindly email psp@polarisbanklimited.com or visit the closest Polaris Bank branch. Welcome on board.</string>
     <string name="institution_name">Polaris Bank</string>
     <string name="institution_website">https://www.polarisbanklimited.com</string>
     <string name="funds_transfer_same_bank">Polaris Bank</string>

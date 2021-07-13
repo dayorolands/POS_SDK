@@ -13,8 +13,8 @@ data class CoraPayReference(
 
 @Serializable
 data class CoraPayTransactionStatus(
-    @SerialName("Status")
-    val status: Int,
+    @SerialName("Data")
+    val data: Int,
 ) {
     companion object {
         const val Pending = 1

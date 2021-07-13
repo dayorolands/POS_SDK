@@ -114,19 +114,6 @@ interface StaticService {
         @Query("DeviceType") deviceType: Int
     ): BackendResponse?
 
-    @GET("CreditClubStatic/GetAssociations")
-    suspend fun getAssociations(
-        @Query("institutionCode") institutionCode: String?,
-        @Query("startIndex") startIndex: String,
-        @Query("limit") limit: String
-    ): ResponseBody
-
-    @GET("CreditClubStatic/GetMembers")
-    suspend fun getMembers(@Query("associationID") associationID: String): ResponseBody
-
-    @GET("CreditClubStatic/GetInstitutions")
-    suspend fun getInstitutions(): List<Institution>?
-
     @GET("CreditClubStatic/GetCustomerAccountByPhoneNumber")
     suspend fun getCustomerAccountByPhoneNumber(
         @Query("institutionCode") institutionCode: String?,
