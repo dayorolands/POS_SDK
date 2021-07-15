@@ -51,7 +51,7 @@ val posModule = module {
     single {
         androidContext().readRawJsonFile(R.raw.pos_tenant, PosTenant.serializer())
     }
-    single(override = true) {
+    single<RemoteConnectionInfo>(override = true) {
         val infoList = get<PosTenant>().infoList
         if (infoList.isEmpty()) InvalidRemoteConnectionInfo
         else infoList[1]
