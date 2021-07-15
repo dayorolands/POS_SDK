@@ -98,18 +98,6 @@
                 android:inputType="number"
                 android:maxLength="11" />
 
-            <com.appzonegroup.app.fasttrack.ui.EditText
-                android:id="@+id/agent_pin_et"
-                style="@style/defaultEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_password"
-                android:drawableLeft="@drawable/ic_password"
-                android:hint="@string/agentPIN_hint"
-                android:inputType="numberPassword"
-                android:maxLength="4" />
-
-
             <com.appzonegroup.app.fasttrack.ui.CustomButton
                 android:id="@+id/deposit_btn"
                 style="@style/button_style"

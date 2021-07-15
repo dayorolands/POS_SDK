@@ -12,7 +12,6 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.appzonegroup.app.fasttrack.model.AppConstants
 import com.appzonegroup.app.fasttrack.model.LoanProduct
 import com.appzonegroup.app.fasttrack.model.LoanRequestCreditClub
 import com.appzonegroup.app.fasttrack.model.Response
@@ -77,7 +76,7 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
             val url = String.format(
                 Locale.getDefault(),
                 "%s/CreditClubMiddleWareAPI/CreditClubStatic/GetEligibleLoanProducts?institutionCode=%s&associationID=%s&memberID=%s&customerAccountNumber=%s",
-                AppConstants.getBaseUrl(),
+                BuildConfig.API_HOST,
                 localStorage.institutionCode,  //associationDAO.Get(selectedAssociationID).getId(),
                 loanRequest_marketAssociations_et!!.text.toString().trim { it <= ' ' },
                 loanRequest_memberID_et!!.text.toString().trim { it <= ' ' },
@@ -232,7 +231,7 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
         loanRequest.setCustomerName(customerName);
         loanRequest.setBVN(BVN);*/showProgressBar("Make Loan Request")
         sendRequestLoanPostRequest(
-            AppConstants.getBaseUrl() + "/CreditClubMiddleWareAPI/CreditClubStatic/LoanRequest",
+            BuildConfig.API_HOST + "/CreditClubMiddleWareAPI/CreditClubStatic/LoanRequest",
             data
         )
     }

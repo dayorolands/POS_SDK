@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -35,14 +36,19 @@ import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.api.FundsTransferService
+import com.creditclub.core.data.model.AccountInfo
+import com.creditclub.core.data.model.AgentFee
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.request.FundsTransferRequest
+import com.creditclub.core.data.response.GenericResponse
 import com.creditclub.core.data.response.NameEnquiryResponse
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.*
 import com.creditclub.pos.printer.PrintJob
 import com.creditclub.ui.*
+import com.creditclub.ui.theme.CreditClubTheme
+import com.google.accompanist.insets.ProvideWindowInsets
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
@@ -78,8 +84,9 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
             this != null && this > 0.0
         }
     }
-    val formattedAmount = remember(amountString, amountIsValid) {
-        if (amountIsValid) amountString.toDouble().toCurrencyFormat() else ""
+    val amount = remember(amountString) { if (amountIsValid) amountString.toDouble() else 0.0 }
+    val formattedAmount = remember(amount, amountIsValid) {
+        if (amountIsValid) amount.toCurrencyFormat() else ""
     }
     var errorMessage by remember(receiverAccountNumber, amountString) {
         mutableStateOf("")
@@ -375,6 +382,29 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 item(key = "narration") {
                     DataItem(label = "Narration", value = narration)
                 }
+                item(key = "summary") {
+                    FundsTransferSummary(
+                        fetchFeeAgent = {
+                            val nameEnquiryRequest = FundsTransferRequest(
+                                agentPhoneNumber = localStorage.agentPhone,
+                                institutionCode = localStorage.institutionCode,
+                                authToken = "95C1D8B4-7589-4F70-8F20-473E89FB5F01",
+                                beneficiaryAccountNumber = receiverAccountNumber,
+                                amountInNaira = amountString.toDouble(),
+                                isToRelatedCommercialBank = isSameBank ?: false,
+                                externalTransactionReference = transactionReference,
+                                geoLocation = gps.geolocationString,
+                                narration = narration.trim { it <= ' ' },
+                                beneficiaryInstitutionCode = bank?.code,
+                                beneficiaryAccountName = nameEnquiryResponse?.beneficiaryAccountName,
+                                beneficiaryBVN = nameEnquiryResponse?.beneficiaryBVN,
+                                beneficiaryKYC = nameEnquiryResponse?.beneficiaryKYC,
+                                nameEnquirySessionID = nameEnquiryResponse?.nameEnquirySessionID,
+                            )
+                            fundsTransferService.getTransferFee(request = nameEnquiryRequest)
+                        },
+                    )
+                }
             }
 
             item(key = "error") {
@@ -427,40 +457,45 @@ private fun RowScope.SmallMenuButton(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 10.dp)
-                .weight(1f)
-                .clickable(onClick = onClick),
+                .weight(1f),
             elevation = 2.dp,
             shape = RoundedCornerShape(20.dp),
         ) {
-            if (draw) {
-                Box(
-                    modifier = Modifier
-                        .padding(30.dp)
-                        .requiredSize(45.dp)
-                        .drawBehind {
-                            drawIntoCanvas { canvas ->
-                                drawable?.let {
-                                    it.setBounds(
-                                        0,
-                                        0,
-                                        size.width.roundToInt(),
-                                        size.height.roundToInt()
-                                    )
-                                    it.draw(canvas.nativeCanvas)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.clickable(onClick = onClick),
+            ) {
+                if (draw) {
+                    Box(
+                        modifier = Modifier
+                            .padding(30.dp)
+                            .requiredSize(45.dp)
+                            .drawBehind {
+                                drawIntoCanvas { canvas ->
+                                    drawable?.let {
+                                        it.setBounds(
+                                            0,
+                                            0,
+                                            size.width.roundToInt(),
+                                            size.height.roundToInt()
+                                        )
+                                        it.draw(canvas.nativeCanvas)
+                                    }
                                 }
                             }
-                        }
-                )
-            } else {
-                Image(
-                    painterResource(id = icon),
-                    contentDescription = null,
-                    alignment = Alignment.Center,
-                    modifier = Modifier
-                        .padding(30.dp)
-                        .size(35.dp),
-                    colorFilter = if (tint.alpha == 0f) null else ColorFilter.tint(tint),
-                )
+                    )
+                } else {
+                    Image(
+                        painterResource(id = icon),
+                        contentDescription = null,
+                        alignment = Alignment.Center,
+                        modifier = Modifier
+                            .padding(30.dp)
+                            .size(35.dp),
+                        colorFilter = if (tint.alpha == 0f) null else ColorFilter.tint(tint),
+                    )
+                }
             }
         }
 
@@ -476,29 +511,31 @@ private fun RowScope.SmallMenuButton(
 }
 
 @Composable
-fun DataItem(label: String, value: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 16.dp)
-        ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.subtitle2,
-                modifier = Modifier
-                    .padding(bottom = 6.dp)
-                    .fillMaxWidth()
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.subtitle1,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
+private fun FundsTransferSummary(
+    fetchFeeAgent: suspend CoroutineScope.() -> GenericResponse<AgentFee>?,
+) {
+    var errorMessage by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val agentFee: AgentFee? by produceState<AgentFee?>(null) {
+        errorMessage = ""
+        val (response, error) = safeRunIO {
+            fetchFeeAgent()
         }
-        Divider()
+        if (error != null) {
+            errorMessage = error.getMessage(context)
+            return@produceState
+        }
+        if (response == null) {
+            return@produceState
+        }
+        value = response.data
     }
+    val formattedAgentFee = remember(agentFee) { agentFee?.totalFee?.toCurrencyFormat() }
+    if (agentFee == null) {
+        Loading(message = "Loading service charge")
+    } else {
+        DataItem(label = "Service charge", value = formattedAgentFee ?: "NA")
+    }
+
+    ErrorMessage(errorMessage)
 }

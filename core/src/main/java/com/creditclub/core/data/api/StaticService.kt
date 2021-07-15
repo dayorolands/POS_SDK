@@ -4,6 +4,7 @@ import com.creditclub.core.data.model.*
 import com.creditclub.core.data.request.*
 import com.creditclub.core.data.response.ApiResponse
 import com.creditclub.core.data.response.BackendResponse
+import com.creditclub.core.data.response.GenericResponse
 import com.creditclub.core.data.response.MiniStatementResponse
 import okhttp3.ResponseBody
 import retrofit2.http.Body
@@ -31,6 +32,12 @@ interface StaticService {
 
     @POST("CreditClubStatic/WithDrawal")
     suspend fun withdrawal(@Body request: WithdrawalRequest): BackendResponse?
+
+    @POST("CreditClubStatic/GetWithDrawalFee")
+    suspend fun getWithdrawalFee(@Body request: WithdrawalRequest): GenericResponse<AgentFee>?
+
+    @POST("CreditClubStatic/GetDepositFee")
+    suspend fun getDepositFee(@Body request: DepositRequest): GenericResponse<AgentFee>?
 
     @POST("CreditClubStatic/SendToken")
     suspend fun sendToken(@Body sendTokenRequest: SendTokenRequest): BackendResponse?
@@ -106,19 +113,6 @@ interface StaticService {
         @Query("AppVersion") appVersion: String,
         @Query("DeviceType") deviceType: Int
     ): BackendResponse?
-
-    @GET("CreditClubStatic/GetAssociations")
-    suspend fun getAssociations(
-        @Query("institutionCode") institutionCode: String?,
-        @Query("startIndex") startIndex: String,
-        @Query("limit") limit: String
-    ): ResponseBody
-
-    @GET("CreditClubStatic/GetMembers")
-    suspend fun getMembers(@Query("associationID") associationID: String): ResponseBody
-
-    @GET("CreditClubStatic/GetInstitutions")
-    suspend fun getInstitutions(): List<Institution>?
 
     @GET("CreditClubStatic/GetCustomerAccountByPhoneNumber")
     suspend fun getCustomerAccountByPhoneNumber(

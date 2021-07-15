@@ -8,6 +8,8 @@ import com.appzonegroup.app.fasttrack.fragment.WithdrawalViewModel
 import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
+import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.request.WithdrawalRequest
 import com.creditclub.core.type.TokenType
 import com.creditclub.core.util.*
@@ -31,6 +33,7 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
     private val retrievalReferenceNumber = generateRRN()
 
     private val viewModel: WithdrawalViewModel by viewModels()
+    private val staticService: StaticService by retrofitService()
 
     override fun onCustomerReady(savedInstanceState: Bundle?) {
         binding.lifecycleOwner = this
@@ -156,15 +159,12 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
             indicateError("Please enter a valid token", binding.tokenEt)
             return
         }
-
-        val agentPin = dialogProvider.getPin("Enter agent PIN") ?: return
         val request = WithdrawalRequest(
             agentPhoneNumber = localStorage.agent?.phoneNumber,
             customerAccountNumber = accountInfo.number,
             amount = amount,
             institutionCode = localStorage.institutionCode,
             token = token,
-            agentPin = agentPin,
             customerPin = customerPin,
             retrievalReferenceNumber = retrievalReferenceNumber,
             additionalInformation = Json.encodeToString(
@@ -174,40 +174,41 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
                 )
             ),
         )
+        renderTransactionSummary(
+            amount = amount.toDouble(),
+            onProceed = {
+                val agentPin =
+                    dialogProvider.getPin("Enter agent PIN") ?: return@renderTransactionSummary
+                withdraw(request.copy(agentPin = agentPin))
+            },
+            fetchFeeAgent = {
+                staticService.getWithdrawalFee(request)
+            }
+        )
+    }
+
+    private suspend fun withdraw(request: WithdrawalRequest) {
         dialogProvider.showProgressBar("Processing transaction")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.withdrawal(request)
+            staticService.withdrawal(request)
         }
         dialogProvider.hideProgressBar()
 
-        if (error != null) return dialogProvider.showError(error, finishOnClose)
-        response ?: return dialogProvider.showError(
+        if (error != null) return dialogProvider.showError(error)
+        if (response == null) return dialogProvider.showError(
             "Transaction failed. Please try again later",
             finishOnClose
         )
 
-        if (response.isSuccessful) {
-            dialogProvider.showSuccess("The withdrawal was successful", finishOnClose)
-        } else {
-            dialogProvider.showError(response.responseMessage, finishOnClose)
-            binding.withdrawBtn.isClickable = true
-        }
-
-        if (Platform.hasPrinter) {
-            val receipt = WithdrawalReceipt(
-                this@WithdrawActivity,
-                request,
-                accountInfo,
-                Instant.now().toString("dd-MM-yyyy hh:mm"),
-                isSuccessful = response.isSuccessful,
-                reason = response.responseMessage,
-            )
-
-            val printerStatus = printer.print(receipt, "Printing...")
-            if (printerStatus !== PrinterStatus.READY) {
-                showError(printerStatus.message)
-            }
-        }
+        val receipt = WithdrawalReceipt(
+            this@WithdrawActivity,
+            request,
+            accountInfo,
+            Instant.now().toString("dd-MM-yyyy hh:mm"),
+            isSuccessful = response.isSuccessful,
+            reason = response.responseMessage,
+        )
+        renderReceiptDetails(receipt)
     }
 }
 
