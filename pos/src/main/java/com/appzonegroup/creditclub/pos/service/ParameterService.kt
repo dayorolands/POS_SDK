@@ -2,9 +2,7 @@ package com.appzonegroup.creditclub.pos.service
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.res.Resources
 import android.os.Looper
-import androidx.activity.ComponentActivity
 import androidx.annotation.RawRes
 import androidx.core.content.edit
 import com.appzonegroup.creditclub.pos.R
@@ -23,7 +21,8 @@ import com.creditclub.pos.PosParameter
 import com.creditclub.pos.RemoteConnectionInfo
 import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.model.ConnectionInfo
-import com.creditclub.pos.utils.TripleDesCipher
+import com.creditclub.pos.utils.asDesEdeKey
+import com.creditclub.pos.utils.decrypt
 import com.creditclub.pos.utils.nonNullStringStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -35,15 +34,12 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.io.IOException
 import java.security.SecureRandom
 import java.time.Instant
 import java.util.*
 import kotlin.reflect.KProperty
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/27/2019.
- * Appzone Ltd
- */
 class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : PosParameter,
     KoinComponent {
     private val prefs: SharedPreferences = run {
@@ -70,160 +66,32 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             defaultJson.decodeFromString(ParameterObject.serializer(), managementDataString)
         }.data ?: ParameterObject()
 
-    override suspend fun downloadKeys(activity: ComponentActivity) {
-        withContext(Dispatchers.IO) {
-            downloadMasterKey()
-            downloadSessionKey()
-            downloadPinKey()
-        }
+    override suspend fun downloadKeys() {
+        val terminalId = config.terminalId
+        val masterKeyBytes = downloadKey(
+            terminalId = terminalId,
+            processingCode = "9A0000",
+            decryptionKey = posMode.key1.hexBytes xor posMode.key2.hexBytes,
+        )
+        val sessionKeyBytes = downloadKey(
+            terminalId = terminalId,
+            processingCode = "9B0000",
+            decryptionKey = masterKeyBytes,
+        )
+        val pinKeyBytes = downloadKey(
+            terminalId = terminalId,
+            processingCode = "9G0000",
+            decryptionKey = masterKeyBytes,
+        )
 
+        pinKey = pinKeyBytes.hexString
+        masterKey = masterKeyBytes.hexString
+        sessionKey = sessionKeyBytes.hexString
         updatedAt = Instant.now().format("MMdd")
     }
 
-    @Throws(KeyDownloadException::class)
-    private fun downloadMasterKey() {
-        val dateParams = TransmissionDateParams()
-        val packager = ISO87Packager()
-
-        val isoMsg = ISOMsg()
-        isoMsg.mti = "0800"
-        isoMsg.set(3, "9A0000")
-        isoMsg.set(7, dateParams.transmissionDateTime)
-        val rrn = SecureRandom().nextInt(1000)
-        val rrnString = String.format("%06d", rrn)
-        isoMsg.set(11, rrnString)
-        isoMsg.set(12, dateParams.localTime)
-        isoMsg.set(13, dateParams.localDate)
-        isoMsg.set(41, config.terminalId)
-        isoMsg.packager = packager
-
-        isoMsg.log()
-        val isoRequestLog = isoMsg.generateRequestLog()
-        val (output, error) = safeRun {
-            SocketJob.execute(posMode, isoMsg.pack())
-        }
-        if (output == null) {
-            isoRequestLog.saveToDb("TE")
-            throw error!!
-        } else {
-            isoMsg.unpack(output)
-            isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
-        }
-
-        debug("MESSAGE: " + String(output))
-        isoMsg.unpack(output)
-
-        isoMsg.log()
-
-        if (isoMsg.hasFailed) {
-            debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
-            throw KeyDownloadException(isoMsg.responseMessage)
-        }
-        val cryptKey = posMode.key1.hexBytes xor posMode.key2.hexBytes
-        val cryptData = isoMsg.getString(53).substring(0, 32).hexBytes
-
-        val tripleDesCipher = TripleDesCipher(cryptKey)
-        masterKey = tripleDesCipher.decrypt(cryptData).copyOf(16).hexString
-    }
-
-    @Throws(KeyDownloadException::class)
-    private fun downloadSessionKey() {
-        val dateParams = TransmissionDateParams()
-        val packager = ISO87Packager()
-
-        val isoMsg = ISOMsg()
-        isoMsg.mti = "0800"
-        isoMsg.set(3, "9B0000")
-        isoMsg.set(7, dateParams.transmissionDateTime)
-        val rrn = SecureRandom().nextInt(1000)
-        val rrnString = String.format("%06d", rrn)
-        isoMsg.set(11, rrnString)
-        isoMsg.set(12, dateParams.localTime)
-        isoMsg.set(13, dateParams.localDate)
-        isoMsg.set(41, config.terminalId)
-
-
-        isoMsg.packager = packager
-
-        isoMsg.log()
-
-        val isoRequestLog = isoMsg.generateRequestLog()
-        val (output, error) = safeRun {
-            SocketJob.execute(posMode, isoMsg.pack())
-        }
-        if (output == null) {
-            isoRequestLog.saveToDb("TE")
-            throw error!!
-        } else {
-            isoMsg.unpack(output)
-            isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
-        }
-
-        debug("MESSAGE: " + String(output))
-        isoMsg.unpack(output)
-        isoMsg.log()
-
-        if (isoMsg.hasFailed) {
-            debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
-            throw KeyDownloadException(isoMsg.responseMessage)
-        }
-        val cryptKey = masterKey.hexBytes
-        val cryptData = isoMsg.getString(53).substring(0, 32).hexBytes
-
-        val tripleDesCipher = TripleDesCipher(cryptKey)
-        sessionKey = tripleDesCipher.decrypt(cryptData).copyOf(16).hexString
-    }
-
-    @Throws(KeyDownloadException::class)
-    private fun downloadPinKey() {
-        val dateParams = TransmissionDateParams()
-        val packager = ISO87Packager()
-
-        val isoMsg = ISOMsg()
-        isoMsg.mti = "0800"
-        isoMsg.set(3, "9G0000")
-        isoMsg.set(7, dateParams.transmissionDateTime)
-        val rrn = SecureRandom().nextInt(1000)
-        val rrnString = String.format("%06d", rrn)
-        isoMsg.set(11, rrnString)
-        isoMsg.set(12, dateParams.localTime)
-        isoMsg.set(13, dateParams.localDate)
-        isoMsg.set(41, config.terminalId)
-
-        isoMsg.packager = packager
-
-        isoMsg.log()
-
-        val isoRequestLog = isoMsg.generateRequestLog()
-        val (output, error) = safeRun {
-            SocketJob.execute(posMode, isoMsg.pack())
-        }
-        if (output == null) {
-            isoRequestLog.saveToDb("TE")
-            throw error!!
-        } else {
-            isoMsg.unpack(output)
-            isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
-        }
-
-        debug("MESSAGE: " + String(output))
-        isoMsg.unpack(output)
-
-        isoMsg.log()
-        if (isoMsg.hasFailed) {
-            debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
-            throw KeyDownloadException(isoMsg.responseMessage)
-        }
-
-        val cryptKey = masterKey.hexBytes
-        val cryptData = isoMsg.getString(53).substring(0, 32).hexBytes
-
-        val tripleDesCipher = TripleDesCipher(cryptKey)
-        pinKey = tripleDesCipher.decrypt(cryptData).copyOf(16).hexString
-    }
-
     @Throws(ParameterDownloadException::class)
-    override suspend fun downloadParameters(activity: ComponentActivity) {
+    override suspend fun downloadParameters() {
         val dateParams = TransmissionDateParams()
 
         val isoMsg = ISOMsg().apply {
@@ -269,12 +137,12 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
             throw ParameterDownloadException(isoMsg.responseMessage)
         }
-
-        managementDataString = isoMsg.getString(62)?.parsePrivateFieldDataBlock()?.toString()
-            ?: throw ParameterDownloadException("")
+        val tlvString =
+            isoMsg.getString(62) ?: throw ParameterDownloadException("No management data")
+        managementDataString = parsePrivateFieldDataBlock(tlvString = tlvString).toString()
     }
 
-    override suspend fun downloadCapk(activity: ComponentActivity) {
+    override suspend fun downloadCapk() {
         val dateParams = TransmissionDateParams()
 
         val isoMsg = ISOMsg().apply {
@@ -323,14 +191,14 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
 
         val capk = isoMsg.managementDataTwo63?.run {
             if (contains("~")) parsePrivateFieldData()
-            else "${this}1".parseCapkData()
+            else parseCapkData("${this}1")
         }
 
         capkList = capk ?: throw PublicKeyDownloadException("")
     }
 
     @Throws(EmvAidDownloadException::class)
-    override suspend fun downloadAid(activity: ComponentActivity) {
+    override suspend fun downloadAid() {
         val dateParams = TransmissionDateParams()
 
         val isoMsg = ISOMsg().apply {
@@ -410,25 +278,25 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
     }
 
     @Throws(JSONException::class)
-    private inline fun String.parsePrivateFieldData(): JSONArray {
+    private fun String.parsePrivateFieldData(): JSONArray {
         val jsonArray = JSONArray()
-        for (s in split("~")) {
-            jsonArray.put(s.parsePrivateFieldDataBlock())
+        for (tlvString in split("~")) {
+            jsonArray.put(parsePrivateFieldDataBlock(tlvString))
         }
         return jsonArray
     }
 
     @Throws(JSONException::class)
-    private inline fun String.parsePrivateFieldDataBlock(): JSONObject {
+    private fun parsePrivateFieldDataBlock(tlvString: String): JSONObject {
         var index = 0
         val jsonObject = JSONObject()
 
-        while (index < length) {
-            val tag = substring(index, index + 2)
+        while (index < tlvString.length) {
+            val tag = tlvString.substring(index, index + 2)
             index += 2
-            val tagLength = substring(index, index + 3).toInt()
+            val tagLength = tlvString.substring(index, index + 3).toInt()
             index += 3
-            val tagData = substring(index, index + tagLength)
+            val tagData = tlvString.substring(index, index + tagLength)
             index += tagLength
             jsonObject.put(tag, tagData)
         }
@@ -436,18 +304,18 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         return jsonObject
     }
 
-    private fun String.parseCapkData(): JSONArray {
+    private fun parseCapkData(tlvString: String): JSONArray {
         val jsonArray = JSONArray()
-        val strLength = length
+        val strLength = tlvString.length
         var index = 0
         while (index < strLength) {
             val jsonObject = JSONObject()
             while (true) {
-                val tag = substring(index, index + 2)
+                val tag = tlvString.substring(index, index + 2)
                 index += 2
-                val tagLength = substring(index, index + 3).toInt()
+                val tagLength = tlvString.substring(index, index + 3).toInt()
                 index += 3
-                val tagData = substring(index, index + tagLength)
+                val tagData = tlvString.substring(index, index + tagLength)
                 index += tagLength
 
                 jsonObject.put(tag, tagData)
@@ -459,9 +327,6 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         return jsonArray
     }
 
-    class KeyDownloadException(message: String) :
-        CreditClubException("Key Download Failed. $message")
-
     class ParameterDownloadException(message: String) :
         CreditClubException("Parameter Download Failed. $message")
 
@@ -470,6 +335,51 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
 
     class EmvAidDownloadException(message: String) :
         CreditClubException("EMV Application AID Download Failed. $message")
+
+    private suspend fun downloadKey(
+        terminalId: String,
+        processingCode: String,
+        decryptionKey: ByteArray
+    ): ByteArray {
+        val dateParams = TransmissionDateParams()
+        val isoMsg = ISOMsg().apply {
+            packager = ISO87Packager()
+            mti = "0800"
+            processingCode3 = processingCode
+            transmissionDateTime7 = dateParams.transmissionDateTime
+            stan11 = String.format("%06d", SecureRandom().nextInt(1000))
+            localTransactionTime12 = dateParams.localTime
+            localTransactionDate13 = dateParams.localDate
+            terminalId41 = terminalId
+        }
+        debugOnly { isoMsg.log() }
+        val (output, error) = safeRunIO { SocketJob.execute(posMode, isoMsg.pack()) }
+        val isoRequestLog = isoMsg.generateRequestLog()
+        if (output == null) {
+            isoRequestLog.saveToDb("TE")
+            throw error ?: IOException("No response")
+        }
+        isoMsg.unpack(output)
+        withContext(Dispatchers.IO) {
+            isoRequestLog.saveToDb(isoMsg.responseCode39 ?: "XX")
+        }
+
+        debugOnly { isoMsg.log() }
+        if (isoMsg.hasFailed) {
+            throw CreditClubException(
+                """
+                    |Key Download failed
+                    |Error contacting ${posMode.label}. 
+                    |Server ${posMode.ip}:${posMode.port}. 
+                    |${isoMsg.responseMessage}
+                    |""".trimMargin()
+            )
+        }
+        val cryptKey = decryptionKey.asDesEdeKey
+        val cryptData = isoMsg.getString(53).substring(0, 32).hexBytes
+
+        return cryptKey.decrypt(cryptData).copyOf(16)
+    }
 
     @Serializable
     data class ParameterObject(

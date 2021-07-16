@@ -7,7 +7,7 @@ import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.SocketJob
 import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.util.TrackGPS
+import com.creditclub.core.util.SafeRunResult
 import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
@@ -29,9 +29,8 @@ class IsoSocketHelper(
 ) : KoinComponent {
     private val database: PosDatabase by inject()
     private val localStorage: LocalStorage by inject()
-    private val gps: TrackGPS by inject()
 
-    fun send(request: ISOMsg, isRetry: Boolean = false): Result {
+    fun send(request: ISOMsg, isRetry: Boolean = false): SafeRunResult<ISOMsg> {
         request.terminalId41 = config.terminalId
 
         Looper.myLooper() ?: Looper.prepare()
@@ -40,14 +39,14 @@ class IsoSocketHelper(
         val isoRequestLog = request.generateLog().apply {
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
-            gpsCoordinates = gps.geolocationString ?: "0.00;0.00"
+            gpsCoordinates = localStorage.lastKnownLocation ?: "0.00;0.00"
             nodeName = remoteConnectionInfo.nodeName
             if (remoteConnectionInfo is ConnectionInfo) {
                 connectionInfo = remoteConnectionInfo
             }
         }
 
-        val (response, error) = safeRun {
+        val result = safeRun {
             val sessionKey = parameters.sessionKey
             val outputData = request.prepare(sessionKey)
             request.log()
@@ -60,6 +59,7 @@ class IsoSocketHelper(
 
             response
         }
+        val (response) = result
 
         if (response == null) {
             isoRequestLog.responseCode = "TE"
@@ -70,7 +70,7 @@ class IsoSocketHelper(
 
         dao.save(isoRequestLog)
 
-        return Result(response, error)
+        return result
     }
 
     suspend inline fun attempt(
@@ -98,19 +98,17 @@ class IsoSocketHelper(
         request: ISOMsg,
         maxAttempts: Int,
         crossinline onReattempt: suspend (attempt: Int) -> Unit
-    ): Result {
+    ): SafeRunResult<ISOMsg> {
         if (maxAttempts < 2) return send(request)
         for (attempt in 1..maxAttempts) {
             if (attempt > 1) onReattempt(attempt)
 
             val result = send(request)
             if (attempt == maxAttempts) return result
-            result.response ?: continue
+            result.data ?: continue
             result.error ?: return result
         }
 
-        return Result(null, null)
+        return SafeRunResult(null)
     }
-
-    data class Result(val response: ISOMsg?, val error: java.lang.Exception?)
 }

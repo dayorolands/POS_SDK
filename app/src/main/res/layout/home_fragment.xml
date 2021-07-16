@@ -129,7 +129,7 @@
                     android:layout_marginStart="@dimen/ten_dp"
                     android:layout_marginLeft="@dimen/ten_dp"
                     android:layout_marginBottom="10dp"
-                    android:text="Powered by CreditClub"
+                    android:text="Powered by Cluster"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
 

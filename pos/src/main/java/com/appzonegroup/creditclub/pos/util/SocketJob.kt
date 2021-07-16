@@ -2,10 +2,7 @@ package com.appzonegroup.creditclub.pos.util
 
 import com.creditclub.core.util.debugOnly
 import com.creditclub.pos.RemoteConnectionInfo
-import java.io.ByteArrayOutputStream
-import java.io.DataInputStream
-import java.io.DataOutputStream
-import java.io.IOException
+import java.io.*
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -19,6 +16,18 @@ import javax.net.ssl.SSLSocket
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
+private val trustManager = object : X509TrustManager {
+    override fun getAcceptedIssuers(): Array<X509Certificate> {
+        return emptyArray()
+    }
+
+    override fun checkClientTrusted(certs: Array<X509Certificate>, authType: String) {
+    }
+
+    override fun checkServerTrusted(certs: Array<X509Certificate>, authType: String) {
+    }
+}
+
 object SocketJob {
     @Throws(
         NoSuchAlgorithmException::class,
@@ -30,7 +39,8 @@ object SocketJob {
         data: ByteArray,
         isRetry: Boolean = false
     ): ByteArray? {
-        if (!connectionInfo.ssl) return socketConnectionJob(connectionInfo, data, isRetry)
+        val sslEnabled = connectionInfo.ssl
+        if (!sslEnabled) return socketConnectionJob(connectionInfo, data, isRetry)
 
         val host = connectionInfo.ip
         val port = connectionInfo.port
@@ -41,36 +51,33 @@ object SocketJob {
 
         debugOnly { println("[remote environment]: $host:$port") }
 
-        val messageByte = ByteArray(1000)
-        var end = false
-        var dataString = ""
-        val trustManager = object : X509TrustManager {
-            override fun getAcceptedIssuers(): Array<X509Certificate> {
-                return emptyArray()
-            }
-
-            override fun checkClientTrusted(certs: Array<X509Certificate>, authType: String) {
-            }
-
-            override fun checkServerTrusted(certs: Array<X509Certificate>, authType: String) {
-            }
-        }
         val trustAllCerts = arrayOf<TrustManager>(trustManager)
         val sc = SSLContext.getInstance("TLS")
         sc.init(null, trustAllCerts, SecureRandom())
-        val sslsocket =
-            sc.socketFactory.createSocket() as SSLSocket
-        sslsocket.soTimeout = timeout * 1000
-        sslsocket.connect(InetSocketAddress(host, port), timeout * 1000)
-        sslsocket.startHandshake()
-        val `in` = DataInputStream(sslsocket.inputStream)
-        val out = DataOutputStream(sslsocket.outputStream)
-        val baos = ByteArrayOutputStream()
+        val sslSocket = sc.socketFactory.createSocket() as SSLSocket
+        sslSocket.soTimeout = timeout * 1000
+        sslSocket.connect(InetSocketAddress(host, port), timeout * 1000)
+        sslSocket.startHandshake()
+        val inputStream = DataInputStream(sslSocket.inputStream)
+        val outputStream = DataOutputStream(sslSocket.outputStream)
+
+        return send(inputStream, outputStream, data)
+    }
+
+    private fun send(
+        inputStream: DataInputStream,
+        outputStream: OutputStream,
+        data: ByteArray
+    ): ByteArray? {
+        val messageByte = ByteArray(1000)
+        var end = false
+        var dataString = ""
+
         val outputInfo = appendLengthBytes(data)
-        out.write(outputInfo)
-        out.flush()
+        outputStream.write(outputInfo)
+        outputStream.flush()
         var bytesRead: Int
-        `in`.readFully(messageByte, 0, 2)
+        inputStream.readFully(messageByte, 0, 2)
 
         //ByteBuffer byteBuffer = ByteBuffer.wrap(messageByte, 0, 2);
         val byteBuffer = ByteBuffer.wrap(messageByte, 0, 2)
@@ -80,8 +87,9 @@ object SocketJob {
         }
 
         //The following code shows in detail how to read from a TCP socket
+        val baos = ByteArrayOutputStream()
         while (!end) {
-            bytesRead = `in`.read(messageByte)
+            bytesRead = inputStream.read(messageByte)
             baos.write(messageByte, 0, bytesRead)
             dataString += String(messageByte, 0, bytesRead)
             if (dataString.length == bytesToRead) {
@@ -96,7 +104,7 @@ object SocketJob {
         connectionInfo: RemoteConnectionInfo,
         data: ByteArray,
         isRetry: Boolean = false
-    ): ByteArray {
+    ): ByteArray? {
         val host = connectionInfo.ip
         val port = connectionInfo.port
 
@@ -106,35 +114,15 @@ object SocketJob {
 
         debugOnly { println("[remote environment]: $host:$port") }
 
-        val connectionSocket: Socket
-        val messageByte = ByteArray(1000)
-        var end = false
-        var dataString = ""
         val serverAddr = InetAddress.getByName(host)
-        connectionSocket = Socket(serverAddr, port)
-        connectionSocket.soTimeout = timeout * 1000
-        val baos = ByteArrayOutputStream()
-        //InputStream in = connectionSocket.getInputStream();
-        val `in` =
-            DataInputStream(connectionSocket.getInputStream())
-        val out = connectionSocket.getOutputStream()
-        out.write(appendLengthBytes(data))
-        var bytesRead: Int
-        messageByte[0] = `in`.readByte()
-        messageByte[1] = `in`.readByte()
-        //ByteBuffer byteBuffer = ByteBuffer.wrap(messageByte, 0, 2);
-        val byteBuffer = ByteBuffer.wrap(messageByte, 0, 2)
-        val bytesToRead = byteBuffer.short.toInt()
-        //The following code shows in detail how to read from a TCP socket
-        while (!end) {
-            bytesRead = `in`.read(messageByte)
-            baos.write(messageByte, 0, bytesRead)
-            dataString += String(messageByte, 0, bytesRead)
-            if (dataString.length == bytesToRead) {
-                end = true
-            }
+        val connectionSocket = Socket(serverAddr, port).apply {
+            soTimeout = timeout * 1000
         }
-        return baos.toByteArray()
+        //InputStream in = connectionSocket.getInputStream();
+        val inputStream = DataInputStream(connectionSocket.getInputStream())
+        val outputStream = connectionSocket.getOutputStream()
+
+        return send(inputStream, outputStream, data)
     }
 
     private fun appendLengthBytes(data: ByteArray): ByteArray {

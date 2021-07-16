@@ -44,7 +44,7 @@ val dataModule = module {
 }
 
 val locationModule = module {
-    single { TrackGPS(androidContext()) }
+    single { TrackGPS(androidContext(), get()) }
 }
 
 val apiModule = module {

@@ -235,7 +235,7 @@ class HomeFragment : CreditClubFragment() {
                 }
 
                 Text(
-                    text = "v${context.packageInfo?.versionName}. Powered by CreditClub",
+                    text = "v${context.packageInfo?.versionName}. Powered by Cluster",
                     modifier = Modifier.padding(start = 16.dp),
                     style = MaterialTheme.typography.body1,
                     color = MaterialTheme.colors.onSurface.copy(0.5f),
