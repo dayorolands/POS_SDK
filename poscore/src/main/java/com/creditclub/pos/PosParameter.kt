@@ -13,12 +13,17 @@ interface PosParameter {
     val capkList: JSONArray?
     val emvAidList: JSONArray?
 
-    fun reset()
+    fun reset() {
+        masterKey = ""
+        sessionKey = ""
+        pinKey = ""
+        updatedAt = ""
+    }
 
-    suspend fun downloadCapk(activity: ComponentActivity)
-    suspend fun downloadAid(activity: ComponentActivity)
-    suspend fun downloadParameters(activity: ComponentActivity)
-    suspend fun downloadKeys(activity: ComponentActivity)
+    suspend fun downloadCapk()
+    suspend fun downloadAid()
+    suspend fun downloadParameters()
+    suspend fun downloadKeys()
 
     interface ManagementData {
         val cardAcceptorId: String

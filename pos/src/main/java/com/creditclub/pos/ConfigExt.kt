@@ -1,7 +1,6 @@
 package com.creditclub.pos
 
 import android.content.Context
-import androidx.activity.ComponentActivity
 import com.appzonegroup.creditclub.pos.R
 import com.appzonegroup.creditclub.pos.service.ParameterService
 import com.creditclub.core.util.readRawFileText
@@ -26,10 +25,10 @@ class DummyPosParameter(context: Context) : PosParameter {
         JSONArray(context.resources.readRawFileText(R.raw.emv_app_data))
 
     override fun reset() {}
-    override suspend fun downloadCapk(activity: ComponentActivity) {}
-    override suspend fun downloadAid(activity: ComponentActivity) {}
-    override suspend fun downloadParameters(activity: ComponentActivity) {}
-    override suspend fun downloadKeys(activity: ComponentActivity) {}
+    override suspend fun downloadCapk() {}
+    override suspend fun downloadAid() {}
+    override suspend fun downloadParameters() {}
+    override suspend fun downloadKeys() {}
 }
 
 fun RemoteConnectionInfo.getParameter(context: Context): PosParameter {

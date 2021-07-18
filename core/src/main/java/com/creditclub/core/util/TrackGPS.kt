@@ -15,8 +15,8 @@ import com.creditclub.core.data.prefs.LocalStorage
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
-class TrackGPS(private val mContext: Context) : LocationListener, KoinComponent {
-    private val localStorage: LocalStorage by inject()
+class TrackGPS(private val mContext: Context, private val localStorage: LocalStorage) :
+    LocationListener {
 
     private var checkGPS = false
     private var checkNetwork = false
@@ -24,21 +24,8 @@ class TrackGPS(private val mContext: Context) : LocationListener, KoinComponent 
 
     private var loc: Location? = null
 
-    var latitude: Double = 0.toDouble()
-        get() {
-            if (loc != null) {
-                field = loc!!.latitude
-            }
-            return field
-        }
-
-    var longitude: Double = 0.toDouble()
-        get() {
-            if (loc != null) {
-                field = loc!!.longitude
-            }
-            return field
-        }
+    val latitude: Double get() = loc?.latitude ?: 0.0
+    val longitude: Double = loc?.longitude ?: 0.0
 
     val geolocationString: String?
         get() = if (loc == null) localStorage.lastKnownLocation
@@ -88,10 +75,7 @@ class TrackGPS(private val mContext: Context) : LocationListener, KoinComponent 
                                 ?: loc
 
                         if (loc != null) {
-                            latitude = loc!!.latitude
-                            longitude = loc!!.longitude
-                            localStorage.lastKnownLocation =
-                                "${loc?.latitude};${loc?.longitude}"
+                            localStorage.lastKnownLocation = "${loc?.latitude};${loc?.longitude}"
                         }
                     } catch (e: SecurityException) {
 
@@ -117,14 +101,9 @@ class TrackGPS(private val mContext: Context) : LocationListener, KoinComponent 
                         MIN_TIME_BW_UPDATES,
                         MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(), this
                     )
-                    Log.d("GPS Enabled", "GPS Enabled")
+                    debug("GPS Enabled")
                     if (locationManager != null) {
-                        loc = locationManager!!
-                            .getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                        if (loc != null) {
-                            latitude = loc!!.latitude
-                            longitude = loc!!.longitude
-                        }
+                        loc = locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                     }
                 }
             }

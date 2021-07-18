@@ -42,6 +42,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     private val posTenant: PosTenant by inject()
     private val posPreferences: PosPreferences by inject()
     private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
+    private val posDatabase: PosDatabase by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,7 +121,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                             answers = data
                             institutionCode = localStorage.institutionCode
                             agentPhoneNumber = localStorage.agentPhone
-                            geoLocation = gps.geolocationString
+                            geoLocation = gps.geolocationString,
                         }
 
                         creditClubMiddleWareAPI.staticService.submitSurvey(surveyData)
@@ -287,7 +288,6 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
 
     private suspend fun settle() = withContext(Dispatchers.IO) {
         val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
-        val posDatabase: PosDatabase = PosDatabase.getInstance(this@LoginActivity)
         val appConfig: AppConfig by inject()
         val configService: ConfigService by inject()
         val posNotificationDao = posDatabase.posNotificationDao()
@@ -338,12 +338,17 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         firebaseCrashlytics.setCustomKey("terminal_id", agent.terminalID ?: "")
 
         if (Platform.isPOS) {
-            val configHasChanged =
-                posConfig.terminalId != agent.terminalID // || posConfig.remoteConnectionInfo.id != agent.posMode
+            val configHasChanged = posConfig.terminalId != agent.terminalID
+            val defaultConnectionInfo = posTenant.infoList.find { it.id == agent.posMode }
+                ?: InvalidRemoteConnectionInfo
+            posConfig.remoteConnectionInfo = defaultConnectionInfo
+            debug("default connection info is $defaultConnectionInfo")
+            firebaseCrashlytics.setCustomKey("default_pos_mode", agent.posMode ?: "")
+            firebaseCrashlytics.setCustomKey("pos_ip", defaultConnectionInfo.ip)
+            firebaseCrashlytics.setCustomKey("pos_port", "${defaultConnectionInfo.port}")
 
             if (configHasChanged) {
                 val notificationCount = withContext(Dispatchers.IO) {
-                    val posDatabase: PosDatabase = PosDatabase.getInstance(this@LoginActivity)
                     posDatabase.posNotificationDao().count()
                 }
 
@@ -356,8 +361,6 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                     return false
                 }
 
-                posConfig.remoteConnectionInfo =
-                    posTenant.infoList.find { it.id == agent.posMode } ?: InvalidRemoteConnectionInfo
                 posConfig.terminalId = agent.terminalID ?: ""
                 posParameter.reset()
             }

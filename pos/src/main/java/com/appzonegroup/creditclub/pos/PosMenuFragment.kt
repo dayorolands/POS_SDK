@@ -18,7 +18,6 @@ import com.creditclub.pos.PosFragment
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.api.posApiService
 import com.creditclub.pos.getParameter
-import com.creditclub.pos.model.PosTenant
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.time.Instant
@@ -26,7 +25,6 @@ import java.time.Instant
 
 class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
     private val binding by dataBinding<PosMenuFragmentBinding>()
-    private val posTenant: PosTenant by inject()
     private val posPreferences: PosPreferences by inject()
     private val defaultParameterStore: PosParameter by inject()
 
@@ -169,7 +167,7 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
             mainScope.launch {
                 dialogProvider.showProgressBar("Downloading CAPK")
                 val (_, error) = safeRunIO {
-                    defaultParameterStore.downloadCapk(requireActivity())
+                    defaultParameterStore.downloadCapk()
                 }
                 dialogProvider.hideProgressBar()
                 if (error != null) return@launch dialogProvider.showError(error)
@@ -180,7 +178,7 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
             mainScope.launch {
                 dialogProvider.showProgressBar("Downloading EMV AID")
                 val (_, error) = safeRunIO {
-                    defaultParameterStore.downloadAid(requireActivity())
+                    defaultParameterStore.downloadAid()
                 }
                 dialogProvider.hideProgressBar()
                 if (error != null) return@launch dialogProvider.showError(error)
@@ -196,8 +194,8 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
         dialogProvider.showProgressBar("Downloading Keys")
         for (parameterStore in parameterStores) {
             val (_, error) = safeRunIO {
-                parameterStore.downloadKeys(requireActivity())
-                parameterStore.downloadParameters(requireActivity())
+                parameterStore.downloadKeys()
+                parameterStore.downloadParameters()
             }
             if (error != null) {
                 dialogProvider.hideProgressBar()
@@ -216,7 +214,7 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
         dialogProvider.showProgressBar("Downloading Keys")
         for (parameterStore in parameterStores) {
             val (_, error) = safeRunIO {
-                parameterStore.downloadKeys(requireActivity())
+                parameterStore.downloadKeys()
             }
             if (error != null) {
                 dialogProvider.hideProgressBar()
@@ -235,7 +233,7 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
         dialogProvider.showProgressBar("Downloading Parameters")
         for (parameterStore in parameterStores) {
             val (_, error) = safeRunIO {
-                parameterStore.downloadParameters(requireActivity())
+                parameterStore.downloadParameters()
             }
             if (error != null) {
                 dialogProvider.hideProgressBar()

@@ -54,7 +54,7 @@ val posModule = module {
     single<RemoteConnectionInfo>(override = true) {
         val infoList = get<PosTenant>().infoList
         if (infoList.isEmpty()) InvalidRemoteConnectionInfo
-        else infoList[1]
+        else infoList[0]
     }
     single<PosConfig> { ConfigService(androidContext()) }
     single { PosDatabase.getInstance(androidContext()) }

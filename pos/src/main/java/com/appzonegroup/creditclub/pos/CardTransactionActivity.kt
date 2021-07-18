@@ -10,10 +10,11 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.viewModels
-import com.appzonegroup.creditclub.pos.card.*
+import com.appzonegroup.creditclub.pos.card.CardIsoMsg
+import com.appzonegroup.creditclub.pos.card.applyManagementData
+import com.appzonegroup.creditclub.pos.card.logPosNotification
 import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.data.create
-import com.appzonegroup.creditclub.pos.databinding.*
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
@@ -289,7 +290,7 @@ abstract class CardTransactionActivity : PosActivity() {
                 val (response, error) = withContext(Dispatchers.IO) {
                     val maxAttempts = 1 + (remoteConnectionInfo.requeryConfig?.maxRetries ?: 0)
                     if (request.mti == "0200" && maxAttempts > 1) {
-                        var result: IsoSocketHelper.Result = IsoSocketHelper.Result(null, null)
+                        var result = SafeRunResult<ISOMsg>(null)
                         for (attempt in 1..maxAttempts) {
                             val isRetry = attempt > 1
                             if (isRetry) {
@@ -300,7 +301,7 @@ abstract class CardTransactionActivity : PosActivity() {
                             }
 
                             result = isoSocketHelper.send(request, isRetry)
-                            val responseMsg = result.response ?: continue
+                            val responseMsg = result.data ?: continue
                             if (responseMsg.responseCode39 == "91") continue
                             if (result.error == null) break
                         }
