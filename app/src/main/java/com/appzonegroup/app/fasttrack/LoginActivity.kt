@@ -117,12 +117,12 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             onSubmit { data ->
                 ioScope.launch {
                     safeRunIO {
-                        val surveyData = SubmitSurveyRequest().apply {
-                            answers = data
-                            institutionCode = localStorage.institutionCode
-                            agentPhoneNumber = localStorage.agentPhone
+                        val surveyData = SubmitSurveyRequest(
+                            answers = data,
+                            institutionCode = localStorage.institutionCode,
+                            agentPhoneNumber = localStorage.agentPhone,
                             geoLocation = gps.geolocationString,
-                        }
+                        )
 
                         creditClubMiddleWareAPI.staticService.submitSurvey(surveyData)
                     }
@@ -157,7 +157,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     }
 
     private fun downloadSurveyQuestions() {
-        var surveyQuestions by jsonPrefs.jsonStore<List<SurveyQuestion>>(
+        var surveyQuestions by jsonPrefs.jsonStore(
             "DATA_SURVEY_QUESTIONS",
             ListSerializer(SurveyQuestion.serializer())
         )
@@ -317,7 +317,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         val (agent, error) = safeRunIO {
             creditClubMiddleWareAPI.staticService.getAgentInfoByPhoneNumber(
                 localStorage.institutionCode,
-                localStorage.agentPhone
+                localStorage.agentPhone,
             )
         }
         dialogProvider.hideProgressBar()
