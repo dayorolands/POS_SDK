@@ -4,22 +4,17 @@ import com.creditclub.core.data.model.SurveyAnswer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 22/11/2019.
- * Appzone Ltd
- */
 @Serializable
-class SubmitSurveyRequest {
+data class SubmitSurveyRequest(
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = ""
+    val agentPhoneNumber: String? = "",
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = ""
+    val institutionCode: String? = "",
 
     @SerialName("GeoLocation")
-    var geoLocation: String? = null
+    val geoLocation: String? = null,
 
     @SerialName("Answers")
-    var answers: List<SurveyAnswer>? = null
-}
+    val answers: List<SurveyAnswer>? = null,
+)
