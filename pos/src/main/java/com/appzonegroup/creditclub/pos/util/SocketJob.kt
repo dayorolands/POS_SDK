@@ -1,6 +1,6 @@
 package com.appzonegroup.creditclub.pos.util
 
-import com.creditclub.core.util.debugOnly
+import com.creditclub.core.util.debug
 import com.creditclub.pos.RemoteConnectionInfo
 import java.io.*
 import java.net.InetAddress
@@ -40,16 +40,26 @@ object SocketJob {
         isRetry: Boolean = false
     ): ByteArray? {
         val sslEnabled = connectionInfo.ssl
-        if (!sslEnabled) return socketConnectionJob(connectionInfo, data, isRetry)
-
         val host = connectionInfo.ip
         val port = connectionInfo.port
+        val timeout = if (isRetry) {
+            connectionInfo.requeryConfig?.timeout ?: connectionInfo.timeout
+        } else {
+            connectionInfo.timeout
+        }
 
-        val timeout =
-            if (isRetry) connectionInfo.requeryConfig?.timeout ?: connectionInfo.timeout
-            else connectionInfo.timeout
+        debug("[remote environment]: $host:$port")
 
-        debugOnly { println("[remote environment]: $host:$port") }
+        if (!sslEnabled) {
+            val serverAddress = InetAddress.getByName(host)
+            val connectionSocket = Socket(serverAddress, port).apply {
+                soTimeout = timeout * 1000
+            }
+            val inputStream = DataInputStream(connectionSocket.getInputStream())
+            val outputStream = connectionSocket.getOutputStream()
+
+            return send(inputStream, outputStream, data)
+        }
 
         val trustAllCerts = arrayOf<TrustManager>(trustManager)
         val sc = SSLContext.getInstance("TLS")
@@ -97,32 +107,6 @@ object SocketJob {
             }
         }
         return baos.toByteArray()
-    }
-
-    @Throws(IOException::class)
-    private fun socketConnectionJob(
-        connectionInfo: RemoteConnectionInfo,
-        data: ByteArray,
-        isRetry: Boolean = false
-    ): ByteArray? {
-        val host = connectionInfo.ip
-        val port = connectionInfo.port
-
-        val timeout =
-            if (isRetry) connectionInfo.requeryConfig?.timeout ?: connectionInfo.timeout
-            else connectionInfo.timeout
-
-        debugOnly { println("[remote environment]: $host:$port") }
-
-        val serverAddr = InetAddress.getByName(host)
-        val connectionSocket = Socket(serverAddr, port).apply {
-            soTimeout = timeout * 1000
-        }
-        //InputStream in = connectionSocket.getInputStream();
-        val inputStream = DataInputStream(connectionSocket.getInputStream())
-        val outputStream = connectionSocket.getOutputStream()
-
-        return send(inputStream, outputStream, data)
     }
 
     private fun appendLengthBytes(data: ByteArray): ByteArray {

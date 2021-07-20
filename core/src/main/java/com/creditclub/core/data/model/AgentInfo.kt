@@ -23,7 +23,7 @@ data class AgentInfo(
     @SerialName("TerminalID")
     val terminalID: String? = null,
 
-    @SerialName("PosMode")
+    @SerialName("POSMode")
     val posMode: String? = null,
 
     @SerialName("CardLimit")

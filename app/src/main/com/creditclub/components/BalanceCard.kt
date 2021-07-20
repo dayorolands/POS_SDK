@@ -91,7 +91,7 @@ fun BalanceCard() {
         ) {
             Text(
                 text = balanceFormatted,
-                style = MaterialTheme.typography.h3,
+                style = MaterialTheme.typography.h4,
                 color = MaterialTheme.colors.onSecondary,
                 modifier = Modifier
                     .padding(horizontal = 10.dp)

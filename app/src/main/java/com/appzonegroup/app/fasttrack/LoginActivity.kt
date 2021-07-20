@@ -121,7 +121,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                             answers = data
                             institutionCode = localStorage.institutionCode
                             agentPhoneNumber = localStorage.agentPhone
-                            geoLocation = gps.geolocationString,
+                            geoLocation = gps.geolocationString
                         }
 
                         creditClubMiddleWareAPI.staticService.submitSurvey(surveyData)
