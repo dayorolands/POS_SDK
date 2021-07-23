@@ -6,6 +6,7 @@
         <item>CashOut</item>
         <item>POSCashOut</item>
         <item>Recharge</item>
+        <item>BillsPayment</item>
         <item>Registration</item>
         <item>FundsTransferCommercialBank</item>
         <item>LocalFundsTransfer</item>

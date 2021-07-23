@@ -5,7 +5,7 @@
     <color name="colorPrimaryTransparent">#DD801d76</color>
     <color name="colorPrimaryDark">#61175A</color>
     <color name="colorOnSecondary">@color/white</color>
-    <color name="splashOverlay">@color/colorPrimaryTransparent</color>
+    <color name="splashOverlay">#FAFBF6FB</color>
     <color name="menuButtonIconTint">@color/transparent</color>
     <!--    <color name="colorLoginBg">@color/transparent</color>-->
     <color name="colorAccentContrast">@color/white</color>
