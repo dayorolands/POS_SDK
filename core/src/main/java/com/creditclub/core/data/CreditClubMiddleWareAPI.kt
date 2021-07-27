@@ -17,20 +17,20 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) {
     private val contentType = "application/json".toMediaType()
 
+    private val json = Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+        allowSpecialFloatingPointValues = true
+        useArrayPolymorphism = true
+        encodeDefaults = true
+    }
+
     val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl("${apiHost}/CreditClubMiddlewareAPI/")
         .client(okHttpClient)
         .addConverterFactory(NullOnEmptyConverterFactory.create())
         .addConverterFactory(ScalarsConverterFactory.create())
-        .addConverterFactory(
-            Json {
-                isLenient = true
-                ignoreUnknownKeys = true
-                allowSpecialFloatingPointValues = true
-                useArrayPolymorphism = true
-                encodeDefaults = true
-            }.asConverterFactory(contentType)
-        )
+        .addConverterFactory(json.asConverterFactory(contentType))
         .build()
 
     val staticService: StaticService by retrofit.service()

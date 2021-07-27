@@ -28,7 +28,6 @@ class LocalStorage(
     var cacheAuth: String? by valueStore(KEY_AUTH)
     var institutionCode: String? by valueStore(INSTITUTION_CODE)
     var agentPhone: String? by valueStore(AGENT_PHONE)
-    var agentInfo: String? by valueStore(AGENT_INFO)
     var sessionID: String? by valueStore(SESSION_ID)
     var lastKnownLocation: String? by valueStore("LAST_KNOWN_LOCATION", "0.00;0.00")
     val agentIsActivated: Boolean
@@ -45,9 +44,7 @@ class LocalStorage(
         private const val KEY_AUTH = "CACHE_AUTH_KEY"
         const val INSTITUTION_CODE = "INSTITUTION_CODE"
         const val AGENT_PHONE = "AGENT_PHONE"
-        const val AGENT_CODE = "AGENT_CODE"
         const val AGENT_INFO = "AGENT_INFO"
-        const val AGENT_NAME = "AGENT_NAME"
         const val SESSION_ID = "SESSION_ID"
 
         const val SuccessCount = "SUCCESS_COUNT"

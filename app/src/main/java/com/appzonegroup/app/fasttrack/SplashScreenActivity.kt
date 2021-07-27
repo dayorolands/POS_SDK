@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
-class SplashScreenActivity : AppCompatActivity() {
+class SplashScreenActivity : AppCompatActivity(R.layout.activity_splashscreen) {
     private val mainScope = CoroutineScope(Dispatchers.Main)
     private val dialogProvider: DialogProvider by inject { parametersOf(this) }
 
@@ -41,7 +41,6 @@ class SplashScreenActivity : AppCompatActivity() {
             localStorage.institutionCode ?: "none"
         )
         firebaseCrashlytics.setCustomKey("environment", BuildConfig.API_HOST)
-        setContentView(R.layout.activity_splashscreen)
 
         checkPermissions()
     }

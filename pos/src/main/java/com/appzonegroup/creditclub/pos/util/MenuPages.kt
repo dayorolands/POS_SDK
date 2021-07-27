@@ -94,7 +94,7 @@ POS Mode: ${remoteConnectionInfo.label}
 APN: ${it.apnInfo}
 Host Name: $host
 Terminal ID: $terminalId
-IP: ${remoteConnectionInfo.ip}
+IP: ${remoteConnectionInfo.host}
 Port: ${remoteConnectionInfo.port}
 Keep Alive (Call Home) in seconds: $callHome
                             """.trimIndent()

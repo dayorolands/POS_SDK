@@ -24,6 +24,9 @@ interface FundsTransferService {
     @POST("FundsTransfer/Transfer")
     suspend fun transfer(@Body request: FundsTransferRequest): BackendResponse?
 
+    @POST("FundsTransfer/Requery")
+    suspend fun requery(@Body request: FundsTransferRequest): BackendResponse?
+
     @GET("FundsTransfer/GetBanks")
     suspend fun getBanks(@Query("institutionCode") institutionCode: String?): List<Bank>?
 

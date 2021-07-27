@@ -20,5 +20,8 @@ open class BackendResponse {
     @SerialName("Message")
     private val message: String? = null
 
+    @SerialName("ResponseCode")
+    val responseCode: String? = null
+
     fun isFailure() = !isSuccessful
 }

@@ -133,36 +133,6 @@
         <item>OTHERS</item>
     </string-array>
 
-    <string-array name="ReportTypes">
-        <item>--Select Report</item>
-        <item>Balance Enquiry</item>
-        <item>Mini Statement</item>
-        <!--<item>Recharge</item>
-        <item>Bills Payment</item>-->
-        <item>Cash In</item>
-        <item>Cash Out</item>
-        <item>PIN Change</item>
-        <item>PIN Reset</item>
-        <item>Registration</item>
-        <item>Funds Transfer Commercial Bank</item>
-        <!--<item>Funds Transfer Cash In</item>
-        <item>Funds Transfer Cash Out</item>
-        <item>Funds Transfer Local</item>
-        <item>Account Activation</item>
-        <item>Local Funds Transfer</item>
-        <item>Set Default Account</item>
-        <item>Loan Request</item>
-        <item>Card Linking</item>
-        <item>Agent To Agent Funds Transfer</item>-->
-        <item>KiaKia To KiaKia</item>
-        <item>KiaKia To Sterling Bank</item>
-        <item>KiaKia To Other Banks</item>
-        <item>Account Liquidation</item>
-        <item>POS Cash Out</item>
-        <!--<item>BVN Update</item>
-        <item>MFB To Other Banks</item>-->
-    </string-array>
-
     <string-array name="States">
         <item>LG,LAGOS,Ikeja</item>
         <item>FC,FCT,Abuja</item>

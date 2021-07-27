@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -33,10 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.appzonegroup.app.fasttrack.R
-import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
+import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.api.FundsTransferService
-import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.model.AgentFee
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.prefs.LocalStorage
@@ -47,14 +45,14 @@ import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.*
 import com.creditclub.pos.printer.PrintJob
 import com.creditclub.ui.*
-import com.creditclub.ui.theme.CreditClubTheme
-import com.google.accompanist.insets.ProvideWindowInsets
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import java.time.Instant
 import java.util.*
 import kotlin.math.roundToInt
+
+private const val FUNDS_TRANSFER_AUTH_TOKEN = "95C1D8B4-7589-4F70-8F20-473E89FB5F01"
 
 @Composable
 fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) {
@@ -65,7 +63,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     val gps: TrackGPS by rememberBean()
     val coroutineScope = rememberCoroutineScope()
     var loadingMessage by remember { mutableStateOf("") }
-    var isSameBank: Boolean? by remember { mutableStateOf(null) }
+    var isSameBank: Boolean? by rememberSaveable { mutableStateOf(null) }
     var bank: Bank? by remember(isSameBank) { mutableStateOf(null) }
     var receiverAccountNumber by remember(bank) { mutableStateOf("") }
     var amountString by remember(bank) { mutableStateOf("") }
@@ -74,11 +72,14 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     }
     val isVerified = nameEnquiryResponse != null
     var narration by remember { mutableStateOf("") }
+    var agentPin by remember { mutableStateOf("") }
     var receipt: PrintJob? by remember { mutableStateOf(null) }
     val transactionReference = rememberSaveable { UUID.randomUUID().toString().substring(0, 8) }
     val accountNumberIsValid = remember(receiverAccountNumber) {
         receiverAccountNumber.isNotBlank() && (receiverAccountNumber.length == 10 || receiverAccountNumber.length == 11)
     }
+    val transferAttemptCount by remember { mutableStateOf(0) }
+    var canRetry by remember { mutableStateOf(false) }
     val amountIsValid = remember(amountString) {
         with(amountString.toDoubleOrNull()) {
             this != null && this > 0.0
@@ -92,6 +93,12 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         mutableStateOf("")
     }
     var showConfirmation by remember(nameEnquiryResponse, isSameBank) { mutableStateOf(false) }
+    val title = when {
+        isSameBank == null -> stringResource(R.string.funds_transfer)
+        !isVerified -> stringResource(R.string.enter_account)
+        showConfirmation -> stringResource(R.string.confirm)
+        else -> stringResource(R.string.funds_transfer)
+    }
     val validateAccount: suspend CoroutineScope.() -> Unit =
         remember(
             isSameBank,
@@ -104,7 +111,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 val nameEnquiryRequest = FundsTransferRequest(
                     agentPhoneNumber = localStorage.agentPhone,
                     institutionCode = localStorage.institutionCode,
-                    authToken = "95C1D8B4-7589-4F70-8F20-473E89FB5F01",
+                    authToken = FUNDS_TRANSFER_AUTH_TOKEN,
                     isToRelatedCommercialBank = isSameBank == true,
                     externalTransactionReference = transactionReference,
                     geoLocation = gps.geolocationString,
@@ -151,15 +158,18 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         ) {
             makeTransfer@{
                 errorMessage = ""
-                val pin = dialogProvider.getPin("Agent PIN") ?: return@makeTransfer
-                if (pin.isEmpty()) return@makeTransfer dialogProvider.showError("Please enter your PIN")
-                if (pin.length != 4) return@makeTransfer dialogProvider.showError("PIN must be four digits")
+                if (transferAttemptCount < 1 || agentPin.isBlank()) {
+                    val pin = dialogProvider.getPin("Agent PIN") ?: return@makeTransfer
+                    if (pin.isEmpty()) return@makeTransfer dialogProvider.showError("Please enter your PIN")
+                    if (pin.length != 4) return@makeTransfer dialogProvider.showError("PIN must be four digits")
+                    agentPin = pin
+                }
 
                 val fundsTransferRequest = FundsTransferRequest(
                     agentPhoneNumber = localStorage.agentPhone,
                     institutionCode = localStorage.institutionCode,
-                    agentPin = pin,
-                    authToken = "95C1D8B4-7589-4F70-8F20-473E89FB5F01",
+                    agentPin = agentPin,
+                    authToken = FUNDS_TRANSFER_AUTH_TOKEN,
                     beneficiaryAccountNumber = receiverAccountNumber,
                     amountInNaira = amountString.toDouble(),
                     isToRelatedCommercialBank = isSameBank ?: false,
@@ -175,22 +185,25 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
 
                 loadingMessage = "Transfer in progress"
                 val (response, error) = safeRunIO {
-                    fundsTransferService.transfer(fundsTransferRequest)
+                    if (transferAttemptCount < 1) {
+                        fundsTransferService.transfer(fundsTransferRequest)
+                    } else {
+                        fundsTransferService.requery(fundsTransferRequest)
+                    }
                 }
                 loadingMessage = ""
 
-                if (error != null) {
+                if (error != null && receipt == null) {
                     dialogProvider.showErrorAndWait(error)
                     navController.popBackStack()
                     return@makeTransfer
                 }
-                if (response == null) {
-                    dialogProvider.showErrorAndWait(context.getString(R.string.network_error_message))
-                    navController.popBackStack()
-                    return@makeTransfer
+                canRetry = canRetry || response!!.responseCode == "96"
+                if (response!!.isFailure()) {
+                    errorMessage = response.responseMessage ?: ""
                 }
 
-                receipt = FundsTransferReceipt(
+                receipt = fundsTransferReceipt(
                     context,
                     fundsTransferRequest,
                     Instant.now().toString("dd-MM-yyyy hh:mm"),
@@ -207,6 +220,18 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         ) {
             validateAccount()
         }
+    }
+
+    if (canRetry) {
+        TransactionStatusQuery(
+            onClose = { canRetry = false },
+            title = "Transaction pending",
+            message = errorMessage,
+            onRequery = {
+                coroutineScope.launch { transferFunds() }
+            },
+        )
+        return
     }
 
     if (receipt != null) {
@@ -229,12 +254,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
             .fillMaxSize(),
     ) {
         CreditClubAppBar(
-            title = when {
-                isSameBank == null -> stringResource(R.string.funds_transfer)
-                !isVerified -> stringResource(R.string.enter_account)
-                showConfirmation -> stringResource(R.string.confirm)
-                else -> stringResource(R.string.funds_transfer)
-            },
+            title = title,
             onBackPressed = {
                 if (isSameBank == null || receipt != null) {
                     navController.popBackStack()
@@ -388,7 +408,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                             val nameEnquiryRequest = FundsTransferRequest(
                                 agentPhoneNumber = localStorage.agentPhone,
                                 institutionCode = localStorage.institutionCode,
-                                authToken = "95C1D8B4-7589-4F70-8F20-473E89FB5F01",
+                                authToken = FUNDS_TRANSFER_AUTH_TOKEN,
                                 beneficiaryAccountNumber = receiverAccountNumber,
                                 amountInNaira = amountString.toDouble(),
                                 isToRelatedCommercialBank = isSameBank ?: false,
@@ -444,7 +464,7 @@ private fun RowScope.SmallMenuButton(
     tint: Color = colorResource(R.color.colorAccent)
 ) {
     val context = LocalContext.current
-    val drawable = AppCompatResources.getDrawable(context, icon)
+    val drawable = remember(icon) { AppCompatResources.getDrawable(context, icon) }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,

@@ -6,7 +6,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,9 +26,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.fragment.findNavController
-import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.ui.FundsTransfer
 import com.appzonegroup.app.fasttrack.utility.logout
@@ -43,7 +45,9 @@ import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.NotificationRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.ui.widget.DialogConfirmParams
-import com.creditclub.core.util.*
+import com.creditclub.core.util.debugOnly
+import com.creditclub.core.util.packageInfo
+import com.creditclub.core.util.safeRunIO
 import com.creditclub.screen.PinChange
 import com.creditclub.screen.SupportCases
 import com.creditclub.screen.UssdWithdrawal
@@ -227,7 +231,7 @@ class HomeFragment : CreditClubFragment() {
 
                 debugOnly {
                     Text(
-                        text = "For development use only",
+                        text = "For testing purposes only",
                         modifier = Modifier.padding(start = 16.dp, bottom = 5.dp),
                         style = MaterialTheme.typography.caption,
                         color = MaterialTheme.colors.onSurface.copy(0.5f),

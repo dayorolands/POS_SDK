@@ -28,7 +28,7 @@ import com.creditclub.ui.Select
 import com.creditclub.ui.rememberBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -56,12 +56,16 @@ fun GetPosTransaction(
             else -> Instant.now()
         }
     }
-    val transactions =
-        produceState<Flow<List<PosTransaction>>>(MutableSharedFlow(), query, startDate, endDate) {
-            withContext(Dispatchers.IO) {
-                value = posDatabase.posTransactionDao().disputable("%${query}%", startDate, endDate)
-            }
-        }.value.collectAsState(emptyList())
+    val transactions by produceState<Flow<List<PosTransaction>>>(
+        emptyFlow(),
+        query,
+        startDate,
+        endDate
+    ) {
+        withContext(Dispatchers.IO) {
+            value = posDatabase.posTransactionDao().disputable("%${query}%", startDate, endDate)
+        }
+    }.value.collectAsState(emptyList())
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (appBar, list) = createRefs()
@@ -144,7 +148,7 @@ fun GetPosTransaction(
                 }
             }
 
-            items(transactions.value, key = { it.id }) {
+            items(transactions, key = { it.id }) {
                 TransactionItem(transaction = it, onClick = {
                     onResult?.invoke(it)
                     if (popOnSelect) {

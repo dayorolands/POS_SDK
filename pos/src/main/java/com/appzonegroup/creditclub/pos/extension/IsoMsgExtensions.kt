@@ -14,12 +14,6 @@ import java.time.Instant
 import java.security.SecureRandom
 import java.util.*
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 02/10/2019.
- * Appzone Ltd
- */
-
 private const val TAG = "IsoMsgExt"
 
 inline val ISOMsg.isSuccessful: Boolean

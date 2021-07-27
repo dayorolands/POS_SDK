@@ -43,6 +43,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     private val posPreferences: PosPreferences by inject()
     private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
     private val posDatabase: PosDatabase by inject()
+    private val ioScope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -344,7 +345,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             posConfig.remoteConnectionInfo = defaultConnectionInfo
             debug("default connection info is $defaultConnectionInfo")
             firebaseCrashlytics.setCustomKey("default_pos_mode", agent.posMode ?: "")
-            firebaseCrashlytics.setCustomKey("pos_ip", defaultConnectionInfo.ip)
+            firebaseCrashlytics.setCustomKey("pos_host", defaultConnectionInfo.host)
             firebaseCrashlytics.setCustomKey("pos_port", "${defaultConnectionInfo.port}")
 
             if (configHasChanged) {
@@ -398,6 +399,11 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ioScope.cancel()
     }
 }
 

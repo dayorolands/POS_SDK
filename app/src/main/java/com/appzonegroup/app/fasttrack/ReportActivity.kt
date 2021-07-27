@@ -18,7 +18,7 @@ import com.creditclub.ui.adapter.PosReportAdapter
 import com.creditclub.ui.dataBinding
 import com.appzonegroup.app.fasttrack.databinding.ActivityReportBinding
 import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
-import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
+import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
 import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.request.DepositRequest
@@ -270,7 +270,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     externalTransactionReference = item.uniqueReference,
                 )
                 posPrinter.print(
-                    FundsTransferReceipt(
+                    fundsTransferReceipt(
                         this,
                         fundsTransferRequest,
                         item.date?.replace("T", " ") ?: "",

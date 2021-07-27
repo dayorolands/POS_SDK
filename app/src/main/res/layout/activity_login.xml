@@ -70,8 +70,8 @@
                 app:boxBackgroundColor="#2fff"
                 app:boxBackgroundMode="outline"
                 app:boxStrokeColor="@color/login_text_input_layout_stroke_color"
-                app:hintTextColor="@color/white"
                 app:boxStrokeWidth="2dp"
+                app:hintTextColor="@color/white"
                 app:placeholderTextColor="@color/white">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -95,8 +95,8 @@
                 android:textColorHint="@color/white"
                 app:boxBackgroundColor="#2fff"
                 app:boxBackgroundMode="outline"
-                app:boxStrokeWidth="2dp"
                 app:boxStrokeColor="@color/login_text_input_layout_stroke_color"
+                app:boxStrokeWidth="2dp"
                 app:hintTextColor="@color/white"
                 app:placeholderTextColor="@color/white">
 
