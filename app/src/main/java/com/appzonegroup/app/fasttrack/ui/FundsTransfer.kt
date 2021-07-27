@@ -76,7 +76,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     val accountNumberIsValid = remember(receiverAccountNumber) {
         receiverAccountNumber.isNotBlank() && (receiverAccountNumber.length == 10 || receiverAccountNumber.length == 11)
     }
-    val transferAttemptCount by remember { mutableStateOf(0) }
+    var transferAttemptCount by remember { mutableStateOf(0) }
     var canRetry by remember { mutableStateOf(false) }
     val amountIsValid = remember(amountString) {
         with(amountString.toDoubleOrNull()) {
@@ -190,6 +190,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     }
                 }
                 loadingMessage = ""
+                transferAttemptCount++
 
                 if (error != null && receipt == null) {
                     dialogProvider.showErrorAndWait(error)
@@ -224,6 +225,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         TransactionStatusQuery(
             onClose = { canRetry = false },
             title = "Transaction pending",
+            loadingMessage = loadingMessage,
             message = errorMessage,
             onRequery = {
                 coroutineScope.launch { transferFunds() }

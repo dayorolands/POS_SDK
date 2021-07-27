@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.appzonegroup.app.fasttrack.R
 import com.creditclub.ui.AppButton
+import com.creditclub.ui.Loading
 
 @Composable
 fun TransactionStatusQuery(
@@ -26,6 +27,7 @@ fun TransactionStatusQuery(
     message: String,
     imageVector: ImageVector = Icons.Outlined.HourglassTop,
     onRequery: () -> Unit,
+    loadingMessage: String,
 ) {
     Column(
         modifier = Modifier
@@ -54,33 +56,37 @@ fun TransactionStatusQuery(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(
-                modifier = Modifier
-                    .size(80.dp),
-                imageVector = imageVector,
-                contentDescription = null,
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.h4,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth(),
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.body2,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp),
-            )
-            Spacer(modifier = Modifier.padding(top = 30.dp))
-            AppButton(
-                modifier = Modifier.padding(horizontal = 10.dp),
-                onClick = onRequery,
-            ) {
-                Text(text = "Check status")
+            if (loadingMessage.isBlank()) {
+                Icon(
+                    modifier = Modifier
+                        .size(80.dp),
+                    imageVector = imageVector,
+                    contentDescription = null,
+                )
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.h4,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                )
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.body2,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                )
+                Spacer(modifier = Modifier.padding(top = 30.dp))
+                AppButton(
+                    modifier = Modifier.padding(horizontal = 10.dp),
+                    onClick = onRequery,
+                ) {
+                    Text(text = "Check status")
+                }
+            } else {
+                Loading(message = loadingMessage)
             }
         }
     }
