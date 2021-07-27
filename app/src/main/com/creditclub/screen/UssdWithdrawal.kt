@@ -127,14 +127,14 @@ fun UssdWithdrawal(navController: NavController) {
                 printJob = printJob {
                     val middleAlignment = com.creditclub.pos.printer.Alignment.MIDDLE
                     image(R.drawable.cc_printer_logo)
-                    text("USSD withdrawal", fontSize = 2, align = middleAlignment)
+                    text("USSD withdrawal", fontSize = 35, align = middleAlignment)
                     text(
                         statusText,
                         align = middleAlignment,
                     )
                     text(
                         response.message?.uppercase(Locale.getDefault()) ?: "",
-                        fontSize = 2,
+                        fontSize = 15,
                         walkPaperAfterPrint = 20,
                         align = middleAlignment,
                     )

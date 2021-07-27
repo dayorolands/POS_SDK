@@ -197,15 +197,15 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     navController.popBackStack()
                     return@makeTransfer
                 }
-                canRetry = canRetry || response!!.responseCode == "96"
-                if (response!!.isFailure()) {
+                canRetry = response!!.responseCode == "96"
+                if (response.isFailure()) {
                     errorMessage = response.responseMessage ?: ""
                 }
 
                 receipt = fundsTransferReceipt(
-                    context,
-                    fundsTransferRequest,
-                    Instant.now().toString("dd-MM-yyyy hh:mm"),
+                    context = context,
+                    request = fundsTransferRequest,
+                    transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
                     isSuccessful = response.isSuccessful,
                     reason = response.responseMessage,
                 )
