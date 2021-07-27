@@ -35,11 +35,9 @@ import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.api.FundsTransferService
-import com.creditclub.core.data.model.AgentFee
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.request.FundsTransferRequest
-import com.creditclub.core.data.response.GenericResponse
 import com.creditclub.core.data.response.NameEnquiryResponse
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.*
@@ -402,29 +400,6 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 item(key = "narration") {
                     DataItem(label = "Narration", value = narration)
                 }
-                item(key = "summary") {
-                    FundsTransferSummary(
-                        fetchFeeAgent = {
-                            val nameEnquiryRequest = FundsTransferRequest(
-                                agentPhoneNumber = localStorage.agentPhone,
-                                institutionCode = localStorage.institutionCode,
-                                authToken = FUNDS_TRANSFER_AUTH_TOKEN,
-                                beneficiaryAccountNumber = receiverAccountNumber,
-                                amountInNaira = amountString.toDouble(),
-                                isToRelatedCommercialBank = isSameBank ?: false,
-                                externalTransactionReference = transactionReference,
-                                geoLocation = gps.geolocationString,
-                                narration = narration.trim { it <= ' ' },
-                                beneficiaryInstitutionCode = bank?.code,
-                                beneficiaryAccountName = nameEnquiryResponse?.beneficiaryAccountName,
-                                beneficiaryBVN = nameEnquiryResponse?.beneficiaryBVN,
-                                beneficiaryKYC = nameEnquiryResponse?.beneficiaryKYC,
-                                nameEnquirySessionID = nameEnquiryResponse?.nameEnquirySessionID,
-                            )
-                            fundsTransferService.getTransferFee(request = nameEnquiryRequest)
-                        },
-                    )
-                }
             }
 
             item(key = "error") {
@@ -528,34 +503,4 @@ private fun RowScope.SmallMenuButton(
             overflow = TextOverflow.Ellipsis,
         )
     }
-}
-
-@Composable
-private fun FundsTransferSummary(
-    fetchFeeAgent: suspend CoroutineScope.() -> GenericResponse<AgentFee>?,
-) {
-    var errorMessage by remember { mutableStateOf("") }
-    val context = LocalContext.current
-    val agentFee: AgentFee? by produceState<AgentFee?>(null) {
-        errorMessage = ""
-        val (response, error) = safeRunIO {
-            fetchFeeAgent()
-        }
-        if (error != null) {
-            errorMessage = error.getMessage(context)
-            return@produceState
-        }
-        if (response == null) {
-            return@produceState
-        }
-        value = response.data
-    }
-    val formattedAgentFee = remember(agentFee) { agentFee?.totalFee?.toCurrencyFormat() }
-    if (agentFee == null) {
-        Loading(message = "Loading service charge")
-    } else {
-        DataItem(label = "Service charge", value = formattedAgentFee ?: "NA")
-    }
-
-    ErrorMessage(errorMessage)
 }
