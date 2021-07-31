@@ -14,12 +14,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
+import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
-import com.appzonegroup.app.fasttrack.utility.FunctionUsageTracker
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
+import com.appzonegroup.app.fasttrack.utility.FunctionUsageTracker
 import com.creditclub.Routes
 import com.creditclub.core.data.ClusterObjectBox
 import com.creditclub.core.data.api.FundsTransferService
@@ -48,7 +51,7 @@ fun PendingTransactions(
         clusterObjectBox.boxStore.boxFor()
     }
     val transactions by remember {
-       ObjectBoxLiveData(pendingTransactionsBox.query().orderDesc(PendingTransaction_.id).build())
+        ObjectBoxLiveData(pendingTransactionsBox.query().orderDesc(PendingTransaction_.id).build())
     }.observeAsState(emptyList())
     val coroutineScope = rememberCoroutineScope()
     val dialogProvider by rememberDialogProvider()
@@ -60,7 +63,11 @@ fun PendingTransactions(
                 when (transaction.transactionType) {
                     TransactionType.LocalFundsTransfer,
                     TransactionType.FundsTransferCommercialBank -> {
-                        fundsTransferService.requery(transaction.requestJson)
+                        val request = defaultJson.decodeFromString(
+                            FundsTransferRequest.serializer(),
+                            transaction.requestJson,
+                        )
+                        fundsTransferService.requery(request)
                     }
                     else -> throw IllegalArgumentException(
                         "requery for " +
@@ -119,10 +126,6 @@ fun PendingTransactions(
                 )
             },
         ) {
-            item {
-                Spacer(modifier = Modifier.size(20.dp))
-            }
-
             items(transactions, key = { it.id }) {
                 TransactionItem(transaction = it, onClick = {
                     coroutineScope.launch { checkStatus(it) }
@@ -141,7 +144,7 @@ private fun TransactionItem(
     transaction: PendingTransaction,
     onClick: () -> Unit,
 ) {
-    val amount = transaction.amount.toCurrencyFormat()
+    val amount = remember { transaction.amount.toCurrencyFormat() }
     val prettyTime = remember { transaction.createdAt.format("MM/dd/uuuu hh:mm:ss") }
     val captionColor = MaterialTheme.colors.onSurface.copy(alpha = 0.52f)
     Column(
@@ -154,14 +157,14 @@ private fun TransactionItem(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "${transaction.accountNumber}, ${transaction.accountName}",
+                    text = "${transaction.accountName}, ${transaction.accountNumber}",
                     style = MaterialTheme.typography.subtitle1,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 10.dp)
                 )
                 Text(
-                    text = "$prettyTime \u2022 ${transaction.reference}",
+                    text = "$prettyTime \u2022 ${transaction.transactionType.label}",
                     style = MaterialTheme.typography.caption,
                     color = captionColor,
                 )
@@ -173,8 +176,14 @@ private fun TransactionItem(
                     color = captionColor,
                     modifier = Modifier.padding(start = 4.dp),
                 )
-                AppButton(onClick = onClick) {
-                    Text("Check status")
+                AppTextButton(onClick = onClick, modifier = Modifier.padding(top = 10.dp)) {
+                    Text(
+                        text = "Check status",
+                        color = colorResource(R.color.menuButtonTextColor),
+                        style = MaterialTheme.typography.caption,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
         }

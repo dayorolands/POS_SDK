@@ -2,7 +2,6 @@ package com.creditclub.core.data.api
 
 import com.creditclub.core.data.model.AgentFee
 import com.creditclub.core.data.model.Bank
-import com.creditclub.core.data.request.DepositRequest
 import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.data.response.BackendResponse
 import com.creditclub.core.data.response.GenericResponse
@@ -26,9 +25,6 @@ interface FundsTransferService {
 
     @POST("FundsTransfer/Requery")
     suspend fun requery(@Body request: FundsTransferRequest): BackendResponse?
-
-    @POST("FundsTransfer/Requery")
-    suspend fun requery(@Body request: String): BackendResponse?
 
     @GET("FundsTransfer/GetBanks")
     suspend fun getBanks(@Query("institutionCode") institutionCode: String?): List<Bank>?

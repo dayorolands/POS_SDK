@@ -10,15 +10,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.HourglassBottom
-import androidx.compose.material.icons.outlined.HourglassEmpty
-import androidx.compose.material.icons.outlined.Pending
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -81,7 +78,7 @@ fun DrawerContent(
     if (institutionConfig.hasOnlineFunctions) {
         DrawerRow(
             title = stringResource(R.string.online_functions),
-            icon = painterResource(R.drawable.ic_fa_arrow_up),
+            imageVector = Icons.Outlined.ArrowUpward,
             onClick = {
                 coroutineScope.launch { scaffoldState.drawerState.close() }
                 context.startActivity(Intent(context, OnlineActivity::class.java))
@@ -91,7 +88,7 @@ fun DrawerContent(
 
     DrawerRow(
         title = stringResource(R.string.reports),
-        icon = painterResource(R.drawable.ic_agent_balance),
+        imageVector = Icons.Outlined.ReceiptLong,
         onClick = {
             coroutineScope.launch { scaffoldState.drawerState.close() }
             context.startActivity(Intent(context, ReportActivity::class.java))
@@ -100,7 +97,7 @@ fun DrawerContent(
 
     DrawerRow(
         title = stringResource(R.string.commission),
-        icon = painterResource(R.drawable.ic_agent_balance),
+        imageVector = Icons.Outlined.Payments,
         onClick = {
             coroutineScope.launch { scaffoldState.drawerState.close() }
             context.startActivity(Intent(context, CommissionsActivity::class.java))
@@ -120,7 +117,7 @@ fun DrawerContent(
 
     DrawerRow(
         title = stringResource(R.string.support),
-        icon = painterResource(R.drawable.ic_chat_bubble_outline),
+        imageVector = Icons.Outlined.ChatBubbleOutline,
         onClick = {
             coroutineScope.launch {
                 scaffoldState.drawerState.close()
@@ -132,7 +129,7 @@ fun DrawerContent(
     if (institutionConfig.hasHlaTagging) {
         DrawerRow(
             title = stringResource(R.string.hla_tagging),
-            icon = painterResource(R.drawable.ic_maps_and_flags),
+            imageVector = Icons.Outlined.Place,
             onClick = {
                 coroutineScope.launch { scaffoldState.drawerState.close() }
                 context.startActivity(Intent(context, HlaTaggingActivity::class.java))
@@ -142,7 +139,7 @@ fun DrawerContent(
 
     DrawerRow(
         title = stringResource(R.string.title_activity_faq),
-        icon = painterResource(R.drawable.ic_help),
+        imageVector = Icons.Outlined.HelpOutline,
         onClick = {
             coroutineScope.launch { scaffoldState.drawerState.close() }
             context.startActivity(Intent(context, FaqActivity::class.java))
@@ -152,7 +149,7 @@ fun DrawerContent(
     if (Platform.isPOS && Platform.deviceType != 2) {
         DrawerRow(
             title = stringResource(R.string.update),
-            icon = painterResource(R.drawable.ic_fa_arrow_down),
+            imageVector = Icons.Outlined.ArrowDownward,
             onClick = {
                 coroutineScope.launch { scaffoldState.drawerState.close() }
                 context.startActivity(Intent(context, UpdateActivity::class.java))
@@ -179,29 +176,6 @@ private fun DrawerRow(
         image()
         Text(color = textColor, text = title)
     }
-}
-
-@Composable
-private fun DrawerRow(
-    title: String,
-    icon: Painter,
-    onClick: () -> Unit
-) {
-    val textColor = MaterialTheme.colors.onSurface.copy(0.5f)
-    DrawerRow(
-        title = title,
-        image = {
-            Image(
-                icon,
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(textColor),
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(24.dp),
-            )
-        },
-        onClick = onClick,
-    )
 }
 
 @Composable
