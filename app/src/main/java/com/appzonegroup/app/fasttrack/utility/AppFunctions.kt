@@ -32,6 +32,7 @@ object FunctionIds {
     const val FAQS = 19
     const val COLLECTION_PAYMENT = 20
     const val USSD_WITHDRAWAL = 21
+    const val PENDING_TRANSACTIONS = 22
 }
 
 fun registerAppFunctions() {
@@ -56,4 +57,5 @@ fun registerAppFunctions() {
     AppFunctions.register(FunctionIds.FAQS, AppFunction(R.id.fn_faq, R.string.title_activity_faq, R.drawable.ic_help))
     AppFunctions.register(FunctionIds.COLLECTION_PAYMENT, AppFunction(R.id.fn_collections_payment, R.string.title_fragment_collection_payment, R.drawable.payday_loan))
     AppFunctions.register(FunctionIds.USSD_WITHDRAWAL, AppFunction(R.id.ussd_withdrawal_button, R.string.ussd_withdrawal, R.drawable.withdrawal))
+    AppFunctions.register(FunctionIds.PENDING_TRANSACTIONS, AppFunction(R.id.fn_pending_transactions, R.string.pending_transactions, R.drawable.ic_baseline_hourglass_bottom_24))
 }

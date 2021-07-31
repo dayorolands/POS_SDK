@@ -12,8 +12,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.creditclub.core.data.prefs.LocalStorage
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class TrackGPS(private val mContext: Context, private val localStorage: LocalStorage) :
     LocationListener {

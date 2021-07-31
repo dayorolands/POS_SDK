@@ -27,8 +27,8 @@ import com.nexgo.oaf.apiv3.SdkResult
 import com.nexgo.oaf.apiv3.device.pinpad.*
 import com.nexgo.oaf.apiv3.device.reader.CardInfoEntity
 import com.nexgo.oaf.apiv3.emv.*
-import org.koin.core.KoinComponent
-import org.koin.core.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 

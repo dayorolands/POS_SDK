@@ -20,8 +20,8 @@ import com.nexgo.oaf.apiv3.emv.EmvTransConfigurationEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.util.*

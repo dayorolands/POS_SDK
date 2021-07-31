@@ -30,14 +30,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.fragment.findNavController
+import com.appzonegroup.app.fasttrack.clusterNavigation
 import com.appzonegroup.app.fasttrack.R
-import com.appzonegroup.app.fasttrack.ui.FundsTransfer
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.Routes
 import com.creditclub.components.*
-import com.creditclub.conversation.ConversationContent
 import com.creditclub.conversation.LocalBackPressedDispatcher
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.api.NotificationService
@@ -48,9 +47,6 @@ import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.safeRunIO
-import com.creditclub.screen.PinChange
-import com.creditclub.screen.SupportCases
-import com.creditclub.screen.UssdWithdrawal
 import com.creditclub.ui.UpdateActivity
 import com.creditclub.ui.rememberBean
 import com.creditclub.ui.theme.CreditClubTheme
@@ -65,6 +61,7 @@ private val composableRouteFunctionIds = mapOf(
     R.id.funds_transfer_button to Routes.FundsTransfer,
     R.id.fn_support to Routes.SupportCases,
     R.id.ussd_withdrawal_button to Routes.UssdWithdrawal,
+    R.id.fn_pending_transactions to Routes.PendingTransactions,
 )
 
 class HomeFragment : CreditClubFragment() {
@@ -121,39 +118,11 @@ class HomeFragment : CreditClubFragment() {
                                         composeNavController = composeNavController,
                                     )
                                 }
-                                composable(Routes.FundsTransfer) {
-                                    FundsTransfer(
-                                        navController = composeNavController,
-                                        dialogProvider = dialogProvider,
-                                    )
-                                }
-                                composable(Routes.PinChange) {
-                                    PinChange(navController = composeNavController)
-                                }
-                                composable(Routes.SupportCases) {
-                                    SupportCases(navController = composeNavController)
-                                }
-                                composable(Routes.SupportConversation) { backStackEntry ->
-                                    val fcmToken by appViewModel.fcmToken
-                                    val arguments = backStackEntry.arguments!!
-                                    val reference = arguments.getString("reference")!!
-                                    val title = arguments.getString("title")
-
-                                    ConversationContent(
-                                        title = title ?: "Case",
-                                        fcmToken = fcmToken,
-                                        reference = reference,
-                                        onNavIconPressed = { composeNavController.popBackStack() },
-                                        navController = composeNavController,
-                                        // Add padding so that we are inset from any left/right navigation bars
-                                        // (usually shown when in landscape orientation)
-                                        modifier = Modifier.navigationBarsPadding(bottom = false),
-                                        navigateToProfile = {},
-                                    )
-                                }
-                                composable(Routes.UssdWithdrawal) {
-                                    UssdWithdrawal(navController = composeNavController)
-                                }
+                                clusterNavigation(
+                                    navController = composeNavController,
+                                    dialogProvider = dialogProvider,
+                                    appViewModel = appViewModel,
+                                )
                             }
                         }
                     }

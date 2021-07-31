@@ -24,8 +24,8 @@ import com.creditclub.core.util.safeRunIO
 import com.creditclub.pos.printer.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.File
 import java.io.FileOutputStream
 import java.time.Instant

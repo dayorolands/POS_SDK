@@ -89,9 +89,14 @@ dependencies {
     // Co-routine Tests
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7'
 
+    // Koin main features for Android (Scope,ViewModel ...)
     api "io.insert-koin:koin-android:${versions.koin}"
-    api "io.insert-koin:koin-androidx-scope:${versions.koin}"
-    api "io.insert-koin:koin-androidx-viewmodel:${versions.koin}"
+    // Koin Java Compatibility
+    api "io.insert-koin:koin-android-compat:${versions.koin}"
+    // Koin for Jetpack WorkManager
+    api "io.insert-koin:koin-androidx-workmanager:${versions.koin}"
+    // Koin for Jetpack Compose
+    implementation "io.insert-koin:koin-androidx-compose:${versions.koin}"
 
     api "com.github.esafirm:android-image-picker:3.0.0-beta1"
     api "com.github.bumptech.glide:glide:${versions.glide}"
@@ -124,16 +129,18 @@ dependencies {
     api "androidx.compose.material:material-icons-core:${versions.compose}"
     api "androidx.compose.material:material-icons-extended:${versions.compose}"
     // Integration with activities
-    api "androidx.activity:activity-compose:1.3.0-rc01"
+    api "androidx.activity:activity-compose:1.3.0"
     // Integration with ViewModels
     api "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07"
+    // Integration with observables
+    api "androidx.compose.runtime:runtime-livedata:${versions.compose}"
     api "com.google.accompanist:accompanist-coil:${versions.accompanist}"
     api "com.google.accompanist:accompanist-insets:${versions.accompanist}"
     api "com.google.accompanist:accompanist-swiperefresh:${versions.accompanist}"
     api "com.google.accompanist:accompanist-flowlayout:${versions.accompanist}"
     api "androidx.palette:palette-ktx:1.0.0"
-    api "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha08"
-    api "androidx.navigation:navigation-compose:2.4.0-alpha04"
+    api "androidx.constraintlayout:constraintlayout-compose:1.0.0-beta01"
+    api "androidx.navigation:navigation-compose:2.4.0-alpha05"
     api "org.jetbrains.kotlinx:kotlinx-datetime:0.2.0"
     // UI Tests
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:${versions.compose}"

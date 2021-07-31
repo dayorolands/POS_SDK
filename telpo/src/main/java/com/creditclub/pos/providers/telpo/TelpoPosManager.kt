@@ -17,9 +17,9 @@ import com.telpo.emv.EmvService
 import com.telpo.pinpad.PinpadService
 import com.telpo.tps550.api.util.StringUtil.DeviceModelEnum
 import com.telpo.tps550.api.util.SystemUtil
-import org.koin.core.KoinComponent
-import org.koin.core.get
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.koin.dsl.module
 import java.io.File
 import java.io.FileOutputStream
@@ -114,10 +114,10 @@ class TelpoPosManager(private val activity: CreditClubActivity) : PosManager, Ko
         override val deviceType = 1
 
         override val module = module {
-            factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
+            factory<PosManager> { (activity: CreditClubActivity) ->
                 TelpoPosManager(activity)
             }
-            factory<PosPrinter>(override = true) { (context: Context, dialogProvider: DialogProvider) ->
+            factory<PosPrinter> { (context: Context, dialogProvider: DialogProvider) ->
                 TelpoPrinter(context, dialogProvider)
             }
         }

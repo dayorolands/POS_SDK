@@ -432,6 +432,7 @@
     <string name="generate_reference">Generate Reference</string>
     <string name="ive_made_payment">I\'ve made payment</string>
     <string name="checking_transaction_status">Checking transaction status</string>
+    <string name="pending_transactions">Pending Transactions</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>

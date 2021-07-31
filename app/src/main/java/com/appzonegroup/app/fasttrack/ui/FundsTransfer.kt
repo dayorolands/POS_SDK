@@ -34,15 +34,21 @@ import androidx.navigation.NavController
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
 import com.creditclub.core.config.IInstitutionConfig
+import com.creditclub.core.data.ClusterObjectBox
 import com.creditclub.core.data.api.FundsTransferService
 import com.creditclub.core.data.model.Bank
+import com.creditclub.core.data.model.PendingTransaction
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.data.response.NameEnquiryResponse
+import com.creditclub.core.type.TransactionType
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.*
+import com.creditclub.core.util.delegates.defaultJson
 import com.creditclub.pos.printer.PrintJob
 import com.creditclub.ui.*
+import io.objectbox.Box
+import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
@@ -58,7 +64,6 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     val fundsTransferService: FundsTransferService by rememberRetrofitService()
     val localStorage: LocalStorage by rememberBean()
     val institutionConfig: IInstitutionConfig by rememberBean()
-    val gps: TrackGPS by rememberBean()
     val coroutineScope = rememberCoroutineScope()
     var loadingMessage by remember { mutableStateOf("") }
     var isSameBank: Boolean? by rememberSaveable { mutableStateOf(null) }
@@ -77,7 +82,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         receiverAccountNumber.isNotBlank() && (receiverAccountNumber.length == 10 || receiverAccountNumber.length == 11)
     }
     var transferAttemptCount by remember { mutableStateOf(0) }
-    var canRetry by remember { mutableStateOf(false) }
+    var isPending by remember { mutableStateOf(false) }
     val amountIsValid = remember(amountString) {
         with(amountString.toDoubleOrNull()) {
             this != null && this > 0.0
@@ -97,6 +102,13 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         showConfirmation -> stringResource(R.string.confirm)
         else -> stringResource(R.string.funds_transfer)
     }
+
+    val clusterObjectBox: ClusterObjectBox by rememberBean()
+    val pendingTransactionsBox: Box<PendingTransaction> = remember {
+        clusterObjectBox.boxStore.boxFor()
+    }
+    var pendingTransactionId: Long? by remember { mutableStateOf(null) }
+
     val validateAccount: suspend CoroutineScope.() -> Unit =
         remember(
             isSameBank,
@@ -112,7 +124,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     authToken = FUNDS_TRANSFER_AUTH_TOKEN,
                     isToRelatedCommercialBank = isSameBank == true,
                     externalTransactionReference = transactionReference,
-                    geoLocation = gps.geolocationString,
+                    geoLocation = localStorage.lastKnownLocation,
                     beneficiaryAccountNumber = receiverAccountNumber,
                     beneficiaryInstitutionCode = bank?.code,
                 )
@@ -153,10 +165,12 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
             transactionReference,
             amountString,
             showConfirmation,
+            nameEnquiryResponse,
         ) {
             makeTransfer@{
+                val isFirstAttempt = transferAttemptCount < 1
                 errorMessage = ""
-                if (transferAttemptCount < 1 || agentPin.isBlank()) {
+                if (agentPin.isBlank()) {
                     val pin = dialogProvider.getPin("Agent PIN") ?: return@makeTransfer
                     if (pin.isEmpty()) return@makeTransfer dialogProvider.showError("Please enter your PIN")
                     if (pin.length != 4) return@makeTransfer dialogProvider.showError("PIN must be four digits")
@@ -172,34 +186,57 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     amountInNaira = amountString.toDouble(),
                     isToRelatedCommercialBank = isSameBank ?: false,
                     externalTransactionReference = transactionReference,
-                    geoLocation = gps.geolocationString,
+                    geoLocation = localStorage.lastKnownLocation,
                     narration = narration.trim { it <= ' ' },
                     beneficiaryInstitutionCode = bank?.code,
-                    beneficiaryAccountName = nameEnquiryResponse?.beneficiaryAccountName,
-                    beneficiaryBVN = nameEnquiryResponse?.beneficiaryBVN,
-                    beneficiaryKYC = nameEnquiryResponse?.beneficiaryKYC,
-                    nameEnquirySessionID = nameEnquiryResponse?.nameEnquirySessionID,
+                    beneficiaryAccountName = nameEnquiryResponse!!.beneficiaryAccountName,
+                    beneficiaryBVN = nameEnquiryResponse!!.beneficiaryBVN,
+                    beneficiaryKYC = nameEnquiryResponse!!.beneficiaryKYC,
+                    nameEnquirySessionID = nameEnquiryResponse!!.nameEnquirySessionID,
                 )
 
                 loadingMessage = "Transfer in progress"
                 val (response, error) = safeRunIO {
-                    if (transferAttemptCount < 1) {
+                    if (isFirstAttempt) {
                         fundsTransferService.transfer(fundsTransferRequest)
                     } else {
                         fundsTransferService.requery(fundsTransferRequest)
                     }
                 }
                 loadingMessage = ""
-                transferAttemptCount++
 
                 if (error != null && receipt == null) {
                     dialogProvider.showErrorAndWait(error)
                     navController.popBackStack()
                     return@makeTransfer
                 }
-                canRetry = response!!.responseCode == "96"
-                if (response.isFailure()) {
+
+                if (response!!.isFailure()) {
                     errorMessage = response.responseMessage ?: ""
+                    isPending = response.responseCode == "96"
+                }
+
+                // Store pending transaction for requery
+                if (isPending && isFirstAttempt) {
+                    val pendingTransaction = PendingTransaction(
+                        transactionType = if (isSameBank == true) TransactionType.LocalFundsTransfer else TransactionType.FundsTransferCommercialBank,
+                        requestJson = defaultJson.encodeToString(
+                            FundsTransferRequest.serializer(),
+                            fundsTransferRequest,
+                        ),
+                        accountName = nameEnquiryResponse!!.beneficiaryAccountName!!,
+                        accountNumber = nameEnquiryResponse!!.beneficiaryAccountName!!,
+                        amount = amount,
+                        reference = transactionReference,
+                        createdAt = Instant.now(),
+                        lastCheckedAt = null,
+                    )
+                    pendingTransactionId = pendingTransactionsBox.put(pendingTransaction)
+                }
+
+                // delete pending transaction once confirmed successful
+                if (response.isSuccess() && pendingTransactionId != null) {
+                    pendingTransactionsBox.remove(pendingTransactionId!!)
                 }
 
                 receipt = fundsTransferReceipt(
@@ -209,6 +246,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     isSuccessful = response.isSuccessful,
                     reason = response.responseMessage,
                 )
+                transferAttemptCount++
             }
         }
 
@@ -221,9 +259,9 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         }
     }
 
-    if (canRetry) {
+    if (isPending) {
         TransactionStatusQuery(
-            onClose = { canRetry = false },
+            onClose = { isPending = false },
             title = "Transaction pending",
             loadingMessage = loadingMessage,
             message = errorMessage,
@@ -248,6 +286,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         )
         return
     }
+
     Column(
         modifier = Modifier
             .background(colorResource(R.color.menuBackground))

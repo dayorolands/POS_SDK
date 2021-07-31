@@ -14,8 +14,8 @@ import com.creditclub.pos.PosParameter
 import com.creditclub.pos.RemoteConnectionInfo
 import com.creditclub.pos.model.ConnectionInfo
 import org.jpos.iso.ISOMsg
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.time.Instant
 
 /**

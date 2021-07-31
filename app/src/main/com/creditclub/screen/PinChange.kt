@@ -15,7 +15,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.appzonegroup.app.fasttrack.R
-import com.appzonegroup.app.fasttrack.utility.FunctionId
+import com.appzonegroup.app.fasttrack.utility.FunctionUsageTracker
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.api.StaticService
 import com.creditclub.core.data.prefs.LocalStorage
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun PinChange(navController: NavController) {
-    FunctionId(FunctionIds.AGENT_CHANGE_PIN)
+    FunctionUsageTracker(FunctionIds.AGENT_CHANGE_PIN)
 
     val dialogProvider by rememberDialogProvider()
     var oldPin by remember { mutableStateOf("") }

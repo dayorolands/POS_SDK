@@ -24,4 +24,6 @@ open class BackendResponse {
     val responseCode: String? = null
 
     fun isFailure() = !isSuccessful
+    fun isPending() = responseCode == "96"
+    fun isSuccess() = !isSuccessful
 }

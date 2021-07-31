@@ -8,4 +8,5 @@
     <item name="fn_collections_payment" type="id" />
     <item name="fn_bill_payment" type="id" />
     <item name="fn_pos_chargeback" type="id" />
+    <item name="fn_pending_transactions" type="id" />
 </resources>

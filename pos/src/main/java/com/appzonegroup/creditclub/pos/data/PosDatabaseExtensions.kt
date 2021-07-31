@@ -11,7 +11,7 @@ import org.jpos.iso.ISOMsg
 import org.koin.core.context.GlobalContext
 
 fun PosTransaction.Companion.create(isoMsg: ISOMsg): PosTransaction {
-    val koin = GlobalContext.get().koin
+    val koin = GlobalContext.get()
     val localStorage = koin.get<LocalStorage>()
     val agent = localStorage.agent
     val transactionType = isoMsg.getTransactionType()

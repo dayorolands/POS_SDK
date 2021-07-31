@@ -25,7 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.appzonegroup.app.fasttrack.CaseLogActivity
 import com.appzonegroup.app.fasttrack.R
-import com.appzonegroup.app.fasttrack.utility.FunctionId
+import com.appzonegroup.app.fasttrack.utility.FunctionUsageTracker
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.Routes
 import com.creditclub.core.data.api.CaseLogService
@@ -47,7 +47,7 @@ private val yesterday = localDateNow.minusDays(1).format("dd/MM/uuuu")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SupportCases(navController: NavController) {
-    FunctionId(FunctionIds.SUPPORT)
+    FunctionUsageTracker(FunctionIds.SUPPORT)
 
     val context = LocalContext.current
     val caseLogService: CaseLogService by rememberRetrofitService()

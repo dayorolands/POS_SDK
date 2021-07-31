@@ -41,6 +41,7 @@ android {
                         "room.schemaLocation"  : "$projectDir/schemas".toString(),
                         "room.incremental"     : "true",
                         "room.expandProjection": "true",
+                        "objectbox.modelPath"  : "$projectDir/schemas/objectbox.json".toString(),
                 ]
             }
         }

@@ -19,8 +19,8 @@ import com.telpo.emv.util.hexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import org.koin.core.KoinComponent
-import org.koin.core.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 
 class TelpoCardReader(
     private val flow: CreditClubActivity,

@@ -32,8 +32,8 @@ import org.jpos.iso.ISOMsg
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.IOException
 import java.security.SecureRandom
 import java.time.Instant

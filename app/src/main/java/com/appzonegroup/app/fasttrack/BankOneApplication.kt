@@ -13,9 +13,9 @@ import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.utility.extensions.registerWorkers
 import com.appzonegroup.app.fasttrack.utility.registerAppFunctions
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.analytics.AnalyticsObjectBox
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.R
+import com.creditclub.core.data.clusterObjectBoxModule
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.prefs.moveTo
 import com.creditclub.core.util.localStorage
@@ -53,7 +53,6 @@ class BankOneApplication : CreditClubApplication() {
         Picasso.setSingletonInstance(
             Picasso.Builder(this).loggingEnabled(BuildConfig.DEBUG).build()
         )
-        AnalyticsObjectBox.init(this)
 
         startKoin {
             androidLogger()
@@ -61,6 +60,7 @@ class BankOneApplication : CreditClubApplication() {
 
             modules(
                 listOf(
+                    clusterObjectBoxModule,
                     apiModule,
                     locationModule,
                     dataModule,

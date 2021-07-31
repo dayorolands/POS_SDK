@@ -53,10 +53,10 @@ class QPosManager(activity: CreditClubActivity) : PosManager,
         override val id = ""
         override val deviceType = 2
         override val module = module {
-            factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
+            factory<PosManager> { (activity: CreditClubActivity) ->
                 QPosManager(activity)
             }
-            factory<PosPrinter>(override = true) { (activity: CreditClubActivity) ->
+            factory<PosPrinter> { (activity: CreditClubActivity) ->
                 QposPrinter(activity)
             }
         }

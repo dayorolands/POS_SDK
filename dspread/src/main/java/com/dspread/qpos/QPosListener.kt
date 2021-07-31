@@ -23,8 +23,8 @@ import com.dspread.R
 import com.dspread.qpos.utils.*
 import com.dspread.xpos.CQPOSService
 import com.dspread.xpos.QPOSService
-import org.koin.core.KoinComponent
-import org.koin.core.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import java.time.Instant
 import java.util.*
 import kotlin.coroutines.Continuation

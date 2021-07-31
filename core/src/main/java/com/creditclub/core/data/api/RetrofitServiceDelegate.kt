@@ -6,8 +6,8 @@ import android.content.ComponentCallbacks
 import android.content.ComponentCallbacks2
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import org.koin.android.ext.android.get
-import org.koin.core.KoinComponent
-import org.koin.core.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 
 inline fun <reified T> ComponentCallbacks.retrofitService(): Lazy<T> {
     return lazy { get<CreditClubMiddleWareAPI>().retrofit.create(T::class.java) }

@@ -60,7 +60,7 @@ val apiModule = module {
             .cache(cache)
 
         builder
-            .addInterceptor(NetworkMetricsInterceptor(get(), get(), get()))
+            .addInterceptor(NetworkMetricsInterceptor(get(), get(), get(), get()))
             .addInterceptor(RequestFailureInterceptor())
 
         debugOnly {
@@ -78,7 +78,7 @@ val apiModule = module {
 }
 
 val uiModule = module {
-    factory<DialogProvider>(override = true) { (context: Context) ->
+    factory<DialogProvider> { (context: Context) ->
         CreditClubDialogProvider(context)
     }
 }
@@ -98,7 +98,7 @@ val configModule = module {
 }
 
 val sharingModule = module {
-    factory<PosPrinter>(override = true) { (context: Activity, dialogProvider: DialogProvider) ->
+    factory<PosPrinter> { (context: Activity, dialogProvider: DialogProvider) ->
         PdfPrinter(context, dialogProvider)
     }
 }

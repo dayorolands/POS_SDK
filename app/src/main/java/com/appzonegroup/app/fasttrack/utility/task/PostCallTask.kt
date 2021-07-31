@@ -17,7 +17,7 @@ class PostCallTask(
     asyncResponse: AsyncResponse?
 ) : AsyncTask<String, Void?, String?>() {
     var delegate: AsyncResponse? = asyncResponse
-    private val koin = GlobalContext.get().koin
+    private val koin = GlobalContext.get()
 
     override fun onPreExecute() {
         super.onPreExecute()

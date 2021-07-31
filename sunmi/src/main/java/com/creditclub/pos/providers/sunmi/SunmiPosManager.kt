@@ -22,8 +22,8 @@ import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
 import com.sunmi.pay.hardware.aidlv2.emv.EMVOptV2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.dsl.module
 import sunmi.paylib.SunmiPayKernel
 import sunmi.paylib.SunmiPayKernel.ConnectCallback
@@ -149,10 +149,10 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
         override val deviceType = 4
 
         override val module = module {
-            factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
+            factory<PosManager> { (activity: CreditClubActivity) ->
                 SunmiPosManager(activity)
             }
-            factory<PosPrinter>(override = true) { (context: Context, dialogProvider: DialogProvider) ->
+            factory<PosPrinter> { (context: Context, dialogProvider: DialogProvider) ->
                 MockPosPrinter(
                     context,
                     dialogProvider
