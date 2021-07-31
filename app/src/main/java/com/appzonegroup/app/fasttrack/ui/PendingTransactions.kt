@@ -85,20 +85,34 @@ fun PendingTransactions(
                 dialogProvider.showErrorAndWait(response.responseMessage ?: "Pending")
                 return@checkStatus
             }
+            if (response.isFailure()) {
+                dialogProvider.showErrorAndWait(response.responseMessage ?: "Failed")
+                return@checkStatus
+            }
 
             pendingTransactionsBox.remove(transaction.id)
 
-            val receipt = fundsTransferReceipt(
-                context = context,
-                request = defaultJson.decodeFromString(
-                    FundsTransferRequest.serializer(),
-                    transaction.requestJson,
-                ),
-                transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
-                isSuccessful = response.isSuccessful,
-                reason = response.responseMessage,
-            )
+            val receipt = when (transaction.transactionType) {
+                TransactionType.LocalFundsTransfer,
+                TransactionType.FundsTransferCommercialBank -> {
+                    fundsTransferReceipt(
+                        context = context,
+                        request = defaultJson.decodeFromString(
+                            FundsTransferRequest.serializer(),
+                            transaction.requestJson,
+                        ),
+                        transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
+                        isSuccessful = response.isSuccessful,
+                        reason = response.responseMessage,
+                    )
+                }
+                else -> throw IllegalArgumentException(
+                    "requery for " +
+                            "${transaction.transactionType} not supported"
+                )
+            }
             navController.setResult(receipt, "receipt")
+            navController.currentBackStackEntry?.arguments?.putParcelable("receipt", receipt)
             navController.navigate(Routes.Receipt)
         }
     }
@@ -176,7 +190,8 @@ private fun TransactionItem(
                     color = captionColor,
                     modifier = Modifier.padding(start = 4.dp),
                 )
-                AppTextButton(onClick = onClick, modifier = Modifier.padding(top = 10.dp)) {
+                Spacer(modifier = Modifier.height(10.dp))
+                AppTextButton(onClick = onClick) {
                     Text(
                         text = "Check status",
                         color = colorResource(R.color.menuButtonTextColor),

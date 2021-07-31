@@ -168,7 +168,8 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
             nameEnquiryResponse,
         ) {
             makeTransfer@{
-                val isFirstAttempt = transferAttemptCount < 1
+                val isRequery = transferAttemptCount < 1
+                val isFirstAttempt = transferAttemptCount == 0
                 errorMessage = ""
                 if (agentPin.isBlank()) {
                     val pin = dialogProvider.getPin("Agent PIN") ?: return@makeTransfer
@@ -197,7 +198,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
 
                 loadingMessage = "Transfer in progress"
                 val (response, error) = safeRunIO {
-                    if (isFirstAttempt) {
+                    if (isRequery) {
                         fundsTransferService.transfer(fundsTransferRequest)
                     } else {
                         fundsTransferService.requery(fundsTransferRequest)

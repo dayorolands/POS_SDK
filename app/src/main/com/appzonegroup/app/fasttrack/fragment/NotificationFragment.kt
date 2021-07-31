@@ -107,7 +107,7 @@ class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) 
             layoutInflater,
             R.layout.notification_detail_dialog,
             null,
-            false
+            false,
         )
         binding.titleTv.text = notification.header
         binding.messageTv.text = notification.message

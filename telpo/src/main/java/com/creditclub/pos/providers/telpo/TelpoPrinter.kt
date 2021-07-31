@@ -140,7 +140,7 @@ class TelpoPrinter(override val context: Context, override val dialogProvider: D
         return try {
             reset()
             setGray(node.printGray)
-            setAlgin(node.align.code)
+            setAlgin(node.align.ordinal)
             val bm = BitmapFactory.decodeResource(context.resources, node.drawable)
 
             if (bm != null) {
@@ -245,7 +245,7 @@ class TelpoPrinter(override val context: Context, override val dialogProvider: D
 
         return try {
             reset()
-            setAlgin(node.align.code)
+            setAlgin(node.align.ordinal)
             setLeftIndent(node.leftDistance)
             setLineSpace(node.lineDistance)
 

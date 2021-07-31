@@ -25,5 +25,5 @@ open class BackendResponse {
 
     fun isFailure() = !isSuccessful
     fun isPending() = responseCode == "96"
-    fun isSuccess() = !isSuccessful
+    fun isSuccess() = isSuccessful
 }
