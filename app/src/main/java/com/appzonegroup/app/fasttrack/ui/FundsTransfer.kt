@@ -226,7 +226,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                             fundsTransferRequest,
                         ),
                         accountName = nameEnquiryResponse!!.beneficiaryAccountName!!,
-                        accountNumber = nameEnquiryResponse!!.beneficiaryAccountName!!,
+                        accountNumber = receiverAccountNumber,
                         amount = amount,
                         reference = transactionReference,
                         createdAt = Instant.now(),
