@@ -85,12 +85,9 @@ fun PendingTransactions(
                 dialogProvider.showErrorAndWait(response.responseMessage ?: "Pending")
                 return@checkStatus
             }
-            if (response.isFailure()) {
-                dialogProvider.showErrorAndWait(response.responseMessage ?: "Failed")
-                return@checkStatus
+            if (response.isSuccess()) {
+                pendingTransactionsBox.remove(transaction.id)
             }
-
-            pendingTransactionsBox.remove(transaction.id)
 
             val receipt = when (transaction.transactionType) {
                 TransactionType.LocalFundsTransfer,

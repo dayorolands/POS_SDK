@@ -206,19 +206,8 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 }
                 loadingMessage = ""
 
-                if (error != null && receipt == null) {
-                    dialogProvider.showErrorAndWait(error)
-                    navController.popBackStack()
-                    return@makeTransfer
-                }
-
-                if (response!!.isFailure()) {
-                    errorMessage = response.responseMessage ?: ""
-                    isPending = response.responseCode == "96"
-                }
-
-                // Store pending transaction for requery
-                if (isPending && isFirstAttempt) {
+                // Store pending and unconfirmed transaction for requery
+                if ((response == null || response.isPending()) && pendingTransactionId == null) {
                     val pendingTransaction = PendingTransaction(
                         transactionType = if (isSameBank == true) TransactionType.LocalFundsTransfer else TransactionType.FundsTransferCommercialBank,
                         requestJson = defaultJson.encodeToString(
@@ -235,8 +224,17 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     pendingTransactionId = pendingTransactionsBox.put(pendingTransaction)
                 }
 
-                // delete pending transaction once confirmed successful
-                if (response.isSuccess() && pendingTransactionId != null) {
+                if (error != null && receipt == null) {
+                    dialogProvider.showErrorAndWait(error)
+                    navController.popBackStack()
+                    return@makeTransfer
+                }
+
+                if (response!!.isFailure()) {
+                    errorMessage = response.responseMessage ?: ""
+                    isPending = response.isPending()
+                } else if (response.isSuccess() && pendingTransactionId != null) {
+                    // delete pending transaction once confirmed successful
                     pendingTransactionsBox.remove(pendingTransactionId!!)
                 }
 
