@@ -59,10 +59,11 @@ fun NavGraphBuilder.clusterNavigation(
     composable(Routes.PendingTransactions) {
         PendingTransactions(navController = navController)
     }
-    composable(Routes.Receipt) { backStackEntry ->
-        val printJob = backStackEntry
-            .arguments
-            ?.getParcelable<ParcelablePrintJob>("receipt")
+    composable(Routes.Receipt) {
+        val printJob: ParcelablePrintJob? = navController
+            .previousBackStackEntry
+            ?.arguments
+            ?.getParcelable("receipt")
         ReceiptDetails(
             navController = navController,
             printJob = printJob ?: return@composable,

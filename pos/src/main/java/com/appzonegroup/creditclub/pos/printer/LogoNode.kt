@@ -6,6 +6,7 @@ import com.creditclub.pos.printer.ImageNode
 import com.creditclub.pos.printer.PrintJobScope
 
 
+@Suppress("FunctionName")
 fun LogoNode(
     walkPaperAfterPrint: Int = 20,
     align: Alignment = Alignment.MIDDLE,
