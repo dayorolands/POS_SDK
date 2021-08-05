@@ -13,6 +13,7 @@ import com.creditclub.core.R
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.MIDDLEWARE_CLIENT
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogListenerBlock
@@ -29,6 +30,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
 
 abstract class CreditClubActivity : AppCompatActivity {
 
@@ -36,7 +38,7 @@ abstract class CreditClubActivity : AppCompatActivity {
     constructor(layout: Int) : super(layout)
 
     val gps: TrackGPS by inject()
-    val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
+    val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject(named(MIDDLEWARE_CLIENT))
     val dialogProvider: DialogProvider by inject { parametersOf(this) }
     val localStorage: LocalStorage by inject()
     val institutionConfig: IInstitutionConfig by inject()

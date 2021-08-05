@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.MIDDLEWARE_CLIENT
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.util.safeRunSuspend
@@ -15,6 +16,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import retrofit2.create
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -30,7 +32,7 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         if (!Platform.isPOS) return@withContext Result.failure()
 
-        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
+        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject(named(MIDDLEWARE_CLIENT))
         val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
         val posDatabase: PosDatabase by inject()
         val appConfig: AppConfig by inject()

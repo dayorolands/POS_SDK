@@ -129,7 +129,7 @@ dependencies {
     api "androidx.compose.material:material-icons-core:${versions.compose}"
     api "androidx.compose.material:material-icons-extended:${versions.compose}"
     // Integration with activities
-    api "androidx.activity:activity-compose:1.3.0"
+    api "androidx.activity:activity-compose:1.3.1"
     // Integration with ViewModels
     api "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07"
     // Integration with observables

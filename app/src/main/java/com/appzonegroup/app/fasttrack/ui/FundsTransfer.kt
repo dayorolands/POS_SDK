@@ -35,6 +35,7 @@ import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.ClusterObjectBox
+import com.creditclub.core.data.TRANSACTIONS_CLIENT
 import com.creditclub.core.data.api.FundsTransferService
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.model.PendingTransaction
@@ -52,6 +53,7 @@ import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
+import org.koin.core.qualifier.named
 import java.time.Instant
 import java.util.*
 import kotlin.math.roundToInt
@@ -62,6 +64,9 @@ private const val FUNDS_TRANSFER_AUTH_TOKEN = "95C1D8B4-7589-4F70-8F20-473E89FB5
 fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) {
     val context = LocalContext.current
     val fundsTransferService: FundsTransferService by rememberRetrofitService()
+    val fundsTransferTransactionService: FundsTransferService by rememberRetrofitService(
+        TRANSACTIONS_CLIENT
+    )
     val localStorage: LocalStorage by rememberBean()
     val institutionConfig: IInstitutionConfig by rememberBean()
     val coroutineScope = rememberCoroutineScope()
@@ -77,7 +82,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     var narration by remember { mutableStateOf("") }
     var agentPin by remember { mutableStateOf("") }
     var receipt: PrintJob? by remember { mutableStateOf(null) }
-    val transactionReference = rememberSaveable { UUID.randomUUID().toString().substring(0, 8) }
+    val transactionReference = rememberSaveable { UUID.randomUUID().toString().substring(0, 10) }
     val accountNumberIsValid = remember(receiverAccountNumber) {
         receiverAccountNumber.isNotBlank() && (receiverAccountNumber.length == 10 || receiverAccountNumber.length == 11)
     }
@@ -199,7 +204,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 loadingMessage = "Transfer in progress"
                 val (response, error) = safeRunIO {
                     if (isRequery) {
-                        fundsTransferService.transfer(fundsTransferRequest)
+                        fundsTransferTransactionService.transfer(fundsTransferRequest)
                     } else {
                         fundsTransferService.requery(fundsTransferRequest)
                     }

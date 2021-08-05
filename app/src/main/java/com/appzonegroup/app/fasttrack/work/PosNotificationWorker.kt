@@ -7,6 +7,7 @@ import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.MIDDLEWARE_CLIENT
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.safeRunSuspend
@@ -17,6 +18,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import retrofit2.create
 
 
@@ -27,7 +29,7 @@ class PosNotificationWorker(context: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         if (Platform.isPOS) return@withContext Result.failure()
-        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
+        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject(named(MIDDLEWARE_CLIENT))
         val posDatabase: PosDatabase by inject()
         val appConfig: AppConfig by inject()
         val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()

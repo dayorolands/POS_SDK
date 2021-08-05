@@ -17,8 +17,9 @@ import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.creditclub.core.CreditClubApplication
-import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.TRANSACTIONS_CLIENT
 import com.creditclub.core.data.api.AppConfig
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.SurveyQuestion
 import com.creditclub.core.data.request.SubmitSurveyRequest
 import com.creditclub.core.data.response.isSuccessful
@@ -34,7 +35,6 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import org.koin.android.ext.android.inject
-import retrofit2.create
 import java.time.Instant
 
 class LoginActivity : CreditClubActivity(R.layout.activity_login) {
@@ -288,11 +288,10 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     }
 
     private suspend fun settle() = withContext(Dispatchers.IO) {
-        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
         val appConfig: AppConfig by inject()
         val configService: ConfigService by inject()
         val posNotificationDao = posDatabase.posNotificationDao()
-        val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
+        val posApiService: PosApiService by retrofitService(TRANSACTIONS_CLIENT)
 
         val jobs = posNotificationDao.all().map { notification ->
             async {

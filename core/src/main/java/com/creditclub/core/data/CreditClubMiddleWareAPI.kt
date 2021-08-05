@@ -10,10 +10,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/4/2019.
- * Appzone Ltd
- */
+const val TRANSACTIONS_CLIENT = "transactions"
+const val MIDDLEWARE_CLIENT = "middleware"
+const val BACKGROUND_CLIENT = "background"
+
 class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) {
     private val contentType = "application/json".toMediaType()
 
