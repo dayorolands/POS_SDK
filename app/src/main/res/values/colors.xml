@@ -36,4 +36,5 @@
     <color name="splashOverlay">@color/transparent</color>
     <color name="menuButtonTextColor">@color/colorPrimary</color>
     <color name="colorOnSecondary">@color/black</color>
+    <color name="colorBalanceCardBg">@color/colorAccent</color>
 </resources>

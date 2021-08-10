@@ -133,6 +133,11 @@ android {
             dimension "flavor"
             applicationId "com.creditclub.purple"
         }
+
+        heritage {
+            dimension "flavor"
+            applicationId "africa.cluster.heritage"
+        }
     }
     sourceSets {
         main {
