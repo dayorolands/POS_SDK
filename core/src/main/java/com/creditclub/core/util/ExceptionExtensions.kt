@@ -4,6 +4,7 @@ import android.content.Context
 import com.creditclub.core.CreditClubException
 import com.creditclub.core.R
 import com.creditclub.core.data.api.RequestFailureException
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
 import java.io.IOException
@@ -38,6 +39,7 @@ fun Throwable.getMessage(context: Context): String {
         this is IOException || this is HttpException -> context.getString(R.string.a_network_error_occurred)
         this is SerializationException -> context.getString(R.string.an_internal_error_occurred)
         this is HttpException -> context.getString(R.string.server_response_error)
+        this is CancellationException -> context.getString(R.string.cancelled)
         else -> context.getString(R.string.an_internal_error_occurred)
     }
 }

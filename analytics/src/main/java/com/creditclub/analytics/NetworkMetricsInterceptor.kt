@@ -57,11 +57,12 @@ class NetworkMetricsInterceptor(
             error = e
             if (e.httpStatusCode != null) {
                 networkMeasurement.statusCode = e.httpStatusCode!!
-                networkMeasurement.responseTime = Instant.now()
             }
         } catch (t: Throwable) {
             error = t
         }
+        networkMeasurement.responseTime = Instant.now()
+
         if (response != null) {
             networkMeasurement.apply {
                 statusCode = response.code

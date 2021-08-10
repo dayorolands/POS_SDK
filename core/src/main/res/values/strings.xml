@@ -37,4 +37,5 @@
     <string name="please_wait">Please wait</string>
     <string name="unexpected_end_of_stream">Request failed (Unexpected end of stream)</string>
     <string name="unable_to_connect">Request failed (Unable to connect)</string>
+    <string name="cancelled">Cancelled</string>
 </resources>

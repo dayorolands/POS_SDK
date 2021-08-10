@@ -24,6 +24,13 @@ open class BackendResponse {
     val responseCode: String? = null
 
     fun isFailure() = !isSuccessful
-    fun isPending() = responseCode == "96"
+    fun isPendingOnBank() = responseCode == "09"
+    fun isPending() = responseCode == "96" && isPendingOnBank()
     fun isSuccess() = isSuccessful
+}
+
+@Serializable
+open class BackendResponseWithCode : BackendResponse() {
+    @SerialName("TransactionSequenceNumber")
+    val transactionSequenceNumber: Long = 0
 }

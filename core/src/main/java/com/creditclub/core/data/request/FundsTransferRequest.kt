@@ -33,6 +33,9 @@ data class FundsTransferRequest(
     @SerialName("AgentPhoneNumber")
     val agentPhoneNumber: String? = null,
 
+    @SerialName("AgentCode")
+    val agentCode: String? = null,
+
     @SerialName("AgentPin")
     val agentPin: String? = null,
 
