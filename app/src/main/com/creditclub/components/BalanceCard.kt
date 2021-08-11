@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
@@ -80,7 +81,7 @@ fun BalanceCard() {
             .fillMaxWidth()
             .padding(6.dp),
         elevation = 2.dp,
-        backgroundColor = MaterialTheme.colors.secondary,
+        backgroundColor = colorResource(R.color.colorBalanceCardBg),
         contentColor = MaterialTheme.colors.onSecondary,
         shape = RoundedCornerShape(20.dp),
     ) {
