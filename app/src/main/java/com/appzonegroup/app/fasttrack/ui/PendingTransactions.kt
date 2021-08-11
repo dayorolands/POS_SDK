@@ -32,6 +32,7 @@ import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.type.TransactionType
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.defaultJson
+import com.creditclub.pos.printer.ParcelablePrintJob
 import com.creditclub.ui.*
 import io.objectbox.Box
 import io.objectbox.android.ObjectBoxLiveData
@@ -89,7 +90,7 @@ fun PendingTransactions(
                 pendingTransactionsBox.remove(transaction.id)
             }
 
-            val receipt = when (transaction.transactionType) {
+            val receipt: ParcelablePrintJob = when (transaction.transactionType) {
                 TransactionType.LocalFundsTransfer,
                 TransactionType.FundsTransferCommercialBank -> {
                     fundsTransferReceipt(

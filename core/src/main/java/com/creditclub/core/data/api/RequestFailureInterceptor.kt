@@ -1,22 +1,14 @@
 package com.creditclub.core.data.api
 
+import com.creditclub.core.util.delegates.defaultJson
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
 
 class RequestFailureInterceptor : Interceptor {
-    val json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
-        encodeDefaults = true
-    }
-
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
@@ -26,7 +18,7 @@ class RequestFailureInterceptor : Interceptor {
         if (!response.isSuccessful) {
             val jsonPayload = response.body?.string() ?: return response
             val failureResponse = try {
-                json.decodeFromString(FailureResponse.serializer(), jsonPayload)
+                defaultJson.decodeFromString(FailureResponse.serializer(), jsonPayload)
             } catch (ex: SerializationException) {
                 response.close()
                 throw RequestFailureException(

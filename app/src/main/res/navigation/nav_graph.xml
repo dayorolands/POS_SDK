@@ -37,8 +37,7 @@
         app:enterAnim="@anim/fade_in"
         app:exitAnim="@anim/fade_out"
         app:popEnterAnim="@anim/fade_in"
-        app:popExitAnim="@anim/fade_out">
-    </action>
+        app:popExitAnim="@anim/fade_out" />
 
     <action
         android:id="@+id/action_to_collection_payment"
@@ -76,14 +75,12 @@
     <fragment
         android:id="@+id/receiptFragment"
         android:name="com.appzonegroup.app.fasttrack.fragment.ReceiptFragment"
-        android:label="Receipt">
-    </fragment>
+        android:label="Receipt" />
 
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.appzonegroup.app.fasttrack.fragment.HomeFragment"
-        android:label="Home"
-        tools:layout="@layout/home_fragment">
+        android:label="Home">
         <action
             android:id="@+id/action_home_to_bill_payment"
             app:destination="@id/billPaymentFragment"
@@ -121,16 +118,14 @@
                 app:enterAnim="@anim/fade_in"
                 app:exitAnim="@anim/fade_out"
                 app:popEnterAnim="@anim/fade_in"
-                app:popExitAnim="@anim/fade_out">
-            </action>
+                app:popExitAnim="@anim/fade_out" />
         </fragment>
 
         <fragment
             android:id="@+id/collectionReferenceGenerationFragment"
             android:name="com.appzonegroup.app.fasttrack.fragment.CollectionReferenceGenerationFragment"
             android:label="Generate Collection Reference"
-            tools:layout="@layout/fragment_collection_reference_generation">
-        </fragment>
+            tools:layout="@layout/fragment_collection_reference_generation" />
     </navigation>
 
     <fragment

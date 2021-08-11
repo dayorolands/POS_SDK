@@ -2,10 +2,7 @@ package com.creditclub.core.data.api
 
 import com.creditclub.core.data.model.*
 import com.creditclub.core.data.request.*
-import com.creditclub.core.data.response.ApiResponse
-import com.creditclub.core.data.response.BackendResponse
-import com.creditclub.core.data.response.GenericResponse
-import com.creditclub.core.data.response.MiniStatementResponse
+import com.creditclub.core.data.response.*
 import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -55,7 +52,7 @@ interface StaticService {
     ): BackendResponse?
 
     @POST("CreditClubStatic/CompleteActivationWithPinChange")
-    suspend fun completeActivationWithPinChange(@Body request: PinChangeRequest): BackendResponse?
+    suspend fun completeActivationWithPinChange(@Body request: PinChangeRequest): BackendResponseWithCode?
 
     @POST("CreditClubStatic/PinChange")
     suspend fun pinChange(@Body request: PinChangeRequest): BackendResponse?

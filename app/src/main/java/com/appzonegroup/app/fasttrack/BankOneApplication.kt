@@ -1,11 +1,13 @@
 package com.appzonegroup.app.fasttrack
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
+import android.provider.Settings
 import android.telephony.TelephonyManager
 import androidx.appcompat.app.AppCompatDelegate
 import com.appzonegroup.app.fasttrack.di.*
@@ -72,11 +74,15 @@ class BankOneApplication : CreditClubApplication() {
         }
 
         encryptAgentInfo()
-
+        observeNetworkState()
+        @SuppressLint("HardwareIds")
+        appDataStorage.deviceId = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ANDROID_ID
+        )
         registerAppFunctions()
         Platform.test(this)
         if (Platform.isPOS) startPosApp()
-        observeNetworkState()
         registerWorkers()
     }
 

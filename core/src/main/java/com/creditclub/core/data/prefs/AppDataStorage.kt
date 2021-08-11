@@ -29,6 +29,7 @@ class AppDataStorage(
     private var latestVersionJson: String? by valueStore("LATEST_VERSION_JSON")
     var networkState: String? by valueStore("network_state")
     var networkCarrier: String? by valueStore("network_carrier")
+    var deviceId: String? by valueStore("device_id")
 
     var latestVersion: AppVersion?
         get() = if (latestVersionJson != null) {

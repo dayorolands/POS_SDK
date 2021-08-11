@@ -34,6 +34,32 @@ fun Loading(message: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
+fun Loading(message: String, modifier: Modifier = Modifier, onCancel: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 30.dp)
+            .then(modifier),
+    ) {
+        CircularProgressIndicator(modifier = Modifier.padding(bottom = 10.dp))
+        Text(
+            text = message,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.colors.onSurface.copy(0.52f),
+        )
+        Spacer(modifier = Modifier.padding(top = 30.dp))
+        AppButton(
+            modifier = Modifier.padding(horizontal = 10.dp),
+            onClick = onCancel,
+        ) {
+            Text(text = "Cancel")
+        }
+    }
+}
+
+@Composable
 fun ErrorFeedback(errorMessage: String, modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

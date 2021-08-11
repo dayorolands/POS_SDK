@@ -10,6 +10,7 @@ import com.creditclub.analytics.NetworkMetricsInterceptor
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.*
 import com.creditclub.core.data.api.AppConfig
+import com.creditclub.core.data.api.AuthInterceptor
 import com.creditclub.core.data.api.RequestFailureInterceptor
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
@@ -78,6 +79,7 @@ val apiModule = module {
             .writeTimeout(3, TimeUnit.MINUTES)
 
         builder
+            .addInterceptor(AuthInterceptor(get()))
             .addInterceptor(NetworkMetricsInterceptor(get(), get(), get(), get()))
             .addInterceptor(RequestFailureInterceptor())
 

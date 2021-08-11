@@ -1,6 +1,8 @@
 package com.creditclub.core.data
 
-import com.creditclub.core.data.api.*
+import com.creditclub.core.data.api.CaseLogService
+import com.creditclub.core.data.api.CollectionsService
+import com.creditclub.core.data.api.StaticService
 import com.creditclub.core.util.delegates.service
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -35,7 +37,5 @@ class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) {
 
     val staticService: StaticService by retrofit.service()
     val caseLogService: CaseLogService by retrofit.service()
-    val reportService: ReportService by retrofit.service()
-    val versionService: VersionService by retrofit.service()
     val collectionsService: CollectionsService by retrofit.service()
 }

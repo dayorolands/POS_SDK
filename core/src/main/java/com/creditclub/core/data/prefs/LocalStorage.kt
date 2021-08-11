@@ -5,9 +5,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.creditclub.core.data.model.AgentInfo
 import com.creditclub.core.data.model.AuthResponse
-import com.creditclub.core.util.delegates.jsonStore
-import com.creditclub.core.util.delegates.valueStore
-import kotlinx.serialization.json.Json
+import com.creditclub.core.util.delegates.*
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
@@ -17,24 +15,15 @@ class LocalStorage(
     context: Context,
     pref: SharedPreferences = context.getEncryptedSharedPreferences("agent_0")
 ) : SharedPreferences by pref {
-    private val json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
-        encodeDefaults = true
-    }
-
     var cacheAuth: String? by valueStore(KEY_AUTH)
     var institutionCode: String? by valueStore(INSTITUTION_CODE)
     var agentPhone: String? by valueStore(AGENT_PHONE)
     var sessionID: String? by valueStore(SESSION_ID)
     var lastKnownLocation: String? by valueStore("LAST_KNOWN_LOCATION", "0.00;0.00")
-    val agentIsActivated: Boolean
-        get() = getString("ACTIVATED") != null
 
-    val authResponse: AuthResponse? by jsonStore(KEY_AUTH, AuthResponse.serializer(), json)
-    var agent: AgentInfo? by jsonStore(AGENT_INFO, AgentInfo.serializer(), json)
+    val authResponse: AuthResponse? by jsonStore(KEY_AUTH, AuthResponse.serializer(), defaultJson)
+    var agent: AgentInfo? by jsonStore(AGENT_INFO, AgentInfo.serializer(), defaultJson)
+    var transactionSequenceNumber: Long by longStore("transaction_sequence_number", 1)
 
     fun getString(key: String): String? = getString(key, null)
 
@@ -53,4 +42,8 @@ class LocalStorage(
         const val ErrorResponseCount = "ERROR_RESPONSE_COUNT"
         const val RequestCount = "REQUEST_COUNT"
     }
+}
+
+fun LocalStorage.newTransactionReference(): String {
+    return "${transactionSequenceNumber++}".padStart(10, '0')
 }
