@@ -24,8 +24,8 @@ open class BackendResponse {
     val responseCode: String? = null
 
     fun isFailure() = !isSuccessful
-    fun isPendingOnBank() = responseCode == "20"
-    fun isPending() = responseCode == "96" && isPendingOnBank()
+    fun isPendingOnBank() = responseCode == "24"
+    fun isPending() = responseCode == "20" && isPendingOnBank()
     fun isSuccess() = isSuccessful
 }
 
