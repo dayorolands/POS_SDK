@@ -32,8 +32,9 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     private val viewModel by viewModels<BillPaymentViewModel>()
     private val binding by dataBinding<BillPaymentFragmentBinding>()
     override val functionId = FunctionIds.PAY_BILL
-    private val uniqueReference by lazy { localStorage.newTransactionReference() }
-    private val retrievalReferenceNumber = generateRRN()
+    private val uniqueReference by lazy {
+        "${localStorage.agent!!.agentCode}${localStorage.newTransactionReference()}"
+    }
     private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
     private val billsPaymentService by retrofitService<BillsPaymentService>()
 
@@ -316,10 +317,10 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             customerPhone = if (isAirtime) {
                 viewModel.fieldOne.value
             } else viewModel.customerPhone.value,
-            customerDepositSlipNumber = "${agent.agentCode}$uniqueReference",
+            customerDepositSlipNumber = uniqueReference,
             geolocation = gps.geolocationString,
             isRecharge = isAirtime,
-            retrievalReferenceNumber = retrievalReferenceNumber,
+            retrievalReferenceNumber = uniqueReference,
             validationCode = viewModel.customerValidationResponse.value?.validationCode,
         )
         dialogProvider.showProgressBar("Processing request")

@@ -45,5 +45,5 @@ class LocalStorage(
 }
 
 fun LocalStorage.newTransactionReference(): String {
-    return "${transactionSequenceNumber++}".padStart(10, '0')
+    return "${transactionSequenceNumber++}".padStart(8, '0')
 }

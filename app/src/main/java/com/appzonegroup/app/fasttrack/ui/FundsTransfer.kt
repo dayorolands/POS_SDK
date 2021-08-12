@@ -52,7 +52,7 @@ import com.creditclub.ui.*
 import io.objectbox.Box
 import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import java.time.Instant
@@ -83,7 +83,10 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     var narration by remember { mutableStateOf("") }
     var agentPin by remember { mutableStateOf("") }
     var receipt: PrintJob? by remember { mutableStateOf(null) }
-    val transactionReference = rememberSaveable { localStorage.newTransactionReference() }
+    val transactionReference = rememberSaveable {
+        val transactionSequenceNumber = localStorage.newTransactionReference()
+        "${localStorage.agent!!.agentCode}$transactionSequenceNumber"
+    }
     val accountNumberIsValid = remember(receiverAccountNumber) {
         receiverAccountNumber.isNotBlank() && (receiverAccountNumber.length == 10 || receiverAccountNumber.length == 11)
     }
@@ -114,7 +117,6 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         clusterObjectBox.boxStore.boxFor()
     }
     var pendingTransactionId: Long? by remember { mutableStateOf(null) }
-    var activeJob: Job? by remember { mutableStateOf(null) }
     var needsManualRequery by remember { mutableStateOf(false) }
 
     val validateAccount: suspend CoroutineScope.() -> Unit =
@@ -136,6 +138,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     geoLocation = localStorage.lastKnownLocation,
                     beneficiaryAccountNumber = receiverAccountNumber,
                     beneficiaryInstitutionCode = bank?.code,
+                    retrievalReferenceNumber = transactionReference,
                 )
 
                 loadingMessage = "Validating account information"
@@ -195,7 +198,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     beneficiaryAccountNumber = receiverAccountNumber,
                     amountInNaira = amountString.toDouble(),
                     isToRelatedCommercialBank = isSameBank ?: false,
-                    externalTransactionReference = "${agent.agentCode}$transactionReference",
+                    externalTransactionReference = transactionReference,
                     geoLocation = localStorage.lastKnownLocation,
                     narration = narration.trim { it <= ' ' },
                     beneficiaryInstitutionCode = bank?.code,
@@ -203,6 +206,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     beneficiaryBVN = nameEnquiryResponse!!.beneficiaryBVN,
                     beneficiaryKYC = nameEnquiryResponse!!.beneficiaryKYC,
                     nameEnquirySessionID = nameEnquiryResponse!!.nameEnquirySessionID,
+                    retrievalReferenceNumber = transactionReference,
                 )
 
                 loadingMessage = if (transferAttemptCount > 0) {
@@ -243,9 +247,9 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     return@makeTransfer
                 }
 
-                if (response!!.isFailure()) {
+                isPending = response!!.isPending()
+                if (response.isFailure()) {
                     errorMessage = response.responseMessage ?: ""
-                    isPending = response.isPending()
                 } else if (response.isSuccess() && pendingTransactionId != null) {
                     // delete pending transaction once confirmed successful
                     pendingTransactionsBox.remove(pendingTransactionId!!)
@@ -273,10 +277,10 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     }
 
     // Schedule automatic requery for pending transactions
-    LaunchedEffect(transferAttemptCount, transferFunds) {
+    LaunchedEffect(transferAttemptCount) {
         if (transferAttemptCount < 1 || needsManualRequery) return@LaunchedEffect
 
-        transferFunds()
+        if (isPending) transferFunds()
     }
 
     if (isPending) {
@@ -286,7 +290,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
             loadingMessage = loadingMessage,
             message = errorMessage,
             onRequery = {
-                activeJob = coroutineScope.launch { transferFunds() }
+                coroutineScope.launch { transferFunds() }
             },
         )
         return
@@ -335,8 +339,8 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     Loading(
                         message = loadingMessage,
                         onCancel = {
-                            activeJob?.cancel()
-                            activeJob = null
+                            coroutineScope.cancel()
+                            loadingMessage = ""
                         },
                     )
                 }
@@ -476,7 +480,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         if (loadingMessage.isBlank() && accountNumberIsValid && amountIsValid && receipt == null) {
             AppButton(
                 onClick = {
-                    activeJob = coroutineScope.launch {
+                    coroutineScope.launch {
                         when {
                             !showConfirmation -> showConfirmation = true
                             isVerified -> transferFunds()

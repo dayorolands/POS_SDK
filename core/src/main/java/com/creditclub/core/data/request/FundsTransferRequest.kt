@@ -61,7 +61,7 @@ data class FundsTransferRequest(
     val additionalInformation: String? = null,
 
     @SerialName("RetrievalReferenceNumber")
-    val retrievalReferenceNumber: String? = generateRRN(),
+    val retrievalReferenceNumber: String?,
 ) {
     @Serializable
     data class Additional(

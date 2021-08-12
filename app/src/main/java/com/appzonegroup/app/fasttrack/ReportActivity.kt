@@ -272,6 +272,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     beneficiaryAccountNumber = item.to,
                     amountInNaira = item.amount ?: 0.0,
                     externalTransactionReference = item.uniqueReference,
+                    retrievalReferenceNumber = item.uniqueReference,
                 )
                 posPrinter.print(
                     fundsTransferReceipt(
