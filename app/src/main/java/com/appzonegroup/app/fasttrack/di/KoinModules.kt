@@ -59,6 +59,7 @@ val apiModule = module {
             .cache(cache)
 
         builder
+            .addInterceptor(AuthInterceptor(get(), get()))
             .addInterceptor(NetworkMetricsInterceptor(get(), get(), get(), get()))
             .addInterceptor(RequestFailureInterceptor())
 
@@ -79,7 +80,7 @@ val apiModule = module {
             .writeTimeout(3, TimeUnit.MINUTES)
 
         builder
-            .addInterceptor(AuthInterceptor(get()))
+            .addInterceptor(AuthInterceptor(get(), get()))
             .addInterceptor(NetworkMetricsInterceptor(get(), get(), get(), get()))
             .addInterceptor(RequestFailureInterceptor())
 

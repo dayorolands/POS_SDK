@@ -90,8 +90,8 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
     }
 
     private suspend fun trySendToken() {
-        val amount = viewModel.amountString.value!!.trim { it <= ' ' }
-        if (amount.isEmpty()) {
+        val amount = viewModel.amountString.value?.trim { it <= ' ' }
+        if (amount.isNullOrBlank()) {
             dialogProvider.showError(getString(R.string.please_enter_an_amount))
             return
         }

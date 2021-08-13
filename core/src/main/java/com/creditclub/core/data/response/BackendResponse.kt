@@ -30,7 +30,7 @@ open class BackendResponse {
 }
 
 @Serializable
-open class BackendResponseWithCode : BackendResponse() {
+open class AgentActivationResponse : BackendResponse() {
     @SerialName("TransactionSequenceNumber")
     val transactionSequenceNumber: Long = 0
 }

@@ -3,8 +3,10 @@ package com.creditclub.core.data
 import com.creditclub.core.data.api.CaseLogService
 import com.creditclub.core.data.api.CollectionsService
 import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.util.delegates.defaultJson
 import com.creditclub.core.util.delegates.service
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -19,20 +21,12 @@ const val BACKGROUND_CLIENT = "background"
 class CreditClubMiddleWareAPI(okHttpClient: OkHttpClient, apiHost: String) {
     private val contentType = "application/json".toMediaType()
 
-    private val json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
-        encodeDefaults = true
-    }
-
     val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl("${apiHost}/CreditClubMiddlewareAPI/")
         .client(okHttpClient)
         .addConverterFactory(NullOnEmptyConverterFactory.create())
         .addConverterFactory(ScalarsConverterFactory.create())
-        .addConverterFactory(json.asConverterFactory(contentType))
+        .addConverterFactory(defaultJson.asConverterFactory(contentType))
         .build()
 
     val staticService: StaticService by retrofit.service()

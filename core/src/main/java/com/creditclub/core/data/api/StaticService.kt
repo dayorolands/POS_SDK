@@ -52,7 +52,7 @@ interface StaticService {
     ): BackendResponse?
 
     @POST("CreditClubStatic/CompleteActivationWithPinChange")
-    suspend fun completeActivationWithPinChange(@Body request: PinChangeRequest): BackendResponseWithCode?
+    suspend fun completeActivationWithPinChange(@Body request: PinChangeRequest): AgentActivationResponse?
 
     @POST("CreditClubStatic/PinChange")
     suspend fun pinChange(@Body request: PinChangeRequest): BackendResponse?
