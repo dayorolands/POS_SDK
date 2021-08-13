@@ -7,14 +7,15 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityWithdrawBinding
 import com.appzonegroup.app.fasttrack.fragment.WithdrawalViewModel
 import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
-import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.api.StaticService
 import com.creditclub.core.data.api.retrofitService
+import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.WithdrawalRequest
 import com.creditclub.core.type.TokenType
-import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
-import com.creditclub.pos.printer.PrinterStatus
+import com.creditclub.core.util.finishOnClose
+import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.toString
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.time.Instant
@@ -30,7 +31,9 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
     )
     override val functionId = FunctionIds.TOKEN_WITHDRAWAL
     private val tokenWithdrawalConfig by lazy { institutionConfig.flows.tokenWithdrawal }
-    private val retrievalReferenceNumber = generateRRN()
+    private val retrievalReferenceNumber by lazy {
+        localStorage.newTransactionReference()
+    }
 
     private val viewModel: WithdrawalViewModel by viewModels()
     private val staticService: StaticService by retrofitService()

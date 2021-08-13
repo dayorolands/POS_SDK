@@ -21,7 +21,10 @@ import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.*
+import com.creditclub.core.util.includesNumbers
+import com.creditclub.core.util.includesSpecialCharacters
+import com.creditclub.core.util.isValidEmail
+import com.creditclub.core.util.safeRunIO
 import com.creditclub.pos.printer.PosPrinter
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -32,9 +35,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     private val viewModel by viewModels<BillPaymentViewModel>()
     private val binding by dataBinding<BillPaymentFragmentBinding>()
     override val functionId = FunctionIds.PAY_BILL
-    private val uniqueReference by lazy {
-        "${localStorage.agent!!.agentCode}${localStorage.newTransactionReference()}"
-    }
+    private val uniqueReference by lazy { localStorage.newTransactionReference() }
     private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
     private val billsPaymentService by retrofitService<BillsPaymentService>()
 

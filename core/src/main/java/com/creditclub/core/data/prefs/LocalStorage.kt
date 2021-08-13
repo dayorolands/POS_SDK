@@ -5,7 +5,10 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.creditclub.core.data.model.AgentInfo
 import com.creditclub.core.data.model.AuthResponse
-import com.creditclub.core.util.delegates.*
+import com.creditclub.core.util.delegates.defaultJson
+import com.creditclub.core.util.delegates.jsonStore
+import com.creditclub.core.util.delegates.longStore
+import com.creditclub.core.util.delegates.valueStore
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
@@ -44,6 +47,10 @@ class LocalStorage(
     }
 }
 
-fun LocalStorage.newTransactionReference(): String {
+private fun LocalStorage.newTransactionSequenceNumber(): String {
     return "${transactionSequenceNumber++}".padStart(8, '0')
+}
+
+fun LocalStorage.newTransactionReference(): String {
+    return "${agent!!.agentCode}${newTransactionSequenceNumber()}"
 }

@@ -7,21 +7,20 @@ import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.api.StaticService
 import com.creditclub.core.data.api.retrofitService
+import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.DepositRequest
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
 import kotlinx.coroutines.launch
 import java.time.Instant
 
-
-/**
- * Created by oto-obong on 2/27/2017.
- */
-
 class DepositActivity : CustomerBaseActivity() {
     private val binding by contentView<DepositActivity, ActivityDepositBinding>(R.layout.activity_deposit)
     override val functionId = FunctionIds.DEPOSIT
     private val staticService: StaticService by retrofitService()
+    private val retrievalReferenceNumber by lazy {
+        localStorage.newTransactionReference()
+    }
 
     override fun onCustomerReady(savedInstanceState: Bundle?) {
 
@@ -79,6 +78,7 @@ class DepositActivity : CustomerBaseActivity() {
             customerAccountNumber = accountInfo.number,
             amount = amount,
             geoLocation = gps.geolocationString,
+            retrievalReferenceNumber = retrievalReferenceNumber
         )
         renderTransactionSummary(
             amount = amount.toDouble(),

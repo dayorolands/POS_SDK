@@ -1,6 +1,5 @@
 package com.creditclub.core.data.request
 
-import com.creditclub.core.util.generateRRN
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -28,7 +27,7 @@ data class DepositRequest(
     val additionalInformation: String? = null,
 
     @SerialName("RetrievalReferenceNumber")
-    val retrievalReferenceNumber: String? = generateRRN(),
+    val retrievalReferenceNumber: String? = null,
 
     @SerialName("UniqueReferenceID")
     val uniqueReferenceID: String? = null,

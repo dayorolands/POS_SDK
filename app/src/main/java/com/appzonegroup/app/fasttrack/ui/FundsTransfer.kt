@@ -83,10 +83,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     var narration by remember { mutableStateOf("") }
     var agentPin by remember { mutableStateOf("") }
     var receipt: PrintJob? by remember { mutableStateOf(null) }
-    val transactionReference = rememberSaveable {
-        val transactionSequenceNumber = localStorage.newTransactionReference()
-        "${localStorage.agent!!.agentCode}$transactionSequenceNumber"
-    }
+    val transactionReference = rememberSaveable { localStorage.newTransactionReference() }
     val accountNumberIsValid = remember(receiverAccountNumber) {
         receiverAccountNumber.isNotBlank() && (receiverAccountNumber.length == 10 || receiverAccountNumber.length == 11)
     }
