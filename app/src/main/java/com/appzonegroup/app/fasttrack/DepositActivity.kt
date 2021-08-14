@@ -78,7 +78,7 @@ class DepositActivity : CustomerBaseActivity() {
             customerAccountNumber = accountInfo.number,
             amount = amount,
             geoLocation = gps.geolocationString,
-            retrievalReferenceNumber = retrievalReferenceNumber
+            retrievalReferenceNumber = retrievalReferenceNumber,
         )
         renderTransactionSummary(
             amount = amount.toDouble(),

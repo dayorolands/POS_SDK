@@ -193,7 +193,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     agentPin = agentPin,
                     authToken = FUNDS_TRANSFER_AUTH_TOKEN,
                     beneficiaryAccountNumber = receiverAccountNumber,
-                    amountInNaira = amountString.toDouble(),
+                    amountInNaira = amount,
                     isToRelatedCommercialBank = isSameBank ?: false,
                     externalTransactionReference = transactionReference,
                     geoLocation = localStorage.lastKnownLocation,
@@ -245,13 +245,13 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 }
 
                 isPending = response!!.isPending()
+                needsManualRequery = response.isPendingOnBank()
                 if (response.isFailure()) {
                     errorMessage = response.responseMessage ?: ""
                 } else if (response.isSuccess() && pendingTransactionId != null) {
                     // delete pending transaction once confirmed successful
                     pendingTransactionsBox.remove(pendingTransactionId!!)
                 }
-                needsManualRequery = response.isPendingOnBank()
 
                 receipt = fundsTransferReceipt(
                     context = context,
@@ -280,9 +280,12 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         if (isPending) transferFunds()
     }
 
-    if (isPending) {
+    if (needsManualRequery) {
         TransactionStatusQuery(
-            onClose = { isPending = false },
+            onClose = {
+                isPending = false
+                needsManualRequery = false
+            },
             title = "Transaction pending",
             loadingMessage = loadingMessage,
             message = errorMessage,
