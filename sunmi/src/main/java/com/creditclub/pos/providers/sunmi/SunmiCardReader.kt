@@ -15,7 +15,7 @@ import com.sunmi.pay.hardware.aidlv2.bean.EMVTransDataV2
 import com.sunmi.pay.hardware.aidlv2.readcard.CheckCardCallbackV2
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
 import sunmi.paylib.SunmiPayKernel
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine

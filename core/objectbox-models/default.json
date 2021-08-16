@@ -1,0 +1,186 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:8080937486238742064",
+      "lastPropertyId": "9:5022845206279744351",
+      "name": "PendingTransaction",
+      "properties": [
+        {
+          "id": "1:3862034992958782087",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:2823562737511081875",
+          "name": "transactionType",
+          "type": 5,
+          "flags": 2
+        },
+        {
+          "id": "3:2336136082856939607",
+          "name": "requestJson",
+          "type": 9
+        },
+        {
+          "id": "4:8327361221814450659",
+          "name": "accountNumber",
+          "type": 9
+        },
+        {
+          "id": "5:7802377865835090461",
+          "name": "accountName",
+          "type": 9
+        },
+        {
+          "id": "6:3326804430471228416",
+          "name": "amount",
+          "type": 8,
+          "flags": 4
+        },
+        {
+          "id": "7:781852059283915358",
+          "name": "reference",
+          "type": 9
+        },
+        {
+          "id": "8:7029708425675196575",
+          "name": "createdAt",
+          "type": 9
+        },
+        {
+          "id": "9:5022845206279744351",
+          "name": "lastCheckedAt",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:3370428315851265837",
+      "lastPropertyId": "20:3713713119483635030",
+      "name": "NetworkMeasurement",
+      "properties": [
+        {
+          "id": "1:305189153266491588",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:63235279417299711",
+          "name": "agentCode",
+          "type": 9
+        },
+        {
+          "id": "3:491716542728680684",
+          "name": "agentPhoneNumber",
+          "type": 9
+        },
+        {
+          "id": "4:6261794905304628406",
+          "name": "institutionCode",
+          "type": 9
+        },
+        {
+          "id": "5:2767086377212300383",
+          "name": "url",
+          "type": 9
+        },
+        {
+          "id": "6:2151305904158753187",
+          "name": "method",
+          "type": 9
+        },
+        {
+          "id": "7:6375236975338432783",
+          "name": "gpsCoordinates",
+          "type": 9
+        },
+        {
+          "id": "8:7588769055765886471",
+          "name": "statusCode",
+          "type": 5,
+          "flags": 4
+        },
+        {
+          "id": "9:5934228300107437934",
+          "name": "appName",
+          "type": 9
+        },
+        {
+          "id": "10:6562281924401183415",
+          "name": "appVersion",
+          "type": 9
+        },
+        {
+          "id": "11:9188022691993798047",
+          "name": "message",
+          "type": 9
+        },
+        {
+          "id": "12:7499682990773942569",
+          "name": "duration",
+          "type": 6,
+          "flags": 4
+        },
+        {
+          "id": "13:9213254128998592982",
+          "name": "flowName",
+          "type": 9
+        },
+        {
+          "id": "14:7398981925209927001",
+          "name": "flowId",
+          "type": 9
+        },
+        {
+          "id": "15:3240888893290009539",
+          "name": "requestTime",
+          "type": 9
+        },
+        {
+          "id": "16:2301157315839418447",
+          "name": "responseTime",
+          "type": 9
+        },
+        {
+          "id": "17:2720028888622484806",
+          "name": "networkState",
+          "type": 9
+        },
+        {
+          "id": "18:1030229615926446050",
+          "name": "networkCarrier",
+          "type": 9
+        },
+        {
+          "id": "19:5851152239865860991",
+          "name": "deviceType",
+          "type": 5,
+          "flags": 2
+        },
+        {
+          "id": "20:3713713119483635030",
+          "name": "terminalId",
+          "type": 9
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "2:3370428315851265837",
+  "lastIndexId": "0:0",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

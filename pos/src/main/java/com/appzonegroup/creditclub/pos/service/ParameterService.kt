@@ -32,8 +32,8 @@ import org.jpos.iso.ISOMsg
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.IOException
 import java.security.SecureRandom
 import java.time.Instant
@@ -43,7 +43,7 @@ import kotlin.reflect.KProperty
 class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : PosParameter,
     KoinComponent {
     private val prefs: SharedPreferences = run {
-        val suffix = "${posMode.ip}:${posMode.port}"
+        val suffix = "${posMode.host}:${posMode.port}"
         val suffixHash = suffix.toByteArray().sha256String
         context.getEncryptedSharedPreferences("pos_parameters_0:$suffixHash")
     }
@@ -134,7 +134,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
-            debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
+            debug("Error contacting ${posMode.label} server ${posMode.host}:${posMode.port}")
             throw ParameterDownloadException(isoMsg.responseMessage)
         }
         val tlvString =
@@ -185,7 +185,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
-            debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
+            debug("Error contacting ${posMode.label} server ${posMode.host}:${posMode.port}")
             throw PublicKeyDownloadException(isoMsg.responseMessage)
         }
 
@@ -240,7 +240,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
-            debug("Error contacting ${posMode.label} server ${posMode.ip}:${posMode.port}")
+            debug("Error contacting ${posMode.label} server ${posMode.host}:${posMode.port}")
             throw EmvAidDownloadException(isoMsg.responseMessage)
         }
 
@@ -336,6 +336,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
     class EmvAidDownloadException(message: String) :
         CreditClubException("EMV Application AID Download Failed. $message")
 
+    @Throws(CreditClubException::class)
     private suspend fun downloadKey(
         terminalId: String,
         processingCode: String,
@@ -353,7 +354,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             terminalId41 = terminalId
         }
         debugOnly { isoMsg.log() }
-        val (output, error) = safeRunIO { SocketJob.execute(posMode, isoMsg.pack()) }
+        val (output, error) = safeRunIO { posMode.sendAndReceive(isoMsg.pack()) }
         val isoRequestLog = isoMsg.generateRequestLog()
         if (output == null) {
             isoRequestLog.saveToDb("TE")
@@ -370,7 +371,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
                 """
                     |Key Download failed
                     |Error contacting ${posMode.label}. 
-                    |Server ${posMode.ip}:${posMode.port}. 
+                    |Server ${posMode.host}:${posMode.port}. 
                     |${isoMsg.responseMessage}
                     |""".trimMargin()
             )

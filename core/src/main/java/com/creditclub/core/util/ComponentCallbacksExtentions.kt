@@ -2,7 +2,9 @@ package com.creditclub.core.util
 
 import android.content.ComponentCallbacks
 import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.MIDDLEWARE_CLIENT
 import org.koin.android.ext.android.get
+import org.koin.core.qualifier.named
 
 
 /**
@@ -10,4 +12,4 @@ import org.koin.android.ext.android.get
  * Appzone Ltd
  */
 
-val ComponentCallbacks.creditClubMiddleWareAPI: CreditClubMiddleWareAPI get() = get()
+val ComponentCallbacks.creditClubMiddleWareAPI: CreditClubMiddleWareAPI get() = get(named(MIDDLEWARE_CLIENT))

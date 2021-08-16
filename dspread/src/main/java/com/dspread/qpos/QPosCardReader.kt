@@ -21,8 +21,8 @@ import com.dspread.xpos.QPOSService
 import com.eazypermissions.common.model.PermissionResult
 import com.eazypermissions.coroutinespermission.PermissionManager
 import kotlinx.coroutines.*
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.time.Instant
 import java.util.*
 import kotlin.concurrent.scheduleAtFixedRate

@@ -20,8 +20,8 @@ import com.creditclub.pos.providers.smartpeak.p1000.pboc.utils.OfflineTransactio
 import com.creditclub.pos.providers.smartpeak.p1000.utils.GlobalData
 import com.pos.sdk.card.PosCardInfo
 import com.pos.sdk.printer.PosPrinterInfo
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.dsl.module
 
 class SmartPeakPosManager(val activity: CreditClubActivity) : PosManager, KoinComponent {
@@ -97,11 +97,11 @@ class SmartPeakPosManager(val activity: CreditClubActivity) : PosManager, KoinCo
             LogUtil.openLog()
         }
 
-        override val module = module(override = true) {
-            single<PosManager>(override = true) { (activity: CreditClubActivity) ->
+        override val module = module {
+            single<PosManager> { (activity: CreditClubActivity) ->
                 SmartPeakPosManager(activity)
             }
-            single<PosPrinter>(override = true) { (context: Context, dialogProvider: DialogProvider) ->
+            single<PosPrinter> { (context: Context, dialogProvider: DialogProvider) ->
                 SmartPeakPrinter(context, dialogProvider)
             }
         }

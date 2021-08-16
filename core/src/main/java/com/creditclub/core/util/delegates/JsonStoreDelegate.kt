@@ -38,13 +38,7 @@ class JsonStoreDelegate<T : Any>(
 inline fun <reified T : Any> SharedPreferences.jsonStore(
     key: String,
     serializer: KSerializer<T>,
-    json: Json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
-        encodeDefaults = true
-    }
+    json: Json = defaultJson,
 ): JsonStoreDelegate<T> {
     return JsonStoreDelegate(this, key, serializer, json)
 }

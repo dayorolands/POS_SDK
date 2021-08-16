@@ -13,6 +13,7 @@ import com.creditclub.core.R
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.MIDDLEWARE_CLIENT
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogListenerBlock
@@ -26,12 +27,10 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
 
 abstract class CreditClubActivity : AppCompatActivity {
 
@@ -39,17 +38,15 @@ abstract class CreditClubActivity : AppCompatActivity {
     constructor(layout: Int) : super(layout)
 
     val gps: TrackGPS by inject()
-    val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
+    val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject(named(MIDDLEWARE_CLIENT))
     val dialogProvider: DialogProvider by inject { parametersOf(this) }
-    val coreDatabase: CoreDatabase by inject()
     val localStorage: LocalStorage by inject()
     val institutionConfig: IInstitutionConfig by inject()
     val appConfig: AppConfig by inject()
 
     open val functionId: Int? = null
 
-    val mainScope by lazy { CoroutineScope(Dispatchers.Main) }
-    val ioScope by lazy { CoroutineScope(Dispatchers.IO) }
+    val mainScope = MainScope()
 
     private val fusedLocationClient: FusedLocationProviderClient by lazy {
         LocationServices.getFusedLocationProviderClient(this)
@@ -114,9 +111,8 @@ abstract class CreditClubActivity : AppCompatActivity {
     }
 
     override fun onDestroy() {
-        mainScope.cancel()
-        ioScope.cancel()
         super.onDestroy()
+        mainScope.cancel()
     }
 
     fun showNetworkError() = showNetworkError(null)

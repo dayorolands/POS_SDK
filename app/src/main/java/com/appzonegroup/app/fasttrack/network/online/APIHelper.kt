@@ -26,7 +26,7 @@ class APIHelper @JvmOverloads constructor(
     private val ctx: Context,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 ) {
-    private val koin = GlobalContext.get().koin
+    private val koin = GlobalContext.get()
     private val localStorage: LocalStorage by koin.inject()
     private val client: CreditClubClient by koin.inject()
 

@@ -18,8 +18,8 @@ import com.nexgo.oaf.apiv3.APIProxy
 import com.nexgo.oaf.apiv3.DeviceEngine
 import com.nexgo.oaf.apiv3.emv.AidEntity
 import com.nexgo.oaf.apiv3.emv.CapkEntity
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.dsl.module
 
 class N3PosManager(private val activity: CreditClubActivity) : PosManager, KoinComponent {
@@ -121,11 +121,11 @@ class N3PosManager(private val activity: CreditClubActivity) : PosManager, KoinC
             APIProxy.getDeviceEngine(context).getEmvHandler2("app2")
         }
 
-        override val module = module(override = true) {
-            factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
+        override val module = module {
+            factory<PosManager> { (activity: CreditClubActivity) ->
                 N3PosManager(activity)
             }
-            factory<PosPrinter>(override = true) { (activity: Activity, dialogProvider: DialogProvider) ->
+            factory<PosPrinter> { (activity: Activity, dialogProvider: DialogProvider) ->
                 N3Printer(activity, dialogProvider)
             }
         }

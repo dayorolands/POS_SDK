@@ -35,7 +35,7 @@ value class PrintJobScope(private val nodes: MutableList<PrintNode> = mutableLis
         text: String,
         leftDistance: Int = 0,
         lineDistance: Int = 0,
-        fontSize: Int = 2,
+        fontSize: Int = 15,
         printGray: Int = 5,
         isBold: Boolean = false,
         align: Alignment = Alignment.LEFT,

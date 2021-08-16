@@ -7,58 +7,61 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FundsTransferRequest(
     @SerialName("ExternalTransactionReference")
-    var externalTransactionReference: String? = null,
+    val externalTransactionReference: String? = null,
 
     @SerialName("BeneficiaryAccountNumber")
-    var beneficiaryAccountNumber: String? = null,
+    val beneficiaryAccountNumber: String? = null,
 
     @SerialName("BeneficiaryAccountName")
-    var beneficiaryAccountName: String? = null,
+    val beneficiaryAccountName: String? = null,
 
     @SerialName("BeneficiaryBVN")
-    var beneficiaryBVN: String? = null,
+    val beneficiaryBVN: String? = null,
 
     @SerialName("BeneficiaryKYC")
-    var beneficiaryKYC: String? = null,
+    val beneficiaryKYC: String? = null,
 
     @SerialName("NameEnquirySessionID")
-    var nameEnquirySessionID: String? = null,
+    val nameEnquirySessionID: String? = null,
 
     @SerialName("BeneficiaryInstitutionCode")
-    var beneficiaryInstitutionCode: String? = null,
+    val beneficiaryInstitutionCode: String? = null,
 
     @SerialName("AuthToken")
-    var authToken: String? = null,
+    val authToken: String? = null,
 
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null,
+    val agentPhoneNumber: String? = null,
+
+    @SerialName("AgentCode")
+    val agentCode: String? = null,
 
     @SerialName("AgentPin")
-    var agentPin: String? = null,
+    val agentPin: String? = null,
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = null,
+    val institutionCode: String? = null,
 
     @SerialName("GeoLocation")
-    var geoLocation: String? = null,
+    val geoLocation: String? = null,
 
     @SerialName("AmountInNaira")
-    var amountInNaira: Double = 0.0,
+    val amountInNaira: Double = 0.0,
 
     @SerialName("IsNotEncryptedPin")
-    var isNotEncryptedPin: Boolean = true,
+    val isNotEncryptedPin: Boolean = true,
 
     @SerialName("IsToRelatedCommercialBank")
-    var isToRelatedCommercialBank: Boolean = true, // for transfer to same institution this is set to true
+    val isToRelatedCommercialBank: Boolean = true, // for transfer to same institution this is set to true
 
     @SerialName("Narration")
-    var narration: String? = null,
+    val narration: String? = null,
 
     @SerialName("AdditionalInformation")
-    var additionalInformation: String? = null,
+    val additionalInformation: String? = null,
 
     @SerialName("RetrievalReferenceNumber")
-    var retrievalReferenceNumber: String? = generateRRN(),
+    val retrievalReferenceNumber: String?,
 ) {
     @Serializable
     data class Additional(

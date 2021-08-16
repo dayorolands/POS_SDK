@@ -49,11 +49,20 @@ abstract class TransactionReceipt(
 }
 
 fun PrintJobScope.transactionStatus(
+    context: Context,
     isSuccessful: Boolean,
-    statusMessage: String,
+    statusMessage: String = (if (isSuccessful) {
+        context.getString(R.string.pos_transaction_approved)
+    } else {
+        context.getString(R.string.pos_transaction_declined)
+    }),
     reason: String? = null,
 ) {
-    text(statusMessage.uppercase(Locale.getDefault()), align = Alignment.MIDDLE, fontSize = 30)
+    text(
+        text = statusMessage.uppercase(Locale.getDefault()),
+        align = Alignment.MIDDLE,
+        fontSize = 30,
+    )
 
     if (!isSuccessful) {
         text(reason ?: "Error", align = Alignment.MIDDLE)

@@ -8,9 +8,9 @@ import com.creditclub.core.util.delegates.intStore
 import com.creditclub.pos.*
 import com.creditclub.pos.utils.nonNullStringStore
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
 import org.koin.core.context.loadKoinModules
-import org.koin.core.get
+import org.koin.core.component.get
 import org.koin.dsl.module
 
 
@@ -37,8 +37,8 @@ open class ConfigService(context: Context) : PosConfig, KoinComponent {
         }
         set(value) {
             loadKoinModules(module {
-                single(override = true) { value }
-                single<PosParameter>(override = true) {
+                single { value }
+                single<PosParameter> {
                     remoteConnectionInfo.getParameter(androidContext())
                 }
             })

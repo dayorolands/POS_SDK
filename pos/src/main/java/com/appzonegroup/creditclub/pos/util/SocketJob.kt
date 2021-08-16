@@ -38,83 +38,89 @@ object SocketJob {
         connectionInfo: RemoteConnectionInfo,
         data: ByteArray,
         isRetry: Boolean = false
-    ): ByteArray? {
-        val sslEnabled = connectionInfo.ssl
-        val host = connectionInfo.ip
-        val port = connectionInfo.port
-        val timeout = if (isRetry) {
-            connectionInfo.requeryConfig?.timeout ?: connectionInfo.timeout
-        } else {
-            connectionInfo.timeout
-        }
+    ): ByteArray? = connectionInfo.sendAndReceive(data = data, isRetry = isRetry)
+}
 
-        debug("[remote environment]: $host:$port")
-
-        if (!sslEnabled) {
-            val serverAddress = InetAddress.getByName(host)
-            val connectionSocket = Socket(serverAddress, port).apply {
-                soTimeout = timeout * 1000
-            }
-            val inputStream = DataInputStream(connectionSocket.getInputStream())
-            val outputStream = connectionSocket.getOutputStream()
-
-            return send(inputStream, outputStream, data)
-        }
-
-        val trustAllCerts = arrayOf<TrustManager>(trustManager)
-        val sc = SSLContext.getInstance("TLS")
-        sc.init(null, trustAllCerts, SecureRandom())
-        val sslSocket = sc.socketFactory.createSocket() as SSLSocket
-        sslSocket.soTimeout = timeout * 1000
-        sslSocket.connect(InetSocketAddress(host, port), timeout * 1000)
-        sslSocket.startHandshake()
-        val inputStream = DataInputStream(sslSocket.inputStream)
-        val outputStream = DataOutputStream(sslSocket.outputStream)
-
-        return send(inputStream, outputStream, data)
+@Throws(
+    NoSuchAlgorithmException::class,
+    KeyManagementException::class,
+    IOException::class
+)
+fun RemoteConnectionInfo.sendAndReceive(
+    data: ByteArray,
+    isRetry: Boolean = false
+): ByteArray? {
+    var derivedTimeout = timeout
+    if (isRetry) {
+        derivedTimeout = requeryConfig?.timeout ?: timeout
     }
 
-    private fun send(
-        inputStream: DataInputStream,
-        outputStream: OutputStream,
-        data: ByteArray
-    ): ByteArray? {
-        val messageByte = ByteArray(1000)
-        var end = false
-        var dataString = ""
+    debug("[remote environment]: $host:$port")
 
-        val outputInfo = appendLengthBytes(data)
-        outputStream.write(outputInfo)
-        outputStream.flush()
-        var bytesRead: Int
-        inputStream.readFully(messageByte, 0, 2)
-
-        //ByteBuffer byteBuffer = ByteBuffer.wrap(messageByte, 0, 2);
-        val byteBuffer = ByteBuffer.wrap(messageByte, 0, 2)
-        val bytesToRead = byteBuffer.short.toInt()
-        if (bytesToRead <= 1) {
-            return null
+    if (!sslEnabled) {
+        val serverAddress = InetAddress.getByName(host)
+        val connectionSocket = Socket(serverAddress, port).apply {
+            soTimeout = derivedTimeout * 1000
         }
+        val inputStream = DataInputStream(connectionSocket.getInputStream())
+        val outputStream = connectionSocket.getOutputStream()
 
-        //The following code shows in detail how to read from a TCP socket
-        val baos = ByteArrayOutputStream()
-        while (!end) {
-            bytesRead = inputStream.read(messageByte)
-            baos.write(messageByte, 0, bytesRead)
-            dataString += String(messageByte, 0, bytesRead)
-            if (dataString.length == bytesToRead) {
-                end = true
-            }
-        }
-        return baos.toByteArray()
+        return sendAndReceive(inputStream, outputStream, data)
     }
 
-    private fun appendLengthBytes(data: ByteArray): ByteArray {
-        val dataLength = data.size.toShort()
-        val destination = ByteArray(2 + dataLength)
-        destination[0] = (dataLength.toInt() shr 8).toByte()
-        destination[1] = dataLength /*>> 0*/.toByte()
-        System.arraycopy(data, 0, destination, 2, dataLength.toInt())
-        return destination
+    val trustAllCerts = arrayOf<TrustManager>(trustManager)
+    val sc = SSLContext.getInstance("TLS")
+    sc.init(null, trustAllCerts, SecureRandom())
+    val sslSocket = sc.socketFactory.createSocket() as SSLSocket
+    sslSocket.soTimeout = derivedTimeout * 1000
+    sslSocket.connect(InetSocketAddress(host, port), derivedTimeout * 1000)
+    sslSocket.startHandshake()
+    val inputStream = DataInputStream(sslSocket.inputStream)
+    val outputStream = DataOutputStream(sslSocket.outputStream)
+
+    return sendAndReceive(inputStream, outputStream, data)
+}
+
+private fun sendAndReceive(
+    inputStream: DataInputStream,
+    outputStream: OutputStream,
+    data: ByteArray
+): ByteArray? {
+    val messageByte = ByteArray(1000)
+    var end = false
+    var dataString = ""
+
+    val outputInfo = withPrependedLength(data)
+    outputStream.write(outputInfo)
+    outputStream.flush()
+    var bytesRead: Int
+    inputStream.readFully(messageByte, 0, 2)
+
+    //ByteBuffer byteBuffer = ByteBuffer.wrap(messageByte, 0, 2);
+    val byteBuffer = ByteBuffer.wrap(messageByte, 0, 2)
+    val bytesToRead = byteBuffer.short.toInt()
+    if (bytesToRead <= 1) {
+        return null
     }
+
+    //The following code shows in detail how to read from a TCP socket
+    val baos = ByteArrayOutputStream()
+    while (!end) {
+        bytesRead = inputStream.read(messageByte)
+        baos.write(messageByte, 0, bytesRead)
+        dataString += String(messageByte, 0, bytesRead)
+        if (dataString.length == bytesToRead) {
+            end = true
+        }
+    }
+    return baos.toByteArray()
+}
+
+private fun withPrependedLength(data: ByteArray): ByteArray {
+    val dataLength = data.size.toShort()
+    val destination = ByteArray(2 + dataLength)
+    destination[0] = (dataLength.toInt() shr 8).toByte()
+    destination[1] = dataLength /*>> 0*/.toByte()
+    System.arraycopy(data, 0, destination, 2, dataLength.toInt())
+    return destination
 }

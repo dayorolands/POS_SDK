@@ -4,9 +4,19 @@ import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.adapter.TransactionReportAdapter
+import com.appzonegroup.app.fasttrack.databinding.ActivityReportBinding
 import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
+import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
+import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
+import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
+import com.creditclub.core.data.api.ReportService
+import com.creditclub.core.data.api.retrofitService
+import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.model.TransactionReport
+import com.creditclub.core.data.request.DepositRequest
+import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.data.request.POSTransactionReportRequest
+import com.creditclub.core.data.request.WithdrawalRequest
 import com.creditclub.core.type.TransactionStatus
 import com.creditclub.core.type.TransactionType
 import com.creditclub.core.ui.CreditClubActivity
@@ -16,14 +26,6 @@ import com.creditclub.core.util.*
 import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.ui.adapter.PosReportAdapter
 import com.creditclub.ui.dataBinding
-import com.appzonegroup.app.fasttrack.databinding.ActivityReportBinding
-import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
-import com.appzonegroup.app.fasttrack.receipt.FundsTransferReceipt
-import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
-import com.creditclub.core.data.model.AccountInfo
-import com.creditclub.core.data.request.DepositRequest
-import com.creditclub.core.data.request.FundsTransferRequest
-import com.creditclub.core.data.request.WithdrawalRequest
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
@@ -43,6 +45,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
     private var posReportAdapter = PosReportAdapter(emptyList())
     private var endDate = LocalDate.now()
     private var startDate = endDate.minusDays(7)
+    private val reportService: ReportService by retrofitService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -174,7 +177,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
 
                 dialogProvider.showProgressBar("Getting POS transactions")
                 val (response, error) = safeRunIO {
-                    creditClubMiddleWareAPI.reportService.getPOSTransactions(request)
+                    reportService.getPOSTransactions(request)
                 }
                 dialogProvider.hideProgressBar()
 
@@ -188,7 +191,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
             else -> {
                 dialogProvider.showProgressBar("Getting transactions")
                 val (response, error) = safeRunIO {
-                    creditClubMiddleWareAPI.reportService.getTransactions(
+                    reportService.getTransactions(
                         localStorage.agentPhone,
                         localStorage.institutionCode,
                         selectedTransactionType.code,
@@ -263,14 +266,16 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
             TransactionType.LocalFundsTransfer -> {
                 val fundsTransferRequest = FundsTransferRequest(
                     agentPhoneNumber = localStorage.agentPhone,
+                    agentCode = localStorage.agent?.agentCode,
                     institutionCode = localStorage.institutionCode,
                     beneficiaryAccountName = item.customerName,
                     beneficiaryAccountNumber = item.to,
                     amountInNaira = item.amount ?: 0.0,
                     externalTransactionReference = item.uniqueReference,
+                    retrievalReferenceNumber = item.uniqueReference,
                 )
                 posPrinter.print(
-                    FundsTransferReceipt(
+                    fundsTransferReceipt(
                         this,
                         fundsTransferRequest,
                         item.date?.replace("T", " ") ?: "",

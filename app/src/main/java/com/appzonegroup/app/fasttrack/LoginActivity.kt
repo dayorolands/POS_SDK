@@ -17,8 +17,9 @@ import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.creditclub.core.CreditClubApplication
-import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.TRANSACTIONS_CLIENT
 import com.creditclub.core.data.api.AppConfig
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.SurveyQuestion
 import com.creditclub.core.data.request.SubmitSurveyRequest
 import com.creditclub.core.data.response.isSuccessful
@@ -34,7 +35,6 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import org.koin.android.ext.android.inject
-import retrofit2.create
 import java.time.Instant
 
 class LoginActivity : CreditClubActivity(R.layout.activity_login) {
@@ -43,6 +43,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     private val posPreferences: PosPreferences by inject()
     private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
     private val posDatabase: PosDatabase by inject()
+    private val ioScope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,12 +118,12 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             onSubmit { data ->
                 ioScope.launch {
                     safeRunIO {
-                        val surveyData = SubmitSurveyRequest(
-                            answers = data,
-                            institutionCode = localStorage.institutionCode,
-                            agentPhoneNumber = localStorage.agentPhone,
-                            geoLocation = gps.geolocationString,
-                        )
+                        val surveyData = SubmitSurveyRequest().apply {
+                            answers = data
+                            institutionCode = localStorage.institutionCode
+                            agentPhoneNumber = localStorage.agentPhone
+                            geoLocation = gps.geolocationString
+                        }
 
                         creditClubMiddleWareAPI.staticService.submitSurvey(surveyData)
                     }
@@ -157,7 +158,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     }
 
     private fun downloadSurveyQuestions() {
-        var surveyQuestions by jsonPrefs.jsonStore(
+        var surveyQuestions by jsonPrefs.jsonStore<List<SurveyQuestion>>(
             "DATA_SURVEY_QUESTIONS",
             ListSerializer(SurveyQuestion.serializer())
         )
@@ -287,11 +288,10 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     }
 
     private suspend fun settle() = withContext(Dispatchers.IO) {
-        val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
         val appConfig: AppConfig by inject()
         val configService: ConfigService by inject()
         val posNotificationDao = posDatabase.posNotificationDao()
-        val posApiService: PosApiService = creditClubMiddleWareAPI.retrofit.create()
+        val posApiService: PosApiService by retrofitService(TRANSACTIONS_CLIENT)
 
         val jobs = posNotificationDao.all().map { notification ->
             async {
@@ -317,7 +317,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         val (agent, error) = safeRunIO {
             creditClubMiddleWareAPI.staticService.getAgentInfoByPhoneNumber(
                 localStorage.institutionCode,
-                localStorage.agentPhone,
+                localStorage.agentPhone
             )
         }
         dialogProvider.hideProgressBar()
@@ -344,7 +344,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             posConfig.remoteConnectionInfo = defaultConnectionInfo
             debug("default connection info is $defaultConnectionInfo")
             firebaseCrashlytics.setCustomKey("default_pos_mode", agent.posMode ?: "")
-            firebaseCrashlytics.setCustomKey("pos_ip", defaultConnectionInfo.ip)
+            firebaseCrashlytics.setCustomKey("pos_host", defaultConnectionInfo.host)
             firebaseCrashlytics.setCustomKey("pos_port", "${defaultConnectionInfo.port}")
 
             if (configHasChanged) {
@@ -398,6 +398,11 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ioScope.cancel()
     }
 }
 

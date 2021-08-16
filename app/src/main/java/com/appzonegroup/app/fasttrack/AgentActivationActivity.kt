@@ -1,9 +1,7 @@
 package com.appzonegroup.app.fasttrack
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.text.InputFilter
 import android.text.InputType
 import android.view.View
@@ -15,6 +13,7 @@ import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.extension.posSerialNumber
 import com.creditclub.core.data.model.AuthResponse
+import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.request.PinChangeRequest
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.debugOnly
@@ -34,12 +33,7 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
     private var institutionCode: String = ""
     private var phoneNumber = ""
     private var pin = ""
-    private val deviceId
-        @SuppressLint("HardwareIds")
-        get() = Settings.Secure.getString(
-            contentResolver,
-            Settings.Secure.ANDROID_ID
-        )
+    private val appDataStorage: AppDataStorage by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -168,7 +162,7 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
             newPin = pin,
             geoLocation = localStorage.lastKnownLocation,
             oldPin = code,
-            deviceId = deviceId,
+            deviceId = appDataStorage.deviceId,
         )
 
         dialogProvider.showProgressBar("Activating")
@@ -180,6 +174,7 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
         response ?: return showNetworkError()
 
         if (response.isSuccessful) {
+            localStorage.transactionSequenceNumber = response.transactionSequenceNumber
             localStorage.institutionCode = institutionCode
             localStorage.agentPhone = phoneNumber
             localStorage.cacheAuth = Json.encodeToString(
@@ -240,7 +235,7 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
                 code,
                 phoneNumber,
                 institutionCode,
-                if (Platform.isPOS) posSerialNumber else deviceId
+                if (Platform.isPOS) posSerialNumber else appDataStorage.deviceId
             )
         }
         dialogProvider.hideProgressBar()

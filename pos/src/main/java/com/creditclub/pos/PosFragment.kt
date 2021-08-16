@@ -28,7 +28,7 @@ abstract class PosFragment(layout: Int) : CreditClubFragment(layout) {
         }
         val remoteConnectionInfo = config.remoteConnectionInfo
         firebaseAnalytics.setUserProperty("default_pos_mode", localStorage.agent?.posMode)
-        firebaseAnalytics.setUserProperty("pos_ip", remoteConnectionInfo.ip)
+        firebaseAnalytics.setUserProperty("pos_ip", remoteConnectionInfo.host)
         firebaseAnalytics.setUserProperty("pos_port", "${remoteConnectionInfo.port}")
     }
 

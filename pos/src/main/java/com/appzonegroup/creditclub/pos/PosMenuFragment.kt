@@ -292,7 +292,7 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
             }
 
             return connectionSequence
-                .distinctBy { "${it.ip}:${it.port}" }
+                .distinctBy { "${it.host}:${it.port}" }
                 .map { it.getParameter(context) }
         }
 }

@@ -7,8 +7,8 @@ import com.creditclub.pos.PosParameter
 import com.creditclub.pos.printer.PrinterStatus
 import com.creditclub.pos.printer.TextNode
 import com.creditclub.pos.printer.WalkPaper
-import org.koin.core.KoinComponent
-import org.koin.core.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 
 
 /**
@@ -94,7 +94,7 @@ POS Mode: ${remoteConnectionInfo.label}
 APN: ${it.apnInfo}
 Host Name: $host
 Terminal ID: $terminalId
-IP: ${remoteConnectionInfo.ip}
+IP: ${remoteConnectionInfo.host}
 Port: ${remoteConnectionInfo.port}
 Keep Alive (Call Home) in seconds: $callHome
                             """.trimIndent()

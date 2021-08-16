@@ -20,5 +20,17 @@ open class BackendResponse {
     @SerialName("Message")
     private val message: String? = null
 
+    @SerialName("ResponseCode")
+    val responseCode: String? = null
+
     fun isFailure() = !isSuccessful
+    fun isPendingOnBank() = responseCode == "24"
+    fun isPending() = responseCode == "20" && isPendingOnBank()
+    fun isSuccess() = isSuccessful
+}
+
+@Serializable
+open class AgentActivationResponse : BackendResponse() {
+    @SerialName("TransactionSequenceNumber")
+    val transactionSequenceNumber: Long = 0
 }

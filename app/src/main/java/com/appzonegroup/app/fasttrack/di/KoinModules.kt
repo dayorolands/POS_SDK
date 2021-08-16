@@ -8,10 +8,9 @@ import com.appzonegroup.app.fasttrack.app.LocalInstitutionConfig
 import com.appzonegroup.app.fasttrack.ui.CreditClubDialogProvider
 import com.creditclub.analytics.NetworkMetricsInterceptor
 import com.creditclub.core.config.IInstitutionConfig
-import com.creditclub.core.data.CoreDatabase
-import com.creditclub.core.data.CreditClubClient
-import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.*
 import com.creditclub.core.data.api.AppConfig
+import com.creditclub.core.data.api.AuthInterceptor
 import com.creditclub.core.data.api.RequestFailureInterceptor
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
@@ -48,7 +47,7 @@ val locationModule = module {
 }
 
 val apiModule = module {
-    single(named("middleware")) {
+    single(named(MIDDLEWARE_CLIENT)) {
         val cache = Cache(
             directory = File(androidContext().cacheDir, "http_cache"),
             maxSize = CACHE_SIZE,
@@ -60,7 +59,8 @@ val apiModule = module {
             .cache(cache)
 
         builder
-            .addInterceptor(NetworkMetricsInterceptor(get(), get(), get()))
+            .addInterceptor(AuthInterceptor(get(), get()))
+            .addInterceptor(NetworkMetricsInterceptor(get(), get(), get(), get()))
             .addInterceptor(RequestFailureInterceptor())
 
         debugOnly {
@@ -72,13 +72,40 @@ val apiModule = module {
         return@single builder.build()
     }
 
-    single { CreditClubMiddleWareAPI(get(named("middleware")), get<AppConfig>().apiHost) }
+    single(named(TRANSACTIONS_CLIENT)) {
+        val builder = OkHttpClient().newBuilder()
+            .connectTimeout(2, TimeUnit.MINUTES)
+            .readTimeout(3, TimeUnit.MINUTES)
+            .retryOnConnectionFailure(false)
+            .writeTimeout(3, TimeUnit.MINUTES)
 
-    single { CreditClubClient(get(named("middleware")), get<AppConfig>().apiHost) }
+        builder
+            .addInterceptor(AuthInterceptor(get(), get()))
+            .addInterceptor(NetworkMetricsInterceptor(get(), get(), get(), get()))
+            .addInterceptor(RequestFailureInterceptor())
+
+        debugOnly {
+            val interceptor = HttpLoggingInterceptor()
+            interceptor.level = HttpLoggingInterceptor.Level.BODY
+            builder.addInterceptor(interceptor)
+        }
+
+        return@single builder.build()
+    }
+
+    single(named(MIDDLEWARE_CLIENT)) {
+        CreditClubMiddleWareAPI(get(named(MIDDLEWARE_CLIENT)), get<AppConfig>().apiHost)
+    }
+
+    single(named(TRANSACTIONS_CLIENT)) {
+        CreditClubMiddleWareAPI(get(named(TRANSACTIONS_CLIENT)), get<AppConfig>().apiHost)
+    }
+
+    single { CreditClubClient(get(named(MIDDLEWARE_CLIENT)), get<AppConfig>().apiHost) }
 }
 
 val uiModule = module {
-    factory<DialogProvider>(override = true) { (context: Context) ->
+    factory<DialogProvider> { (context: Context) ->
         CreditClubDialogProvider(context)
     }
 }
@@ -98,7 +125,7 @@ val configModule = module {
 }
 
 val sharingModule = module {
-    factory<PosPrinter>(override = true) { (context: Activity, dialogProvider: DialogProvider) ->
+    factory<PosPrinter> { (context: Activity, dialogProvider: DialogProvider) ->
         PdfPrinter(context, dialogProvider)
     }
 }

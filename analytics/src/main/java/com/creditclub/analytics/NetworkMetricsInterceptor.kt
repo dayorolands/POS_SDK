@@ -1,8 +1,9 @@
 package com.creditclub.analytics
 
-import com.creditclub.analytics.models.NetworkMeasurement
+import com.creditclub.core.data.ClusterObjectBox
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.api.RequestFailureException
+import com.creditclub.core.data.model.NetworkMeasurement
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import io.objectbox.kotlin.boxFor
@@ -15,8 +16,9 @@ class NetworkMetricsInterceptor(
     private val appConfig: AppConfig,
     private val appDataStorage: AppDataStorage,
     private val localStorage: LocalStorage,
+    private val clusterObjectBox: ClusterObjectBox,
 ) : Interceptor {
-    private val metricsBox by lazy { AnalyticsObjectBox.boxStore.boxFor<NetworkMeasurement>() }
+    private val metricsBox by lazy { clusterObjectBox.boxStore.boxFor<NetworkMeasurement>() }
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
@@ -55,11 +57,12 @@ class NetworkMetricsInterceptor(
             error = e
             if (e.httpStatusCode != null) {
                 networkMeasurement.statusCode = e.httpStatusCode!!
-                networkMeasurement.responseTime = Instant.now()
             }
         } catch (t: Throwable) {
             error = t
         }
+        networkMeasurement.responseTime = Instant.now()
+
         if (response != null) {
             networkMeasurement.apply {
                 statusCode = response.code

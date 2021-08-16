@@ -8,10 +8,11 @@ import com.appzonegroup.app.fasttrack.di.configModule
 import com.appzonegroup.app.fasttrack.di.dataModule
 import com.appzonegroup.app.fasttrack.di.locationModule
 import com.appzonegroup.creditclub.pos.posModule
+import com.creditclub.core.data.clusterObjectBoxModule
 import com.google.firebase.analytics.FirebaseAnalytics
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
 import org.koin.dsl.koinApplication
 
 
@@ -24,20 +25,21 @@ abstract class BaseWorker(context: Context, params: WorkerParameters) :
 
     protected val firebaseAnalytics get() = FirebaseAnalytics.getInstance(applicationContext)
 
-    private val koinApp = koinApplication {
-        androidLogger()
-        androidContext(applicationContext)
-
-        modules(
-            listOf(
-                apiModule,
-                locationModule,
-                dataModule,
-                configModule,
-                posModule
-            )
-        )
-    }
-
-    override fun getKoin() = koinApp.koin
+//    private val koinApp = koinApplication {
+//        androidLogger()
+//        androidContext(applicationContext)
+//
+//        modules(
+//            listOf(
+//                apiModule,
+//                locationModule,
+//                dataModule,
+//                configModule,
+//                posModule,
+//                clusterObjectBoxModule,
+//            )
+//        )
+//    }
+//
+//    override fun getKoin() = koinApp.koin
 }

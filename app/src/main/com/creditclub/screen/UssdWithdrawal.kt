@@ -24,7 +24,7 @@ import androidx.navigation.NavController
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.receipt.footerNodes
 import com.appzonegroup.app.fasttrack.ui.ReceiptDetails
-import com.appzonegroup.app.fasttrack.utility.FunctionId
+import com.appzonegroup.app.fasttrack.utility.FunctionUsageTracker
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.api.UssdCashoutService
 import com.creditclub.core.data.model.CoraPayReference
@@ -43,7 +43,7 @@ import java.util.*
 
 @Composable
 fun UssdWithdrawal(navController: NavController) {
-    FunctionId(fid = FunctionIds.USSD_WITHDRAWAL)
+    FunctionUsageTracker(fid = FunctionIds.USSD_WITHDRAWAL)
 
     val coroutineScope = rememberCoroutineScope()
     var loadingMessage by remember { mutableStateOf("") }
@@ -127,14 +127,14 @@ fun UssdWithdrawal(navController: NavController) {
                 printJob = printJob {
                     val middleAlignment = com.creditclub.pos.printer.Alignment.MIDDLE
                     image(R.drawable.cc_printer_logo)
-                    text("USSD withdrawal", fontSize = 2, align = middleAlignment)
+                    text("USSD withdrawal", fontSize = 35, align = middleAlignment)
                     text(
                         statusText,
                         align = middleAlignment,
                     )
                     text(
                         response.message?.uppercase(Locale.getDefault()) ?: "",
-                        fontSize = 2,
+                        fontSize = 15,
                         walkPaperAfterPrint = 20,
                         align = middleAlignment,
                     )

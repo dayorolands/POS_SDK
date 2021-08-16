@@ -25,9 +25,9 @@ data class Route(
 @Parcelize
 data class ConnectionInfo(
     @SerialName("Name") override val nodeName: String,
-    @SerialName("IPAddress") override val ip: String,
+    @SerialName("IPAddress") override val host: String,
     @SerialName("Port") override val port: Int,
-    @SerialName("EnableSSL") override val ssl: Boolean,
+    @SerialName("EnableSSL") override val sslEnabled: Boolean,
     @SerialName("Dukpt") override val dukptConfig: DukptConfigImpl? = null,
     @SerialName("Timeout") override val timeout: Int = 90,
     @SerialName("RequeryConfig") override val requeryConfig: RequeryConfigImpl? = RequeryConfigImpl(

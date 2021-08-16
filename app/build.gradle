@@ -33,14 +33,15 @@ android {
         ndkVersion '21.3.6528147'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 33
-        versionName "1.4.12"
+        versionCode 34
+        versionName "1.4.13"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [
                         "room.schemaLocation"  : "$projectDir/schemas".toString(),
                         "room.incremental"     : "true",
                         "room.expandProjection": "true",
+                        "objectbox.modelPath"  : "$projectDir/schemas/objectbox.json".toString(),
                 ]
             }
         }

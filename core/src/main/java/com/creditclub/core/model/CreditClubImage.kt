@@ -3,6 +3,7 @@ package com.creditclub.core.model
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.util.Base64
 import com.creditclub.core.serializer.CreditClubImageSerializer
 import com.creditclub.core.util.safeRun
@@ -28,7 +29,11 @@ class CreditClubImage(context: Context, private val image: Image) {
         bitmap ?: return@lazy null
 
         val byteArrayOutputStream = ByteArrayOutputStream()
-        bitmap?.compress(Bitmap.CompressFormat.WEBP, 0, byteArrayOutputStream)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            bitmap?.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 10, byteArrayOutputStream)
+        } else {
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 10, byteArrayOutputStream)
+        }
         val byteArray = byteArrayOutputStream.toByteArray()
 
         Base64.encodeToString(byteArray, Base64.DEFAULT)

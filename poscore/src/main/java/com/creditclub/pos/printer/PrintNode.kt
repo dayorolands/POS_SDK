@@ -31,10 +31,10 @@ data class TextNode(
 @Parcelize
 data class WalkPaper(override val walkPaperAfterPrint: Int = 20) : PrintNode
 
-enum class Alignment(val code: Int) {
-    LEFT(0),
-    MIDDLE(1),
-    RIGHT(2)
+enum class Alignment {
+    LEFT,
+    MIDDLE,
+    RIGHT,
 }
 
 @Parcelize

@@ -23,8 +23,8 @@ import com.telpo.emv.util.hexString
 import com.telpo.emv.util.xor
 import com.telpo.pinpad.PinParam
 import com.telpo.pinpad.PinpadService
-import org.koin.core.KoinComponent
-import org.koin.core.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import java.io.UnsupportedEncodingException
 import java.time.Instant
 

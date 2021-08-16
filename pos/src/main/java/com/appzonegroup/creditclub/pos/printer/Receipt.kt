@@ -16,8 +16,8 @@ import com.creditclub.pos.printer.PrintJob
 import com.creditclub.pos.printer.PrintNode
 import com.creditclub.pos.printer.TextNode
 import org.jpos.iso.ISOMsg
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 
 /**

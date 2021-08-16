@@ -1,6 +1,6 @@
 package com.creditclub.analytics.api
 
-import com.creditclub.analytics.models.NetworkMeasurement
+import com.creditclub.core.data.model.NetworkMeasurement
 import com.creditclub.core.data.model.DeviceTransactionInformation
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

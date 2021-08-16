@@ -27,7 +27,7 @@ import org.koin.core.context.GlobalContext
  * Appzone Ltd
  */
 
-inline val Context.localStorage get() = GlobalContext.get().koin.get<LocalStorage>()
+inline val Context.localStorage get() = GlobalContext.get().get<LocalStorage>()
 
 fun Context.increaseTransactionMonitorCounter(
     transactionCountType: TransactionCountType,
@@ -39,7 +39,7 @@ fun Context.increaseTransactionMonitorCounter(
     if (value != null) count = Integer.parseInt(value) + 1
 
     localStorage.putString(transactionCountType.key, count.toString())
-    val coreDatabase = GlobalContext.get().koin.get<CoreDatabase>()
+    val coreDatabase = GlobalContext.get().get<CoreDatabase>()
     GlobalScope.launch(Dispatchers.Main) {
         withContext(Dispatchers.IO) {
             val info = DeviceTransactionInformation.getInstance(
@@ -88,7 +88,7 @@ inline val Context.RAMInfo: LongArray
     }
 
 suspend inline fun Context.logFunctionUsage(fid: Int) = safeRunIO {
-    val coreDatabase = GlobalContext.get().koin.get<CoreDatabase>()
+    val coreDatabase = GlobalContext.get().get<CoreDatabase>()
     val appFunctionUsageDao = coreDatabase.appFunctionUsageDao()
     val appFunction = appFunctionUsageDao.getFunction(fid)
 
@@ -114,7 +114,7 @@ inline fun <reified T : Any> Context.readRawJsonFile(
     return defaultJson.decodeFromString(serializer, fileContents)
 }
 
-fun getAndroidContext() = GlobalContext.get().koin.get<Context>()
+fun getAndroidContext() = GlobalContext.get().get<Context>()
 
 fun Resources.readRawFileText(@RawRes fileLocation: Int): String {
     return openRawResource(fileLocation).bufferedReader().use { it.readText() }

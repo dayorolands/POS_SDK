@@ -1,4 +1,4 @@
-package com.creditclub.analytics.models
+package com.creditclub.core.data.model
 
 import com.creditclub.core.serializer.TimeInstantConverter
 import com.creditclub.core.serializer.TimeInstantSerializer

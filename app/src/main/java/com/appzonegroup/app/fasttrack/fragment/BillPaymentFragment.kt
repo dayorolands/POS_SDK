@@ -14,28 +14,30 @@ import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.api.BillsPaymentService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.BillCategory
 import com.creditclub.core.data.model.ValidateCustomerInfoRequest
+import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.*
-import com.creditclub.core.util.delegates.service
+import com.creditclub.core.util.includesNumbers
+import com.creditclub.core.util.includesSpecialCharacters
+import com.creditclub.core.util.isValidEmail
+import com.creditclub.core.util.safeRunIO
 import com.creditclub.pos.printer.PosPrinter
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
-import java.util.*
 
 class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
     private val viewModel by viewModels<BillPaymentViewModel>()
     private val binding by dataBinding<BillPaymentFragmentBinding>()
     override val functionId = FunctionIds.PAY_BILL
-    private val uniqueReference = UUID.randomUUID().toString()
-    private val retrievalReferenceNumber = generateRRN()
+    private val uniqueReference by lazy { localStorage.newTransactionReference() }
     private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
-    private val billsPaymentService by creditClubMiddleWareAPI.retrofit.service<BillsPaymentService>()
+    private val billsPaymentService by retrofitService<BillsPaymentService>()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -294,9 +296,11 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         val pin = dialogProvider.getPin("Agent PIN") ?: return
         if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
+        val agent = localStorage.agent
         val request = PayBillRequest(
             agentPin = pin,
             agentPhoneNumber = localStorage.agentPhone,
+            agentCode = agent!!.agentCode,
             institutionCode = localStorage.institutionCode,
             customerId = viewModel.fieldOne.value,
             merchantBillerIdField = viewModel.item.value?.billerId?.toString(),
@@ -317,7 +321,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             customerDepositSlipNumber = uniqueReference,
             geolocation = gps.geolocationString,
             isRecharge = isAirtime,
-            retrievalReferenceNumber = retrievalReferenceNumber,
+            retrievalReferenceNumber = uniqueReference,
             validationCode = viewModel.customerValidationResponse.value?.validationCode,
         )
         dialogProvider.showProgressBar("Processing request")

@@ -28,8 +28,8 @@ import com.sunmi.pay.hardware.aidlv2.bean.EMVCandidateV2
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
 import com.sunmi.pay.hardware.aidlv2.emv.EMVListenerV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
-import org.koin.core.KoinComponent
-import org.koin.core.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import sunmi.paylib.SunmiPayKernel
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidKeyException

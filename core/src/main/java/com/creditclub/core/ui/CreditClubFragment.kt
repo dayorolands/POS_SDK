@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import com.creditclub.core.config.IInstitutionConfig
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.creditclub.core.data.MIDDLEWARE_CLIENT
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
@@ -20,6 +21,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
 
 
 /**
@@ -31,7 +33,7 @@ open class CreditClubFragment : Fragment {
     constructor(layout: Int) : super(layout)
 
     open val gps: TrackGPS by inject()
-    open val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject()
+    open val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject(named(MIDDLEWARE_CLIENT))
     open val dialogProvider: DialogProvider by inject { parametersOf(activity) }
     open val functionId: Int? = null
 

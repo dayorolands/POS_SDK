@@ -8,6 +8,9 @@ data class PayBillRequest(
     @SerialName("AgentPhoneNumber")
     val agentPhoneNumber: String?,
 
+    @SerialName("AgentCode")
+    val agentCode: String? = null,
+
     @SerialName("AgentPin")
     val agentPin: String?,
 

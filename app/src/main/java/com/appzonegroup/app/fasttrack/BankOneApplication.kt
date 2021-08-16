@@ -1,11 +1,13 @@
 package com.appzonegroup.app.fasttrack
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
+import android.provider.Settings
 import android.telephony.TelephonyManager
 import androidx.appcompat.app.AppCompatDelegate
 import com.appzonegroup.app.fasttrack.di.*
@@ -13,9 +15,9 @@ import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.utility.extensions.registerWorkers
 import com.appzonegroup.app.fasttrack.utility.registerAppFunctions
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.analytics.AnalyticsObjectBox
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.R
+import com.creditclub.core.data.clusterObjectBoxModule
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.prefs.moveTo
 import com.creditclub.core.util.localStorage
@@ -53,7 +55,6 @@ class BankOneApplication : CreditClubApplication() {
         Picasso.setSingletonInstance(
             Picasso.Builder(this).loggingEnabled(BuildConfig.DEBUG).build()
         )
-        AnalyticsObjectBox.init(this)
 
         startKoin {
             androidLogger()
@@ -61,6 +62,7 @@ class BankOneApplication : CreditClubApplication() {
 
             modules(
                 listOf(
+                    clusterObjectBoxModule,
                     apiModule,
                     locationModule,
                     dataModule,
@@ -72,11 +74,15 @@ class BankOneApplication : CreditClubApplication() {
         }
 
         encryptAgentInfo()
-
+        observeNetworkState()
+        @SuppressLint("HardwareIds")
+        appDataStorage.deviceId = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ANDROID_ID
+        )
         registerAppFunctions()
         Platform.test(this)
         if (Platform.isPOS) startPosApp()
-        observeNetworkState()
         registerWorkers()
     }
 

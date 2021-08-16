@@ -286,7 +286,6 @@ abstract class CardTransactionActivity : PosActivity() {
             dialogProvider.showProgressBar("Receiving...")
             try {
                 callHomeService.stopCallHomeTimer()
-
                 val (response, error) = withContext(Dispatchers.IO) {
                     val maxAttempts = 1 + (remoteConnectionInfo.requeryConfig?.maxRetries ?: 0)
                     if (request.mti == "0200" && maxAttempts > 1) {
@@ -300,7 +299,10 @@ abstract class CardTransactionActivity : PosActivity() {
                                 runOnUiThread { dialogProvider.showProgressBar("Retrying...$attempt") }
                             }
 
-                            result = isoSocketHelper.send(request, isRetry)
+                            val newResult = isoSocketHelper.send(request, isRetry)
+                            if (result.data == null || (result.data!!.responseCode39 != "00" && newResult.isSuccess)) {
+                                result = newResult
+                            }
                             val responseMsg = result.data ?: continue
                             if (responseMsg.responseCode39 == "91") continue
                             if (result.error == null) break
@@ -310,10 +312,19 @@ abstract class CardTransactionActivity : PosActivity() {
                         isoSocketHelper.send(request)
                     }
                 }
-
                 callHomeService.startCallHomeTimer()
 
-                if (error != null) firebaseCrashlytics.recordException(error)
+                if (error != null) {
+                    firebaseCrashlytics.recordException(error)
+                    withContext(Dispatchers.IO) {
+                        val posTransaction = PosTransaction.create(request).apply {
+                            bankName = getString(R.string.pos_acquirer)
+                            cardHolder = cardData.holder
+                            cardType = cardData.type
+                        }
+                        posDatabase.posTransactionDao().save(posTransaction)
+                    }
+                }
                 if (response == null) {
                     renderTransactionFailure("Transmission Error")
                     isoSocketHelper.attemptReversal(request)

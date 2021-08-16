@@ -18,8 +18,8 @@ import com.jhl.bluetooth.ibridge.BluetoothIBridgeDevice
 import com.jhl.jhlblueconn.BlueStateListenerCallback
 import com.jhl.jhlblueconn.BluetoothCommmanager
 import kotlinx.coroutines.*
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.dsl.module
 import java.util.*
 
@@ -279,7 +279,7 @@ class MPosManager(activity: CreditClubActivity) : PosManager, BlueStateListenerC
         override val id = ""
         override val deviceType = 2
         override val module = module {
-            factory<PosManager>(override = true) { (activity: CreditClubActivity) ->
+            factory<PosManager> { (activity: CreditClubActivity) ->
                 MPosManager(activity)
             }
         }

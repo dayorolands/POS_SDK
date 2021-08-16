@@ -120,7 +120,7 @@ class DeviceTransactionInformation {
 }
 
 private fun getTransactionMonitorCounter(key: String): Int {
-    val localStorage = GlobalContext.get().koin.get<LocalStorage>()
+    val localStorage = GlobalContext.get().get<LocalStorage>()
     val value = localStorage.getString(key)
     var count = 0
     if (value != null) count = Integer.parseInt(value)

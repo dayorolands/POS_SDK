@@ -51,14 +51,14 @@ val posModule = module {
     single {
         androidContext().readRawJsonFile(R.raw.pos_tenant, PosTenant.serializer())
     }
-    single<RemoteConnectionInfo>(override = true) {
+    single<RemoteConnectionInfo> {
         val infoList = get<PosTenant>().infoList
         if (infoList.isEmpty()) InvalidRemoteConnectionInfo
         else infoList[0]
     }
     single<PosConfig> { ConfigService(androidContext()) }
     single { PosDatabase.getInstance(androidContext()) }
-    single(override = true) {
+    single {
         get<PosConfig>().remoteConnectionInfo.getParameter(androidContext())
     }
     single { CallHomeService(get(), get()) }

@@ -4,8 +4,8 @@ import android.util.Log
 import com.creditclub.core.data.Encryption
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import org.koin.core.KoinComponent
-import org.koin.core.get
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import retrofit2.http.*
 
 interface BankOneService {

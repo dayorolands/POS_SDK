@@ -2,12 +2,13 @@ package com.appzonegroup.app.fasttrack.utility
 
 import android.app.Activity
 import android.content.Intent
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.*
+import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.fragment.HomeFragmentDirections
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.CoreDatabase
@@ -16,7 +17,10 @@ import com.creditclub.core.data.request.BalanceEnquiryRequest
 import com.creditclub.core.type.CustomerRequestOption
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.*
+import com.creditclub.core.util.debug
+import com.creditclub.core.util.logFunctionUsage
+import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.ui.rememberBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,25 +41,28 @@ fun Activity.logout() {
 private suspend fun Fragment.logFunctionUsage(fid: Int) = requireContext().logFunctionUsage(fid)
 
 @Composable
-fun FunctionId(fid: Int) {
+fun FunctionUsageTracker(fid: Int) {
     val coreDatabase: CoreDatabase by rememberBean()
+    var usageHasBeenLogged by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(fid) {
-        withContext(Dispatchers.IO) {
-            val appFunctionUsageDao = coreDatabase.appFunctionUsageDao()
-            val appFunction = appFunctionUsageDao.getFunction(fid)
+        if (!usageHasBeenLogged) {
+            withContext(Dispatchers.IO) {
+                val appFunctionUsageDao = coreDatabase.appFunctionUsageDao()
+                val appFunction = appFunctionUsageDao.getFunction(fid)
 
-            val count = if (appFunction == null) {
-                appFunctionUsageDao.insert(AppFunctionUsage(fid))
-                1
-            } else {
-                appFunction.usage++
-                appFunctionUsageDao.update(appFunction)
+                val count = if (appFunction == null) {
+                    appFunctionUsageDao.insert(AppFunctionUsage(fid))
+                    1
+                } else {
+                    appFunction.usage++
+                    appFunctionUsageDao.update(appFunction)
 
-                appFunction.usage
+                    appFunction.usage
+                }
+                usageHasBeenLogged = true
+                debug("Usage for function $fid -> $count")
             }
-
-            debug("Usage for function $fid -> $count")
         }
     }
 }
