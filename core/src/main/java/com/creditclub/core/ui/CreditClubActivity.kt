@@ -11,7 +11,6 @@ import androidx.core.app.ActivityCompat
 import com.creditclub.core.AppFunctions
 import com.creditclub.core.R
 import com.creditclub.core.config.IInstitutionConfig
-import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.MIDDLEWARE_CLIENT
 import com.creditclub.core.data.api.AppConfig
@@ -27,7 +26,9 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import kotlinx.coroutines.*
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named

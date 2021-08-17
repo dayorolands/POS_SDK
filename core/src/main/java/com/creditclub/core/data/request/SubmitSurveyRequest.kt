@@ -10,16 +10,16 @@ import kotlinx.serialization.Serializable
  * Appzone Ltd
  */
 @Serializable
-class SubmitSurveyRequest {
+data class SubmitSurveyRequest(
     @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = ""
+    val agentPhoneNumber: String? = "",
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = ""
+    val institutionCode: String? = "",
 
     @SerialName("GeoLocation")
-    var geoLocation: String? = null
+    val geoLocation: String? = null,
 
     @SerialName("Answers")
-    var answers: List<SurveyAnswer>? = null
-}
+    val answers: List<SurveyAnswer>? = null,
+)
