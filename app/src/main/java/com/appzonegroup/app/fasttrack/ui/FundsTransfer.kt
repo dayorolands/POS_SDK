@@ -43,6 +43,7 @@ import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.data.response.NameEnquiryResponse
+import com.creditclub.core.data.response.RetryPolicy
 import com.creditclub.core.type.TransactionType
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.*
@@ -87,8 +88,12 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     val accountNumberIsValid = remember(receiverAccountNumber) {
         receiverAccountNumber.isNotBlank() && (receiverAccountNumber.length == 10 || receiverAccountNumber.length == 11)
     }
+
+    // variables for requery
     var transferAttemptCount by remember { mutableStateOf(0) }
-    var isPending by remember { mutableStateOf(false) }
+    var retryPolicy: RetryPolicy? by remember { mutableStateOf(null) }
+    var pendingTransactionId: Long? by remember { mutableStateOf(null) }
+
     val amountIsValid = remember(amountString) {
         with(amountString.toDoubleOrNull()) {
             this != null && this > 0.0
@@ -113,8 +118,6 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     val pendingTransactionsBox: Box<PendingTransaction> = remember {
         clusterObjectBox.boxStore.boxFor()
     }
-    var pendingTransactionId: Long? by remember { mutableStateOf(null) }
-    var needsManualRequery by remember { mutableStateOf(false) }
 
     val validateAccount: suspend CoroutineScope.() -> Unit =
         remember(
@@ -238,26 +241,40 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     pendingTransactionId = pendingTransactionsBox.put(pendingTransaction)
                 }
 
-                if (error != null && receipt == null) {
-                    dialogProvider.showErrorAndWait(error)
-                    navController.popBackStack()
+                if (error != null) {
+                    errorMessage = error.getMessage(context)
+                    if (error.isTimeout()) {
+                        retryPolicy = RetryPolicy.AutoRetry
+                        transferAttemptCount++
+                        return@makeTransfer
+                    }
+
                     return@makeTransfer
                 }
 
-                isPending = response!!.isPending()
-                needsManualRequery = response.isPendingOnBank()
-                if (response.isFailure()) {
-                    errorMessage = response.responseMessage ?: ""
-                } else if (response.isSuccess() && pendingTransactionId != null) {
-                    // delete pending transaction once confirmed successful
-                    pendingTransactionsBox.remove(pendingTransactionId!!)
+                when {
+                    response!!.isPendingOnBank() -> {
+                        retryPolicy = RetryPolicy.RetryLater
+                    }
+                    response.isPendingOnMiddleware() -> {
+                        retryPolicy = RetryPolicy.AutoRetry
+                    }
+                    response.isFailure() -> {
+                        retryPolicy = null
+                        errorMessage = response.responseMessage ?: ""
+                    }
+                    response.isSuccess() && pendingTransactionId != null -> {
+                        // delete pending transaction once confirmed successful
+                        pendingTransactionsBox.remove(pendingTransactionId!!)
+                        retryPolicy = null
+                    }
                 }
 
                 receipt = fundsTransferReceipt(
                     context = context,
                     request = fundsTransferRequest,
                     transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
-                    isSuccessful = response.isSuccessful,
+                    isSuccessful = response!!.isSuccessful,
                     reason = response.responseMessage,
                 )
                 transferAttemptCount++
@@ -275,23 +292,24 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
 
     // Schedule automatic requery for pending transactions
     LaunchedEffect(transferAttemptCount) {
-        if (transferAttemptCount < 1 || needsManualRequery) return@LaunchedEffect
-
-        if (isPending) transferFunds()
+        if (transferAttemptCount > 0 && retryPolicy == RetryPolicy.AutoRetry) {
+            transferFunds()
+        }
     }
 
-    if (needsManualRequery) {
+    if (retryPolicy == RetryPolicy.ManualRetry || retryPolicy == RetryPolicy.RetryLater) {
         TransactionStatusQuery(
             onClose = {
-                isPending = false
-                needsManualRequery = false
+                retryPolicy = null
             },
             title = "Transaction pending",
             loadingMessage = loadingMessage,
             message = errorMessage,
-            onRequery = {
-                coroutineScope.launch { transferFunds() }
-            },
+            onRequery = if (retryPolicy == RetryPolicy.ManualRetry) {
+                {
+                    coroutineScope.launch { transferFunds() }
+                }
+            } else null,
         )
         return
     }

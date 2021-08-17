@@ -25,6 +25,11 @@ fun Throwable?.isServerError() = this != null && this is HttpException
 
 fun Throwable?.isKotlinNPE() = this != null && this is KotlinNullPointerException
 
+fun Throwable?.isTimeout() =
+    this != null && this is SocketTimeoutException || this is IOException && (cause.toString()
+        .contains("unexpected end of stream") || message
+        ?.contains("unexpected end of stream") == true)
+
 fun Throwable.getMessage(context: Context): String {
     return when {
         this is CreditClubException -> message
