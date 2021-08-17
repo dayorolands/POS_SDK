@@ -12,6 +12,8 @@ import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
 import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.extension.posSerialNumber
+import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.AuthResponse
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.request.PinChangeRequest
@@ -34,6 +36,7 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
     private var phoneNumber = ""
     private var pin = ""
     private val appDataStorage: AppDataStorage by inject()
+    private val staticService: StaticService by retrofitService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,10 +88,17 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
         binding.submitBtn.setOnClickListener {
             mainScope.launch { submit() }
         }
+
+        val phoneNumber = intent.getStringExtra("phone_number")
+        if (phoneNumber != null) {
+            binding.phoneNumberEt.apply {
+                setText(phoneNumber)
+                isEnabled = false
+            }
+        }
     }
 
     private suspend fun submit() {
-
         code = binding.codeEt.text.toString().trim(' ')
         phoneNumber = binding.phoneNumberEt.text.toString().trim(' ')
 
@@ -166,12 +176,18 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
         )
 
         dialogProvider.showProgressBar("Activating")
-        val (response) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.completeActivationWithPinChange(request)
+        val (response, error) = safeRunIO {
+            staticService.completeActivationWithPinChange(request)
         }
         dialogProvider.hideProgressBar()
 
-        response ?: return showNetworkError()
+        if (error != null) {
+            dialogProvider.showError(error)
+            return
+        }
+        if (response == null) {
+            return showNetworkError()
+        }
 
         if (response.isSuccessful) {
             localStorage.transactionSequenceNumber = response.transactionSequenceNumber
@@ -202,14 +218,13 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
 
     private suspend fun syncAgentInfo(): Boolean {
         val (agent, error) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.getAgentInfoByPhoneNumber(
+            staticService.getAgentInfoByPhoneNumber(
                 localStorage.institutionCode,
-                localStorage.agentPhone
+                localStorage.agentPhone,
             )
         }
 
-        if (error != null) return false
-        agent ?: return false
+        if (error != null || agent == null) return false
 
         localStorage.agent = agent
         firebaseCrashlytics.setUserId(agent.agentCode ?: "0")
@@ -230,8 +245,8 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
 
     private suspend inline fun verify() {
         dialogProvider.showProgressBar("Verifying")
-        val (response) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.agentVerification(
+        val (response, error) = safeRunIO {
+            staticService.agentVerification(
                 code,
                 phoneNumber,
                 institutionCode,
@@ -240,7 +255,13 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
         }
         dialogProvider.hideProgressBar()
 
-        response ?: return showNetworkError()
+        if (error != null) {
+            dialogProvider.showError(error)
+            return
+        }
+        if (response == null) {
+            return showNetworkError()
+        }
 
         if (response.isSuccessful) {
             isActivation = true
