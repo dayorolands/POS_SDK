@@ -85,8 +85,7 @@ fun PendingTransactions(
             if (response!!.isPending()) {
                 dialogProvider.showErrorAndWait(response.responseMessage ?: "Pending")
                 return@checkStatus
-            }
-            if (response.isSuccess()) {
+            } else {
                 pendingTransactionsBox.remove(transaction.id)
             }
 
