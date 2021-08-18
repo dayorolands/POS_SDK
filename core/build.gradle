@@ -139,8 +139,8 @@ dependencies {
     api "com.google.accompanist:accompanist-swiperefresh:${versions.accompanist}"
     api "com.google.accompanist:accompanist-flowlayout:${versions.accompanist}"
     api "androidx.palette:palette-ktx:1.0.0"
-    api "androidx.constraintlayout:constraintlayout-compose:1.0.0-beta01"
-    api "androidx.navigation:navigation-compose:2.4.0-alpha05"
+    api "androidx.constraintlayout:constraintlayout-compose:1.0.0-beta02"
+    api "androidx.navigation:navigation-compose:2.4.0-alpha06"
     api "org.jetbrains.kotlinx:kotlinx-datetime:0.2.0"
     // UI Tests
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:${versions.compose}"
