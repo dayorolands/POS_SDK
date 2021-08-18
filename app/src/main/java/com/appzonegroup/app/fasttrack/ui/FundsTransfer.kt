@@ -245,7 +245,8 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 }
 
                 if (error != null) {
-                    errorMessage = error.getMessage(context)
+                    errorMessage =
+                        error.getMessage(context) + ". Please click the CONFIRM button to try again"
                     if (error.isTimeout()) {
                         retryPolicy = RetryPolicy.AutoRetry
                         transferAttemptCount++
