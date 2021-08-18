@@ -40,7 +40,6 @@ import com.creditclub.core.data.api.FundsTransferService
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.model.PendingTransaction
 import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.data.response.NameEnquiryResponse
 import com.creditclub.core.data.response.RetryPolicy
@@ -87,7 +86,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     var narration by remember { mutableStateOf("") }
     var agentPin by remember { mutableStateOf("") }
     var receipt: PrintJob? by remember { mutableStateOf(null) }
-    val transactionReference = rememberSaveable { localStorage.newTransactionReference() }
+    val transactionReference = rememberTransactionReference()
     val accountNumberIsValid = remember(receiverAccountNumber) {
         receiverAccountNumber.isNotBlank() && receiverAccountNumber.length == institutionConfig.bankAccountNumberLength
     }
@@ -323,7 +322,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         return
     }
 
-    if (receipt != null) {
+    if (receipt != null && loadingMessage.isBlank()) {
         ReceiptDetails(navController = navController, printJob = receipt!!)
         return
     }
