@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.creditclub.core.config.IInstitutionConfig
+import com.creditclub.core.config.InstitutionConfig
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.MIDDLEWARE_CLIENT
@@ -12,7 +12,6 @@ import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.logFunctionUsage
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.CoroutineScope
@@ -32,14 +31,13 @@ open class CreditClubFragment : Fragment {
     constructor() : super()
     constructor(layout: Int) : super(layout)
 
-    open val gps: TrackGPS by inject()
     open val creditClubMiddleWareAPI: CreditClubMiddleWareAPI by inject(named(MIDDLEWARE_CLIENT))
     open val dialogProvider: DialogProvider by inject { parametersOf(activity) }
     open val functionId: Int? = null
 
     open val localStorage: LocalStorage by inject()
     open val appDataStorage: AppDataStorage by inject()
-    open val institutionConfig: IInstitutionConfig by inject()
+    open val institutionConfig: InstitutionConfig by inject()
     open val appConfig: AppConfig by inject()
     open val coreDatabase: CoreDatabase by inject()
 

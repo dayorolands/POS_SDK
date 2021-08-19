@@ -224,7 +224,7 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
         loanRequest.memberID = loanRequest_memberID_et!!.text.toString()
         loanRequest.agentPhoneNumber = localStorage.agentPhone
         //loanRequest.setAssociationID(associationDAO.Get(selectedAssociationID).getId());
-        loanRequest.geoLocation = gps.geolocationString
+        loanRequest.geoLocation = localStorage.lastKnownLocation
         loanRequest.agentPin = agentPIN_et!!.text.toString().trim { it <= ' ' }
         val data = Gson().toJson(loanRequest)
         /*loanRequest.setCustomerID(customerID);

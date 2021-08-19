@@ -1,8 +1,6 @@
 package com.creditclub.core
 
 import android.app.Application
-import androidx.work.Configuration
-import androidx.work.WorkManager
 import com.creditclub.core.data.api.VersionService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.prefs.AppDataStorage
@@ -26,12 +24,6 @@ open class CreditClubApplication : Application() {
         if (MissingSplitsManagerFactory.create(this).disableAppIfMissingRequiredSplits()) {
             return
         }
-
-        val myConfig = Configuration.Builder()
-            .setMinimumLoggingLevel(if (BuildConfig.DEBUG) android.util.Log.DEBUG else android.util.Log.INFO)
-            .build()
-
-        WorkManager.initialize(this, myConfig)
     }
 
     open suspend fun getLatestVersion() = safeRunIO {

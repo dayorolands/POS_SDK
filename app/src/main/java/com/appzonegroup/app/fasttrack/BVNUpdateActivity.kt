@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -12,11 +14,14 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityBvnupdateBinding
 import com.appzonegroup.app.fasttrack.databinding.FragmentAuthorizationBinding
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
+import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.request.BVNRequest
 import com.creditclub.core.type.TokenType
 import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.contentView
+import com.creditclub.core.util.isNetworkError
+import com.creditclub.core.util.safeRunIO
 import kotlinx.coroutines.launch
 
 class BVNUpdateActivity : CustomerBaseActivity() {
@@ -76,6 +81,7 @@ class BVNUpdateActivity : CustomerBaseActivity() {
     class AuthorizationFragment : CreditClubFragment(R.layout.fragment_authorization) {
         private val binding:FragmentAuthorizationBinding by dataBinding()
         val activity get() = getActivity() as BVNUpdateActivity
+        private val staticService: StaticService by retrofitService()
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
@@ -96,7 +102,6 @@ class BVNUpdateActivity : CustomerBaseActivity() {
                 @SuppressLint("SetTextI18n")
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     if (s?.length == 11) activity.mainScope.launch {
-                        val staticService = activity.creditClubMiddleWareAPI.staticService
                         activity.showProgressBar("Getting the BVN information...")
 
                         val (response, error) = safeRunIO {
@@ -140,15 +145,13 @@ class BVNUpdateActivity : CustomerBaseActivity() {
                     operationType = TokenType.BVNUpdate
                 ) {
                     onSubmit {
-                        val staticService = activity.creditClubMiddleWareAPI.staticService
-
                         val bvnRequest = BVNRequest()
 
                         bvnRequest.customerAccountNumber = activity.accountInfo.number
                         bvnRequest.customerPhoneNumber = activity.accountInfo.phoneNumber
                         bvnRequest.bvn =
                             binding.accountDetailsBvnEt.text.toString().trim { it <= ' ' }
-                        bvnRequest.geoLocation = activity.gps.geolocationString
+                        bvnRequest.geoLocation = localStorage.lastKnownLocation
                         bvnRequest.institutionCode = activity.localStorage.institutionCode
                         bvnRequest.agentPhoneNumber = activity.localStorage.agentPhone
                         bvnRequest.agentPin = binding.authAgentPINEt.text.toString()

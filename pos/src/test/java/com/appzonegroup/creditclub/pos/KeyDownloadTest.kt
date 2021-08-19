@@ -63,6 +63,17 @@ class KeyDownloadTest : PosParameter {
         runBlocking { downloadKeys() }
     }
 
+    @Test
+    fun message_unpacksProperly() {
+        val messageStr = ""
+        val packedMsg = messageStr.hexBytes
+        val isoMsg = ISOMsg().apply {
+            packager = ISO87Packager()
+        }
+        isoMsg.unpack(packedMsg)
+        isoMsg.log()
+    }
+
     override suspend fun downloadKeys() {
         val masterKeyBytes = downloadKey(
             processingCode = "9A0000",

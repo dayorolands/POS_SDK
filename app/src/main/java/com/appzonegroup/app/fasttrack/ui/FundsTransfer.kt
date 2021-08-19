@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
-import com.creditclub.core.config.IInstitutionConfig
+import com.creditclub.core.config.InstitutionConfig
 import com.creditclub.core.data.ClusterObjectBox
 import com.creditclub.core.data.TRANSACTIONS_CLIENT
 import com.creditclub.core.data.api.FundsTransferService
@@ -69,7 +69,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         TRANSACTIONS_CLIENT
     )
     val localStorage: LocalStorage by rememberBean()
-    val institutionConfig: IInstitutionConfig by rememberBean()
+    val institutionConfig: InstitutionConfig by rememberBean()
 
     val coroutineScope = rememberCoroutineScope()
     var activeJob: Job? by remember { mutableStateOf(null) }

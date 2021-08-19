@@ -319,7 +319,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
                 viewModel.fieldOne.value
             } else viewModel.customerPhone.value,
             customerDepositSlipNumber = uniqueReference,
-            geolocation = gps.geolocationString,
+            geolocation = localStorage.lastKnownLocation,
             isRecharge = isAirtime,
             retrievalReferenceNumber = uniqueReference,
             validationCode = viewModel.customerValidationResponse.value?.validationCode,

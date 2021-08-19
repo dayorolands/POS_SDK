@@ -8,14 +8,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.FragmentCollectionReferenceGenerationBinding
 import com.appzonegroup.app.fasttrack.ui.dataBinding
+import com.creditclub.core.data.api.CollectionsService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.request.CollectionReferenceGenerationRequest
 import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.*
+import com.creditclub.core.util.safeRunIO
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.util.*
@@ -32,6 +33,7 @@ class CollectionReferenceGenerationFragment :
     private val binding by dataBinding<FragmentCollectionReferenceGenerationBinding>()
     private val viewModel: CollectionPaymentViewModel by navGraphViewModels(R.id.collectionGraph)
     private val uniqueReference = UUID.randomUUID().toString()
+    private val collectionsService: CollectionsService by retrofitService()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -109,7 +111,7 @@ class CollectionReferenceGenerationFragment :
     }
 
     private suspend fun loadCategories() = viewModel.categoryList.download("categories") {
-        creditClubMiddleWareAPI.collectionsService.getCollectionCategories(
+        collectionsService.getCollectionCategories(
             localStorage.institutionCode,
             derivedCollectionType,
             viewModel.region.value,
@@ -119,7 +121,7 @@ class CollectionReferenceGenerationFragment :
 
     private suspend fun loadPaymentItems() =
         viewModel.itemList.download("payment items") {
-            creditClubMiddleWareAPI.collectionsService.getCollectionPaymentItems(
+            collectionsService.getCollectionPaymentItems(
                 localStorage.institutionCode,
                 viewModel.categoryCode.value,
                 viewModel.region.value,
@@ -138,7 +140,7 @@ class CollectionReferenceGenerationFragment :
         viewModel.customer.value = null
         dialogProvider.showProgressBar("Loading customer")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.collectionsService.getCollectionCustomer(
+            collectionsService.getCollectionCustomer(
                 localStorage.institutionCode,
                 "${viewModel.customerType.value}${viewModel.customerId.value?.trim()}",
                 viewModel.region.value,
@@ -219,7 +221,7 @@ class CollectionReferenceGenerationFragment :
             else viewModel.itemCode.value
 
             amount = binding.amountInput.value.toDoubleOrNull()
-            geoLocation = gps.geolocationString
+            geoLocation = localStorage.lastKnownLocation
             currency = "NGN"
             referenceName = viewModel.paymentReferenceName.value
             institutionCode = localStorage.institutionCode
@@ -232,7 +234,7 @@ class CollectionReferenceGenerationFragment :
 
         dialogProvider.showProgressBar("Processing request")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.collectionsService.generateCollectionReference(request)
+            collectionsService.generateCollectionReference(request)
         }
         dialogProvider.hideProgressBar()
 

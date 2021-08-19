@@ -32,7 +32,7 @@ buildscript {
             'room'               : '2.3.0',
             'serialization'      : '1.1.0',
             'viewPager2'         : '1.0.0-beta02',
-            'work'               : '2.5.0',
+            'work'               : '2.7.0-alpha05',
     ]
 
     repositories {
@@ -50,7 +50,6 @@ buildscript {
         classpath 'com.google.firebase:perf-plugin:1.4.0'
         // classpath 'com.google.firebase:firebase-crashlytics-gradle:2.6.0'
         // classpath 'com.google.firebase:perf-plugin:1.4.0'
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:${versions.navigation}"
         classpath "io.objectbox:objectbox-gradle-plugin:${versions.objectBox}"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

@@ -137,8 +137,6 @@ public class ChangeCustomerPinActivity extends BaseActivity {
 
     public void change_pin_button_click(View view) {
 
-        String location = getGps().getGeolocationString();
-
         oldPin = oldPinET.getText().toString();
 
         if (oldPin.length() != 4) {
@@ -180,7 +178,7 @@ public class ChangeCustomerPinActivity extends BaseActivity {
             changePinRequest.setNewPin(newPin);
             changePinRequest.setConfirmNewPin(confirmNewPin);
             changePinRequest.setOldPin(oldPin);
-            changePinRequest.setGeoLocation(location);
+            changePinRequest.setGeoLocation(getLocalStorage().getLastKnownLocation());
             changePinRequest.setCustomerPhoneNumber(customerPhoneEt.getText().toString().trim());
             changePinRequest.setAgentPin("0000");
             changePinRequest.setCustomerToken(customerToken);

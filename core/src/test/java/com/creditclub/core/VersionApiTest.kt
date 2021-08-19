@@ -1,6 +1,8 @@
 package com.creditclub.core
 
+import com.creditclub.core.data.api.VersionService
 import com.creditclub.core.data.model.Version
+import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.safeRunIO
 import org.junit.Test
 
@@ -10,12 +12,13 @@ import org.junit.Test
  * Appzone Ltd
  */
 open class VersionApiTest : UnitTest() {
+    val versionService: VersionService by middleWareAPI.retrofit.service()
 
     @Test
     fun `fetches app latest version`() {
         mainScope {
             val (response, error) = safeRunIO {
-                middleWareAPI.versionService.getLatestVersionAndDownloadLink("AccessPOS")
+                versionService.getLatestVersionAndDownloadLink("AccessPOS")
             }
 
             assert(error == null)

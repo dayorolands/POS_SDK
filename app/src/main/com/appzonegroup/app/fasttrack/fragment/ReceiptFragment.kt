@@ -6,11 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.appzonegroup.app.fasttrack.ui.ReceiptDetails
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.pos.printer.ParcelablePrintJob
-import com.creditclub.pos.printer.PrintJob
 import com.creditclub.ui.theme.CreditClubTheme
 import com.google.accompanist.insets.ProvideWindowInsets
 

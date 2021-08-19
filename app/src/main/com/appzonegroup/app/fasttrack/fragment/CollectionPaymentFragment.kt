@@ -17,6 +17,8 @@ import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
+import com.creditclub.core.data.api.CollectionsService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.request.CollectionPaymentRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.safeRunIO
@@ -37,6 +39,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     override val functionId = FunctionIds.COLLECTION_PAYMENT
     private val request = CollectionPaymentRequest()
     private val uniqueReference = UUID.randomUUID().toString()
+    private val collectionsService: CollectionsService by retrofitService()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -100,7 +103,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     }
 
     private suspend fun loadRegions() = loadDependencies("regions", regions, binding.regionInput) {
-        regions = creditClubMiddleWareAPI.collectionsService.getCollectionRegions(
+        regions = collectionsService.getCollectionRegions(
             localStorage.institutionCode,
             viewModel.collectionService.value
         )
@@ -109,7 +112,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
     private suspend fun loadCollectionTypes() =
         loadDependencies("collection types", collectionTypes, binding.collectionTypeInput) {
-            collectionTypes = creditClubMiddleWareAPI.collectionsService.getCollectionTypes(
+            collectionTypes = collectionsService.getCollectionTypes(
                 localStorage.institutionCode,
                 viewModel.region.value,
                 viewModel.collectionService.value
@@ -127,7 +130,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         viewModel.collectionReference.value = null
         dialogProvider.showProgressBar("Loading reference")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.collectionsService.getCollectionReferenceByReference(
+            collectionsService.getCollectionReferenceByReference(
                 localStorage.institutionCode,
                 viewModel.referenceString.value?.trim(),
                 viewModel.region.value,
@@ -246,7 +249,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             collectionType = derivedCollectionType
             itemCode = viewModel.itemCode.value
             amount = amountDouble
-            geoLocation = gps.geolocationString
+            geoLocation = localStorage.lastKnownLocation
             currency = "NGN"
             institutionCode = localStorage.institutionCode
             agentPhoneNumber = localStorage.agentPhone
@@ -256,7 +259,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
         dialogProvider.showProgressBar("Processing request")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.collectionsService.collectionPayment(request)
+            collectionsService.collectionPayment(request)
         }
         dialogProvider.hideProgressBar()
         if (error != null) return dialogProvider.showErrorAndWait(error)

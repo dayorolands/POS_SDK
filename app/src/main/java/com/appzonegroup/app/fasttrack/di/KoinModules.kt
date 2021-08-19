@@ -7,7 +7,7 @@ import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.app.LocalInstitutionConfig
 import com.appzonegroup.app.fasttrack.ui.CreditClubDialogProvider
 import com.creditclub.analytics.NetworkMetricsInterceptor
-import com.creditclub.core.config.IInstitutionConfig
+import com.creditclub.core.config.InstitutionConfig
 import com.creditclub.core.data.*
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.api.AuthInterceptor
@@ -15,7 +15,6 @@ import com.creditclub.core.data.api.RequestFailureInterceptor
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.core.util.TrackGPS
 import com.creditclub.core.util.debugOnly
 import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.receipt.PdfPrinter
@@ -40,10 +39,6 @@ val dataModule = module {
     single { LocalStorage(androidContext()) }
     single { AppDataStorage.getInstance(androidContext()) }
     single { CoreDatabase.getInstance(androidContext()) }
-}
-
-val locationModule = module {
-    single { TrackGPS(androidContext(), get()) }
 }
 
 val apiModule = module {
@@ -111,7 +106,7 @@ val uiModule = module {
 }
 
 val configModule = module {
-    single<IInstitutionConfig> { LocalInstitutionConfig.create(androidContext()) }
+    single<InstitutionConfig> { LocalInstitutionConfig.create(androidContext()) }
     single<AppConfig> {
         object : AppConfig {
             override val apiHost = BuildConfig.API_HOST
