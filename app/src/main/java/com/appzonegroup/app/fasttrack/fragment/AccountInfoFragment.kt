@@ -14,6 +14,8 @@ import com.creditclub.core.type.TokenType
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.isKotlinNPE
 import com.appzonegroup.app.fasttrack.requireAndValidateToken
+import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.util.safeRunIO
 import kotlinx.coroutines.launch
 
@@ -21,6 +23,7 @@ class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
     private val activity get() = getActivity() as CustomerRequestOpenAccountActivity
     private val binding by dataBinding<FragmentCustomerRequestAccountInfoBinding>()
     private val viewModel by activityViewModels<OpenAccountViewModel>()
+    private val staticService: StaticService by retrofitService()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -36,7 +39,7 @@ class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
     private suspend fun loadProducts() {
         dialogProvider.showProgressBar("Getting Products...")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.getAllProducts(
+            staticService.getAllProducts(
                 localStorage.institutionCode,
                 localStorage.agentPhone
             )
@@ -78,7 +81,7 @@ class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
     private suspend fun getCustomerBVN() {
         dialogProvider.showProgressBar("Getting the BVN information...")
         val (result, error) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.getCustomerDetailsByBVN(
+            staticService.getCustomerDetailsByBVN(
                 localStorage.institutionCode,
                 viewModel.bvn.value!!
             )

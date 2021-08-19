@@ -1,6 +1,5 @@
 package com.creditclub.core.data.request
 
-import com.creditclub.core.data.model.GeoTagCoordinate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,7 +10,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class OfflineHLATaggingRequest {
-
     @SerialName("Name")
     var name: String? = null
 
@@ -39,3 +37,9 @@ class OfflineHLATaggingRequest {
     @SerialName("DateTagged")
     var dateTagged: String? = null
 }
+
+@Serializable
+data class GeoTagCoordinate(
+    @SerialName("Latitude") val latitude: String,
+    @SerialName("Longitude") val longitude: String,
+)

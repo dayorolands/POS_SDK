@@ -10,6 +10,8 @@ import android.os.Build
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.appzonegroup.app.fasttrack.di.*
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.utility.extensions.registerWorkers
@@ -64,7 +66,6 @@ class BankOneApplication : CreditClubApplication() {
                 listOf(
                     clusterObjectBoxModule,
                     apiModule,
-                    locationModule,
                     dataModule,
                     uiModule,
                     configModule,
@@ -83,6 +84,12 @@ class BankOneApplication : CreditClubApplication() {
         registerAppFunctions()
         Platform.test(this)
         if (Platform.isPOS) startPosApp()
+
+        val myConfig = Configuration.Builder()
+            .setMinimumLoggingLevel(if (BuildConfig.DEBUG) android.util.Log.DEBUG else android.util.Log.INFO)
+            .build()
+
+        WorkManager.initialize(this, myConfig)
         registerWorkers()
     }
 

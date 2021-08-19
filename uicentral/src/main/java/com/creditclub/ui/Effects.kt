@@ -3,9 +3,12 @@ package com.creditclub.ui
 import android.app.Application
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import com.creditclub.core.data.MIDDLEWARE_CLIENT
 import com.creditclub.core.data.api.retrofitService
+import com.creditclub.core.data.prefs.LocalStorage
+import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.ui.widget.DialogProvider
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
@@ -35,4 +38,10 @@ fun rememberDialogProvider(): Lazy<DialogProvider> {
         val application = localContext.applicationContext as Application
         application.inject { parametersOf(localContext) }
     }
+}
+
+@Composable
+fun rememberTransactionReference(): String {
+    val localStorage: LocalStorage by rememberBean()
+    return rememberSaveable { localStorage.newTransactionReference() }
 }

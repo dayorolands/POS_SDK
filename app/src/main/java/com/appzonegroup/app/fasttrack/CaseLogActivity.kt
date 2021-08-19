@@ -6,6 +6,8 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import com.appzonegroup.app.fasttrack.databinding.ActivityCaseLogBinding
 import com.appzonegroup.app.fasttrack.fragment.CaseLogViewModel
+import com.creditclub.core.data.api.CaseLogService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.request.LogCaseRequest
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
@@ -17,7 +19,7 @@ import kotlinx.serialization.SerializationException
 
 class CaseLogActivity : CreditClubActivity(R.layout.activity_case_log) {
     private val binding: ActivityCaseLogBinding by dataBinding()
-    private val caseLogService = creditClubMiddleWareAPI.caseLogService
+    private val caseLogService: CaseLogService by retrofitService()
     private val viewModel: CaseLogViewModel by viewModels()
     private val request = LogCaseRequest()
 

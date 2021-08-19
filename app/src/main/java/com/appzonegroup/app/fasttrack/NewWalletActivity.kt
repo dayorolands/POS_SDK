@@ -16,10 +16,14 @@ import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.creditclub.pos.Platform
+import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.request.CustomerRequest
 import com.creditclub.core.data.response.BackendResponse
 import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.util.*
+import com.creditclub.core.util.hasOccurred
+import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.showNetworkError
 import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.pos.printer.PrinterStatus
 import kotlinx.coroutines.launch
@@ -34,6 +38,7 @@ class NewWalletActivity : CreditClubActivity(R.layout.activity_open_account) {
     private val viewModel by viewModels<OpenAccountViewModel>()
     private val receipt by lazy { NewAccountReceipt(this) }
     private val request by lazy { CustomerRequest().apply { uniqueReferenceID = Misc.getGUID() } }
+    private val staticService: StaticService by retrofitService()
 
     override val functionId = FunctionIds.NEW_WALLET
 
@@ -71,7 +76,6 @@ class NewWalletActivity : CreditClubActivity(R.layout.activity_open_account) {
     }
 
     private suspend fun createCustomer() {
-        val location = gps.geolocationString
         val gender = viewModel.gender.value
 
         request.customerLastName = viewModel.surname.value?.trim()
@@ -80,7 +84,7 @@ class NewWalletActivity : CreditClubActivity(R.layout.activity_open_account) {
         request.placeOfBirth = viewModel.placeOfBirth.value?.trim()
         request.customerPhoneNumber = viewModel.phoneNumber.value?.trim()
         request.gender = gender?.substring(0, 1)?.toLowerCase(Locale.getDefault())
-        request.geoLocation = location
+        request.geoLocation = localStorage.lastKnownLocation
         request.starterPackNumber = viewModel.starterPackNo.value?.trim()
         request.address = viewModel.address.value?.trim()
         request.productCode = viewModel.productCode.value
@@ -111,9 +115,8 @@ class NewWalletActivity : CreditClubActivity(R.layout.activity_open_account) {
             )
 
         dialogProvider.showProgressBar("Creating customer wallet")
-        val service = creditClubMiddleWareAPI.staticService
         val (response, error) = safeRunIO {
-            service.register(request)
+            staticService.register(request)
         }
         dialogProvider.hideProgressBar()
 

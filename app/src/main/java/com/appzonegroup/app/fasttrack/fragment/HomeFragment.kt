@@ -14,7 +14,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyGridScope
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
@@ -30,15 +32,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.fragment.findNavController
-import com.appzonegroup.app.fasttrack.clusterNavigation
 import com.appzonegroup.app.fasttrack.R
+import com.appzonegroup.app.fasttrack.clusterNavigation
 import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.Routes
 import com.creditclub.components.*
-import com.creditclub.conversation.LocalBackPressedDispatcher
-import com.creditclub.core.config.IInstitutionConfig
+import com.creditclub.core.config.InstitutionConfig
 import com.creditclub.core.data.api.NotificationService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.NotificationRequest
@@ -51,7 +52,8 @@ import com.creditclub.ui.UpdateActivity
 import com.creditclub.ui.rememberBean
 import com.creditclub.ui.theme.CreditClubTheme
 import com.creditclub.viewmodel.AppViewModel
-import com.google.accompanist.insets.*
+import com.google.accompanist.insets.ExperimentalAnimatedInsets
+import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 import java.util.*
@@ -89,41 +91,22 @@ class HomeFragment : CreditClubFragment() {
     ): View {
         val fragmentNavController = findNavController()
         return ComposeView(inflater.context).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-            )
-
-            // Create a ViewWindowInsetObserver using this view, and call start() to
-            // start listening now. The WindowInsets instance is returned, allowing us to
-            // provide it to AmbientWindowInsets in our content below.
-            val windowInsets = ViewWindowInsetObserver(this)
-                // We use the `windowInsetsAnimationsEnabled` parameter to enable animated
-                // insets support. This allows our `ConversationContent` to animate with the
-                // on-screen keyboard (IME) as it enters/exits the screen.
-                .start(windowInsetsAnimationsEnabled = true)
-
             setContent {
                 val composeNavController = rememberNavController()
-                CompositionLocalProvider(
-                    LocalBackPressedDispatcher provides requireActivity().onBackPressedDispatcher,
-                    LocalWindowInsets provides windowInsets,
-                ) {
-                    CreditClubTheme {
-                        ProvideWindowInsets {
-                            NavHost(navController = composeNavController, Routes.Home) {
-                                composable(Routes.Home) {
-                                    HomeContent(
-                                        mainNavController = fragmentNavController,
-                                        composeNavController = composeNavController,
-                                    )
-                                }
-                                clusterNavigation(
-                                    navController = composeNavController,
-                                    dialogProvider = dialogProvider,
-                                    appViewModel = appViewModel,
+                CreditClubTheme {
+                    ProvideWindowInsets {
+                        NavHost(navController = composeNavController, Routes.Home) {
+                            composable(Routes.Home) {
+                                HomeContent(
+                                    mainNavController = fragmentNavController,
+                                    composeNavController = composeNavController,
                                 )
                             }
+                            clusterNavigation(
+                                navController = composeNavController,
+                                dialogProvider = dialogProvider,
+                                appViewModel = appViewModel,
+                            )
                         }
                     }
                 }
@@ -137,7 +120,7 @@ class HomeFragment : CreditClubFragment() {
         mainNavController: NavController,
         composeNavController: NavHostController,
     ) {
-        val institutionConfig: IInstitutionConfig by rememberBean()
+        val institutionConfig: InstitutionConfig by rememberBean()
         val flows = institutionConfig.flows
         val homeNavController = rememberNavController()
         val coroutineScope = rememberCoroutineScope()

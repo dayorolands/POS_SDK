@@ -11,6 +11,8 @@ import com.creditclub.core.util.toString
 import com.creditclub.ui.adapter.MiniStatementAdapter
 import com.creditclub.ui.dataBinding
 import com.appzonegroup.app.fasttrack.databinding.ActivityMiniStatementBinding
+import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.data.api.retrofitService
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.Period
@@ -24,6 +26,7 @@ class MiniStatementActivity : CreditClubActivity(R.layout.activity_mini_statemen
 
     private var endDate = LocalDate.now()
     private var startDate = endDate.minusDays(6)
+    private val staticService: StaticService by retrofitService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,7 +114,7 @@ class MiniStatementActivity : CreditClubActivity(R.layout.activity_mini_statemen
             agentPhoneNumber = localStorage.agentPhone,
             startDate = binding.content.startDateContentTv.text.toString(),
             endDate = binding.content.endDateContentTv.text.toString(),
-            geoLocation = gps.geolocationString,
+            geoLocation = localStorage.lastKnownLocation,
             transactionCount = 20,
             institutionCode = localStorage.institutionCode,
             agentPin = agentPIN,
@@ -119,7 +122,7 @@ class MiniStatementActivity : CreditClubActivity(R.layout.activity_mini_statemen
 
         dialogProvider.showProgressBar("Getting transaction")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.miniStatement(request)
+            staticService.miniStatement(request)
         }
         dialogProvider.hideProgressBar()
 

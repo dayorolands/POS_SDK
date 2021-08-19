@@ -9,6 +9,8 @@ import android.view.Window
 import androidx.databinding.DataBindingUtil
 import com.appzonegroup.app.fasttrack.databinding.DialogCustomerRequestOptionsBinding
 import com.creditclub.core.R
+import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.request.BalanceEnquiryRequest
 import com.creditclub.core.data.request.ConfirmTokenRequest
@@ -87,6 +89,7 @@ fun CreditClubActivity.requestAccountInfo(
     option: CustomerRequestOption,
     continuation: Continuation<AccountInfo?>,
 ) {
+    val staticService: StaticService by retrofitService()
     val params = when (option) {
         CustomerRequestOption.PhoneNumber -> TextFieldParams(
             "Enter customer phone number",
@@ -108,7 +111,6 @@ fun CreditClubActivity.requestAccountInfo(
     dialogProvider.showInput(params) {
         onSubmit { text ->
             mainScope.launch {
-                val staticService = creditClubMiddleWareAPI.staticService
                 val institutionCode = localStorage.institutionCode
 
                 hide()
@@ -211,6 +213,7 @@ suspend fun CreditClubActivity.sendToken(
     operationType: TokenType,
     amount: Double = 1.0,
 ): Boolean {
+    val staticService: StaticService by retrofitService()
     val reference = SecureRandom().nextInt(1000000)
     val sendTokenRequest = SendTokenRequest(
         customerPhoneNumber = accountInfo.phoneNumber,
@@ -226,7 +229,7 @@ suspend fun CreditClubActivity.sendToken(
 
     dialogProvider.showProgressBar("Sending Token")
     val (data, error) = safeRunIO {
-        creditClubMiddleWareAPI.staticService.sendToken(sendTokenRequest)
+        staticService.sendToken(sendTokenRequest)
     }
     dialogProvider.hideProgressBar()
 
@@ -259,6 +262,7 @@ inline fun CreditClubActivity.requireAndValidateToken(
     textFieldParams: TextFieldParams = tokenParams,
     crossinline block: DialogListenerBlock<Unit>
 ) {
+    val staticService: StaticService by retrofitService()
     val reference = SecureRandom().nextInt(1000000)
 
     val sendTokenRequest = SendTokenRequest(
@@ -277,7 +281,7 @@ inline fun CreditClubActivity.requireAndValidateToken(
         dialogProvider.showProgressBar("Sending Token")
 
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.sendToken(sendTokenRequest)
+            staticService.sendToken(sendTokenRequest)
         }
 
         dialogProvider.hideProgressBar()
@@ -310,7 +314,7 @@ inline fun CreditClubActivity.requireAndValidateToken(
                     dialogProvider.showProgressBar("Confirming token")
 
                     val (confirmTokenResponse) = safeRunIO {
-                        creditClubMiddleWareAPI.staticService.confirmToken(confirmTokenRequest)
+                        staticService.confirmToken(confirmTokenRequest)
                     }
 
                     dialogProvider.hideProgressBar()
@@ -361,6 +365,7 @@ suspend fun CreditClubActivity.selectAccountNumber(linkingBankAccounts: List<Acc
 }
 
 suspend fun CreditClubActivity.customerBalanceEnquiry(accountInfo: AccountInfo) {
+    val staticService: StaticService by retrofitService()
     val pin = dialogProvider.getPin(getString(R.string.agent_pin)) ?: return
     if (pin.length != 4) {
         dialogProvider.showError(getString(R.string.agent_pin_must_be_4_digits))
@@ -371,13 +376,13 @@ suspend fun CreditClubActivity.customerBalanceEnquiry(accountInfo: AccountInfo) 
         customerAccountNumber = accountInfo.number,
         agentPin = pin,
         agentPhoneNumber = localStorage.agentPhone,
-        geoLocation = gps.geolocationString,
+        geoLocation = localStorage.lastKnownLocation,
         institutionCode = localStorage.institutionCode,
     )
 
     dialogProvider.showProgressBar("Sending balance to customer")
     val (response, error) = safeRunIO {
-        creditClubMiddleWareAPI.staticService.balanceEnquiry(request)
+        staticService.balanceEnquiry(request)
     }
     dialogProvider.hideProgressBar()
 

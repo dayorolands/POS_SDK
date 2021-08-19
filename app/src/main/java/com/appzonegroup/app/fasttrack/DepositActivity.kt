@@ -77,7 +77,7 @@ class DepositActivity : CustomerBaseActivity() {
             institutionCode = localStorage.institutionCode,
             customerAccountNumber = accountInfo.number,
             amount = amount,
-            geoLocation = gps.geolocationString,
+            geoLocation = localStorage.lastKnownLocation,
             retrievalReferenceNumber = retrievalReferenceNumber,
         )
         renderTransactionSummary(

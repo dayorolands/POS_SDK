@@ -26,7 +26,7 @@ fun TransactionStatusQuery(
     title: String,
     message: String,
     imageVector: ImageVector = Icons.Outlined.HourglassTop,
-    onRequery: () -> Unit,
+    onRequery: (() -> Unit)? = null,
     loadingMessage: String,
 ) {
     Column(
@@ -79,11 +79,13 @@ fun TransactionStatusQuery(
                         .padding(horizontal = 10.dp),
                 )
                 Spacer(modifier = Modifier.padding(top = 30.dp))
-                AppButton(
-                    modifier = Modifier.padding(horizontal = 10.dp),
-                    onClick = onRequery,
-                ) {
-                    Text(text = "Check status")
+                if (onRequery != null) {
+                    AppButton(
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                        onClick = onRequery,
+                    ) {
+                        Text(text = "Check status")
+                    }
                 }
             } else {
                 Loading(message = loadingMessage)

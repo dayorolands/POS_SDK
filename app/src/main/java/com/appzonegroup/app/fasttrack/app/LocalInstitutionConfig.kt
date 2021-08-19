@@ -19,7 +19,7 @@ class LocalInstitutionConfig private constructor(
     override var flows: FlowConfig,
     override var categories: CategoryConfig,
     override var bankAccountNumberLength: Int,
-) : IInstitutionConfig {
+) : InstitutionConfig {
 
     companion object {
 

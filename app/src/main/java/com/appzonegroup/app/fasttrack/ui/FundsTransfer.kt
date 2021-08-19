@@ -33,16 +33,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
-import com.creditclub.core.config.IInstitutionConfig
+import com.creditclub.core.config.InstitutionConfig
 import com.creditclub.core.data.ClusterObjectBox
 import com.creditclub.core.data.TRANSACTIONS_CLIENT
 import com.creditclub.core.data.api.FundsTransferService
 import com.creditclub.core.data.model.Bank
 import com.creditclub.core.data.model.PendingTransaction
 import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.FundsTransferRequest
 import com.creditclub.core.data.response.NameEnquiryResponse
+import com.creditclub.core.data.response.RetryPolicy
 import com.creditclub.core.type.TransactionType
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.*
@@ -52,7 +52,7 @@ import com.creditclub.ui.*
 import io.objectbox.Box
 import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import java.time.Instant
@@ -69,8 +69,11 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         TRANSACTIONS_CLIENT
     )
     val localStorage: LocalStorage by rememberBean()
-    val institutionConfig: IInstitutionConfig by rememberBean()
+    val institutionConfig: InstitutionConfig by rememberBean()
+
     val coroutineScope = rememberCoroutineScope()
+    var activeJob: Job? by remember { mutableStateOf(null) }
+
     var loadingMessage by remember { mutableStateOf("") }
     var isSameBank: Boolean? by rememberSaveable { mutableStateOf(null) }
     var bank: Bank? by remember(isSameBank) { mutableStateOf(null) }
@@ -83,12 +86,16 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     var narration by remember { mutableStateOf("") }
     var agentPin by remember { mutableStateOf("") }
     var receipt: PrintJob? by remember { mutableStateOf(null) }
-    val transactionReference = rememberSaveable { localStorage.newTransactionReference() }
+    val transactionReference = rememberTransactionReference()
     val accountNumberIsValid = remember(receiverAccountNumber) {
-        receiverAccountNumber.isNotBlank() && (receiverAccountNumber.length == 10 || receiverAccountNumber.length == 11)
+        receiverAccountNumber.isNotBlank() && receiverAccountNumber.length == institutionConfig.bankAccountNumberLength
     }
+
+    // variables for requery
     var transferAttemptCount by remember { mutableStateOf(0) }
-    var isPending by remember { mutableStateOf(false) }
+    var retryPolicy: RetryPolicy? by remember { mutableStateOf(null) }
+    var pendingTransactionId: Long? by remember { mutableStateOf(null) }
+
     val amountIsValid = remember(amountString) {
         with(amountString.toDoubleOrNull()) {
             this != null && this > 0.0
@@ -113,8 +120,6 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     val pendingTransactionsBox: Box<PendingTransaction> = remember {
         clusterObjectBox.boxStore.boxFor()
     }
-    var pendingTransactionId: Long? by remember { mutableStateOf(null) }
-    var needsManualRequery by remember { mutableStateOf(false) }
 
     val validateAccount: suspend CoroutineScope.() -> Unit =
         remember(
@@ -238,26 +243,49 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     pendingTransactionId = pendingTransactionsBox.put(pendingTransaction)
                 }
 
-                if (error != null && receipt == null) {
-                    dialogProvider.showErrorAndWait(error)
-                    navController.popBackStack()
+                if (error != null) {
+                    errorMessage =
+                        error.getMessage(context) + ". Please click the CONFIRM button to try again"
+                    if (error.isTimeout()) {
+                        retryPolicy = RetryPolicy.AutoRetry
+                        transferAttemptCount++
+                        return@makeTransfer
+                    }
+
                     return@makeTransfer
                 }
 
-                isPending = response!!.isPending()
-                needsManualRequery = response.isPendingOnBank()
-                if (response.isFailure()) {
-                    errorMessage = response.responseMessage ?: ""
-                } else if (response.isSuccess() && pendingTransactionId != null) {
-                    // delete pending transaction once confirmed successful
-                    pendingTransactionsBox.remove(pendingTransactionId!!)
+                when {
+                    response!!.isPendingOnBank() -> {
+                        retryPolicy = RetryPolicy.RetryLater
+                    }
+                    response.isPendingOnMiddleware() -> {
+                        retryPolicy = RetryPolicy.AutoRetry
+                    }
+                    response.isFailure() -> {
+                        if (pendingTransactionId != null) {
+                            // delete pending transaction once confirmed failed
+                            pendingTransactionsBox.remove(pendingTransactionId!!)
+                        }
+
+                        retryPolicy = null
+                        errorMessage = response.responseMessage ?: ""
+                    }
+                    response.isSuccess() && pendingTransactionId != null -> {
+                        if (pendingTransactionId != null) {
+                            // delete pending transaction once confirmed successful
+                            pendingTransactionsBox.remove(pendingTransactionId!!)
+                        }
+
+                        retryPolicy = null
+                    }
                 }
 
                 receipt = fundsTransferReceipt(
                     context = context,
                     request = fundsTransferRequest,
                     transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
-                    isSuccessful = response.isSuccessful,
+                    isSuccessful = response!!.isSuccessful,
                     reason = response.responseMessage,
                 )
                 transferAttemptCount++
@@ -265,38 +293,36 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         }
 
     LaunchedEffect(receiverAccountNumber) {
-        if (receiverAccountNumber.length == institutionConfig.bankAccountNumberLength
-            && loadingMessage.isBlank()
-            && nameEnquiryResponse == null
-        ) {
+        if (accountNumberIsValid && loadingMessage.isBlank() && nameEnquiryResponse == null) {
             validateAccount()
         }
     }
 
     // Schedule automatic requery for pending transactions
     LaunchedEffect(transferAttemptCount) {
-        if (transferAttemptCount < 1 || needsManualRequery) return@LaunchedEffect
-
-        if (isPending) transferFunds()
+        if (transferAttemptCount > 0 && retryPolicy == RetryPolicy.AutoRetry) {
+            transferFunds()
+        }
     }
 
-    if (needsManualRequery) {
+    if (retryPolicy == RetryPolicy.ManualRetry || retryPolicy == RetryPolicy.RetryLater) {
         TransactionStatusQuery(
             onClose = {
-                isPending = false
-                needsManualRequery = false
+                retryPolicy = null
             },
             title = "Transaction pending",
             loadingMessage = loadingMessage,
             message = errorMessage,
-            onRequery = {
-                coroutineScope.launch { transferFunds() }
-            },
+            onRequery = if (retryPolicy == RetryPolicy.ManualRetry) {
+                {
+                    activeJob = coroutineScope.launch { transferFunds() }
+                }
+            } else null,
         )
         return
     }
 
-    if (receipt != null) {
+    if (receipt != null && loadingMessage.isBlank()) {
         ReceiptDetails(navController = navController, printJob = receipt!!)
         return
     }
@@ -339,7 +365,8 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     Loading(
                         message = loadingMessage,
                         onCancel = {
-                            coroutineScope.cancel()
+                            activeJob?.cancel()
+                            activeJob = null
                             loadingMessage = ""
                         },
                     )
@@ -400,7 +427,11 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                         singleLine = true,
                         trailingIcon = {
                             if (accountNumberIsValid && !isVerified) {
-                                IconButton(onClick = { coroutineScope.launch { validateAccount() } }) {
+                                IconButton(
+                                    onClick = {
+                                        activeJob = coroutineScope.launch { validateAccount() }
+                                    },
+                                ) {
                                     Icon(
                                         Icons.Outlined.Search,
                                         contentDescription = null,
@@ -480,7 +511,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         if (loadingMessage.isBlank() && accountNumberIsValid && amountIsValid && receipt == null) {
             AppButton(
                 onClick = {
-                    coroutineScope.launch {
+                    activeJob = coroutineScope.launch {
                         when {
                             !showConfirmation -> showConfirmation = true
                             isVerified -> transferFunds()

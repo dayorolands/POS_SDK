@@ -121,7 +121,7 @@ class TransactionReportAdapter(
 
                 is ItemReport2Binding -> {
                     fromTv.text = item.to
-                    amountTv.text = item.amount?.toCurrencyFormat()
+                    amountTv.text = item.amount?.times(100)?.toCurrencyFormat()
                     dateTv.text = item.date?.replace("T", " ")
                     phoneNoTv.text = item.fromPhoneNumber
 
@@ -133,7 +133,9 @@ class TransactionReportAdapter(
                         printReceiptButton.setOnClickListener {
                             listener?.onClick(item, transactionType)
                         }
-                    } else printReceiptButton.visibility = View.GONE
+                    } else {
+                        printReceiptButton.visibility = View.GONE
+                    }
                 }
 
                 is ItemReport3Binding -> {

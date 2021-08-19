@@ -13,6 +13,8 @@ import com.appzonegroup.app.fasttrack.BuildConfig
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.FragmentCustomerRequestGeneralInfoBinding
 import com.appzonegroup.app.fasttrack.ui.dataBinding
+import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.response.ApiResponse
 import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.ui.CreditClubFragment
@@ -24,6 +26,7 @@ import java.time.LocalDate
 class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_request_general_info) {
     private val binding by dataBinding<FragmentCustomerRequestGeneralInfoBinding>()
     private val viewModel by activityViewModels<OpenAccountViewModel>()
+    private val staticService: StaticService by retrofitService()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -223,12 +226,12 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
     }
 
     private suspend fun loadStates() = viewModel.stateList.download("states") {
-        creditClubMiddleWareAPI.staticService.getStates(localStorage.institutionCode)
+        staticService.getStates(localStorage.institutionCode)
     }
 
     private suspend fun loadLgas() =
         viewModel.lgaList.download("lgas") {
-            creditClubMiddleWareAPI.staticService.getLgas(
+            staticService.getLgas(
                 localStorage.institutionCode,
                 viewModel.addressState.value?.id
             )
