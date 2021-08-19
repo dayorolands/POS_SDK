@@ -32,6 +32,10 @@ Beneficiary: ${request.beneficiaryAccountName} ${request.beneficiaryAccountNumbe
 Transaction Date: $transactionDate
 RRN: ${request.externalTransactionReference}"""
     )
-    transactionStatus(context = context, isSuccessful = isSuccessful, reason = reason)
+    transactionStatus(
+        context = context,
+        isSuccessful = isSuccessful,
+        reason = reason,
+    )
     footerNodes(context)
 }

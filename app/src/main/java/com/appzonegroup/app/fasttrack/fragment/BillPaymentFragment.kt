@@ -21,7 +21,10 @@ import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.*
+import com.creditclub.core.util.includesNumbers
+import com.creditclub.core.util.includesSpecialCharacters
+import com.creditclub.core.util.isValidEmail
+import com.creditclub.core.util.safeRunIO
 import com.creditclub.pos.printer.PosPrinter
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -33,7 +36,6 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     private val binding by dataBinding<BillPaymentFragmentBinding>()
     override val functionId = FunctionIds.PAY_BILL
     private val uniqueReference by lazy { localStorage.newTransactionReference() }
-    private val retrievalReferenceNumber = generateRRN()
     private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
     private val billsPaymentService by retrofitService<BillsPaymentService>()
 
@@ -316,10 +318,10 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             customerPhone = if (isAirtime) {
                 viewModel.fieldOne.value
             } else viewModel.customerPhone.value,
-            customerDepositSlipNumber = "${agent.agentCode}$uniqueReference",
-            geolocation = gps.geolocationString,
+            customerDepositSlipNumber = uniqueReference,
+            geolocation = localStorage.lastKnownLocation,
             isRecharge = isAirtime,
-            retrievalReferenceNumber = retrievalReferenceNumber,
+            retrievalReferenceNumber = uniqueReference,
             validationCode = viewModel.customerValidationResponse.value?.validationCode,
         )
         dialogProvider.showProgressBar("Processing request")

@@ -9,7 +9,6 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.Fragment
 import com.appzonegroup.app.fasttrack.BankOneApplication
 import com.appzonegroup.app.fasttrack.OnlineActivity
 import com.appzonegroup.app.fasttrack.R
@@ -26,6 +25,7 @@ import com.appzonegroup.app.fasttrack.utility.online.convertXmlToJson
 import com.creditclub.core.data.Encryption
 import com.creditclub.core.model.CreditClubImage
 import com.creditclub.core.ui.CreditClubFragment
+import com.creditclub.core.util.format
 import com.creditclub.core.util.safeRunIO
 import com.esafirm.imagepicker.features.*
 import com.esafirm.imagepicker.features.cameraonly.CameraOnlyConfig
@@ -33,9 +33,13 @@ import com.esafirm.imagepicker.features.common.BaseConfig
 import com.esafirm.imagepicker.helper.ConfigUtils
 import com.esafirm.imagepicker.model.Image
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.File
+import java.io.FileOutputStream
+import java.time.Instant
 import java.util.concurrent.TimeoutException
 
 inline fun CreditClubFragment.registerImagePicker(
@@ -68,7 +72,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
         try {
             val tmpImage = it.firstOrNull()
                 ?: return@registerImagePicker dialogProvider.showError("An internal error occurred")
-            creditClubImage = CreditClubImage(requireContext(), tmpImage)
+            creditClubImage = CreditClubImage(requireContext(), cacheImage(tmpImage))
 
             dialogProvider.showProgressBar("Processing image")
 
@@ -81,6 +85,18 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
             ex.printStackTrace()
             dialogProvider.showError("An internal error occurred")
         }
+    }
+
+    private suspend fun cacheImage(image: Image): Image {
+        val time = Instant.now().format("ddMMHHmmss")
+        val fileName = "/${appConfig.appName} Receipt ${time}.pdf"
+        val file = withContext(Dispatchers.IO) {
+            val myFilePath = requireContext().externalCacheDir?.path + fileName
+            val myFile = File(myFilePath)
+            myFile
+        }
+
+        return Image(image.id, fileName, file.absolutePath)
     }
 
     override fun onViewCreated(

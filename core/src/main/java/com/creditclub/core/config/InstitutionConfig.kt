@@ -2,7 +2,7 @@ package com.creditclub.core.config
 
 import com.creditclub.core.type.TransactionType
 
-interface IInstitutionConfig {
+interface InstitutionConfig {
     val name: String
     val hasOnlineFunctions: Boolean
     val hasHlaTagging: Boolean

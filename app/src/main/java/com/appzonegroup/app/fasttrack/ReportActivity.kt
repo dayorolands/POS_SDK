@@ -9,6 +9,7 @@ import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
 import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
 import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
 import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
+import com.creditclub.core.data.api.CollectionsService
 import com.creditclub.core.data.api.ReportService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.AccountInfo
@@ -46,6 +47,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
     private var endDate = LocalDate.now()
     private var startDate = endDate.minusDays(7)
     private val reportService: ReportService by retrofitService()
+    private val collectionsService: CollectionsService by retrofitService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -240,7 +242,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
             TransactionType.CollectionPayment -> {
                 dialogProvider.showProgressBar("Loading collection reference")
                 val (response, error) = safeRunIO {
-                    creditClubMiddleWareAPI.collectionsService.verifyCollectionPayment(
+                    collectionsService.verifyCollectionPayment(
                         localStorage.institutionCode,
                         item.uniqueReference,
                         null,
@@ -272,6 +274,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     beneficiaryAccountNumber = item.to,
                     amountInNaira = item.amount ?: 0.0,
                     externalTransactionReference = item.uniqueReference,
+                    retrievalReferenceNumber = item.uniqueReference,
                 )
                 posPrinter.print(
                     fundsTransferReceipt(

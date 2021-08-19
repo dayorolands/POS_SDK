@@ -8,6 +8,12 @@ import kotlinx.serialization.Serializable
  * Appzone Ltd
  */
 
+enum class RetryPolicy {
+    AutoRetry,
+    ManualRetry,
+    RetryLater,
+}
+
 @Serializable
 open class BackendResponse {
     @SerialName("ReponseMessage")
@@ -24,13 +30,14 @@ open class BackendResponse {
     val responseCode: String? = null
 
     fun isFailure() = !isSuccessful
-    fun isPendingOnBank() = responseCode == "09"
-    fun isPending() = responseCode == "96" && isPendingOnBank()
+    fun isPendingOnBank() = responseCode == "24"
+    fun isPendingOnMiddleware() = responseCode == "20"
+    fun isPending() = isPendingOnMiddleware() || isPendingOnBank()
     fun isSuccess() = isSuccessful
 }
 
 @Serializable
-open class BackendResponseWithCode : BackendResponse() {
+open class AgentActivationResponse : BackendResponse() {
     @SerialName("TransactionSequenceNumber")
     val transactionSequenceNumber: Long = 0
 }

@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.appzonegroup.app.fasttrack.fragment.HomeFragmentDirections
+import com.appzonegroup.app.fasttrack.R
 import com.creditclub.core.util.safeRunSuspend
 import com.google.accompanist.insets.statusBarsHeight
 import kotlinx.coroutines.launch
@@ -39,7 +39,7 @@ fun HomeAppBar(scaffoldState: ScaffoldState, mainNavController: NavController) {
                 )
                 IconButton(
                     onClick = {
-                        mainNavController.navigate(HomeFragmentDirections.homeToNotifications())
+                        mainNavController.navigate(R.id.home_to_notifications)
                     }
                 ) {
                     Icon(

@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.core.config.IInstitutionConfig
+import com.creditclub.core.config.InstitutionConfig
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.ui.UpdateActivity
 import com.creditclub.ui.rememberBean
@@ -39,7 +39,7 @@ fun DrawerContent(
     openPage: (Int) -> Unit,
 ) {
     val localStorage: LocalStorage by rememberBean()
-    val institutionConfig: IInstitutionConfig by rememberBean()
+    val institutionConfig: InstitutionConfig by rememberBean()
     val agent = localStorage.agent
     val context = LocalContext.current
     val logoTint = colorResource(R.color.navHeaderLogoTint)

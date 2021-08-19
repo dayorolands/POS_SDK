@@ -6,19 +6,18 @@ import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
 import androidx.core.content.edit
+import com.appzonegroup.app.fasttrack.databinding.ActivityLoginBinding
 import com.appzonegroup.app.fasttrack.ui.SurveyDialog
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
-import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.data.TRANSACTIONS_CLIENT
 import com.creditclub.core.data.api.AppConfig
+import com.creditclub.core.data.api.StaticService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.SurveyQuestion
 import com.creditclub.core.data.request.SubmitSurveyRequest
@@ -27,9 +26,10 @@ import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.jsonStore
 import com.creditclub.pos.InvalidRemoteConnectionInfo
+import com.creditclub.pos.PosConfig
 import com.creditclub.pos.api.PosApiService
-import com.creditclub.pos.api.posApiService
 import com.creditclub.pos.model.PosTenant
+import com.creditclub.ui.dataBinding
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.*
 import kotlinx.serialization.builtins.ListSerializer
@@ -38,12 +38,14 @@ import org.koin.android.ext.android.inject
 import java.time.Instant
 
 class LoginActivity : CreditClubActivity(R.layout.activity_login) {
-
     private val posTenant: PosTenant by inject()
     private val posPreferences: PosPreferences by inject()
     private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
     private val posDatabase: PosDatabase by inject()
     private val ioScope = CoroutineScope(Dispatchers.IO)
+    private val binding: ActivityLoginBinding by dataBinding()
+    private val posApiService: PosApiService by retrofitService()
+    private val staticService: StaticService by retrofitService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,18 +53,18 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             window.statusBarColor = getColor(R.color.colorLoginBg)
             window.navigationBarColor = getColor(R.color.colorLoginBg)
         }
-        findViewById<TextView>(R.id.version_tv).text = "Version ${packageInfo?.versionName}"
+        binding.versionTv.text = "Version ${packageInfo?.versionName}"
         debugOnly {
             val debugInfo = "Version ${packageInfo?.versionName}. ${BuildConfig.BUILD_TYPE}"
-            findViewById<TextView>(R.id.version_tv).text = debugInfo
-            findViewById<EditText>(R.id.login_phoneNumber).setText(localStorage.agentPhone)
+            binding.versionTv.text = debugInfo
+            binding.loginPhoneNumber.setText(localStorage.agentPhone)
         }
         val agentName = localStorage.agent?.agentName
         if (agentName != null) {
-            findViewById<TextView>(R.id.welcome_message_tv).text = "Welcome back, $agentName"
+            binding.welcomeMessageTv.text = "Welcome back, $agentName"
         }
 
-        findViewById<View>(R.id.email_sign_in_button).setOnClickListener {
+        binding.emailSignInButton.setOnClickListener {
             mainScope.launch { attemptLogin() }
         }
 
@@ -91,12 +93,54 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         if (Platform.isPOS) {
             mainScope.launch { settle() }
         }
+
+        binding.forgetDeviceBtn.setOnClickListener {
+            mainScope.launch { attemptForgetDevice() }
+        }
+
+        binding.forgotPasswordBtn.setOnClickListener {
+            val intent = Intent(this, AgentActivationActivity::class.java).apply {
+                putExtra("phone_number", localStorage.agentPhone)
+            }
+            startActivity(intent)
+        }
+    }
+
+    private suspend fun attemptForgetDevice() {
+        val confirmed = dialogProvider.getConfirmation(
+            title = "Forget Device",
+            subtitle = "Are you sure you want to remove your ${getString(R.string.app_name)} profile from this device"
+        )
+        if (!confirmed) return
+        if (Platform.isPOS) {
+            dialogProvider.showProgressBar("Processing")
+            settle()
+            dialogProvider.hideProgressBar()
+
+            val notificationCount = withContext(Dispatchers.IO) {
+                posDatabase.posNotificationDao().count()
+            }
+            if (notificationCount > 0) {
+                dialogProvider.showErrorAndWait(
+                    "Hmm. \n" +
+                            "There are pending cashout settlement requests \n" +
+                            "Kindly contact your administrator"
+                )
+                return
+            }
+        }
+
+        localStorage.edit { remove("ACTIVATED") }
+
+        val intent = Intent(this, AgentActivationActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private suspend fun updateBinRoutes() {
         posPreferences.clearBinRoutes()
         val (response) = safeRunIO {
-            creditClubMiddleWareAPI.posApiService.getBinRoutes(
+            posApiService.getBinRoutes(
                 localStorage.institutionCode,
                 localStorage.agentPhone
             )
@@ -118,14 +162,14 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             onSubmit { data ->
                 ioScope.launch {
                     safeRunIO {
-                        val surveyData = SubmitSurveyRequest().apply {
-                            answers = data
-                            institutionCode = localStorage.institutionCode
-                            agentPhoneNumber = localStorage.agentPhone
-                            geoLocation = gps.geolocationString
-                        }
+                        val surveyData = SubmitSurveyRequest(
+                            answers = data,
+                            institutionCode = localStorage.institutionCode,
+                            agentPhoneNumber = localStorage.agentPhone,
+                            geoLocation = localStorage.lastKnownLocation,
+                        )
 
-                        creditClubMiddleWareAPI.staticService.submitSurvey(surveyData)
+                        staticService.submitSurvey(surveyData)
                     }
                     surveyQuestions = null
                 }
@@ -140,7 +184,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         )
         ioScope.launch {
             val (response) = safeRunIO {
-                creditClubMiddleWareAPI.staticService.getBannerImages(
+                staticService.getBannerImages(
                     localStorage.institutionCode,
                     localStorage.agentPhone,
                     packageInfo?.versionName
@@ -164,7 +208,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         )
         ioScope.launch {
             val (response) = safeRunIO {
-                creditClubMiddleWareAPI.staticService.getSurveyQuestions(
+                staticService.getSurveyQuestions(
                     localStorage.institutionCode,
                     localStorage.agentPhone,
                     packageInfo?.versionName
@@ -198,8 +242,8 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     }
 
     private suspend fun attemptLogin() {
-        val phoneNumber = (findViewById<View>(R.id.login_phoneNumber) as EditText).text.toString()
-        val pin = (findViewById<View>(R.id.login_pin) as EditText).text.toString()
+        val phoneNumber = binding.loginPhoneNumber.text.toString()
+        val pin = binding.loginPin.text.toString()
 
         if (TextUtils.isEmpty(phoneNumber)) {
             showError("Phone number is required", R.id.login_phoneNumber)
@@ -229,7 +273,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         if (!syncAgentInfo()) return
         dialogProvider.showProgressBar("Logging you in")
         val (response, error) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.confirmAgentInformation(
+            staticService.confirmAgentInformation(
                 localStorage.institutionCode,
                 phoneNumber,
                 pin,
@@ -289,7 +333,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
 
     private suspend fun settle() = withContext(Dispatchers.IO) {
         val appConfig: AppConfig by inject()
-        val configService: ConfigService by inject()
+        val configService: PosConfig by inject()
         val posNotificationDao = posDatabase.posNotificationDao()
         val posApiService: PosApiService by retrofitService(TRANSACTIONS_CLIENT)
 
@@ -315,7 +359,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     private suspend fun syncAgentInfo(): Boolean {
         dialogProvider.showProgressBar("Checking agent details")
         val (agent, error) = safeRunIO {
-            creditClubMiddleWareAPI.staticService.getAgentInfoByPhoneNumber(
+            staticService.getAgentInfoByPhoneNumber(
                 localStorage.institutionCode,
                 localStorage.agentPhone
             )

@@ -91,3 +91,4 @@ lint/tmp/
 # lint/reports/
 /.idea/deploymentTargetDropDown.xml
 /.idea/misc.xml
+output-metadata.json

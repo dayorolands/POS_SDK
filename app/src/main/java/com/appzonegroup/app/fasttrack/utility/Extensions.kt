@@ -9,9 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.R
-import com.appzonegroup.app.fasttrack.fragment.HomeFragmentDirections
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.CoreDatabase
+import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.AppFunctionUsage
 import com.creditclub.core.data.request.BalanceEnquiryRequest
 import com.creditclub.core.type.CustomerRequestOption
@@ -88,6 +89,7 @@ fun CreditClubFragment.openPageById(id: Int) {
         R.id.customer_change_pin_button -> startActivity(ChangeCustomerPinActivity::class.java)
 
         R.id.agent_balance_enquiry_button -> {
+            val staticService: StaticService by retrofitService()
             mainScope.launch {
                 val pin = dialogProvider.getPin("Agent PIN") ?: return@launch
                 if (pin.length != 4) {
@@ -102,7 +104,7 @@ fun CreditClubFragment.openPageById(id: Int) {
 
                 dialogProvider.showProgressBar("Getting Balance")
                 val (response) = safeRunIO {
-                    creditClubMiddleWareAPI.staticService.balanceEnquiry(request)
+                    staticService.balanceEnquiry(request)
                 }
                 dialogProvider.hideProgressBar()
 
@@ -143,7 +145,7 @@ fun CreditClubFragment.openPageById(id: Int) {
         }
 
         R.id.fn_bill_payment -> {
-            findNavController().navigate(HomeFragmentDirections.actionHomeToBillPayment())
+            findNavController().navigate(R.id.action_home_to_bill_payment)
         }
 
         R.id.customer_balance_enquiry_button -> {

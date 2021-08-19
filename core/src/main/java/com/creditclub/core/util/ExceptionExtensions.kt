@@ -25,6 +25,11 @@ fun Throwable?.isServerError() = this != null && this is HttpException
 
 fun Throwable?.isKotlinNPE() = this != null && this is KotlinNullPointerException
 
+fun Throwable?.isTimeout() =
+    this != null && this is SocketTimeoutException || this is IOException && (cause.toString()
+        .contains("unexpected end of stream") || message
+        ?.contains("unexpected end of stream") == true)
+
 fun Throwable.getMessage(context: Context): String {
     return when {
         this is CreditClubException -> message
@@ -34,8 +39,9 @@ fun Throwable.getMessage(context: Context): String {
         )
         this is ConnectException -> context.getString(R.string.unable_to_connect)
         this is SocketTimeoutException -> context.getString(R.string.request_time_out)
-        this is IOException && cause.toString()
-            .contains("unexpected end of stream") -> context.getString(R.string.unexpected_end_of_stream)
+        this is IOException && (cause.toString()
+            .contains("unexpected end of stream") || message
+            ?.contains("unexpected end of stream") == true) -> context.getString(R.string.unexpected_end_of_stream)
         this is IOException || this is HttpException -> context.getString(R.string.a_network_error_occurred)
         this is SerializationException -> context.getString(R.string.an_internal_error_occurred)
         this is HttpException -> context.getString(R.string.server_response_error)
