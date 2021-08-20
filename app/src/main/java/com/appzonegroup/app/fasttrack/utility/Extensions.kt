@@ -6,7 +6,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.creditclub.pos.Platform
@@ -178,12 +180,12 @@ fun CreditClubFragment.openPageById(id: Int) {
 
         R.id.fn_faq -> startActivity(FaqActivity::class.java)
 
-        R.id.collection_payment_button -> {
-            findNavController().navigate(R.id.action_to_collection_payment)
-        }
-
-        R.id.fn_collections_payment -> {
-            findNavController().navigate(R.id.action_home_to_collection_payment)
+        R.id.collection_payment_button, R.id.fn_collections_payment -> {
+            findNavController().navigate(
+                R.id.action_to_collection_payment,
+                null,
+                navOptions = navOptions { restoreState = false },
+            )
         }
 
         R.id.fn_pos_chargeback -> {
