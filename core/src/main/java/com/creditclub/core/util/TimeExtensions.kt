@@ -7,7 +7,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-private const val defaultZone = "UTC+01:00"
+private const val defaultZone = "+0100"
 const val CREDIT_CLUB_DATE_PATTERN = "uuuu-MM-dd'T'HH:mm:ss[.SSSSSSS][.SSSSSS][.SSS][xxx][xx][X]"
 const val CREDIT_CLUB_REQUEST_DATE_PATTERN = "uuuu-MM-dd'T'HH:mm:ss[.SSS]"
 

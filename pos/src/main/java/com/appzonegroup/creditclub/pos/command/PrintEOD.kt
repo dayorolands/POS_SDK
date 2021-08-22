@@ -2,17 +2,18 @@ package com.appzonegroup.creditclub.pos.command
 
 import android.content.Context
 import com.appzonegroup.creditclub.pos.data.PosDatabase
-import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
-import com.creditclub.pos.printer.PosPrinter
-import com.creditclub.pos.printer.PrinterStatus
-import com.creditclub.pos.printer.TextNode
-import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.format
-import kotlinx.coroutines.*
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.parameter.parametersOf
+import com.creditclub.core.util.toCurrencyFormat
+import com.creditclub.pos.printer.PosPrinter
+import com.creditclub.pos.printer.PrinterStatus
+import com.creditclub.pos.printer.printJob
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 6/26/2019.
@@ -31,66 +32,67 @@ import org.koin.core.parameter.parametersOf
  * 7. Total Cash Transaction for the day
  *
  */
-class PrintEOD(
-    private val context: Context,
-    private val isoSocketHelper: IsoSocketHelper,
-    private val dialogProvider: DialogProvider,
-    private val localDate: String
-) : Runnable, KoinComponent {
+suspend fun printEOD(
+    context: Context,
+    dialogProvider: DialogProvider,
+    localDate: LocalDate,
+    posPrinter: PosPrinter,
+) {
+    val from: Instant = localDate.atStartOfDay().toInstant(ZoneOffset.MIN)
+    val to: Instant = localDate.plusDays(1).atStartOfDay().toInstant(ZoneOffset.MIN)
 
-    override fun run() {
-        PosDatabase.open(context) { db ->
-            val transactions = withContext(Dispatchers.IO) {
-                db.financialTransactionDao().byDate(localDate)
-            }
+    val transactions = withContext(Dispatchers.IO) {
+        PosDatabase
+            .getInstance(context = context)
+            .financialTransactionDao()
+            .findAllInRange(from = from, to = to)
+    }
+    if (transactions.isEmpty()) {
+        dialogProvider.showError("No Transactions")
+        return
+    }
 
-            if (transactions.isEmpty()) return@open dialogProvider.showError("No Transactions")
+    var totalAmount = 0.0
 
-            var totalAmount = 0L
+    val text = StringBuilder("END OF DAY RECEIPT $localDate").apply {
+        append("\n-----------------------\n")
+    }
+    for (trn in transactions) {
+        val iso = trn.isoMsg
+        val transactionAmount = iso.transactionAmount4?.toDoubleOrNull()?.div(100.0) ?: 0.0
+        if (iso.isSuccessful) {
+            totalAmount += transactionAmount
+        }
 
-            val text = StringBuilder("END OF DAY RECEIPT $localDate")
-            text.append("\n-----------------------\n")
-            for (trn in transactions) {
-                val iso = trn.isoMsg
-                if (iso.isSuccessful) totalAmount += iso.transactionAmount4?.toLong() ?: 0
-
-                text.append("\nTime    ${trn.createdAt.format("dd/MM/yyyy hh:mm", "+0100")}")
-                text.append("\nType    ${trn.type}")
-                text.append("\nPAN     ${trn.pan}")
-                text.append("\nAmount  ${CurrencyFormatter.format(iso.transactionAmount4)}")
-                text.append("\nRRN     ${trn.isoMsg.retrievalReferenceNumber37}")
-                text.append("\nStatus  ${if (iso.isSuccessful) "APPROVED" else "DECLINED"}")
-//                text .append("\n${iso.stan11}  ${iso.retrievalReferenceNumber37} ${CurrencyFormatter.format(iso.transactionAmount4)}")
-                text.append("\n------------------\n")
-            }
-
-            text.append("\n\n${CurrencyFormatter.format("$totalAmount")} in card transactions")
-            text.append("\nTotal Card Transactions ${transactions.size}")
-            text.append("\nTotal Cash Transactions 0")
-
-            val node = TextNode(text.toString(), walkPaperAfterPrint = 20)
-
-            get<PosPrinter> { parametersOf(context, dialogProvider) }.printAsync(
-                node,
-                message = "Printing Report"
-            ) { printerStatus ->
-                if (printerStatus != PrinterStatus.READY) {
-                    dialogProvider.showError(printerStatus.message)
-                    return@printAsync
-                }
-
-                GlobalScope.launch(Dispatchers.Main) {
-                    dialogProvider.showProgressBar("Connecting to host")
-
-                    delay(2000)
-
-                    dialogProvider.showProgressBar("Receiving reply")
-
-                    delay(2000)
-
-                    dialogProvider.showSuccess("Batch reconciled")
-                }
-            }
+        text.apply {
+            append("\nTime    ${trn.createdAt.format("dd/MM/yyyy hh:mm", "+0100")}")
+            append("\nType    ${trn.type}")
+            append("\nPAN     ${trn.pan}")
+            append("\nAmount  ${transactionAmount.toCurrencyFormat()}")
+            append("\nRRN     ${trn.isoMsg.retrievalReferenceNumber37}")
+            append("\nStatus  ${if (iso.isSuccessful) "APPROVED" else "DECLINED"}")
+            append("\n------------------\n")
         }
     }
+
+    text.apply {
+        append("\n\n${totalAmount.toCurrencyFormat()} in card transactions")
+        append("\nTotal Card Transactions ${transactions.size}")
+        append("\nTotal Cash Transactions 0")
+    }
+
+    val printJob = printJob {
+        text(text.toString(), walkPaperAfterPrint = 20)
+    }
+    val printerStatus = posPrinter.print(printJob = printJob, message = "Printing Report")
+    if (printerStatus != PrinterStatus.READY) {
+        dialogProvider.showError(printerStatus.message)
+        return
+    }
+
+    dialogProvider.showProgressBar("Connecting to host")
+    delay(2000)
+    dialogProvider.showProgressBar("Receiving reply")
+    delay(2000)
+    dialogProvider.showSuccess("Batch reconciled")
 }

@@ -101,13 +101,7 @@ open class FinancialTransaction {
 @Dao
 interface FinancialTransactionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun saveAll(financialTransactions: List<FinancialTransaction>)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun save(financialTransaction: FinancialTransaction)
-
-    @Update
-    fun update(financialTransaction: FinancialTransaction)
 
     @Delete
     fun delete(financialTransaction: FinancialTransaction)
@@ -115,24 +109,18 @@ interface FinancialTransactionDao {
     @Query("DELETE FROM FinancialTransaction")
     fun deleteAll()
 
-    @Query("SELECT * FROM FinancialTransaction")
-    fun findAll(): LiveData<List<FinancialTransaction>>
-
     @Query("SELECT * FROM FinancialTransaction WHERE createdAt BETWEEN :from AND :to ORDER by datetime(createdAt)")
-    fun eodByDate(from: Instant, to: Instant): List<FinancialTransaction>
+    fun findAllInRange(from: Instant, to: Instant): List<FinancialTransaction>
 
     @Query("SELECT * FROM FinancialTransaction WHERE isSettled = 0")
-    fun unsettledTransactions(): LiveData<List<FinancialTransaction>>
+    fun findAllUnsettled(): LiveData<List<FinancialTransaction>>
 
     @Query("SELECT * FROM FinancialTransaction ORDER BY id DESC LIMIT 1")
-    fun lastTransaction(): FinancialTransaction?
+    fun last(): FinancialTransaction?
 
     @Query("SELECT * FROM FinancialTransaction WHERE stan = :stan")
-    fun byStan(stan: String): FinancialTransaction?
+    fun findByStan(stan: String): FinancialTransaction?
 
     @Query("SELECT * FROM FinancialTransaction WHERE rrn = :rrn")
-    fun byRRN(rrn: String): FinancialTransaction?
-
-    @Query("SELECT * FROM FinancialTransaction WHERE date = :date LIMIT 200")
-    fun byDate(date: String): List<FinancialTransaction>
+    fun findByReference(rrn: String): FinancialTransaction?
 }
