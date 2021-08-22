@@ -35,5 +35,11 @@ inline fun actionButton(
     id: Int = 0,
     icon: Int = R.mipmap.ic_launcher_round,
     name: String = "",
-    activityClass: Class<*>? = null, crossinline block: ActionButton.() -> Unit
-) = ActionButton(id = id, icon = icon, name = name, activityClass = activityClass).apply(block)
+    activityClass: Class<*>? = null,
+    crossinline block: ActionButton.() -> Unit,
+) = ActionButton(
+    id = id,
+    icon = icon,
+    name = name,
+    activityClass = activityClass,
+).apply(block)

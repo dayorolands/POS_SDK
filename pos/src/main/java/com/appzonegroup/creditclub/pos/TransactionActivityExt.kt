@@ -231,12 +231,11 @@ internal inline fun CardTransactionActivity.showReferencePage(
         binding.confirmRrnButton.setOnClickListener {
             val rrn = binding.rrnInput.text.toString().trim { it <= ' ' }
             if (rrn.length != 12) {
-                return@setOnClickListener showError("RRN must be 12 digits")
+                return@setOnClickListener dialogProvider.showError("RRN must be 12 digits")
             }
             mainScope.launch {
                 val trn = withContext(Dispatchers.IO) {
-                    PosDatabase.getInstance(this@showReferencePage).financialTransactionDao()
-                        .byRRN(rrn)
+                    posDatabase.financialTransactionDao().findByReference(rrn)
                 }
                 if (trn == null) {
                     dialogProvider.showError("Unable to locate record") {
