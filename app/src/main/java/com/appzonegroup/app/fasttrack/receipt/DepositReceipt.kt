@@ -11,6 +11,7 @@ import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.request.DepositRequest
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
+import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.core.util.toString
 import java.time.Instant
 
@@ -47,7 +48,7 @@ class DepositReceipt(
 Agent Code: ${context.localStorage.agent?.agentCode}
 Agent Phone: ${request.agentPhoneNumber}
 --------------------------
-Amount ${CurrencyFormatter.format("${request.amount}00")}
+Amount ${request.amount?.toDouble()?.toCurrencyFormat()}
 
 Customer Account: ${accountInfo.number.mask(4, 2)}
 Customer Name: ${accountInfo.accountName}

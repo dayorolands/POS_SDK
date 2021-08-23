@@ -3,19 +3,16 @@ package com.appzonegroup.creditclub.pos.util
 import com.appzonegroup.creditclub.pos.CardWithdrawalActivity
 import com.appzonegroup.creditclub.pos.PosActivity
 import com.appzonegroup.creditclub.pos.R
-import com.appzonegroup.creditclub.pos.command.PrintEOD
+import com.appzonegroup.creditclub.pos.command.printEOD
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
-import com.creditclub.pos.printer.PrinterStatus
 import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.widget.Dialogs
+import com.creditclub.pos.printer.PrinterStatus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 1/3/2019.
- * Appzone Ltd
- */
+import java.time.LocalDate
 
 object Modules {
     const val PURCHASE = 0
@@ -24,21 +21,9 @@ object Modules {
 
     const val PRINT_EOD = 3
     const val EOD_BY_DATE = 4
-    const val PRINT_SUMMARY = 5
-    const val PRINT_TOTAL = 6
 
-    //    const val LOGON = 7
-    const val DOWNLOAD_PARAMETER = 8
-
-    //    const val DOWNLOAD_BILL = 9
-//    const val PRINT_LIBS = 10
-//    const val BALANCE = 11
     const val PRINT_PARAMETER = 12
-
-    //    const val DOWNLOAD_AID = 13
-    const val DOWN_CAPK = 14
     const val NETWORK_PARAMETERS = 15
-    const val KEY_DOWNLOAD = 16
     const val PRINT_CONFIG = 17
 
     private val MODULE_MAP = hashMapOf<Int, ActionButton>()
@@ -60,7 +45,7 @@ object Modules {
             onClick { activity ->
                 PosDatabase.open(activity, Dispatchers.Main) { db ->
                     val trn = withContext(Dispatchers.IO) {
-                        db.financialTransactionDao().lastTransaction()
+                        db.financialTransactionDao().last()
                     } ?: return@open activity.showError("No transactions")
 
                     printReceipt(trn, activity)
@@ -79,7 +64,7 @@ object Modules {
                         dismiss()
                         PosDatabase.open(activity, Dispatchers.Main) { db ->
                             val trn = withContext(Dispatchers.Default) {
-                                db.financialTransactionDao().byStan(stan)
+                                db.financialTransactionDao().findByStan(stan)
                             } ?: return@open activity.showError("Transaction not found")
                             printReceipt(trn, activity)
                         }
@@ -92,14 +77,14 @@ object Modules {
             name = "Print EOD"
 
             onClick { activity ->
-                printEod(activity)
-            }
-        }
-
-        MODULE_MAP[PRINT_TOTAL] = actionButton {
-            name = "Print Total"
-            onClick {
-
+                activity.mainScope.launch {
+                    printEOD(
+                        context = activity,
+                        dialogProvider = activity.dialogProvider,
+                        localDate = LocalDate.now(),
+                        posPrinter = activity.printer
+                    )
+                }
             }
         }
 
@@ -108,14 +93,21 @@ object Modules {
             onClick { activity ->
                 Dialogs.date(activity) {
                     onSubmit { dateValue ->
-                        printEod(activity, "${dateValue[1]}${dateValue[0]}")
+                        activity.mainScope.launch {
+                            printEOD(
+                                context = activity,
+                                dialogProvider = activity.dialogProvider,
+                                localDate = LocalDate.of(
+                                    dateValue[2].toInt(),
+                                    dateValue[1].toInt(),
+                                    dateValue[0].toInt(),
+                                ),
+                                posPrinter = activity.printer,
+                            )
+                        }
                     }
                 }.show()
             }
-        }
-
-        MODULE_MAP[PRINT_SUMMARY] = actionButton {
-            name = "Print Summary"
         }
     }
 
@@ -155,12 +147,5 @@ object Modules {
                 }.show()
             }
         }
-    }
-
-    private fun printEod(
-        activity: PosActivity,
-        localDate: String = TransmissionDateParams().localDate
-    ) {
-        PrintEOD(activity, activity.isoSocketHelper, activity.dialogProvider, localDate).run()
     }
 }

@@ -14,6 +14,4 @@ object AppConstants {
 
     var CALL_HOME = "600"
     var TID = ""
-
-    const val ZONE_ID: String = "UTC+01:00"
 }

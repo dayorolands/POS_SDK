@@ -83,13 +83,13 @@ class BankOneApplication : CreditClubApplication() {
         )
         registerAppFunctions()
         Platform.test(this)
-        if (Platform.isPOS) startPosApp()
 
         val myConfig = Configuration.Builder()
             .setMinimumLoggingLevel(if (BuildConfig.DEBUG) android.util.Log.DEBUG else android.util.Log.INFO)
             .build()
 
         WorkManager.initialize(this, myConfig)
+        if (Platform.isPOS) startPosApp()
         registerWorkers()
     }
 
