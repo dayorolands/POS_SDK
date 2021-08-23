@@ -121,7 +121,7 @@ class TransactionReportAdapter(
 
                 is ItemReport2Binding -> {
                     fromTv.text = item.to
-                    amountTv.text = item.amount?.times(100)?.toCurrencyFormat()
+                    amountTv.text = item.amount?.toCurrencyFormat()
                     dateTv.text = item.date?.replace("T", " ")
                     phoneNoTv.text = item.fromPhoneNumber
 
