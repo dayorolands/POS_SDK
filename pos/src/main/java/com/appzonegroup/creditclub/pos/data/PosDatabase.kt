@@ -16,9 +16,9 @@ import kotlin.coroutines.CoroutineContext
         Reversal::class,
         PosNotification::class,
         IsoRequestLog::class,
-        PosTransaction::class
+        PosTransaction::class,
     ],
-    version = 12,
+    version = 13,
     exportSchema = true
 )
 @TypeConverters(RoomConverters::class)
@@ -48,6 +48,7 @@ abstract class PosDatabase : RoomDatabase() {
                         MIGRATION_9_10,
                         MIGRATION_10_11,
                         MIGRATION_11_12,
+                        MIGRATION_12_13,
                     ).build()
                 }
 
@@ -58,7 +59,7 @@ abstract class PosDatabase : RoomDatabase() {
         inline fun <T> open(
             context: Context,
             dispatcher: CoroutineContext = Dispatchers.Main,
-            crossinline block: suspend CoroutineScope.(PosDatabase) -> T
+            crossinline block: suspend CoroutineScope.(PosDatabase) -> T,
         ) {
             GlobalScope.launch(dispatcher) {
                 val inst = withContext(Dispatchers.Default) {

@@ -246,7 +246,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 if (error != null) {
                     errorMessage =
                         error.getMessage(context) + ". Please click the CONFIRM button to try again"
-                    if (error.isTimeout()) {
+                    if (error.isTimeout() || error.isInternalServerError()) {
                         retryPolicy = RetryPolicy.AutoRetry
                         transferAttemptCount++
                         return@makeTransfer
@@ -538,7 +538,7 @@ private fun RowScope.SmallMenuButton(
     @DrawableRes icon: Int,
     onClick: () -> Unit,
     draw: Boolean = false,
-    tint: Color = colorResource(R.color.colorAccent)
+    tint: Color = colorResource(R.color.colorAccent),
 ) {
     val context = LocalContext.current
     val drawable = remember(icon) { AppCompatResources.getDrawable(context, icon) }

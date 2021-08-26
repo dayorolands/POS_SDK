@@ -61,6 +61,8 @@ class IsoRequestLog {
 
     @kotlinx.serialization.Transient
     var connectionInfo: ConnectionInfo? = null
+
+    var duration: Long = 0
 }
 
 @Dao

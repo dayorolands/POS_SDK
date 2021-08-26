@@ -36,6 +36,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.IOException
 import java.security.SecureRandom
+import java.time.Duration
 import java.time.Instant
 import java.util.*
 import kotlin.reflect.KProperty
@@ -271,6 +272,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
     private fun IsoRequestLog.saveToDb(serverResponseCode: String) {
         responseTime = Instant.now()
         responseCode = serverResponseCode
+        duration = Duration.between(requestTime, responseTime ?: Instant.now()).toMillis()
 
         Looper.myLooper() ?: Looper.prepare()
         val dao = database.isoRequestLogDao()
@@ -340,7 +342,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
     private suspend fun downloadKey(
         terminalId: String,
         processingCode: String,
-        decryptionKey: ByteArray
+        decryptionKey: ByteArray,
     ): ByteArray {
         val dateParams = TransmissionDateParams()
         val isoMsg = ISOMsg().apply {
@@ -402,7 +404,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
 
     private inner class ManagementDataDelegate(
         private val key: String,
-        @RawRes private val fallbackFileLocation: Int
+        @RawRes private val fallbackFileLocation: Int,
     ) {
         private var jsonArray: JSONArray? = null
         operator fun getValue(obj: Any, prop: KProperty<*>): JSONArray? {

@@ -16,6 +16,7 @@ import com.creditclub.pos.model.ConnectionInfo
 import org.jpos.iso.ISOMsg
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.time.Duration
 import java.time.Instant
 
 /**
@@ -25,7 +26,7 @@ import java.time.Instant
 class IsoSocketHelper(
     val config: PosConfig,
     val parameters: PosParameter,
-    internal val remoteConnectionInfo: RemoteConnectionInfo = config.remoteConnectionInfo
+    internal val remoteConnectionInfo: RemoteConnectionInfo = config.remoteConnectionInfo,
 ) : KoinComponent {
     private val database: PosDatabase by inject()
     private val localStorage: LocalStorage by inject()
@@ -67,6 +68,10 @@ class IsoSocketHelper(
             isoRequestLog.responseTime = Instant.now()
             isoRequestLog.responseCode = response.responseCode39 ?: "XX"
         }
+        isoRequestLog.duration = Duration.between(
+            isoRequestLog.requestTime,
+            isoRequestLog.responseTime ?: Instant.now()
+        ).toMillis()
 
         dao.save(isoRequestLog)
 
@@ -76,7 +81,7 @@ class IsoSocketHelper(
     suspend inline fun attempt(
         request: CardIsoMsg,
         maxAttempts: Int,
-        crossinline onReattempt: suspend (attempt: Int) -> Unit
+        crossinline onReattempt: suspend (attempt: Int) -> Unit,
     ): Boolean {
         if (maxAttempts < 2) {
             send(request).error ?: return true
@@ -97,7 +102,7 @@ class IsoSocketHelper(
     suspend inline fun send(
         request: ISOMsg,
         maxAttempts: Int,
-        crossinline onReattempt: suspend (attempt: Int) -> Unit
+        crossinline onReattempt: suspend (attempt: Int) -> Unit,
     ): SafeRunResult<ISOMsg> {
         if (maxAttempts < 2) return send(request)
         for (attempt in 1..maxAttempts) {

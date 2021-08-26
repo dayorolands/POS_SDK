@@ -30,6 +30,9 @@ fun Throwable?.isTimeout() =
         .contains("unexpected end of stream") || message
         ?.contains("unexpected end of stream") == true)
 
+fun Throwable?.isInternalServerError() =
+    this != null && this is RequestFailureException && this.httpStatusCode == 500
+
 fun Throwable.getMessage(context: Context): String {
     return when {
         this is CreditClubException -> message

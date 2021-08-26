@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 12,
-    "identityHash": "bd76b9fa383537f26a43aed7a6226eef",
+    "identityHash": "869f3f40162d1ef204712bff8119bb18",
     "entities": [
       {
         "tableName": "FinancialTransaction",
@@ -324,7 +324,7 @@
       },
       {
         "tableName": "IsoRequestLog",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uniqueId` TEXT NOT NULL, `institutionCode` TEXT NOT NULL, `terminalId` TEXT NOT NULL, `rrn` TEXT NOT NULL, `transactionType` TEXT NOT NULL, `amount` TEXT NOT NULL, `agentCode` TEXT NOT NULL, `gpsCoordinates` TEXT NOT NULL, `responseCode` TEXT NOT NULL, `requestTime` TEXT NOT NULL, `responseTime` TEXT, `nodeName` TEXT, `connectionInfo` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uniqueId` TEXT NOT NULL, `institutionCode` TEXT NOT NULL, `terminalId` TEXT NOT NULL, `rrn` TEXT NOT NULL, `transactionType` TEXT NOT NULL, `amount` TEXT NOT NULL, `agentCode` TEXT NOT NULL, `gpsCoordinates` TEXT NOT NULL, `responseCode` TEXT NOT NULL, `requestTime` TEXT NOT NULL, `responseTime` TEXT, `nodeName` TEXT, `connectionInfo` TEXT, `duration` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -409,6 +409,12 @@
             "columnName": "connectionInfo",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -594,7 +600,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bd76b9fa383537f26a43aed7a6226eef')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '869f3f40162d1ef204712bff8119bb18')"
     ]
   }
 }

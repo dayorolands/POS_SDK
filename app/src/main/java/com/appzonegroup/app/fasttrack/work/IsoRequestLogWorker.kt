@@ -38,9 +38,9 @@ class IsoRequestLogWorker(context: Context, params: WorkerParameters) :
             async {
                 val (response) = safeRunSuspend {
                     posApiService.logToGrafanaForPOSTransactions(
-                        requestLog,
-                        "iRestrict ${appConfig.posNotificationToken}",
-                        requestLog.terminalId
+                        request = requestLog,
+                        authToken = "iRestrict ${appConfig.posNotificationToken}",
+                        terminalID = requestLog.terminalId,
                     )
                 }
 
