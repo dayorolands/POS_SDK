@@ -1,14 +1,17 @@
 package com.creditclub.core.data.model
 
 import android.content.Context
+import android.os.Environment
+import android.os.StatFs
 import androidx.room.*
 import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.util.Misc
 import com.creditclub.core.util.RAMInfo
 import com.creditclub.core.util.localStorage
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.koin.core.context.GlobalContext
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Serializable
 @Entity(indices = [Index("sessionID")])
@@ -84,7 +87,7 @@ class DeviceTransactionInformation {
     var appName: String? = null
 
     private fun setDateEnded() {
-        this.dateEnded = Misc.currentDateLongString
+        this.dateEnded = currentDateLongString
     }
 
     companion object {
@@ -99,12 +102,12 @@ class DeviceTransactionInformation {
 
             // Get Current sessionID
             information.sessionID = sessionID
-            information.dateReceived = Misc.currentDateLongString
-            information.memorySpace = Misc.totalMemory
-            information.memorySpaceLeft = Misc.availableMemory
+            information.dateReceived = currentDateLongString
+            information.memorySpace = totalMemory
+            information.memorySpaceLeft = availableMemory
 
             val ramInfo = context.RAMInfo
-            information.ramSize = Misc.formatMemorySize(ramInfo[0])
+            information.ramSize = formatMemorySize(ramInfo[0])
             information.percentageLeftOver = ramInfo[0].toFloat() / ramInfo[1].toFloat() * 100.toFloat()
 
             information.noInternet = getTransactionMonitorCounter(LocalStorage.NoInternetCount)
@@ -160,4 +163,103 @@ interface DeviceTransactionInformationDAO {
 
     @Query("DELETE FROM DeviceTransactionInformation WHERE ID >= :startID AND ID <= :endID")
     fun deleteRange(startID: Int, endID: Int)
+}
+
+inline val currentDateLongString: String
+    get() {
+        val currentDateTime = Calendar.getInstance().time
+        val formatter = SimpleDateFormat("dd-MM-yyyy hh:mm:ss:SSS")
+        var part = formatter.format(currentDateTime)
+        part += "0000 "
+        return part + SimpleDateFormat("a").format(currentDateTime)
+    }
+
+inline val totalMemory: String
+    get() = formatMemorySize(totalInternalMemorySize + totalExternalMemorySize)
+
+inline val availableMemory: String
+    get() = formatMemorySize(availableInternalMemorySize + availableExternalMemorySize)
+
+inline val availableInternalMemorySize: Long
+    get() {
+        val path = Environment.getDataDirectory()
+        val stat = StatFs(path.path)
+        val blockSize: Long = stat.blockSizeLong
+
+        val availableBlocks: Long = stat.availableBlocksLong
+
+        return availableBlocks * blockSize
+    }
+
+inline val totalInternalMemorySize: Long
+    get() {
+        val path = Environment.getDataDirectory()
+        val stat = StatFs(path.path)
+        val blockSize: Long = stat.blockSizeLong
+        val totalBlocks: Long = stat.blockCountLong
+        return totalBlocks * blockSize
+    }
+
+inline val availableExternalMemorySize: Long
+    get() {
+        return if (externalMemoryAvailable) {
+            val path = Environment. getExternalStorageDirectory()
+            val stat = StatFs(path.path)
+            val blockSize: Long = stat.blockSizeLong
+            val availableBlocks: Long = stat.availableBlocksLong
+
+            availableBlocks * blockSize
+        } else {
+            -1
+        }
+    }
+
+inline val totalExternalMemorySize: Long
+    get() {
+        return if (externalMemoryAvailable) {
+            val path = Environment.getExternalStorageDirectory()
+            val stat = StatFs(path.path)
+
+            val blockSize: Long = stat.blockSizeLong
+
+            val totalBlocks: Long = stat.blockCountLong
+
+            totalBlocks * blockSize
+        } else {
+            0
+        }
+    }
+
+inline val externalMemoryAvailable: Boolean
+    get() = Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+
+fun formatMemorySize(size: Long): String {
+    var size = size
+    var suffix: String? = null
+
+    if (size >= 1024) {
+        suffix = "KB"
+        size /= 1024
+        if (size >= 1024) {
+            suffix = "MB"
+            size /= 1024
+
+            if (size >= 1024) {
+                suffix = "GB"
+                size /= 1024
+            }
+        }
+    }
+
+    val resultBuffer = StringBuilder(size.toString())
+
+    var commaOffset = resultBuffer.length - 3
+    while (commaOffset > 0) {
+        resultBuffer.insert(commaOffset, ',')
+        commaOffset -= 3
+    }
+
+    if (suffix != null)
+        resultBuffer.append(suffix)
+    return resultBuffer.toString()
 }

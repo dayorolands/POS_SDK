@@ -44,26 +44,26 @@ class CreditClubImage(context: Context, private val image: Image) {
             val inputStream = contentResolver.openInputStream(image.uri)
             val tempBitmap = BitmapFactory.decodeStream(inputStream)
             inputStream?.close()
-            getResizedBitmap(tempBitmap!!)
+            tempBitmap!!.createScaledBitmap(maxSize = 400)
         }
 
         return tempBitmap
     }
+}
 
-    private fun getResizedBitmap(image: Bitmap): Bitmap {
-        var width = image.width
-        var height = image.height
-        val maxSize = 400
+fun Bitmap.createScaledBitmap(maxSize: Int): Bitmap {
+    var newWidth = width
+    var newHeight = height
 
-        val bitmapRatio = width.toFloat() / height.toFloat()
-        if (bitmapRatio > 0) {
-            width = maxSize
-            height = (width / bitmapRatio).toInt()
-        } else {
-            height = maxSize
-            width = (height * bitmapRatio).toInt()
-        }
 
-        return Bitmap.createScaledBitmap(image, width, height, true)
+    val bitmapRatio = newWidth.toFloat() / newHeight.toFloat()
+    if (bitmapRatio > 0) {
+        newWidth = maxSize
+        newHeight = (newWidth / bitmapRatio).toInt()
+    } else {
+        newHeight = maxSize
+        newWidth = (newHeight * bitmapRatio).toInt()
     }
+
+    return Bitmap.createScaledBitmap(this, newWidth, newHeight, true)
 }

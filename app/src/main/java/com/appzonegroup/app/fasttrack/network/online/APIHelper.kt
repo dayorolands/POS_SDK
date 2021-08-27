@@ -167,8 +167,7 @@ class APIHelper @JvmOverloads constructor(
         val requestFile: RequestBody = image
             .asRequestBody((mimeType ?: "image/jpeg").toMediaTypeOrNull())
 
-        val body =
-            MultipartBody.Part.createFormData("file", image.name, requestFile)
+        val body = MultipartBody.Part.createFormData("file", image.name, requestFile)
 
         return safeRunIO {
             client.bankOneService.operationNextImage(

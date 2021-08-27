@@ -66,7 +66,7 @@ class KeyDownloadTest : PosParameter {
     @Test
     fun message_unpacksProperly() {
         val messageStr = ""
-        val packedMsg = messageStr.hexBytes
+        val packedMsg = messageStr.toByteArray()
         val isoMsg = ISOMsg().apply {
             packager = ISO87Packager()
         }

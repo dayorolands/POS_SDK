@@ -16,19 +16,6 @@ import com.creditclub.core.ui.widget.DialogListenerBlock
  * Appzone Ltd
  */
 
-fun Context.isMyServiceRunning(serviceClass: Class<*>): Boolean {
-    val manager = getSystemService(Application.ACTIVITY_SERVICE) as ActivityManager?
-    manager?.run {
-        for (service in getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.name == service.service.className) {
-                return true
-            }
-        }
-    }
-
-    return false
-}
-
 inline val Activity.finishOnClose: DialogListenerBlock<*>
     get() = {
         onClose {

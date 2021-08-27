@@ -2,6 +2,8 @@ package com.appzonegroup.app.fasttrack.fragment.online
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Bitmap.CompressFormat
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -24,6 +26,7 @@ import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages
 import com.appzonegroup.app.fasttrack.utility.online.convertXmlToJson
 import com.creditclub.core.data.Encryption
 import com.creditclub.core.model.CreditClubImage
+import com.creditclub.core.model.createScaledBitmap
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.format
 import com.creditclub.core.util.safeRunIO
@@ -42,8 +45,9 @@ import java.io.FileOutputStream
 import java.time.Instant
 import java.util.concurrent.TimeoutException
 
+
 inline fun CreditClubFragment.registerImagePicker(
-    crossinline callback: suspend CoroutineScope.(List<Image>) -> Unit
+    crossinline callback: suspend CoroutineScope.(List<Image>) -> Unit,
 ): (BaseConfig) -> Unit {
     val activityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -70,9 +74,9 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
     private val ah by lazy { APIHelper(requireActivity()) }
     private val launcher = registerImagePicker {
         try {
-            val tmpImage = it.firstOrNull()
-                ?: return@registerImagePicker dialogProvider.showError("An internal error occurred")
-            creditClubImage = CreditClubImage(requireContext(), cacheImage(tmpImage))
+            val tmpImage = it.firstOrNull() ?: return@registerImagePicker
+            val context = requireContext()
+            creditClubImage = CreditClubImage(context, context.cacheImage(tmpImage))
 
             dialogProvider.showProgressBar("Processing image")
 
@@ -87,21 +91,28 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
         }
     }
 
-    private suspend fun cacheImage(image: Image): Image {
+    private suspend fun Context.cacheImage(image: Image): Image {
         val time = Instant.now().format("ddMMHHmmss")
-        val fileName = "/${appConfig.appName} Receipt ${time}.pdf"
-        val file = withContext(Dispatchers.IO) {
-            val myFilePath = requireContext().externalCacheDir?.path + fileName
-            val myFile = File(myFilePath)
-            myFile
+        val fileName = "/${appConfig.appName}-image-${time}.jpg".lowercase()
+        val filePath = externalCacheDir?.path + fileName
+
+        withContext(Dispatchers.IO) {
+            contentResolver.openInputStream(image.uri).use { inputStream ->
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                FileOutputStream(filePath).use { outputStream ->
+                    bitmap
+                        .createScaledBitmap(400)
+                        .compress(CompressFormat.JPEG, 50, outputStream)
+                }
+            }
         }
 
-        return Image(image.id, fileName, file.absolutePath)
+        return Image(image.id, fileName, File(filePath).absolutePath)
     }
 
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
         OnlineActivity.isHome = false
@@ -152,16 +163,16 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
         val ah = APIHelper(requireContext())
 
         dialogProvider.showProgressBar("Uploading")
-        val (result, e) = ah.getNextOperationImage(
-            authResponse?.phoneNumber ?: "",
-            authResponse?.sessionId ?: "nothing",
-            finalFile,
-            localStorage.lastKnownLocation ?: "0.00;0.00",
-            optionsText?.isShouldCompress ?: false,
+        val (result, error) = ah.getNextOperationImage(
+            pNumber = authResponse?.phoneNumber ?: "",
+            sessionId = authResponse?.sessionId ?: "nothing",
+            image = finalFile,
+            location = localStorage.lastKnownLocation ?: "0.00;0.00",
+            isFullImage = optionsText?.isShouldCompress ?: false,
         )
         dialogProvider.hideProgressBar()
 
-        if (e == null && result != null) {
+        if (error == null && result != null) {
             try {
                 val answer = Response.fixResponse(result)
                 Log.e("Answer", answer)
@@ -189,32 +200,21 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
                 )
             }
         } else {
-            if (e != null) {
-                Log.e("ErrorResponse", e.toString())
-                e.printStackTrace()
-                if (e is TimeoutException) {
-                    showDialogWithGoHomeAction("Something went wrong! Please try again.")
-                    Misc.increaseTransactionMonitorCounter(
-                        activity,
-                        TransactionCountType.NO_RESPONSE_COUNT,
-                        authResponse?.sessionId
-                    )
-                } else {
-                    Misc.increaseTransactionMonitorCounter(
-                        activity,
-                        TransactionCountType.NO_INTERNET_COUNT,
-                        authResponse?.sessionId
-                    )
-                    dialogProvider.showError("Connection lost")
-                }
-            } else {
-                dialogProvider.showError("Connection lost")
+            if (error is TimeoutException) {
+                showDialogWithGoHomeAction("Something went wrong! Please try again.")
                 Misc.increaseTransactionMonitorCounter(
                     activity,
-                    TransactionCountType.NO_INTERNET_COUNT,
+                    TransactionCountType.NO_RESPONSE_COUNT,
                     authResponse?.sessionId
                 )
+                return
             }
+            Misc.increaseTransactionMonitorCounter(
+                activity,
+                TransactionCountType.NO_INTERNET_COUNT,
+                authResponse?.sessionId
+            )
+            dialogProvider.showError("Connection lost")
         }
     }
 
@@ -261,17 +261,14 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
                                 )
                                 localStorage.cacheAuth = null
                             } else if (state) {
-                                Log.e(
-                                    "Case",
-                                    "correct activation code||" + creditClubImage?.path
-                                )
-                                val auth = JSONObject()
-                                auth.put("phone_number", authResponse.phoneNumber)
-                                auth.put("session_id", authResponse.sessionId)
-                                auth.put(
-                                    "activation_code",
-                                    creditClubImage?.path
-                                )
+                                val auth = JSONObject().apply {
+                                    put("phone_number", authResponse.phoneNumber)
+                                    put("session_id", authResponse.sessionId)
+                                    put(
+                                        "activation_code",
+                                        creditClubImage?.path
+                                    )
+                                }
                                 localStorage.cacheAuth = auth.toString()
                             }
                             Misc.increaseTransactionMonitorCounter(
@@ -389,7 +386,6 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
     }
 
     companion object {
-
         @JvmStatic
         fun instantiate(data: JSONObject): CustomerImageFragment {
             return CustomerImageFragment().apply {

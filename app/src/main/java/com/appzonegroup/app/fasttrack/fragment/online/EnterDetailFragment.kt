@@ -314,8 +314,9 @@ class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
     }
 
     companion object {
-        var state = false
-        var optionsText: OptionsText? = null
+        private var state = false
+        private var optionsText: OptionsText? = null
+
         fun instantiate(data: JSONObject): EnterDetailFragment {
             optionsText = OptionsText(data)
             return EnterDetailFragment()
