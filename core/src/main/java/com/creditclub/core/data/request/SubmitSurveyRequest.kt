@@ -4,11 +4,6 @@ import com.creditclub.core.data.model.SurveyAnswer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 22/11/2019.
- * Appzone Ltd
- */
 @Serializable
 data class SubmitSurveyRequest(
     @SerialName("AgentPhoneNumber")

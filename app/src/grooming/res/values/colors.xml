@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="navHeaderLogoTint">#0000</color>
+    <color name="colorPrimary">#801d76</color>
+    <color name="colorPrimaryTransparent">#DD801d76</color>
+    <color name="colorPrimaryDark">#61175A</color>
+    <color name="colorOnSecondary">@color/white</color>
+    <color name="splashOverlay">#FAFBF6FB</color>
+    <color name="menuButtonIconTint">@color/transparent</color>
+    <!--    <color name="colorLoginBg">@color/transparent</color>-->
+    <color name="colorAccentContrast">@color/white</color>
+    <color name="menuBackground">#1108237e</color>
+    <color name="fundsTransferSameBankTint">@color/colorAccent</color>
+    <color name="colorSplashBg">#fff</color>
+</resources>

@@ -112,25 +112,25 @@ android {
             dimension "flavor"
             applicationId "com.appzonegroup.app.creditclub.plus"
         }
-
         polaris {
             dimension "flavor"
             applicationId "com.appzonegroup.app.creditclub.polaris"
         }
-
         access {
             dimension "flavor"
             applicationId "com.creditclub.access"
         }
-
         gtbank {
             dimension "flavor"
             applicationId "com.creditclub.gtbank"
         }
-
         purple {
             dimension "flavor"
             applicationId "com.creditclub.purple"
+        }
+        grooming {
+            dimension "flavor"
+            applicationId "com.creditclub.grooming"
         }
     }
     sourceSets {
@@ -192,8 +192,10 @@ dependencies {
     polarisImplementation project(path: ':sunmi')
     accessImplementation project(path: ':telpo')
     gtbankImplementation project(path: ':dspread')
-//    purpleImplementation project(path: ':dspread')
-    purpleImplementation project(path: ':telpo')
+    purpleImplementation project(path: ':dspread')
+//    purpleImplementation project(path: ':telpo')
+    groomingImplementation project(path: ':telpo')
+    groomingImplementation project(path: ':nexgo')
 
     implementation fileTree(dir: "jniLibs", include: ["*.so"])
     implementation fileTree(include: ["*.jar"], dir: "libs")
