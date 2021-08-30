@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Heritage Agents</string>
+    <string name="app_name">Paydia</string>
     <string name="institution_name">Heritage Bank</string>
     <string name="institution_website">https://www.hbng.com/</string>
     <string name="funds_transfer_same_bank">@string/institution_name</string>
