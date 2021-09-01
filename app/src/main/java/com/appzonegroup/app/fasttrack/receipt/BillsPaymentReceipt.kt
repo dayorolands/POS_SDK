@@ -1,42 +1,31 @@
 package com.appzonegroup.app.fasttrack.receipt
 
 import android.content.Context
-import com.appzonegroup.creditclub.pos.printer.LogoNode
-import com.appzonegroup.creditclub.pos.receipt.TransactionReceipt
+import com.appzonegroup.creditclub.pos.printer.logo
+import com.appzonegroup.creditclub.pos.receipt.transactionStatus
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.data.response.PayBillResponse
+import com.creditclub.core.util.delegates.defaultJson
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
 import com.creditclub.core.util.toString
 import com.creditclub.pos.printer.Alignment
-import com.creditclub.pos.printer.PrintNode
-import com.creditclub.pos.printer.TextNode
-import kotlinx.serialization.json.Json
+import com.creditclub.pos.printer.printJob
 import java.time.Instant
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 6/28/2019.
- * Appzone Ltd
- */
-
-class BillsPaymentReceipt(context: Context, val request: PayBillRequest) :
-    TransactionReceipt(context) {
-
-    private var additionalInformation: PayBillResponse.AdditionalInformation? = null
-
-    override val nodes: List<PrintNode>
-        get() {
-            val nodes = mutableListOf(
-                LogoNode(),
-
-                TextNode(if (request.isRecharge) "Airtime Recharge" else "Bills Payment").apply {
-                    align = Alignment.MIDDLE
-                    wordFont = 35
-                },
-
-                TextNode(
-                    """
+fun billsPaymentReceipt(
+    context: Context,
+    request: PayBillRequest,
+    response: PayBillResponse? = null,
+) = printJob {
+    logo()
+    text(
+        if (request.isRecharge) "Airtime Recharge" else "Bills Payment",
+        align = Alignment.MIDDLE,
+        fontSize = 35,
+    )
+    text(
+        """
 Agent Code: ${context.localStorage.agent?.agentCode}
 Agent Phone: ${request.agentPhoneNumber}
 --------------------------
@@ -50,39 +39,22 @@ Customer Account: ${request.customerId?.mask(4, 2)}
 Customer Name: ${request.customerName}
 RRN: ${request.retrievalReferenceNumber}
 Transaction ID: ${request.customerDepositSlipNumber}"""
-                )
-            )
+    )
 
-            additionalInformation?.customerAddress?.run {
-                nodes.add(TextNode("Customer Address: $this"))
-            }
+    response?.additionalInformation?.run {
+        val additionalInfo = defaultJson.decodeFromString(
+            deserializer = PayBillResponse.AdditionalInformation.serializer(),
+            string = this,
+        )
 
-            additionalInformation?.customerToken?.run {
-                nodes.add(TextNode("Customer Token: $this"))
-            }
-
-            nodes.addTransactionStatus()
-            nodes.addAll(footerNodes(context))
-            return nodes.toList()
-        }
-
-    fun withResponse(response: PayBillResponse?): BillsPaymentReceipt {
-        response ?: return this
-
-        isSuccessful = response.isSuccessFul == true
-        reason = response.responseMessage
-        response.additionalInformation?.run {
-            val json = Json {
-                isLenient = true
-                ignoreUnknownKeys = true
-                allowSpecialFloatingPointValues = true
-                useArrayPolymorphism = true
-                encodeDefaults = true
-            }
-            val serializer = PayBillResponse.AdditionalInformation.serializer()
-            additionalInformation = json.decodeFromString(serializer, this)
-        }
-
-        return this
+        text("Customer Address: ${additionalInfo.customerAddress}")
+        text("Customer Token: ${additionalInfo.customerToken}")
     }
+
+    transactionStatus(
+        context = context,
+        isSuccessful = response?.isSuccessFul == true,
+        reason = response?.responseMessage,
+    )
+    footer(context)
 }

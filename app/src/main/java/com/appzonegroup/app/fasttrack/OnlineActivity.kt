@@ -46,7 +46,7 @@ class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
             val sessionId = generateSessionId(phoneNumber)
             dialogProvider.showProgressBar("Loading")
             Misc.resetTransactionMonitorCounter(baseContext)
-            APIHelper(baseContext).attemptValidation(
+            APIHelper(baseContext, mainScope).attemptValidation(
                 phoneNumber,
                 sessionId,
                 verificationCode,

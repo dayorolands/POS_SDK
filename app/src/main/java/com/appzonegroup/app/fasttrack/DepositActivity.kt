@@ -1,5 +1,6 @@
 package com.appzonegroup.app.fasttrack
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import com.appzonegroup.app.fasttrack.databinding.ActivityDepositBinding

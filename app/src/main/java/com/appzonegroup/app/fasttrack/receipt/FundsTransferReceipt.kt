@@ -37,5 +37,5 @@ RRN: ${request.externalTransactionReference}"""
         isSuccessful = isSuccessful,
         reason = reason,
     )
-    footerNodes(context)
+    footer(context)
 }

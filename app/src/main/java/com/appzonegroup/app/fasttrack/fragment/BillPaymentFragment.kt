@@ -9,35 +9,29 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.BillPaymentFragmentBinding
-import com.appzonegroup.app.fasttrack.receipt.BillsPaymentReceipt
+import com.appzonegroup.app.fasttrack.receipt.billsPaymentReceipt
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
-import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.api.BillsPaymentService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.BillCategory
 import com.creditclub.core.data.model.ValidateCustomerInfoRequest
 import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.PayBillRequest
-import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.includesNumbers
 import com.creditclub.core.util.includesSpecialCharacters
 import com.creditclub.core.util.isValidEmail
 import com.creditclub.core.util.safeRunIO
-import com.creditclub.pos.printer.PosPrinter
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 
 class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
-    private val viewModel by viewModels<BillPaymentViewModel>()
-    private val binding by dataBinding<BillPaymentFragmentBinding>()
+    private val viewModel: BillPaymentViewModel by viewModels()
+    private val binding: BillPaymentFragmentBinding by dataBinding()
     override val functionId = FunctionIds.PAY_BILL
     private val uniqueReference by lazy { localStorage.newTransactionReference() }
-    private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
-    private val billsPaymentService by retrofitService<BillsPaymentService>()
+    private val billsPaymentService: BillsPaymentService by retrofitService()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -130,7 +124,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     private inline fun <T> MutableLiveData<List<T>>.bindDropDown(
         selectedItemLiveData: MutableLiveData<T>,
         autoCompleteTextView: AutoCompleteTextView,
-        crossinline mapFunction: List<T>.() -> List<Any>
+        crossinline mapFunction: List<T>.() -> List<Any>,
     ) {
         observe(viewLifecycleOwner) { list ->
             val items = list?.mapFunction() ?: emptyList()
@@ -172,7 +166,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
     private suspend inline fun loadDependencies(
         dependencyName: String,
-        crossinline fetcher: suspend () -> Unit
+        crossinline fetcher: suspend () -> Unit,
     ) {
         dialogProvider.showProgressBar("Loading $dependencyName")
         val (items) = safeRunIO { fetcher() }
@@ -317,7 +311,9 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
             customerPhone = if (isAirtime) {
                 viewModel.fieldOne.value
-            } else viewModel.customerPhone.value,
+            } else {
+                viewModel.customerPhone.value
+            },
             customerDepositSlipNumber = uniqueReference,
             geolocation = localStorage.lastKnownLocation,
             isRecharge = isAirtime,
@@ -329,30 +325,16 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             billsPaymentService.runTransaction(request)
         }
         dialogProvider.hideProgressBar()
-        if (error != null) return dialogProvider.showErrorAndWait(error)
-        if (response == null) {
-            dialogProvider.showErrorAndWait("An error occurred. Please try again later")
-            printReceipt(request, null)
-            activity?.onBackPressed()
+        if (error != null) {
+            dialogProvider.showErrorAndWait(error)
             return
         }
 
-        if (response.isSuccessFul == true) {
-            dialogProvider.showSuccessAndWait(response.responseMessage ?: "Transaction successful")
-        } else {
-            val message = response.responseMessage
-                ?: getString(R.string.an_error_occurred_please_try_again_later)
-            dialogProvider.showErrorAndWait(message)
-        }
-
-        printReceipt(request, response)
-        activity?.onBackPressed()
-    }
-
-    private suspend fun printReceipt(request: PayBillRequest, response: PayBillResponse?) {
-        if (Platform.hasPrinter) {
-            val receipt = BillsPaymentReceipt(requireContext(), request).withResponse(response)
-            posPrinter.print(receipt)
-        }
+        val receipt = billsPaymentReceipt(
+            context = requireContext(),
+            request = request,
+            response = response,
+        )
+        navigateToReceipt(receipt, popBackStack = true)
     }
 }

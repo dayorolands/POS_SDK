@@ -34,11 +34,11 @@ import com.appzonegroup.app.fasttrack.databinding.NotificationDetailDialogBindin
 import com.appzonegroup.app.fasttrack.databinding.NotificationFragmentBinding
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.creditclub.core.data.api.NotificationService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.Notification
 import com.creditclub.core.data.model.NotificationRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.createDialog
-import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.timeAgo
 import com.creditclub.ui.theme.CreditClubTheme
@@ -50,7 +50,7 @@ import java.util.*
 class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) {
     private val binding by dataBinding<NotificationFragmentBinding>()
     private val viewModel by activityViewModels<NotificationViewModel>()
-    private val notificationService by creditClubMiddleWareAPI.retrofit.service<NotificationService>()
+    private val notificationService: NotificationService by retrofitService()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

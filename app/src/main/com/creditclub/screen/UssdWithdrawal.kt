@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.appzonegroup.app.fasttrack.R
-import com.appzonegroup.app.fasttrack.receipt.footerNodes
+import com.appzonegroup.app.fasttrack.receipt.footer
 import com.appzonegroup.app.fasttrack.ui.ReceiptDetails
 import com.appzonegroup.app.fasttrack.utility.FunctionUsageTracker
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
@@ -148,7 +148,7 @@ fun UssdWithdrawal(navController: NavController) {
                             align = middleAlignment,
                         )
                     }
-                    footerNodes(context)
+                    footer(context)
                 }
             }
         }

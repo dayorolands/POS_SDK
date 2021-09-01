@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.appzonegroup.app.fasttrack.R
+import com.appzonegroup.app.fasttrack.navigateToReceipt
 import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.FunctionUsageTracker
@@ -108,9 +109,7 @@ fun PendingTransactions(
                             "${transaction.transactionType} not supported"
                 )
             }
-            navController.setResult(receipt, "receipt")
-            navController.currentBackStackEntry?.arguments?.putParcelable("receipt", receipt)
-            navController.navigate(Routes.Receipt)
+            navController.navigateToReceipt(receipt, popBackStack = false)
         }
     }
 

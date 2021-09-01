@@ -9,6 +9,7 @@ import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.databinding.PosMenuFragmentBinding
 import com.appzonegroup.creditclub.pos.util.MenuPage
 import com.appzonegroup.creditclub.pos.util.MenuPages
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.TextFieldParams
 import com.creditclub.core.util.format
@@ -16,7 +17,7 @@ import com.creditclub.core.util.safeRunIO
 import com.creditclub.pos.InvalidRemoteConnectionInfo
 import com.creditclub.pos.PosFragment
 import com.creditclub.pos.PosParameter
-import com.creditclub.pos.api.posApiService
+import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.getParameter
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -24,9 +25,10 @@ import java.time.Instant
 
 
 class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
-    private val binding by dataBinding<PosMenuFragmentBinding>()
+    private val binding: PosMenuFragmentBinding by dataBinding()
     private val posPreferences: PosPreferences by inject()
     private val defaultParameterStore: PosParameter by inject()
+    private val posApiService: PosApiService by retrofitService()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -75,7 +77,7 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
     private suspend fun updateBinRoutes() {
         dialogProvider.showProgressBar("Downloading pos settings")
         val (response) = safeRunIO {
-            creditClubMiddleWareAPI.posApiService.getBinRoutes(
+            posApiService.getBinRoutes(
                 localStorage.institutionCode,
                 localStorage.agentPhone
             )
@@ -260,7 +262,7 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
     private inline fun confirmSupervisorPin(
         pin: String,
         closeOnFail: Boolean = false,
-        crossinline next: (Boolean) -> Unit
+        crossinline next: (Boolean) -> Unit,
     ) {
         val status = pin == config.supervisorPin
         if (!status) {

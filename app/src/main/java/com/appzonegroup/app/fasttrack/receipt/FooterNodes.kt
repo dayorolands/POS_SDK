@@ -40,7 +40,7 @@ fun footerNodes(context: Context) = listOf<PrintNode>(
     )
 )
 
-fun PrintJobScope.footerNodes(context: Context) {
+fun PrintJobScope.footer(context: Context) {
     text(
         "-----------------------------", align = Alignment.MIDDLE,
         fontSize = 15,

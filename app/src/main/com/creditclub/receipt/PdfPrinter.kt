@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context.PRINT_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.graphics.BitmapFactory
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
@@ -22,7 +23,7 @@ import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.format
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.pos.printer.*
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -36,6 +37,8 @@ class PdfPrinter(
     override val dialogProvider: DialogProvider,
 ) : PosPrinter, KoinComponent {
     private val appConfig: AppConfig by inject()
+    private val mainScope = MainScope()
+
     override fun check(): PrinterStatus {
         ActivityCompat.requestPermissions(
             context,
@@ -51,9 +54,9 @@ class PdfPrinter(
     override fun printAsync(
         nodes: List<PrintNode>,
         message: String,
-        block: ((PrinterStatus) -> Unit)?
+        block: ((PrinterStatus) -> Unit)?,
     ) {
-        GlobalScope.launch {
+        mainScope.launch {
             print(printJob(nodes), message, false)
         }
     }
@@ -61,7 +64,7 @@ class PdfPrinter(
     override suspend fun print(
         printJob: PrintJob,
         message: String,
-        retryOnFail: Boolean
+        retryOnFail: Boolean,
     ): PrinterStatus {
         val printAttributes =
             PrintAttributes.Builder().setColorMode(PrintAttributes.COLOR_MODE_COLOR)
@@ -82,12 +85,6 @@ class PdfPrinter(
         val paint = Paint()
         val canvas = page.canvas
         canvas.scale(90f / hdpi, 90f / vdpi)
-
-        fun getXFromAlignment(width: Int, alignment: Alignment): Float = when (alignment) {
-            Alignment.MIDDLE -> (pageWidth - width) / 2F
-            Alignment.RIGHT -> pageWidth - width - 10F
-            else -> x
-        }
 
         fun walkPaper(distance: Int) {
             if (distance > 0) {
@@ -120,14 +117,20 @@ class PdfPrinter(
 
         document.finishPage(page)
         val time = Instant.now().format("ddMMHHmmss")
-        val fileName = "/${appConfig.appName} Receipt ${time}.pdf"
-        val file = safeRunIO {
-            val myFilePath = context.externalCacheDir?.path + fileName
-            val myFile = File(myFilePath)
-            document.writeTo(FileOutputStream(myFile))
-            myFile
-        }.data ?: return PrinterStatus.READY
+        val (file) = safeRunIO {
+            val receiptFolder = File(context.filesDir.path, "receipts")
+            if (!receiptFolder.exists()) {
+                receiptFolder.mkdir()
+            }
+            val receiptFilePath = "${receiptFolder.path}/${appConfig.appName} receipt ${time}.pdf"
+            val receiptFile = File(receiptFilePath).apply { createNewFile() }
+            FileOutputStream(receiptFile).use { outputStream -> document.writeTo(outputStream) }
+            receiptFile
+        }
         document.close()
+        if (file == null) {
+            return PrinterStatus.NOT_READY
+        }
 
         val shareIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
@@ -139,16 +142,30 @@ class PdfPrinter(
                 appConfig.fileProviderAuthority,
                 file,
             )
-            shareIntent.setDataAndType(uri, "application/pdf")
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            shareIntent.setDataAndType(uri, context.contentResolver.getType(uri))
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+            //GRANTING THE PERMISSIONS EXPLICITLY HERE! to all possible choosers (3rd party apps):
+            val resolvedInfoActivities: List<ResolveInfo> = context.packageManager
+                .queryIntentActivities(shareIntent, PackageManager.MATCH_DEFAULT_ONLY)
+
+            for (ri in resolvedInfoActivities) {
+                context.grantUriPermission(
+                    ri.activityInfo.packageName,
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                )
+            }
         } else {
-            shareIntent.setDataAndType(Uri.fromFile(file), "application/pdf")
+            val uri = Uri.fromFile(file)
+            shareIntent.setDataAndType(uri, context.contentResolver.getType(uri))
         }
         context.startActivity(
             Intent.createChooser(
                 shareIntent,
                 context.resources.getText(R.string.share_receipt_to)
-            )
+            ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION),
         )
 
         return PrinterStatus.READY

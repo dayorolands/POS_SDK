@@ -11,6 +11,7 @@ import com.appzonegroup.app.fasttrack.ui.ReceiptDetails
 import com.creditclub.Routes
 import com.creditclub.conversation.ConversationContent
 import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.setResult
 import com.creditclub.pos.printer.ParcelablePrintJob
 import com.creditclub.screen.PinChange
 import com.creditclub.screen.SupportCases
@@ -69,4 +70,11 @@ fun NavGraphBuilder.clusterNavigation(
             printJob = printJob ?: return@composable,
         )
     }
+}
+
+fun NavController.navigateToReceipt(receipt: ParcelablePrintJob, popBackStack: Boolean = true) {
+    setResult(receipt, "receipt")
+    currentBackStackEntry?.arguments?.putParcelable("receipt", receipt)
+    navigate(Routes.Receipt)
+    if (popBackStack) popBackStack()
 }

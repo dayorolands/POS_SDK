@@ -45,6 +45,7 @@ import com.creditclub.core.config.InstitutionConfig
 import com.creditclub.core.data.api.NotificationService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.NotificationRequest
+import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.util.debugOnly
@@ -60,6 +61,7 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import java.util.*
 
 private val composableRouteFunctionIds = mapOf(
@@ -74,6 +76,7 @@ class HomeFragment : CreditClubFragment() {
     private val notificationViewModel: NotificationViewModel by activityViewModels()
     private val appViewModel: AppViewModel by viewModels()
     private val notificationService: NotificationService by retrofitService()
+    private val appDataStorage: AppDataStorage by inject()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
