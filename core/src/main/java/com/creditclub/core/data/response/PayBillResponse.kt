@@ -4,28 +4,23 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class PayBillResponse {
+class PayBillResponse(
     @SerialName("ResponseCode")
-    var responseCode: String? = ""
-
+    val responseCode: String? = "",
     @SerialName("ResponseMessage")
-    var responseMessage: String? = ""
-
+    val responseMessage: String? = "",
     @SerialName("IsSuccessFul")
-    var isSuccessFul: Boolean? = false
-
+    val isSuccessFul: Boolean? = false,
     @SerialName("Reference")
-    var reference: String? = ""
-
+    val reference: String? = "",
     @SerialName("AdditionalInformation")
-    var additionalInformation: String? = ""
-
+    val additionalInformation: String? = "",
+) {
     @Serializable
-    class AdditionalInformation {
+    data class AdditionalInformation(
         @SerialName("CustomerAddress")
-        var customerAddress: String? = null
-
+        val customerAddress: String? = null,
         @SerialName("CustomerToken")
-        var customerToken: String? = null
-    }
+        val customerToken: String? = null,
+    )
 }

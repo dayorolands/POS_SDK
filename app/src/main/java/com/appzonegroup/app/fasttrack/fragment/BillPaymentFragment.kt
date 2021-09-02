@@ -19,11 +19,9 @@ import com.creditclub.core.data.model.ValidateCustomerInfoRequest
 import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.includesNumbers
-import com.creditclub.core.util.includesSpecialCharacters
-import com.creditclub.core.util.isValidEmail
-import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.*
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
@@ -334,6 +332,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             context = requireContext(),
             request = request,
             response = response,
+            transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
         )
         navigateToReceipt(receipt, popBackStack = true)
     }

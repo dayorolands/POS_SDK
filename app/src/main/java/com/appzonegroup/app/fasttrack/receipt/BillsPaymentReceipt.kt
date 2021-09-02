@@ -15,6 +15,7 @@ import java.time.Instant
 
 fun billsPaymentReceipt(
     context: Context,
+    transactionDate: String,
     request: PayBillRequest,
     response: PayBillResponse? = null,
 ) = printJob {
@@ -34,7 +35,7 @@ Payment Item: ${request.paymentItemName}
 Payment Item Code: ${request.paymentItemCode}
 Biller Name: ${request.billerName}
 Biller Category: ${request.billerCategoryName}
-Transaction Date: ${Instant.now().toString("dd-MM-yyyy hh:mm")}
+Transaction Date: $transactionDate
 Customer Account: ${request.customerId?.mask(4, 2)}
 Customer Name: ${request.customerName}
 RRN: ${request.retrievalReferenceNumber}
