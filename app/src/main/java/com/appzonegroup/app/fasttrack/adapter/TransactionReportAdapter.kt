@@ -87,13 +87,18 @@ class TransactionReportAdapter(
             TransactionType.LocalFundsTransfer -> 2
 
             TransactionType.Registration -> 3
+
             TransactionType.BillsPayment,
             TransactionType.CashIn,
             TransactionType.CashOut,
             TransactionType.Recharge -> 4
+
             TransactionType.PINChange, TransactionType.PINReset -> 5
+
             TransactionType.BalanceEnquiry -> 6
+
             TransactionType.CollectionPayment -> 7
+
             else -> 0
         }
     }

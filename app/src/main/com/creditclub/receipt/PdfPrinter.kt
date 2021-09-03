@@ -123,8 +123,13 @@ class PdfPrinter(
                 receiptFolder.mkdir()
             }
             val receiptFilePath = "${receiptFolder.path}/${appConfig.appName} receipt ${time}.pdf"
-            val receiptFile = File(receiptFilePath).apply { createNewFile() }
-            FileOutputStream(receiptFile).use { outputStream -> document.writeTo(outputStream) }
+            val receiptFile = File(receiptFilePath).apply {
+                createNewFile()
+                outputStream().use { outputStream ->
+                    document.writeTo(outputStream)
+                }
+            }
+
             receiptFile
         }
         document.close()

@@ -5,19 +5,14 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.adapter.TransactionReportAdapter
 import com.appzonegroup.app.fasttrack.databinding.ActivityReportBinding
-import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
-import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
-import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
-import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
+import com.appzonegroup.app.fasttrack.receipt.*
 import com.creditclub.core.data.api.CollectionsService
 import com.creditclub.core.data.api.ReportService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.model.TransactionReport
-import com.creditclub.core.data.request.DepositRequest
-import com.creditclub.core.data.request.FundsTransferRequest
-import com.creditclub.core.data.request.POSTransactionReportRequest
-import com.creditclub.core.data.request.WithdrawalRequest
+import com.creditclub.core.data.request.*
+import com.creditclub.core.data.response.PayBillResponse
 import com.creditclub.core.type.TransactionStatus
 import com.creditclub.core.type.TransactionType
 import com.creditclub.core.ui.CreditClubActivity
@@ -265,7 +260,8 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                 posPrinter.print(CollectionPaymentReceipt(this, response))
             }
             TransactionType.FundsTransferCommercialBank,
-            TransactionType.LocalFundsTransfer -> {
+            TransactionType.LocalFundsTransfer,
+            -> {
                 val fundsTransferRequest = FundsTransferRequest(
                     agentPhoneNumber = localStorage.agentPhone,
                     agentCode = localStorage.agent?.agentCode,
@@ -278,11 +274,51 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                 )
                 posPrinter.print(
                     fundsTransferReceipt(
-                        this,
-                        fundsTransferRequest,
-                        item.date?.replace("T", " ") ?: "",
+                        context = this,
+                        request = fundsTransferRequest,
+                        transactionDate = item.date?.replace("T", " ") ?: "",
                         isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
                         reason = selectedTransactionStatus.label,
+                    )
+                )
+            }
+            TransactionType.BillsPayment,
+            TransactionType.Recharge,
+            -> {
+                val payBillRequest = PayBillRequest(
+                    agentPhoneNumber = localStorage.agentPhone,
+                    agentCode = localStorage.agent?.agentCode,
+                    institutionCode = localStorage.institutionCode,
+                    customerName = item.customerName,
+                    customerPhone = item.customerPhone,
+                    customerEmail = null,
+                    amount = item.amount?.toString(),
+                    customerDepositSlipNumber = item.uniqueReference,
+                    retrievalReferenceNumber = item.uniqueReference,
+                    geolocation = null,
+                    isRecharge = selectedTransactionType == TransactionType.Recharge,
+                    validationCode = null,
+                    agentPin = null,
+                    merchantBillerIdField = null,
+                    billerCategoryName = null,
+                    billerCategoryID = null,
+                    billItemID = null,
+                    customerId = null,
+                    accountNumber = null,
+                    billerName = null,
+                    paymentItemCode = null,
+                    paymentItemName = item.productName,
+                )
+                val response = PayBillResponse(
+                    isSuccessFul = selectedTransactionStatus == TransactionStatus.Successful,
+                    responseMessage = selectedTransactionStatus.label,
+                )
+                posPrinter.print(
+                    billsPaymentReceipt(
+                        context = this,
+                        transactionDate = item.date?.replace("T", " ") ?: "",
+                        request = payBillRequest,
+                        response = response,
                     )
                 )
             }
@@ -296,8 +332,8 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                 )
                 posPrinter.print(
                     DepositReceipt(
-                        this,
-                        depositRequest,
+                        context = this,
+                        request = depositRequest,
                         accountInfo = AccountInfo(
                             accountName = item.customerName ?: "",
                             number = item.to ?: "",
@@ -320,8 +356,8 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                 )
                 posPrinter.print(
                     WithdrawalReceipt(
-                        this,
-                        withdrawalRequest,
+                        context = this,
+                        request = withdrawalRequest,
                         accountInfo = AccountInfo(
                             accountName = item.customerName ?: "",
                             number = item.to ?: "",
