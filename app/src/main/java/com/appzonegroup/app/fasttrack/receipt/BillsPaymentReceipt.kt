@@ -42,10 +42,10 @@ RRN: ${request.retrievalReferenceNumber}
 Transaction ID: ${request.customerDepositSlipNumber}"""
     )
 
-    response?.additionalInformation?.run {
+    if (!response?.additionalInformation.isNullOrBlank()) {
         val additionalInfo = defaultJson.decodeFromString(
             deserializer = PayBillResponse.AdditionalInformation.serializer(),
-            string = this,
+            string = response!!.additionalInformation!!,
         )
 
         text("Customer Address: ${additionalInfo.customerAddress}")

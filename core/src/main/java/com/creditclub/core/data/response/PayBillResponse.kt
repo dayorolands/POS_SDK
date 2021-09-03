@@ -14,7 +14,7 @@ class PayBillResponse(
     @SerialName("Reference")
     val reference: String? = "",
     @SerialName("AdditionalInformation")
-    val additionalInformation: String? = "",
+    val additionalInformation: String? = null,
 ) {
     @Serializable
     data class AdditionalInformation(
