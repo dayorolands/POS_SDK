@@ -13,7 +13,7 @@ data class WithdrawalRequest(
     val institutionCode: String? = null,
 
     @SerialName("CustomerAccountNumber")
-    val customerAccountNumber: String? = null,
+    val customerAccountNumber: String,
 
     @SerialName("AgentPin")
     val agentPin: String? = null,
@@ -25,7 +25,7 @@ data class WithdrawalRequest(
     val customerPin: String? = null,
 
     @SerialName("Amount")
-    val amount: String? = null,
+    val amount: String,
 
     @SerialName("GeoLocation")
     val geoLocation: String? = null,
@@ -34,7 +34,10 @@ data class WithdrawalRequest(
     val additionalInformation: String? = null,
 
     @SerialName("RetrievalReferenceNumber")
-    val retrievalReferenceNumber: String?,
+    val retrievalReferenceNumber: String,
+
+    @SerialName("DeviceNumber")
+    val deviceNumber: Int? = null,
 ) {
     @Serializable
     data class Additional(

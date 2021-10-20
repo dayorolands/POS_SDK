@@ -1,8 +1,14 @@
 package com.creditclub.conversation
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -41,7 +47,6 @@ import com.esafirm.imagepicker.features.cameraonly.CameraOnlyConfig
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.google.accompanist.insets.statusBarsPadding
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -125,7 +130,7 @@ fun ConversationContent(
     val isResolved = caseResponse.isResolved
     val isClosed = caseResponse.isClosed
 
-    val sendMessage: suspend CoroutineScope.(newMessage: Feedback) -> Unit = remember {
+    val sendMessage: suspend (newMessage: Feedback) -> Unit = remember {
         sendMessage@{ newMessage ->
             val (_, error) = safeRunIO {
                 caseLogService.saveFeedback(newMessage)
@@ -141,7 +146,7 @@ fun ConversationContent(
         }
     }
 
-    val closeCase: suspend CoroutineScope.() -> Unit = remember {
+    val closeCase: suspend () -> Unit = remember {
         closeCase@{
             dialogProvider.showProgressBar("Closing case")
             val (_, error) = safeRunIO {
@@ -237,7 +242,7 @@ fun Messages(
     messages: List<Feedback>,
     navigateToProfile: (String) -> Unit,
     scrollState: LazyListState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val localDateNow = remember { LocalDate.now() }
     val today = remember { localDateNow.format("dd/MM/uuuu") }
@@ -322,7 +327,7 @@ private fun MessageItem(
     msg: Feedback,
     isUserMe: Boolean,
     isFirstMessageByAuthor: Boolean,
-    isLastMessageByAuthor: Boolean
+    isLastMessageByAuthor: Boolean,
 ) {
     // TODO: get image from msg.author
     val painter = if (isUserMe) {
@@ -373,7 +378,7 @@ fun AuthorAndTextMessage(
     msg: Feedback,
     isFirstMessageByAuthor: Boolean,
     isLastMessageByAuthor: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         if (isFirstMessageByAuthor) {
@@ -449,7 +454,7 @@ private fun RowScope.DayHeaderLine() {
 @Composable
 fun ChatItemBubble(
     message: Feedback,
-    lastMessageByAuthor: Boolean
+    lastMessageByAuthor: Boolean,
 ) {
 
     val backgroundBubbleColor =

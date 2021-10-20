@@ -71,6 +71,9 @@ class CustomerRequest {
     @SerialName("RetrievalReferenceNumber")
     var retrievalReferenceNumber: String? = null
 
+    @SerialName("DeviceNumber")
+    var deviceNumber: Int? = null
+
     @Serializable
     class Additional {
         @SerialName("MiddleName")

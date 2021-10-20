@@ -7,17 +7,24 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityWithdrawBinding
 import com.appzonegroup.app.fasttrack.fragment.WithdrawalViewModel
 import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
+import com.creditclub.core.data.ClusterObjectBox
+import com.creditclub.core.data.TRANSACTIONS_CLIENT
 import com.creditclub.core.data.api.StaticService
 import com.creditclub.core.data.api.retrofitService
+import com.creditclub.core.data.model.PendingTransaction
 import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.WithdrawalRequest
 import com.creditclub.core.type.TokenType
+import com.creditclub.core.type.TransactionType
 import com.creditclub.core.util.delegates.contentView
+import com.creditclub.core.util.delegates.defaultJson
 import com.creditclub.core.util.finishOnClose
-import com.creditclub.core.util.safeRunIO
 import com.creditclub.core.util.toString
+import io.objectbox.Box
+import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import org.koin.android.ext.android.inject
 import java.time.Instant
 
 /**
@@ -37,6 +44,8 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
 
     private val viewModel: WithdrawalViewModel by viewModels()
     private val staticService: StaticService by retrofitService()
+    private val transactionService: StaticService by retrofitService(TRANSACTIONS_CLIENT)
+    private val clusterObjectBox: ClusterObjectBox by inject()
 
     override fun onCustomerReady(savedInstanceState: Bundle?) {
         binding.lifecycleOwner = this
@@ -170,6 +179,7 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
             token = token,
             customerPin = customerPin,
             retrievalReferenceNumber = retrievalReferenceNumber,
+            deviceNumber = localStorage.deviceNumber,
             additionalInformation = Json.encodeToString(
                 WithdrawalRequest.Additional.serializer(),
                 WithdrawalRequest.Additional(
@@ -192,9 +202,34 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
 
     private suspend fun withdraw(request: WithdrawalRequest) {
         dialogProvider.showProgressBar("Processing transaction")
-        val (response, error) = safeRunIO {
-            staticService.withdrawal(request)
-        }
+        val requestTime = Instant.now()
+        val pendingTransactionsBox: Box<PendingTransaction> = clusterObjectBox.boxStore.boxFor()
+        val pendingTransaction = PendingTransaction(
+            transactionType = TransactionType.CashOut,
+            requestJson = defaultJson.encodeToString(
+                WithdrawalRequest.serializer(),
+                request,
+            ),
+            accountName = accountInfo.accountName,
+            accountNumber = request.customerAccountNumber,
+            amount = request.amount.toDouble(),
+            reference = request.retrievalReferenceNumber,
+            createdAt = requestTime,
+            lastCheckedAt = null,
+        )
+        val (response, error) = executeTransaction(
+            fetcher = { transactionService.withdrawal(request) },
+            reFetcher = {
+                transactionService.getTransactionStatusByReferenceNumber(
+                    deviceNumber = localStorage.deviceNumber,
+                    retrievalReferenceNumber = request.retrievalReferenceNumber,
+                    institutionCode = localStorage.institutionCode,
+                )
+                        },
+            pendingTransaction = pendingTransaction,
+            pendingTransactionsBox = pendingTransactionsBox,
+            dialogProvider = dialogProvider,
+        )
         dialogProvider.hideProgressBar()
 
         if (error != null) return dialogProvider.showError(error)

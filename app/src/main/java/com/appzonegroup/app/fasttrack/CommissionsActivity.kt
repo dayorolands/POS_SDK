@@ -1,12 +1,13 @@
 package com.appzonegroup.app.fasttrack
 
 import android.os.Bundle
-import com.creditclub.core.util.delegates.contentView
+import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.ui.dataBinding
 import com.creditclub.ui.databinding.ActivityCommissionsBinding
 import com.creditclub.ui.manager.ActivityCommissionsManager
 
-class CommissionsActivity : BaseActivity() {
-    private val binding by contentView<CommissionsActivity, ActivityCommissionsBinding>(R.layout.activity_commissions)
+class CommissionsActivity : CreditClubActivity(R.layout.activity_commissions) {
+    private val binding: ActivityCommissionsBinding by dataBinding()
     private val manager by lazy {
         ActivityCommissionsManager(
             this,

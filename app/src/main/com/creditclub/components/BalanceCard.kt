@@ -1,6 +1,5 @@
 package com.creditclub.components
 
-import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -13,20 +12,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.*
-import com.appzonegroup.app.fasttrack.*
 import com.appzonegroup.app.fasttrack.R
 import com.creditclub.core.data.api.StaticService
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.request.BalanceEnquiryRequest
-import com.creditclub.core.util.*
+import com.creditclub.core.util.SuspendCallback
+import com.creditclub.core.util.safeRunIO
+import com.creditclub.core.util.toCurrencyFormat
 import com.creditclub.ui.rememberBean
 import com.creditclub.ui.rememberDialogProvider
 import com.creditclub.ui.rememberRetrofitService
-import com.google.accompanist.insets.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.*
 
 @Composable
 fun BalanceCard() {
@@ -46,7 +42,7 @@ fun BalanceCard() {
     val localStorage: LocalStorage by rememberBean()
     val staticService: StaticService by rememberRetrofitService()
     val networkErrorMessage = stringResource(R.string.a_network_error_occurred)
-    val loadBalance: suspend CoroutineScope.() -> Unit = remember {
+    val loadBalance: SuspendCallback = remember {
         loadBalance@{
             val pin = dialogProvider.getPin("Agent PIN") ?: return@loadBalance
             if (pin.length != 4) {
@@ -118,7 +114,7 @@ fun BalanceCard() {
                     IconButton(
                         onClick = {
                             if (visible) visible = false
-                            else coroutineScope.launch(block = loadBalance)
+                            else coroutineScope.launch { loadBalance() }
                         },
                     ) {
                         Icon(

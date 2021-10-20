@@ -75,6 +75,6 @@ fun NavGraphBuilder.clusterNavigation(
 fun NavController.navigateToReceipt(receipt: ParcelablePrintJob, popBackStack: Boolean = true) {
     setResult(receipt, "receipt")
     currentBackStackEntry?.arguments?.putParcelable("receipt", receipt)
-    navigate(Routes.Receipt)
     if (popBackStack) popBackStack()
+    navigate(Routes.Receipt)
 }

@@ -13,7 +13,6 @@ import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardTransactionStatus
 import com.creditclub.pos.extensions.hexBytes
-import com.creditclub.pos.utils.TripleDesCipher
 import com.creditclub.pos.utils.asDesEdeKey
 import com.creditclub.pos.utils.encrypt
 import com.telpo.emv.*

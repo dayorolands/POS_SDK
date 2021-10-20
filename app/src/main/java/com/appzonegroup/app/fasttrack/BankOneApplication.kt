@@ -1,6 +1,7 @@
 package com.appzonegroup.app.fasttrack
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
@@ -10,29 +11,30 @@ import android.os.Build
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.work.Configuration
-import androidx.work.WorkManager
 import com.appzonegroup.app.fasttrack.di.*
 import com.appzonegroup.app.fasttrack.model.online.AuthResponse
 import com.appzonegroup.app.fasttrack.utility.extensions.registerWorkers
 import com.appzonegroup.app.fasttrack.utility.registerAppFunctions
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.R
 import com.creditclub.core.data.clusterObjectBoxModule
+import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.prefs.moveTo
-import com.creditclub.core.util.localStorage
 import com.squareup.picasso.Picasso
 import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidFileProperties
 import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.fragment.koin.fragmentFactory
+import org.koin.androidx.workmanager.koin.workManagerFactory
+import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 
-class BankOneApplication : CreditClubApplication() {
-
-    override val otaAppName: String
-        get() = if (Platform.isPOS) "${super.otaAppName}${Platform.posId}" else super.otaAppName
+class BankOneApplication : Application() {
+    private val appDataStorage: AppDataStorage by inject()
+    private val localStorage: LocalStorage by inject()
 
     val authResponse: AuthResponse by lazy {
         val phoneNumber = "234${localStorage.agentPhone?.substring(1)}"
@@ -61,6 +63,9 @@ class BankOneApplication : CreditClubApplication() {
         startKoin {
             androidLogger()
             androidContext(this@BankOneApplication)
+            androidFileProperties()
+            fragmentFactory()
+            workManagerFactory()
 
             modules(
                 listOf(
@@ -70,6 +75,7 @@ class BankOneApplication : CreditClubApplication() {
                     uiModule,
                     configModule,
                     sharingModule,
+                    workerModule,
                 )
             )
         }
@@ -84,12 +90,10 @@ class BankOneApplication : CreditClubApplication() {
         registerAppFunctions()
         Platform.test(this)
 
-        val myConfig = Configuration.Builder()
-            .setMinimumLoggingLevel(if (BuildConfig.DEBUG) android.util.Log.DEBUG else android.util.Log.INFO)
-            .build()
-
-        WorkManager.initialize(this, myConfig)
-        if (Platform.isPOS) startPosApp()
+        if (Platform.isPOS) {
+            loadKoinModules(posWorkerModule)
+            startPosApp()
+        }
         registerWorkers()
     }
 

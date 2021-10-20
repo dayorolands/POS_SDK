@@ -1,6 +1,7 @@
 package com.appzonegroup.app.fasttrack.work
 
 import android.content.Context
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.appzonegroup.app.fasttrack.BuildConfig
 import com.creditclub.analytics.api.MobileTrackingService
@@ -11,28 +12,29 @@ import com.creditclub.core.data.model.DeviceTransactionInformation
 import com.creditclub.core.data.model.NetworkMeasurement
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.debugOnly
+import com.creditclub.core.util.delegates.defaultJson
 import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.safeRunSuspend
 import com.google.gson.Gson
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.*
-import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
-import org.koin.core.component.get
-import org.koin.core.component.inject
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
 
 
-class MobileTrackingWorker(context: Context, params: WorkerParameters) :
-    BaseWorker(context, params) {
+class MobileTrackingWorker(
+    context: Context, params: WorkerParameters,
+    private val localStorage: LocalStorage,
+    clusterObjectBox: ClusterObjectBox,
+) : CoroutineWorker(context, params) {
 
-    private val metricsBox = get<ClusterObjectBox>().boxStore.boxFor<NetworkMeasurement>()
+    private val metricsBox = clusterObjectBox.boxStore.boxFor<NetworkMeasurement>()
     private val contentType = "application/json".toMediaType()
     private val okHttpClient = run {
         val builder = OkHttpClient().newBuilder()
@@ -48,20 +50,13 @@ class MobileTrackingWorker(context: Context, params: WorkerParameters) :
 
         builder.build()
     }
-    private val json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
-        encodeDefaults = true
-    }
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("${BuildConfig.API_HOST}/CreditClubMiddlewareAPI/")
         .client(okHttpClient)
         .addConverterFactory(NullOnEmptyConverterFactory.create())
         .addConverterFactory(ScalarsConverterFactory.create())
-        .addConverterFactory(json.asConverterFactory(contentType))
+        .addConverterFactory(defaultJson.asConverterFactory(contentType))
         .build()
     private val mobileTrackingService by retrofit.service<MobileTrackingService>()
 
@@ -87,7 +82,6 @@ class MobileTrackingWorker(context: Context, params: WorkerParameters) :
 
     private suspend fun logDeviceTransactionInfo() {
         val gson = Gson()
-        val localStorage: LocalStorage by inject()
 
         val dao = CoreDatabase.getInstance(applicationContext).deviceTransactionInformationDao()
         val allInfo = dao.findAll()

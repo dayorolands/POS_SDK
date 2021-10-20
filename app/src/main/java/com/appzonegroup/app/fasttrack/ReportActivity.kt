@@ -271,6 +271,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     amountInNaira = item.amount ?: 0.0,
                     externalTransactionReference = item.uniqueReference,
                     retrievalReferenceNumber = item.uniqueReference,
+                    deviceNumber = localStorage.deviceNumber,
                 )
                 posPrinter.print(
                     fundsTransferReceipt(
@@ -292,9 +293,10 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     customerName = item.customerName,
                     customerPhone = item.customerPhone,
                     customerEmail = null,
-                    amount = item.amount?.toString(),
+                    amount = item.amount.toString(),
                     customerDepositSlipNumber = item.uniqueReference,
                     retrievalReferenceNumber = item.uniqueReference,
+                    deviceNumber = localStorage.deviceNumber,
                     geolocation = null,
                     isRecharge = selectedTransactionType == TransactionType.Recharge,
                     validationCode = null,
@@ -326,9 +328,11 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                 val depositRequest = DepositRequest(
                     agentPhoneNumber = localStorage.agentPhone,
                     institutionCode = localStorage.institutionCode,
-                    customerAccountNumber = item.to,
-                    amount = item.amount?.toString() ?: "0.0",
+                    customerAccountNumber = item.to!!,
+                    amount = item.amount.toString(),
                     uniqueReferenceID = item.uniqueReference,
+                    retrievalReferenceNumber = item.uniqueReference,
+                    deviceNumber = localStorage.deviceNumber,
                 )
                 posPrinter.print(
                     DepositReceipt(
@@ -350,9 +354,10 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                 val withdrawalRequest = WithdrawalRequest(
                     agentPhoneNumber = localStorage.agentPhone,
                     institutionCode = localStorage.institutionCode,
-                    customerAccountNumber = item.to,
-                    amount = item.amount?.toString() ?: "0.0",
+                    customerAccountNumber = item.to!!,
+                    amount = item.amount.toString(),
                     retrievalReferenceNumber = item.uniqueReference,
+                    deviceNumber = localStorage.deviceNumber,
                 )
                 posPrinter.print(
                     WithdrawalReceipt(

@@ -3,6 +3,9 @@
     <files-path
         name="receipts"
         path="receipts/" />
+    <files-path
+        name="apks"
+        path="apks/" />
     <external-path
         name="external"
         path="." />

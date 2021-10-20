@@ -12,11 +12,15 @@ import com.creditclub.core.AppFunctions
 import com.creditclub.core.R
 import com.creditclub.core.config.InstitutionConfig
 import com.creditclub.core.data.api.AppConfig
+import com.creditclub.core.data.api.VersionService
+import com.creditclub.core.data.api.retrofitService
+import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogListenerBlock
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.getMessage
 import com.creditclub.core.util.logFunctionUsage
+import com.creditclub.core.util.safeRunIO
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -26,6 +30,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
@@ -134,4 +139,23 @@ abstract class CreditClubActivity : AppCompatActivity {
     }
 
     fun showError(exception: Exception) = showError(exception, null)
+}
+
+suspend fun getLatestVersion(
+    versionService: VersionService,
+    appDataStorage: AppDataStorage,
+    appConfig: AppConfig,
+) = safeRunIO {
+    val newVersion = versionService.getLatestVersionAndDownloadLink(appConfig.otaUpdateId)
+    if (newVersion != null) {
+        val previousVersion = appDataStorage.latestVersion
+        previousVersion?.run {
+            if (version == newVersion.version) {
+                newVersion.notifiedAt = previousVersion.notifiedAt
+            }
+        }
+        appDataStorage.latestVersion = newVersion
+    }
+
+    newVersion
 }

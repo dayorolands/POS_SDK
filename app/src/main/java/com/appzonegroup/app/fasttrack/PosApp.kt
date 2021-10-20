@@ -2,14 +2,16 @@ package com.appzonegroup.app.fasttrack
 
 import android.app.Application
 import android.os.Build
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.WorkManager
+import com.appzonegroup.app.fasttrack.utility.extensions.registerPeriodicWorker
 import com.appzonegroup.app.fasttrack.work.IsoRequestLogWorker
 import com.appzonegroup.app.fasttrack.work.ReversalWorker
 import com.appzonegroup.app.fasttrack.work.TransactionLogWorker
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.data.prefs.moveTo
-import java.util.concurrent.TimeUnit
 
 
 /**
@@ -26,31 +28,21 @@ fun Application.startPosApp() {
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
 
-    val transactionLogRequest =
-        PeriodicWorkRequestBuilder<TransactionLogWorker>(15, TimeUnit.MINUTES)
-            .setConstraints(constraints)
-            .build()
+    workManager.cancelAllWork()
 
-    workManager.enqueueUniquePeriodicWork(
-        "APP_TRANSACTION_LOG",
-        ExistingPeriodicWorkPolicy.KEEP,
-        transactionLogRequest
+    workManager.registerPeriodicWorker<TransactionLogWorker>(
+        uniqueWorkName = "APP_TRANSACTION_LOG",
+        constraints = constraints,
     )
 
-    workManager.enqueueUniquePeriodicWork(
-        "APP_ISO_REQUEST_LOG",
-        ExistingPeriodicWorkPolicy.KEEP,
-        PeriodicWorkRequestBuilder<IsoRequestLogWorker>(15, TimeUnit.MINUTES)
-            .setConstraints(constraints)
-            .build()
+    workManager.registerPeriodicWorker<IsoRequestLogWorker>(
+        uniqueWorkName = "APP_ISO_REQUEST_LOG",
+        constraints = constraints,
     )
 
-    workManager.enqueueUniquePeriodicWork(
-        "APP_REVERSAL",
-        ExistingPeriodicWorkPolicy.KEEP,
-        PeriodicWorkRequestBuilder<ReversalWorker>(15, TimeUnit.MINUTES)
-            .setConstraints(constraints)
-            .build()
+    workManager.registerPeriodicWorker<ReversalWorker>(
+        uniqueWorkName = "APP_REVERSAL",
+        constraints = constraints,
     )
 
 //    if (get<ConfigService>().terminalId.isNotEmpty()) {

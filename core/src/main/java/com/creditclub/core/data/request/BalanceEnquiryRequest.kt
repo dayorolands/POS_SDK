@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
-data class BalanceEnquiryRequest(
+data class BalanceEnquiryRequest (
     @SerialName("AgentPhoneNumber")
     val agentPhoneNumber: String? = null,
 
@@ -28,4 +28,10 @@ data class BalanceEnquiryRequest(
 
     @SerialName("AdditionalInformation")
     val additionalInformation: String? = null,
+
+    @SerialName("RetrievalReferenceNumber")
+    val retrievalReferenceNumber: String? = null,
+
+    @SerialName("DeviceNumber")
+    val deviceNumber: Int? = null,
 )

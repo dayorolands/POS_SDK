@@ -2,16 +2,20 @@ package com.appzonegroup.app.fasttrack.di
 
 import android.app.Activity
 import android.content.Context
+import androidx.work.WorkerParameters
 import com.appzonegroup.app.fasttrack.BuildConfig
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.app.LocalInstitutionConfig
 import com.appzonegroup.app.fasttrack.ui.CreditClubDialogProvider
+import com.appzonegroup.app.fasttrack.work.*
+import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.analytics.NetworkMetricsInterceptor
 import com.creditclub.core.config.InstitutionConfig
 import com.creditclub.core.data.*
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.api.AuthInterceptor
 import com.creditclub.core.data.api.RequestFailureInterceptor
+import com.creditclub.core.data.api.getRetrofitService
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogProvider
@@ -22,6 +26,7 @@ import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.io.File
@@ -33,7 +38,7 @@ import java.util.concurrent.TimeUnit
  * Appzone Ltd
  */
 
-private const val CACHE_SIZE = 50L * 1024L * 1024L // 50 MB
+const val CACHE_SIZE = 50L * 1024L * 1024L // 50 MB
 
 val dataModule = module {
     single { LocalStorage(androidContext()) }
@@ -112,6 +117,14 @@ val configModule = module {
             override val apiHost = BuildConfig.API_HOST
             override val posNotificationToken = BuildConfig.NOTIFICATION_TOKEN
             override val appName = androidContext().getString(R.string.app_name)
+            override val otaUpdateId = run {
+                val baseOtaAppName = androidContext().getString(R.string.ota_app_name)
+                if (Platform.isPOS) {
+                    "${baseOtaAppName}${Platform.posId}"
+                } else {
+                    baseOtaAppName
+                }
+            }
             override val versionName = BuildConfig.VERSION_NAME
             override val versionCode = BuildConfig.VERSION_CODE
             override val fileProviderAuthority = "${BuildConfig.APPLICATION_ID}.provider"
@@ -122,5 +135,58 @@ val configModule = module {
 val sharingModule = module {
     factory<PosPrinter> { (context: Activity, dialogProvider: DialogProvider) ->
         PdfPrinter(context, dialogProvider)
+    }
+}
+
+val workerModule = module {
+    worker { (workerParams: WorkerParameters) ->
+        AppUpdateWorker(
+            context = androidContext(),
+            params = workerParams,
+            appDataStorage = get(),
+            appConfig = get(),
+            okHttpClient = get(),
+            versionService = getRetrofitService(),
+        )
+    }
+    worker { (workerParams: WorkerParameters) ->
+        MobileTrackingWorker(
+            context = androidContext(),
+            params = workerParams,
+            localStorage = get(),
+            clusterObjectBox = get(),
+        )
+    }
+}
+
+val posWorkerModule = module {
+    worker { (workerParams: WorkerParameters) ->
+        ReversalWorker(
+            context = androidContext(),
+            params = workerParams,
+        )
+    }
+    worker { (workerParams: WorkerParameters) ->
+        TransactionLogWorker(
+            context = androidContext(),
+            params = workerParams,
+        )
+    }
+    worker { (workerParams: WorkerParameters) ->
+        PosNotificationWorker(
+            context = androidContext(),
+            params = workerParams,
+            localStorage = get(),
+            posDatabase = get(),
+            appConfig = get(),
+            configService = get(),
+            creditClubMiddleWareAPI = get(named(MIDDLEWARE_CLIENT)),
+        )
+    }
+    worker { (workerParams: WorkerParameters) ->
+        IsoRequestLogWorker(
+            context = androidContext(),
+            params = workerParams,
+        )
     }
 }

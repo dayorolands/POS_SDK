@@ -12,8 +12,10 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.core.app.ActivityCompat
-import com.creditclub.core.CreditClubApplication
+import com.creditclub.core.data.api.VersionService
+import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.prefs.AppDataStorage
+import com.creditclub.core.ui.getLatestVersion
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.packageInfo
 import com.creditclub.ui.databinding.ActivityUpdateBinding
@@ -26,6 +28,7 @@ class UpdateActivity : CreditClubActivity(R.layout.activity_update) {
     private var latestVersion = appDataStorage.latestVersion
     private val fileName get() = "${getString(R.string.ota_app_name)}${latestVersion?.version}.apk"
     private var isProcessing = false
+    private val versionService: VersionService by retrofitService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +60,11 @@ class UpdateActivity : CreditClubActivity(R.layout.activity_update) {
         binding.progressBar.visibility = View.VISIBLE
 
         mainScope.launch {
-            val error = (application as CreditClubApplication).getLatestVersion().error
+            val error = getLatestVersion(
+                versionService = versionService,
+                appConfig = appConfig,
+                appDataStorage = appDataStorage,
+            ).error
 
             if (error != null) return@launch dialogProvider.showError(error) {
                 onClose {
@@ -67,7 +74,7 @@ class UpdateActivity : CreditClubActivity(R.layout.activity_update) {
 
             latestVersion = appDataStorage.latestVersion
 
-            if (latestVersion?.updateIsAvailable(packageInfo!!.versionName) != true) {
+            if (latestVersion?.isNewerThan(packageInfo!!.versionName) != true) {
                 val message =
                     "Congratulations. You're on the latest version of ${getString(R.string.app_name)}"
                 dialogProvider.showSuccess(message) {
@@ -149,7 +156,7 @@ class UpdateActivity : CreditClubActivity(R.layout.activity_update) {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {

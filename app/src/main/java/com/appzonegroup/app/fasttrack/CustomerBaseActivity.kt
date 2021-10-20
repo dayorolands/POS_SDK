@@ -2,6 +2,11 @@ package com.appzonegroup.app.fasttrack
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.MenuItem
+import android.view.View
+import android.widget.EditText
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,10 +18,11 @@ import com.creditclub.core.data.model.AccountInfo
 import com.creditclub.core.data.model.AgentFee
 import com.creditclub.core.data.response.GenericResponse
 import com.creditclub.core.type.CustomerRequestOption
+import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.util.SuspendCallback
 import com.creditclub.pos.printer.PrintJob
 import com.creditclub.ui.theme.CreditClubTheme
 import com.google.accompanist.insets.ProvideWindowInsets
-import kotlinx.coroutines.CoroutineScope
 import java.util.*
 
 
@@ -26,7 +32,7 @@ import java.util.*
  */
 
 @SuppressLint("Registered")
-abstract class CustomerBaseActivity(protected var flowName: String? = null) : BaseActivity() {
+abstract class CustomerBaseActivity(protected var flowName: String? = null) : CreditClubActivity() {
     protected var accountInfo = AccountInfo()
     protected var flowId: String? = UUID.randomUUID().toString().substring(0, 8)
 
@@ -53,10 +59,10 @@ abstract class CustomerBaseActivity(protected var flowName: String? = null) : Ba
 
     abstract fun onCustomerReady(savedInstanceState: Bundle?)
 
-    fun renderTransactionSummary(
+    protected fun renderTransactionSummary(
         amount: Double,
-        onProceed: suspend CoroutineScope.() -> Unit,
-        fetchFeeAgent: suspend CoroutineScope.() -> GenericResponse<AgentFee>?,
+        onProceed: SuspendCallback,
+        fetchFeeAgent: suspend () -> GenericResponse<AgentFee>?,
     ) {
         setContent {
             TransactionSummary(
@@ -68,7 +74,7 @@ abstract class CustomerBaseActivity(protected var flowName: String? = null) : Ba
         }
     }
 
-    fun renderReceiptDetails(receipt: PrintJob) {
+    protected fun renderReceiptDetails(receipt: PrintJob) {
         setContent {
             val navController = rememberNavController()
             CreditClubTheme {
@@ -87,4 +93,69 @@ abstract class CustomerBaseActivity(protected var flowName: String? = null) : Ba
             }
         }
     }
+
+    fun addValidPhoneNumberListener(editText: EditText) {
+
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                phoneNumberEditTextFilter(editText, this)
+            }
+
+            override fun afterTextChanged(s: Editable) {
+
+            }
+        })
+    }
+
+    fun phoneNumberEditTextFilter(editText: EditText, textWatcher: TextWatcher) {
+        val numbers = "0123456789"
+
+        val text = editText.text.toString().trim { it <= ' ' }
+
+        val textToCharArray = text.toCharArray()
+
+        val accumulator = StringBuilder()
+
+        for (c in textToCharArray) {
+            if (numbers.contains(c + "")) {
+                accumulator.append(c)
+            }
+        }
+        editText.removeTextChangedListener(textWatcher)
+
+        //This line without the line before and after will cause endless loop
+        //of call to the text changed listener
+        editText.setText(accumulator)
+        editText.addTextChangedListener(textWatcher)
+        editText.setSelection(accumulator.length)
+    }
+
+    fun goBack(v: View) {
+        onBackPressed()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun showError(message: String?) = dialogProvider.showError(message)
+
+    fun showSuccess(message: String?) = dialogProvider.showSuccess(message)
+
+    open fun indicateError(message: String?, view: EditText?) =
+        dialogProvider.indicateError(message, view)
+
+    fun showProgressBar(title: String) = dialogProvider.showProgressBar(title)
+
+    fun hideProgressBar() = dialogProvider.hideProgressBar()
 }

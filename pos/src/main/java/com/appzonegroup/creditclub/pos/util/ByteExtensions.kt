@@ -31,8 +31,8 @@ infix fun ByteArray.xor(other: ByteArray): ByteArray {
 
 inline val ByteArray.hexString: String
     get() {
+        if (isEmpty()) return ""
         val stringBuilder = StringBuilder("")
-        if (size <= 0) return ""
         val buffer = CharArray(2)
         for (i in indices) {
             buffer[0] = Character.forDigit(get(i).toInt() ushr 4 and 0x0F, 16)

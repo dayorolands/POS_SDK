@@ -20,6 +20,7 @@ import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.api.StaticService
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.request.PinChangeRequest
+import com.creditclub.core.util.SuspendCallback
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.ui.*
 import kotlinx.coroutines.CoroutineScope
@@ -40,7 +41,7 @@ fun PinChange(navController: NavController) {
     val staticService: StaticService by rememberRetrofitService()
     val localStorage: LocalStorage by rememberBean()
 
-    val changePin: suspend CoroutineScope.() -> Unit =
+    val changePin: SuspendCallback =
         remember(confirmNewPin, oldPin, newPin) {
             changePin@{
                 if (oldPin.isEmpty()) {

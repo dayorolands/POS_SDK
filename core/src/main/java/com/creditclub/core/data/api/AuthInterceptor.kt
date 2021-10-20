@@ -12,6 +12,7 @@ class AuthInterceptor(
         val request = chain.request()
         val newRequestBuilder = request.newBuilder().apply {
             addHeader("Device-Id", appDataStorage.deviceId ?: "unknown")
+            addHeader("App-Name", appConfig.otaUpdateId)
             addHeader("App-Version", appConfig.versionName)
         }
 

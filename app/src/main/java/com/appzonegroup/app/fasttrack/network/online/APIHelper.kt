@@ -24,13 +24,13 @@ import java.util.concurrent.TimeoutException
 
 class APIHelper @JvmOverloads constructor(
     private val ctx: Context,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
 ) {
     private val koin = GlobalContext.get()
     private val localStorage: LocalStorage by koin.inject()
     private val client: CreditClubClient by koin.inject()
 
-    fun interface VolleyCallback<T> {
+    fun interface Callback<T> {
         fun onCompleted(e: Exception?, result: T?, status: Boolean)
     }
 
@@ -40,7 +40,7 @@ class APIHelper @JvmOverloads constructor(
         activationCode: String,
         location: String,
         state: Boolean,
-        callback: VolleyCallback<String>
+        callback: Callback<String>,
     ) {
         Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId)
         val url = BankOneService.UrlGenerator.operationInit(
@@ -63,7 +63,7 @@ class APIHelper @JvmOverloads constructor(
         activationCode: String,
         location: String,
         state: Boolean,
-        callback: VolleyCallback<String>
+        callback: Callback<String>,
     ) {
 
         Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId)
@@ -86,7 +86,7 @@ class APIHelper @JvmOverloads constructor(
         sessionId: String?,
         next: String,
         location: String,
-        callback: VolleyCallback<String>
+        callback: Callback<String>,
     ) {
         Misc.increaseTransactionMonitorCounter(ctx, TransactionCountType.REQUEST_COUNT, sessionId)
 
@@ -219,7 +219,7 @@ class APIHelper @JvmOverloads constructor(
 
     private inline fun handleRequest(
         url: String,
-        crossinline block: (SafeRunResult<String?>) -> Unit
+        crossinline block: (SafeRunResult<String?>) -> Unit,
     ) {
         scope.launch {
             val result = safeRunIO {

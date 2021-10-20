@@ -3,7 +3,6 @@ package com.creditclub.core.data.api
 import com.creditclub.core.data.model.*
 import com.creditclub.core.data.request.*
 import com.creditclub.core.data.response.*
-import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -19,6 +18,13 @@ interface StaticService {
     suspend fun status(
         @Query("reference") reference: String,
         @Query("type") type: Int
+    ): BackendResponse?
+
+    @GET("CreditClubStatic/GetTransactionStatusByReferenceNumber")
+    suspend fun getTransactionStatusByReferenceNumber(
+        @Query("deviceNumber") deviceNumber: Int,
+        @Query("retrievalReferenceNumber") retrievalReferenceNumber: String,
+        @Query("institutionCode") institutionCode: String?,
     ): BackendResponse?
 
     @POST("CreditClubStatic/BalanceEnquiry")
@@ -58,7 +64,7 @@ interface StaticService {
     suspend fun pinChange(@Body request: PinChangeRequest): BackendResponse?
 
     @POST("CreditClubStatic/LoanRequest")
-    suspend fun loanRequest(): BackendResponse?
+    suspend fun loanRequest(request: LoanRequestCreditClub): BackendResponse?
 
     @GET("CreditClubStatic/AgentVerification")
     suspend fun agentVerification(
@@ -84,10 +90,10 @@ interface StaticService {
         @Query("associationID") associationID: String,
         @Query("memberID") memberID: String,
         @Query("customerAccountNumber") customerAccountNumber: String
-    ): ResponseBody
+    ): List<LoanProduct>
 
     @GET("CreditClubStatic/GetAllLoanProducts")
-    suspend fun getAllLoanProducts(@Query("institutionCode") institutionCode: String?): ResponseBody
+    suspend fun getAllLoanProducts(@Query("institutionCode") institutionCode: String?): List<LoanProduct>
 
     @GET("CreditClubStatic/GetAllProducts")
     suspend fun getAllProducts(

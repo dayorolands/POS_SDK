@@ -9,18 +9,26 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.BillPaymentFragmentBinding
+import com.appzonegroup.app.fasttrack.executeTransaction
 import com.appzonegroup.app.fasttrack.receipt.billsPaymentReceipt
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
+import com.creditclub.core.data.ClusterObjectBox
 import com.creditclub.core.data.api.BillsPaymentService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.BillCategory
+import com.creditclub.core.data.model.PendingTransaction
 import com.creditclub.core.data.model.ValidateCustomerInfoRequest
 import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.PayBillRequest
+import com.creditclub.core.type.TransactionType
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
+import com.creditclub.core.util.delegates.defaultJson
+import io.objectbox.Box
+import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import java.time.Instant
 
 class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
@@ -30,6 +38,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     override val functionId = FunctionIds.PAY_BILL
     private val uniqueReference by lazy { localStorage.newTransactionReference() }
     private val billsPaymentService: BillsPaymentService by retrofitService()
+    private val clusterObjectBox: ClusterObjectBox by inject()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -297,7 +306,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             customerId = viewModel.fieldOne.value,
             merchantBillerIdField = viewModel.item.value?.billerId?.toString(),
             billItemID = billerItem.id,
-            amount = viewModel.amountString.value,
+            amount = viewModel.amountString.value!!,
             billerCategoryID = category.id,
             customerEmail = customerEmailValue,
             accountNumber = localStorage.agentPhone,
@@ -316,12 +325,32 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             geolocation = localStorage.lastKnownLocation,
             isRecharge = isAirtime,
             retrievalReferenceNumber = uniqueReference,
+            deviceNumber = localStorage.deviceNumber,
             validationCode = viewModel.customerValidationResponse.value?.validationCode,
         )
         dialogProvider.showProgressBar("Processing request")
-        val (response, error) = safeRunIO {
-            billsPaymentService.runTransaction(request)
-        }
+        val requestTime = Instant.now()
+        val pendingTransactionsBox: Box<PendingTransaction> = clusterObjectBox.boxStore.boxFor()
+        val pendingTransaction = PendingTransaction(
+            transactionType = if (isAirtime) TransactionType.Recharge else TransactionType.BillsPayment,
+            requestJson = defaultJson.encodeToString(
+                PayBillRequest.serializer(),
+                request,
+            ),
+            accountName = billerItem.name!!,
+            accountNumber = viewModel.customerName.value ?: "",
+            amount = request.amount.toDouble(),
+            reference = request.retrievalReferenceNumber,
+            createdAt = requestTime,
+            lastCheckedAt = null,
+        )
+        val (response, error) = executeTransaction(
+            fetcher = { billsPaymentService.runTransaction(request) },
+            reFetcher = { billsPaymentService.billPaymentStatus(request) },
+            pendingTransaction = pendingTransaction,
+            pendingTransactionsBox = pendingTransactionsBox,
+            dialogProvider = dialogProvider,
+        )
         dialogProvider.hideProgressBar()
         if (error != null) {
             dialogProvider.showErrorAndWait(error)

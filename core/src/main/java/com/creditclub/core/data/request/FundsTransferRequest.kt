@@ -61,6 +61,9 @@ data class FundsTransferRequest(
 
     @SerialName("RetrievalReferenceNumber")
     val retrievalReferenceNumber: String?,
+
+    @SerialName("DeviceNumber")
+    val deviceNumber: Int? = null,
 ) {
     @Serializable
     data class Additional(

@@ -5,8 +5,10 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.creditclub.core.R
 import com.creditclub.core.data.model.AppVersion
+import com.creditclub.core.util.delegates.defaultJson
+import com.creditclub.core.util.delegates.jsonStore
 import com.creditclub.core.util.delegates.valueStore
-import kotlinx.serialization.json.Json
+import java.io.File
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
@@ -17,31 +19,35 @@ class AppDataStorage(
     pref: SharedPreferences = context.getSharedPreferences(
         context.getString(R.string.APP_DATA_SOURCE),
         Context.MODE_PRIVATE
-    )
+    ),
 ) : SharedPreferences by pref {
-    private val json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-        allowSpecialFloatingPointValues = true
-        useArrayPolymorphism = true
-        encodeDefaults = true
-    }
-    private var latestVersionJson: String? by valueStore("LATEST_VERSION_JSON")
     var networkState: String? by valueStore("network_state")
     var networkCarrier: String? by valueStore("network_carrier")
     var deviceId: String? by valueStore("device_id")
-
-    var latestVersion: AppVersion?
-        get() = if (latestVersionJson != null) {
-            json.decodeFromString(
-                AppVersion.serializer(),
-                latestVersionJson!!
-            )
-        } else null
-        set(value) {
-            latestVersionJson = if (value != null) {
-                json.encodeToString(AppVersion.serializer(), value)
-            } else null
+    var latestVersion: AppVersion? by jsonStore(
+        key = "LATEST_VERSION_JSON",
+        json = defaultJson,
+        serializer = AppVersion.serializer(),
+    )
+    private val otaAppName = context.getString(R.string.ota_app_name)
+    private val filesDirPath = context.filesDir.path
+    val latestApkFileName: String?
+        get() {
+            val appVersion = latestVersion ?: return null
+            return "$otaAppName${appVersion.version}.apk"
+        }
+    val latestApkFile: File?
+        get() {
+            val fileName = latestApkFileName ?: return null
+            val apkFolder = File(filesDirPath, "apks")
+            if (!apkFolder.exists()) {
+                apkFolder.mkdir()
+            }
+            val file = File("${apkFolder.path}/${fileName}")
+            if (file.exists()) {
+                file.delete()
+            }
+            return file
         }
 
     fun getString(key: String): String? = getString(key, null)

@@ -32,7 +32,7 @@ class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
         (requireActivity().application as BankOneApplication).authResponse
     }
     private val binding by dataBinding<FragmentEnterDetailBinding>()
-    private val ah by lazy { APIHelper(requireActivity()) }
+    private val ah by lazy { APIHelper(requireActivity(), mainScope) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

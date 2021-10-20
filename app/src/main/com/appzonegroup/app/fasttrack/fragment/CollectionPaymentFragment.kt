@@ -19,6 +19,7 @@ import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.api.CollectionsService
 import com.creditclub.core.data.api.retrofitService
+import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.data.request.CollectionPaymentRequest
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.safeRunIO
@@ -49,7 +50,9 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        if (viewModel.retrievalReferenceNumber.value.isNullOrBlank()) {
+            viewModel.retrievalReferenceNumber.value = localStorage.newTransactionReference()
+        }
         binding.viewModel = viewModel
         binding.toolbar.title = "IGR Collections"
         mainScope.launch { loadRegions() }
@@ -157,7 +160,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         dependencyName: String,
         currentValue: List<String>?,
         autoCompleteTextView: AutoCompleteTextView,
-        crossinline fetcher: suspend () -> List<String>?
+        crossinline fetcher: suspend () -> List<String>?,
     ) {
         val items = if (currentValue == null) {
             dialogProvider.showProgressBar("Loading $dependencyName")
@@ -255,7 +258,9 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             agentPhoneNumber = localStorage.agentPhone
             collectionService = viewModel.collectionService.value
             requestReference = uniqueReference
+            retrievalReferenceNumber = viewModel.retrievalReferenceNumber.value
             additionalInformation = Json.encodeToString(serializer, additional)
+            deviceNumber = localStorage.deviceNumber
         }
         dialogProvider.showProgressBar("Processing request")
         val (response, error) = safeRunIO {

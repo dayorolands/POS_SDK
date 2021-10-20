@@ -1,5 +1,6 @@
 package com.creditclub.core.data.response
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -16,8 +17,9 @@ enum class RetryPolicy {
 
 @Serializable
 open class BackendResponse {
+    @OptIn(ExperimentalSerializationApi::class)
     @SerialName("ReponseMessage")
-    var responseMessage: String? = null
+    open val responseMessage: String? = null
         get() = if (field.isNullOrEmpty()) message else field
 
     @SerialName("IsSuccessful")
@@ -37,7 +39,10 @@ open class BackendResponse {
 }
 
 @Serializable
-open class AgentActivationResponse : BackendResponse() {
+class AgentActivationResponse(
     @SerialName("TransactionSequenceNumber")
-    val transactionSequenceNumber: Long = 0
-}
+    val transactionSequenceNumber: Long = 0,
+
+    @SerialName("DeviceNumber")
+    val deviceNumber: Int = 0,
+) : BackendResponse()

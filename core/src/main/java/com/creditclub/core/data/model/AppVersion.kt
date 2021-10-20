@@ -25,10 +25,10 @@ data class AppVersion(
     var notifiedAt: LocalDate = LocalDate.now()
 
     fun updateIsRequired(currentVersion: String): Boolean {
-        return gracePeriod != null && updateIsAvailable(currentVersion) && daysOfGraceLeft() < 1
+        return gracePeriod != null && isNewerThan(currentVersion) && daysOfGraceLeft() < 1
     }
 
-    fun updateIsAvailable(currentVersion: String): Boolean {
+    fun isNewerThan(currentVersion: String): Boolean {
         return Version(version) > Version(currentVersion)
     }
 

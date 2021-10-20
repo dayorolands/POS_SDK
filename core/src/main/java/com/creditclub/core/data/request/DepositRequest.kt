@@ -15,10 +15,10 @@ data class DepositRequest(
     val geoLocation: String? = null,
 
     @SerialName("CustomerAccountNumber")
-    val customerAccountNumber: String? = null,
+    val customerAccountNumber: String,
 
     @SerialName("Amount")
-    val amount: String? = null,
+    val amount: String,
 
     @SerialName("AgentPin")
     val agentPin: String? = null,
@@ -27,7 +27,10 @@ data class DepositRequest(
     val additionalInformation: String? = null,
 
     @SerialName("RetrievalReferenceNumber")
-    val retrievalReferenceNumber: String? = null,
+    val retrievalReferenceNumber: String,
+
+    @SerialName("DeviceNumber")
+    val deviceNumber: Int? = null,
 
     @SerialName("UniqueReferenceID")
     val uniqueReferenceID: String? = null,

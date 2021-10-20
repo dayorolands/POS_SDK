@@ -5,10 +5,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.creditclub.core.data.model.AgentInfo
 import com.creditclub.core.data.model.AuthResponse
-import com.creditclub.core.util.delegates.defaultJson
-import com.creditclub.core.util.delegates.jsonStore
-import com.creditclub.core.util.delegates.longStore
-import com.creditclub.core.util.delegates.valueStore
+import com.creditclub.core.util.delegates.*
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
@@ -16,7 +13,7 @@ import com.creditclub.core.util.delegates.valueStore
  */
 class LocalStorage(
     context: Context,
-    pref: SharedPreferences = context.getEncryptedSharedPreferences("agent_0")
+    pref: SharedPreferences = context.getEncryptedSharedPreferences("agent_0"),
 ) : SharedPreferences by pref {
     var cacheAuth: String? by valueStore(KEY_AUTH)
     var institutionCode: String? by valueStore(INSTITUTION_CODE)
@@ -27,6 +24,7 @@ class LocalStorage(
     val authResponse: AuthResponse? by jsonStore(KEY_AUTH, AuthResponse.serializer(), defaultJson)
     var agent: AgentInfo? by jsonStore(AGENT_INFO, AgentInfo.serializer(), defaultJson)
     var transactionSequenceNumber: Long by longStore("transaction_sequence_number", 1)
+    var deviceNumber: Int by intStore("device_number", 1)
 
     fun getString(key: String): String? = getString(key, null)
 

@@ -141,6 +141,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     beneficiaryAccountNumber = receiverAccountNumber,
                     beneficiaryInstitutionCode = bank?.code,
                     retrievalReferenceNumber = transactionReference,
+                    deviceNumber = localStorage.deviceNumber,
                 )
 
                 loadingMessage = "Validating account information"
@@ -209,6 +210,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     beneficiaryKYC = nameEnquiryResponse!!.beneficiaryKYC,
                     nameEnquirySessionID = nameEnquiryResponse!!.nameEnquirySessionID,
                     retrievalReferenceNumber = transactionReference,
+                    deviceNumber = localStorage.deviceNumber,
                 )
 
                 loadingMessage = if (transferAttemptCount > 0) {

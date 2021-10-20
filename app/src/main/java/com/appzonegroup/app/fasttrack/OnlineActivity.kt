@@ -5,14 +5,12 @@ import android.os.Bundle
 import android.text.Html
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.appzonegroup.app.fasttrack.fragment.online.EnterDetailFragment
 import com.appzonegroup.app.fasttrack.fragment.online.ListOptionsFragment
 import com.appzonegroup.app.fasttrack.model.TransactionCountType
 import com.appzonegroup.app.fasttrack.model.online.Response
 import com.appzonegroup.app.fasttrack.network.online.APIHelper
-import com.appzonegroup.app.fasttrack.utility.Dialogs
 import com.appzonegroup.app.fasttrack.utility.Misc
 import com.appzonegroup.app.fasttrack.utility.online.ErrorMessages
 import com.appzonegroup.app.fasttrack.utility.online.convertXmlToJson
@@ -175,7 +173,7 @@ class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
                                     object : DialogInterface.OnClickListener {
                                         override fun onClick(
                                             dialogInterface: DialogInterface,
-                                            i: Int
+                                            i: Int,
                                         ) {
                                             goHome()
                                         }
@@ -221,13 +219,13 @@ class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
     }
 
     private fun showCloseDialog() {
-        val dialog = Dialogs.getQuestionDialog(this, "Go Offline?")
-        dialog.findViewById<View>(R.id.cancel_btn).setOnClickListener { dialog.dismiss() }
-        dialog.findViewById<View>(R.id.ok_btn).setOnClickListener {
-            dialog.dismiss()
-            finish()
+        dialogProvider.confirm("Go Offline?") {
+            onSubmit {
+                if (it) {
+                    finish()
+                }
+            }
         }
-        dialog.show()
     }
 
     companion object {

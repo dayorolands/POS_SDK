@@ -2,16 +2,12 @@ package com.appzonegroup.creditclub.pos
 
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.service.ParameterService
-import com.appzonegroup.creditclub.pos.service.defaultManagementData
 import com.appzonegroup.creditclub.pos.util.*
+import com.appzonegroup.creditclub.pos.util.xor
 import com.creditclub.core.CreditClubException
 import com.creditclub.core.util.debug
 import com.creditclub.core.util.debugOnly
-import com.creditclub.core.util.safeRun
-import com.creditclub.pos.DukptConfig
-import com.creditclub.pos.PosParameter
-import com.creditclub.pos.RemoteConnectionInfo
-import com.creditclub.pos.RequeryConfig
+import com.creditclub.pos.*
 import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.utils.asDesEdeKey
 import com.creditclub.pos.utils.decrypt
@@ -60,7 +56,10 @@ class KeyDownloadTest : PosParameter {
 
     @Test
     fun keys_downloadProperly() {
-        runBlocking { downloadKeys() }
+        runBlocking {
+            downloadKeys()
+//            downloadParameters(terminalId = TERMINAL_ID)
+        }
     }
 
     @Test
@@ -75,29 +74,29 @@ class KeyDownloadTest : PosParameter {
     }
 
     override suspend fun downloadKeys() {
-        val masterKeyBytes = downloadKey(
-            processingCode = "9A0000",
-            key = posMode.key1.hexBytes xor posMode.key2.hexBytes,
-        )
-        val sessionKeyBytes = downloadKey(
-            processingCode = "9B0000",
-            key = masterKeyBytes,
-        )
-        val pinKeyBytes = downloadKey(
-            processingCode = "9G0000",
-            key = masterKeyBytes,
-        )
+        posMode.tcp().use { client ->
+            val masterKeyBytes = client.downloadKey(
+                processingCode = "9A0000",
+                key = posMode.key1.hexBytes xor posMode.key2.hexBytes,
+            )
+            val sessionKeyBytes = client.downloadKey(
+                processingCode = "9B0000",
+                key = masterKeyBytes,
+            )
+            val pinKeyBytes = client.downloadKey(
+                processingCode = "9G0000",
+                key = masterKeyBytes,
+            )
 
-        masterKey = masterKeyBytes.hexString
-        sessionKey = sessionKeyBytes.hexString
-        pinKey = pinKeyBytes.hexString
-
-        downloadParameters(terminalId = TERMINAL_ID)
+            masterKey = masterKeyBytes.hexString
+            sessionKey = sessionKeyBytes.hexString
+            pinKey = pinKeyBytes.hexString
+        }
 
         assert(true)
     }
 
-    private fun downloadKey(processingCode: String, key: ByteArray): ByteArray {
+    private fun TcpClient.downloadKey(processingCode: String, key: ByteArray): ByteArray {
         val dateParams = TransmissionDateParams()
         val isoMsg = ISOMsg().apply {
             packager = ISO87Packager()
@@ -109,7 +108,8 @@ class KeyDownloadTest : PosParameter {
             localTransactionDate13 = dateParams.localDate
             terminalId41 = TERMINAL_ID
         }
-        val output = SocketJob.execute(posMode, isoMsg.pack())
+        val input = isoMsg.pack()
+        val output = sendAndReceive(input)
         isoMsg.unpack(output)
 
         if (isoMsg.hasFailed) {
@@ -129,7 +129,7 @@ class KeyDownloadTest : PosParameter {
     }
 
 
-    fun downloadParameters(terminalId: String) {
+    private fun downloadParameters(terminalId: String) {
         val dateParams = TransmissionDateParams()
 
         val isoMsg = ISOMsg().apply {
@@ -157,14 +157,8 @@ class KeyDownloadTest : PosParameter {
 
         debugOnly { isoMsg.log() }
 
-        val (output, error) = safeRun {
-            SocketJob.execute(posMode, finalMsgBytes)
-        }
-        if (output == null) {
-            if (error != null) throw error
-        } else {
-            isoMsg.unpack(output)
-        }
+        val output = SocketJob.execute(posMode, finalMsgBytes)
+        isoMsg.unpack(output)
 
         debugOnly { isoMsg.log() }
 
@@ -173,7 +167,7 @@ class KeyDownloadTest : PosParameter {
             throw ParameterService.ParameterDownloadException(isoMsg.responseMessage)
         }
         val tlvString =
-            isoMsg.getString(62)
+            isoMsg.managementDataOne62
                 ?: throw ParameterService.ParameterDownloadException("No management data")
         managementDataString = parsePrivateFieldDataBlock(tlvString = tlvString).toString()
     }

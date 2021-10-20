@@ -13,21 +13,23 @@
 #-forceprocessing
 -optimizationpasses 5
 
+# remove verbose logging
 -assumenosideeffects class android.util.Log {
-    public static *** v(...);
-    public static *** d(...);
-    public static *** i(...);
-    public static *** w(...);
-    public static *** e(...);
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
 }
-# no logging in production
--assumenosideeffects class android.util.Log {
-  v(...);
-  d(...);
-  i(...);
-  w(...);
-  e(...);
-  println(...);
+-assumenosideeffects class * implements org.slf4j.Logger {
+    public *** trace(...);
+    public *** debug(...);
+    public *** info(...);
+    public *** warn(...);
+}
+-assumevalues class android.os.Build$VERSION {
+   int SDK_INT return 21..2147483647;
 }
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface

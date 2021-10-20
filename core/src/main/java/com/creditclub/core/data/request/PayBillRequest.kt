@@ -54,7 +54,7 @@ data class PayBillRequest(
     val customerPhone: String?,
 
     @SerialName("Amount")
-    val amount: String?,
+    val amount: String,
 
     @SerialName("InstitutionCode")
     val institutionCode: String?,
@@ -66,7 +66,10 @@ data class PayBillRequest(
     val isRecharge: Boolean,
 
     @SerialName("RetrievalReferenceNumber")
-    val retrievalReferenceNumber: String?,
+    val retrievalReferenceNumber: String,
+
+    @SerialName("DeviceNumber")
+    val deviceNumber: Int? = null,
 
     @SerialName("ValidationCode")
     val validationCode: String?,

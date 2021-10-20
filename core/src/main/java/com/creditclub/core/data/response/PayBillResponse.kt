@@ -5,17 +5,15 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class PayBillResponse(
-    @SerialName("ResponseCode")
-    val responseCode: String? = "",
     @SerialName("ResponseMessage")
-    val responseMessage: String? = "",
+    override val responseMessage: String? = "",
     @SerialName("IsSuccessFul")
     val isSuccessFul: Boolean? = false,
     @SerialName("Reference")
     val reference: String? = "",
     @SerialName("AdditionalInformation")
     val additionalInformation: String? = null,
-) {
+) : BackendResponse() {
     @Serializable
     data class AdditionalInformation(
         @SerialName("CustomerAddress")

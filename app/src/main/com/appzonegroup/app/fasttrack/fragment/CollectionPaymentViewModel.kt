@@ -11,8 +11,10 @@ import com.creditclub.core.data.model.CollectionCustomer
 import com.creditclub.core.data.model.CollectionPaymentItem
 import com.creditclub.core.data.model.CollectionReference
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.serialization.SerialName
 
 class CollectionPaymentViewModel : ViewModel() {
+    val retrievalReferenceNumber: MutableLiveData<String> = MutableLiveData()
     val collectionReference: MutableLiveData<CollectionReference> = MutableLiveData()
     val collectionReferenceItemCode = Transformations.map(collectionReference) { it?.itemCode }
     val collectionReferenceCategoryCode =

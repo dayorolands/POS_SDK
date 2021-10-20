@@ -9,12 +9,18 @@ import androidx.databinding.DataBindingUtil
 import com.appzonegroup.app.fasttrack.databinding.TransactionStatusFragmentBinding
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.activity.ReceiptActivity
+import com.creditclub.core.data.model.PendingTransaction
+import com.creditclub.core.data.response.BackendResponse
 import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.util.toCurrencyFormat
+import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.*
 import com.creditclub.pos.printer.ParcelablePrintJob
 import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.pos.printer.PrintJob
 import com.creditclub.pos.printer.PrinterStatus
+import io.objectbox.Box
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
 import org.koin.android.ext.android.get
 import org.koin.core.parameter.parametersOf
 
@@ -23,7 +29,7 @@ internal fun CreditClubActivity.renderTransactionStatusPage(
     amount: Long,
     isSuccessful: Boolean,
     responseMessage: String?,
-    receipt: PrintJob?
+    receipt: PrintJob?,
 ) {
     val binding = DataBindingUtil.setContentView<TransactionStatusFragmentBinding>(
         this,
@@ -72,4 +78,85 @@ fun CreditClubActivity.startReceiptActivity(receipt: ParcelablePrintJob) {
         putExtra("receipt", receipt)
     }
     startActivity(intent)
+}
+
+suspend inline fun <T : BackendResponse> executeTransaction(
+    crossinline fetcher: suspend () -> T?,
+    crossinline reFetcher: suspend () -> T?,
+    pendingTransaction: PendingTransaction,
+    dialogProvider: DialogProvider,
+    pendingTransactionsBox: Box<PendingTransaction>,
+): SafeRunResult<T?> = coroutineScope {
+    var result: SafeRunResult<T?>
+    var tryCount = 0
+    var pendingTransactionId: Long? = null
+
+    transactionLoop@ while (true) {
+        result = if (tryCount == 0) {
+            dialogProvider.showProgressBar("Processing")
+            safeRunIO(block = fetcher)
+        } else {
+            dialogProvider.showProgressBar("Verifying Transaction Status\nRetrying....(count = $tryCount)") {
+                onClose {
+                    dialogProvider.hideProgressBar()
+                    this@coroutineScope.cancel()
+                }
+            }
+            safeRunIO(block = reFetcher)
+        }
+        tryCount++
+        val response = result.data
+
+        // Store pending and unconfirmed transaction for requery
+        if ((response == null || response.isPending()) && pendingTransactionId == null) {
+            pendingTransactionId = pendingTransactionsBox.put(pendingTransaction)
+        }
+
+        if (result.isFailure) {
+            val error = result.error!!
+            if (error.isTimeout() || error.isInternalServerError()) {
+                tryCount++
+                continue@transactionLoop
+            }
+
+            break@transactionLoop
+        }
+
+        if (response != null) {
+            when {
+                response.isSuccess() -> {
+                    if (pendingTransactionId != null) {
+                        // delete pending transaction once confirmed successful
+                        pendingTransactionsBox.remove(pendingTransactionId)
+                    }
+                    break@transactionLoop
+                }
+                response.isPendingOnBank() -> {
+                    dialogProvider.hideProgressBar()
+                    val retry = dialogProvider.getConfirmation(
+                        title = "Transaction pending",
+                        subtitle = "Check Status?"
+                    )
+                    if (retry) {
+                        continue@transactionLoop
+                    } else {
+                        break@transactionLoop
+                    }
+                }
+                response.isPendingOnMiddleware() -> {
+                    continue@transactionLoop
+                }
+                response.isFailure() -> {
+                    if (pendingTransactionId != null) {
+                        // delete pending transaction once confirmed failed
+                        pendingTransactionsBox.remove(pendingTransactionId)
+                    }
+                    break@transactionLoop
+                }
+            }
+        }
+    }
+    dialogProvider.hideProgressBar()
+
+    return@coroutineScope result
 }

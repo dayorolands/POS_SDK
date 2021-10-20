@@ -71,7 +71,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
     private val authResponse: AuthResponse by lazy {
         (requireActivity().application as BankOneApplication).authResponse
     }
-    private val ah by lazy { APIHelper(requireActivity()) }
+    private val ah by lazy { APIHelper(requireActivity(), mainScope) }
     private val launcher = registerImagePicker {
         try {
             val tmpImage = it.firstOrNull() ?: return@registerImagePicker
@@ -160,7 +160,6 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
         val finalFile = File(creditClubImage?.path ?: return)
         val bankOneApplication = activity?.application as BankOneApplication?
         val authResponse = bankOneApplication?.authResponse
-        val ah = APIHelper(requireContext())
 
         dialogProvider.showProgressBar("Uploading")
         val (result, error) = ah.getNextOperationImage(

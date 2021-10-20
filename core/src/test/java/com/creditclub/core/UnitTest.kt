@@ -1,7 +1,10 @@
 package com.creditclub.core
 
 import com.creditclub.core.data.CreditClubMiddleWareAPI
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import okhttp3.OkHttpClient
@@ -42,7 +45,7 @@ abstract class UnitTest {
         mainThreadSurrogate.close()
     }
 
-    fun <T> mainScope(block: suspend CoroutineScope.() -> T) = runBlocking {
+    fun <T> mainScope(block: suspend () -> T) = runBlocking {
         launch(Dispatchers.Main) {
             block()
         }

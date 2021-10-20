@@ -35,7 +35,7 @@ data class TransactionReport(
         val productCode: String? = null,
 
         @SerialName("Amount")
-        val amount: Double? = null,
+        val amount: Double,
 
         @SerialName("Date")
         val date: String? = null,
@@ -65,7 +65,7 @@ data class TransactionReport(
         val displayMessage: String? = null,
 
         @SerialName("UniqueReference")
-        val uniqueReference: String? = null,
+        val uniqueReference: String,
 
         @SerialName("ID")
         val id: Long = 0

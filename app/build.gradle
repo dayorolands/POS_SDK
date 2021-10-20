@@ -17,15 +17,6 @@ android {
 
     useLibrary "org.apache.http.legacy"
 
-//    signingConfigs {
-//        config {
-//            enableV1Signing = true
-//            enableV2Signing = true
-//            enableV3Signing = true
-//            enableV4Signing = true
-//        }
-//    }
-
     defaultConfig {
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
@@ -73,26 +64,25 @@ android {
 
     buildTypes {
         release {
-            shrinkResources false
+            shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
             manifestPlaceholders = [usesCleartextTraffic: "false"]
             resValue "string", "app_name_suffix", ""
-//            signingConfig signingConfigs.config
         }
 
         releaseStaging {
             debuggable true
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (Staging)"
             matchingFallbacks = ["release", "debug"]
-//            signingConfig signingConfigs.config
         }
 
         debug {
@@ -102,6 +92,12 @@ android {
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             resValue "string", "app_name_suffix", " (Staging)"
             ext.enableCrashlytics = false
+//            FirebasePerformance {
+//                // Set this flag to 'false' to disable @AddTrace annotation processing and
+//                // automatic monitoring of HTTP/S network requests
+//                // for a specific build variant at compile time.
+//                instrumentationEnabled false
+//            }
         }
     }
 
@@ -148,16 +144,16 @@ android {
     }
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_11.toString()
         useIR = true
     }
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         kotlinOptions {
-            jvmTarget = "1.8"
+            jvmTarget = JavaVersion.VERSION_11.toString()
             useIR = true
         }
     }
@@ -217,15 +213,12 @@ dependencies {
 
     implementation "androidx.recyclerview:recyclerview:1.2.0"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
-    implementation "androidx.constraintlayout:constraintlayout:2.0.4"
+    implementation "androidx.constraintlayout:constraintlayout:${versions.constraintLayout}"
     implementation "com.google.android.material:material:${versions.material}"
     implementation "com.google.code.gson:gson:2.8.5"
     implementation "androidx.cardview:cardview:1.0.0"
     implementation "de.hdodenhof:circleimageview:2.1.0"
     implementation "com.loopj.android:android-async-http:1.4.11"
-    implementation "com.android.volley:volley:1.1.0"
-    implementation "com.google.firebase:firebase-crashlytics:${versions.firebaseCrashlytics}"
-    implementation "com.google.firebase:firebase-analytics:${versions.firebase}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
 
     implementation "com.google.android.flexbox:flexbox:3.0.0"
@@ -277,14 +270,9 @@ dependencies {
     // Testing Navigation
     androidTestImplementation "androidx.navigation:navigation-testing:${versions.navigation}"
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${versions.desugarJdk}"
-    // Import the BoM for the Firebase platform
-    implementation platform("com.google.firebase:firebase-bom:26.1.1")
 
-    // Declare the dependencies for the Firebase Cloud Messaging and Analytics libraries
-    // When using the BoM, you don"t specify versions in Firebase library dependencies
-    implementation "com.google.firebase:firebase-messaging-ktx"
-    implementation "com.google.firebase:firebase-analytics-ktx"
     implementation 'com.github.smart-fun:XmlToJson:1.5.1'
     debugImplementation "androidx.compose.ui:ui-tooling:${versions.compose}"
     debugImplementation "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}"
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
 }

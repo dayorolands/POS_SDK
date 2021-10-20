@@ -6,6 +6,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 @JvmInline
 value class SafeRunResult<out T>(val value: Any?) {
 
+    @Suppress("UNCHECKED_CAST")
     inline val data: T?
         get() = when {
             isFailure -> null
@@ -37,7 +38,7 @@ value class SafeRunResult<out T>(val value: Any?) {
 
     internal class Failure(
         @JvmField
-        val exception: Exception
+        val exception: Exception,
     ) {
         override fun equals(other: Any?): Boolean = other is Failure && exception == other.exception
         override fun hashCode(): Int = exception.hashCode()
@@ -50,12 +51,7 @@ value class SafeRunResult<out T>(val value: Any?) {
  * make sure that this class is not exposed in ABI.
  */
 @PublishedApi
-internal fun createFailure(exception: Exception): Any =
-    SafeRunResult.Failure(exception)
-
-internal fun SafeRunResult<*>.throwOnFailure() {
-    if (value is SafeRunResult.Failure) throw value.exception
-}
+internal fun createFailure(exception: Exception): Any = SafeRunResult.Failure(exception)
 
 inline fun <T> safeRun(crossinline block: () -> T): SafeRunResult<T> {
     return try {

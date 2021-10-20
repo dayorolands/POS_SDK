@@ -33,6 +33,9 @@ interface BillsPaymentService {
     @POST("api/PayBills/RunTransaction")
     suspend fun runTransaction(@Body body: PayBillRequest): PayBillResponse?
 
+    @POST("api/PayBills/BillPaymentStatus")
+    suspend fun billPaymentStatus(@Body body: PayBillRequest): PayBillResponse?
+
     @POST("api/PayBills/ValidateCustomerInformation")
     suspend fun validateCustomerInfo(@Body body: ValidateCustomerInfoRequest): ValidateCustomerInfoResponse?
 }

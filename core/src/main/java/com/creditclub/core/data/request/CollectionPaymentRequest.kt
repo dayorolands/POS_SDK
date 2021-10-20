@@ -47,6 +47,12 @@ class CollectionPaymentRequest {
     @SerialName("RequestReference")
     var requestReference: String? = null
 
+    @SerialName("RetrievalReferenceNumber")
+    var retrievalReferenceNumber: String? = null
+
+    @SerialName("DeviceNumber")
+    var deviceNumber: Int? = null
+
     @SerialName("ApplyFee")
     var applyFee: Boolean? = null
 

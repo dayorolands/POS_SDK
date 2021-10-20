@@ -14,15 +14,16 @@ import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
-import com.creditclub.core.CreditClubApplication
 import com.creditclub.core.data.TRANSACTIONS_CLIENT
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.data.api.VersionService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.SurveyQuestion
 import com.creditclub.core.data.request.SubmitSurveyRequest
 import com.creditclub.core.data.response.isSuccessful
 import com.creditclub.core.ui.CreditClubActivity
+import com.creditclub.core.ui.getLatestVersion
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.jsonStore
 import com.creditclub.pos.InvalidRemoteConnectionInfo
@@ -34,6 +35,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.coroutines.*
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.time.Instant
 
@@ -46,6 +48,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     private val binding: ActivityLoginBinding by dataBinding()
     private val posApiService: PosApiService by retrofitService()
     private val staticService: StaticService by retrofitService()
+    private val versionService: VersionService by retrofitService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +71,13 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             mainScope.launch { attemptLogin() }
         }
 
-        mainScope.launch { (application as CreditClubApplication).getLatestVersion() }
+        mainScope.launch {
+            getLatestVersion(
+                versionService = versionService,
+                appDataStorage = get(),
+                appConfig = appConfig,
+            )
+        }
         if (Platform.isPOS) {
             mainScope.launch {
                 updateBinRoutes()
@@ -103,6 +112,23 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                 putExtra("phone_number", localStorage.agentPhone)
             }
             startActivity(intent)
+        }
+
+        debugOnly {
+            if (BuildConfig.BUILD_TYPE == "debug") {
+                binding.skipAuthBtn.run {
+                    visibility = View.VISIBLE
+                    setOnClickListener {
+                        mainScope.launch {
+                            if (!syncAgentInfo()) return@launch
+                            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                            startActivity(intent)
+                            finish()
+                        }
+                    }
+                }
+            }
         }
     }
 

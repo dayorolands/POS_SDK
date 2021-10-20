@@ -3,21 +3,17 @@ package com.creditclub.core.data.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Created by Joseph on 6/6/2016.
- */
 @Serializable
-class Product {
-
+data class Product(
     @SerialName("ID")
-    var id: Long = 0
+    val id: Long = 0,
 
     @SerialName("Name")
-    var name: String = ""
+    val name: String = "",
 
     @SerialName("Code")
-    var code: String = ""
+    val code: String = "",
 
     @SerialName("AdditionalInformation")
-    var additionalInformation: String? = null
-}
+    val additionalInformation: String? = null,
+)

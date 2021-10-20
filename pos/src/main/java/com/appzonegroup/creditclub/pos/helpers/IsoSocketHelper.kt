@@ -32,6 +32,11 @@ class IsoSocketHelper(
     private val localStorage: LocalStorage by inject()
 
     fun send(request: ISOMsg, isRetry: Boolean = false): SafeRunResult<ISOMsg> {
+        var derivedTimeout = remoteConnectionInfo.timeout
+        if (isRetry) {
+            derivedTimeout = remoteConnectionInfo.requeryConfig?.timeout ?: derivedTimeout
+        }
+
         request.terminalId41 = config.terminalId
 
         Looper.myLooper() ?: Looper.prepare()
@@ -51,7 +56,7 @@ class IsoSocketHelper(
             val sessionKey = parameters.sessionKey
             val outputData = request.prepare(sessionKey)
             request.log()
-            val output = SocketJob.execute(remoteConnectionInfo, outputData, isRetry)
+            val output = SocketJob.execute(remoteConnectionInfo, outputData, derivedTimeout)
             val response = ISOMsg().apply {
                 packager = ISO87Packager()
                 unpack(output)

@@ -1,6 +1,10 @@
 package com.appzonegroup.app.fasttrack.fragment
 
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -25,6 +29,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
@@ -51,7 +56,6 @@ import com.creditclub.core.ui.widget.DialogConfirmParams
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.packageInfo
 import com.creditclub.core.util.safeRunIO
-import com.creditclub.ui.UpdateActivity
 import com.creditclub.ui.rememberBean
 import com.creditclub.ui.theme.CreditClubTheme
 import com.creditclub.viewmodel.AppViewModel
@@ -62,6 +66,7 @@ import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import java.io.File
 import java.util.*
 
 private val composableRouteFunctionIds = mapOf(
@@ -94,7 +99,7 @@ class HomeFragment : CreditClubFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val fragmentNavController = findNavController()
         return ComposeView(inflater.context).apply {
@@ -539,41 +544,78 @@ class HomeFragment : CreditClubFragment() {
     }
 
     private fun checkForUpdate() = appDataStorage.latestVersion?.run {
-        val currentVersion = requireContext().packageInfo?.versionName
-        if (currentVersion != null && updateIsAvailable(currentVersion)) {
-            val updateIsRequired = updateIsRequired(currentVersion)
-            val mustUpdate = updateIsRequired && daysOfGraceLeft() < 1
-            val message = "A new version (v$version) is available."
-            val subtitle =
-                if (updateIsRequired && mustUpdate) "You need to update now"
-                else if (updateIsRequired) "Please update with ${daysOfGraceLeft()} days"
-                else "Please update"
+        val currentVersion = requireContext().packageInfo!!.versionName
+        if (!isNewerThan(currentVersion)) {
+            return@run
+        }
+        val latestApkFile = appDataStorage.latestApkFile ?: return@run
+        val canUpdate = updateIsRequired(currentVersion) && latestApkFile.exists()
+        val mustUpdate = canUpdate && daysOfGraceLeft() < 1
+        val message = "A new version (v$version) is available."
+        val subtitle = when {
+            canUpdate && mustUpdate -> "You need to update now"
+            canUpdate -> "Please update with ${daysOfGraceLeft()} days"
+            else -> "Please update"
+        }
 
-            dialogProvider.confirm(DialogConfirmParams(message, subtitle)) {
-                onSubmit {
-                    if (it) {
-                        startActivity(
-                            Intent(
-                                context,
-                                UpdateActivity::class.java
-                            )
-                        )
-                        requireActivity().finish()
-                    } else if (mustUpdate) requireActivity().finish()
-                }
+        dialogProvider.confirm(DialogConfirmParams(message, subtitle)) {
+            onSubmit {
+                if (it) {
+                    openApk(latestApkFile)
+                } else if (mustUpdate) requireActivity().finish()
+            }
 
-                onClose {
-                    if (mustUpdate) requireActivity().finish()
-                }
+            onClose {
+                if (mustUpdate) requireActivity().finish()
             }
         }
     }
 
-    private fun loadFcmToken() {
+    private fun openApk(apkFile: File) {
+        val context = requireContext()
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val uri = FileProvider.getUriForFile(
+                context.applicationContext,
+                appConfig.fileProviderAuthority,
+                apkFile,
+            )
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.setDataAndType(uri, "application/vnd.android.package-archive")
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+            //GRANTING THE PERMISSIONS EXPLICITLY HERE! to all possible choosers (3rd party apps):
+            val resolvedInfoActivities: List<ResolveInfo> = context.packageManager
+                .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+
+            for (ri in resolvedInfoActivities) {
+                context.grantUriPermission(
+                    ri.activityInfo.packageName,
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                )
+            }
+        } else {
+            val uri = Uri.fromFile(apkFile)
+            intent.setDataAndType(uri, "application/vnd.android.package-archive")
+        }
+        context.startActivity(
+            Intent.createChooser(
+                intent,
+                context.resources.getText(R.string.share_receipt_to)
+            ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION),
+        )
+    }
+
+    private fun loadFcmToken(retryOnFail: Boolean = true) {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.e("Support", "Fetching FCM registration token failed", task.exception)
-                loadFcmToken()
+                if (retryOnFail) {
+                    loadFcmToken(retryOnFail = false)
+                }
                 return@addOnCompleteListener
             }
 

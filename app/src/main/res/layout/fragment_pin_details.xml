@@ -62,6 +62,5 @@
         android:text="@string/submit"
         android:layout_marginLeft="@dimen/form_margin_horizontal"
         android:layout_marginRight="@dimen/form_margin_horizontal"
-        style="@style/button_style"
-        android:onClick="change_pin_button_click"/>
+        style="@style/button_style"/>
 </LinearLayout>

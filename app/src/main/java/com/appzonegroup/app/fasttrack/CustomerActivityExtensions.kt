@@ -260,7 +260,7 @@ inline fun CreditClubActivity.requireAndValidateToken(
     operationType: TokenType,
     isPinChange: Boolean = false,
     textFieldParams: TextFieldParams = tokenParams,
-    crossinline block: DialogListenerBlock<Unit>
+    crossinline block: DialogListenerBlock<Unit>,
 ) {
     val staticService: StaticService by retrofitService()
     val reference = SecureRandom().nextInt(1000000)

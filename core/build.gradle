@@ -37,11 +37,11 @@ android {
     }
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 }
 
@@ -103,10 +103,12 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.0'
     api 'com.google.android.play:core-ktx:1.8.1'
 
-    api "com.google.firebase:firebase-crashlytics:${versions.firebaseCrashlytics}"
-    api "com.google.firebase:firebase-core:${versions.firebase}"
-    api "com.google.firebase:firebase-analytics:${versions.firebase}"
-    api 'com.google.firebase:firebase-perf:19.1.1'
+    implementation platform('com.google.firebase:firebase-bom:28.4.2')
+    api "com.google.firebase:firebase-crashlytics-ktx"
+    api "com.google.firebase:firebase-core"
+    api "com.google.firebase:firebase-messaging-ktx"
+    api "com.google.firebase:firebase-analytics-ktx"
+    api 'com.google.firebase:firebase-perf-ktx'
     api "androidx.work:work-runtime-ktx:${versions.work}"
     api 'com.google.android.gms:play-services-location:18.0.0'
     api "androidx.security:security-crypto:1.1.0-alpha03"

@@ -6,13 +6,14 @@ import kotlinx.parcelize.Parcelize
 
 sealed interface PrintNode : Parcelable {
     val walkPaperAfterPrint: Int
+    val align: Alignment
 }
 
 @Parcelize
 data class ImageNode(
     @DrawableRes val drawable: Int,
     override var walkPaperAfterPrint: Int = 20,
-    val align: Alignment = Alignment.MIDDLE,
+    override val align: Alignment = Alignment.MIDDLE,
     val printGray: Int = 5,
 ) : PrintNode
 
@@ -24,12 +25,15 @@ data class TextNode(
     var wordFont: Int = 22,
     val printGray: Int = 5,
     val isBold: Boolean = false,
-    var align: Alignment = Alignment.LEFT,
+    override var align: Alignment = Alignment.LEFT,
     override val walkPaperAfterPrint: Int = 0,
 ) : PrintNode
 
 @Parcelize
-data class WalkPaper(override val walkPaperAfterPrint: Int = 20) : PrintNode
+data class WalkPaper(
+    override val walkPaperAfterPrint: Int = 20,
+    override var align: Alignment = Alignment.LEFT,
+) : PrintNode
 
 enum class Alignment {
     LEFT,
@@ -37,30 +41,6 @@ enum class Alignment {
     RIGHT,
 }
 
-@Parcelize
-data class BarCodeNode(
-    val text: String,
-    val leftDistance: Int = 0,
-    val lineDistance: Int = 0,
-    val wordFont: Int = 22,
-    val printGray: Int = 5,
-    val isBold: Boolean = false,
-    val align: Alignment = Alignment.LEFT,
-    override val walkPaperAfterPrint: Int = 0,
-) : PrintNode
-
 enum class FontWeight {
     Small, Normal, Bold, Big
 }
-
-@Parcelize
-data class QrCodeNode(
-    val text: String,
-    val leftDistance: Int = 0,
-    val lineDistance: Int = 0,
-    val wordFont: Int = 22,
-    val printGray: Int = 5,
-    val isBold: Boolean = false,
-    val align: Alignment = Alignment.LEFT,
-    override val walkPaperAfterPrint: Int = 0,
-) : PrintNode

@@ -1,32 +1,27 @@
 package com.appzonegroup.app.fasttrack
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.android.volley.Request
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import com.appzonegroup.app.fasttrack.model.LoanProduct
-import com.appzonegroup.app.fasttrack.model.LoanRequestCreditClub
-import com.appzonegroup.app.fasttrack.model.Response
-import com.appzonegroup.app.fasttrack.utility.CustomAutoCompleteAdapter
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
-import com.appzonegroup.app.fasttrack.utility.Misc
+import com.creditclub.core.data.api.StaticService
+import com.creditclub.core.data.api.retrofitService
+import com.creditclub.core.data.model.LoanProduct
+import com.creditclub.core.data.model.LoanRequestCreditClub
+import com.creditclub.core.util.safeRunIO
 import com.google.android.material.tabs.TabLayout
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import org.json.JSONObject
+import kotlinx.coroutines.launch
 import java.util.*
 
 class CreditClubLoanRequestActivity : CustomerBaseActivity() {
-    var eligibleLoanProducts: ArrayList<LoanProduct>? = null
+    private lateinit var eligibleLoanProducts: List<LoanProduct>
     override val functionId: Int = FunctionIds.LOAN_REQUEST
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
@@ -34,21 +29,15 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
 
     private var loanRequest_customerPhone_et: EditText? = null
 
-    //loanRequest2_customerName_et,
     private var loanRequest_marketAssociations_et: EditText? = null
     private var loanRequest_memberID_et: EditText? = null
-    private  var loanRequest_customerAccount_et: EditText? = null
-    private  var loanRequest_loanAmount_et: EditText? = null
+    private var loanRequest_customerAccount_et: EditText? = null
+    private var loanRequest_loanAmount_et: EditText? = null
 
-    //loanRequest2_bvn_et,
-    //loanRequest2_productid_et,
-    //loanRequest2_customerid_et,
     private var agentPIN_et: EditText? = null
     private var loanProductsSpinner: Spinner? = null
-    private var adapter: CustomAutoCompleteAdapter? = null
+    private val staticService: StaticService by retrofitService()
 
-    //public AssociationList associationList;
-    //private static String selectedAssociation;
     private var selectedAssociationID = ""
 
     override fun onCustomerReady(savedInstanceState: Bundle?) {
@@ -71,100 +60,69 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
         }
     }
 
-    private val loanProducts: Unit
-        get() {
-            val url = String.format(
-                Locale.getDefault(),
-                "%s/CreditClubMiddleWareAPI/CreditClubStatic/GetEligibleLoanProducts?institutionCode=%s&associationID=%s&memberID=%s&customerAccountNumber=%s",
-                BuildConfig.API_HOST,
-                localStorage.institutionCode,  //associationDAO.Get(selectedAssociationID).getId(),
-                loanRequest_marketAssociations_et!!.text.toString().trim { it <= ' ' },
-                loanRequest_memberID_et!!.text.toString().trim { it <= ' ' },
-                loanRequest_customerAccount_et!!.text.toString().trim { it <= ' ' })
-            Log.e("LoanProducts", url)
-            showProgressBar("Getting loan products...")
-            val queue = Volley.newRequestQueue(this)
-            //JSONObject convertedObject = null;
-            // Request a string response from the provided URL.
-            val stringRequest = StringRequest(
-                Request.Method.GET, url,
-                { response ->
-                    // Display the first 500 characters of the response string.
-                    var response = response
-                    if (response != null) {
-                        try {
-                            Log.e("LoanProducts", response)
-                            //Standard .NET additions to serialized objects
-                            response =
-                                response.replace("\\", "").replace("\n", "").trim { it <= ' ' }
-                            val typeToken = object : TypeToken<ArrayList<LoanProduct?>?>() {}
-                            eligibleLoanProducts = Gson().fromJson(response, typeToken.type)
-                            val loanProductsInfo = ArrayList<String>()
-                            loanProductsInfo.add("Select a loan product...")
-                            eligibleLoanProducts?.forEach { loanProduct ->
-                                loanProductsInfo.add(
-                                    String.format(
-                                        Locale.getDefault(),
-                                        "%s - (N%s - N%s)",
-                                        loanProduct.name,
-                                        loanProduct.minimumAmount.toString(),
-                                        loanProduct.maximumAmount.toString()
-                                    )
-                                )
-                            }
-                            Misc.populateSpinnerWithString(
-                                this@CreditClubLoanRequestActivity,
-                                loanProductsInfo,
-                                loanProductsSpinner
-                            )
-                            hideProgressBar()
-                            mViewPager!!.setCurrentItem(1, true)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            FirebaseCrashlytics.getInstance().recordException(Exception(e.message))
-                            showError(e.message)
-                        }
-                    } else {
-                        Log.e("ResponseFailed", "Api call failed")
-                        showError("Api call failed")
-                    }
-                }) { error ->
-                Log.e("LoanProducts", Gson().toJson(error))
-                showError("A network-related error occurred.")
-            }
+    private suspend fun getLoanProducts() {
+        dialogProvider.showProgressBar("Getting loan products")
+        val (response, error) = safeRunIO {
+            staticService.getEligibleLoanProducts(
+                institutionCode = localStorage.institutionCode!!,
+                associationID = loanRequest_marketAssociations_et!!.value,
+                memberID = loanRequest_memberID_et!!.value,
+                customerAccountNumber = loanRequest_customerAccount_et!!.value,
+            )
+        }
+        dialogProvider.hideProgressBar()
 
-// Add the request to the RequestQueue.
-            queue.add(stringRequest)
+        if (error != null) {
+            dialogProvider.showError(error)
+            return
         }
 
-    private fun sendRequestLoanPostRequest(url: String?, data: String?) {
-        val queue = Volley.newRequestQueue(this)
-        var convertedObject: JSONObject? = null
-        try {
-            convertedObject = JSONObject(data)
-        } catch (e: Exception) {
-            Log.e("creditclub", "failed json parsing")
+        eligibleLoanProducts = response!!
+        val loanProductsInfo = mutableListOf("Select a loan product...")
+        eligibleLoanProducts.forEach { loanProduct ->
+            loanProductsInfo.add(
+                String.format(
+                    Locale.getDefault(),
+                    "%s - (N%s - N%s)",
+                    loanProduct.name,
+                    loanProduct.minimumAmount.toString(),
+                    loanProduct.maximumAmount.toString()
+                )
+            )
         }
-        val request = JsonObjectRequest(Request.Method.POST, url, convertedObject, { `object` ->
-            var result = `object`.toString()
-            result = result.replace("\\", "").replace("\n", "").trim { it <= ' ' }
-            val response = Gson().fromJson(result, Response::class.java)
-            val serverResponse = Gson().fromJson(result, Response::class.java)
-            if (serverResponse.isSuccessful) {
-                dialogProvider.showSuccess("Loan request was made successfully") {
-                    onClose {
-                        finish()
-                    }
-                }
-            } else {
-                showError(response.reponseMessage)
-            }
-        }) { showError("A network-related error just occurred. Please try again later") }
-        queue.add(request)
+        val arrayAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            this,
+            android.R.layout.simple_spinner_item,
+            loanProductsInfo
+        )
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        loanProductsSpinner!!.adapter = arrayAdapter
+
+        mViewPager!!.setCurrentItem(1, true)
+    }
+
+    private suspend fun sendRequestLoanPostRequest(request: LoanRequestCreditClub) {
+        dialogProvider.showProgressBar("Making Loan Request")
+        val (response, error) = safeRunIO {
+            staticService.loanRequest(request = request)
+        }
+        dialogProvider.hideProgressBar()
+
+        if (error != null) {
+            dialogProvider.showError(error)
+            return
+        }
+
+        if (response!!.isSuccessful) {
+            dialogProvider.showSuccessAndWait("Loan request was made successfully")
+            finish()
+        } else {
+            dialogProvider.showError(response.responseMessage)
+        }
     }
 
     fun requestLoan_click(view: View?) {
-        val accountNumber = loanRequest_customerAccount_et!!.text.toString().trim { it <= ' ' }
+        val accountNumber = loanRequest_customerAccount_et!!.value
         if (accountNumber.length != 10) {
             Toast.makeText(baseContext, "Please enter customer phone number", Toast.LENGTH_LONG)
                 .show()
@@ -173,7 +131,7 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
             return
         }
         val loanAmount = loanRequest_loanAmount_et!!.text.toString().trim { it <= ' ' }
-        if (loanAmount.length == 0) {
+        if (loanAmount.isEmpty()) {
             showError("Please enter a loan amount")
             return
         }
@@ -194,7 +152,7 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
             showError("Please select a loan product")
             return
         }
-        if (agentPIN_et!!.text.toString().length == 0) {
+        if (agentPIN_et!!.text.toString().isEmpty()) {
             showError("Please enter your PIN")
             return
         }
@@ -202,45 +160,30 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
             showError("PIN must be four digits")
             return
         }
-        val agentPhoneNumber = localStorage.agentPhone
-        val institutionCode = localStorage.institutionCode
 
-        //String code = associationDAO.Get(selectedAssociationID).getId();
-        val loanRequest = LoanRequestCreditClub()
-        loanRequest.customerAccountNumber = accountNumber
-        loanRequest.loanAmount = loanAmount.toDouble()
-        loanRequest.agentPhoneNumber = phoneNumber
-        loanRequest.institutionCode = institutionCode
-        //loanRequest.setLoanProductID(productID);
-        loanRequest.associationID = loanRequest_marketAssociations_et!!.text.toString()
-        loanRequest.memberID = loanRequest_memberID_et!!.text.toString()
-        loanRequest.agentPhoneNumber = agentPhoneNumber
-        loanRequest.customerAccountNumber =
-            loanRequest_customerAccount_et!!.text.toString().trim { it <= ' ' }
-        loanRequest.institutionCode = localStorage.institutionCode
-        loanRequest.loanProductID =
-            eligibleLoanProducts!![loanProductsSpinner!!.selectedItemPosition - 1].id
-                .toInt()
-        loanRequest.memberID = loanRequest_memberID_et!!.text.toString()
-        loanRequest.agentPhoneNumber = localStorage.agentPhone
-        //loanRequest.setAssociationID(associationDAO.Get(selectedAssociationID).getId());
-        loanRequest.geoLocation = localStorage.lastKnownLocation
-        loanRequest.agentPin = agentPIN_et!!.text.toString().trim { it <= ' ' }
-        val data = Gson().toJson(loanRequest)
-        /*loanRequest.setCustomerID(customerID);
-        loanRequest.setCustomerName(customerName);
-        loanRequest.setBVN(BVN);*/showProgressBar("Make Loan Request")
-        sendRequestLoanPostRequest(
-            BuildConfig.API_HOST + "/CreditClubMiddleWareAPI/CreditClubStatic/LoanRequest",
-            data
+        val eligibleLoanProductIndex = loanProductsSpinner!!.selectedItemPosition - 1
+        val loanProductId = eligibleLoanProducts[eligibleLoanProductIndex].id.toInt()
+        val loanRequest = LoanRequestCreditClub(
+            customerAccountNumber = accountNumber,
+            loanAmount = loanAmount.toDouble(),
+            associationID = loanRequest_marketAssociations_et!!.value,
+            memberID = loanRequest_memberID_et!!.value,
+            institutionCode = localStorage.institutionCode,
+            loanProductID = loanProductId,
+            agentPhoneNumber = localStorage.agentPhone,
+            geoLocation = localStorage.lastKnownLocation,
+            agentPin = agentPIN_et!!.text.toString().trim { it <= ' ' },
         )
+        mainScope.launch {
+            sendRequestLoanPostRequest(loanRequest)
+        }
     }
 
     fun next_button_click(view: View?) {
         selectedAssociationID = loanRequest_marketAssociations_et!!.text.toString()
             .trim { it <= ' ' } // adapter.getPosition(associationAutoCompletTV.getText().toString());
         val accountNumber = loanRequest_customerAccount_et!!.text.toString().trim { it <= ' ' }
-        if (accountNumber.length == 0) {
+        if (accountNumber.isEmpty()) {
             showError("Please enter the account number")
             return
         }
@@ -249,12 +192,11 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
             return
         }
         val amount = loanRequest_loanAmount_et!!.text.toString().trim { it <= ' ' }
-        if (amount.length == 0) {
+        if (amount.isEmpty()) {
             showError("Please enter the loan amount")
             return
         }
-        val amountDouble: Double
-        amountDouble = try {
+        val amountDouble: Double = try {
             amount.toDouble()
         } catch (ex: Exception) {
             showError("Please enter a valid amount")
@@ -265,7 +207,7 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
             return
         }
         val phoneNumber = loanRequest_customerPhone_et!!.text.toString().trim { it <= ' ' }
-        if (phoneNumber.length == 0) {
+        if (phoneNumber.isEmpty()) {
             showError("Please enter the customer's phone number")
             return
         }
@@ -273,15 +215,17 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
             showError("Please enter the correct phone number")
             return
         }
-        if (selectedAssociationID.length == 0) {
+        if (selectedAssociationID.isEmpty()) {
             showError("Please enter the market association ID")
             return
         }
-        if (loanRequest_memberID_et!!.text.toString().trim { it <= ' ' }.length == 0) {
+        if (loanRequest_memberID_et!!.value.isBlank()) {
             showError("Please enter the customer's association ID")
             return
         }
-        loanProducts
+        mainScope.launch {
+            getLoanProducts()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -290,24 +234,6 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
         return true
     }
 
-    /*static void updateAssociationsAutoComplete(String[] associationNames)
-    {
-        associationAutoCompletTV.setAdapter(new CustomAutoCompleteAdapter(BankOneApplication.getAppContext(), R.layout.item_list, associationNames));
-
-        associationAutoCompletTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
-                selectedAssociation = null;
-                selectedAssociation = (String) adapterView.getItemAtPosition(position);
-                associationAutoCompletTV.setText(selectedAssociation);
-
-                adapter = ((CustomAutoCompleteAdapter)
-                        associationAutoCompletTV.getAdapter());
-
-            }
-        });
-    }*/
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings -> return true
@@ -323,7 +249,7 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
         override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
-            savedInstanceState: Bundle?
+            savedInstanceState: Bundle?,
         ): View? {
             val rootView = inflater.inflate(R.layout.fragment_loan_request, container, false)
             loanRequest_customerAccount_et =
@@ -353,7 +279,7 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
         override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
-            savedInstanceState: Bundle?
+            savedInstanceState: Bundle?,
         ): View? {
             val rootView = inflater.inflate(R.layout.fragment_loan_request2, container, false)
 
@@ -367,10 +293,6 @@ class CreditClubLoanRequestActivity : CustomerBaseActivity() {
         }
     }
 
-    /**
-     * A [FragmentPagerAdapter] that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
     inner class SectionsPagerAdapter(fm: FragmentManager?) : FragmentPagerAdapter(
         fm!!
     ) {

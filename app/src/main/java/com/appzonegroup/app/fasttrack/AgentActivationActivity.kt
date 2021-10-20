@@ -191,6 +191,7 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
 
         if (response.isSuccessful) {
             localStorage.transactionSequenceNumber = response.transactionSequenceNumber
+            localStorage.deviceNumber = response.deviceNumber
             localStorage.institutionCode = institutionCode
             localStorage.agentPhone = phoneNumber
             localStorage.cacheAuth = Json.encodeToString(

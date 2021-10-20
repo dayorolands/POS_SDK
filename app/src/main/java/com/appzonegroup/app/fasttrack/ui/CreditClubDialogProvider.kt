@@ -28,6 +28,8 @@ import com.creditclub.ui.adapter.DialogOptionAdapter
 import com.creditclub.ui.databinding.DialogOptionsBinding
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class CreditClubDialogProvider(override val context: Context) : DialogProvider {
 
@@ -49,18 +51,22 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         }
 
     override fun hideProgressBar() {
-        if (!activity.isFinishing) activity.runOnUiThread {
+        if (activity.isFinishing) {
+            currentProgressDialog = null
+            return
+        }
+
+        activity.runOnUiThread {
             safeRun {
                 if (progressDialog.isShowing && !activity.isFinishing) {
                     progressDialog.dismiss()
                 }
             }
             currentProgressDialog = null
-        } else currentProgressDialog = null
+        }
     }
 
     override fun showError(error: Throwable, block: DialogListenerBlock<*>?) {
-        hideProgressBar()
         val message = error.getMessage(context)
 
         block ?: return showError(message)
@@ -79,6 +85,28 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
 
             dialog.show()
         }
+    }
+
+    override suspend fun showErrorAndWait(message: CharSequence) {
+        suspendCoroutine<Unit> { continuation ->
+            activity.runOnUiThread {
+                hideProgressBar()
+                val dialog = getErrorDialog(activity, message).apply {
+                    setOnDismissListener {
+                        continuation.resume(Unit)
+                    }
+                }
+                dialog.findViewById<View>(R.id.close_btn).setOnClickListener {
+                    dialog.dismiss()
+                }
+
+                dialog.show()
+            }
+        }
+    }
+
+    override suspend fun showErrorAndWait(exception: Exception) {
+        showErrorAndWait(exception.getMessage(context))
     }
 
     override fun showInfo(message: CharSequence?, block: DialogListenerBlock<Unit>?) {
@@ -130,27 +158,32 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         title: CharSequence,
         message: CharSequence?,
         isCancellable: Boolean,
-        block: (DialogListenerBlock<*>)?
+        block: (DialogListenerBlock<*>)?,
     ): Dialog {
         activity.runOnUiThread {
             progressDialog.findViewById<TextView>(R.id.message_tv).text = message
             progressDialog.findViewById<TextView>(R.id.header_tv).text = title
 
             progressDialog.findViewById<View>(R.id.cancel_button).run {
-                visibility = if (isCancellable) View.VISIBLE else View.GONE
-                setOnClickListener {
-                    if (progressDialog.isShowing) progressDialog.dismiss()
+                val showCancelButton = isCancellable || block != null
+                visibility = if (showCancelButton) View.VISIBLE else View.GONE
+
+                when {
+                    block != null -> {
+                        val listener = DialogListener.create<Any>(block)
+                        setOnClickListener {
+                            hideProgressBar()
+                            listener.close()
+                        }
+                    }
+                    isCancellable -> {
+                        setOnClickListener {
+                            hideProgressBar()
+                        }
+                    }
+                    else -> progressDialog.setOnCancelListener { }
                 }
             }
-
-            if (block != null) {
-                val listener = DialogListener.create<Any>(block)
-
-                progressDialog.findViewById<View>(R.id.cancel_button).setOnClickListener {
-                    if (progressDialog.isShowing) progressDialog.hide()
-                    listener.close()
-                }
-            } else progressDialog.setOnCancelListener { }
 
             if (!progressDialog.isShowing) progressDialog.show()
         }
@@ -285,7 +318,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
 
     override fun showDateInput(
         params: DateInputParams,
-        block: DialogListenerBlock<LocalDate>
+        block: DialogListenerBlock<LocalDate>,
     ) {
         val dialog = Dialog(activity)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -314,7 +347,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
     override fun showOptions(
         title: CharSequence,
         options: List<DialogOptionItem>,
-        block: DialogListenerBlock<Int>
+        block: DialogListenerBlock<Int>,
     ) {
         activity.runOnUiThread {
             val dialog = getDialog(activity)

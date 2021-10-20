@@ -6,15 +6,6 @@ import java.security.spec.InvalidKeySpecException
 import javax.crypto.*
 import javax.crypto.spec.DESedeKeySpec
 
-@JvmInline
-value class TripleDesCipher(private val rawKey: ByteArray) {
-    @Throws(Exception::class)
-    fun encrypt(plain: ByteArray): ByteArray = rawKey.asDesEdeKey.encrypt(plain)
-
-    @Throws(Exception::class)
-    fun decrypt(encryptedData: ByteArray): ByteArray = rawKey.asDesEdeKey.decrypt(encryptedData)
-}
-
 inline val ByteArray.asDesEdeKey: SecretKey
     @Throws(
         InvalidKeyException::class,

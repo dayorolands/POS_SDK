@@ -37,9 +37,9 @@ interface DialogProvider {
 
     fun showProgressBar(
         title: CharSequence,
-        message: CharSequence?,
-        isCancellable: Boolean,
-        block: DialogListenerBlock<*>?
+        message: CharSequence? = context.getString(R.string.please_wait),
+        isCancellable: Boolean = false,
+        block: DialogListenerBlock<*>? = null,
     ): Dialog
 
     fun showProgressBar(title: CharSequence): Dialog {
@@ -47,7 +47,12 @@ interface DialogProvider {
     }
 
     fun showProgressBar(@StringRes title: Int): Dialog {
-        return showProgressBar(context.getString(title), context.getString(R.string.please_wait), false, null)
+        return showProgressBar(
+            title = context.getString(title),
+            message = context.getString(R.string.please_wait),
+            isCancellable = false,
+            block = null
+        )
     }
 
     fun showProgressBar(title: CharSequence, message: CharSequence?): Dialog {
@@ -57,9 +62,9 @@ interface DialogProvider {
     fun showProgressBar(
         title: CharSequence,
         message: CharSequence?,
-        block: DialogListenerBlock<*>?
+        block: DialogListenerBlock<*>?,
     ): Dialog {
-        return showProgressBar(title, message, false, block)
+        return showProgressBar(title, message, true, block)
     }
 
     fun requestPIN(title: CharSequence, block: DialogListenerBlock<String>)
@@ -71,15 +76,15 @@ interface DialogProvider {
     fun showOptions(
         title: CharSequence,
         options: List<DialogOptionItem>,
-        block: DialogListenerBlock<Int>
+        block: DialogListenerBlock<Int>,
     )
 
     fun confirm(params: DialogConfirmParams, block: DialogListenerBlock<Boolean>?)
 
     fun confirm(
         title: CharSequence,
-        subtitle: CharSequence?,
-        block: DialogListenerBlock<Boolean>?
+        subtitle: CharSequence? = null,
+        block: DialogListenerBlock<Boolean>?,
     ) = confirm(DialogConfirmParams(title, subtitle), block)
 
     suspend fun getInput(params: TextFieldParams) =
@@ -128,19 +133,9 @@ interface DialogProvider {
             }
         }
 
-    suspend fun showErrorAndWait(message: CharSequence) =
-        suspendCoroutine<Unit> { continuation ->
-            showError(message) {
-                onClose { continuation.resume(Unit) }
-            }
-        }
+    suspend fun showErrorAndWait(message: CharSequence)
 
-    suspend fun showErrorAndWait(exception: Exception) =
-        suspendCoroutine<Unit> { continuation ->
-            showError(exception) {
-                onClose { continuation.resume(Unit) }
-            }
-        }
+    suspend fun showErrorAndWait(exception: Exception)
 
     suspend fun showSuccessAndWait(message: CharSequence) =
         suspendCoroutine<Unit> { continuation ->

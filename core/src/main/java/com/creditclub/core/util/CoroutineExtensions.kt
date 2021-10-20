@@ -2,7 +2,6 @@ package com.creditclub.core.util
 
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -12,9 +11,9 @@ import kotlinx.coroutines.withContext
  * Appzone Ltd
  */
 
-typealias SuspendCallback = suspend CoroutineScope.() -> Unit
+typealias SuspendCallback = suspend () -> Unit
 
-suspend inline fun <T> safeRunIO(crossinline block: suspend CoroutineScope.() -> T): SafeRunResult<T> =
+suspend inline fun <T> safeRunIO(crossinline block: suspend () -> T): SafeRunResult<T> =
     withContext(Dispatchers.IO) {
         try {
             SafeRunResult(block())

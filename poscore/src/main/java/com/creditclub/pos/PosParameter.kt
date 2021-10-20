@@ -1,6 +1,5 @@
 package com.creditclub.pos
 
-import androidx.activity.ComponentActivity
 import org.json.JSONArray
 
 interface PosParameter {
