@@ -1,70 +1,24 @@
 package com.creditclub.pos.providers.telpo
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.BatteryManager
 import android.os.Looper
 import android.widget.Toast
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.pos.printer.*
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.EncodeHintType
-import com.google.zxing.MultiFormatWriter
-import com.google.zxing.WriterException
 import com.telpo.tps550.api.printer.UsbThermalPrinter
-import com.telpo.tps550.api.util.StringUtil
-import com.telpo.tps550.api.util.SystemUtil
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
 
+private const val MAX_LEFT_DISTANCE = 255
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 1/14/2019.
- * Appzone Ltd
- */
 class TelpoPrinter(override val context: Context, override val dialogProvider: DialogProvider) :
     UsbThermalPrinter(context),
     PosPrinter {
-    private var lowBattery = false
 
-    @Throws(WriterException::class)
-    fun createCode(
-        str: String,
-        type: BarcodeFormat,
-        bmpWidth: Int,
-        bmpHeight: Int
-    ): Bitmap {
-        val mHashTable = Hashtable<EncodeHintType, String>()
-        mHashTable[EncodeHintType.CHARACTER_SET] = "UTF-8"
-
-        val matrix = MultiFormatWriter().encode(str, type, bmpWidth, bmpHeight, mHashTable)
-        val width = matrix.width
-        val height = matrix.height
-
-        val pixels = IntArray(width * height)
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                if (matrix.get(x, y)) {
-                    pixels[y * width + x] = -0x1000000
-                } else {
-                    pixels[y * width + x] = -0x1
-                }
-            }
-        }
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-
-        bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
-        return bitmap
-    }
-
-    private val printReceive: BroadcastReceiver
+    private val mainScope = MainScope()
 
     override fun check(): PrinterStatus {
         return try {
@@ -81,27 +35,23 @@ class TelpoPrinter(override val context: Context, override val dialogProvider: D
     override fun printAsync(
         nodes: List<PrintNode>,
         message: String,
-        block: ((PrinterStatus) -> Unit)?
+        block: ((PrinterStatus) -> Unit)?,
     ) {
-        GlobalScope.launch(Dispatchers.Main) {
-
+        mainScope.launch {
             dialogProvider.showProgressBar(message)
-
             val status = withContext(Dispatchers.Default) {
                 Looper.myLooper() ?: Looper.prepare()
                 print(nodes)
             }
-
             dialogProvider.hideProgressBar()
             block?.invoke(status)
-
         }
     }
 
     override suspend fun print(
         printJob: PrintJob,
         message: String,
-        retryOnFail: Boolean
+        retryOnFail: Boolean,
     ): PrinterStatus {
         dialogProvider.showProgressBar(message)
         val status = withContext(Dispatchers.Default) {
@@ -166,58 +116,7 @@ class TelpoPrinter(override val context: Context, override val dialogProvider: D
         }
     }
 
-    fun print(node: QrCodeNode): PrinterStatus {
-        return try {
-            reset()
-            setGray(node.printGray)
-            val bitmap: Bitmap? = createCode(node.text, BarcodeFormat.QR_CODE, 256, 256)
-            if (bitmap != null) {
-                printLogo(bitmap, true)
-            }
-            addString(node.text)
-            printString()
-            walkPaper(20)
-
-            PrinterStatus.READY
-        } catch (e: Exception) {
-            e.printStackTrace()
-            printerStatus(e)
-        }
-    }
-
-    fun print(node: BarCodeNode): PrinterStatus {
-        return try {
-            reset()
-            setGray(node.printGray)
-            val bitmap: Bitmap? = createCode(node.text, BarcodeFormat.CODE_128, 320, 176)
-            if (bitmap != null) {
-                printLogo(bitmap, true)
-            }
-            addString(node.text)
-            printString()
-            walkPaper(20)
-
-            PrinterStatus.READY
-        } catch (e: Exception) {
-            e.printStackTrace()
-            printerStatus(e)
-        }
-    }
-
-//    override fun marker(node: SearchMark): PrinterStatus {
-//        return try {
-//            reset()
-//            searchMark(
-//                Integer.parseInt("200"),
-//                Integer.parseInt("50")
-//            )
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            printerStatus(e)
-//        }
-//    }
-
-    fun print(node: TextNode): PrinterStatus {
+    private fun print(node: TextNode): PrinterStatus {
         if (node.leftDistance > MAX_LEFT_DISTANCE) {
             Toast.makeText(context, context.getString(R.string.outOfLeft), Toast.LENGTH_LONG).show()
             return PrinterStatus.READY
@@ -269,41 +168,5 @@ class TelpoPrinter(override val context: Context, override val dialogProvider: D
         "com.telpo.tps550.api.OverHeatException" -> PrinterStatus.OVER_HEAT
         "com.telpo.tps550.api.BlackBlockNotFoundException" -> PrinterStatus.NO_BLACK_BLOCK
         else -> PrinterStatus.NOT_READY
-    }
-
-    companion object {
-        private const val MAX_LEFT_DISTANCE = 255
-    }
-
-    init {
-        printReceive = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                val action = intent.action
-                if (action == Intent.ACTION_BATTERY_CHANGED) {
-                    val status =
-                        intent.getIntExtra(
-                            BatteryManager.EXTRA_STATUS,
-                            BatteryManager.BATTERY_STATUS_NOT_CHARGING
-                        )
-                    val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
-                    val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 0)
-                    //TPS390 can not print,while in low battery,whether is charging or not charging
-                    lowBattery =
-                        if (SystemUtil.getDeviceType() == StringUtil.DeviceModelEnum.TPS390.ordinal) {
-                            level * 5 <= scale
-                        } else {
-                            status != BatteryManager.BATTERY_STATUS_CHARGING && level * 5 <= scale
-                        }
-                } else if (action == "android.intent.action.BATTERY_CAPACITY_EVENT") {
-                    val status = intent.getIntExtra("action", 0)
-                    val level = intent.getIntExtra("level", 0)
-                    lowBattery = status == 0 && level < 1
-                } //Only use for TPS550MTK devices
-            }
-        }
-        val pIntentFilter = IntentFilter()
-        pIntentFilter.addAction(Intent.ACTION_BATTERY_CHANGED)
-        pIntentFilter.addAction("android.intent.action.BATTERY_CAPACITY_EVENT")
-//        context.registerReceiver(printReceive, pIntentFilter)
     }
 }
