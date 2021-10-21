@@ -102,6 +102,7 @@ fun CreditClubFragment.openPageById(id: Int) {
                     agentPin = pin,
                     agentPhoneNumber = localStorage.agentPhone,
                     institutionCode = localStorage.institutionCode,
+                    deviceNumber = localStorage.deviceNumber,
                 )
 
                 dialogProvider.showProgressBar("Getting Balance")

@@ -53,6 +53,7 @@ fun BalanceCard() {
                 agentPin = pin,
                 agentPhoneNumber = localStorage.agentPhone,
                 institutionCode = localStorage.institutionCode,
+                deviceNumber = localStorage.deviceNumber,
             )
 
             loading = true

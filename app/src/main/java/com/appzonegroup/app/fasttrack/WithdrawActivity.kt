@@ -179,6 +179,7 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
             token = token,
             customerPin = customerPin,
             retrievalReferenceNumber = retrievalReferenceNumber,
+            geoLocation = localStorage.lastKnownLocation,
             deviceNumber = localStorage.deviceNumber,
             additionalInformation = Json.encodeToString(
                 WithdrawalRequest.Additional.serializer(),

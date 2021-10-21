@@ -12,6 +12,7 @@ import com.creditclub.pos.*
 import com.creditclub.pos.model.PosTenant
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 object Platform {
@@ -56,7 +57,7 @@ val posModule = module {
         if (infoList.isEmpty()) InvalidRemoteConnectionInfo
         else infoList[0]
     }
-    single<PosConfig> { ConfigService(androidContext()) }
+    single { ConfigService(androidContext()) }.bind(PosConfig::class)
     single { PosDatabase.getInstance(androidContext()) }
     single {
         get<PosConfig>().remoteConnectionInfo.getParameter(androidContext())

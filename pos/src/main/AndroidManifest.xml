@@ -40,17 +40,20 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name="com.appzonegroup.creditclub.pos.TerminalOptionsActivity"
+            android:exported="false"
             android:label="Terminal Options"
             android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.MenuActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.CardWithdrawalActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Make Payment"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
@@ -59,6 +62,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.ReversalActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Reversal"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.ReversalActivity"
@@ -67,6 +71,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.BalanceInquiryActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Balance Inquiry"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
@@ -75,6 +80,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.RefundActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Refund"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
@@ -83,6 +89,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.SalesCompleteActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Sales Completion"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
@@ -91,6 +98,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.PreAuthActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Pre Auth"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
@@ -99,6 +107,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.CashBackActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Cash Back"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
@@ -107,6 +116,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.CashAdvanceActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Cash Advance"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity"
@@ -114,10 +124,12 @@
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.UnsettledTransactionsActivity"
+            android:exported="false"
             android:label="Pending Confirmations"
             android:parentActivityName="com.appzonegroup.creditclub.pos.MenuActivity" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.ReprintMenuActivity"
+            android:exported="false"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>

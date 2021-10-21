@@ -33,5 +33,5 @@ data class BalanceEnquiryRequest (
     val retrievalReferenceNumber: String? = null,
 
     @SerialName("DeviceNumber")
-    val deviceNumber: Int? = null,
+    val deviceNumber: Int,
 )

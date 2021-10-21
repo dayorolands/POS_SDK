@@ -7,10 +7,10 @@ import kotlinx.serialization.Serializable
 data class WithdrawalRequest(
 
     @SerialName("AgentPhoneNumber")
-    val agentPhoneNumber: String? = null,
+    val agentPhoneNumber: String?,
 
     @SerialName("InstitutionCode")
-    val institutionCode: String? = null,
+    val institutionCode: String?,
 
     @SerialName("CustomerAccountNumber")
     val customerAccountNumber: String,
@@ -37,7 +37,7 @@ data class WithdrawalRequest(
     val retrievalReferenceNumber: String,
 
     @SerialName("DeviceNumber")
-    val deviceNumber: Int? = null,
+    val deviceNumber: Int,
 ) {
     @Serializable
     data class Additional(

@@ -69,7 +69,7 @@ data class PayBillRequest(
     val retrievalReferenceNumber: String,
 
     @SerialName("DeviceNumber")
-    val deviceNumber: Int? = null,
+    val deviceNumber: Int,
 
     @SerialName("ValidationCode")
     val validationCode: String?,

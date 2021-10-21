@@ -5,11 +5,11 @@ import android.os.Bundle
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.appzonegroup.creditclub.pos.data.PosDatabase
-import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.creditclub.core.data.CreditClubMiddleWareAPI
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.util.safeRunSuspend
+import com.creditclub.pos.PosConfig
 import com.creditclub.pos.api.PosApiService
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +25,7 @@ class PosNotificationWorker(
     private val localStorage: LocalStorage,
     private val posDatabase: PosDatabase,
     private val appConfig: AppConfig,
-    private val configService: ConfigService,
+    private val posConfig: PosConfig,
     private val creditClubMiddleWareAPI: CreditClubMiddleWareAPI,
 ) : CoroutineWorker(context, params) {
 
@@ -44,7 +44,7 @@ class PosNotificationWorker(
                     posApiService.posCashOutNotification(
                         notification,
                         "iRestrict ${appConfig.posNotificationToken}",
-                        notification.terminalId ?: configService.terminalId
+                        notification.terminalId ?: posConfig.terminalId
                     )
                 }
 

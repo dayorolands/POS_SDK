@@ -378,6 +378,7 @@ suspend fun CreditClubActivity.customerBalanceEnquiry(accountInfo: AccountInfo) 
         agentPhoneNumber = localStorage.agentPhone,
         geoLocation = localStorage.lastKnownLocation,
         institutionCode = localStorage.institutionCode,
+        deviceNumber = localStorage.deviceNumber,
     )
 
     dialogProvider.showProgressBar("Sending balance to customer")

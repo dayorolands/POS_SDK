@@ -179,7 +179,7 @@ val posWorkerModule = module {
             localStorage = get(),
             posDatabase = get(),
             appConfig = get(),
-            configService = get(),
+            posConfig = get(),
             creditClubMiddleWareAPI = get(named(MIDDLEWARE_CLIENT)),
         )
     }

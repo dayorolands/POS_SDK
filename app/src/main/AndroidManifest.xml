@@ -22,16 +22,15 @@
         android:extractNativeLibs="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:windowSoftInputMode="adjustResize|stateHidden"
         android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="${usesCleartextTraffic}"
+        android:windowSoftInputMode="adjustResize|stateHidden"
         tools:replace="extractNativeLibs"
         tools:targetApi="n">
         <activity
             android:name=".MainActivity"
             android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".FaqActivity"
@@ -64,6 +63,7 @@
         </activity>
         <activity
             android:name=".ReportActivity"
+            android:exported="false"
             android:label="@string/reports"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -73,6 +73,7 @@
         </activity>
         <activity
             android:name=".DepositActivity"
+            android:exported="false"
             android:label="Cash Deposit"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -81,6 +82,7 @@
         </activity>
         <activity
             android:name=".WithdrawActivity"
+            android:exported="false"
             android:label="Cash Withdrawal"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -89,6 +91,7 @@
         </activity>
         <activity
             android:name=".CreditClubLoanRequestActivity"
+            android:exported="false"
             android:label="@string/title_activity_loan_request"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -97,15 +100,18 @@
         </activity>
         <activity
             android:name=".LoginActivity"
+            android:exported="false"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".AgentActivationActivity"
+            android:exported="false"
             android:label="@string/agentSetup" />
 
         <activity
             android:name=".BVNUpdateActivity"
+            android:exported="false"
             android:label="@string/title_activity_bvnUpdate"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -114,14 +120,17 @@
         </activity>
         <activity
             android:name="com.creditclub.ui.UpdateActivity"
+            android:exported="false"
             android:label="@string/update"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.creditclub.activity.ReceiptActivity"
+            android:exported="false"
             android:label="@string/receipt"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CustomerRequestOpenAccountActivity"
+            android:exported="false"
             android:label="@string/title_activity_open_account"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -130,6 +139,7 @@
         </activity>
         <activity
             android:name=".ChangePinActivity"
+            android:exported="false"
             android:label="@string/pin_change">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -137,10 +147,12 @@
         </activity>
         <activity
             android:name=".ChangeCustomerPinActivity"
+            android:exported="false"
             android:label="@string/change_customer_pin"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".OnlineActivity"
+            android:exported="false"
             android:label="@string/online_functions"
             android:parentActivityName=".MainActivity">
 
@@ -150,6 +162,7 @@
         </activity>
         <activity
             android:name=".MiniStatementActivity"
+            android:exported="false"
             android:label="@string/title_activity_basic_mini_statement"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -159,6 +172,7 @@
         </activity>
         <activity
             android:name=".CommissionsActivity"
+            android:exported="false"
             android:label="@string/title_activity_commissions_statement"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -168,6 +182,7 @@
         </activity>
         <activity
             android:name=".NewWalletActivity"
+            android:exported="false"
             android:label="@string/title_activity_new_wallet"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -176,16 +191,19 @@
         </activity>
         <activity
             android:name="com.appzonegroup.creditclub.pos.TerminalOptionsActivity"
+            android:exported="false"
             android:label="Terminal Options" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.MenuActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.CardWithdrawalActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Make Payment"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
@@ -195,6 +213,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.ReversalActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Reversal"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.creditclub.pos.ReversalActivity"
@@ -204,6 +223,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.BalanceInquiryActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Balance Inquiry"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
@@ -213,6 +233,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.RefundActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Refund"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
@@ -222,6 +243,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.SalesCompleteActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Sales Completion"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
@@ -231,6 +253,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.PreAuthActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Pre Auth"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
@@ -240,6 +263,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.CashBackActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Cash Back"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
@@ -249,6 +273,7 @@
         <activity
             android:name="com.appzonegroup.creditclub.pos.CashAdvanceActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:exported="false"
             android:label="Cash Advance"
             android:launchMode="singleTask"
             android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
@@ -257,15 +282,18 @@
             tools:replace="android:parentActivityName" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.UnsettledTransactionsActivity"
+            android:exported="false"
             android:label="Pending Confirmations"
             android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
             tools:replace="android:parentActivityName" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.ReprintMenuActivity"
+            android:exported="false"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.esafirm.imagepicker.features.ImagePickerActivity"
+            android:exported="false"
             android:theme="@style/AppTheme.NoActionBar"
             tools:replace="android:theme" />
 
@@ -292,8 +320,9 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+                android:resource="@xml/file_paths" />
         </provider>
+
         <meta-data
             android:name="com.google.android.actions"
             android:resource="@xml/file_paths" />
