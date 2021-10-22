@@ -15,10 +15,10 @@ import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.delegates.defaultJson
 import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.safeRunSuspend
-import com.google.gson.Gson
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.*
+import kotlinx.serialization.builtins.ListSerializer
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -81,8 +81,6 @@ class MobileTrackingWorker(
     }
 
     private suspend fun logDeviceTransactionInfo() {
-        val gson = Gson()
-
         val dao = CoreDatabase.getInstance(applicationContext).deviceTransactionInformationDao()
         val allInfo = dao.findAll()
         if (allInfo.isEmpty()) return
@@ -103,7 +101,10 @@ class MobileTrackingWorker(
 
         if (finishedTransactions.isEmpty()) return
 
-        val dataToSend = gson.toJson(finishedTransactions)
+        val dataToSend = defaultJson.encodeToString(
+            ListSerializer(DeviceTransactionInformation.serializer()),
+            finishedTransactions,
+        )
 
         val (response) = safeRunSuspend {
             val request = dataToSend.toRequestBody(contentType)

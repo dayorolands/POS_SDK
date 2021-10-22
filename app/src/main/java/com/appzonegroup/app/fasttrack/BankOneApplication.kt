@@ -40,9 +40,9 @@ class BankOneApplication : Application() {
         val phoneNumber = "234${localStorage.agentPhone?.substring(1)}"
         val newAuth = localStorage.authResponse
             ?: return@lazy AuthResponse(
-                phoneNumber,
-                localStorage.getString("AGENT_CODE") ?: "",
-                localStorage.getString("AGENT_CODE") ?: ""
+                phoneNumber = phoneNumber,
+                sessionId = localStorage.getString("AGENT_CODE") ?: "",
+                activationCode = localStorage.getString("AGENT_CODE") ?: ""
             )
 
         return@lazy AuthResponse(

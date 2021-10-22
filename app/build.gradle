@@ -223,7 +223,6 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.constraintlayout:constraintlayout:${versions.constraintLayout}"
     implementation "com.google.android.material:material:${versions.material}"
-    implementation "com.google.code.gson:gson:2.8.5"
     implementation "androidx.cardview:cardview:1.0.0"
     implementation "de.hdodenhof:circleimageview:2.1.0"
     implementation "com.loopj.android:android-async-http:1.4.11"
