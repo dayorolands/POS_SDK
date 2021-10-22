@@ -145,7 +145,7 @@ val workerModule = module {
             params = workerParams,
             appDataStorage = get(),
             appConfig = get(),
-            okHttpClient = get(),
+            okHttpClient = get(named(MIDDLEWARE_CLIENT)),
             versionService = getRetrofitService(),
         )
     }

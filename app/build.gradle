@@ -23,8 +23,8 @@ android {
         ndkVersion '21.3.6528147'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 36
-        versionName "1.4.15"
+        versionCode 37
+        versionName "1.4.16"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [
