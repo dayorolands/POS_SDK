@@ -54,7 +54,7 @@ Customer Account: ${accountInfo.number.mask(4, 2)}
 Customer Name: ${accountInfo.accountName}
 
 Transaction Date: $transactionDate}
-RRN: ${request.retrievalReferenceNumber}"""
+RRN: ${request.deviceNumber}${request.retrievalReferenceNumber}"""
                 )
             ).apply { addTransactionStatus(); addAll(footerNodes(context)) }
         }

@@ -38,7 +38,7 @@ Biller Category: ${request.billerCategoryName}
 Transaction Date: $transactionDate
 Customer Account: ${request.customerId?.mask(4, 2)}
 Customer Name: ${request.customerName}
-RRN: ${request.retrievalReferenceNumber}
+RRN: ${request.deviceNumber}${request.retrievalReferenceNumber}
 Transaction ID: ${request.customerDepositSlipNumber}"""
     )
 
