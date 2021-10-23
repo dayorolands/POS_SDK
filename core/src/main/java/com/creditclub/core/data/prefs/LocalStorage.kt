@@ -24,7 +24,7 @@ class LocalStorage(
     val authResponse: AuthResponse? by jsonStore(KEY_AUTH, AuthResponse.serializer(), defaultJson)
     var agent: AgentInfo? by jsonStore(AGENT_INFO, AgentInfo.serializer(), defaultJson)
     var transactionSequenceNumber: Long by longStore("transaction_sequence_number", 1)
-    var deviceNumber: Int by intStore("device_number", 1)
+    var deviceNumber: Int by intStore("device_number", 0)
 
     fun getString(key: String): String? = getString(key, null)
 
