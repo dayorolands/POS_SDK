@@ -11,6 +11,7 @@ import com.appzonegroup.creditclub.pos.extension.apnInfo
 import com.appzonegroup.creditclub.pos.util.AppConstants
 import com.appzonegroup.creditclub.pos.widget.Dialogs
 import com.creditclub.core.ui.widget.DialogOptionItem
+import com.creditclub.core.util.debugOnly
 import com.creditclub.pos.InvalidRemoteConnectionInfo
 import com.creditclub.pos.model.PosTenant
 import com.creditclub.ui.dataBinding
@@ -24,9 +25,16 @@ class TerminalOptionsActivity : PosActivity(R.layout.activity_network_parameters
     private val posTenant: PosTenant by inject()
 
     override fun onClick(v: View?) {
-        if (v?.id == R.id.terminal_id_item && !BuildConfig.DEBUG) {
-            dialogProvider.showError("Terminal ID cannot be set manually. Please contact your administrator")
-            return
+        if (v?.id == R.id.terminal_id_item) {
+            var isDebuggable = false
+            debugOnly {
+                isDebuggable = true
+            }
+
+            if (!isDebuggable) {
+                dialogProvider.showError("Terminal ID cannot be set manually. Please contact your administrator")
+                return
+            }
         }
 
         val hint: String

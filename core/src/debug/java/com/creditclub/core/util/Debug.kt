@@ -9,7 +9,7 @@ import kotlin.contracts.contract
 @OptIn(ExperimentalContracts::class)
 inline fun debugOnly(crossinline block: () -> Unit) {
     contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
     block()
 }
