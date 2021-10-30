@@ -8,6 +8,7 @@ import android.util.Log
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.debug
+import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosManagerCompanion
 import com.creditclub.pos.PosParameter
@@ -165,7 +166,9 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
             intent.setPackage("com.sunmi.pay.hardware_v3")
 
             val pkgManager: PackageManager = context.applicationContext.packageManager
-            val services: List<ResolveInfo> = pkgManager.queryIntentServices(intent, 0)
+            val services: List<ResolveInfo>? = safeRun {
+                pkgManager.queryIntentServices(intent, 0)
+            }.data
 
             return services != null && services.isNotEmpty()
         }

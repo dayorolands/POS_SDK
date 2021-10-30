@@ -7,4 +7,7 @@
     <color name="colorAccentContrast">@color/white</color>
     <color name="menuBackground">#1108237e</color>
     <color name="fundsTransferSameBankTint">@color/colorAccent</color>
+    <color name="colorSplashBg">@color/white</color>
+    <color name="colorBalanceCardBg">@color/white</color>
+    <color name="menuButtonTextColor">@color/colorAccent</color>
 </resources>

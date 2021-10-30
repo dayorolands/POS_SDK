@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Cluster Plus</string>
+    <string name="app_name">Cluster Agents</string>
     <string name="ota_app_name">Cluster</string>
     <string name="institution_name">Cluster</string>
     <string name="activation_instructions" />
