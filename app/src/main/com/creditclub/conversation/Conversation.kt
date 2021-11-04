@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.appzonegroup.app.fasttrack.R
 import com.creditclub.core.data.api.CaseLogService
 import com.creditclub.core.data.model.Feedback
@@ -44,7 +45,6 @@ import com.creditclub.ui.*
 import com.creditclub.ui.theme.elevatedSurface
 import com.creditclub.ui.util.registerImagePicker
 import com.esafirm.imagepicker.features.cameraonly.CameraOnlyConfig
-import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
@@ -471,7 +471,12 @@ fun ChatItemBubble(
                 Spacer(modifier = Modifier.height(4.dp))
                 Surface(color = backgroundBubbleColor, shape = bubbleShape) {
                     Image(
-                        painter = rememberCoilPainter(it, fadeIn = true),
+                        painter = rememberImagePainter(
+                            data = it,
+                            builder = {
+                                crossfade(true)
+                            },
+                        ),
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.size(160.dp),
                         contentDescription = stringResource(id = R.string.attached_image)

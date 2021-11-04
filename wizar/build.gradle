@@ -32,7 +32,7 @@ android {
 
 dependencies {
 
-    implementation 'com.google.android.material:material:1.4.0'
+    implementation "com.google.android.material:material:${versions.material}"
     implementation project(path: ':poscore')
     implementation project(path: ':core')
     implementation project(path: ':poscore')
