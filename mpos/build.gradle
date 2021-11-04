@@ -38,11 +38,11 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation files('libs/iBridge.jar')
     implementation files('libs/jhlblueconn.jar')
-    implementation "androidx.recyclerview:recyclerview:1.1.0"
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.cardview:cardview:1.0.0"
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation "androidx.constraintlayout:constraintlayout:${versions.constraintlayout}"
     implementation "com.google.android.material:material:${versions.material}"
 }
