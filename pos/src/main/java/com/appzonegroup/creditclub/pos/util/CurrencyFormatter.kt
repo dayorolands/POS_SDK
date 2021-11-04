@@ -1,6 +1,6 @@
 package com.appzonegroup.creditclub.pos.util
 
-import com.appzonegroup.creditclub.pos.BuildConfig
+import com.creditclub.core.util.debugOnly
 import java.text.NumberFormat
 import java.util.*
 
@@ -24,7 +24,7 @@ object CurrencyFormatter {
     fun format(text: String?): String = try {
         numberFormatter.format((text?.toDouble() ?: 0.00) / 100.0)
     } catch (ex: Exception) {
-        if (BuildConfig.DEBUG) ex.printStackTrace()
+        debugOnly { ex.printStackTrace() }
         "NGN0.00"
     }
 }

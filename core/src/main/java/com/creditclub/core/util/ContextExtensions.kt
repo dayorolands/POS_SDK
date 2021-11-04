@@ -6,7 +6,6 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import androidx.annotation.RawRes
-import com.creditclub.core.BuildConfig
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.model.AppFunctionUsage
 import com.creditclub.core.data.model.DeviceTransactionInformation
@@ -74,7 +73,7 @@ inline val Context.packageInfo: PackageInfo?
         return try {
             packageManager.getPackageInfo(packageName, 0)
         } catch (e: PackageManager.NameNotFoundException) {
-            if (BuildConfig.DEBUG) e.printStackTrace()
+            debugOnly { e.printStackTrace() }
             null
         }
     }
