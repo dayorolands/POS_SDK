@@ -3,7 +3,7 @@
     <color name="navHeaderLogoTint">#0000</color>
     <color name="splashOverlay">#DDFFFFFF</color>
     <color name="menuButtonIconTint">@color/transparent</color>
-    <!--    <color name="colorLoginBg">@color/transparent</color>-->
+    <color name="colorLoginBg">#D000</color>
     <color name="colorAccentContrast">@color/white</color>
     <color name="menuBackground">#1108237e</color>
     <color name="fundsTransferSameBankTint">@color/colorAccent</color>
