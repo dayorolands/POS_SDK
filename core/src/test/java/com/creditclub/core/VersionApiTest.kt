@@ -1,7 +1,7 @@
 package com.creditclub.core
 
 import com.creditclub.core.data.api.VersionService
-import com.creditclub.core.data.model.Version
+import com.creditclub.core.data.model.SemVer
 import com.creditclub.core.util.delegates.service
 import com.creditclub.core.util.safeRunIO
 import org.junit.Test
@@ -23,16 +23,18 @@ open class VersionApiTest : UnitTest() {
 
             assert(error == null)
             assert(response != null)
-            Version(response!!.version)
+            SemVer.parse(response!!.version)
         }
     }
 
     @Test
     fun `version comparison works`() {
-        assert(Version("0") == Version("0.0.0"))
-        assert(Version("1.4.9") < Version("1.4.10"))
-        assert(Version("1.4.9") > Version("1.4.8"))
-        assert(Version("1.40.9") < Version("1.40.86"))
-        assert(Version("2.4.9") > Version("1.40.86"))
+        assert(SemVer.parse("0") == SemVer.parse("0.0.0"))
+        assert(SemVer.parse("1.4.10") > SemVer.parse("1.4.9"))
+        assert(SemVer.parse("1.4.9") > SemVer.parse("1.4.8"))
+        assert(SemVer.parse("1.40.86") > SemVer.parse("1.40.9"))
+        assert(SemVer.parse("2.4.9") > SemVer.parse("1.40.86"))
+        assert(SemVer.parse("2.4.9") > SemVer.parse("2.4.9-beta1"))
+        assert(SemVer.parse("2.4.9-alpha2") > SemVer.parse("2.4.9-alpha1"))
     }
 }

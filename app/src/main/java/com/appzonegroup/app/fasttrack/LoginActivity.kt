@@ -58,8 +58,6 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
         binding.versionTv.text = "Version ${packageInfo?.versionName}"
         debugOnly {
-            val debugInfo = "Version ${packageInfo?.versionName}. ${BuildConfig.BUILD_TYPE}"
-            binding.versionTv.text = debugInfo
             binding.loginPhoneNumber.setText(localStorage.agentPhone)
         }
         val agentName = localStorage.agent?.agentName

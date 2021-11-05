@@ -4,7 +4,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("kotlinx-serialization")
+    kotlin("plugin.serialization")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("com.google.firebase.firebase-perf")
@@ -16,6 +16,10 @@ kapt {
         arg("correctErrorTypes", "true")
         arg("useBuildCache", "true")
     }
+}
+
+object Config {
+    const val NOTIFICATION_TOKEN = "C175CFBE-E036-487B-9CC5-D8DFD2199989"
 }
 
 android {
@@ -86,11 +90,8 @@ android {
                 "proguard-rules.pro",
             )
             buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
-            buildConfigField("String",
-                "NOTIFICATION_TOKEN",
-                "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
+            buildConfigField("String", "NOTIFICATION_TOKEN", "\"${Config.NOTIFICATION_TOKEN}\"")
             manifestPlaceholders["usesCleartextTraffic"] = "false"
-            resValue("string", "app_name_suffix", "")
         }
 
         create("releaseStaging") {
@@ -102,11 +103,8 @@ android {
                 "proguard-rules.pro",
             )
             buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
-            buildConfigField("String",
-                "NOTIFICATION_TOKEN",
-                "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
+            buildConfigField("String", "NOTIFICATION_TOKEN", "\"${Config.NOTIFICATION_TOKEN}\"")
             manifestPlaceholders["usesCleartextTraffic"] = "true"
-            resValue("string", "app_name_suffix", " (Staging)")
             initWith(getByName("release"))
             matchingFallbacks += listOf("release", "debug")
             signingConfig = signingConfigs.getByName("debug")
@@ -116,13 +114,8 @@ android {
         getByName("debug") {
             isDebuggable = true
             buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
-            buildConfigField(
-                "String",
-                "NOTIFICATION_TOKEN",
-                "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\""
-            )
+            buildConfigField("String", "NOTIFICATION_TOKEN", "\"${Config.NOTIFICATION_TOKEN}\"")
             manifestPlaceholders["usesCleartextTraffic"] = "true"
-            resValue("string", "app_name_suffix", " (Debug)")
             extra["enableCrashlytics"] = false
             extra["alwaysUpdateBuildId"] = false
             configure<com.google.firebase.perf.plugin.FirebasePerfExtension> {
@@ -187,21 +180,12 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = Versions.compose
     }
-//    dynamicFeatures = [":nexgo"]
+//    dynamicFeatures += setOf(":nexgo")
     splits {
-        // Configures multiple APKs based on ABI.
         abi {
-            // Enables building multiple APKs per ABI.
             isEnable = true
-
-            // By default all ABIs are included, so use reset() and include to specify that we only
-            // want APKs for x86, armeabi-v7a, and mips.
             reset()
-
-            // Specifies a list of ABIs that Gradle should create APKs for.
             include("armeabi", "armeabi-v7a", "arm64-v8a")
-
-            // Specifies that we want to also generate a universal APK that includes all ABIs.
             isUniversalApk = true
         }
     }
@@ -220,8 +204,8 @@ dependencies {
 //    "polarisImplementation"(project(":sunmi"))
     "accessImplementation"(project(":telpo"))
     "gtbankImplementation"(project(":dspread"))
-    "purpleImplementation"(project(":dspread"))
-//    "purpleImplementation"(project(":telpo"))
+//    "purpleImplementation"(project(":dspread"))
+    "purpleImplementation"(project(":telpo"))
     "groomingImplementation"(project(":telpo"))
     "groomingImplementation"(project(":nexgo"))
     "heritageImplementation"(project(":wizar"))
@@ -258,14 +242,16 @@ dependencies {
     // Test helpers
     testImplementation("androidx.room:room-testing:${Versions.room}")
 
-    implementation("com.thoughtbot:expandablerecyclerview:1.4")
+    implementation("com.github.thoughtbot:expandable-recycler-view:v1.4") {
+        exclude(group = "com.thoughtbot", module = "expandablerecyclerview")
+    }
 
     testImplementation("junit:junit:4.13.2")
 
     // Co-routine Tests
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}")
 
-    implementation("me.relex:circleindicator:2.1.4")
+    implementation("me.relex:circleindicator:2.1.6")
     implementation("com.squareup.picasso:picasso:2.71828")
 
     // Kotlin
