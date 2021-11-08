@@ -12,13 +12,21 @@ import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.utils.asDesEdeKey
 import com.creditclub.pos.utils.decrypt
 import kotlinx.coroutines.runBlocking
+import okio.use
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.jpos.iso.ISOMsg
+import org.jpos.iso.ISOUtil
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import org.junit.Test
+import java.io.File
+import java.security.KeyStore
 import java.security.SecureRandom
+import java.security.Security
 import java.util.*
+import javax.net.ssl.TrustManager
+import javax.net.ssl.TrustManagerFactory
 
 const val TERMINAL_ID = "2076KB84"
 val posMode = object : RemoteConnectionInfo {
@@ -45,6 +53,10 @@ class KeyDownloadTest : PosParameter {
     override val capkList: JSONArray? = null
     override val emvAidList: JSONArray? = null
 
+    init {
+        SocketJob.setTrustManagers(getTrustManagers())
+    }
+
     override suspend fun downloadCapk() {
     }
 
@@ -58,7 +70,7 @@ class KeyDownloadTest : PosParameter {
     fun keys_downloadProperly() {
         runBlocking {
             downloadKeys()
-//            downloadParameters(terminalId = TERMINAL_ID)
+            downloadParameters(terminalId = TERMINAL_ID)
         }
     }
 
@@ -71,6 +83,20 @@ class KeyDownloadTest : PosParameter {
         }
         isoMsg.unpack(packedMsg)
         isoMsg.log()
+    }
+
+    @Throws(Exception::class)
+    fun getTrustManagers(): Array<TrustManager?>? {
+        Security.insertProviderAt(BouncyCastleProvider(), 1)
+        val password = "cluster".toCharArray()
+        val trustStoreFile = File(javaClass.getResource("/pos_trust_store.bks").path)
+        val trustStore = KeyStore.getInstance("BKS")
+        trustStoreFile.inputStream().use { inputStream ->
+            trustStore.load(inputStream, password)
+        }
+        val tmf = TrustManagerFactory.getInstance("X509")
+        tmf.init(trustStore)
+        return tmf.trustManagers
     }
 
     override suspend fun downloadKeys() {
@@ -108,9 +134,11 @@ class KeyDownloadTest : PosParameter {
             localTransactionDate13 = dateParams.localDate
             terminalId41 = TERMINAL_ID
         }
+        debugOnly { isoMsg.log() }
         val input = isoMsg.pack()
         val output = sendAndReceive(input)
         isoMsg.unpack(output)
+        debugOnly { isoMsg.log() }
 
         if (isoMsg.hasFailed) {
             throw CreditClubException(

@@ -1,6 +1,5 @@
 package com.appzonegroup.creditclub.pos.util
 
-import android.annotation.SuppressLint
 import com.creditclub.pos.RemoteConnectionInfo
 import okio.*
 import java.io.Closeable
@@ -11,28 +10,11 @@ import java.nio.ByteBuffer
 import java.security.KeyManagementException
 import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
-import java.security.cert.X509Certificate
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 
-@SuppressLint("CustomX509TrustManager")
-private val trustManager: TrustManager = object : X509TrustManager {
-    override fun getAcceptedIssuers(): Array<X509Certificate> {
-        return emptyArray()
-    }
-
-    @SuppressLint("TrustAllX509TrustManager")
-    override fun checkClientTrusted(certs: Array<X509Certificate>, authType: String) {
-    }
-
-    @SuppressLint("TrustAllX509TrustManager")
-    override fun checkServerTrusted(certs: Array<X509Certificate>, authType: String) {
-    }
-}
-private val trustAllCerts = arrayOf(trustManager)
-
+private var trustManagers: Array<TrustManager?>? = null
 
 /**
  * @param remoteConnectionInfo
@@ -116,10 +98,18 @@ object SocketJob {
         data: ByteArray,
         timeout: Int = connectionInfo.timeout,
     ): ByteArray? = connectionInfo.tcp(timeout = timeout).sendAndReceive(data = data)
+
+    fun setTrustManagers(tManagers: Array<TrustManager?>) {
+        trustManagers = tManagers
+    }
 }
 
-fun RemoteConnectionInfo.tcp(timeout: Int = this.timeout) =
-    TcpClient(remoteConnectionInfo = this, timeout = timeout)
+fun RemoteConnectionInfo.tcp(
+    timeout: Int = this.timeout,
+) = TcpClient(
+    remoteConnectionInfo = this,
+    timeout = timeout,
+)
 
 private fun withPrependedLength(data: ByteArray): ByteArray {
     val dataLength = data.size.toShort()
@@ -130,7 +120,10 @@ private fun withPrependedLength(data: ByteArray): ByteArray {
     return destination
 }
 
-private fun getSocket(remoteConnectionInfo: RemoteConnectionInfo, timeout: Int): Socket {
+private fun getSocket(
+    remoteConnectionInfo: RemoteConnectionInfo,
+    timeout: Int,
+): Socket {
     val timeoutInMilliSeconds = timeout * 1000
     if (!remoteConnectionInfo.sslEnabled) {
         return Socket(remoteConnectionInfo.host, remoteConnectionInfo.port).apply {
@@ -138,8 +131,8 @@ private fun getSocket(remoteConnectionInfo: RemoteConnectionInfo, timeout: Int):
         }
     }
 
-    val sc = SSLContext.getInstance("TLS")
-    sc.init(null, trustAllCerts, SecureRandom())
+    val sc = SSLContext.getInstance("TLSv1.2")
+    sc.init(null, trustManagers, SecureRandom())
     val sslSocket = sc.socketFactory.createSocket() as SSLSocket
     sslSocket.soTimeout = timeoutInMilliSeconds
     val address = InetSocketAddress(remoteConnectionInfo.host, remoteConnectionInfo.port)

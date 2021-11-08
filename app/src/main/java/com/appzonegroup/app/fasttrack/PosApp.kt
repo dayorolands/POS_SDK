@@ -1,6 +1,7 @@
 package com.appzonegroup.app.fasttrack
 
 import android.app.Application
+import android.content.Context
 import android.os.Build
 import androidx.work.Constraints
 import androidx.work.NetworkType
@@ -10,8 +11,15 @@ import com.appzonegroup.app.fasttrack.work.IsoRequestLogWorker
 import com.appzonegroup.app.fasttrack.work.ReversalWorker
 import com.appzonegroup.app.fasttrack.work.TransactionLogWorker
 import com.appzonegroup.creditclub.pos.service.ConfigService
+import com.appzonegroup.creditclub.pos.util.SocketJob
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.data.prefs.moveTo
+import okio.use
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import java.security.KeyStore
+import java.security.Security
+import javax.net.ssl.TrustManager
+import javax.net.ssl.TrustManagerFactory
 
 
 /**
@@ -20,6 +28,7 @@ import com.creditclub.core.data.prefs.moveTo
  */
 
 fun Application.startPosApp() {
+    SocketJob.setTrustManagers(getTrustManagers(this))
     encryptPosConfig()
 
     val workManager = WorkManager.getInstance(this)
@@ -65,4 +74,17 @@ private fun Application.encryptPosConfig() {
             deleteSharedPreferences(prefsName)
         }
     }
+}
+
+@Throws(Exception::class)
+private fun getTrustManagers(context: Context): Array<TrustManager?> {
+    Security.insertProviderAt(BouncyCastleProvider(), 1)
+    val password = "cluster".toCharArray()
+    val trustStore = KeyStore.getInstance("BKS")
+    context.resources.openRawResource(R.raw.pos_trust_store).use { inputStream ->
+        trustStore.load(inputStream, password)
+    }
+    val tmf = TrustManagerFactory.getInstance("X509")
+    tmf.init(trustStore)
+    return tmf.trustManagers
 }
