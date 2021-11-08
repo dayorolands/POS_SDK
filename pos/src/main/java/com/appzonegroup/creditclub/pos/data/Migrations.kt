@@ -3,7 +3,7 @@ package com.appzonegroup.creditclub.pos.data
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-internal val MIGRATION_7_8 = object : Migration(7, 8) {
+val MIGRATION_7_8 = object : Migration(7, 8) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
@@ -15,7 +15,7 @@ internal val MIGRATION_7_8 = object : Migration(7, 8) {
     }
 }
 
-internal val MIGRATION_8_9 = object : Migration(8, 9) {
+val MIGRATION_8_9 = object : Migration(8, 9) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
@@ -31,7 +31,7 @@ internal val MIGRATION_8_9 = object : Migration(8, 9) {
     }
 }
 
-internal val MIGRATION_9_10 = object : Migration(9, 10) {
+val MIGRATION_9_10 = object : Migration(9, 10) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("ALTER TABLE `PosNotification` ADD COLUMN `nodeName` TEXT")
@@ -51,21 +51,21 @@ internal val MIGRATION_9_10 = object : Migration(9, 10) {
     }
 }
 
-internal val MIGRATION_10_11 = object : Migration(10, 11) {
+val MIGRATION_10_11 = object : Migration(10, 11) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("ALTER TABLE `PosNotification` ADD COLUMN `terminalId` TEXT")
     }
 }
 
-internal val MIGRATION_11_12 = object : Migration(11, 12) {
+val MIGRATION_11_12 = object : Migration(11, 12) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("ALTER TABLE `PosTransaction` ADD COLUMN `isSynced` INTEGER NOT NULL DEFAULT 0")
     }
 }
 
-internal val MIGRATION_12_13 = object : Migration(12, 13) {
+val MIGRATION_12_13 = object : Migration(12, 13) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("ALTER TABLE `IsoRequestLog` ADD COLUMN `duration` INTEGER NOT NULL DEFAULT 0")

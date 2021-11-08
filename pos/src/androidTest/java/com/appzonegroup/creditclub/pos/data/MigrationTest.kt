@@ -5,10 +5,10 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import kotlinx.io.IOException
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.IOException
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare></enosakhare>@appzonegroup.com> on 05/02/2020.
@@ -45,7 +45,14 @@ class MigrationTest {
     }
 
     companion object {
-        private val ALL_MIGRATIONS = arrayOf(PosDatabase.MIGRATION_7_8, PosDatabase.MIGRATION_8_9)
+        private val ALL_MIGRATIONS = arrayOf(
+            MIGRATION_7_8,
+            MIGRATION_8_9,
+            MIGRATION_9_10,
+            MIGRATION_10_11,
+            MIGRATION_11_12,
+            MIGRATION_12_13,
+        )
         private const val TEST_DB = "credit_club_pos_test"
     }
 }
