@@ -6,7 +6,9 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.BillPaymentFragmentBinding
 import com.appzonegroup.app.fasttrack.executeTransaction
@@ -17,16 +19,18 @@ import com.creditclub.core.data.ClusterObjectBox
 import com.creditclub.core.data.api.BillsPaymentService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.BillCategory
+import com.creditclub.core.data.model.PayBillRequest
 import com.creditclub.core.data.model.PendingTransaction
 import com.creditclub.core.data.model.ValidateCustomerInfoRequest
 import com.creditclub.core.data.prefs.newTransactionReference
-import com.creditclub.core.data.request.PayBillRequest
 import com.creditclub.core.type.TransactionType
 import com.creditclub.core.ui.CreditClubFragment
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.defaultJson
 import io.objectbox.Box
 import io.objectbox.kotlin.boxFor
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.time.Instant
@@ -54,7 +58,18 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         binding.toolbar.title = if (isAirtime) "Airtime Purchase" else "Bill Payment"
 
         binding.completePaymentButton.setOnClickListener {
-            mainScope.launch { completePayment() }
+            mainScope.launch {
+                if (viewModel.shouldValidate.value == true) {
+                    validateCustomerInformation()
+                } else {
+                    completePayment(isRenewal = false)
+                }
+            }
+        }
+        binding.renewButton.setOnClickListener {
+            mainScope.launch {
+                completePayment(isRenewal = true)
+            }
         }
 
         viewModel.run {
@@ -72,9 +87,9 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             category.onChange { newCategory ->
                 mainScope.launch {
                     biller.value = null
-                    billerName.value = null
+                    billerName.value = ""
                     item.value = null
-                    itemName.value = null
+                    itemName.value = ""
                     if (newCategory != null) {
                         loadBillers()
                     }
@@ -84,7 +99,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             biller.onChange { newBiller ->
                 mainScope.launch {
                     item.value = null
-                    itemName.value = null
+                    itemName.value = ""
                     customerValidationResponse.value = null
                     if (newBiller != null) {
                         loadItems()
@@ -95,7 +110,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             item.onChange { newItem ->
                 mainScope.launch {
                     if (amountIsNeeded.value == false) {
-                        amountString.value = newItem?.amount?.toString()
+                        amountString.value = newItem?.amount?.toString() ?: "0"
                     }
                 }
             }
@@ -117,29 +132,37 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         }
     }
 
-    private inline fun <T> MutableLiveData<T>.onChange(crossinline block: (value: T?) -> Unit) {
+    private inline fun <T> MutableStateFlow<T>.onChange(crossinline block: (value: T) -> Unit) {
         var oldValue = value
-        observe(viewLifecycleOwner) {
-            if (it != oldValue) {
-                oldValue = it
-                block(it)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                collect {
+                    if (it != oldValue) {
+                        oldValue = it
+                        block(it)
+                    }
+                }
             }
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    private inline fun <T> MutableLiveData<List<T>>.bindDropDown(
-        selectedItemLiveData: MutableLiveData<T>,
+    private inline fun <T> MutableStateFlow<List<T>>.bindDropDown(
+        selectedItemLiveData: MutableStateFlow<T?>,
         autoCompleteTextView: AutoCompleteTextView,
         crossinline mapFunction: List<T>.() -> List<Any>,
     ) {
-        observe(viewLifecycleOwner) { list ->
-            val items = list?.mapFunction() ?: emptyList()
-            val adapter = ArrayAdapter(requireContext(), R.layout.list_item, items)
-            autoCompleteTextView.setAdapter(adapter)
-            if (list != null) {
-                autoCompleteTextView.setOnItemClickListener { parent, _, position, _ ->
-                    selectedItemLiveData.postValue(parent.getItemAtPosition(position) as T)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                this@bindDropDown.collect { list ->
+                    val items = list.mapFunction() ?: emptyList()
+                    val adapter = ArrayAdapter(requireContext(), R.layout.list_item, items)
+                    autoCompleteTextView.setAdapter(adapter)
+                    autoCompleteTextView.setOnItemClickListener { parent, _, position, _ ->
+                        lifecycleScope.launchWhenStarted {
+                            selectedItemLiveData.emit(parent.getItemAtPosition(position) as T)
+                        }
+                    }
                 }
             }
         }
@@ -186,37 +209,37 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     }
 
     private suspend fun validateCustomerInformation() {
-        val billerItem = viewModel.item.value
-        val biller = viewModel.biller.value
+        val billerItem = viewModel.item.value!!
+        val biller = viewModel.biller.value!!
 
         if (viewModel.fieldOneIsNeeded.value == true) {
             val fieldOne = viewModel.fieldOne.value
-            if (fieldOne.isNullOrBlank()) {
+            if (fieldOne.isBlank()) {
                 return dialogProvider.showError("${viewModel.fieldOneLabel.value} should not be empty")
             } else {
-                billerItem!!.customerFieldOneField = fieldOne
+                billerItem.customerFieldOneField = fieldOne
             }
         }
 
         if (viewModel.fieldTwoIsNeeded.value == true) {
             val fieldTwo = viewModel.fieldTwo.value
-            if (fieldTwo.isNullOrBlank()) {
+            if (fieldTwo.isBlank()) {
                 return dialogProvider.showError("${viewModel.fieldTwoLabel.value} should not be empty")
             } else {
-                billerItem!!.customerFieldOneField = fieldTwo
+                billerItem.customerFieldOneField = fieldTwo
             }
         }
 
-        if (viewModel.amountString.value.isNullOrBlank()) {
+        if (viewModel.amountString.value.isBlank()) {
             return dialogProvider.showErrorAndWait("Amount is required")
         }
 
         if (viewModel.amountIsNeeded.value == true) {
             val amountString = viewModel.amountString.value
-            if (amountString.isNullOrBlank()) {
+            if (amountString.isBlank()) {
                 return dialogProvider.showError("Please enter an amount")
             } else {
-                billerItem!!.amount = amountString.toDoubleOrNull()
+                billerItem.amount = amountString.toDoubleOrNull()
             }
         }
 
@@ -224,9 +247,9 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         val (response, error) = safeRunIO {
             billsPaymentService.validateCustomerInfo(
                 ValidateCustomerInfoRequest(
-                    amount = billerItem!!.amount!!,
-                    billerId = biller!!.id!!,
-                    customerId = viewModel.fieldOne.value!!,
+                    amount = billerItem.amount!!,
+                    billerId = biller.id!!,
+                    customerId = viewModel.fieldOne.value,
                     institutionCode = localStorage.institutionCode!!,
                 )
             )
@@ -248,29 +271,12 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         viewModel.customerValidationResponse.value = response
     }
 
-
-    private suspend fun completePayment() {
-        val billerItem = viewModel.item.value
-        val category = viewModel.category.value
+    private suspend fun completePayment(isRenewal: Boolean) {
+        val billerItem = viewModel.item.value!!
+        val category = viewModel.category.value!!
         val isAirtime = viewModel.category.value?.isAirtime ?: false
-        val biller = viewModel.biller.value
 
-        if (category == null) {
-            return dialogProvider.showErrorAndWait("Please select a category")
-        }
-
-        if (biller == null) {
-            return dialogProvider.showError("Please select a biller")
-        }
-
-        if (billerItem == null) {
-            return dialogProvider.showError("Please select an item")
-        }
-
-        if (viewModel.category.value?.isAirtime != true &&
-            viewModel.customerValidationResponse.value == null &&
-            viewModel.fieldOneIsNeeded.value == true
-        ) {
+        if (viewModel.shouldValidate.value == true) {
             validateCustomerInformation()
             if (viewModel.customerValidationResponse.value == null) {
                 return
@@ -279,18 +285,18 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
 
         if (viewModel.category.value?.isAirtime != true) {
             val customerName = viewModel.customerName.value
-            if (customerName.isNullOrBlank()) return dialogProvider.showError("Customer Name is required")
+            if (customerName.isBlank()) return dialogProvider.showError("Customer Name is required")
             if (customerName.includesSpecialCharacters() || customerName.includesNumbers()) {
                 return dialogProvider.showError("Customer Name is invalid")
             }
 
             val customerPhone = viewModel.customerPhone.value
-            if (customerPhone.isNullOrBlank()) return dialogProvider.showError("Customer Phone is required")
+            if (customerPhone.isBlank()) return dialogProvider.showError("Customer Phone is required")
             if (customerPhone.length != 11) return dialogProvider.showError("Customer Phone must be 11 digits")
         }
 
         val customerEmailValue = viewModel.customerEmail.value
-        if (!customerEmailValue.isNullOrBlank() && !customerEmailValue.isValidEmail()) {
+        if (customerEmailValue.isNotBlank() && !customerEmailValue.isValidEmail()) {
             return dialogProvider.showErrorAndWait("Customer Email is invalid")
         }
 
@@ -298,6 +304,11 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
         val agent = localStorage.agent
+        val renewalAmount = viewModel.renewalInfo.value?.renewalAmount ?: 0.0
+        val additional = PayBillRequest.Additional(
+            isRenewal = isRenewal,
+            renewalAmount = renewalAmount,
+        )
         val request = PayBillRequest(
             agentPin = pin,
             agentPhoneNumber = localStorage.agentPhone,
@@ -306,7 +317,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             customerId = viewModel.fieldOne.value,
             merchantBillerIdField = viewModel.item.value?.billerId?.toString(),
             billItemID = billerItem.id,
-            amount = viewModel.amountString.value!!,
+            amount = viewModel.amountString.value,
             billerCategoryID = category.id,
             customerEmail = customerEmailValue,
             accountNumber = localStorage.agentPhone,
@@ -327,6 +338,10 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             retrievalReferenceNumber = uniqueReference,
             deviceNumber = localStorage.deviceNumber,
             validationCode = viewModel.customerValidationResponse.value?.validationCode,
+            additionalInformation = defaultJson.encodeToString(
+                PayBillRequest.Additional.serializer(),
+                additional,
+            )
         )
         dialogProvider.showProgressBar("Processing request")
         val requestTime = Instant.now()
@@ -364,5 +379,11 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
         )
         navigateToReceipt(receipt, popBackStack = true)
+    }
+
+    private fun <T> MutableStateFlow<T>.postValue(item: T) {
+        lifecycleScope.launchWhenStarted {
+            emit(item)
+        }
     }
 }

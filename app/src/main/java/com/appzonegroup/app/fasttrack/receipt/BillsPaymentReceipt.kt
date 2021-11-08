@@ -3,15 +3,13 @@ package com.appzonegroup.app.fasttrack.receipt
 import android.content.Context
 import com.appzonegroup.creditclub.pos.printer.logo
 import com.appzonegroup.creditclub.pos.receipt.transactionStatus
-import com.creditclub.core.data.request.PayBillRequest
-import com.creditclub.core.data.response.PayBillResponse
+import com.creditclub.core.data.model.PayBillRequest
+import com.creditclub.core.data.model.PayBillResponse
 import com.creditclub.core.util.delegates.defaultJson
 import com.creditclub.core.util.localStorage
 import com.creditclub.core.util.mask
-import com.creditclub.core.util.toString
 import com.creditclub.pos.printer.Alignment
 import com.creditclub.pos.printer.printJob
-import java.time.Instant
 
 fun billsPaymentReceipt(
     context: Context,

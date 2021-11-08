@@ -50,7 +50,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    android:hint="Category"
+                    android:hint="@string/category"
                     app:goneIf="@{viewModel.hideCategoryField}">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -135,8 +135,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    android:hint="Amount"
-                    app:disableUnless="@{viewModel.amountIsNeeded}">
+                    android:hint="@string/amount"
+                    app:disableUnless="@{viewModel.amountIsNeeded}"
+                    app:prefixText="@string/naira">
 
                     <com.google.android.material.textfield.TextInputEditText
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -159,7 +160,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    app:goneIf="@{viewModel.isAirtime}">
+                    app:goneIf="@{viewModel.isAirtime}"
+                    android:baselineAligned="false">
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -168,7 +170,7 @@
                         android:layout_marginEnd="20dp"
                         android:layout_marginBottom="15dp"
                         android:layout_weight="1"
-                        android:hint="Customer Name"
+                        android:hint="@string/customer_name"
                         app:goneIfPresent="@{viewModel.customerValidationName}">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -184,7 +186,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:hint="Phone Number"
+                        android:hint="@string/phone_number"
                         app:counterEnabled="true"
                         app:counterMaxLength="11"
                         app:endIconMode="custom">
@@ -228,7 +230,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="Customer Name"
+                    android:text="@string/customer_name"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     app:goneUnlessPresent="@{viewModel.customerValidationName}" />
@@ -244,18 +246,46 @@
             </LinearLayout>
         </ScrollView>
 
-        <Button
-            android:id="@+id/complete_payment_button"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_alignParentEnd="true"
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
             android:layout_alignParentBottom="true"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="20dp"
-            android:width="180dp"
-            android:gravity="center"
-            android:text="Complete Payment"
-            android:textColor="#fff" />
+            android:layout_marginTop="3dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="10dp"
+            app:goneUnless="@{viewModel.requestIsValid}">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/renew_button"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="12dp"
+                    android:gravity="center"
+                    android:text="@{viewModel.renewalButtonText}"
+                    android:textColor="@color/colorPrimary"
+                    app:goneUnless="@{viewModel.isRenewable}" />
+
+                <Button
+                    android:id="@+id/complete_payment_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="16dp"
+                    android:width="160dp"
+                    android:layout_marginVertical="5dp"
+                    android:gravity="center"
+                    android:text="@{viewModel.primaryButtonText}"
+                    android:textColor="#fff" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
     </RelativeLayout>
 </layout>

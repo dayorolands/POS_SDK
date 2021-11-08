@@ -1,8 +1,8 @@
 package com.creditclub.core.data.api
 
 import com.creditclub.core.data.model.*
-import com.creditclub.core.data.request.PayBillRequest
-import com.creditclub.core.data.response.PayBillResponse
+import com.creditclub.core.data.model.PayBillRequest
+import com.creditclub.core.data.model.PayBillResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -19,16 +19,16 @@ interface BillsPaymentService {
     suspend fun getBillers(
         @Query("institutionCode") institutionCode: String?,
         @Query("billerCategoryID") billerCategoryId: String?
-    ): List<Biller>?
+    ): List<Biller>
 
     @GET("api/PayBills/GetBillerCategories")
-    suspend fun getBillerCategories(@Query("institutionCode") institutionCode: String?): List<BillCategory>?
+    suspend fun getBillerCategories(@Query("institutionCode") institutionCode: String?): List<BillCategory>
 
     @GET("api/PayBills/GetPaymentItems")
     suspend fun getPaymentItems(
         @Query("institutionCode") institutionCode: String?,
         @Query("billerID") billerId: String?
-    ): List<BillPaymentItem>?
+    ): List<BillPaymentItem>
 
     @POST("api/PayBills/RunTransaction")
     suspend fun runTransaction(@Body body: PayBillRequest): PayBillResponse?

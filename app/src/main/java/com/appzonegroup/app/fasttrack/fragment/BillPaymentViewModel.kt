@@ -1,51 +1,83 @@
 package com.appzonegroup.app.fasttrack.fragment
 
-import android.view.View
-import androidx.databinding.BindingAdapter
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import com.creditclub.core.data.model.BillCategory
-import com.creditclub.core.data.model.BillPaymentItem
-import com.creditclub.core.data.model.Biller
-import com.creditclub.core.data.model.ValidateCustomerInfoResponse
+import androidx.lifecycle.*
+import com.creditclub.core.data.model.*
+import com.creditclub.core.util.delegates.defaultJson
+import com.creditclub.core.util.toCurrencyFormat
+import kotlinx.coroutines.flow.*
 
 class BillPaymentViewModel : ViewModel() {
-    val category: MutableLiveData<BillCategory> = MutableLiveData()
-    val categoryName = MutableLiveData<String>()
+    val category = MutableStateFlow<BillCategory?>(null)
+    val categoryName = MutableStateFlow("")
 
-    val biller: MutableLiveData<Biller> = MutableLiveData()
-    val billerName = MutableLiveData<String>()
+    val biller = MutableStateFlow<Biller?>(null)
+    val billerName = MutableStateFlow("")
 
-    val item: MutableLiveData<BillPaymentItem> = MutableLiveData()
-    val itemName = MutableLiveData<String>()
+    val item = MutableStateFlow<BillPaymentItem?>(null)
+    val itemName = MutableStateFlow("")
 
-    val categoryList: MutableLiveData<List<BillCategory>> = MutableLiveData()
-    val billerList: MutableLiveData<List<Biller>> = MutableLiveData()
-    val itemList: MutableLiveData<List<BillPaymentItem>> = MutableLiveData()
+    val categoryList = MutableStateFlow(emptyList<BillCategory>())
+    val billerList = MutableStateFlow(emptyList<Biller>())
+    val itemList = MutableStateFlow(emptyList<BillPaymentItem>())
 
-    val customerName = MutableLiveData<String>()
-    val customerPhone = MutableLiveData<String>()
-    val amountString = MutableLiveData<String>()
-    val amountIsNeeded = Transformations.map(item) { .0 >= it?.amount ?: .0 }
+    val customerName = MutableStateFlow("")
+    val customerPhone = MutableStateFlow("")
+    val amountString = MutableStateFlow("")
+    val amountIsNeeded = item.map { .0 >= (it?.amount ?: .0) }.asLiveData()
 
-    val fieldOneLabel = Transformations.map(biller) { it?.customerField1 }
-    val fieldOneIsNeeded = Transformations.map(biller) { !it?.customerField1.isNullOrBlank() }
-    val requiresValidation = Transformations.map(biller) {
+    val fieldOneLabel = biller.map { it?.customerField1 }.asLiveData()
+    val fieldOneIsNeeded = biller.map { !it?.customerField1.isNullOrBlank() }.asLiveData()
+    val requiresValidation = biller.map {
         !it?.customerField1.isNullOrBlank() && biller.value?.isAirtime == false
-    }
-    val fieldOne = MutableLiveData<String>()
+    }.asLiveData()
+    val fieldOne = MutableStateFlow("")
 
-    val fieldTwoLabel = Transformations.map(biller) { it?.customerField2 }
-    val fieldTwoIsNeeded = Transformations.map(biller) { !it?.customerField2.isNullOrBlank() }
-    val fieldTwo = MutableLiveData<String>()
-    val hideCategoryField = MutableLiveData<Boolean>()
+    val fieldTwoLabel = biller.map { it?.customerField2 }.asLiveData()
+    val fieldTwoIsNeeded = biller.map { !it?.customerField2.isNullOrBlank() }.asLiveData()
+    val fieldTwo = MutableStateFlow("")
+    val hideCategoryField = MutableStateFlow(false)
 
-    val customerEmail = MutableLiveData<String>()
-    val customerValidationResponse = MutableLiveData<ValidateCustomerInfoResponse>()
-    val customerValidationName = Transformations.map(customerValidationResponse) {
+    val customerEmail = MutableStateFlow("")
+
+    // Validation
+    val customerValidationResponse = MutableStateFlow<ValidateCustomerInfoResponse?>(null)
+    val customerValidationName = customerValidationResponse.map {
         it?.customerName
-    }
+    }.asLiveData()
 
-    val isAirtime = Transformations.map(category) { it?.isAirtime == true }
+    val requestIsValid: LiveData<Boolean> =
+        combine(category, biller, item) { category, biller, item ->
+            category != null && biller != null && item != null
+        }.asLiveData()
+
+    val isAirtime = category.map { it?.isAirtime == true }.asLiveData()
+
+    private val shouldValidateFlow = combine(
+        category,
+        biller,
+        customerValidationResponse,
+    ) { category, biller, customerValidationResponse ->
+        category?.isAirtime != true
+                && !biller?.customerField1.isNullOrBlank()
+                && customerValidationResponse == null
+    }
+    val shouldValidate: LiveData<Boolean> = shouldValidateFlow.asLiveData()
+    val primaryButtonText: LiveData<String> = shouldValidateFlow.map {
+        if (it) "Validate customer" else "Pay"
+    }.asLiveData()
+
+
+    // Renewal
+    private val renewalInfoFlow: Flow<RenewalInfo?> = customerValidationResponse.map {
+        if (it?.additionalInformation == null) return@map null
+        return@map defaultJson.decodeFromString(
+            ValidateCustomerInfoResponse.Additional.serializer(),
+            it.additionalInformation!!,
+        ).renewalInfo
+    }
+    val isRenewable: LiveData<Boolean> = renewalInfoFlow.map { it != null }.asLiveData()
+    val renewalInfo: LiveData<RenewalInfo?> = renewalInfoFlow.asLiveData()
+    val renewalButtonText: LiveData<String> = renewalInfoFlow.map {
+        "Renew (${it?.renewalAmount?.toCurrencyFormat() ?: "NGN0.00"})"
+    }.asLiveData()
 }

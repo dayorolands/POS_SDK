@@ -10,9 +10,10 @@ import com.creditclub.core.data.api.CollectionsService
 import com.creditclub.core.data.api.ReportService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.AccountInfo
+import com.creditclub.core.data.model.PayBillRequest
 import com.creditclub.core.data.model.TransactionReport
 import com.creditclub.core.data.request.*
-import com.creditclub.core.data.response.PayBillResponse
+import com.creditclub.core.data.model.PayBillResponse
 import com.creditclub.core.type.TransactionStatus
 import com.creditclub.core.type.TransactionType
 import com.creditclub.core.ui.CreditClubActivity
