@@ -38,10 +38,11 @@ suspend fun printEOD(
     localDate: LocalDate,
     posPrinter: PosPrinter,
 ) {
-    val from: Instant = localDate.atStartOfDay().toInstant(ZoneOffset.MIN)
-    val to: Instant = localDate.plusDays(1).atStartOfDay().toInstant(ZoneOffset.MIN)
-
     val transactions = withContext(Dispatchers.IO) {
+        val zoneOffset = ZoneOffset.of("+0100")
+        val from: Instant = localDate.atStartOfDay().toInstant(zoneOffset)
+        val to: Instant = localDate.plusDays(1).atStartOfDay().toInstant(zoneOffset)
+
         PosDatabase
             .getInstance(context = context)
             .financialTransactionDao()
