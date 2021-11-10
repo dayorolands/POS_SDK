@@ -21,7 +21,6 @@ import com.creditclub.core.data.clusterObjectBoxModule
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.prefs.moveTo
-import com.squareup.picasso.Picasso
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
@@ -55,10 +54,6 @@ class BankOneApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
-
-        Picasso.setSingletonInstance(
-            Picasso.Builder(this).loggingEnabled(BuildConfig.DEBUG).build()
-        )
 
         startKoin {
             androidLogger()

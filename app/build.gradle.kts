@@ -252,7 +252,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}")
 
     implementation("me.relex:circleindicator:2.1.6")
-    implementation("com.squareup.picasso:picasso:2.71828")
+    implementation("io.coil-kt:coil:${Versions.coil}")
 
     // Kotlin
     implementation("androidx.navigation:navigation-fragment-ktx:${Versions.navigation}")

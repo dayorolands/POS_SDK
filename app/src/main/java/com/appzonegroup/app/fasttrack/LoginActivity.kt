@@ -7,6 +7,8 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.view.View
 import androidx.core.content.edit
+import coil.Coil
+import coil.request.ImageRequest
 import com.appzonegroup.app.fasttrack.databinding.ActivityLoginBinding
 import com.appzonegroup.app.fasttrack.ui.SurveyDialog
 import com.appzonegroup.creditclub.pos.Platform
@@ -31,7 +33,6 @@ import com.creditclub.pos.PosConfig
 import com.creditclub.pos.api.PosApiService
 import com.creditclub.pos.model.PosTenant
 import com.creditclub.ui.dataBinding
-import com.squareup.picasso.Picasso
 import kotlinx.coroutines.*
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
@@ -219,7 +220,13 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             val data = response.data ?: return@launch
 
             if (response.isSuccessful) {
-                data.forEach { Picasso.get().load(it).fetch() }
+                data.forEach {
+                    Coil.enqueue(
+                        ImageRequest.Builder(this@LoginActivity)
+                            .data(it)
+                            .build()
+                    )
+                }
                 bannerImages = data
             }
         }

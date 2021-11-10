@@ -2,13 +2,13 @@ package com.appzonegroup.app.fasttrack
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import coil.load
 import com.appzonegroup.app.fasttrack.databinding.ActivityBannerBinding
 import com.appzonegroup.app.fasttrack.databinding.ItemBannerImageBinding
 import com.creditclub.core.ui.SimpleBindingAdapter
 import com.creditclub.core.util.delegates.jsonStore
 import com.creditclub.core.util.safeRun
 import com.creditclub.ui.dataBinding
-import com.squareup.picasso.Picasso
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 
@@ -37,10 +37,8 @@ class BannerActivity : AppCompatActivity(R.layout.activity_banner) {
         SimpleBindingAdapter<String, ItemBannerImageBinding>(R.layout.item_banner_image) {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            with(holder.binding) {
-                safeRun {
-                    Picasso.get().load(values[position]).into(image)
-                }
+            safeRun {
+                holder.binding.image.load(values[position])
             }
         }
     }
