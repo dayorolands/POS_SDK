@@ -1,5 +1,10 @@
 image: androidsdk/android-30
-
+definitions:
+  caches:
+    android-sdk: android-sdk
+  services:
+    docker:
+      memory: 1024
 pipelines:
   default:
       - step:
@@ -8,6 +13,7 @@ pipelines:
           caches:
             - gradle
           script:
+            - JAVA_OPTS="-Xmx2048m -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
             - echo "$SIGNING_JKS_FILE" | base64 -d > android-signing-keystore.jks
             - ./gradlew assembleHeritageDebug --no-daemon
           artifacts:
