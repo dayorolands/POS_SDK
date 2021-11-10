@@ -3,6 +3,7 @@ image: mingc/android-build-box:latest
 definitions:
   caches:
     android-sdk: android-sdk
+    gradle-wrapper: ~/.gradle/wrapper
   services:
     docker:
       memory: 1024
@@ -14,6 +15,7 @@ pipelines:
           caches:
             - gradle
           script:
+            - . $HOME/.bash_profile && jenv local 11
             - JAVA_OPTS="-Xmx2048m -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
             - echo "$SIGNING_JKS_FILE" | base64 -d > android-signing-keystore.jks
             - ./gradlew assembleReleaseStaging --no-daemon
