@@ -51,7 +51,7 @@
                 android:onClick="goBack"
                 android:padding="17dp"
                 android:visibility="@{safeUnbox(hideBackButton)?View.VISIBLE:View.GONE, default=gone}"
-                app:srcCompat="@mipmap/ic_launcher_round" />
+                app:srcCompat="@drawable/ic_logo_round" />
 
             <LinearLayout
                 android:id="@+id/logo"
