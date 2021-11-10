@@ -2,6 +2,7 @@ image: androidsdk/android-30
 
 pipelines:
   default:
+    - parallel:
       - step:
           name: Cluster Staging Application
           deployment: staging
@@ -9,8 +10,7 @@ pipelines:
             - gradle
           script:
             - echo "$SIGNING_JKS_FILE" | base64 -d > android-signing-keystore.jks
-            - ./gradlew assembleReleaseStaging
-            - ./gradlew lint
+            - ./gradlew assembleHeritageReleaseStaging
           artifacts:
             - app/build/outputs/**
             - app/build/reports/**
@@ -22,7 +22,6 @@ pipelines:
           script:
             - echo "$SIGNING_JKS_FILE" | base64 -d > android-signing-keystore.jks
             - ./gradlew assembleRelease
-            - ./gradlew lint
           artifacts:
             - app/build/outputs/**
             - app/build/reports/**
