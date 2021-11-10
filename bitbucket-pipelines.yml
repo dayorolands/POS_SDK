@@ -1,0 +1,14 @@
+image: androidsdk/android-31
+
+pipelines:
+  default:
+      - step:
+          name: Android Staging Application
+          caches:
+            - gradle
+          script:
+            - ./gradlew assembleReleaseStaging
+            - ./gradlew lint
+          artifacts:
+            - app/build/outputs/**
+            - app/build/reports/**
