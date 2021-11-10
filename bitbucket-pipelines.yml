@@ -9,7 +9,7 @@ pipelines:
             - gradle
           script:
             - echo "$SIGNING_JKS_FILE" | base64 -d > android-signing-keystore.jks
-            - ./gradlew assembleHeritageReleaseStaging
+            - ./gradlew assembleHeritageReleaseStaging --no-daemon
           artifacts:
             - app/build/outputs/**
             - app/build/reports/**
@@ -20,7 +20,7 @@ pipelines:
             - gradle
           script:
             - echo "$SIGNING_JKS_FILE" | base64 -d > android-signing-keystore.jks
-            - ./gradlew assembleRelease
+            - ./gradlew assembleRelease --no-daemon
           artifacts:
             - app/build/outputs/**
             - app/build/reports/**
