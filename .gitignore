@@ -92,3 +92,5 @@ lint/tmp/
 /.idea/deploymentTargetDropDown.xml
 /.idea/misc.xml
 output-metadata.json
+# Local build cache
+build-cache
