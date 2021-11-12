@@ -1,0 +1,35 @@
+
+image: mingc/android-build-box:latest
+definitions:
+  caches:
+    android-sdk: android-sdk
+    gradle-wrapper: ~/.gradle/wrapper
+  services:
+    docker:
+      memory: 1024
+pipelines:
+  default:
+      - step:
+          name: Cluster Staging Application
+          deployment: staging
+          caches:
+            - gradle
+          script:
+            - . $HOME/.bash_profile && jenv local 11
+            - JAVA_OPTS="-Xmx2048m -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+            - echo "$SIGNING_JKS_FILE" | base64 -d > android-signing-keystore.jks
+            - ./gradlew assembleReleaseStaging --no-daemon
+          artifacts:
+            - app/build/outputs/**
+            - app/build/reports/**
+      - step:
+          name: Cluster Prod Application
+          deployment: production
+          caches:
+            - gradle
+          script:
+            - echo "$SIGNING_JKS_FILE" | base64 -d > android-signing-keystore.jks
+            - ./gradlew assembleRelease --no-daemon
+          artifacts:
+            - app/build/outputs/**
+            - app/build/reports/**

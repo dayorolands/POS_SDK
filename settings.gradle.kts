@@ -15,3 +15,14 @@ include(":nexgo", ":nexgo_smartpos_sdk")
 include(":telpo")
 include(":sunmi", ":paylib")
 include(":smartpeak")
+
+buildCache {
+    local {
+        isEnabled = true
+        directory = File(rootDir, "build-cache")
+        removeUnusedEntriesAfterDays = 30
+    }
+    remote<HttpBuildCache>() {
+        isEnabled = false
+    }
+}
