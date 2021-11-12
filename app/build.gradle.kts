@@ -94,6 +94,20 @@ android {
             manifestPlaceholders["usesCleartextTraffic"] = "false"
         }
 
+        getByName("debug") {
+            isDebuggable = true
+//            buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
+            buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
+            buildConfigField("String", "NOTIFICATION_TOKEN", "\"${Config.NOTIFICATION_TOKEN}\"")
+            manifestPlaceholders["usesCleartextTraffic"] = "true"
+            extra["enableCrashlytics"] = false
+            extra["alwaysUpdateBuildId"] = false
+            configure<com.google.firebase.perf.plugin.FirebasePerfExtension> {
+                setInstrumentationEnabled(false)
+            }
+            versionNameSuffix = "-dev"
+        }
+
         create("releaseStaging") {
             isDebuggable = true
             isMinifyEnabled = true
@@ -105,23 +119,9 @@ android {
             buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", "\"${Config.NOTIFICATION_TOKEN}\"")
             manifestPlaceholders["usesCleartextTraffic"] = "true"
-            initWith(getByName("release"))
             matchingFallbacks += listOf("release", "debug")
             signingConfig = signingConfigs.getByName("debug")
             versionNameSuffix = "-staging"
-        }
-
-        getByName("debug") {
-            isDebuggable = true
-            buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
-            buildConfigField("String", "NOTIFICATION_TOKEN", "\"${Config.NOTIFICATION_TOKEN}\"")
-            manifestPlaceholders["usesCleartextTraffic"] = "true"
-            extra["enableCrashlytics"] = false
-            extra["alwaysUpdateBuildId"] = false
-            configure<com.google.firebase.perf.plugin.FirebasePerfExtension> {
-                setInstrumentationEnabled(false)
-            }
-            versionNameSuffix = "-dev"
         }
     }
 
