@@ -261,7 +261,7 @@ dependencies {
     // Dynamic Feature Module Support
     implementation("androidx.navigation:navigation-dynamic-features-fragment:${Versions.navigation}")
 
-    implementation(platform("com.google.firebase:firebase-bom:28.4.2"))
+    implementation(platform("com.google.firebase:firebase-bom:29.0.0"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-core")
     implementation("com.google.firebase:firebase-messaging-ktx")
