@@ -1,8 +1,5 @@
 package com.appzonegroup.app.fasttrack.fragment
 
-import android.view.View
-import androidx.databinding.BindingAdapter
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
@@ -10,8 +7,6 @@ import com.creditclub.core.data.model.CollectionCategory
 import com.creditclub.core.data.model.CollectionCustomer
 import com.creditclub.core.data.model.CollectionPaymentItem
 import com.creditclub.core.data.model.CollectionReference
-import com.google.android.material.textfield.TextInputLayout
-import kotlinx.serialization.SerialName
 
 class CollectionPaymentViewModel : ViewModel() {
     val retrievalReferenceNumber: MutableLiveData<String> = MutableLiveData()
@@ -49,49 +44,4 @@ class CollectionPaymentViewModel : ViewModel() {
 
     val itemList = MutableLiveData<List<CollectionPaymentItem>>()
     val categoryList = MutableLiveData<List<CollectionCategory>>()
-
-    companion object {
-        @JvmStatic
-        @BindingAdapter("app:goneUnless")
-        fun goneUnless(view: View, visible: Boolean) {
-            view.visibility = if (visible) View.VISIBLE else View.GONE
-        }
-
-        @JvmStatic
-        @BindingAdapter("app:dependsOn")
-        fun dependsOn(view: View, data: LiveData<String>) {
-            view.isEnabled = !data.value.isNullOrBlank()
-        }
-
-        @JvmStatic
-        @BindingAdapter("app:goneIfPresent")
-        fun goneIfPresent(view: View, data: LiveData<*>) {
-            val visible = when (data.value) {
-                is String? -> (data.value as? String).isNullOrBlank()
-                else -> data.value == null
-            }
-            view.visibility = if (visible) View.VISIBLE else View.GONE
-        }
-
-        @JvmStatic
-        @BindingAdapter("app:goneUnlessPresent")
-        fun goneUnlessPresent(view: View, data: LiveData<*>) {
-            val visible = when (data.value) {
-                is String? -> !(data.value as? String).isNullOrBlank()
-                else -> data.value != null
-            }
-            view.visibility = if (visible) View.VISIBLE else View.GONE
-        }
-
-        @JvmStatic
-        @BindingAdapter("app:showEndIconIfPresent")
-        fun showEndIconIfPresent(textInputLayout: TextInputLayout, data: LiveData<*>) {
-            val value = data.value
-            textInputLayout.isEndIconVisible = when (value) {
-                is String? -> !value.isNullOrBlank()
-                is Boolean? -> value == true
-                else -> data.value != null
-            }
-        }
-    }
 }

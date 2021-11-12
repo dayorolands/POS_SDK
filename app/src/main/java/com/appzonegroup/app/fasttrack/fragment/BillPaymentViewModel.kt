@@ -1,10 +1,15 @@
 package com.appzonegroup.app.fasttrack.fragment
 
-import androidx.lifecycle.*
-import com.creditclub.core.data.model.*
-import com.creditclub.core.util.delegates.defaultJson
-import com.creditclub.core.util.toCurrencyFormat
-import kotlinx.coroutines.flow.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import com.creditclub.core.data.model.BillCategory
+import com.creditclub.core.data.model.BillPaymentItem
+import com.creditclub.core.data.model.Biller
+import com.creditclub.core.data.model.ValidateCustomerInfoResponse
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
 class BillPaymentViewModel : ViewModel() {
     val category = MutableStateFlow<BillCategory?>(null)
@@ -27,8 +32,10 @@ class BillPaymentViewModel : ViewModel() {
 
     val fieldOneLabel = biller.map { it?.customerField1 }.asLiveData()
     val fieldOneIsNeeded = biller.map { !it?.customerField1.isNullOrBlank() }.asLiveData()
-    val requiresValidation = biller.map {
-        !it?.customerField1.isNullOrBlank() && biller.value?.isAirtime == false
+    val requiresValidation: LiveData<Boolean> = combine(category, biller) { category, biller ->
+        if (category == null) return@combine false
+        if (biller == null) return@combine false
+        !category.isAirtime && !biller.customerField1.isNullOrBlank()
     }.asLiveData()
     val fieldOne = MutableStateFlow("")
 
@@ -44,6 +51,17 @@ class BillPaymentViewModel : ViewModel() {
     val customerValidationName = customerValidationResponse.map {
         it?.customerName
     }.asLiveData()
+    val customerValidatedOrSkipped: LiveData<Boolean> = combine(
+        customerValidationResponse,
+        category,
+        biller,
+    ) { customerValidationResponse, category, biller ->
+        if (category == null) return@combine false
+        if (biller == null) return@combine false
+        customerValidationResponse != null
+                || biller.customerField1.isNullOrBlank()
+                || category.isAirtime
+    }.asLiveData()
 
     val requestIsValid: LiveData<Boolean> =
         combine(category, biller, item) { category, biller, item ->
@@ -57,27 +75,14 @@ class BillPaymentViewModel : ViewModel() {
         biller,
         customerValidationResponse,
     ) { category, biller, customerValidationResponse ->
-        category?.isAirtime != true
-                && !biller?.customerField1.isNullOrBlank()
+        if (category == null) return@combine false
+        if (biller == null) return@combine false
+        !category.isAirtime
+                && !biller.customerField1.isNullOrBlank()
                 && customerValidationResponse == null
     }
     val shouldValidate: LiveData<Boolean> = shouldValidateFlow.asLiveData()
     val primaryButtonText: LiveData<String> = shouldValidateFlow.map {
         if (it) "Validate customer" else "Pay"
-    }.asLiveData()
-
-
-    // Renewal
-    private val renewalInfoFlow: Flow<RenewalInfo?> = customerValidationResponse.map {
-        if (it?.additionalInformation == null) return@map null
-        return@map defaultJson.decodeFromString(
-            ValidateCustomerInfoResponse.Additional.serializer(),
-            it.additionalInformation!!,
-        ).renewalInfo
-    }
-    val isRenewable: LiveData<Boolean> = renewalInfoFlow.map { it != null }.asLiveData()
-    val renewalInfo: LiveData<RenewalInfo?> = renewalInfoFlow.asLiveData()
-    val renewalButtonText: LiveData<String> = renewalInfoFlow.map {
-        "Renew (${it?.renewalAmount?.toCurrencyFormat() ?: "NGN0.00"})"
     }.asLiveData()
 }

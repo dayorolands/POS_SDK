@@ -46,12 +46,15 @@
                 android:paddingBottom="80dp">
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/category_input_layout"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
                     android:hint="@string/category"
-                    app:goneIf="@{viewModel.hideCategoryField}">
+                    app:goneIf="@{viewModel.hideCategoryField}"
+                    app:showStartIconIfEmpty="@{viewModel.categoryList}"
+                    app:startIconDrawable="@drawable/ic_refresh_black_24dp">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/category_input"
@@ -62,12 +65,16 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/biller_input_layout"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    android:hint="Biller"
-                    app:dependsOn="@{viewModel.categoryName}">
+                    android:hint="@string/biller"
+                    app:dependsOn="@{viewModel.categoryName}"
+                    app:goneUnlessPresent="@{viewModel.category}"
+                    app:showStartIconIfEmpty="@{viewModel.billerList}"
+                    app:startIconDrawable="@drawable/ic_refresh_black_24dp">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/biller_input"
@@ -75,22 +82,6 @@
                         android:layout_height="wrap_content"
                         android:singleLine="true"
                         android:text="@={viewModel.billerName}" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
-                    android:hint="Payment Item"
-                    app:dependsOn="@{viewModel.billerName}">
-
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/payment_item_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:singleLine="true"
-                        android:text="@={viewModel.itemName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -114,6 +105,26 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/payment_item_input_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:hint="@string/payment_item"
+                    app:dependsOn="@{viewModel.billerName}"
+                    app:goneUnless="@{viewModel.customerValidatedOrSkipped}"
+                    app:showStartIconIfEmpty="@{viewModel.itemList}"
+                    app:startIconDrawable="@drawable/ic_refresh_black_24dp">
+
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/payment_item_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:text="@={viewModel.itemName}" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -130,119 +141,126 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
-                    android:hint="@string/amount"
-                    app:disableUnless="@{viewModel.amountIsNeeded}"
-                    app:prefixText="@string/naira">
+                    android:orientation="vertical"
+                    app:goneUnless="@{viewModel.customerValidatedOrSkipped}">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:inputType="numberDecimal"
-                        android:maxLength="7"
-                        android:singleLine="true"
-                        android:text="@={viewModel.amountString}" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <View
-                    android:layout_width="50dp"
-                    android:layout_height="1dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="15dp"
-                    android:background="#ddd" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:goneIf="@{viewModel.isAirtime}"
-                    android:baselineAligned="false">
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="20dp"
-                        android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:hint="@string/customer_name"
-                        app:goneIfPresent="@{viewModel.customerValidationName}">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:singleLine="true"
-                            android:text="@={viewModel.customerName}" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="@string/phone_number"
-                        app:counterEnabled="true"
-                        app:counterMaxLength="11"
-                        app:endIconMode="custom">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:inputType="phone"
-                            android:maxLength="11"
-                            android:singleLine="true"
-                            android:text="@={viewModel.customerPhone}" />
-                    </com.google.android.material.textfield.TextInputLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:baselineAligned="false"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="15dp"
-                        android:layout_weight="1"
-                        android:hint="Customer Email (optional)">
+                        android:hint="@string/amount"
+                        app:disableUnless="@{viewModel.amountIsNeeded}"
+                        app:prefixText="@string/naira">
 
                         <com.google.android.material.textfield.TextInputEditText
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:inputType="textEmailAddress"
+                            android:inputType="numberDecimal"
+                            android:maxLength="7"
                             android:singleLine="true"
-                            android:text="@={viewModel.customerEmail}" />
+                            android:text="@={viewModel.amountString}" />
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <View
+                        android:layout_width="50dp"
+                        android:layout_height="1dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="15dp"
+                        android:background="#ddd" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal"
+                        app:goneIf="@{viewModel.isAirtime}">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="20dp"
+                            android:layout_marginBottom="15dp"
+                            android:layout_weight="1"
+                            android:hint="@string/customer_name"
+                            app:goneIfPresent="@{viewModel.customerValidationName}">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:singleLine="true"
+                                android:text="@={viewModel.customerName}" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="@string/phone_number"
+                            app:counterEnabled="true"
+                            app:counterMaxLength="11"
+                            app:endIconMode="custom">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:inputType="phone"
+                                android:maxLength="11"
+                                android:singleLine="true"
+                                android:text="@={viewModel.customerPhone}" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="15dp"
+                            android:layout_weight="1"
+                            android:hint="@string/customer_email_optional">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:inputType="textEmailAddress"
+                                android:singleLine="true"
+                                android:text="@={viewModel.customerEmail}" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:text="@string/customer_name"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        app:goneUnlessPresent="@{viewModel.customerValidationName}" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{viewModel.customerValidationName}"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="25sp"
+                        app:goneUnlessPresent="@{viewModel.customerValidationName}" />
+
                 </LinearLayout>
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="@string/customer_name"
-                    android:textColor="@color/black"
-                    android:textSize="20sp"
-                    app:goneUnlessPresent="@{viewModel.customerValidationName}" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{viewModel.customerValidationName}"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="25sp"
-                    app:goneUnlessPresent="@{viewModel.customerValidationName}" />
-
             </LinearLayout>
         </ScrollView>
 
@@ -262,25 +280,13 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/renew_button"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="12dp"
-                    android:gravity="center"
-                    android:text="@{viewModel.renewalButtonText}"
-                    android:textColor="@color/colorPrimary"
-                    app:goneUnless="@{viewModel.isRenewable}" />
-
-                <Button
                     android:id="@+id/complete_payment_button"
                     android:layout_width="wrap_content"
                     android:layout_height="50dp"
                     android:layout_gravity="center_vertical"
+                    android:layout_marginVertical="5dp"
                     android:layout_marginEnd="16dp"
                     android:width="160dp"
-                    android:layout_marginVertical="5dp"
                     android:gravity="center"
                     android:text="@{viewModel.primaryButtonText}"
                     android:textColor="#fff" />

@@ -27,7 +27,8 @@ interface BillsPaymentService {
     @GET("api/PayBills/GetPaymentItems")
     suspend fun getPaymentItems(
         @Query("institutionCode") institutionCode: String?,
-        @Query("billerID") billerId: String?
+        @Query("billerID") billerId: String?,
+        @Query("customerID") customerId: String?,
     ): List<BillPaymentItem>
 
     @POST("api/PayBills/RunTransaction")

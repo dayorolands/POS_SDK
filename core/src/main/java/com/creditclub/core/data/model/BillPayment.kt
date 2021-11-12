@@ -8,8 +8,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ValidateCustomerInfoRequest(
-    @SerialName("Amount")
-    val amount: Double,
     @SerialName("BillerID")
     val billerId: String,
     @SerialName("CustomerID")
@@ -44,22 +42,6 @@ data class ValidateCustomerInfoResponse(
     val responseMessage: String? = null,
     @SerialName("ValidationCode")
     val validationCode: String? = null,
-) {
-    @Serializable
-    data class Additional(
-        @SerialName("RenewalInfo")
-        val renewalInfo: RenewalInfo,
-    )
-}
-
-@Serializable
-data class RenewalInfo(
-    @SerialName("TotalAmount")
-    val totalAmount: Double,
-    @SerialName("RenewalAmount")
-    val renewalAmount: Double,
-    @SerialName("CurrentPlan")
-    val currentPlan: String,
 )
 
 @Serializable
@@ -135,17 +117,7 @@ data class PayBillRequest(
 
     @SerialName("AdditionalInformation")
     val additionalInformation: String? = null,
-) {
-
-    @Serializable
-    data class Additional(
-        @SerialName("IsRenewal")
-        val isRenewal: Boolean,
-
-        @SerialName("RenewalAmount")
-        val renewalAmount: Double,
-    )
-}
+)
 
 @Serializable
 class PayBillResponse(
@@ -175,10 +147,10 @@ class PayBillResponse(
 @Serializable
 data class BillCategory(
     @SerialName("ID")
-    var id: String? = null,
+    var id: String,
 
     @SerialName("Name")
-    var name: String? = null,
+    var name: String,
 
     @SerialName("Description")
     var description: String? = null,
@@ -186,18 +158,12 @@ data class BillCategory(
     @SerialName("IsAirtime")
     var isAirtime: Boolean = false,
 ) {
-    override fun toString() = name ?: "Category $id"
+    override fun toString() = name
 }
 
 @Serializable
 @Parcelize
 data class Biller(
-    @SerialName("Description")
-    var description: String? = null,
-
-    @SerialName("IsAirtime")
-    var isAirtime: Boolean? = null,
-
     @SerialName("BillerCategoryID")
     var billerCategoryId: Int? = null,
 
@@ -208,13 +174,7 @@ data class Biller(
     var id: String? = null,
 
     @SerialName("Name")
-    var name: String? = null,
-
-    @SerialName("Status")
-    var status: Boolean? = null,
-
-    @SerialName("Amount")
-    var amount: String? = null,
+    var name: String,
 
     @SerialName("CustomerField1")
     var customerField1: String? = null,
@@ -222,7 +182,7 @@ data class Biller(
     @SerialName("CustomerField2")
     var customerField2: String? = null,
 ) : Parcelable {
-    override fun toString() = name ?: "Biller $id"
+    override fun toString() = name
 }
 
 @Serializable
@@ -239,10 +199,6 @@ class BillPaymentItem(
 
     @SerialName("Amount")
     var amount: Double? = null,
-
-    var customerFieldOneField: String? = null,
-
-    var customerFieldTwoField: String? = null,
 
     @SerialName("Name")
     var name: String? = null,

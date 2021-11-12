@@ -9,6 +9,7 @@ import com.creditclub.core.data.MIDDLEWARE_CLIENT
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.prefs.newTransactionReference
+import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogProvider
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
@@ -35,8 +36,7 @@ inline fun <reified T : Any> rememberBean(): Lazy<T> {
 fun rememberDialogProvider(): Lazy<DialogProvider> {
     val localContext = LocalContext.current
     return remember {
-        val application = localContext.applicationContext as Application
-        application.inject { parametersOf(localContext) }
+        lazy { (localContext as CreditClubActivity).dialogProvider }
     }
 }
 
