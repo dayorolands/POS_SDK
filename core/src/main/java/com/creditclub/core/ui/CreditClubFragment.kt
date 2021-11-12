@@ -10,10 +10,8 @@ import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.logFunctionUsage
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 
 
 /**
@@ -24,7 +22,9 @@ open class CreditClubFragment : Fragment {
     constructor() : super()
     constructor(layout: Int) : super(layout)
 
-    open val dialogProvider: DialogProvider by inject { parametersOf(activity) }
+    open val dialogProvider: DialogProvider by lazy {
+        (requireActivity() as CreditClubActivity).dialogProvider
+    }
     open val functionId: Int? = null
 
     open val localStorage: LocalStorage by inject()
@@ -32,10 +32,8 @@ open class CreditClubFragment : Fragment {
     open val appConfig: AppConfig by inject()
     open val coreDatabase: CoreDatabase by inject()
 
-    open val mainScope by lazy { MainScope() }
+    open val mainScope = MainScope()
     open val ioScope by lazy { CoroutineScope(Dispatchers.IO) }
-
-    val firebaseCrashlytics by lazy { FirebaseCrashlytics.getInstance() }
 
     var TextView.value: String
         get() = text.toString().trim { it <= ' ' }
@@ -47,7 +45,7 @@ open class CreditClubFragment : Fragment {
         super.onCreate(savedInstanceState)
         functionId?.also { id ->
             mainScope.launch {
-                requireContext().logFunctionUsage(id)
+                logFunctionUsage(id)
             }
         }
     }

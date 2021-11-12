@@ -13,7 +13,6 @@ import com.creditclub.core.R
 import com.creditclub.core.config.InstitutionConfig
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.api.VersionService
-import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.widget.DialogListenerBlock
@@ -30,7 +29,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
@@ -74,12 +72,20 @@ abstract class CreditClubActivity : AppCompatActivity {
             }
         }
 
+        val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
         localStorage.agent?.let { agent ->
             firebaseAnalytics.setUserId(agent.agentCode)
             firebaseAnalytics.setUserProperty("agent_name", agent.agentName)
             firebaseAnalytics.setUserProperty("agent_code", agent.agentCode)
             firebaseAnalytics.setUserProperty("agent_phone", agent.phoneNumber)
+
+            firebaseCrashlytics.setUserId(localStorage.agent?.agentCode ?: "guest")
         }
+        firebaseAnalytics.setUserProperty("agent_institution", localStorage.institutionCode)
+        firebaseCrashlytics.setCustomKey(
+            "agent_institution",
+            localStorage.institutionCode ?: "none"
+        )
 
         if (ActivityCompat.checkSelfPermission(
                 this,

@@ -33,11 +33,11 @@ import kotlin.coroutines.suspendCoroutine
 
 class CreditClubDialogProvider(override val context: Context) : DialogProvider {
 
-    override val activity: CreditClubActivity
+    override val activity: Activity
         get() = when (context) {
-            is CreditClubActivity -> context
+            is Activity -> context
             is Fragment -> context.activity as CreditClubActivity
-            else -> throw IllegalStateException("Dialog provider context must either be a fragment or CreditClubActivity")
+            else -> throw IllegalStateException("Dialog provider context must either be a fragment or activity")
         }
 
     private var currentProgressDialog: Dialog? = null

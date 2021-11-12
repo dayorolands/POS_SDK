@@ -5,23 +5,20 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.StrictMode
-import android.os.StrictMode.VmPolicy
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.localStorage
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
 class SplashScreenActivity : AppCompatActivity(R.layout.activity_splashscreen) {
-    private val mainScope = CoroutineScope(Dispatchers.Main)
+    private val mainScope = MainScope()
     private val dialogProvider: DialogProvider by inject { parametersOf(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

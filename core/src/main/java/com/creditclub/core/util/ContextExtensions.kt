@@ -30,7 +30,7 @@ inline val Context.localStorage get() = GlobalContext.get().get<LocalStorage>()
 
 fun Context.increaseTransactionMonitorCounter(
     transactionCountType: TransactionCountType,
-    sessionID: String
+    sessionID: String,
 ) {
     val localStorage = localStorage
     val value = localStorage.getString(transactionCountType.key)
@@ -86,7 +86,7 @@ inline val Context.RAMInfo: LongArray
         return longArrayOf(memInfo.availMem, memInfo.totalMem)
     }
 
-suspend inline fun Context.logFunctionUsage(fid: Int) = safeRunIO {
+suspend inline fun logFunctionUsage(fid: Int) = safeRunIO {
     val coreDatabase = GlobalContext.get().get<CoreDatabase>()
     val appFunctionUsageDao = coreDatabase.appFunctionUsageDao()
     val appFunction = appFunctionUsageDao.getFunction(fid)
@@ -106,15 +106,16 @@ suspend inline fun Context.logFunctionUsage(fid: Int) = safeRunIO {
 
 inline fun <reified T : Any> Context.readRawJsonFile(
     @RawRes fileLocation: Int,
-    serializer: KSerializer<T> = serializer()
+    serializer: KSerializer<T> = serializer(),
 ): T {
-    val fileContents =
-        resources.openRawResource(fileLocation).bufferedReader().use { it.readText() }
+    val fileContents = resources.readRawFileText(fileLocation)
     return defaultJson.decodeFromString(serializer, fileContents)
 }
 
-fun getAndroidContext() = GlobalContext.get().get<Context>()
-
 fun Resources.readRawFileText(@RawRes fileLocation: Int): String {
-    return openRawResource(fileLocation).bufferedReader().use { it.readText() }
+    return openRawResource(fileLocation).use { inputStream ->
+        inputStream.bufferedReader().use { bufferedStream ->
+            bufferedStream.readText()
+        }
+    }
 }

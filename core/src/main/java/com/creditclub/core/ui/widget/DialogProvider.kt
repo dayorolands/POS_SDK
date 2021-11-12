@@ -1,17 +1,17 @@
 package com.creditclub.core.ui.widget
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.widget.EditText
 import androidx.annotation.StringRes
 import com.creditclub.core.R
-import com.creditclub.core.ui.CreditClubActivity
 import java.time.LocalDate
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 interface DialogProvider {
-    val activity: CreditClubActivity
+    val activity: Activity
 
     val context: Context get() = activity
 
