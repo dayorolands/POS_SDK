@@ -19,7 +19,7 @@ class LocalStorage(
     var institutionCode: String? by valueStore(INSTITUTION_CODE)
     var agentPhone: String? by valueStore(AGENT_PHONE)
     var sessionID: String? by valueStore(SESSION_ID)
-    var lastKnownLocation: String? by valueStore("LAST_KNOWN_LOCATION", "0.00;0.00")
+    var lastKnownLocation: String by valueStore("LAST_KNOWN_LOCATION", "0.00;0.00")
 
     val authResponse: AuthResponse? by jsonStore(KEY_AUTH, AuthResponse.serializer(), defaultJson)
     var agent: AgentInfo? by jsonStore(AGENT_INFO, AgentInfo.serializer(), defaultJson)

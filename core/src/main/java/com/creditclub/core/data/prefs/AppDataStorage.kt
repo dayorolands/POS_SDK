@@ -31,7 +31,7 @@ class AppDataStorage(
     )
     private val otaAppName = context.getString(R.string.ota_app_name)
     private val filesDirPath = context.filesDir.path
-    val latestApkFileName: String?
+    private val latestApkFileName: String?
         get() {
             val appVersion = latestVersion ?: return null
             return "$otaAppName${appVersion.version}.apk"
@@ -55,13 +55,6 @@ class AppDataStorage(
     fun putString(key: String, value: String?) = edit { putString(key, value) }
 
     companion object {
-
-        const val SuccessCount = "SUCCESS_COUNT"
-        const val NoInternetCount = "NO_INTERNET_COUNT"
-        const val NoResponseCount = "NO_RESPONSE_COUNT"
-        const val ErrorResponseCount = "ERROR_RESPONSE_COUNT"
-        const val RequestCount = "REQUEST_COUNT"
-
         private var INSTANCE: AppDataStorage? = null
 
         fun getInstance(context: Context): AppDataStorage {
