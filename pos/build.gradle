@@ -76,10 +76,12 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:${versions.constraintLayout}"
     implementation "androidx.navigation:navigation-fragment-ktx:${versions.navigation}"
     implementation "androidx.navigation:navigation-ui-ktx:${versions.navigation}"
+    implementation 'androidx.test.ext:junit-ktx:1.1.3'
     kapt "androidx.room:room-compiler:${versions.room}"
 
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation "androidx.room:room-ktx:${versions.room}"
+    testImplementation 'org.json:json:20210307'
 
     // Test helpers
     testImplementation "androidx.room:room-testing:${versions.room}"

@@ -1,6 +1,5 @@
 package com.appzonegroup.creditclub.pos.models
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.creditclub.core.util.format
 import com.creditclub.pos.model.ConnectionInfo
@@ -17,81 +16,83 @@ import kotlinx.serialization.Serializable
 
 @Entity
 @Serializable
-class PosNotification {
+data class PosNotification(
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    var id: Int = 0,
 
     @SerialName("TransactionReference")
-    var transactionReference: String? = "2058HK58-00022224148-1031170618"
+    var transactionReference: String? = null,
 
     @SerialName("Amount")
-    var amount: Double? = 0.00
+    var amount: Double? = 0.00,
 
     @SerialName("Reference")
-    var reference: String? = ""
+    var reference: String? = "",
 
     @SerialName("Currency")
-    var currency: String? = "NGN"
+    var currency: String? = "NGN",
 
     @SerialName("Type")
-    var type: String? = "Invoice"
+    var type: String? = "Invoice",
 
     @SerialName("CardScheme")
-    var cardScheme: String? = "Debit MasterCard"
+    var cardScheme: String? = null,
 
     @SerialName("StatusCode")
     @Required
-    var statusCode: String? = "00"
+    var statusCode: String? = null,
 
     @SerialName("PaymentDate")
-    var paymentDate: String? = "2018-10-31 17:06:18"
+    var paymentDate: String? = null,
 
     @SerialName("RetrievalReferenceNumber")
-    var retrievalReferenceNumber: String? = "000220000148"
+    var retrievalReferenceNumber: String? = null,
 
     @SerialName("MaskedPAN")
-    var maskedPAN: String? = "539983******9569"
+    var maskedPAN: String? = null,
 
     @SerialName("Nuban")
-    var nuban: String? = ""
+    var nuban: String? = "",
 
     @SerialName("TerminalID")
-    var terminalId: String? = null
+    var terminalId: String? = null,
 
     @SerialName("CustomerName")
-    var customerName: String? = "SAIDU/M"
+    var customerName: String? = null,
 
     @SerialName("StatusDescription")
-    var statusDescription: String? = "Approved or completed successfully"
+    var statusDescription: String? = null,
 
     @SerialName("AdditionalInformation")
-    var additionalInformation: String? = ""
+    var additionalInformation: String? = "",
 
     @SerialName("NodeName")
-    var nodeName: String? = null
+    var nodeName: String? = null,
 
     @kotlinx.serialization.Transient
-    var connectionInfo: ConnectionInfo? = null
+    var connectionInfo: ConnectionInfo? = null,
+) {
+
 
     companion object {
         fun create(trn: FinancialTransaction): PosNotification {
-            return PosNotification().apply {
-                id = trn.stan.toInt()
-                transactionReference = trn.isoMsg.retrievalReferenceNumber37
-                type = trn.type
-                amount = trn.isoMsg.transactionAmount4?.toDouble()?.div(100)
-                reference = "$type-$transactionReference"
-                currency = "NGN"
-                cardScheme = trn.cardType
-                statusCode = trn.isoMsg.responseCode39
-                paymentDate = trn.createdAt.format("dd-MM-yyyy hh:mm:ss")
-                retrievalReferenceNumber = trn.isoMsg.retrievalReferenceNumber37
-                maskedPAN = trn.pan
-                nuban = ""
-                customerName = trn.cardHolder
-                statusDescription = trn.isoMsg.responseMessage
-                additionalInformation = ""
-            }
+            val transactionReference = trn.isoMsg.retrievalReferenceNumber37
+            return PosNotification(
+                transactionReference = transactionReference,
+                type = trn.type,
+                amount = trn.isoMsg.transactionAmount4?.toDouble()?.div(100),
+                reference = "${trn.type}-$transactionReference",
+                currency = "NGN",
+                cardScheme = trn.cardType,
+                statusCode = trn.isoMsg.responseCode39,
+                paymentDate = trn.createdAt.format("dd-MM-yyyy hh:mm:ss"),
+                retrievalReferenceNumber = trn.isoMsg.retrievalReferenceNumber37,
+                maskedPAN = trn.pan,
+                nuban = "",
+                customerName = trn.cardHolder,
+                statusDescription = trn.isoMsg.responseMessage,
+                additionalInformation = "",
+            )
         }
     }
 }

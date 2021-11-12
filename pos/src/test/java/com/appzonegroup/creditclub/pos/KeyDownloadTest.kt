@@ -15,7 +15,6 @@ import kotlinx.coroutines.runBlocking
 import okio.use
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.jpos.iso.ISOMsg
-import org.jpos.iso.ISOUtil
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -28,14 +27,14 @@ import java.util.*
 import javax.net.ssl.TrustManager
 import javax.net.ssl.TrustManagerFactory
 
-const val TERMINAL_ID = "2076KB84"
+const val TERMINAL_ID = "2076ER56"
 val posMode = object : RemoteConnectionInfo {
     override val id: String = "test"
     override val label: String = "test"
-    override val key1: String = "3DFB3802940E8A546B3D38610852BA7A"
-    override val key2: String = "0234E39861D3405E7A6B3185BA675873"
-    override val host: String = "196.6.103.73"
-    override val port: Int = 5043
+    override val key1: String = "C48A1564CBFB3213A485BCE9195D321C"
+    override val key2: String = "FE169BD37C34B06215E919C4D3F75E79"
+    override val host: String = "196.6.103.18"
+    override val port: Int = 5023
     override val sslEnabled: Boolean = true
     override val dukptConfig: DukptConfig? = null
     override val timeout: Int = 60
@@ -86,10 +85,11 @@ class KeyDownloadTest : PosParameter {
     }
 
     @Throws(Exception::class)
-    fun getTrustManagers(): Array<TrustManager?>? {
+    fun getTrustManagers(): Array<TrustManager?> {
         Security.insertProviderAt(BouncyCastleProvider(), 1)
         val password = "cluster".toCharArray()
-        val trustStoreFile = File(javaClass.getResource("/pos_trust_store.bks").path)
+        val url = javaClass.getResource("/pos_trust_store.bks") ?: return emptyArray()
+        val trustStoreFile = File(url.path)
         val trustStore = KeyStore.getInstance("BKS")
         trustStoreFile.inputStream().use { inputStream ->
             trustStore.load(inputStream, password)

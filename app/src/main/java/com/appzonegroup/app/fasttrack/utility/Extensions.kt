@@ -5,8 +5,6 @@ import android.content.Intent
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.appzonegroup.app.fasttrack.*
@@ -40,8 +38,6 @@ fun Activity.logout() {
     finish()
     startActivity(intent)
 }
-
-private suspend fun Fragment.logFunctionUsage(fid: Int) = requireContext().logFunctionUsage(fid)
 
 @Composable
 fun FunctionUsageTracker(fid: Int) {
