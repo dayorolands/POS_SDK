@@ -53,6 +53,7 @@ import io.objectbox.Box
 import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import java.time.Instant
@@ -246,13 +247,14 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 }
 
                 if (error != null) {
-                    errorMessage =
-                        error.getMessage(context) + ". Please click the CONFIRM button to try again"
                     if (error.isTimeout() || error.isInternalServerError()) {
+                        delay(3000)
                         retryPolicy = RetryPolicy.AutoRetry
                         transferAttemptCount++
                         return@makeTransfer
                     }
+                    errorMessage =
+                        error.getMessage(context) + ". Please click the CONFIRM button to try again"
 
                     return@makeTransfer
                 }
@@ -262,6 +264,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                         retryPolicy = RetryPolicy.RetryLater
                     }
                     response.isPendingOnMiddleware() -> {
+                        delay(3000)
                         retryPolicy = RetryPolicy.AutoRetry
                     }
                     response.isFailure() -> {
@@ -302,7 +305,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
 
     // Schedule automatic requery for pending transactions
     LaunchedEffect(transferAttemptCount) {
-        if (transferAttemptCount > 0 && retryPolicy == RetryPolicy.AutoRetry) {
+        if (transferAttemptCount > 0 && retryPolicy == RetryPolicy.AutoRetry && isVerified) {
             transferFunds()
         }
     }
@@ -324,19 +327,21 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
         return
     }
 
-    if (receipt != null && loadingMessage.isBlank()) {
-        ReceiptDetails(navController = navController, printJob = receipt!!)
-        return
-    }
+    if (retryPolicy == null) {
+        if (receipt != null && loadingMessage.isBlank()) {
+            ReceiptDetails(navController = navController, printJob = receipt!!)
+            return
+        }
 
-    if (isSameBank == false && bank == null) {
-        GetBank(
-            title = "Select Bank",
-            navController = navController,
-            popOnSelect = false,
-            onResult = { bank = it }
-        )
-        return
+        if (isSameBank == false && bank == null) {
+            GetBank(
+                title = "Select Bank",
+                navController = navController,
+                popOnSelect = false,
+                onResult = { bank = it }
+            )
+            return
+        }
     }
 
     Column(
