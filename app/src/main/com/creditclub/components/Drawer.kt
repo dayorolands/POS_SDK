@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -42,22 +41,18 @@ fun DrawerContent(
     val institutionConfig: InstitutionConfig by rememberBean()
     val agent = localStorage.agent
     val context = LocalContext.current
-    val logoTint = colorResource(R.color.navHeaderLogoTint)
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colors.primary)
+            .background(MaterialTheme.colors.primary.copy(0.2f))
     ) {
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Image(
             painter = painterResource(R.drawable.ic_launcher_transparent),
-            colorFilter = if (logoTint == Color.Transparent) null else ColorFilter.tint(logoTint),
             contentDescription = null,
             modifier = Modifier
-                .height(50.dp)
-                .width(IntrinsicSize.Max)
-                .padding(16.dp)
-                .widthIn(),
+                .size(80.dp)
+                .padding(16.dp),
         )
         Text(
             text = agent?.agentName ?: "",
@@ -65,13 +60,13 @@ fun DrawerContent(
                 .padding(start = 16.dp, end = 16.dp),
             softWrap = true,
             style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.onPrimary,
+            color = MaterialTheme.colors.onSurface,
         )
         Text(
             text = agent?.phoneNumber ?: "",
             modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
             style = MaterialTheme.typography.body1,
-            color = MaterialTheme.colors.onPrimary.copy(0.5f),
+            color = MaterialTheme.colors.onSurface.copy(0.5f),
         )
     }
 
