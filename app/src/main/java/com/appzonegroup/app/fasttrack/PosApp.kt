@@ -7,13 +7,13 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.WorkManager
 import com.appzonegroup.app.fasttrack.utility.extensions.registerPeriodicWorker
-import com.appzonegroup.app.fasttrack.work.IsoRequestLogWorker
-import com.appzonegroup.app.fasttrack.work.ReversalWorker
-import com.appzonegroup.app.fasttrack.work.TransactionLogWorker
+import com.appzonegroup.app.fasttrack.work.*
+import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.util.SocketJob
 import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.data.prefs.moveTo
+import com.creditclub.pos.work.CallHomeWorker
 import okio.use
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.KeyStore
@@ -37,8 +37,6 @@ fun Application.startPosApp() {
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
 
-    workManager.cancelAllWork()
-
     workManager.registerPeriodicWorker<TransactionLogWorker>(
         uniqueWorkName = "APP_TRANSACTION_LOG",
         constraints = constraints,
@@ -54,12 +52,17 @@ fun Application.startPosApp() {
         constraints = constraints,
     )
 
-//    if (get<ConfigService>().terminalId.isNotEmpty()) {
-//        GlobalScope.launch(Dispatchers.Main) {
-//            safeRunIO { get<PosParameter>().downloadKeys() }
-//        }
-//        get<CallHomeService>().startCallHomeTimer()
-//    }
+    workManager.registerPeriodicWorker<CallHomeWorker>(constraints)
+
+    workManager.registerPeriodicWorker<PosNotificationWorker>(
+        uniqueWorkName = "APP_POS_NOTIFICATION",
+        constraints = constraints,
+    )
+
+    // mPOS app updates will be handled by google play store
+    if (Platform.deviceType != 2) {
+        workManager.registerPeriodicWorker<AppUpdateWorker>(constraints)
+    }
 }
 
 private fun Application.encryptPosConfig() {
@@ -79,10 +82,9 @@ private fun Application.encryptPosConfig() {
 @Throws(Exception::class)
 private fun getTrustManagers(context: Context): Array<TrustManager?> {
     Security.insertProviderAt(BouncyCastleProvider(), 1)
-    val password = "cluster".toCharArray()
     val trustStore = KeyStore.getInstance("BKS")
     context.resources.openRawResource(R.raw.pos_trust_store).use { inputStream ->
-        trustStore.load(inputStream, password)
+        trustStore.load(inputStream, "cluster".toCharArray())
     }
     val tmf = TrustManagerFactory.getInstance("X509")
     tmf.init(trustStore)

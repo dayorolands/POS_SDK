@@ -23,6 +23,7 @@ import com.appzonegroup.creditclub.pos.models.PosTransaction
 import com.appzonegroup.creditclub.pos.models.Reversal
 import com.appzonegroup.creditclub.pos.models.messaging.ReversalRequest
 import com.appzonegroup.creditclub.pos.printer.Receipt
+import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.util.*
 import com.creditclub.pos.*
@@ -53,12 +54,14 @@ abstract class CardTransactionActivity : PosActivity() {
     private lateinit var cardData: CardData
     private val posApiService: PosApiService by retrofitService()
     private val posPreferences: PosPreferences by inject()
+    private val callHomeService: CallHomeService by inject()
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_OFF)
@@ -364,7 +367,8 @@ abstract class CardTransactionActivity : PosActivity() {
                         TransactionType.CashAdvance,
                         TransactionType.CashBack,
                         TransactionType.PreAuth,
-                        TransactionType.SalesComplete -> {
+                        TransactionType.SalesComplete,
+                        -> {
                             val posNotification = PosNotification.create(transaction)
                             posNotification.terminalId = config.terminalId
                             posNotification.nodeName = remoteConnectionInfo.nodeName

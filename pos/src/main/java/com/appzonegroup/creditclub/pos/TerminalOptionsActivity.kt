@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import com.appzonegroup.creditclub.pos.databinding.ActivityNetworkParametersBinding
 import com.appzonegroup.creditclub.pos.extension.apnInfo
+import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.util.AppConstants
 import com.appzonegroup.creditclub.pos.widget.Dialogs
 import com.creditclub.core.ui.widget.DialogOptionItem
@@ -23,6 +24,7 @@ class TerminalOptionsActivity : PosActivity(R.layout.activity_network_parameters
     View.OnClickListener {
     private val binding: ActivityNetworkParametersBinding by dataBinding()
     private val posTenant: PosTenant by inject()
+    private val callHomeService: CallHomeService by inject()
 
     override fun onClick(v: View?) {
         if (v?.id == R.id.terminal_id_item) {
@@ -111,7 +113,6 @@ class TerminalOptionsActivity : PosActivity(R.layout.activity_network_parameters
                         binding.portItem.value = param
                         callHomeService.stopCallHomeTimer()
                         callHomeService.startCallHomeTimer()
-                        mainScope.launch { callHomeService.callHome() }
                     }
                 }
             }
