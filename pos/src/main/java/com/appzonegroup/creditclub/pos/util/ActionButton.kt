@@ -12,7 +12,7 @@ import com.appzonegroup.creditclub.pos.R
 
 open class ActionButton(
     open var id: Int = 0,
-    open var icon: Int = R.mipmap.ic_launcher_round,
+    open var icon: Int = R.drawable.ic_logo_round,
     open var name: String = "",
     open var activityClass: Class<*>? = null,
 ) {
@@ -33,7 +33,7 @@ open class ActionButton(
 
 inline fun actionButton(
     id: Int = 0,
-    icon: Int = R.mipmap.ic_launcher_round,
+    icon: Int = R.drawable.ic_logo_round,
     name: String = "",
     activityClass: Class<*>? = null,
     crossinline block: ActionButton.() -> Unit,

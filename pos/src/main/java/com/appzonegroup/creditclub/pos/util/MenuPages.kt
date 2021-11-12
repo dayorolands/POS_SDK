@@ -29,7 +29,7 @@ object MenuPages : KoinComponent {
     init {
         PAGE_MAP[MAIN_MENU] = menuPage {
             id = MAIN_MENU
-            icon = R.mipmap.ic_launcher
+            icon = R.drawable.ic_logo_round
             name = "Welcome"
 
             options = lazy {

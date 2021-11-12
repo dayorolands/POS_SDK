@@ -11,7 +11,7 @@ open class MenuPage(
     var options: Lazy<LinkedHashMap<Int, ActionButton>>? = null,
     val isSecure: Boolean = false,
     override var id: Int = 0,
-    override var icon: Int = R.mipmap.ic_launcher_round,
+    override var icon: Int = R.drawable.ic_logo_round,
     override var name: String = "",
     override var activityClass: Class<*>? = null,
 ) : ActionButton(id = id, icon = icon, name = name, activityClass = activityClass) {
