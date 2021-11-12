@@ -16,6 +16,7 @@ import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.util.*
 import com.creditclub.core.util.delegates.defaultJson
 import com.creditclub.core.util.delegates.stringStore
+import com.creditclub.core.util.delegates.valueStore
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.RemoteConnectionInfo
@@ -23,7 +24,6 @@ import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.model.ConnectionInfo
 import com.creditclub.pos.utils.asDesEdeKey
 import com.creditclub.pos.utils.decrypt
-import com.creditclub.pos.utils.nonNullStringStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
@@ -53,11 +53,11 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
     private val localStorage: LocalStorage by inject()
     private val resources = context.resources
 
-    override var masterKey by prefs.nonNullStringStore("MasterKey")
-    override var sessionKey by prefs.nonNullStringStore("SessionKey")
-    override var pinKey by prefs.nonNullStringStore("PinKey")
+    override var masterKey: String by prefs.valueStore("MasterKey", "")
+    override var sessionKey: String by prefs.valueStore("SessionKey", "")
+    override var pinKey: String by prefs.valueStore("PinKey", "")
 
-    override var managementDataString by prefs.nonNullStringStore("PFMD", "{}")
+    override var managementDataString: String by prefs.valueStore("PFMD", "{}")
     override var updatedAt by prefs.stringStore("UpdatedAt")
     override var capkList by ManagementDataDelegate("CAPK_ARRAY", R.raw.capk_data)
     override var emvAidList by ManagementDataDelegate("EMV_APP_ARRAY", R.raw.emv_app_data)
@@ -261,7 +261,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         return generateLog().apply {
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
-            gpsCoordinates = localStorage.lastKnownLocation ?: "0.00;0.00"
+            gpsCoordinates = localStorage.lastKnownLocation
             nodeName = posMode.nodeName
             if (posMode is ConnectionInfo) {
                 connectionInfo = posMode
@@ -390,10 +390,10 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         override val cardAcceptorId: String = "",
 
         @SerialName("05")
-        override val currencyCode: String = "",
+        override val currencyCode: String = "566",
 
         @SerialName("06")
-        override val countryCode: String = "",
+        override val countryCode: String = "566",
 
         @SerialName("08")
         override val merchantCategoryCode: String = "",
