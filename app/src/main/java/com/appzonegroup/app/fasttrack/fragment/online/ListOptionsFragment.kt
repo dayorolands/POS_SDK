@@ -205,7 +205,7 @@ class ListOptionsFragment : CreditClubFragment(R.layout.fragment_listview), OnIt
             authResponse.phoneNumber,
             authResponse.sessionId,
             selectedOption!!.index!!,
-            localStorage.lastKnownLocation ?: "0.00;0.00",
+            localStorage.lastKnownLocation,
         )
         dialogProvider.hideProgressBar()
 

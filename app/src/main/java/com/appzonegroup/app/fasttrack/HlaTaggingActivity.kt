@@ -172,9 +172,8 @@ class HlaTaggingActivity : CreditClubActivity(R.layout.activity_hla_tagging),
         }
 
         formData.dateTagged = Instant.now().toString()
-        formData.location = localStorage.lastKnownLocation?.split(";")?.run {
-            GeoTagCoordinate(latitude = get(0), longitude = get(1))
-        }
+        val (latitude, longitude) = localStorage.lastKnownLocation.split(";")
+        formData.location = GeoTagCoordinate(latitude = latitude, longitude = longitude)
         formData.agentPhoneNumber = localStorage.agent?.phoneNumber
         formData.institutionCode = localStorage.institutionCode
 
@@ -202,7 +201,7 @@ class HlaTaggingActivity : CreditClubActivity(R.layout.activity_hla_tagging),
 
     private fun createImageListener(
         imageBinding: ItemAddImageBinding,
-        onSubmit: ImageListenerBlock
+        onSubmit: ImageListenerBlock,
     ) {
         imageBinding.run {
             root.setOnClickListener {

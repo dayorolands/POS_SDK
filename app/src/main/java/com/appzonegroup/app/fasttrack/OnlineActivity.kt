@@ -48,7 +48,7 @@ class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
                 phoneNumber,
                 sessionId,
                 verificationCode,
-                localStorage.lastKnownLocation ?: "0.00;0.00",
+                localStorage.lastKnownLocation,
                 false
             ) { e, result, _ ->
                 dialogProvider.hideProgressBar()

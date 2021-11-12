@@ -166,7 +166,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
             pNumber = authResponse?.phoneNumber ?: "",
             sessionId = authResponse?.sessionId ?: "nothing",
             image = finalFile,
-            location = localStorage.lastKnownLocation ?: "0.00;0.00",
+            location = localStorage.lastKnownLocation,
             isFullImage = optionsText?.isShouldCompress ?: false,
         )
         dialogProvider.hideProgressBar()
@@ -231,7 +231,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
             authResponse.phoneNumber,
             authResponse.sessionId,
             creditClubImage?.path ?: "",
-            localStorage.lastKnownLocation ?: "0.00;0.00",
+            localStorage.lastKnownLocation,
         ) { e, result, status ->
             dialogProvider.hideProgressBar()
             if (status) {

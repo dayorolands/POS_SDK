@@ -56,7 +56,7 @@ class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
             authResponse.phoneNumber,
             authResponse.sessionId,
             txt,
-            localStorage.lastKnownLocation ?: "0.00;0.00",
+            localStorage.lastKnownLocation,
         )
         dialogProvider.hideProgressBar()
 
@@ -90,7 +90,7 @@ class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
             authResponse.phoneNumber,
             authResponse.sessionId,
             txt,
-            localStorage.lastKnownLocation ?: "0.00;0.00",
+            localStorage.lastKnownLocation,
         )
         dialogProvider.hideProgressBar()
         if (error == null) {
@@ -260,7 +260,7 @@ class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
             authResponse.phoneNumber,
             authResponse.sessionId,
             txt,
-            localStorage.lastKnownLocation ?: "0.00;0.00",
+            localStorage.lastKnownLocation,
         )
         dialogProvider.hideProgressBar()
         if (error != null) {

@@ -45,7 +45,7 @@ class IsoSocketHelper(
         val isoRequestLog = request.generateLog().apply {
             institutionCode = localStorage.institutionCode ?: ""
             agentCode = localStorage.agent?.agentCode ?: ""
-            gpsCoordinates = localStorage.lastKnownLocation ?: "0.00;0.00"
+            gpsCoordinates = localStorage.lastKnownLocation
             nodeName = remoteConnectionInfo.nodeName
             if (remoteConnectionInfo is ConnectionInfo) {
                 connectionInfo = remoteConnectionInfo
