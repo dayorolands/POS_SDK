@@ -36,8 +36,9 @@ class N3EmvListener(
     private val activity: CreditClubActivity,
     private val deviceEngine: DeviceEngine,
     private val sessionData: PosManager.SessionData,
-    private val continuation: Continuation<CardData?>
+    private val continuation: Continuation<CardData?>,
 ) : OnEmvProcessListener2, KoinComponent {
+    private var hasResumed: Boolean = false
     private val emvHandler2 = deviceEngine.getEmvHandler2("app2")
     private val cardData = N3CardData()
     private var filed55: String? = null
@@ -46,7 +47,7 @@ class N3EmvListener(
     override fun onSelApp(
         appNameList: List<String>?,
         appInfoList: List<CandidateAppInfoEntity>?,
-        isFirstSelect: Boolean
+        isFirstSelect: Boolean,
     ) {
         appNameList ?: return
         emvHandler2.onSetSelAppResponse(1)
@@ -64,9 +65,12 @@ class N3EmvListener(
     override fun onCardHolderInputPin(isOnlinePin: Boolean, leftTimes: Int) {
         if (!isOnlinePin && leftTimes < 1) {
             emvHandler2.emvProcessCancel()
-            continuation.resume(N3CardData().apply {
-                status = CardTransactionStatus.CardRestricted
-            })
+            if (!hasResumed) {
+                hasResumed = true
+                continuation.resume(N3CardData().apply {
+                    status = CardTransactionStatus.CardRestricted
+                })
+            }
             return
         }
 
@@ -262,7 +266,10 @@ class N3EmvListener(
             }
         }
 
-        continuation.resume(cardData)
+        if (!hasResumed) {
+            hasResumed = true
+            continuation.resume(cardData)
+        }
     }
 
     private fun getFiled55String(): String {
