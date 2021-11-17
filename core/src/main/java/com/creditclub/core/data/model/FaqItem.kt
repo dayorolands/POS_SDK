@@ -1,5 +1,7 @@
 package com.creditclub.core.data.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -9,10 +11,11 @@ import kotlinx.serialization.Serializable
  * Appzone Ltd
  */
 @Serializable
-class FaqItem {
+@Parcelize
+data class FaqItem(
     @SerialName("Question")
-    var question: String = ""
+    val question: String = "",
 
     @SerialName("Answer")
-    var answer: String = ""
-}
+    val answer: String = "",
+) : Parcelable

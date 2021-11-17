@@ -190,11 +190,16 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
     }
 
     private suspend fun checkKeysAndParameters() {
+        if (posParameterList.isEmpty()) {
+            dialogProvider.showError("No routes available")
+            return
+        }
+
         val localDate = Instant.now().format("MMdd")
         if (localDate == parameters.updatedAt) return
 
         dialogProvider.showProgressBar("Downloading Keys")
-        for (parameterStore in parameterStores) {
+        for (parameterStore in posParameterList) {
             val (_, error) = safeRunIO {
                 parameterStore.downloadKeys()
                 parameterStore.downloadParameters()
@@ -213,8 +218,13 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
     }
 
     private suspend fun downloadKeys() {
+        if (posParameterList.isEmpty()) {
+            dialogProvider.showError("No routes available")
+            return
+        }
+
         dialogProvider.showProgressBar("Downloading Keys")
-        for (parameterStore in parameterStores) {
+        for (parameterStore in posParameterList) {
             val (_, error) = safeRunIO {
                 parameterStore.downloadKeys()
             }
@@ -232,8 +242,13 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
     }
 
     private suspend fun downloadParameters() {
+        if (posParameterList.isEmpty()) {
+            dialogProvider.showError("No routes available")
+            return
+        }
+
         dialogProvider.showProgressBar("Downloading Parameters")
-        for (parameterStore in parameterStores) {
+        for (parameterStore in posParameterList) {
             val (_, error) = safeRunIO {
                 parameterStore.downloadParameters()
             }
@@ -277,24 +292,24 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
         next(status)
     }
 
-    private inline val parameterStores: Sequence<PosParameter>
-        get() {
-            val context = requireContext()
-            val connectionSequence = sequence {
-                if (config.remoteConnectionInfo != InvalidRemoteConnectionInfo) {
-                    yield(config.remoteConnectionInfo)
-                }
-                posPreferences.binRoutes?.run {
-                    for (binRoutes in this) {
-                        for (route in binRoutes.routes) {
-                            yield(route.connectionInfo)
-                        }
+    private val posParameterList: List<PosParameter> by lazy {
+        val context = requireContext()
+        val connectionSequence = sequence {
+            if (config.remoteConnectionInfo != InvalidRemoteConnectionInfo) {
+                yield(config.remoteConnectionInfo)
+            }
+            posPreferences.binRoutes?.run {
+                for (binRoutes in this) {
+                    for (route in binRoutes.routes) {
+                        yield(route.connectionInfo)
                     }
                 }
             }
-
-            return connectionSequence
-                .distinctBy { "${it.host}:${it.port}" }
-                .map { it.getParameter(context) }
         }
+
+        return@lazy connectionSequence
+            .distinctBy { "${it.host}:${it.port}" }
+            .map { it.getParameter(context) }
+            .toList()
+    }
 }

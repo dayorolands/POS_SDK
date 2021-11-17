@@ -1,9 +1,12 @@
 package com.creditclub.pos.utils
 
+import android.annotation.SuppressLint
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
 import java.security.spec.InvalidKeySpecException
-import javax.crypto.*
+import javax.crypto.Cipher
+import javax.crypto.SecretKey
+import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.DESedeKeySpec
 
 inline val ByteArray.asDesEdeKey: SecretKey
@@ -33,12 +36,14 @@ inline val ByteArray.asDesEdeKey: SecretKey
         return keyFactory.generateSecret(keySpec)
     }
 
+@SuppressLint("GetInstance")
 fun SecretKey.encrypt(data: ByteArray, transformation: String = "DESede/ECB/NoPadding"): ByteArray {
     val cipher = Cipher.getInstance(transformation)
     cipher.init(Cipher.ENCRYPT_MODE, this)
     return cipher.doFinal(data)
 }
 
+@SuppressLint("GetInstance")
 fun SecretKey.decrypt(data: ByteArray, transformation: String = "DESede/ECB/NoPadding"): ByteArray {
     val cipher = Cipher.getInstance(transformation)
     cipher.init(Cipher.DECRYPT_MODE, this)

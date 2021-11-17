@@ -41,10 +41,10 @@ class CreditClubImage(context: Context, private val image: Image) {
 
     private fun Context.compressImage(): Bitmap? {
         val (tempBitmap) = safeRun {
-            val inputStream = contentResolver.openInputStream(image.uri)
-            val tempBitmap = BitmapFactory.decodeStream(inputStream)
-            inputStream?.close()
-            tempBitmap!!.createScaledBitmap(maxSize = 400)
+            val tempBitmap = contentResolver.openInputStream(image.uri).use { inputStream ->
+                BitmapFactory.decodeStream(inputStream)
+            }
+            tempBitmap.createScaledBitmap(maxSize = 400)
         }
 
         return tempBitmap

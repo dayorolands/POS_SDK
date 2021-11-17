@@ -280,7 +280,11 @@ abstract class CardTransactionActivity : PosActivity() {
         val posParameter = remoteConnectionInfo.getParameter(this)
         request.applyManagementData(posParameter.managementData)
         request.acquiringInstIdCode32 = localStorage.institutionCode
-        val isoSocketHelper = IsoSocketHelper(config, posParameter, remoteConnectionInfo)
+        val isoSocketHelper = IsoSocketHelper(
+            config = config,
+            parameters = posParameter,
+            remoteConnectionInfo = remoteConnectionInfo,
+        )
         mainScope.launch {
             if (cardData.pinBlock.isEmpty()) {
                 dialogProvider.showProgressBar("Pin Ok")

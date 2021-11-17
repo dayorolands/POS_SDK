@@ -49,14 +49,14 @@ fun getDefaultAidList(context: Context): List<AidEntity> {
 
 @Throws(IOException::class)
 private fun Context.readAssetsTxt(fileName: String): String {
-    val inputStream = assets.open(fileName)
-    val size = inputStream.available()
-    // Read the entire asset into a local byte buffer.
-    val buffer = ByteArray(size)
-    inputStream.read(buffer)
-    inputStream.close()
-    // Convert the buffer into a string.
-    return String(buffer, Charsets.UTF_8)
+    return assets.open(fileName).use { inputStream ->
+        val size = inputStream.available()
+        // Read the entire asset into a local byte buffer.
+        val buffer = ByteArray(size)
+        inputStream.read(buffer)
+        // Convert the buffer into a string.
+        String(buffer, Charsets.UTF_8)
+    }
 }
 
 inline val Int.hexString get() = toString(16)

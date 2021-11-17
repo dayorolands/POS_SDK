@@ -1,8 +1,6 @@
 package com.appzonegroup.app.fasttrack
 
 import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -12,6 +10,7 @@ import com.appzonegroup.app.fasttrack.databinding.ActivityFaqBinding
 import com.appzonegroup.app.fasttrack.databinding.ListItemFaqAnswerBinding
 import com.appzonegroup.app.fasttrack.databinding.ListItemFaqQuestionBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
+import com.creditclub.core.data.StringParcel
 import com.creditclub.core.data.model.FaqItem
 import com.creditclub.core.data.response.FaqResponse
 import com.creditclub.core.ui.CreditClubActivity
@@ -32,17 +31,21 @@ class FaqActivity : CreditClubActivity(R.layout.activity_faq) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "FAQ"
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.run {
+            title = "FAQ"
+            setDisplayHomeAsUpEnabled(true)
+        }
 
         binding.list.layoutManager = LinearLayoutManager(this)
         mainScope.launch {
             val (faqs) = safeRunIO {
-                val fileContents = assets.open("faq.json").rawContents
-                Json.decodeFromString(FaqResponse.serializer(), fileContents)
+                assets.open("faq.json").use { inputStream ->
+                    val fileContents = inputStream.rawContents
+                    Json.decodeFromString(FaqResponse.serializer(), fileContents)
+                }
             }
 
-            faqs ?: return@launch
+            if (faqs == null) return@launch
             binding.list.adapter = GenreAdapter(faqs.data?.map { FaqGroup(it) } ?: emptyList())
         }
     }
@@ -82,7 +85,7 @@ class FaqActivity : CreditClubActivity(R.layout.activity_faq) {
 
         override fun onBindChildViewHolder(
             holder: AnswerViewHolder, flatPosition: Int, group: ExpandableGroup<*>,
-            childIndex: Int
+            childIndex: Int,
         ) {
             val answer = (group as FaqGroup).items[childIndex]
             holder.binding.answerText = answer.value
@@ -91,7 +94,7 @@ class FaqActivity : CreditClubActivity(R.layout.activity_faq) {
         override fun onBindGroupViewHolder(
             holder: QuestionViewHolder,
             flatPosition: Int,
-            group: ExpandableGroup<*>
+            group: ExpandableGroup<*>,
         ) {
             holder.binding.questionText = (group as FaqGroup).faqItem.question
         }
@@ -105,30 +108,6 @@ class FaqActivity : CreditClubActivity(R.layout.activity_faq) {
         ChildViewHolder(binding.root)
 
     private class FaqGroup(val faqItem: FaqItem) : ExpandableGroup<StringParcel>(
-        faqItem.question, listOf(
-            StringParcel(faqItem.answer)
-        )
+        faqItem.question, listOf(StringParcel(faqItem.answer))
     )
-
-    private class StringParcel(val value: String?) : Parcelable {
-        constructor(parcel: Parcel) : this(parcel.readString())
-
-        override fun writeToParcel(parcel: Parcel, flags: Int) {
-            parcel.writeString(value)
-        }
-
-        override fun describeContents(): Int {
-            return 0
-        }
-
-        companion object CREATOR : Parcelable.Creator<StringParcel> {
-            override fun createFromParcel(parcel: Parcel): StringParcel {
-                return StringParcel(parcel)
-            }
-
-            override fun newArray(size: Int): Array<StringParcel?> {
-                return arrayOfNulls(size)
-            }
-        }
-    }
 }

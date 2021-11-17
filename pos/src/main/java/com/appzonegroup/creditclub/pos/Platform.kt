@@ -66,7 +66,12 @@ val posModule = module {
         get<PosConfig>().remoteConnectionInfo.getParameter(androidContext())
     }
     single { CallHomeService(androidContext()) }
-    single { IsoSocketHelper(get(), get()) }
+    single {
+        IsoSocketHelper(
+            config = get(),
+            parameters = get(),
+        )
+    }
     single {
         PosPreferences(androidContext().getEncryptedSharedPreferences("com.creditclub.pos.preferences"))
     }

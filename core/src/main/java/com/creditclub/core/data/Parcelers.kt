@@ -1,8 +1,13 @@
 package com.creditclub.core.data
 
 import android.os.Parcel
+import android.os.Parcelable
 import kotlinx.parcelize.Parceler
+import kotlinx.parcelize.Parcelize
 import java.time.Instant
+
+@Parcelize
+data class StringParcel(val value: String?) : Parcelable
 
 inline fun <T> Parcel.readNullable(crossinline reader: () -> T) =
     if (readInt() != 0) reader() else null
