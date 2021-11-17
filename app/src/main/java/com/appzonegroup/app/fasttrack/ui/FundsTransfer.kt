@@ -291,7 +291,9 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     reason = response.responseMessage,
                 )
                 transferAttemptCount++
-                loadingMessage = ""
+                if (!response.isPendingOnMiddleware()) {
+                    loadingMessage = ""
+                }
             }
         }
 
@@ -304,7 +306,9 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     // Schedule automatic requery for pending transactions
     LaunchedEffect(transferAttemptCount) {
         if (transferAttemptCount > 0 && retryPolicy == RetryPolicy.AutoRetry && isVerified) {
-            transferFunds()
+            activeJob = coroutineScope.launch {
+                transferFunds()
+            }
         }
     }
 
