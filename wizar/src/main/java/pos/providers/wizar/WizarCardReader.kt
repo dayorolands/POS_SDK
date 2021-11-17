@@ -1,8 +1,8 @@
 package pos.providers.wizar
 
 import android.content.Context
-import android.os.Environment
 import android.util.Log
+import androidx.core.content.edit
 import com.cloudpos.*
 import com.cloudpos.jniinterface.EMVJNIInterface
 import com.cloudpos.jniinterface.IFuntionListener
@@ -11,18 +11,21 @@ import com.cloudpos.pinpad.PINPadDevice
 import com.cloudpos.pinpad.PINPadOperationResult
 import com.cloudpos.pinpad.extend.PINPadExtendDevice
 import com.cloudpos.smartcardreader.SmartCardReaderDevice
+import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.format
 import com.creditclub.core.util.safeRun
-import com.creditclub.core.util.safeRunIO
+import com.creditclub.pos.DukptConfig
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.*
-import com.creditclub.pos.encryptPinBlock
 import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.extensions.hexString
+import com.creditclub.pos.utils.asDesEdeKey
+import com.creditclub.pos.utils.decrypt
+import com.creditclub.pos.utils.encrypt
 import com.wizarpos.emvsample.constant.EMVConstant
 import com.wizarpos.emvsample.constant.EMVConstant.*
 import com.wizarpos.emvsample.db.TransDetailInfo
@@ -33,7 +36,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.Instant
-import java.time.LocalDateTime
 import kotlin.concurrent.thread
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
@@ -46,6 +48,7 @@ fun getSmartCardDevice(context: Context): SmartCardReaderDevice {
 }
 
 private const val TAG = "Wizar"
+private const val PREF_CURRENT_MASTER_KEY_FIELD_NAME = "currentMasterKey"
 
 class WizarCardReader(
     private val activity: CreditClubActivity,
@@ -55,6 +58,8 @@ class WizarCardReader(
     private val terminalConfig: WizarTerminalConfig,
 ) : CardReader, IFuntionListener, EMVConstant {
     private val dialogProvider = activity.dialogProvider
+    private val prefs =
+        activity.getEncryptedSharedPreferences("pos.providers.wizar.cardreader")
 
     private var cardReaderEvent: CardReaderEvent = CardReaderEvent.CANCELLED
 
@@ -87,7 +92,16 @@ class WizarCardReader(
             Log.i("test", "kernel id:" + EMVJNIInterface.emv_get_kernel_id())
             Log.i("test", "process type:" + EMVJNIInterface.emv_get_process_type())
         }
-        updateCardWaitingProgress("Insert or swipe card")
+        dialogProvider.showProgressBar(
+            title = "Please insert card",
+            message = "Waiting...",
+            isCancellable = true,
+        ) {
+            onClose {
+                userCancel = true
+                if (!activity.isFinishing) activity.finish()
+            }
+        }
         cardReaderEvent = suspendCoroutine { continuation ->
             EMVJNIInterface.registerFunctionListener(CardInsertListener(continuation))
             EMVJNIInterface.open_reader(1)
@@ -114,14 +128,6 @@ class WizarCardReader(
             EMVJNIInterface.emv_anti_shake_finish(1)
             emvStart()
         }
-        safeRunIO {
-            debugOnly {
-                Runtime.getRuntime().exec(
-                    "logcat -v time -f " + Environment.getExternalStorageDirectory()
-                        .path + "/" + "emvlog_" + LocalDateTime.now().toString()
-                )
-            }
-        }
         dialogProvider.hideProgressBar()
         return cardData
     }
@@ -138,15 +144,6 @@ class WizarCardReader(
         if (!userCancel && !isSessionOver && cardEvent == CardReaderEvent.REMOVED) {
             userCancel = true
             onEventChange(CardReaderEvent.REMOVED)
-        }
-    }
-
-    private fun updateCardWaitingProgress(text: String = "Please insert card") {
-        dialogProvider.showProgressBar(text, "Waiting...", isCancellable = true) {
-            onClose {
-                userCancel = true
-                if (!activity.isFinishing) activity.finish()
-            }
         }
     }
 
@@ -405,17 +402,43 @@ class WizarCardReader(
         val posParameter: PosParameter =
             sessionData.getPosParameter?.invoke(cardData.pan, sessionData.amount / 100.0)
                 ?: defaultPosParameter
+        val dukptConfig: DukptConfig? =
+            sessionData.getDukptConfig?.invoke(cardData.pan, sessionData.amount / 100.0)
+
+        pinPad.open()
+
+        val masterKeyString = posParameter.masterKey
+        val masterKey = masterKeyString.hexBytes
+        val localMasterKey = ByteArray(16) { 0x38.toByte() }
+        val newPinKey = masterKey.asDesEdeKey.encrypt(posParameter.pinKey.hexBytes)
+
+        if (dukptConfig == null) {
+            safeRun {
+                pinPad.updateMasterKey(0, localMasterKey, masterKey)
+                prefs.edit {
+                    putString(PREF_CURRENT_MASTER_KEY_FIELD_NAME, masterKeyString)
+                }
+            }
+            safeRun { pinPad.updateUserKey(0, 0, newPinKey) }
+        }
+
+        pinPad.setPINLength(4, 4)
+
         val pinListener = OperationListener { operationResult ->
             when (operationResult.resultCode) {
                 OperationResult.SUCCESS -> {
-                    val pinBlock = (operationResult as PINPadOperationResult).encryptedPINBlock
-                    if (operationResult.resultCode == OperationResult.SUCCESS && pinBlock != null && pinBlock.isNotEmpty()) {
-                        val encryptedPinBlock = encryptPinBlock(
-                            posParameter,
-                            cardNo = cardData.pan,
-                            plainPin = "",
-                        )
-                        cardData.pinBlock = pinBlock.hexString
+                    // PIN block encrypted by the sdk
+                    val localPinBlock = (operationResult as PINPadOperationResult).encryptedPINBlock
+                    if (operationResult.resultCode == OperationResult.SUCCESS && localPinBlock != null && localPinBlock.isNotEmpty()) {
+                        if (dukptConfig == null) {
+                            val localPinKey = masterKey.asDesEdeKey.decrypt(newPinKey)
+                            val pinPanXor = localPinKey.asDesEdeKey.decrypt(localPinBlock)
+                            val remoteSecretKey = posParameter.pinKey.hexBytes.asDesEdeKey
+
+                            // PIN block encrypted by remote pin key
+                            val remotePinBlock = remoteSecretKey.encrypt(pinPanXor)
+                            cardData.pinBlock = remotePinBlock.hexString
+                        }
                     }
                     EMVJNIInterface.emv_set_online_pin_entered(1)
                     emvNext()
@@ -432,10 +455,21 @@ class WizarCardReader(
             }
             pinPad.close()
         }
-        val keyInfo = KeyInfo(PINPadDevice.KEY_TYPE_MK_SK, 0, 0, AlgorithmConstants.ALG_3DES)
-        pinPad.open()
-        safeRun { pinPad.updateUserKey(0, 0, posParameter.pinKey.hexBytes) }
-        pinPad.setPINLength(4, 4)
+        val keyInfo = if (dukptConfig == null) {
+            KeyInfo(
+                PINPadDevice.KEY_TYPE_MK_SK,
+                0,
+                0,
+                AlgorithmConstants.ALG_3DES
+            )
+        } else {
+            KeyInfo(
+                PINPadDevice.KEY_TYPE_TDUKPT,
+                0,
+                0,
+                AlgorithmConstants.ALG_3DES
+            )
+        }
         pinPad.listenForPinBlock(
             keyInfo,
             cardData.pan,

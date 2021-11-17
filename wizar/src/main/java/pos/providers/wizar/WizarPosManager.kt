@@ -1,10 +1,15 @@
 package pos.providers.wizar
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
 import android.util.Log
 import com.cloudpos.jniinterface.EMVJNIInterface
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogProvider
+import com.creditclub.core.util.debug
 import com.creditclub.core.util.debugOnly
 import com.creditclub.core.util.safeRun
 import com.creditclub.pos.PosConfig
@@ -13,14 +18,15 @@ import com.creditclub.pos.PosManagerCompanion
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardReader
 import com.creditclub.pos.printer.PosPrinter
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import com.wizarpos.security.injectkey.aidl.IKeyLoaderService
 import org.koin.dsl.module
 
 
-class WizarPosManager(private val activity: CreditClubActivity) : PosManager, KoinComponent {
-    private val posParameter: PosParameter by inject()
-    private val posConfig: PosConfig by inject()
+open class WizarPosManager(
+    private val activity: CreditClubActivity,
+    private val posParameter: PosParameter,
+    private val posConfig: PosConfig,
+) : PosManager {
     override val cardReader: CardReader by lazy {
         WizarCardReader(
             activity = activity,
@@ -30,6 +36,8 @@ class WizarPosManager(private val activity: CreditClubActivity) : PosManager, Ko
             terminalConfig = wizarTerminalConfig,
         )
     }
+    private var service: IKeyLoaderService? = null
+    private var authInfo = byteArrayOf()
 
     private var emvParamLoadFlag: Boolean = false
     private val wizarTerminalConfig = WizarTerminalConfig(activity)
@@ -47,10 +55,49 @@ class WizarPosManager(private val activity: CreditClubActivity) : PosManager, Ko
         ) {
             emvParamLoadFlag = true
         }
+
+        startInjectKeyService(activity)
     }
 
     override fun cleanUpEmv() {
+        if (service != null) {
+            service = null
+            activity.unbindService(serviceConnection)
+        }
         safeRun { EMVJNIInterface.close_reader(1) }
+    }
+
+    @Synchronized
+    protected fun startConnectService(
+        context: Context,
+        comp: ComponentName,
+        connection: ServiceConnection?,
+    ): Boolean {
+        val intent = Intent()
+        intent.setPackage(comp.packageName)
+        intent.component = comp
+        val isSuccess = context.bindService(intent, connection!!, Context.BIND_AUTO_CREATE)
+        debug("(%s)bind service (%s, %s) isSuccess=${isSuccess}, comp.packageName=${comp.packageName}, comp.className=${comp.className}")
+        return isSuccess
+    }
+
+    private fun startInjectKeyService(context: Context): Boolean {
+        val comp = ComponentName(
+            "com.wizarpos.security.injectkey",
+            "com.wizarpos.security.injectkey.service.MainService")
+        return startConnectService(activity, comp, serviceConnection)
+    }
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, obj: IBinder?) {
+            service = IKeyLoaderService.Stub.asInterface(obj)
+            service!!.resetMasterKey(0)
+            authInfo = service!!.authInfo
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            service = null
+        }
     }
 
     companion object : PosManagerCompanion {
@@ -59,7 +106,11 @@ class WizarPosManager(private val activity: CreditClubActivity) : PosManager, Ko
 
         override val module = module {
             factory<PosManager> { (activity: CreditClubActivity) ->
-                WizarPosManager(activity)
+                WizarPosManager(
+                    activity = activity,
+                    posParameter = get(),
+                    posConfig = get(),
+                )
             }
             factory<PosPrinter> { (context: Context, dialogProvider: DialogProvider) ->
                 WizarPrinter(
