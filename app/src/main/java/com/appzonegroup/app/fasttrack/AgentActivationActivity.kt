@@ -28,7 +28,7 @@ import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
 
 class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activation) {
-    private val binding by dataBinding<ActivityAgentActivationBinding>()
+    private val binding: ActivityAgentActivationBinding by dataBinding()
 
     private var isActivation = false
     private var code = ""

@@ -19,7 +19,6 @@ import com.creditclub.pos.card.CardTransactionStatus
 import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.utils.asDesEdeKey
 import com.creditclub.pos.utils.encrypt
-import com.creditclub.pos.xor
 import com.dspread.R
 import com.dspread.qpos.utils.DUKPK2009_CBC
 import com.dspread.qpos.utils.TLV
@@ -27,8 +26,6 @@ import com.dspread.qpos.utils.TLVParser
 import com.dspread.qpos.utils.hexString
 import com.dspread.xpos.CQPOSService
 import com.dspread.xpos.QPOSService
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import java.time.Instant
 import java.util.*
 import kotlin.coroutines.Continuation
@@ -37,11 +34,12 @@ import kotlin.coroutines.suspendCoroutine
 
 class QPosListener(
     private val pos: QPOSService,
-    private val qPosManager: QPosManager
-) : CQPOSService(), KoinComponent {
+    private val qPosManager: QPosManager,
+    private val defaultPosParameter: PosParameter,
+) : CQPOSService() {
     internal var dukptConfig: DukptConfig? = null
     internal var cardDataContinuation: Continuation<CardData?>? = null
-    internal var cardEventContinuation: Continuation<CardReaderEvent>? = null
+    private var cardEventContinuation: Continuation<CardReaderEvent>? = null
     internal var posConnectContinuation: Continuation<Boolean>? = null
     internal var unitContinuation: Continuation<Unit>? = null
     internal var stringContinuation: Continuation<String?>? = null
@@ -52,7 +50,7 @@ class QPosListener(
 
     override fun onDoTradeResult(
         result: QPOSService.DoTradeResult,
-        decodeData: Hashtable<String, String>?
+        decodeData: Hashtable<String, String>?,
     ) {
         when (result) {
             QPOSService.DoTradeResult.NONE -> {
@@ -157,7 +155,7 @@ class QPosListener(
         var content = ""
         content += getString(R.string.posId) + posId + "\n"
         content += "csn: $csn\n"
-        content += "conn: " + pos.getBluetoothState() + "\n"
+        content += "conn: " + pos.bluetoothState + "\n"
         content += "psamId: $psamId\n"
         content += "NFCId: $NFCId\n"
         statusEditText.setText(content)
@@ -252,21 +250,19 @@ class QPosListener(
         }
 
         if (dukptConfig == null) {
-            val encryptedPin = DUKPK2009_CBC.getDate(
+            val pinPanXor = DUKPK2009_CBC.getDate(
                 pinKsn,
                 pinBlock,
                 DUKPK2009_CBC.Enum_key.PIN,
                 DUKPK2009_CBC.Enum_mode.CBC
-            )
+            ).hexBytes
             val pan = dates.getValue("5A", hex = false, fpadded = true)
-            val parsCarN = "0000" + pan.substring(
-                pan.length - 13,
-                pan.length - 1
-            )
-            val pinTlv = DUKPK2009_CBC.xor(parsCarN, encryptedPin)
-            val pinLength = pinTlv.substring(0, 2).toInt()
-            val pin = pinTlv.substring(2, 2 + pinLength)
-            cardData.pinBlock = encryptedPinBlock(cardData.pan, pin).hexString
+            val posParameter: PosParameter =
+                sessionData.getPosParameter?.invoke(pan, sessionData.amount / 100.0)
+                    ?: defaultPosParameter
+            val secretKey = posParameter.pinKey.hexBytes.asDesEdeKey
+            val encryptedPinBlock = secretKey.encrypt(pinPanXor).copyOf(8)
+            cardData.pinBlock = encryptedPinBlock.hexString
         } else {
             cardData.pinBlock = pinBlock // dukptPinBlock(dukptConfig, cardData.pan, pin).hexString
             cardData.ksnData = pinKsn // dukptConfig.ksn
@@ -461,7 +457,7 @@ class QPosListener(
 
     override fun onReturnCustomConfigResult(
         isSuccess: Boolean,
-        result: String
+        result: String,
     ) {
         handleUnitContinuation()
     }
@@ -570,7 +566,7 @@ class QPosListener(
     override fun onGetPosComm(
         mod: Int,
         amount: String,
-        posid: String
+        posid: String,
     ) {
         TRACE.d("onGetPosComm(int mod, String amount, String posid):" + mod + TRACE.NEW_LINE + amount + TRACE.NEW_LINE + posid)
     }
@@ -582,7 +578,7 @@ class QPosListener(
 
     override fun onUpdateMasterKeyResult(
         arg0: Boolean,
-        arg1: Hashtable<String, String>
+        arg1: Hashtable<String, String>,
     ) { // TODO Auto-generated method stub
         TRACE.d("onUpdateMasterKeyResult(boolean arg0, Hashtable<String, String> arg1):" + arg0 + TRACE.NEW_LINE + arg1.toString())
     }
@@ -593,14 +589,14 @@ class QPosListener(
 
     override fun onSetParamsResult(
         arg0: Boolean,
-        arg1: Hashtable<String, Any>
+        arg1: Hashtable<String, Any>,
     ) { // TODO Auto-generated method stub
         TRACE.d("onSetParamsResult(boolean arg0, Hashtable<String, Object> arg1):" + arg0 + TRACE.NEW_LINE + arg1.toString())
     }
 
     override fun onGetInputAmountResult(
         arg0: Boolean,
-        arg1: String
+        arg1: String,
     ) { // TODO Auto-generated method stub
         TRACE.d("onGetInputAmountResult(boolean arg0, String arg1):" + arg0 + TRACE.NEW_LINE + arg1)
     }
@@ -740,7 +736,7 @@ class QPosListener(
 
     private fun devicePermissionRequest(
         mManager: UsbManager,
-        usbDevice: UsbDevice
+        usbDevice: UsbDevice,
     ) {
         val mPermissionIntent = PendingIntent.getBroadcast(
             activity, 0, Intent(
@@ -800,19 +796,19 @@ class QPosListener(
 
     override fun onReturnSetAESResult(
         isSuccess: Boolean,
-        result: String
+        result: String,
     ) {
     }
 
     override fun onReturnAESTransmissonKeyResult(
         isSuccess: Boolean,
-        result: String
+        result: String,
     ) {
     }
 
     override fun onReturnSignature(
         b: Boolean,
-        signaturedData: String
+        signaturedData: String,
     ) {
         if (b) {
             val encode = Base64.encode(signaturedData.toByteArray(), Base64.DEFAULT)
@@ -911,16 +907,6 @@ class QPosListener(
         }
     }
     private val updateThread: UpdateThread? = UpdateThread(qPosManager)
-
-    private fun encryptedPinBlock(pan: String, pin: String): ByteArray {
-        val posParameter: PosParameter =
-            sessionData.getPosParameter?.invoke(pan, sessionData.amount / 100.0) ?: get()
-        val pinBlock = "0${pin.length}$pin".padEnd(16, 'F')
-        val panBlock = pan.substring(3, pan.lastIndex).padStart(16, '0')
-        val cryptData = pinBlock.hexBytes xor panBlock.hexBytes
-        val secretKey = posParameter.pinKey.hexBytes.asDesEdeKey
-        return secretKey.encrypt(cryptData).copyOf(8)
-    }
 
     companion object {
         private const val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"

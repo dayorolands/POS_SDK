@@ -276,4 +276,5 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling:${Versions.compose}")
     debugImplementation("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
+    testImplementation("androidx.test.ext:junit-ktx:1.1.3")
 }

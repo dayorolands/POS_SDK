@@ -12,7 +12,7 @@
     },
     {
       "Question": "I have not received my verification code. What should I do?",
-      "Answer": "Contact the Admin to resend the verification code."
+      "Answer": "Contact your ACRM to resend the verification code."
     },
     {
       "Question": "I get a notification to turn on my location when I launch the app. Why?",
@@ -20,27 +20,27 @@
     },
     {
       "Question": "I cannot remember my PIN. What should I do?",
-      "Answer": "Contact the Admin. They will reset the PIN. You will receive an SMS stating the new default PIN which you will have to change. "
+      "Answer": "Contact your ACRM. They will reset the PIN. You will receive an SMS stating the new default PIN which you will have to change. "
     },
     {
       "Question": "The app has locked me out. What should I do?",
-      "Answer": "Contact the Admin. You must have input a wrong PIN more than 3 times. The admin will reset your PIN tries and you can regain access with your same PIN"
+      "Answer": "Contact your ACRM. You must have input a wrong PIN more than 3 times. The admin will reset your PIN tries and you can regain access with your same PIN"
     },
     {
       "Question": "I cannot perform a withdrawal or funds transfer because I have reached transaction limit. What should I do?",
-      "Answer": "Contact the Admin to reset transaction limit."
+      "Answer": "Contact your ACRM to reset transaction limit."
     },
     {
       "Question": "I no longer want to be an agent. What should I do?",
-      "Answer": "Contact the Admin and report the issue."
+      "Answer": "Contact your ACRM and report the issue."
     },
     {
       "Question": "I am trying to open account for a customer but the BVN is flagging an error. What happened?",
-      "Answer": "The BVN being used has been blacklisted by Sterling bank on suspicion of fraudulent economic activities. Therefore, an account cannot be opened for the customer using that BVN."
+      "Answer": "The BVN being used has been blacklisted by the bank on suspicion of fraudulent economic activities. Therefore, an account cannot be opened for the customer using that BVN."
     },
     {
       "Question": "Customers have not been receiving SMS for their transactions. What should I do?",
-      "Answer": "Contact the Admin and report the issue."
+      "Answer": "Contact your ACRM and report the issue."
     },
     {
       "Question": "How can I easily communicate issues to the admin?",
@@ -52,7 +52,7 @@
     },
     {
       "Question": "How can I reuse my account if i misplace my device or it was stolen?",
-      "Answer": "Report the incidence. Your account will be unlinked from the stolen or misplaced device. When you get a new device, contact the admin to reactivate your account. Your account will be linked to the new device. \nLinking and unlinking of devices is only necessary if the device is POS terminal."
+      "Answer": "Report the incidence. Your account will be unlinked from the stolen or misplaced device. When you get a new device, Contact your ACRM to reactivate your account. Your account will be linked to the new device. \nLinking and unlinking of devices is only necessary if the device is POS terminal."
     },
     {
       "Question": "Can I operate on multiple devices?",

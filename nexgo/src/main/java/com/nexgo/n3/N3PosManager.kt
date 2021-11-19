@@ -7,6 +7,8 @@ import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.debug
 import com.creditclub.core.util.debugOnly
+import com.creditclub.core.util.safeRun
+import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosManager
 import com.creditclub.pos.PosManagerCompanion
 import com.creditclub.pos.PosParameter
@@ -18,16 +20,25 @@ import com.nexgo.oaf.apiv3.APIProxy
 import com.nexgo.oaf.apiv3.DeviceEngine
 import com.nexgo.oaf.apiv3.emv.AidEntity
 import com.nexgo.oaf.apiv3.emv.CapkEntity
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.koin.dsl.module
 
-class N3PosManager(private val activity: CreditClubActivity) : PosManager, KoinComponent {
+class N3PosManager(
+    private val activity: CreditClubActivity,
+    private val defaultPosParameter: PosParameter,
+    private val posConfig: PosConfig,
+) : PosManager {
     private val deviceEngine: DeviceEngine = APIProxy.getDeviceEngine(activity)
     private val emvHandler2 = deviceEngine.getEmvHandler2("app2")
     override val sessionData = PosManager.SessionData()
-    override val cardReader = N3CardReader(activity, deviceEngine, sessionData, this)
-    private val posParameter: PosParameter by inject()
+    override val cardReader = N3CardReader(
+        activity = activity,
+        deviceEngine = deviceEngine,
+        sessionData = sessionData,
+        posManager = this,
+        defaultPosParameter = defaultPosParameter,
+        posConfig = posConfig,
+    )
+
 
     override suspend fun loadEmv() {
         debugOnly {
@@ -42,7 +53,7 @@ class N3PosManager(private val activity: CreditClubActivity) : PosManager, KoinC
     private fun injectAid() {
         emvHandler2.delAllAid()
         val aidEntityList = mutableListOf<AidEntity>()
-        val jsonArray = posParameter.emvAidList ?: return
+        val jsonArray = defaultPosParameter.emvAidList ?: return
         val arrayLength = jsonArray.length()
         for (i in 0 until arrayLength) {
             val jsonObject = jsonArray.getJSONObject(i)
@@ -81,7 +92,7 @@ class N3PosManager(private val activity: CreditClubActivity) : PosManager, KoinC
     private fun injectCapk() {
         emvHandler2.delAllCapk()
         val capkEntityList = mutableListOf<CapkEntity>()
-        val jsonArray = posParameter.capkList ?: return
+        val jsonArray = defaultPosParameter.capkList ?: return
         val arrayLength = jsonArray.length()
         for (i in 0 until arrayLength) {
             val jsonObject = jsonArray.getJSONObject(i)
@@ -123,7 +134,11 @@ class N3PosManager(private val activity: CreditClubActivity) : PosManager, KoinC
 
         override val module = module {
             factory<PosManager> { (activity: CreditClubActivity) ->
-                N3PosManager(activity)
+                N3PosManager(
+                    activity = activity,
+                    defaultPosParameter = get(),
+                    posConfig = get(),
+                )
             }
             factory<PosPrinter> { (activity: Activity, dialogProvider: DialogProvider) ->
                 N3Printer(activity, dialogProvider)

@@ -3,7 +3,6 @@ package com.nexgo.n3
 import android.os.Environment
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.debugOnly
-import com.creditclub.core.util.safeRun
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.pos.PosConfig
 import com.creditclub.pos.PosManager
@@ -20,8 +19,6 @@ import com.nexgo.oaf.apiv3.emv.EmvTransConfigurationEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.util.*
@@ -32,13 +29,13 @@ class N3CardReader(
     private val activity: CreditClubActivity,
     private val deviceEngine: DeviceEngine,
     private val sessionData: PosManager.SessionData,
-    private val posManager: N3PosManager
-) : CardReader, KoinComponent {
+    private val posManager: N3PosManager,
+    private val defaultPosParameter:PosParameter,
+    private val posConfig: PosConfig,
+) : CardReader {
     private var cardReader = deviceEngine.cardReader
     private val emvHandler2 = deviceEngine.getEmvHandler2("app2")
     private val dialogProvider = activity.dialogProvider
-    private val posParameter: PosParameter by inject()
-    private val posConfig: PosConfig by inject()
 
     private var cardReaderEvent: CardReaderEvent = CardReaderEvent.CANCELLED
 
@@ -73,7 +70,13 @@ class N3CardReader(
                     continuation.resume(null)
                 }
             }
-            val emvListener = N3EmvListener(activity, deviceEngine, sessionData, continuation)
+            val emvListener = N3EmvListener(
+                activity = activity,
+                deviceEngine = deviceEngine,
+                sessionData = sessionData,
+                continuation = continuation,
+                defaultPosParameter = defaultPosParameter,
+            )
             emvHandler2.setTlv("9F33".hexBytes, "E040C8".hexBytes)
             emvHandler2.emvProcess(transData, emvListener)
         }
@@ -134,7 +137,7 @@ class N3CardReader(
             countryCode = "0566" //CountryCode
             currencyCode = "0566" //CurrencyCode
             termId = posConfig.terminalId
-            merId = posParameter.managementData.cardAcceptorId
+            merId = defaultPosParameter.managementData.cardAcceptorId
             transDate =
                 SimpleDateFormat("yyMMdd", Locale.getDefault()).format(Date())
             transTime =

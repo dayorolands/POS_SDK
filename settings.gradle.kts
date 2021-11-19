@@ -13,7 +13,7 @@ include(":wizar", ":wizar_cloudpos_sdk")
 include(":dspread")
 include(":nexgo", ":nexgo_smartpos_sdk")
 include(":telpo")
-include(":sunmi", ":paylib")
+//include(":sunmi", ":paylib")
 include(":smartpeak")
 
 buildCache {

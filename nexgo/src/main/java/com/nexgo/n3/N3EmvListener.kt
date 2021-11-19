@@ -27,8 +27,6 @@ import com.nexgo.oaf.apiv3.SdkResult
 import com.nexgo.oaf.apiv3.device.pinpad.*
 import com.nexgo.oaf.apiv3.device.reader.CardInfoEntity
 import com.nexgo.oaf.apiv3.emv.*
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
@@ -37,7 +35,8 @@ class N3EmvListener(
     private val deviceEngine: DeviceEngine,
     private val sessionData: PosManager.SessionData,
     private val continuation: Continuation<CardData?>,
-) : OnEmvProcessListener2, KoinComponent {
+    private val defaultPosParameter: PosParameter,
+) : OnEmvProcessListener2 {
     private var hasResumed: Boolean = false
     private val emvHandler2 = deviceEngine.getEmvHandler2("app2")
     private val cardData = N3CardData()
@@ -83,7 +82,8 @@ class N3EmvListener(
                 "Cashback Amount: ${amount.toCurrencyFormat()}"
         val dukptConfig = sessionData.getDukptConfig?.invoke(cardNo, amount)
         val posParameter: PosParameter =
-            sessionData.getPosParameter?.invoke(cardNo, sessionData.amount / 100.0) ?: get()
+            sessionData.getPosParameter?.invoke(cardNo, sessionData.amount / 100.0)
+                ?: defaultPosParameter
         if (dukptConfig != null) {
             val ipekBytes = dukptConfig.ipek.hexBytes
             val ksnBytes = dukptConfig.ksn.hexBytes
@@ -196,8 +196,7 @@ class N3EmvListener(
         val emvOnlineResult = EmvOnlineResultEntity()
         emvOnlineResult.authCode = "123450"
         emvOnlineResult.rejCode = "00"
-        if (filed55 == null) filed55 = getFiled55String()
-        emvOnlineResult.recvField55 = filed55!!.hexBytes
+        emvOnlineResult.recvField55 = getFiled55String().hexBytes
         emvHandler2.onSetOnlineProcResponse(SdkResult.Success, emvOnlineResult)
     }
 
@@ -218,8 +217,7 @@ class N3EmvListener(
         when (retCode) {
             SdkResult.Emv_Success_Arpc_Fail, SdkResult.Success, SdkResult.Emv_Script_Fail -> {
                 val cardDataInfo = emvHandler2.emvCardDataInfo
-                if (filed55 == null) filed55 = getFiled55String()
-                cardData.mIccString = filed55!!
+                cardData.mIccString = getFiled55String()
                 cardData.apply {
                     pan = cardDataInfo.cardNo
                     track2 = cardDataInfo.tk2
@@ -273,6 +271,7 @@ class N3EmvListener(
     }
 
     private fun getFiled55String(): String {
+        if (filed55 != null) return filed55!!
         val tags = arrayOf(
             "82",
             "84",
@@ -295,6 +294,7 @@ class N3EmvListener(
             "9F09",
             "9F41"
         )
-        return emvHandler2.getTlvByTags(tags)
+        filed55 = emvHandler2.getTlvByTags(tags)
+        return filed55!!
     }
 }
