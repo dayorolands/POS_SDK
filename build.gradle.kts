@@ -47,7 +47,7 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-serialization:${buildVersions.kotlin}")
         classpath("com.google.gms:google-services:${buildVersions.googleServices}")
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.8.0")
-        classpath("com.google.firebase:perf-plugin:1.4.0")
+//        classpath("com.google.firebase:perf-plugin:1.4.0")
         classpath("io.objectbox:objectbox-gradle-plugin:${buildVersions.objectBox}")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -60,6 +60,14 @@ allprojects {
         google()
         maven { url = java.net.URI.create("https://jitpack.io") }
         jcenter()
+    }
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "org.xerial" && requested.name == "sqlite-jdbc" && requested.version != "3.34.0") {
+                useVersion("3.34.0")
+                because("add macOS m1 support")
+            }
+        }
     }
 }
 task<Delete>("clean") {

@@ -7,7 +7,7 @@ plugins {
     kotlin("plugin.serialization")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-    id("com.google.firebase.firebase-perf")
+//    id("com.google.firebase.firebase-perf")
     id("io.objectbox")
 }
 
@@ -103,9 +103,9 @@ android {
             manifestPlaceholders["usesCleartextTraffic"] = "true"
             extra["enableCrashlytics"] = false
             extra["alwaysUpdateBuildId"] = false
-            configure<com.google.firebase.perf.plugin.FirebasePerfExtension> {
-                setInstrumentationEnabled(false)
-            }
+//            configure<com.google.firebase.perf.plugin.FirebasePerfExtension> {
+//                setInstrumentationEnabled(false)
+//            }
             versionNameSuffix = "-dev"
         }
 
