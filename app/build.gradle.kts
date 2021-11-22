@@ -49,12 +49,13 @@ android {
 
     lint {
         // Eliminates UnusedResources false positives for resources used in DataBinding layouts
-        checkGeneratedSources = true
+        isCheckGeneratedSources = true
         // Running lint over the debug variant is enough
-        checkReleaseBuilds = false
+        isCheckReleaseBuilds = false
         // Or, if you prefer, you can continue to check for errors in release builds,
         // but continue the build even when errors are found:
-        abortOnError = false
+        isAbortOnError = false
+        baseline(file("lint-baseline.xml"))
     }
 
     buildFeatures {
@@ -204,8 +205,8 @@ dependencies {
 //    "polarisImplementation"(project(":sunmi"))
     "accessImplementation"(project(":telpo"))
     "gtbankImplementation"(project(":dspread"))
-//    "purpleImplementation"(project(":dspread"))
-    "purpleImplementation"(project(":telpo"))
+    "purpleImplementation"(project(":dspread"))
+//    "purpleImplementation"(project(":telpo"))
     "groomingImplementation"(project(":telpo"))
     "groomingImplementation"(project(":nexgo"))
     "heritageImplementation"(project(":wizar"))
