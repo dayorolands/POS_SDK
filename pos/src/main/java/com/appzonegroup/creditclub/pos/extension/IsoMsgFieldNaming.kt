@@ -1,14 +1,27 @@
 package com.appzonegroup.creditclub.pos.extension
 
-import com.appzonegroup.creditclub.pos.util.delegate.isoMsgField
 import org.jpos.iso.ISOMsg
 import org.jpos.transaction.TransactionManager
+import kotlin.reflect.KProperty
 
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 07/11/2019.
  * Appzone Ltd
  */
+
+@JvmInline
+value class IsoMsgFieldDelegate(private val fieldNo: Int) {
+    operator fun getValue(isoMsg: ISOMsg, property: KProperty<*>): String? {
+        return isoMsg.getString(fieldNo)
+    }
+
+    operator fun setValue(isoMsg: ISOMsg, property: KProperty<*>, value: String?) {
+        isoMsg.set(fieldNo, value)
+    }
+}
+
+fun isoMsgField(fldno: Int) = IsoMsgFieldDelegate(fldno)
 
 var ISOMsg.pan by isoMsgField(2)
 

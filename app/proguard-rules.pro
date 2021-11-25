@@ -13,6 +13,19 @@
 #-forceprocessing
 -optimizationpasses 5
 
+-repackageclasses ""
+
+# remove indirection
+-allowaccessmodification
+# remove source file names
+-renamesourcefileattribute ""
+-keepclassmembers class * implements android.os.Parcelable {
+  public static final ** CREATOR;
+}
+
+# suppress warnings
+-dontwarn android.support.**
+
 # remove verbose logging
 -assumenosideeffects class android.util.Log {
     public static boolean isLoggable(java.lang.String, int);
@@ -113,7 +126,7 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
-# Kotlin Intrinsics
+# remove runtime assertions, they are enforced in compile-time by Kotlin compiler
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
   public static void checkExpressionValueIsNotNull(java.lang.Object, java.lang.String);
   public static void checkFieldIsNotNull(java.lang.Object, java.lang.String);
@@ -125,7 +138,39 @@
   public static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
   public static void checkReturnedValueIsNotNull(java.lang.Object, java.lang.String);
   public static void checkReturnedValueIsNotNull(java.lang.Object, java.lang.String, java.lang.String);
-  public static void throwUninitializedPropertyAccessException(java.lang.String);
+}
+
+# remove unused string builders
+-assumenoexternalsideeffects class java.lang.StringBuilder {
+    public java.lang.StringBuilder();
+    public java.lang.StringBuilder(int);
+    public java.lang.StringBuilder(java.lang.String);
+    public java.lang.StringBuilder append(java.lang.Object);
+    public java.lang.StringBuilder append(java.lang.String);
+    public java.lang.StringBuilder append(java.lang.StringBuffer);
+    public java.lang.StringBuilder append(char[]);
+    public java.lang.StringBuilder append(char[], int, int);
+    public java.lang.StringBuilder append(boolean);
+    public java.lang.StringBuilder append(char);
+    public java.lang.StringBuilder append(int);
+    public java.lang.StringBuilder append(long);
+    public java.lang.StringBuilder append(float);
+    public java.lang.StringBuilder append(double);
+    public java.lang.String toString();
+}
+
+-assumenoexternalreturnvalues public final class java.lang.StringBuilder {
+    public java.lang.StringBuilder append(java.lang.Object);
+    public java.lang.StringBuilder append(java.lang.String);
+    public java.lang.StringBuilder append(java.lang.StringBuffer);
+    public java.lang.StringBuilder append(char[]);
+    public java.lang.StringBuilder append(char[], int, int);
+    public java.lang.StringBuilder append(boolean);
+    public java.lang.StringBuilder append(char);
+    public java.lang.StringBuilder append(int);
+    public java.lang.StringBuilder append(long);
+    public java.lang.StringBuilder append(float);
+    public java.lang.StringBuilder append(double);
 }
 
 # Core Kotlin Serializaion

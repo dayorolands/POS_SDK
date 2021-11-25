@@ -14,13 +14,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.DialogConfirmBinding
 import com.appzonegroup.app.fasttrack.databinding.DialogInputBinding
 import com.appzonegroup.app.fasttrack.databinding.PinpadBinding
-import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.*
 import com.creditclub.core.util.getMessage
 import com.creditclub.core.util.safeRun
@@ -34,11 +32,8 @@ import kotlin.coroutines.suspendCoroutine
 class CreditClubDialogProvider(override val context: Context) : DialogProvider {
 
     override val activity: Activity
-        get() = when (context) {
-            is Activity -> context
-            is Fragment -> context.activity as CreditClubActivity
-            else -> throw IllegalStateException("Dialog provider context must either be a fragment or activity")
-        }
+        get() = if (context is Activity) context
+        else throw IllegalStateException("Dialog provider context must either be a fragment or activity")
 
     private var currentProgressDialog: Dialog? = null
 
@@ -341,6 +336,34 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
                 dialog,
                 LocalDate.of(datePicker.year, datePicker.month + 1, datePicker.dayOfMonth)
             )
+        }
+    }
+
+    override suspend fun getDate(params: DateInputParams): LocalDate? {
+        val dialog = Dialog(activity)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.calendar_dialog)
+        dialog.show()
+        val datePicker = dialog.findViewById<DatePicker>(R.id.datePicker)
+
+        params.maxDate?.run {
+            datePicker.maxDate = atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000
+        }
+        params.minDate?.run {
+            datePicker.minDate = atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000
+        }
+
+        return suspendCoroutine { continuation ->
+            dialog.findViewById<View>(R.id.calendarViewButton).setOnClickListener {
+                dialog.dismiss()
+
+                val localDate = LocalDate.of(
+                    datePicker.year,
+                    datePicker.month + 1,
+                    datePicker.dayOfMonth
+                )
+                continuation.resume(localDate)
+            }
         }
     }
 

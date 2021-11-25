@@ -7,11 +7,18 @@ import android.content.pm.ProviderInfo
 import android.database.Cursor
 import android.net.Uri
 
-abstract class PosManagerProvider(private val packageName: String) : ContentProvider() {
+abstract class PosManagerProvider(
+    private val packageName: String,
+    private val registerFirst: Boolean = true,
+) : ContentProvider() {
     abstract val posManagerCompanion: PosManagerCompanion
 
     override fun onCreate(): Boolean {
-        PosProviders.registerFirst(context!!, posManagerCompanion)
+        if (registerFirst) {
+            PosProviders.registerFirst(posManagerCompanion)
+        } else {
+            PosProviders.registerLast(posManagerCompanion)
+        }
         return true
     }
 

@@ -356,7 +356,11 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             terminalId41 = terminalId
         }
         debugOnly { isoMsg.log() }
-        val (output, error) = safeRunIO { posMode.tcp().sendAndReceive(isoMsg.pack()) }
+        val (output, error) = safeRunIO {
+            posMode.tcp().use {
+                it.sendAndReceive(isoMsg.pack())
+            }
+        }
         val isoRequestLog = isoMsg.generateRequestLog()
         if (output == null) {
             isoRequestLog.saveToDb("TE")

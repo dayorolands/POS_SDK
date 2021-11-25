@@ -267,7 +267,7 @@ dependencies {
     implementation("com.google.firebase:firebase-core")
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.google.firebase:firebase-perf-ktx")
+//    implementation("com.google.firebase:firebase-perf-ktx")
 
     // Testing Navigation
     androidTestImplementation("androidx.navigation:navigation-testing:${Versions.navigation}")

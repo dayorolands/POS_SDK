@@ -73,6 +73,8 @@ interface DialogProvider {
 
     fun showDateInput(params: DateInputParams, block: DialogListenerBlock<LocalDate>)
 
+    suspend fun getDate(params: DateInputParams): LocalDate?
+
     fun showOptions(
         title: CharSequence,
         options: List<DialogOptionItem>,

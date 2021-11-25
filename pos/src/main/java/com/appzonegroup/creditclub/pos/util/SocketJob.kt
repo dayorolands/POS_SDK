@@ -97,7 +97,9 @@ object SocketJob {
         connectionInfo: RemoteConnectionInfo,
         data: ByteArray,
         timeout: Int = connectionInfo.timeout,
-    ): ByteArray? = connectionInfo.tcp(timeout = timeout).sendAndReceive(data = data)
+    ): ByteArray? = connectionInfo.tcp(timeout = timeout).use {
+        it.sendAndReceive(data = data)
+    }
 
     fun setTrustManagers(tManagers: Array<TrustManager?>) {
         trustManagers = tManagers

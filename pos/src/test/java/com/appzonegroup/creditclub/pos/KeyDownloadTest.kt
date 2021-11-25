@@ -7,6 +7,7 @@ import com.appzonegroup.creditclub.pos.util.xor
 import com.creditclub.core.CreditClubException
 import com.creditclub.core.util.debug
 import com.creditclub.core.util.debugOnly
+import com.creditclub.core.util.safeRun
 import com.creditclub.pos.*
 import com.creditclub.pos.extensions.hexBytes
 import com.creditclub.pos.utils.asDesEdeKey
@@ -27,14 +28,14 @@ import java.util.*
 import javax.net.ssl.TrustManager
 import javax.net.ssl.TrustManagerFactory
 
-const val TERMINAL_ID = "2076ER56"
+const val TERMINAL_ID = "2101F546"
 val posMode = object : RemoteConnectionInfo {
     override val id: String = "test"
     override val label: String = "test"
-    override val key1: String = "C48A1564CBFB3213A485BCE9195D321C"
-    override val key2: String = "FE169BD37C34B06215E919C4D3F75E79"
+    override val key1: String = "386758793DE364F88319EA0D4C7091EF"
+    override val key2: String = "67A78CB3D9C1FE38C1DAB6F154D634D6"
     override val host: String = "196.6.103.18"
-    override val port: Int = 5023
+    override val port: Int = 5009
     override val sslEnabled: Boolean = true
     override val dukptConfig: DukptConfig? = null
     override val timeout: Int = 60
@@ -49,27 +50,20 @@ class KeyDownloadTest : PosParameter {
     override var updatedAt: String? = ""
     override var managementDataString: String = ""
     override val managementData: PosParameter.ManagementData = defaultManagementData
-    override val capkList: JSONArray? = null
-    override val emvAidList: JSONArray? = null
+    override var capkList: JSONArray? = null
+    override var emvAidList: JSONArray? = null
 
     init {
         SocketJob.setTrustManagers(getTrustManagers())
-    }
-
-    override suspend fun downloadCapk() {
-    }
-
-    override suspend fun downloadAid() {
-    }
-
-    override suspend fun downloadParameters() {
     }
 
     @Test
     fun keys_downloadProperly() {
         runBlocking {
             downloadKeys()
-            downloadParameters(terminalId = TERMINAL_ID)
+            downloadParameters()
+            downloadAid()
+            downloadCapk()
         }
     }
 
@@ -157,7 +151,7 @@ class KeyDownloadTest : PosParameter {
     }
 
 
-    private fun downloadParameters(terminalId: String) {
+    override suspend fun downloadParameters() {
         val dateParams = TransmissionDateParams()
 
         val isoMsg = ISOMsg().apply {
@@ -170,8 +164,8 @@ class KeyDownloadTest : PosParameter {
             set(11, rrnString)
             set(12, dateParams.localTime)
             set(13, dateParams.localDate)
-            set(41, terminalId)
-            set(62, "01008${terminalId}")
+            set(41, TERMINAL_ID)
+            set(62, "01008${TERMINAL_ID}")
         }
 
         val packedMsg = isoMsg.pack()
@@ -216,5 +210,137 @@ class KeyDownloadTest : PosParameter {
         }
 
         return jsonObject
+    }
+
+    override suspend fun downloadCapk() {
+        val dateParams = TransmissionDateParams()
+
+        val isoMsg = ISOMsg().apply {
+            packager = ISO87Packager()
+            mti = "0800"
+            set(3, "9E0000")
+            set(7, dateParams.transmissionDateTime)
+            val rrn = SecureRandom().nextInt(1000)
+            val rrnString = String.format("%06d", rrn)
+            set(11, rrnString)
+            set(12, dateParams.localTime)
+            set(13, dateParams.localDate)
+            set(41, TERMINAL_ID)
+            set(63, "01008${TERMINAL_ID}")
+        }
+
+        val packedMsg = isoMsg.pack()
+        packedMsg[19]++
+
+        val baos = sessionKey.hexBytes + packedMsg
+        val field64 = baos.sha256String.uppercase(Locale.getDefault())
+        isoMsg.set(64, field64)
+
+        val finalMsgBytes = packedMsg + field64.toByteArray()
+
+        debugOnly { isoMsg.log() }
+
+        val (output, error) = safeRun {
+            SocketJob.execute(posMode, finalMsgBytes)
+        }
+        if (output == null) {
+            if (error != null) throw error
+        } else {
+            isoMsg.unpack(output)
+        }
+
+        debugOnly { isoMsg.log() }
+
+        if (isoMsg.hasFailed) {
+            debug("Error contacting ${posMode.label} server ${posMode.host}:${posMode.port}")
+            throw ParameterService.PublicKeyDownloadException(isoMsg.responseMessage)
+        }
+
+        val capk = isoMsg.managementDataTwo63?.run {
+            if (contains("~")) parsePrivateFieldData()
+            else parseCapkData("${this}1")
+        }
+
+        capkList = capk ?: throw ParameterService.PublicKeyDownloadException("")
+    }
+
+    @Throws(ParameterService.EmvAidDownloadException::class)
+    override suspend fun downloadAid() {
+        val dateParams = TransmissionDateParams()
+
+        val isoMsg = ISOMsg().apply {
+            packager = ISO87Packager()
+            mti = "0800"
+            set(3, "9F0000")
+            set(7, dateParams.transmissionDateTime)
+            val rrn = SecureRandom().nextInt(1000)
+            val rrnString = String.format("%06d", rrn)
+            set(11, rrnString)
+            set(12, dateParams.localTime)
+            set(13, dateParams.localDate)
+            set(41, TERMINAL_ID)
+            set(63, "01008${TERMINAL_ID}")
+        }
+
+        val packedMsg = isoMsg.pack()
+        packedMsg[19]++
+
+        val baos = sessionKey.hexBytes + packedMsg
+        val field64 = baos.sha256String.uppercase(Locale.getDefault())
+        isoMsg.set(64, field64)
+
+        val finalMsgBytes = packedMsg + field64.toByteArray()
+        debugOnly { isoMsg.log() }
+
+        val (output, error) = safeRun {
+            SocketJob.execute(posMode, finalMsgBytes)
+        }
+        if (output == null) {
+            if (error != null) throw error
+        } else {
+            isoMsg.unpack(output)
+        }
+
+        debugOnly { isoMsg.log() }
+
+        if (isoMsg.hasFailed) {
+            debug("Error contacting ${posMode.label} server ${posMode.host}:${posMode.port}")
+            throw ParameterService.EmvAidDownloadException(isoMsg.responseMessage)
+        }
+
+        val aids = (isoMsg.managementDataTwo63)?.parsePrivateFieldData()
+        emvAidList = aids ?: throw ParameterService.EmvAidDownloadException("")
+    }
+
+    @Throws(JSONException::class)
+    private fun String.parsePrivateFieldData(): JSONArray {
+        val jsonArray = JSONArray()
+        for (tlvString in split("~")) {
+            jsonArray.put(parsePrivateFieldDataBlock(tlvString))
+        }
+        return jsonArray
+    }
+
+    private fun parseCapkData(tlvString: String): JSONArray {
+        val jsonArray = JSONArray()
+        val strLength = tlvString.length
+        var index = 0
+        while (index < strLength) {
+            val jsonObject = JSONObject()
+            while (true) {
+                val tag = tlvString.substring(index, index + 2)
+                index += 2
+                val tagLength = tlvString.substring(index, index + 3).toInt()
+                index += 3
+                val tagData = tlvString.substring(index, index + tagLength)
+                index += tagLength
+
+                jsonObject.put(tag, tagData)
+
+                if (tag == "40") break
+            }
+            jsonArray.put(jsonObject)
+        }
+        return jsonArray
     }
 }

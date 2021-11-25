@@ -93,7 +93,7 @@ dependencies {
     api "com.google.firebase:firebase-core"
     api "com.google.firebase:firebase-messaging-ktx"
     api "com.google.firebase:firebase-analytics-ktx"
-    api 'com.google.firebase:firebase-perf-ktx'
+//    api 'com.google.firebase:firebase-perf-ktx'
     api "androidx.work:work-runtime-ktx:${versions.work}"
     api 'com.google.android.gms:play-services-location:18.0.0'
     api "androidx.security:security-crypto:1.1.0-alpha03"
