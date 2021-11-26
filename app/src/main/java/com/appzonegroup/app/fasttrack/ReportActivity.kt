@@ -313,7 +313,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     paymentItemName = item.productName,
                 )
                 val response = PayBillResponse(
-                    isSuccessFul = selectedTransactionStatus == TransactionStatus.Successful,
+                    isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
                     responseMessage = selectedTransactionStatus.label,
                 )
                 posPrinter.print(
