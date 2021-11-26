@@ -12,7 +12,6 @@ import com.creditclub.core.data.prefs.newTransactionReference
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.ui.widget.DialogProvider
 import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 
 @Composable
 inline fun <reified T : Any> rememberRetrofitService(clientName: String = MIDDLEWARE_CLIENT): Lazy<T> {

@@ -45,6 +45,15 @@ android {
                 )
             }
         }
+
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+                arg("room.incremental", "true")
+                arg("room.expandProjection", "true")
+                arg("objectbox.modelPath", "$projectDir/schemas/objectbox.json")
+            }
+        }
     }
 
     lint {
@@ -97,7 +106,6 @@ android {
 
         getByName("debug") {
             isDebuggable = true
-//            buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
             buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", "\"${Config.NOTIFICATION_TOKEN}\"")
             manifestPlaceholders["usesCleartextTraffic"] = "true"
@@ -205,8 +213,8 @@ dependencies {
 //    "polarisImplementation"(project(":sunmi"))
     "accessImplementation"(project(":telpo"))
     "gtbankImplementation"(project(":dspread"))
-    "purpleImplementation"(project(":dspread"))
-//    "purpleImplementation"(project(":telpo"))
+//    "purpleImplementation"(project(":dspread"))
+    "purpleImplementation"(project(":telpo"))
     "groomingImplementation"(project(":telpo"))
     "groomingImplementation"(project(":nexgo"))
     "heritageImplementation"(project(":wizar"))

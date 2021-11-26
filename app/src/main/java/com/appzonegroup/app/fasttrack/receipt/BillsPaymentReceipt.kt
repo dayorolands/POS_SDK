@@ -52,7 +52,7 @@ Transaction ID: ${request.customerDepositSlipNumber}"""
 
     transactionStatus(
         context = context,
-        isSuccessful = response?.isSuccessFul == true,
+        isSuccessful = response?.isSuccessful == true,
         reason = response?.responseMessage,
     )
     footer(context)

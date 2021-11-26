@@ -15,15 +15,20 @@ enum class RetryPolicy {
     RetryLater,
 }
 
+interface BackendResponseContract {
+    val responseMessage: String?
+    val isSuccessful: Boolean
+}
+
 @Serializable
-open class BackendResponse {
+open class BackendResponse : BackendResponseContract {
     @OptIn(ExperimentalSerializationApi::class)
     @SerialName("ReponseMessage")
-    open val responseMessage: String? = null
+    override val responseMessage: String? = null
         get() = if (field.isNullOrEmpty()) message else field
 
     @SerialName("IsSuccessful")
-    var isSuccessful: Boolean = false
+    override var isSuccessful: Boolean = false
 
     @SerialName("Message")
     private val message: String? = null

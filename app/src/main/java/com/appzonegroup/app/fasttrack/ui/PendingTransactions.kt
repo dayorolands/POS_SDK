@@ -21,12 +21,15 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.navigateToReceipt
+import com.appzonegroup.app.fasttrack.receipt.billsPaymentReceipt
 import com.appzonegroup.app.fasttrack.receipt.fundsTransferReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.FunctionUsageTracker
-import com.creditclub.Routes
 import com.creditclub.core.data.ClusterObjectBox
+import com.creditclub.core.data.api.BillsPaymentService
 import com.creditclub.core.data.api.FundsTransferService
+import com.creditclub.core.data.model.PayBillRequest
+import com.creditclub.core.data.model.PayBillResponse
 import com.creditclub.core.data.model.PendingTransaction
 import com.creditclub.core.data.model.PendingTransaction_
 import com.creditclub.core.data.request.FundsTransferRequest
@@ -58,22 +61,32 @@ fun PendingTransactions(
     val coroutineScope = rememberCoroutineScope()
     val dialogProvider by rememberDialogProvider()
     val fundsTransferService: FundsTransferService by rememberRetrofitService()
+    val billsPaymentService: BillsPaymentService by rememberRetrofitService()
     val checkStatus: suspend CoroutineScope.(transaction: PendingTransaction) -> Unit = remember {
         checkStatus@{ transaction ->
             dialogProvider.showProgressBar("Processing")
             val (response, error) = safeRunIO {
                 when (transaction.transactionType) {
                     TransactionType.LocalFundsTransfer,
-                    TransactionType.FundsTransferCommercialBank -> {
+                    TransactionType.FundsTransferCommercialBank,
+                    -> {
                         val request = defaultJson.decodeFromString(
                             FundsTransferRequest.serializer(),
                             transaction.requestJson,
                         )
                         fundsTransferService.requery(request)
                     }
+                    TransactionType.BillsPayment,
+                    TransactionType.Recharge,
+                    -> {
+                        val request = defaultJson.decodeFromString(
+                            PayBillRequest.serializer(),
+                            transaction.requestJson,
+                        )
+                        billsPaymentService.billPaymentStatus(request)
+                    }
                     else -> throw IllegalArgumentException(
-                        "requery for " +
-                                "${transaction.transactionType} not supported"
+                        "requery for ${transaction.transactionType} not supported"
                     )
                 }
             }
@@ -92,7 +105,8 @@ fun PendingTransactions(
 
             val receipt: ParcelablePrintJob = when (transaction.transactionType) {
                 TransactionType.LocalFundsTransfer,
-                TransactionType.FundsTransferCommercialBank -> {
+                TransactionType.FundsTransferCommercialBank,
+                -> {
                     fundsTransferReceipt(
                         context = context,
                         request = defaultJson.decodeFromString(
@@ -104,9 +118,21 @@ fun PendingTransactions(
                         reason = response.responseMessage,
                     )
                 }
+                TransactionType.BillsPayment,
+                TransactionType.Recharge,
+                -> {
+                    billsPaymentReceipt(
+                        context = context,
+                        request = defaultJson.decodeFromString(
+                            PayBillRequest.serializer(),
+                            transaction.requestJson,
+                        ),
+                        transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
+                        response = response as? PayBillResponse,
+                    )
+                }
                 else -> throw IllegalArgumentException(
-                    "requery for " +
-                            "${transaction.transactionType} not supported"
+                    "requery for ${transaction.transactionType} not supported"
                 )
             }
             navController.navigateToReceipt(receipt, popBackStack = false)

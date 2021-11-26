@@ -10,6 +10,7 @@ fun Application.registerWorkers() {
     val workManager = WorkManager.getInstance(this)
     val constraints = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
+        .setRequiresBatteryNotLow(true)
         .build()
 
     workManager.registerPeriodicWorker<MobileTrackingWorker>(

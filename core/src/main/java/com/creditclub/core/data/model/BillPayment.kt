@@ -125,10 +125,7 @@ class PayBillResponse(
     override val responseMessage: String? = "",
 
     @SerialName("IsSuccessFul")
-    val isSuccessFul: Boolean? = false,
-
-    @SerialName("Reference")
-    val reference: String? = "",
+    override var isSuccessful: Boolean = false,
 
     @SerialName("AdditionalInformation")
     val additionalInformation: String? = null,
