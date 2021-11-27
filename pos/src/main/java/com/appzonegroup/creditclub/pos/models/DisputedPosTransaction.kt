@@ -100,8 +100,9 @@ data class DisputedPosTransaction(
 
 fun DisputedPosTransaction.Companion.from(posTransaction: PosTransaction) = posTransaction.run {
     val currentLocale = Locale("ng", "NG")
-    val format: NumberFormat = NumberFormat.getCurrencyInstance(currentLocale)
-    format.currency = Currency.getInstance("NGN")
+    val format: NumberFormat = NumberFormat.getCurrencyInstance(currentLocale).apply {
+        currency = Currency.getInstance("NGN")
+    }
     val number: Number? = format.parse(amount ?: "NGN0.0")
     DisputedPosTransaction(
         agentName = agentName,

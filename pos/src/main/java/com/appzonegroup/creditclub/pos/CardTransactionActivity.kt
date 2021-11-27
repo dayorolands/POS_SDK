@@ -359,6 +359,7 @@ abstract class CardTransactionActivity : PosActivity() {
                             bankName = getString(R.string.pos_acquirer)
                             cardHolder = cardData.holder
                             cardType = cardData.type
+                            nodeName = remoteConnectionInfo.nodeName
                         }
                         posDatabase.financialTransactionDao().save(transaction)
                         posDatabase.posTransactionDao().save(posTransaction)

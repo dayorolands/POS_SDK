@@ -13,6 +13,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.Instant
 
+// POS Receipt
+
 @Entity
 @Serializable
 @Parcelize
