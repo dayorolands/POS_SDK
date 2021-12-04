@@ -1,15 +1,13 @@
 import com.cluster.buildsrc.Versions
 
-plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    id("kotlin-kapt")
-    id("kotlinx-serialization")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
-//    id("com.google.firebase.firebase-perf")
-    id("io.objectbox")
-}
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-kapt"
+apply plugin: "kotlinx-serialization"
+apply plugin: "com.google.gms.google-services"
+apply plugin: "com.google.firebase.crashlytics"
+//apply plugin: "com.google.firebase.firebase-perf"
+apply plugin: "io.objectbox"
 
 kapt {
     correctErrorTypes = true
