@@ -1,2 +1,2 @@
 configurations.maybeCreate("default")
-artifacts.add("default", file('cloudpossdkV1.5.3.055_Standard.aar'))
+artifacts.add("default", file('cloudpossdkV1.5.3.084_Standard.aar'))

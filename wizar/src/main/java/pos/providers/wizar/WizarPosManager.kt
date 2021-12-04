@@ -18,6 +18,7 @@ import com.creditclub.pos.PosManagerCompanion
 import com.creditclub.pos.PosParameter
 import com.creditclub.pos.card.CardReader
 import com.creditclub.pos.printer.PosPrinter
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.wizarpos.security.injectkey.aidl.IKeyLoaderService
 import org.koin.dsl.module
 
@@ -128,8 +129,10 @@ open class WizarPosManager(
                 return true
             } catch (ex: Exception) {
                 debugOnly { Log.e("WizarPosManager", ex.message, ex) }
+                FirebaseCrashlytics.getInstance().recordException(ex)
             } catch (err: UnsatisfiedLinkError) {
                 debugOnly { Log.e("WizarPosManager", err.message, err) }
+                FirebaseCrashlytics.getInstance().recordException(err)
             }
 
             return false
