@@ -1,3 +1,4 @@
+import com.cluster.buildsrc.Libs
 import com.cluster.buildsrc.Versions
 
 buildscript {
@@ -39,8 +40,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath(com.cluster.buildsrc.Libs.androidGradlePlugin)
-        classpath(com.cluster.buildsrc.Libs.Kotlin.gradlePlugin)
+        classpath(Libs.androidGradlePlugin)
+        classpath(Libs.Kotlin.gradlePlugin)
         classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
         classpath("com.google.gms:google-services:${Versions.googleServices}")
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.8.0")
