@@ -1,0 +1,72 @@
+import com.cluster.buildsrc.Versions
+
+buildscript {
+    ext.versions = [
+        "compileSdk": Versions.compileSdk,
+        "minSdk": Versions.minSdk,
+        "targetSdk": Versions.targetSdk,
+        "accompanist": Versions.accompanist,
+        "activityKtx": Versions.activityKtx,
+        "appcompat": Versions.appcompat,
+        "coil": Versions.coil,
+        "constraintLayout": Versions.constraintLayout,
+        "coreKtx": Versions.coreKtx,
+        "coroutines": Versions.coroutines,
+        "compose": Versions.compose,
+        "desugarJdk": Versions.desugarJdk,
+        "espresso": Versions.espresso,
+        "extJunit": Versions.extJunit,
+        "fragmentKtx": Versions.fragmentKtx,
+        "googleServices": Versions.googleServices,
+        "junit": Versions.junit,
+        "koin": Versions.koin,
+        "kotlin": Versions.kotlin,
+        "lifecycle": Versions.lifecycle,
+        "material": Versions.material,
+        "navigation": Versions.navigation,
+        "objectBox": Versions.objectBox,
+        "okhttp": Versions.okhttp,
+        "retrofit": Versions.retrofit,
+        "room": Versions.room,
+        "serialization": Versions.serialization,
+        "work": Versions.work,
+    ]
+
+    repositories {
+        mavenCentral()
+        google()
+        maven { url "https://jitpack.io" }
+        jcenter()
+    }
+    dependencies {
+        classpath(com.cluster.buildsrc.Libs.androidGradlePlugin)
+        classpath(com.cluster.buildsrc.Libs.Kotlin.gradlePlugin)
+        classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
+        classpath("com.google.gms:google-services:${Versions.googleServices}")
+        classpath("com.google.firebase:firebase-crashlytics-gradle:2.8.0")
+//        classpath("com.google.firebase:perf-plugin:1.4.0")
+        classpath("io.objectbox:objectbox-gradle-plugin:${Versions.objectBox}")
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        google()
+        maven { url "https://jitpack.io" }
+        jcenter()
+    }
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'org.xerial' && details.requested.name == 'sqlite-jdbc' && details.requested.version != '3.34.0') {
+                details.useVersion '3.34.0'
+                details.because 'add macOS m1 support'
+            }
+        }
+    }
+}
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
