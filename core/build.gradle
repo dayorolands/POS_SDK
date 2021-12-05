@@ -31,7 +31,7 @@ android {
         release {
             consumerProguardFiles 'proguard-rules.pro'
         }
-        releaseStaging {
+        staging {
             matchingFallbacks = ['release', 'debug']
         }
     }
