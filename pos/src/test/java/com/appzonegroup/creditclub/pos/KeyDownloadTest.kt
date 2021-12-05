@@ -28,14 +28,14 @@ import java.util.*
 import javax.net.ssl.TrustManager
 import javax.net.ssl.TrustManagerFactory
 
-const val TERMINAL_ID = "2101F546"
+const val TERMINAL_ID = "2039OP98"
 val posMode = object : RemoteConnectionInfo {
     override val id: String = "test"
     override val label: String = "test"
-    override val key1: String = "386758793DE364F88319EA0D4C7091EF"
-    override val key2: String = "67A78CB3D9C1FE38C1DAB6F154D634D6"
-    override val host: String = "196.6.103.18"
-    override val port: Int = 5009
+    override val key1: String = "25F7432326081AA82520647C61DCC83D"
+    override val key2: String = "F270D5A76ED6FB9298CD580E6D986723"
+    override val host: String = "197.253.19.78"
+    override val port: Int = 5080
     override val sslEnabled: Boolean = true
     override val dukptConfig: DukptConfig? = null
     override val timeout: Int = 60

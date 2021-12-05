@@ -11,7 +11,7 @@ import com.appzonegroup.app.fasttrack.fragment.AgentPINFragment
 import com.appzonegroup.app.fasttrack.fragment.DocumentUploadFragment
 import com.appzonegroup.app.fasttrack.fragment.GeneralInfoFragment
 import com.appzonegroup.app.fasttrack.fragment.OpenAccountViewModel
-import com.appzonegroup.app.fasttrack.receipt.NewAccountReceipt
+import com.appzonegroup.app.fasttrack.receipt.newAccountReceipt
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.app.fasttrack.utility.Misc
@@ -36,7 +36,6 @@ class NewWalletActivity : CreditClubActivity(R.layout.activity_open_account) {
     private val binding by dataBinding<ActivityOpenAccountBinding>()
     private val printer: PosPrinter by inject { parametersOf(this, dialogProvider) }
     private val viewModel by viewModels<OpenAccountViewModel>()
-    private val receipt by lazy { NewAccountReceipt(this) }
     private val request by lazy { CustomerRequest().apply { uniqueReferenceID = Misc.getGUID() } }
     private val staticService: StaticService by retrofitService()
 
@@ -142,24 +141,25 @@ class NewWalletActivity : CreditClubActivity(R.layout.activity_open_account) {
     }
 
     private fun printReceipt(response: BackendResponse) {
-        receipt.apply {
-            isSuccessful = response.isSuccessful
-            reason = response.responseMessage
+        var accountName: String? = null
+        var accountNumber: String? = null
+        if (response.isSuccessful) {
+            accountName =
+                "${request.customerFirstName} ${viewModel.middleName.value} ${request.customerLastName}"
 
-            bvn = request.bvn
-            institutionCode = localStorage.institutionCode!!
-            agentPhoneNumber = localStorage.agentPhone!!
-            uniqueReferenceID = request.uniqueReferenceID!!
-
-            if (response.isSuccessful) {
-                accountName =
-                    "${request.customerFirstName} ${viewModel.middleName.value} ${request.customerLastName}"
-
-                response.responseMessage?.run {
-                    accountNumber = this
-                }
+            response.responseMessage?.run {
+                accountNumber = this
             }
         }
+        val receipt = newAccountReceipt(
+            context = this,
+            isSuccessful = response.isSuccessful,
+            reason = response.responseMessage,
+            bvn = request.bvn,
+            uniqueReferenceID = request.uniqueReferenceID!!,
+            accountName = accountName,
+            accountNumber = accountNumber,
+        )
 
         printer.printAsync(receipt) { printerStatus ->
             if (printerStatus != PrinterStatus.READY) dialogProvider.showError(printerStatus.message)

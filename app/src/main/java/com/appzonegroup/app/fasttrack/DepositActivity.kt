@@ -3,7 +3,7 @@ package com.appzonegroup.app.fasttrack
 import android.os.Bundle
 import android.widget.EditText
 import com.appzonegroup.app.fasttrack.databinding.ActivityDepositBinding
-import com.appzonegroup.app.fasttrack.receipt.DepositReceipt
+import com.appzonegroup.app.fasttrack.receipt.depositReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.ClusterObjectBox
 import com.creditclub.core.data.TRANSACTIONS_CLIENT
@@ -139,7 +139,7 @@ class DepositActivity : CustomerBaseActivity() {
         if (error != null) return dialogProvider.showError(error)
         if (response == null) return showNetworkError(finishOnClose)
 
-        val receipt = DepositReceipt(
+        val receipt = depositReceipt(
             context = this@DepositActivity,
             request = request,
             accountInfo = accountInfo,

@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.app.fasttrack.databinding.CollectionPaymentFragmentBinding
-import com.appzonegroup.app.fasttrack.receipt.CollectionPaymentReceipt
+import com.appzonegroup.app.fasttrack.receipt.collectionPaymentReceipt
 import com.appzonegroup.app.fasttrack.ui.dataBinding
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.appzonegroup.creditclub.pos.Platform
@@ -285,7 +285,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         if (response.isSuccessful == true) {
             dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
             if (Platform.hasPrinter) {
-                posPrinter.print(CollectionPaymentReceipt(requireContext(), response))
+                posPrinter.print(collectionPaymentReceipt(requireContext(), response))
             }
             activity?.onBackPressed()
         } else {

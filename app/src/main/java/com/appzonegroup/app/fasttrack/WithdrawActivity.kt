@@ -5,7 +5,7 @@ import android.view.View
 import androidx.activity.viewModels
 import com.appzonegroup.app.fasttrack.databinding.ActivityWithdrawBinding
 import com.appzonegroup.app.fasttrack.fragment.WithdrawalViewModel
-import com.appzonegroup.app.fasttrack.receipt.WithdrawalReceipt
+import com.appzonegroup.app.fasttrack.receipt.withdrawalReceipt
 import com.appzonegroup.app.fasttrack.utility.FunctionIds
 import com.creditclub.core.data.ClusterObjectBox
 import com.creditclub.core.data.TRANSACTIONS_CLIENT
@@ -239,7 +239,7 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
             finishOnClose
         )
 
-        val receipt = WithdrawalReceipt(
+        val receipt = withdrawalReceipt(
             this@WithdrawActivity,
             request,
             accountInfo,

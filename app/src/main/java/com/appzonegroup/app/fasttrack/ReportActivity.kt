@@ -258,7 +258,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
                 }
 
-                posPrinter.print(CollectionPaymentReceipt(this, response))
+                posPrinter.print(collectionPaymentReceipt(this, response))
             }
             TransactionType.FundsTransferCommercialBank,
             TransactionType.LocalFundsTransfer,
@@ -336,7 +336,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     deviceNumber = localStorage.deviceNumber,
                 )
                 posPrinter.print(
-                    DepositReceipt(
+                    depositReceipt(
                         context = this,
                         request = depositRequest,
                         accountInfo = AccountInfo(
@@ -361,7 +361,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     deviceNumber = localStorage.deviceNumber,
                 )
                 posPrinter.print(
-                    WithdrawalReceipt(
+                    withdrawalReceipt(
                         context = this,
                         request = withdrawalRequest,
                         accountInfo = AccountInfo(
