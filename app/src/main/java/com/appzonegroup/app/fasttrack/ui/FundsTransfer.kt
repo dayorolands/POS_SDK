@@ -171,6 +171,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 nameEnquiryResponse = response
             }
         }
+    val beneficiaryAccountName = nameEnquiryResponse?.beneficiaryAccountName ?: "Unknown Account"
 
     val transferFunds: suspend CoroutineScope.() -> Unit =
         remember(
@@ -205,13 +206,17 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     geoLocation = localStorage.lastKnownLocation,
                     narration = narration.trim { it <= ' ' },
                     beneficiaryInstitutionCode = bank?.code,
-                    beneficiaryAccountName = nameEnquiryResponse!!.beneficiaryAccountName,
-                    beneficiaryBVN = nameEnquiryResponse!!.beneficiaryBVN,
-                    beneficiaryKYC = nameEnquiryResponse!!.beneficiaryKYC,
-                    nameEnquirySessionID = nameEnquiryResponse!!.nameEnquirySessionID,
                     retrievalReferenceNumber = transactionReference,
                     deviceNumber = localStorage.deviceNumber,
-                )
+                ).let {
+                    if (nameEnquiryResponse == null) it
+                    else it.copy(
+                        beneficiaryAccountName = nameEnquiryResponse!!.beneficiaryAccountName,
+                        beneficiaryBVN = nameEnquiryResponse!!.beneficiaryBVN,
+                        beneficiaryKYC = nameEnquiryResponse!!.beneficiaryKYC,
+                        nameEnquirySessionID = nameEnquiryResponse!!.nameEnquirySessionID,
+                    )
+                }
 
                 loadingMessage = if (transferAttemptCount > 0) {
                     "Verifying Transaction Status\n Retrying(count = $transferAttemptCount)"
@@ -234,7 +239,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                             FundsTransferRequest.serializer(),
                             fundsTransferRequest,
                         ),
-                        accountName = nameEnquiryResponse!!.beneficiaryAccountName!!,
+                        accountName = beneficiaryAccountName,
                         accountNumber = receiverAccountNumber,
                         amount = amount,
                         reference = transactionReference,
@@ -454,7 +459,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 if (isVerified && !showConfirmation) {
                     item(key = "account-name") {
                         Text(
-                            nameEnquiryResponse!!.beneficiaryAccountName ?: "",
+                            beneficiaryAccountName,
                             modifier = Modifier
                                 .padding(top = 4.dp, start = 16.dp, end = 16.dp)
                                 .fillMaxWidth(),
@@ -495,7 +500,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                 item(key = "confirm-beneficiary") {
                     DataItem(
                         label = "Beneficiary",
-                        value = "${nameEnquiryResponse!!.beneficiaryAccountName}, $receiverAccountNumber"
+                        value = "${beneficiaryAccountName}, $receiverAccountNumber"
                     )
                 }
                 item(key = "confirm-bank") {

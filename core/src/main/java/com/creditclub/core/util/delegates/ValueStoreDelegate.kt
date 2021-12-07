@@ -37,14 +37,14 @@ class LongStoreDelegate(
     private val pref: SharedPreferences,
     private val key: String,
     private val defValue: Long,
-) {
-    operator fun getValue(obj: Any, prop: KProperty<*>): Long {
+) : ReadWriteProperty<Any, Long> {
+    override operator fun getValue(thisRef: Any, property: KProperty<*>): Long {
         return pref.getLong(key, defValue)
     }
 
-    operator fun setValue(obj: Any, prop: KProperty<*>, newValue: Long) {
+    override operator fun setValue(thisRef: Any, property: KProperty<*>, value: Long) {
         pref.edit {
-            putLong(key, newValue)
+            putLong(key, value)
         }
     }
 }
@@ -115,6 +115,7 @@ inline fun <reified T> SharedPreferences.valueStore(key: String): ReadWritePrope
     return when (T::class) {
         String::class -> StringStoreDelegate(this, key, null)
         Int::class -> IntStoreDelegate(this, key, 0)
+        Long::class -> LongStoreDelegate(this, key, 0L)
         else -> throw IllegalArgumentException("${T::class.java.name} is not supported")
     } as ReadWriteProperty<Any, T?>
 }
@@ -127,6 +128,7 @@ inline fun <reified T> SharedPreferences.valueStore(
     return when (T::class) {
         String::class -> StringStoreDelegate(this, key, defValue as String)
         Int::class -> IntStoreDelegate(this, key, defValue as Int)
+        Long::class -> LongStoreDelegate(this, key, defValue as Long)
         else -> throw IllegalArgumentException("type ${T::class.java.name} is not supported in valueStore")
     } as ReadWriteProperty<Any, T>
 }

@@ -2,6 +2,7 @@ package com.creditclub.core.data.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Environment
 import androidx.core.content.edit
 import com.creditclub.core.R
 import com.creditclub.core.data.model.AppVersion
@@ -30,8 +31,8 @@ class AppDataStorage(
         serializer = AppVersion.serializer(),
     )
     private val otaAppName = context.getString(R.string.ota_app_name)
-    private val filesDirPath = context.filesDir.path
-    private val latestApkFileName: String?
+    private val downloadDir = context.getDownloadsFolder()
+    val latestApkFileName: String?
         get() {
             val appVersion = latestVersion ?: return null
             return "$otaAppName${appVersion.version}.apk"
@@ -39,16 +40,9 @@ class AppDataStorage(
     val latestApkFile: File?
         get() {
             val fileName = latestApkFileName ?: return null
-            val apkFolder = File(filesDirPath, "apks")
-            if (!apkFolder.exists()) {
-                apkFolder.mkdir()
-            }
-            val file = File("${apkFolder.path}/${fileName}")
-            if (file.exists()) {
-                file.delete()
-            }
-            return file
+            return File(downloadDir, fileName)
         }
+    var updateDownloadId: Long by valueStore("update_download_id", -1)
 
     fun getString(key: String): String? = getString(key, null)
 
@@ -61,4 +55,25 @@ class AppDataStorage(
             return INSTANCE ?: AppDataStorage(context).also { INSTANCE = it }
         }
     }
+}
+
+fun Context.getDownloadsFolder(): File {
+    val file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        ?: throw IllegalStateException("Failed to get external storage public directory")
+
+    if (file.exists()) {
+        if (!file.isDirectory) {
+            throw IllegalStateException(
+                (file.absolutePath
+                        + " already exists and is not a directory")
+            )
+        }
+    } else if (!file.mkdirs()) {
+        throw IllegalStateException(
+            ("Unable to create directory: "
+                    + file.absolutePath)
+        )
+    }
+
+    return file
 }

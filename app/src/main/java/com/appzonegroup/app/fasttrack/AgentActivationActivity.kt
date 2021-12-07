@@ -11,7 +11,7 @@ import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
 import com.appzonegroup.creditclub.pos.extension.posConfig
 import com.appzonegroup.creditclub.pos.extension.posParameter
-import com.appzonegroup.creditclub.pos.extension.posSerialNumber
+import com.appzonegroup.creditclub.pos.extension.getPosSerialNumber
 import com.creditclub.core.data.api.StaticService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.model.AuthResponse
@@ -251,7 +251,7 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
                 code,
                 phoneNumber,
                 institutionCode,
-                if (Platform.isPOS) posSerialNumber else appDataStorage.deviceId
+                if (Platform.isPOS) getPosSerialNumber() else appDataStorage.deviceId
             )
         }
         dialogProvider.hideProgressBar()

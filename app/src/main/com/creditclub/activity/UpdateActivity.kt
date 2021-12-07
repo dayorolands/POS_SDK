@@ -1,4 +1,4 @@
-package com.creditclub.ui
+package com.creditclub.activity
 
 import android.Manifest
 import android.app.DownloadManager
@@ -12,13 +12,16 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.core.app.ActivityCompat
+import com.appzonegroup.app.fasttrack.R
+import com.appzonegroup.app.fasttrack.databinding.ActivityUpdateBinding
+import com.appzonegroup.app.fasttrack.ui.dataBinding
+import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.api.VersionService
 import com.creditclub.core.data.api.retrofitService
 import com.creditclub.core.data.prefs.AppDataStorage
 import com.creditclub.core.ui.getLatestVersion
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.core.util.packageInfo
-import com.creditclub.ui.databinding.ActivityUpdateBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
@@ -62,8 +65,10 @@ class UpdateActivity : CreditClubActivity(R.layout.activity_update) {
         mainScope.launch {
             val error = getLatestVersion(
                 versionService = versionService,
-                appConfig = appConfig,
                 appDataStorage = appDataStorage,
+                appConfig = appConfig,
+                localStorage = localStorage,
+                deviceType = Platform.deviceType,
             ).error
 
             if (error != null) return@launch dialogProvider.showError(error) {
