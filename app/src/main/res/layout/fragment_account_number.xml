@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_height="match_parent">
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <com.cluster.ui.EditText
         android:id="@+id/customer_account_number_et"
         android:hint="@string/customer_account_number"
         style="@style/defaultEditText"
@@ -13,7 +13,7 @@
         android:maxLength="10"
         android:inputType="phone" />
 
-    <com.appzonegroup.app.fasttrack.ui.CustomButton
+    <com.cluster.ui.CustomButton
         android:id="@+id/next_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

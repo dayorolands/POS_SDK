@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
-import com.appzonegroup.app.fasttrack.ui.dataBinding
+import com.cluster.ui.dataBinding
 import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.databinding.PosMenuFragmentBinding
 import com.appzonegroup.creditclub.pos.util.MenuPage

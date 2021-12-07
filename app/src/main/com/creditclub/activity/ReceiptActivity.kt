@@ -5,7 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.appzonegroup.app.fasttrack.ui.ReceiptDetails
+import com.cluster.ui.ReceiptDetails
 import com.creditclub.Routes
 import com.creditclub.core.ui.CreditClubActivity
 import com.creditclub.pos.printer.ParcelablePrintJob

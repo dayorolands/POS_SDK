@@ -14,7 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.appzonegroup.app.fasttrack.R
+import com.cluster.R
 import com.creditclub.core.AppFunctions
 import com.creditclub.core.data.CoreDatabase
 import com.creditclub.core.data.model.AppFunctionUsage

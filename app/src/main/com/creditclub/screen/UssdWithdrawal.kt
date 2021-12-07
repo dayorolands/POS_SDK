@@ -21,11 +21,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.appzonegroup.app.fasttrack.R
-import com.appzonegroup.app.fasttrack.receipt.footer
-import com.appzonegroup.app.fasttrack.ui.ReceiptDetails
-import com.appzonegroup.app.fasttrack.utility.FunctionUsageTracker
-import com.appzonegroup.app.fasttrack.utility.FunctionIds
+import com.cluster.R
+import com.cluster.receipt.footer
+import com.cluster.ui.ReceiptDetails
+import com.cluster.utility.FunctionUsageTracker
+import com.cluster.utility.FunctionIds
 import com.creditclub.core.data.api.UssdCashoutService
 import com.creditclub.core.data.model.CoraPayReference
 import com.creditclub.core.data.model.CoraPayTransactionStatus

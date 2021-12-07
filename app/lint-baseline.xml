@@ -1632,7 +1632,7 @@
     <issue
         id="RestrictedApi"
         message="MergedDataBinderMapper.addMapper can only be called from within the same library (androidx.databinding:databinding-runtime)"
-        errorLine1="    addMapper(new com.appzonegroup.app.fasttrack.DataBinderMapperImpl());"
+        errorLine1="    addMapper(new com.cluster.DataBinderMapperImpl());"
         errorLine2="    ~~~~~~~~~">
         <location
             file="build/generated/source/kapt/accessDebug/androidx/databinding/DataBinderMapperImpl.java"

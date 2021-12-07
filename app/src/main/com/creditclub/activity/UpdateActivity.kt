@@ -12,9 +12,9 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.core.app.ActivityCompat
-import com.appzonegroup.app.fasttrack.R
-import com.appzonegroup.app.fasttrack.databinding.ActivityUpdateBinding
-import com.appzonegroup.app.fasttrack.ui.dataBinding
+import com.cluster.R
+import com.cluster.databinding.ActivityUpdateBinding
+import com.cluster.ui.dataBinding
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.api.VersionService
 import com.creditclub.core.data.api.retrofitService

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.appzonegroup.app.fasttrack">
+    package="com.cluster">
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -17,7 +17,7 @@
     <uses-feature android:name="android.hardware.location.gps" />
 
     <application
-        android:name=".BankOneApplication"
+        android:name="com.cluster.BankOneApplication"
         android:allowBackup="false"
         android:extractNativeLibs="true"
         android:icon="@mipmap/ic_launcher"
@@ -29,30 +29,30 @@
         tools:replace="extractNativeLibs"
         tools:targetApi="n">
         <activity
-            android:name=".MainActivity"
+            android:name="com.cluster.MainActivity"
             android:icon="@mipmap/ic_launcher"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".FaqActivity"
+            android:name="com.cluster.FaqActivity"
             android:label="@string/title_activity_faq"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".BannerActivity"
-            android:parentActivityName=".LoginActivity"
+            android:name="com.cluster.BannerActivity"
+            android:parentActivityName="com.cluster.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.LoginActivity" />
+                android:value="com.cluster.LoginActivity" />
         </activity>
         <activity
-            android:name=".HlaTaggingActivity"
+            android:name="com.cluster.HlaTaggingActivity"
             android:label="@string/title_activity_hla_tagging"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".CaseLogActivity"
+            android:name="com.cluster.CaseLogActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SplashScreenActivity"
+            android:name="com.cluster.SplashScreenActivity"
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -62,61 +62,61 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ReportActivity"
+            android:name="com.cluster.ReportActivity"
             android:exported="false"
             android:label="@string/reports"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.cluster.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
+                android:value="com.cluster.MainActivity" />
         </activity>
         <activity
-            android:name=".DepositActivity"
+            android:name="com.cluster.DepositActivity"
             android:exported="false"
             android:label="Cash Deposit"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="com.cluster.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
+                android:value="com.cluster.MainActivity" />
         </activity>
         <activity
-            android:name=".WithdrawActivity"
+            android:name="com.cluster.WithdrawActivity"
             android:exported="false"
             android:label="Cash Withdrawal"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="com.cluster.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
+                android:value="com.cluster.MainActivity" />
         </activity>
         <activity
-            android:name=".CreditClubLoanRequestActivity"
+            android:name="com.cluster.CreditClubLoanRequestActivity"
             android:exported="false"
             android:label="@string/title_activity_loan_request"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="com.cluster.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
+                android:value="com.cluster.MainActivity" />
         </activity>
         <activity
-            android:name=".LoginActivity"
+            android:name="com.cluster.LoginActivity"
             android:exported="false"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".AgentActivationActivity"
+            android:name="com.cluster.AgentActivationActivity"
             android:exported="false"
             android:label="@string/agentSetup" />
 
         <activity
-            android:name=".BVNUpdateActivity"
+            android:name="com.cluster.BVNUpdateActivity"
             android:exported="false"
             android:label="@string/title_activity_bvnUpdate"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="com.cluster.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
+                android:value="com.cluster.MainActivity" />
         </activity>
         <activity
             android:name="com.creditclub.activity.UpdateActivity"
@@ -129,65 +129,65 @@
             android:label="@string/receipt"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".CustomerRequestOpenAccountActivity"
+            android:name="com.cluster.CustomerRequestOpenAccountActivity"
             android:exported="false"
             android:label="@string/title_activity_open_account"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="com.cluster.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
+                android:value="com.cluster.MainActivity" />
         </activity>
         <activity
-            android:name=".ChangePinActivity"
+            android:name="com.cluster.ChangePinActivity"
             android:exported="false"
             android:label="@string/pin_change">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
+                android:value="com.cluster.MainActivity" />
         </activity>
         <activity
-            android:name=".ChangeCustomerPinActivity"
+            android:name="com.cluster.ChangeCustomerPinActivity"
             android:exported="false"
             android:label="@string/change_customer_pin"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName="com.cluster.MainActivity" />
         <activity
-            android:name=".OnlineActivity"
+            android:name="com.cluster.OnlineActivity"
             android:exported="false"
             android:label="@string/online_functions"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="com.cluster.MainActivity">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
+                android:value="com.cluster.MainActivity" />
         </activity>
         <activity
-            android:name=".MiniStatementActivity"
+            android:name="com.cluster.MiniStatementActivity"
             android:exported="false"
             android:label="@string/title_activity_basic_mini_statement"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.cluster.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
+                android:value="com.cluster.MainActivity" />
         </activity>
         <activity
-            android:name=".CommissionsActivity"
+            android:name="com.cluster.CommissionsActivity"
             android:exported="false"
             android:label="@string/title_activity_commissions_statement"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="com.cluster.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
+                android:value="com.cluster.MainActivity" />
         </activity>
         <activity
-            android:name=".NewWalletActivity"
+            android:name="com.cluster.NewWalletActivity"
             android:exported="false"
             android:label="@string/title_activity_new_wallet"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="com.cluster.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.appzonegroup.app.fasttrack.MainActivity" />
+                android:value="com.cluster.MainActivity" />
         </activity>
         <activity
             android:name="com.appzonegroup.creditclub.pos.TerminalOptionsActivity"
@@ -206,7 +206,7 @@
             android:exported="false"
             android:label="Make Payment"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
+            android:parentActivityName="com.cluster.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             tools:replace="android:parentActivityName" />
@@ -226,7 +226,7 @@
             android:exported="false"
             android:label="Balance Inquiry"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
+            android:parentActivityName="com.cluster.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             tools:replace="android:parentActivityName" />
@@ -236,7 +236,7 @@
             android:exported="false"
             android:label="Refund"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
+            android:parentActivityName="com.cluster.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             tools:replace="android:parentActivityName" />
@@ -246,7 +246,7 @@
             android:exported="false"
             android:label="Sales Completion"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
+            android:parentActivityName="com.cluster.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             tools:replace="android:parentActivityName" />
@@ -256,7 +256,7 @@
             android:exported="false"
             android:label="Pre Auth"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
+            android:parentActivityName="com.cluster.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             tools:replace="android:parentActivityName" />
@@ -266,7 +266,7 @@
             android:exported="false"
             android:label="Cash Back"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
+            android:parentActivityName="com.cluster.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             tools:replace="android:parentActivityName" />
@@ -276,7 +276,7 @@
             android:exported="false"
             android:label="Cash Advance"
             android:launchMode="singleTask"
-            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
+            android:parentActivityName="com.cluster.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             tools:replace="android:parentActivityName" />
@@ -284,7 +284,7 @@
             android:name="com.appzonegroup.creditclub.pos.UnsettledTransactionsActivity"
             android:exported="false"
             android:label="Pending Confirmations"
-            android:parentActivityName="com.appzonegroup.app.fasttrack.MainActivity"
+            android:parentActivityName="com.cluster.MainActivity"
             tools:replace="android:parentActivityName" />
         <activity
             android:name="com.appzonegroup.creditclub.pos.ReprintMenuActivity"

@@ -19,7 +19,7 @@
         android:textAllCaps="true"
         android:text="Send Token"/>
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <com.cluster.ui.EditText
         android:layout_width="match_parent"
         android:id="@+id/customer_phone_et"
         android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <com.appzonegroup.app.fasttrack.ui.CustomButton
+        <com.cluster.ui.CustomButton
             android:id="@+id/cancel_btn"
             android:text="@string/cancel"
             android:layout_width="match_parent"
@@ -45,7 +45,7 @@
             android:layout_weight="2"
             android:layout_marginBottom="20dp"
             style="@style/button_style"/>
-        <com.appzonegroup.app.fasttrack.ui.CustomButton
+        <com.cluster.ui.CustomButton
             android:layout_weight="2"
             android:id="@+id/ok_btn"
             android:text="@string/ok"

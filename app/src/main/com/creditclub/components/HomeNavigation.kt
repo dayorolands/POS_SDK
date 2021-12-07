@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.appzonegroup.app.fasttrack.R
+import com.cluster.R
 
 @Composable
 fun SubMenuBottomNavigation(

@@ -17,7 +17,7 @@ import android.print.PrintAttributes.Resolution
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.scale
-import com.appzonegroup.app.fasttrack.R
+import com.cluster.R
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.format
@@ -28,7 +28,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
-import java.io.FileOutputStream
 import java.time.Instant
 
 

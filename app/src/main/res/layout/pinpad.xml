@@ -10,7 +10,7 @@
 
         <variable
             name="pinChangeHandler"
-            type="com.appzonegroup.app.fasttrack.ui.Dialogs.PinChangeHandler" />
+            type="com.cluster.ui.Dialogs.PinChangeHandler" />
     </data>
 
     <androidx.cardview.widget.CardView

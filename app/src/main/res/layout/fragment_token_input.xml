@@ -16,7 +16,7 @@
         android:text="@string/customer_otp"
         android:gravity="center"/>
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <com.cluster.ui.EditText
         android:id="@+id/customer_otp_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -30,7 +30,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.appzonegroup.app.fasttrack.R
+import com.cluster.R
 import com.creditclub.core.data.api.CaseLogService
 import com.creditclub.core.data.model.Feedback
 import com.creditclub.core.data.prefs.LocalStorage

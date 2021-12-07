@@ -27,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.appzonegroup.app.fasttrack.ui.EditText
+                <com.cluster.ui.EditText
                     android:id="@+id/eText"
                     style="@style/defaultEditText"
                     android:layout_width="match_parent"
@@ -40,7 +40,7 @@
 
             <requestFocus />
 
-            <com.appzonegroup.app.fasttrack.ui.CustomButton
+            <com.cluster.ui.CustomButton
                 android:id="@+id/btnActivate"
                 style="@style/button_style"
                 android:layout_width="match_parent"

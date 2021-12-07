@@ -15,7 +15,7 @@
         android:text="@string/agentPIN"
         android:gravity="center"/>
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <com.cluster.ui.EditText
         android:id="@+id/agent_pin_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

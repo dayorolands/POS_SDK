@@ -36,7 +36,7 @@
         android:layout_margin="@dimen/five_dp"
         android:gravity="center"/>
 
-    <com.appzonegroup.app.fasttrack.ui.CustomButton
+    <com.cluster.ui.CustomButton
         android:id="@+id/ok_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

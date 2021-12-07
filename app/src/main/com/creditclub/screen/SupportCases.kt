@@ -23,10 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.appzonegroup.app.fasttrack.CaseLogActivity
-import com.appzonegroup.app.fasttrack.R
-import com.appzonegroup.app.fasttrack.utility.FunctionUsageTracker
-import com.appzonegroup.app.fasttrack.utility.FunctionIds
+import com.cluster.CaseLogActivity
+import com.cluster.R
+import com.cluster.utility.FunctionUsageTracker
+import com.cluster.utility.FunctionIds
 import com.creditclub.Routes
 import com.creditclub.core.data.api.CaseLogService
 import com.creditclub.core.data.model.CaseDetail

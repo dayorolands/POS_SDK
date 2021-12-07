@@ -7,7 +7,7 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <com.cluster.ui.EditText
         android:id="@+id/withdrawal_amount_et"
         android:layout_width="300dp"
         android:layout_height="wrap_content"

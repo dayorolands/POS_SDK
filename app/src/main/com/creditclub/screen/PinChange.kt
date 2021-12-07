@@ -14,16 +14,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.appzonegroup.app.fasttrack.R
-import com.appzonegroup.app.fasttrack.utility.FunctionUsageTracker
-import com.appzonegroup.app.fasttrack.utility.FunctionIds
+import com.cluster.R
+import com.cluster.utility.FunctionUsageTracker
+import com.cluster.utility.FunctionIds
 import com.creditclub.core.data.api.StaticService
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.request.PinChangeRequest
 import com.creditclub.core.util.SuspendCallback
 import com.creditclub.core.util.safeRunIO
 import com.creditclub.ui.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable

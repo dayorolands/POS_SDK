@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.appzonegroup.app.fasttrack.R
+import com.cluster.R
 import com.creditclub.core.util.safeRunSuspend
 import com.google.accompanist.insets.statusBarsHeight
 import kotlinx.coroutines.launch

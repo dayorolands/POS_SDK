@@ -47,7 +47,7 @@
                 android:textColor="@color/white"
                 android:textSize="@dimen/medium_sized_text" />
 
-            <com.appzonegroup.app.fasttrack.ui.CustomButton
+            <com.cluster.ui.CustomButton
                 android:id="@+id/ok_btn"
                 style="@style/AppButton.RoundOrangeButton"
                 android:layout_width="match_parent"

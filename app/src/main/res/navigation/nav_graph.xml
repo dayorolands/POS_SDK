@@ -57,29 +57,29 @@
 
     <fragment
         android:id="@+id/billPaymentFragment"
-        android:name="com.appzonegroup.app.fasttrack.fragment.BillPaymentFragment"
+        android:name="com.cluster.fragment.BillPaymentFragment"
         android:label="Bill Payment"
         tools:layout="@layout/bill_payment_fragment" />
 
     <fragment
         android:id="@+id/fundsTransferFragment"
-        android:name="com.appzonegroup.app.fasttrack.FundsTransferFragment"
+        android:name="com.cluster.FundsTransferFragment"
         android:label="Funds Transfer" />
 
     <fragment
         android:id="@+id/notificationFragment"
-        android:name="com.appzonegroup.app.fasttrack.fragment.NotificationFragment"
+        android:name="com.cluster.fragment.NotificationFragment"
         android:label="Notification"
         tools:layout="@layout/notification_fragment" />
 
     <fragment
         android:id="@+id/receiptFragment"
-        android:name="com.appzonegroup.app.fasttrack.fragment.ReceiptFragment"
+        android:name="com.cluster.fragment.ReceiptFragment"
         android:label="Receipt" />
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.appzonegroup.app.fasttrack.fragment.HomeFragment"
+        android:name="com.cluster.fragment.HomeFragment"
         android:label="Home">
         <action
             android:id="@+id/action_home_to_bill_payment"
@@ -102,7 +102,7 @@
         app:startDestination="@id/collectionPaymentFragment">
         <fragment
             android:id="@+id/collectionPaymentFragment"
-            android:name="com.appzonegroup.app.fasttrack.fragment.CollectionPaymentFragment"
+            android:name="com.cluster.fragment.CollectionPaymentFragment"
             android:label="IGR Collections"
             tools:layout="@layout/collection_payment_fragment">
             <action
@@ -116,13 +116,13 @@
 
         <fragment
             android:id="@+id/collectionReferenceGenerationFragment"
-            android:name="com.appzonegroup.app.fasttrack.fragment.CollectionReferenceGenerationFragment"
+            android:name="com.cluster.fragment.CollectionReferenceGenerationFragment"
             android:label="Generate Collection Reference"
             tools:layout="@layout/fragment_collection_reference_generation" />
     </navigation>
 
     <fragment
         android:id="@+id/composeFragment"
-        android:name="com.appzonegroup.app.fasttrack.fragment.ComposeFragment"
+        android:name="com.cluster.fragment.ComposeFragment"
         android:label="Compose" />
 </navigation>

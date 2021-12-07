@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:weightSum="2">
 
-                <com.appzonegroup.app.fasttrack.ui.CustomButton
+                <com.cluster.ui.CustomButton
                     android:id="@+id/passport_gallery_btn"
                     style="@style/AppButton.RoundBlueButton"
                     android:layout_width="match_parent"
@@ -50,7 +50,7 @@
                     android:textStyle="bold"
                     android:visibility="gone" />
 
-                <com.appzonegroup.app.fasttrack.ui.CustomButton
+                <com.cluster.ui.CustomButton
                     android:id="@+id/passport_takePhoto_btn"
                     style="@style/AppButton.RoundBlueButton"
                     android:layout_width="match_parent"
@@ -92,7 +92,7 @@
                 android:layout_height="wrap_content"
                 android:weightSum="2">
 
-                <com.appzonegroup.app.fasttrack.ui.CustomButton
+                <com.cluster.ui.CustomButton
                     android:id="@+id/id_card_gallery_btn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -102,7 +102,7 @@
                     android:textColor="@android:color/white"
                     android:textStyle="bold" />
 
-                <com.appzonegroup.app.fasttrack.ui.CustomButton
+                <com.cluster.ui.CustomButton
                     android:id="@+id/id_card_takePhoto_btn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -142,7 +142,7 @@
                 android:layout_height="wrap_content"
                 android:weightSum="2">
 
-                <com.appzonegroup.app.fasttrack.ui.CustomButton
+                <com.cluster.ui.CustomButton
                     android:id="@+id/signature_gallery_btn"
                     style="@style/button_style_orange"
                     android:layout_width="match_parent"
@@ -154,7 +154,7 @@
                     android:textStyle="bold"
                     android:visibility="gone" />
 
-                <com.appzonegroup.app.fasttrack.ui.CustomButton
+                <com.cluster.ui.CustomButton
                     android:id="@+id/signature_takePhoto_btn"
                     style="@style/button_style"
                     android:layout_width="match_parent"
@@ -168,7 +168,7 @@
 
             </LinearLayout>
 
-            <com.appzonegroup.app.fasttrack.ui.CustomButton
+            <com.cluster.ui.CustomButton
                 android:id="@+id/next_btn"
                 style="@style/AppButton.RoundBlueButton"
                 android:layout_width="300dp"

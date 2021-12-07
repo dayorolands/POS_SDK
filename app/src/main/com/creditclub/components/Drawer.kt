@@ -21,8 +21,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.appzonegroup.app.fasttrack.*
-import com.appzonegroup.app.fasttrack.R
+import com.cluster.*
+import com.cluster.R
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.config.InstitutionConfig
 import com.creditclub.core.data.prefs.LocalStorage

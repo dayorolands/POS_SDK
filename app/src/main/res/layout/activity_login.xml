@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:activity="com.appzonegroup.app.fasttrack.LoginActivity">
+        tools:activity="com.cluster.LoginActivity">
 
         <!-- Login progress -->
 

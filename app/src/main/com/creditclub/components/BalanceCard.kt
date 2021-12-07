@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.appzonegroup.app.fasttrack.R
+import com.cluster.R
 import com.creditclub.core.data.api.StaticService
 import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.data.request.BalanceEnquiryRequest

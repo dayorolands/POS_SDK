@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-        tools:activity="com.appzonegroup.app.fasttrack.BVNUpdateActivity">
+        tools:activity="com.cluster.BVNUpdateActivity">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appbar"
@@ -38,7 +38,7 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <com.appzonegroup.app.fasttrack.ui.NonSwipeableViewPager
+        <com.cluster.ui.NonSwipeableViewPager
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
