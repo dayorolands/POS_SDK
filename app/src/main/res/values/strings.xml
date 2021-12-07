@@ -319,7 +319,6 @@
     <string name="requires_internet">(Requires internet)</string>
     <string name="verification_code_hint">Verification Code</string>
     <string name="withdrawal_options">Withdrawal Options</string>
-    <string name="sterling_bank_customer">Sterling Bank Customer</string>
     <string name="other_bank_customer_token">Other Bank Customer (Token)</string>
     <string name="other_bank_customer_card">Other Bank Customer (Card)</string>
     <string name="title_activity_withdrawal_by_apitoken">Withdrawal</string>

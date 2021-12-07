@@ -44,6 +44,7 @@ import com.appzonegroup.app.fasttrack.utility.logout
 import com.appzonegroup.app.fasttrack.utility.openPageById
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.Routes
+import com.creditclub.activity.UpdateActivity
 import com.creditclub.components.*
 import com.creditclub.conversation.LocalBackPressedDispatcher
 import com.creditclub.core.config.InstitutionConfig
@@ -543,25 +544,48 @@ class HomeFragment : CreditClubFragment() {
         }
     }
 
-    private fun checkForUpdate() = appDataStorage.latestVersion?.run {
+    private fun checkForUpdate() {
+        val latestVersion = appDataStorage.latestVersion ?: return
         val currentVersion = requireContext().packageInfo!!.versionName
-        if (!isNewerThan(currentVersion)) {
-            return@run
+        if (!latestVersion.isNewerThan(currentVersion)) {
+            return
         }
-        val latestApkFile = appDataStorage.latestApkFile ?: return@run
-        val canUpdate = updateIsRequired(currentVersion) && latestApkFile.exists()
-        val mustUpdate = canUpdate && daysOfGraceLeft() < 1
-        val message = "A new version (v$version) is available."
+        val canUpdate = latestVersion.updateIsRequired(currentVersion)
+        val mustUpdate = canUpdate && latestVersion.daysOfGraceLeft() < 1
+        val message = "A new version (v${latestVersion.version}) is available."
         val subtitle = when {
             canUpdate && mustUpdate -> "You need to update now"
-            canUpdate -> "Please update with ${daysOfGraceLeft()} days"
-            else -> "Please update"
+            canUpdate -> "Kindly update within ${latestVersion.daysOfGraceLeft()} days"
+            else -> "Kindly update"
+        }
+
+        val latestApkFile = appDataStorage.latestApkFile
+        if (latestApkFile?.exists() == true) {
+            dialogProvider.confirm(DialogConfirmParams(message, subtitle)) {
+                onSubmit {
+                    if (it) {
+                        openApk(latestApkFile)
+                        if (mustUpdate) {
+                            requireActivity().finish()
+                        }
+                    } else if (mustUpdate) requireActivity().finish()
+                }
+
+                onClose {
+                    if (mustUpdate) requireActivity().finish()
+                }
+            }
+            return
         }
 
         dialogProvider.confirm(DialogConfirmParams(message, subtitle)) {
             onSubmit {
                 if (it) {
-                    openApk(latestApkFile)
+                    val intent = Intent(requireContext(), UpdateActivity::class.java)
+                    startActivity(intent)
+                    if (mustUpdate) {
+                        requireActivity().finish()
+                    }
                 } else if (mustUpdate) requireActivity().finish()
             }
 

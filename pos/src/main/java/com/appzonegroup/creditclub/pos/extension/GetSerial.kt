@@ -1,28 +1,31 @@
 package com.appzonegroup.creditclub.pos.extension
 
+import android.annotation.SuppressLint
 import android.os.Build
 import java.lang.reflect.Method
 
 
-val posSerialNumber: String?
-    get() {
-        var serialNumber: Any?
+var serialNumber: Any? = null
 
-        try {
-            val c = Class.forName("android.os.SystemProperties")
-            val get: Method = c.getMethod("get", String::class.java)
+@SuppressLint("PrivateApi", "BanUncheckedReflection")
+fun getPosSerialNumber(): String? {
+    if (serialNumber != null) return serialNumber as String?
 
-            serialNumber = get.invoke(c, "gsm.sn1")
-            if (serialNumber == "") serialNumber = get.invoke(c, "ril.serialnumber")
-            if (serialNumber == "") serialNumber = get.invoke(c, "ro.serialno")
-            if (serialNumber == "") serialNumber = get.invoke(c, "sys.serialnumber")
-            if (serialNumber == "") serialNumber = Build.SERIAL
+    try {
+        val c = Class.forName("android.os.SystemProperties")
+        val get: Method = c.getMethod("get", String::class.java)
 
-            if (serialNumber == "") serialNumber = null
-        } catch (e: Exception) {
-            e.printStackTrace()
-            serialNumber = null
-        }
+        serialNumber = get.invoke(c, "gsm.sn1")
+        if (serialNumber == "") serialNumber = get.invoke(c, "ril.serialnumber")
+        if (serialNumber == "") serialNumber = get.invoke(c, "ro.serialno")
+        if (serialNumber == "") serialNumber = get.invoke(c, "sys.serialnumber")
+        if (serialNumber == "") serialNumber = Build.SERIAL
 
-        return serialNumber as String?
+        if (serialNumber == "") serialNumber = null
+    } catch (e: Exception) {
+        e.printStackTrace()
+        serialNumber = null
     }
+
+    return serialNumber as String?
+}

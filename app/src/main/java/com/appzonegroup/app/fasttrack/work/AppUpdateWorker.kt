@@ -1,38 +1,42 @@
 package com.appzonegroup.app.fasttrack.work
 
+import android.app.DownloadManager
 import android.content.Context
+import android.net.Uri
+import android.os.Environment
+import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.appzonegroup.app.fasttrack.R
+import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.data.api.AppConfig
 import com.creditclub.core.data.api.VersionService
 import com.creditclub.core.data.prefs.AppDataStorage
+import com.creditclub.core.data.prefs.LocalStorage
 import com.creditclub.core.ui.getLatestVersion
 import com.creditclub.core.util.packageInfo
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.*
-import okio.buffer
-import okio.sink
-import java.io.IOException
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 
 class AppUpdateWorker(
     context: Context,
     params: WorkerParameters,
     private val appDataStorage: AppDataStorage,
-    private val okHttpClient: OkHttpClient,
+    private val localStorage: LocalStorage,
     private val versionService: VersionService,
     private val appConfig: AppConfig,
 ) : CoroutineWorker(context, params) {
 
+    private val appName = context.getString(R.string.app_name)
+
     override suspend fun doWork(): Result {
         val result = getLatestVersion(
             versionService = versionService,
-            appConfig = appConfig,
             appDataStorage = appDataStorage,
+            appConfig = appConfig,
+            localStorage = localStorage,
+            deviceType = Platform.deviceType,
         )
         if (result.isFailure) return Result.retry()
         val latestVersion = appDataStorage.latestVersion ?: return Result.retry()
@@ -45,33 +49,34 @@ class AppUpdateWorker(
         if (exists) {
             return Result.success()
         }
-        val url = latestVersion.link
 
-        val response = suspendCoroutine<Response?> { continuation ->
-            val request = Request.Builder().url(url).build()
-            okHttpClient.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    FirebaseCrashlytics.getInstance().recordException(e)
-                    continuation.resume(null)
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    continuation.resume(response)
-                }
-            })
-        }
-
-        if (response?.body == null) {
-            return Result.retry()
-        }
-
-        return withContext(Dispatchers.IO) {
-            latestApkFile.createNewFile()
-            latestApkFile.sink().buffer().use { sink ->
-                sink.writeAll(response.body!!.source())
+        val latestApkFileUri = latestApkFile.toUri()
+        val manager =
+            applicationContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val oldUpdateDownloadId = appDataStorage.updateDownloadId
+        if (oldUpdateDownloadId > 0) {
+            val oldFileUri: Uri? = manager.getUriForDownloadedFile(appDataStorage.updateDownloadId)
+            if (oldFileUri == null || oldFileUri != latestApkFileUri) {
+                manager.remove(oldUpdateDownloadId)
+            } else {
+                return Result.success()
             }
-
-            Result.success()
         }
+
+        val request = DownloadManager.Request(latestVersion.link.toUri()).apply {
+            setDescription("Downloading ${latestVersion.version}")
+            setTitle("$appName update")
+            setAllowedOverMetered(true)
+            setMimeType("application/vnd.android.package-archive")
+            setAllowedOverRoaming(true)
+            setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            setDestinationInExternalPublicDir(
+                Environment.DIRECTORY_DOWNLOADS,
+                appDataStorage.latestApkFileName
+            )
+        }
+        appDataStorage.updateDownloadId = manager.enqueue(request)
+
+        return Result.success()
     }
 }

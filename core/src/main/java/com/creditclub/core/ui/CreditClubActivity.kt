@@ -151,8 +151,15 @@ suspend fun getLatestVersion(
     versionService: VersionService,
     appDataStorage: AppDataStorage,
     appConfig: AppConfig,
+    localStorage: LocalStorage,
+    deviceType: Int,
 ) = safeRunIO {
-    val newVersion = versionService.getLatestVersionAndDownloadLink(appConfig.otaUpdateId)
+    val newVersion = versionService.getLatestVersionAndDownloadLink(
+        appConfig.otaUpdateId,
+        agentPhoneNumber = localStorage.agentPhone,
+        institutionCode = localStorage.institutionCode,
+        deviceType = deviceType,
+    )
     if (newVersion != null) {
         val previousVersion = appDataStorage.latestVersion
         previousVersion?.run {

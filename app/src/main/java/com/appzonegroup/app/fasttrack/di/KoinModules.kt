@@ -22,14 +22,14 @@ import com.creditclub.core.ui.widget.DialogProvider
 import com.creditclub.core.util.debugOnly
 import com.creditclub.pos.printer.PosPrinter
 import com.creditclub.receipt.PdfPrinter
-import okhttp3.Cache
-import okhttp3.OkHttpClient
+import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.io.File
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -144,9 +144,9 @@ val workerModule = module {
             context = androidContext(),
             params = workerParams,
             appDataStorage = get(),
-            appConfig = get(),
-            okHttpClient = get(named(MIDDLEWARE_CLIENT)),
+            localStorage = get(),
             versionService = getRetrofitService(),
+            appConfig = get(),
         )
     }
     worker { (workerParams: WorkerParameters) ->

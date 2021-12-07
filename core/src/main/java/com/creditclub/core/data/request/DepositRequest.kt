@@ -30,7 +30,7 @@ data class DepositRequest(
     val retrievalReferenceNumber: String,
 
     @SerialName("DeviceNumber")
-    val deviceNumber: Int,
+    val deviceNumber: Int = 0,
 
     @SerialName("UniqueReferenceID")
     val uniqueReferenceID: String? = null,

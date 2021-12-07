@@ -75,6 +75,8 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                 versionService = versionService,
                 appDataStorage = get(),
                 appConfig = appConfig,
+                localStorage = localStorage,
+                deviceType = Platform.deviceType,
             )
         }
         if (Platform.isPOS) {
@@ -263,10 +265,6 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     override fun onBackPressed() {
         dialogProvider.confirm("Close Application", null) {
             onSubmit {
-                val intent = Intent(Intent.ACTION_MAIN)
-                intent.addCategory(Intent.CATEGORY_HOME)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
                 finish()
             }
         }

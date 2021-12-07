@@ -37,7 +37,7 @@ data class WithdrawalRequest(
     val retrievalReferenceNumber: String,
 
     @SerialName("DeviceNumber")
-    val deviceNumber: Int,
+    val deviceNumber: Int = 0,
 ) {
     @Serializable
     data class Additional(

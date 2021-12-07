@@ -26,7 +26,7 @@ import com.appzonegroup.app.fasttrack.R
 import com.appzonegroup.creditclub.pos.Platform
 import com.creditclub.core.config.InstitutionConfig
 import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.ui.UpdateActivity
+import com.creditclub.activity.UpdateActivity
 import com.creditclub.ui.rememberBean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
