@@ -27,6 +27,6 @@
 
     <fragment
         android:id="@+id/chargeBackFragment"
-        android:name="com.creditclub.pos.ChargeBackFragment"
+        android:name="com.cluster.pos.ChargeBackFragment"
         android:label="CardMenu" />
 </navigation>

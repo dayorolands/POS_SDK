@@ -11,11 +11,11 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.cluster.utility.FunctionIds
-import com.creditclub.core.data.api.StaticService
-import com.creditclub.core.data.api.retrofitService
-import com.creditclub.core.data.model.LoanProduct
-import com.creditclub.core.data.model.LoanRequestCreditClub
-import com.creditclub.core.util.safeRunIO
+import com.cluster.core.data.api.StaticService
+import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.model.LoanProduct
+import com.cluster.core.data.model.LoanRequestCreditClub
+import com.cluster.core.util.safeRunIO
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch
 import java.util.*

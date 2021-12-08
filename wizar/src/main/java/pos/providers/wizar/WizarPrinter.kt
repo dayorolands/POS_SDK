@@ -5,8 +5,8 @@ import android.graphics.BitmapFactory
 import com.cloudpos.POSTerminal
 import com.cloudpos.printer.Format
 import com.cloudpos.printer.PrinterDevice
-import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.pos.printer.*
+import com.cluster.core.ui.widget.DialogProvider
+import com.cluster.pos.printer.*
 import kotlinx.coroutines.*
 
 class WizarPrinter(override val context: Context, override val dialogProvider: DialogProvider) :

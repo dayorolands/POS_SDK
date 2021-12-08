@@ -2,8 +2,8 @@ package com.cluster
 
 import android.view.MenuItem
 import android.view.View
-import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.ui.CreditClubFragment
+import com.cluster.core.ui.CreditClubActivity
+import com.cluster.core.ui.CreditClubFragment
 
 
 class MainActivity : CreditClubActivity(R.layout.activity_main) {

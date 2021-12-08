@@ -24,8 +24,8 @@ import com.cluster.ui.dataBinding
 import com.cluster.utility.Misc
 import com.cluster.utility.online.ErrorMessages
 import com.cluster.utility.online.convertXmlToJson
-import com.creditclub.core.data.Encryption.decrypt
-import com.creditclub.core.ui.CreditClubFragment
+import com.cluster.core.data.Encryption.decrypt
+import com.cluster.core.ui.CreditClubFragment
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject

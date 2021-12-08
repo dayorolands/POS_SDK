@@ -1,7 +1,7 @@
 package com.dspread.qpos
 
 import android.content.Context
-import com.creditclub.pos.card.TransactionType
+import com.cluster.pos.card.TransactionType
 import com.dspread.R
 import com.dspread.qpos.utils.TLV
 import com.dspread.qpos.utils.TLVParser

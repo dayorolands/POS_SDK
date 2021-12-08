@@ -7,9 +7,9 @@ import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.extension.responseCode39
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
-import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.pos.PosConfig
-import com.creditclub.pos.PosParameter
+import com.cluster.core.data.prefs.LocalStorage
+import com.cluster.pos.PosConfig
+import com.cluster.pos.PosParameter
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

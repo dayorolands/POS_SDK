@@ -119,12 +119,12 @@
                 android:value="com.cluster.MainActivity" />
         </activity>
         <activity
-            android:name="com.creditclub.activity.UpdateActivity"
+            android:name="com.cluster.activity.UpdateActivity"
             android:exported="false"
             android:label="@string/update"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.creditclub.activity.ReceiptActivity"
+            android:name="com.cluster.activity.ReceiptActivity"
             android:exported="false"
             android:label="@string/receipt"
             android:theme="@style/AppTheme.NoActionBar" />

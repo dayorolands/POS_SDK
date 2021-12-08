@@ -22,7 +22,8 @@
             android:layout_height="wrap_content"
             android:text="@string/lastName"/>
 
-        <com.creditclub.ui.widget.EditText            android:id="@+id/accountReportItem_surname_et"
+        <com.cluster.ui.widget.EditText
+                android:id="@+id/accountReportItem_surname_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:enabled="false"
@@ -33,7 +34,8 @@
             android:layout_height="wrap_content"
             android:text="@string/firstName"/>
 
-        <com.creditclub.ui.widget.EditText            android:id="@+id/accountReportItem_firstName_et"
+        <com.cluster.ui.widget.EditText
+                android:id="@+id/accountReportItem_firstName_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:enabled="false"
@@ -44,7 +46,8 @@
             android:layout_height="wrap_content"
             android:text="@string/phoneNo"/>
 
-        <com.creditclub.ui.widget.EditText            android:id="@+id/accountReportItem_phone_et"
+        <com.cluster.ui.widget.EditText
+                android:id="@+id/accountReportItem_phone_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:enabled="false"
@@ -55,7 +58,8 @@
             android:layout_height="wrap_content"
             android:text="@string/status"/>
 
-        <com.creditclub.ui.widget.EditText            android:id="@+id/accountReportItem_status_et"
+        <com.cluster.ui.widget.EditText
+                android:id="@+id/accountReportItem_status_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"

@@ -1,4 +1,4 @@
-package com.creditclub.pos.providers.sunmi.tuple;
+package com.cluster.pos.providers.sunmi.tuple;
 
 /**
  * 二元组

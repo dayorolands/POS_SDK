@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
 import com.appzonegroup.creditclub.pos.card.cardTransactionType
-import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.databinding.*
 import com.appzonegroup.creditclub.pos.extension.isSuccessful
 import com.appzonegroup.creditclub.pos.extension.responseMessage
@@ -17,12 +16,12 @@ import com.appzonegroup.creditclub.pos.extension.transactionAmount4
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
 import com.appzonegroup.creditclub.pos.printer.Receipt
 import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
-import com.creditclub.core.util.format
-import com.creditclub.pos.PosManager
-import com.creditclub.pos.card.AccountType
-import com.creditclub.pos.card.CardReaderEvent
-import com.creditclub.pos.card.TransactionType
-import com.creditclub.pos.printer.PrinterStatus
+import com.cluster.core.util.format
+import com.cluster.pos.PosManager
+import com.cluster.pos.card.AccountType
+import com.cluster.pos.card.CardReaderEvent
+import com.cluster.pos.card.TransactionType
+import com.cluster.pos.printer.PrinterStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

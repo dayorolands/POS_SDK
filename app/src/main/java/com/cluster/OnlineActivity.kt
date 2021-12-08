@@ -14,9 +14,9 @@ import com.cluster.network.online.APIHelper
 import com.cluster.utility.Misc
 import com.cluster.utility.online.ErrorMessages
 import com.cluster.utility.online.convertXmlToJson
-import com.creditclub.core.data.Encryption.decrypt
-import com.creditclub.core.data.Encryption.generateSessionId
-import com.creditclub.core.ui.CreditClubActivity
+import com.cluster.core.data.Encryption.decrypt
+import com.cluster.core.data.Encryption.generateSessionId
+import com.cluster.core.ui.CreditClubActivity
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import java.util.concurrent.TimeoutException
 

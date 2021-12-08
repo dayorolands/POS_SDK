@@ -2,8 +2,8 @@ package com.cluster.ui
 
 import com.cluster.R
 import com.cluster.databinding.ItemSurveyChoiceBinding
-import com.creditclub.core.ui.SimpleBindingAdapter
-import com.creditclub.core.ui.widget.DialogOptionItem
+import com.cluster.core.ui.SimpleBindingAdapter
+import com.cluster.core.ui.widget.DialogOptionItem
 
 
 /**

@@ -1,8 +1,8 @@
 package com.appzonegroup.creditclub.pos
 
 import com.appzonegroup.creditclub.pos.models.messaging.FinancialAdviceMessage
-import com.creditclub.pos.card.CardData
-import com.creditclub.pos.card.TransactionType
+import com.cluster.pos.card.CardData
+import com.cluster.pos.card.TransactionType
 
 class SalesCompleteActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.SalesComplete

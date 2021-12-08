@@ -33,10 +33,10 @@
 }
 -keep,includedescriptorclasses class kotlinx.serialization.json.**$$serializer { *; }
 
--keep,includedescriptorclasses class com.creditclub.analytics.**$$serializer { *; }
--keepclassmembers class com.creditclub.analytics.** {
+-keep,includedescriptorclasses class com.cluster.analytics.**$$serializer { *; }
+-keepclassmembers class com.cluster.analytics.** {
     *** Companion;
 }
--keepclasseswithmembers class com.creditclub.analytics.** {
+-keepclasseswithmembers class com.cluster.analytics.** {
     kotlinx.serialization.KSerializer serializer(...);
 }

@@ -3,12 +3,12 @@ package com.cluster
 import android.os.Bundle
 import com.cluster.databinding.ActivityChangePinBinding
 import com.cluster.utility.FunctionIds
-import com.creditclub.core.data.api.StaticService
-import com.creditclub.core.data.api.retrofitService
-import com.creditclub.core.data.request.PinChangeRequest
-import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.util.safeRunIO
-import com.creditclub.ui.dataBinding
+import com.cluster.core.data.api.StaticService
+import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.request.PinChangeRequest
+import com.cluster.core.ui.CreditClubActivity
+import com.cluster.core.util.safeRunIO
+import com.cluster.ui.dataBinding
 import kotlinx.coroutines.launch
 
 class ChangePinActivity : CreditClubActivity(R.layout.activity_change_pin) {

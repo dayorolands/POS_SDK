@@ -16,13 +16,13 @@ import com.cluster.databinding.DialogSurveyBinding
 import com.cluster.databinding.LayoutBooleanBinding
 import com.cluster.databinding.LayoutMultipleChoiceBinding
 import com.cluster.databinding.LayoutRatingBinding
-import com.creditclub.core.data.model.SurveyAnswer
-import com.creditclub.core.data.model.SurveyQuestion
-import com.creditclub.core.data.model.SurveyQuestionType
-import com.creditclub.core.ui.SimpleAdapter
-import com.creditclub.core.ui.widget.DialogListener
-import com.creditclub.core.ui.widget.DialogListenerBlock
-import com.creditclub.core.ui.widget.DialogOptionItem
+import com.cluster.core.data.model.SurveyAnswer
+import com.cluster.core.data.model.SurveyQuestion
+import com.cluster.core.data.model.SurveyQuestionType
+import com.cluster.core.ui.SimpleAdapter
+import com.cluster.core.ui.widget.DialogListener
+import com.cluster.core.ui.widget.DialogListenerBlock
+import com.cluster.core.ui.widget.DialogOptionItem
 
 
 class SurveyDialog private constructor(context: Context, questions: List<SurveyQuestion>) :

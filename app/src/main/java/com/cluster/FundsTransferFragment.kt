@@ -11,9 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.fragment.findNavController
 import com.cluster.ui.FundsTransfer
 import com.cluster.utility.FunctionIds
-import com.creditclub.Routes
-import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.ui.theme.CreditClubTheme
+import com.cluster.core.ui.CreditClubFragment
+import com.cluster.ui.theme.CreditClubTheme
 import com.google.accompanist.insets.ProvideWindowInsets
 
 class FundsTransferFragment : CreditClubFragment() {

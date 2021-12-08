@@ -23,8 +23,8 @@ import com.cluster.network.online.APIHelper;
 import com.cluster.utility.Misc;
 import com.cluster.utility.online.ErrorMessages;
 import com.cluster.utility.online.XmlToJson;
-import com.creditclub.core.data.Encryption;
-import com.creditclub.core.ui.CreditClubFragment;
+import com.cluster.core.data.Encryption;
+import com.cluster.core.ui.CreditClubFragment;
 
 import org.json.JSONObject;
 

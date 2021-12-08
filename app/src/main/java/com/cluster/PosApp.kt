@@ -11,9 +11,9 @@ import com.cluster.work.*
 import com.appzonegroup.creditclub.pos.Platform
 import com.appzonegroup.creditclub.pos.service.ConfigService
 import com.appzonegroup.creditclub.pos.util.SocketJob
-import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
-import com.creditclub.core.data.prefs.moveTo
-import com.creditclub.pos.work.CallHomeWorker
+import com.cluster.core.data.prefs.getEncryptedSharedPreferences
+import com.cluster.core.data.prefs.moveTo
+import com.cluster.pos.work.CallHomeWorker
 import okio.use
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.KeyStore

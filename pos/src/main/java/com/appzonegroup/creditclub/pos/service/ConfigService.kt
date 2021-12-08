@@ -3,10 +3,10 @@ package com.appzonegroup.creditclub.pos.service
 import android.content.Context
 import android.content.SharedPreferences
 import com.appzonegroup.creditclub.pos.util.AppConstants
-import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
-import com.creditclub.core.util.delegates.intStore
-import com.creditclub.core.util.delegates.valueStore
-import com.creditclub.pos.*
+import com.cluster.core.data.prefs.getEncryptedSharedPreferences
+import com.cluster.core.util.delegates.intStore
+import com.cluster.core.util.delegates.valueStore
+import com.cluster.pos.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.loadKoinModules

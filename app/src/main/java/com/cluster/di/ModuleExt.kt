@@ -1,10 +1,10 @@
 package com.cluster.di
 
-import com.creditclub.analytics.NetworkMetricsInterceptor
-import com.creditclub.core.data.HttpClientConfiguration
-import com.creditclub.core.data.api.AuthInterceptor
-import com.creditclub.core.data.api.RequestFailureInterceptor
-import com.creditclub.core.util.debugOnly
+import com.cluster.analytics.NetworkMetricsInterceptor
+import com.cluster.core.data.HttpClientConfiguration
+import com.cluster.core.data.api.AuthInterceptor
+import com.cluster.core.data.api.RequestFailureInterceptor
+import com.cluster.core.util.debugOnly
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

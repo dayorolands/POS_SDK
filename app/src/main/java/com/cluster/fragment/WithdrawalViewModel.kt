@@ -3,7 +3,7 @@ package com.cluster.fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.creditclub.core.data.model.AccountInfo
+import com.cluster.core.data.model.AccountInfo
 
 class WithdrawalViewModel : ViewModel() {
     val accountNumber = MutableLiveData<String>()

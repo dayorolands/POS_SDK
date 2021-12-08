@@ -15,7 +15,8 @@
         android:layout_gravity="left"
         android:text="@string/phoneNumber_hint"/>
 
-    <com.creditclub.ui.widget.EditText        android:id="@+id/ePhone"
+    <com.cluster.ui.widget.EditText
+            android:id="@+id/ePhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColorHint="@android:color/black"
@@ -41,7 +42,8 @@
         android:layout_gravity="left"
         android:text="@string/verification_code_hint"/>
 
-    <com.creditclub.ui.widget.EditText        android:layout_marginTop="@dimen/five_dp"
+    <com.cluster.ui.widget.EditText
+            android:layout_marginTop="@dimen/five_dp"
         android:id="@+id/eVerificationCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

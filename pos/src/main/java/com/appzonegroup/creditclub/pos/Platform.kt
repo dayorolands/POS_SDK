@@ -7,11 +7,11 @@ import com.appzonegroup.creditclub.pos.data.PosPreferences
 import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.service.ConfigService
-import com.creditclub.core.data.prefs.getEncryptedSharedPreferences
-import com.creditclub.core.util.readRawJsonFile
-import com.creditclub.pos.*
-import com.creditclub.pos.model.PosTenant
-import com.creditclub.pos.work.CallHomeWorker
+import com.cluster.core.data.prefs.getEncryptedSharedPreferences
+import com.cluster.core.util.readRawJsonFile
+import com.cluster.pos.*
+import com.cluster.pos.model.PosTenant
+import com.cluster.pos.work.CallHomeWorker
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.context.loadKoinModules
@@ -73,7 +73,7 @@ val posModule = module {
         )
     }
     single {
-        PosPreferences(androidContext().getEncryptedSharedPreferences("com.creditclub.pos.preferences"))
+        PosPreferences(androidContext().getEncryptedSharedPreferences("com.temp.creditclub.pos.preferences"))
     }
     worker { (workerParams: WorkerParameters) ->
         CallHomeWorker(

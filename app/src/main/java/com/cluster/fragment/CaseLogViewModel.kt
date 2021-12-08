@@ -2,7 +2,7 @@ package com.cluster.fragment
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.creditclub.core.data.model.CaseCategory
+import com.cluster.core.data.model.CaseCategory
 
 class CaseLogViewModel : ViewModel() {
     val subject = MutableLiveData<String>()

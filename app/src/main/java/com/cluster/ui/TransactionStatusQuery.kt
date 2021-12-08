@@ -17,8 +17,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.cluster.R
-import com.creditclub.ui.AppButton
-import com.creditclub.ui.Loading
 
 @Composable
 fun TransactionStatusQuery(

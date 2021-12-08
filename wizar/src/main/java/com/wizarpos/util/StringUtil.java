@@ -1,6 +1,6 @@
 package com.wizarpos.util;
 
-import com.creditclub.pos.extensions.StringExtensionsKt;
+import com.cluster.pos.extensions.StringExtensionsKt;
 
 public class StringUtil
 {

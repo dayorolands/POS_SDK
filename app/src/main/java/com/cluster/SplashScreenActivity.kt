@@ -8,8 +8,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.core.util.localStorage
+import com.cluster.core.ui.widget.DialogProvider
+import com.cluster.core.util.localStorage
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay

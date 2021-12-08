@@ -2,8 +2,8 @@ package com.appzonegroup.creditclub.pos
 
 import com.appzonegroup.creditclub.pos.card.cardIsoMsg
 import com.appzonegroup.creditclub.pos.models.messaging.AuthorizationRequest
-import com.creditclub.pos.card.CardData
-import com.creditclub.pos.card.TransactionType
+import com.cluster.pos.card.CardData
+import com.cluster.pos.card.TransactionType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

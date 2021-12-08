@@ -3,10 +3,10 @@ package com.cluster.fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.creditclub.core.data.model.CollectionCategory
-import com.creditclub.core.data.model.CollectionCustomer
-import com.creditclub.core.data.model.CollectionPaymentItem
-import com.creditclub.core.data.model.CollectionReference
+import com.cluster.core.data.model.CollectionCategory
+import com.cluster.core.data.model.CollectionCustomer
+import com.cluster.core.data.model.CollectionPaymentItem
+import com.cluster.core.data.model.CollectionReference
 
 class CollectionPaymentViewModel : ViewModel() {
     val retrievalReferenceNumber: MutableLiveData<String> = MutableLiveData()

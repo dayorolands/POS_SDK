@@ -1,9 +1,9 @@
 package com.cluster
 
 import com.appzonegroup.creditclub.pos.models.PosNotification
-import com.creditclub.core.util.delegates.service
-import com.creditclub.core.util.safeRunIO
-import com.creditclub.pos.api.PosApiService
+import com.cluster.core.util.delegates.service
+import com.cluster.core.util.safeRunIO
+import com.cluster.pos.api.PosApiService
 import org.junit.Test
 
 

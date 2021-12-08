@@ -1,10 +1,9 @@
 package com.appzonegroup.creditclub.pos
 
-import android.os.Bundle
 import com.appzonegroup.creditclub.pos.card.cardIsoMsg
 import com.appzonegroup.creditclub.pos.models.messaging.AuthorizationRequest
-import com.creditclub.pos.card.CardData
-import com.creditclub.pos.card.TransactionType
+import com.cluster.pos.card.CardData
+import com.cluster.pos.card.TransactionType
 
 class PreAuthActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.PreAuth

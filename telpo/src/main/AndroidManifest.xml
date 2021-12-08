@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.creditclub.pos.providers.telpo">
+    package="com.cluster.pos.providers.telpo">
 
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.TELPO_ICC " />
@@ -8,7 +8,7 @@
 
     <application>
         <provider
-            android:name=".TelpoPosManagerProvider"
+            android:name="com.cluster.pos.providers.telpo.TelpoPosManagerProvider"
             android:authorities="${applicationId}.TelpoPosManagerProvider"
             android:enabled="true"
             android:exported="false" />

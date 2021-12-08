@@ -1,8 +1,8 @@
 package com.appzonegroup.creditclub.pos.data
 
 import android.content.SharedPreferences
-import com.creditclub.core.util.delegates.jsonStore
-import com.creditclub.pos.model.BinRoutes
+import com.cluster.core.util.delegates.jsonStore
+import com.cluster.pos.model.BinRoutes
 import kotlinx.serialization.builtins.ListSerializer
 
 class PosPreferences(private val prefs: SharedPreferences) : SharedPreferences by prefs {

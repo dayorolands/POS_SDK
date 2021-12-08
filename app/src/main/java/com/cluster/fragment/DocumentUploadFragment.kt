@@ -8,11 +8,11 @@ import com.cluster.R
 import com.cluster.databinding.FragmentDocumentUploadBinding
 import com.cluster.fragment.online.registerImagePicker
 import com.cluster.ui.dataBinding
-import com.creditclub.core.model.CreditClubImage
-import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.debugOnly
-import com.creditclub.core.util.safeRunIO
-import com.creditclub.core.util.showInternalError
+import com.cluster.core.model.CreditClubImage
+import com.cluster.core.ui.CreditClubFragment
+import com.cluster.core.util.debugOnly
+import com.cluster.core.util.safeRunIO
+import com.cluster.core.util.showInternalError
 import com.esafirm.imagepicker.features.ImagePickerConfig
 import com.esafirm.imagepicker.features.ImagePickerMode
 import com.esafirm.imagepicker.features.ReturnMode

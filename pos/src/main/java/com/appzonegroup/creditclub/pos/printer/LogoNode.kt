@@ -1,9 +1,9 @@
 package com.appzonegroup.creditclub.pos.printer
 
 import com.appzonegroup.creditclub.pos.R
-import com.creditclub.pos.printer.Alignment
-import com.creditclub.pos.printer.ImageNode
-import com.creditclub.pos.printer.PrintJobScope
+import com.cluster.pos.printer.Alignment
+import com.cluster.pos.printer.ImageNode
+import com.cluster.pos.printer.PrintJobScope
 
 
 @Suppress("FunctionName")

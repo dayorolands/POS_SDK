@@ -7,7 +7,7 @@ import com.appzonegroup.creditclub.pos.databinding.ActivityReprintMenuBinding
 import com.appzonegroup.creditclub.pos.util.MenuPage
 import com.appzonegroup.creditclub.pos.util.MenuPages
 import com.appzonegroup.creditclub.pos.widget.Dialogs
-import com.creditclub.ui.dataBinding
+import com.cluster.ui.dataBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

@@ -11,11 +11,11 @@ import com.appzonegroup.creditclub.pos.extension.apnInfo
 import com.appzonegroup.creditclub.pos.service.CallHomeService
 import com.appzonegroup.creditclub.pos.util.AppConstants
 import com.appzonegroup.creditclub.pos.widget.Dialogs
-import com.creditclub.core.ui.widget.DialogOptionItem
-import com.creditclub.core.util.debugOnly
-import com.creditclub.pos.InvalidRemoteConnectionInfo
-import com.creditclub.pos.model.PosTenant
-import com.creditclub.ui.dataBinding
+import com.cluster.core.ui.widget.DialogOptionItem
+import com.cluster.core.util.debugOnly
+import com.cluster.pos.InvalidRemoteConnectionInfo
+import com.cluster.pos.model.PosTenant
+import com.cluster.ui.dataBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject

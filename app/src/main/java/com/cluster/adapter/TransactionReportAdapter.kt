@@ -6,13 +6,13 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.core.data.model.TransactionReport
-import com.creditclub.core.type.TransactionType
-import com.creditclub.core.ui.SimpleAdapter
-import com.creditclub.core.util.*
-import com.creditclub.ui.R
-import com.creditclub.ui.databinding.*
-import com.creditclub.ui.databinding.ItemReport1Binding as ItemReport1Binding1
+import com.cluster.core.data.model.TransactionReport
+import com.cluster.core.type.TransactionType
+import com.cluster.core.ui.SimpleAdapter
+import com.cluster.core.util.*
+import com.cluster.ui.R
+import com.cluster.ui.databinding.*
+import com.cluster.ui.databinding.ItemReport1Binding as ItemReport1Binding1
 
 
 /**

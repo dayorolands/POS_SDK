@@ -13,15 +13,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cluster.ui.ReceiptDetails
 import com.cluster.ui.TransactionSummary
-import com.creditclub.Routes
-import com.creditclub.core.data.model.AccountInfo
-import com.creditclub.core.data.model.AgentFee
-import com.creditclub.core.data.response.GenericResponse
-import com.creditclub.core.type.CustomerRequestOption
-import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.util.SuspendCallback
-import com.creditclub.pos.printer.PrintJob
-import com.creditclub.ui.theme.CreditClubTheme
+import com.cluster.core.data.model.AccountInfo
+import com.cluster.core.data.model.AgentFee
+import com.cluster.core.data.response.GenericResponse
+import com.cluster.core.type.CustomerRequestOption
+import com.cluster.core.ui.CreditClubActivity
+import com.cluster.core.util.SuspendCallback
+import com.cluster.pos.printer.PrintJob
+import com.cluster.ui.theme.CreditClubTheme
 import com.google.accompanist.insets.ProvideWindowInsets
 import java.util.*
 

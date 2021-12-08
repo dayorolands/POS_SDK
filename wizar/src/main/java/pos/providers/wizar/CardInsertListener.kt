@@ -2,7 +2,7 @@ package pos.providers.wizar
 
 import com.cloudpos.jniinterface.EMVJNIInterface
 import com.cloudpos.jniinterface.IFuntionListener
-import com.creditclub.pos.card.CardReaderEvent
+import com.cluster.pos.card.CardReaderEvent
 import com.wizarpos.emvsample.constant.EMVConstant.*
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume

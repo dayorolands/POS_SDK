@@ -9,14 +9,14 @@ import com.cluster.CustomerRequestOpenAccountActivity
 import com.cluster.R
 import com.cluster.databinding.FragmentCustomerRequestAccountInfoBinding
 import com.cluster.ui.dataBinding
-import com.creditclub.core.data.model.AccountInfo
-import com.creditclub.core.type.TokenType
-import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.isKotlinNPE
+import com.cluster.core.data.model.AccountInfo
+import com.cluster.core.type.TokenType
+import com.cluster.core.ui.CreditClubFragment
+import com.cluster.core.util.isKotlinNPE
 import com.cluster.requireAndValidateToken
-import com.creditclub.core.data.api.StaticService
-import com.creditclub.core.data.api.retrofitService
-import com.creditclub.core.util.safeRunIO
+import com.cluster.core.data.api.StaticService
+import com.cluster.core.data.api.retrofitService
+import com.cluster.core.util.safeRunIO
 import kotlinx.coroutines.launch
 
 class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_request_account_info) {

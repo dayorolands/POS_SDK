@@ -1,6 +1,6 @@
 package com.appzonegroup.creditclub.pos.util
 
-import com.creditclub.pos.RemoteConnectionInfo
+import com.cluster.pos.RemoteConnectionInfo
 import okio.*
 import java.io.Closeable
 import java.io.IOException

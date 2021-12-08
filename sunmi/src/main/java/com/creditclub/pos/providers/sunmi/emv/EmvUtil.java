@@ -1,7 +1,7 @@
-package com.creditclub.pos.providers.sunmi.emv;
+package com.cluster.pos.providers.sunmi.emv;
 
-import com.creditclub.pos.providers.sunmi.utils.ByteUtil;
-import com.creditclub.pos.providers.sunmi.utils.LogUtil;
+import com.cluster.pos.providers.sunmi.utils.ByteUtil;
+import com.cluster.pos.providers.sunmi.utils.LogUtil;
 import com.sunmi.pay.hardware.aidlv2.AidlConstantsV2;
 import com.sunmi.pay.hardware.aidlv2.bean.AidV2;
 import com.sunmi.pay.hardware.aidlv2.bean.CapkV2;

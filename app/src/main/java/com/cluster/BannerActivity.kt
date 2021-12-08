@@ -2,13 +2,12 @@ package com.cluster
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import coil.load
 import com.cluster.databinding.ActivityBannerBinding
 import com.cluster.databinding.ItemBannerImageBinding
-import com.creditclub.core.ui.SimpleBindingAdapter
-import com.creditclub.core.util.delegates.jsonStore
-import com.creditclub.core.util.safeRun
-import com.creditclub.ui.dataBinding
+import com.cluster.core.ui.SimpleBindingAdapter
+import com.cluster.core.util.delegates.jsonStore
+import com.cluster.core.util.safeRun
+import com.cluster.ui.dataBinding
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 

@@ -3,8 +3,8 @@ package com.cluster.fragment
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import com.cluster.R
-import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.pos.printer.ParcelablePrintJob
+import com.cluster.core.ui.CreditClubFragment
+import com.cluster.pos.printer.ParcelablePrintJob
 
 fun CreditClubFragment.navigateToReceipt(
     receipt: ParcelablePrintJob,

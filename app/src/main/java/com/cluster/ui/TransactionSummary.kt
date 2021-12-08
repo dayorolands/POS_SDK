@@ -16,17 +16,14 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.cluster.R
-import com.creditclub.core.data.model.AccountInfo
-import com.creditclub.core.data.model.AgentFee
-import com.creditclub.core.data.response.GenericResponse
-import com.creditclub.core.util.SuspendCallback
-import com.creditclub.core.util.getMessage
-import com.creditclub.core.util.safeRunIO
-import com.creditclub.core.util.toCurrencyFormat
-import com.creditclub.ui.AppButton
-import com.creditclub.ui.ErrorMessage
-import com.creditclub.ui.Loading
-import com.creditclub.ui.theme.CreditClubTheme
+import com.cluster.core.data.model.AccountInfo
+import com.cluster.core.data.model.AgentFee
+import com.cluster.core.data.response.GenericResponse
+import com.cluster.core.util.SuspendCallback
+import com.cluster.core.util.getMessage
+import com.cluster.core.util.safeRunIO
+import com.cluster.core.util.toCurrencyFormat
+import com.cluster.ui.theme.CreditClubTheme
 import com.google.accompanist.insets.ProvideWindowInsets
 import kotlinx.coroutines.launch
 

@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.navigation.fragment.findNavController
 import com.cluster.ui.ReceiptDetails
-import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.pos.printer.ParcelablePrintJob
-import com.creditclub.ui.theme.CreditClubTheme
+import com.cluster.core.ui.CreditClubFragment
+import com.cluster.pos.printer.ParcelablePrintJob
+import com.cluster.ui.theme.CreditClubTheme
 import com.google.accompanist.insets.ProvideWindowInsets
 
 class ReceiptFragment : CreditClubFragment() {

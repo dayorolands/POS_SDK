@@ -3,9 +3,9 @@ package com.appzonegroup.creditclub.pos.models
 import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.creditclub.core.data.InstantParceler
-import com.creditclub.core.serializer.TimeInstantSerializer
-import com.creditclub.pos.model.ConnectionInfo
+import com.cluster.core.data.InstantParceler
+import com.cluster.core.serializer.TimeInstantSerializer
+import com.cluster.pos.model.ConnectionInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.TypeParceler

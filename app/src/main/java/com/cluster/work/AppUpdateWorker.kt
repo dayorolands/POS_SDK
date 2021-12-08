@@ -9,12 +9,12 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.cluster.R
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.core.data.api.AppConfig
-import com.creditclub.core.data.api.VersionService
-import com.creditclub.core.data.prefs.AppDataStorage
-import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.ui.getLatestVersion
-import com.creditclub.core.util.packageInfo
+import com.cluster.core.data.api.AppConfig
+import com.cluster.core.data.api.VersionService
+import com.cluster.core.data.prefs.AppDataStorage
+import com.cluster.core.data.prefs.LocalStorage
+import com.cluster.core.ui.getLatestVersion
+import com.cluster.core.util.packageInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

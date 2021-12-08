@@ -51,7 +51,8 @@
                         android:layout_height="wrap_content"
                         android:hint="Field">
 
-                        <com.creditclub.ui.widget.EditText                            android:id="@+id/input"
+                        <com.cluster.ui.widget.EditText
+                                android:id="@+id/input"
                             style="@style/Widget.AppCompat.EditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

@@ -2,10 +2,10 @@ package com.appzonegroup.creditclub.pos.card
 
 import com.appzonegroup.creditclub.pos.data.PosDatabase
 import com.appzonegroup.creditclub.pos.models.PosNotification
-import com.creditclub.core.data.api.AppConfig
-import com.creditclub.core.util.safeRunIO
-import com.creditclub.pos.PosConfig
-import com.creditclub.pos.api.PosApiService
+import com.cluster.core.data.api.AppConfig
+import com.cluster.core.util.safeRunIO
+import com.cluster.pos.PosConfig
+import com.cluster.pos.api.PosApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

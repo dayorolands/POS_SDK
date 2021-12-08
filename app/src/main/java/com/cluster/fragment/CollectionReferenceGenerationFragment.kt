@@ -12,11 +12,11 @@ import androidx.navigation.navGraphViewModels
 import com.cluster.R
 import com.cluster.databinding.FragmentCollectionReferenceGenerationBinding
 import com.cluster.ui.dataBinding
-import com.creditclub.core.data.api.CollectionsService
-import com.creditclub.core.data.api.retrofitService
-import com.creditclub.core.data.request.CollectionReferenceGenerationRequest
-import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.safeRunIO
+import com.cluster.core.data.api.CollectionsService
+import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.request.CollectionReferenceGenerationRequest
+import com.cluster.core.ui.CreditClubFragment
+import com.cluster.core.util.safeRunIO
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.util.*

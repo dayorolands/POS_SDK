@@ -1,9 +1,8 @@
 package com.appzonegroup.creditclub.pos
 
-import android.os.Bundle
 import com.appzonegroup.creditclub.pos.models.messaging.FinancialMessage
-import com.creditclub.pos.card.CardData
-import com.creditclub.pos.card.TransactionType
+import com.cluster.pos.card.CardData
+import com.cluster.pos.card.TransactionType
 
 class RefundActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.Refund

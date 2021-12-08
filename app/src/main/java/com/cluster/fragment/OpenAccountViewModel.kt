@@ -2,8 +2,8 @@ package com.cluster.fragment
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.creditclub.core.data.model.Lga
-import com.creditclub.core.data.model.State
+import com.cluster.core.data.model.Lga
+import com.cluster.core.data.model.State
 
 class OpenAccountViewModel : ViewModel() {
     val passportString = MutableLiveData<String>()

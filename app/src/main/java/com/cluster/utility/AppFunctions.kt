@@ -1,8 +1,8 @@
 package com.cluster.utility
 
 import com.cluster.R
-import com.creditclub.core.AppFunction
-import com.creditclub.core.AppFunctions
+import com.cluster.core.AppFunction
+import com.cluster.core.AppFunctions
 
 
 /**

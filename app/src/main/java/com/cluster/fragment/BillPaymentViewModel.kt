@@ -3,10 +3,10 @@ package com.cluster.fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import com.creditclub.core.data.model.BillCategory
-import com.creditclub.core.data.model.BillPaymentItem
-import com.creditclub.core.data.model.Biller
-import com.creditclub.core.data.model.ValidateCustomerInfoResponse
+import com.cluster.core.data.model.BillCategory
+import com.cluster.core.data.model.BillPaymentItem
+import com.cluster.core.data.model.Biller
+import com.cluster.core.data.model.ValidateCustomerInfoResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map

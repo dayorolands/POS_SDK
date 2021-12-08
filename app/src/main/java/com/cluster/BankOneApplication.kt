@@ -16,11 +16,11 @@ import com.cluster.model.online.AuthResponse
 import com.cluster.utility.extensions.registerWorkers
 import com.cluster.utility.registerAppFunctions
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.core.R
-import com.creditclub.core.data.clusterObjectBoxModule
-import com.creditclub.core.data.prefs.AppDataStorage
-import com.creditclub.core.data.prefs.LocalStorage
-import com.creditclub.core.data.prefs.moveTo
+import com.cluster.core.R
+import com.cluster.core.data.clusterObjectBoxModule
+import com.cluster.core.data.prefs.AppDataStorage
+import com.cluster.core.data.prefs.LocalStorage
+import com.cluster.core.data.prefs.moveTo
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext

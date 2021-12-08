@@ -3,7 +3,7 @@ package com.cluster.utility;
 import android.content.Context;
 
 import com.cluster.model.TransactionCountType;
-import com.creditclub.core.util.ContextExtensionsKt;
+import com.cluster.core.util.ContextExtensionsKt;
 
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ public class Misc {
                                                          String sessionID) {
         ContextExtensionsKt.increaseTransactionMonitorCounter(
                 context,
-                com.creditclub.core.type.TransactionCountType.valueOf(transactionCountType.name()),
+                com.cluster.core.type.TransactionCountType.valueOf(transactionCountType.name()),
                 sessionID
         );
     }

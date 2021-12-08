@@ -3,9 +3,9 @@ package com.cluster.app
 import android.content.Context
 import com.cluster.BuildConfig
 import com.cluster.R
-import com.creditclub.core.config.*
-import com.creditclub.core.type.TransactionType
-import com.creditclub.core.util.localStorage
+import com.cluster.core.config.*
+import com.cluster.core.type.TransactionType
+import com.cluster.core.util.localStorage
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 17/10/2019.

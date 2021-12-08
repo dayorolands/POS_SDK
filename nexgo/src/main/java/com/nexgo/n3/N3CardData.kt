@@ -1,6 +1,6 @@
 package com.nexgo.n3
 
-import com.creditclub.pos.card.CardData
+import com.cluster.pos.card.CardData
 
 class N3CardData : CardData() {
     override var track2 = ""

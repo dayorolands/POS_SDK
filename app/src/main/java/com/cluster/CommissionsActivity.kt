@@ -1,10 +1,10 @@
 package com.cluster
 
 import android.os.Bundle
-import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.ui.dataBinding
-import com.creditclub.ui.databinding.ActivityCommissionsBinding
-import com.creditclub.ui.manager.ActivityCommissionsManager
+import com.cluster.core.ui.CreditClubActivity
+import com.cluster.ui.dataBinding
+import com.cluster.ui.databinding.ActivityCommissionsBinding
+import com.cluster.ui.manager.ActivityCommissionsManager
 
 class CommissionsActivity : CreditClubActivity(R.layout.activity_commissions) {
     private val binding: ActivityCommissionsBinding by dataBinding()

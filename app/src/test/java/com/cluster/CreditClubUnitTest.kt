@@ -1,6 +1,6 @@
 package com.cluster
 
-import com.creditclub.core.data.CreditClubMiddleWareAPI
+import com.cluster.core.data.CreditClubMiddleWareAPI
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -25,7 +25,7 @@ abstract class CreditClubUnitTest {
             .writeTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level =
-                    if (com.creditclub.core.BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+                    if (com.cluster.core.BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
             })
             .build()
     }

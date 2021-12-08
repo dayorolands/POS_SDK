@@ -1,6 +1,6 @@
 package com.appzonegroup.creditclub.pos.util
 
-import com.creditclub.core.util.format
+import com.cluster.core.util.format
 import java.time.Instant
 
 @JvmInline

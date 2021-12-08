@@ -16,11 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.appzonegroup.creditclub.pos.Platform
-import com.creditclub.pos.printer.*
-import com.creditclub.pos.rememberPosPrinter
-import com.creditclub.ui.AppButton
-import com.creditclub.ui.CreditClubAppBar
-import com.creditclub.ui.ErrorMessage
+import com.cluster.pos.printer.*
+import com.cluster.pos.rememberPosPrinter
 import kotlinx.coroutines.launch
 
 @Composable
@@ -62,9 +59,9 @@ fun ReceiptDetails(
                             fontWeight = if (node.isBold) FontWeight.Bold else null,
                             fontSize = (node.wordFont - 4).sp,
                             textAlign = when (node.align) {
-                                com.creditclub.pos.printer.Alignment.LEFT -> TextAlign.Start
-                                com.creditclub.pos.printer.Alignment.MIDDLE -> TextAlign.Center
-                                com.creditclub.pos.printer.Alignment.RIGHT -> TextAlign.End
+                                com.cluster.pos.printer.Alignment.LEFT -> TextAlign.Start
+                                com.cluster.pos.printer.Alignment.MIDDLE -> TextAlign.Center
+                                com.cluster.pos.printer.Alignment.RIGHT -> TextAlign.End
                             },
                         )
                     }
@@ -77,9 +74,9 @@ fun ReceiptDetails(
                                 .height(80.dp)
                                 .padding(bottom = node.walkPaperAfterPrint.dp),
                             alignment = when (node.align) {
-                                com.creditclub.pos.printer.Alignment.LEFT -> Alignment.BottomStart
-                                com.creditclub.pos.printer.Alignment.MIDDLE -> Alignment.BottomCenter
-                                com.creditclub.pos.printer.Alignment.RIGHT -> Alignment.BottomEnd
+                                com.cluster.pos.printer.Alignment.LEFT -> Alignment.BottomStart
+                                com.cluster.pos.printer.Alignment.MIDDLE -> Alignment.BottomCenter
+                                com.cluster.pos.printer.Alignment.RIGHT -> Alignment.BottomEnd
                             }
                         )
                     }

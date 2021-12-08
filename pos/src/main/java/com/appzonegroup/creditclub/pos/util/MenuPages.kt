@@ -8,10 +8,10 @@ import com.appzonegroup.creditclub.pos.extension.apnInfo
 import com.appzonegroup.creditclub.pos.extension.posParameter
 import com.appzonegroup.creditclub.pos.models.FinancialTransaction
 import com.appzonegroup.creditclub.pos.printer.Receipt
-import com.creditclub.core.ui.widget.DateInputParams
-import com.creditclub.core.ui.widget.TextFieldParams
-import com.creditclub.pos.printer.PrinterStatus
-import com.creditclub.pos.printer.printJob
+import com.cluster.core.ui.widget.DateInputParams
+import com.cluster.core.ui.widget.TextFieldParams
+import com.cluster.pos.printer.PrinterStatus
+import com.cluster.pos.printer.printJob
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

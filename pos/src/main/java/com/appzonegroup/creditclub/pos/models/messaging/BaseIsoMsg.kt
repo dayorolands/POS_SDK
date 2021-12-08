@@ -4,7 +4,7 @@ import com.appzonegroup.creditclub.pos.extension.generateStan
 import com.appzonegroup.creditclub.pos.extension.setTransactionTime
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.sha256String
-import com.creditclub.pos.extensions.hexBytes
+import com.cluster.pos.extensions.hexBytes
 import org.jpos.iso.ISOMsg
 import java.util.*
 

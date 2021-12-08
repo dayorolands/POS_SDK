@@ -2,8 +2,8 @@ package com.appzonegroup.creditclub.pos.receipt
 
 import android.content.Context
 import com.appzonegroup.creditclub.pos.R
-import com.creditclub.core.data.response.BackendResponse
-import com.creditclub.pos.printer.*
+import com.cluster.core.data.response.BackendResponse
+import com.cluster.pos.printer.*
 import java.util.*
 
 /**

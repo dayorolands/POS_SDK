@@ -3,9 +3,9 @@ package com.appzonegroup.creditclub.pos.card
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.util.ISO87Packager
 import com.appzonegroup.creditclub.pos.util.TransmissionDateParams
-import com.creditclub.pos.PosParameter
-import com.creditclub.pos.card.CardData
-import com.creditclub.pos.card.CardReaderEvent
+import com.cluster.pos.PosParameter
+import com.cluster.pos.card.CardData
+import com.cluster.pos.card.CardReaderEvent
 import org.jpos.iso.ISOMsg
 import java.security.SecureRandom
 

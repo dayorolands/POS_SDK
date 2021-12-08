@@ -13,13 +13,13 @@ import com.cluster.BuildConfig
 import com.cluster.R
 import com.cluster.databinding.FragmentCustomerRequestGeneralInfoBinding
 import com.cluster.ui.dataBinding
-import com.creditclub.core.data.api.StaticService
-import com.creditclub.core.data.api.retrofitService
-import com.creditclub.core.data.response.ApiResponse
-import com.creditclub.core.data.response.isSuccessful
-import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.ui.widget.DateInputParams
-import com.creditclub.core.util.*
+import com.cluster.core.data.api.StaticService
+import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.response.ApiResponse
+import com.cluster.core.data.response.isSuccessful
+import com.cluster.core.ui.CreditClubFragment
+import com.cluster.core.ui.widget.DateInputParams
+import com.cluster.core.util.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 

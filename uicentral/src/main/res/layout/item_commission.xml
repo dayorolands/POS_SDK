@@ -6,7 +6,7 @@
 
         <variable
             name="report"
-            type="com.creditclub.core.data.model.CommissionReport.Report" />
+            type="com.cluster.core.data.model.CommissionReport.Report" />
 
         <variable
             name="logDate"

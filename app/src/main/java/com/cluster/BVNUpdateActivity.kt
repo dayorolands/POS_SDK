@@ -14,14 +14,14 @@ import com.cluster.databinding.ActivityBvnupdateBinding
 import com.cluster.databinding.FragmentAuthorizationBinding
 import com.cluster.ui.dataBinding
 import com.cluster.utility.FunctionIds
-import com.creditclub.core.data.api.StaticService
-import com.creditclub.core.data.api.retrofitService
-import com.creditclub.core.data.request.BVNRequest
-import com.creditclub.core.type.TokenType
-import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.core.util.delegates.contentView
-import com.creditclub.core.util.isNetworkError
-import com.creditclub.core.util.safeRunIO
+import com.cluster.core.data.api.StaticService
+import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.request.BVNRequest
+import com.cluster.core.type.TokenType
+import com.cluster.core.ui.CreditClubFragment
+import com.cluster.core.util.delegates.contentView
+import com.cluster.core.util.isNetworkError
+import com.cluster.core.util.safeRunIO
 import kotlinx.coroutines.launch
 
 class BVNUpdateActivity : CustomerBaseActivity() {

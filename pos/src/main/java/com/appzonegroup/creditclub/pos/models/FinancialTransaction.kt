@@ -6,8 +6,8 @@ import com.appzonegroup.creditclub.pos.card.CardIsoMsg
 import com.appzonegroup.creditclub.pos.card.cardTransactionType
 import com.appzonegroup.creditclub.pos.extension.*
 import com.appzonegroup.creditclub.pos.util.hexString
-import com.creditclub.core.util.mask
-import com.creditclub.pos.model.ConnectionInfo
+import com.cluster.core.util.mask
+import com.cluster.pos.model.ConnectionInfo
 import org.jpos.iso.ISOMsg
 import java.time.Instant
 

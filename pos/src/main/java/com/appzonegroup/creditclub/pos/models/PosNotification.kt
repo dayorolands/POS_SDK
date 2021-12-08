@@ -1,8 +1,8 @@
 package com.appzonegroup.creditclub.pos.models
 
 import androidx.room.*
-import com.creditclub.core.util.format
-import com.creditclub.pos.model.ConnectionInfo
+import com.cluster.core.util.format
+import com.cluster.pos.model.ConnectionInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Required
 import kotlinx.serialization.SerialName

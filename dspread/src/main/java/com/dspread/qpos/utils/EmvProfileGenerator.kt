@@ -1,8 +1,8 @@
 package com.dspread.qpos.utils
 
 import android.util.Xml
-import com.creditclub.pos.PosParameter
-import com.creditclub.pos.extensions.*
+import com.cluster.pos.PosParameter
+import com.cluster.pos.extensions.*
 import org.json.JSONObject
 import org.xmlpull.v1.XmlSerializer
 

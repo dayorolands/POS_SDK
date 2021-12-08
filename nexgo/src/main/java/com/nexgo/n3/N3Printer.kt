@@ -3,8 +3,8 @@ package com.nexgo.n3
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
-import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.pos.printer.*
+import com.cluster.core.ui.widget.DialogProvider
+import com.cluster.pos.printer.*
 import com.nexgo.oaf.apiv3.APIProxy
 import com.nexgo.oaf.apiv3.SdkResult
 import com.nexgo.oaf.apiv3.device.printer.*

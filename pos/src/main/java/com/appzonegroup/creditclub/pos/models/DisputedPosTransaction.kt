@@ -1,6 +1,6 @@
 package com.appzonegroup.creditclub.pos.models
 
-import com.creditclub.core.serializer.TimeInstantSerializer
+import com.cluster.core.serializer.TimeInstantSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.text.NumberFormat

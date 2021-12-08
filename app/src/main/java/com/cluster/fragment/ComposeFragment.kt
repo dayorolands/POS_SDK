@@ -10,10 +10,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.fragment.findNavController
 import com.cluster.clusterNavigation
-import com.creditclub.Routes
-import com.creditclub.core.ui.CreditClubFragment
-import com.creditclub.ui.theme.CreditClubTheme
-import com.creditclub.viewmodel.AppViewModel
+import com.cluster.Routes
+import com.cluster.core.ui.CreditClubFragment
+import com.cluster.ui.theme.CreditClubTheme
+import com.cluster.viewmodel.AppViewModel
 import com.google.accompanist.insets.ProvideWindowInsets
 
 class ComposeFragment : CreditClubFragment() {
