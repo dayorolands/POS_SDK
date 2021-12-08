@@ -1,1 +1,5 @@
--keep public class com.cloudpos.jniinterface.* { public * ; }
+-keep class com.cloudpos.** { *; }
+-keepclassmembers class com.cloudpos.** { *; }
+
+-keep class com.wizarpos.** { *; }
+-keepclassmembers class com.wizarpos.** { *; }
