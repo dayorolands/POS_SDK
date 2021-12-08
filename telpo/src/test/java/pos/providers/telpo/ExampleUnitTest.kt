@@ -1,4 +1,4 @@
-package com.cluster.pos.providers.telpo
+package pos.providers.telpo
 
 import org.junit.Test
 

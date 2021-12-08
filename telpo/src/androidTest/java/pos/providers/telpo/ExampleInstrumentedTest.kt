@@ -1,4 +1,4 @@
-package com.cluster.pos.providers.telpo
+package pos.providers.telpo
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

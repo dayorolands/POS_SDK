@@ -1,4 +1,4 @@
-package com.cluster.pos.providers.telpo
+package pos.providers.telpo
 
 import com.cluster.pos.PosManagerCompanion
 import com.cluster.pos.PosManagerProvider

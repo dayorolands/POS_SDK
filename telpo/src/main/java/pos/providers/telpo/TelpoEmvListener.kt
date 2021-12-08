@@ -1,4 +1,4 @@
-package com.cluster.pos.providers.telpo
+package pos.providers.telpo
 
 import android.app.KeyguardManager
 import android.content.Context
