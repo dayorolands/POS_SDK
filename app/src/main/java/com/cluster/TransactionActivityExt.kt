@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
 import com.cluster.databinding.TransactionStatusFragmentBinding
-import com.appzonegroup.creditclub.pos.Platform
+import com.cluster.pos.Platform
 import com.cluster.activity.ReceiptActivity
 import com.cluster.core.data.model.PendingTransaction
 import com.cluster.core.data.response.BackendResponse

@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.appzonegroup.creditclub.pos.Platform
+import com.cluster.pos.Platform
 import com.cluster.pos.printer.*
 import com.cluster.pos.rememberPosPrinter
 import kotlinx.coroutines.launch

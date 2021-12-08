@@ -1,6 +1,6 @@
 package com.cluster.pos.api
 
-import com.appzonegroup.creditclub.pos.models.DisputedPosTransaction
+import com.cluster.pos.models.DisputedPosTransaction
 import com.cluster.core.data.response.ApiResponse
 import retrofit2.http.Body
 import retrofit2.http.POST

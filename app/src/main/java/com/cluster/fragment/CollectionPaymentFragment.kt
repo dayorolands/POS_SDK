@@ -15,7 +15,7 @@ import com.cluster.databinding.CollectionPaymentFragmentBinding
 import com.cluster.receipt.collectionPaymentReceipt
 import com.cluster.ui.dataBinding
 import com.cluster.utility.FunctionIds
-import com.appzonegroup.creditclub.pos.Platform
+import com.cluster.pos.Platform
 import com.cluster.core.data.api.CollectionsService
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.prefs.newTransactionReference

@@ -3,9 +3,9 @@ package com.cluster.pos.work
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.appzonegroup.creditclub.pos.extension.isSuccessful
-import com.appzonegroup.creditclub.pos.extension.processingCode3
-import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
+import com.cluster.pos.extension.isSuccessful
+import com.cluster.pos.extension.processingCode3
+import com.cluster.pos.helpers.IsoSocketHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jpos.iso.ISOMsg

@@ -13,10 +13,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.appzonegroup.creditclub.pos.R
-import com.appzonegroup.creditclub.pos.models.DisputedPosTransaction
-import com.appzonegroup.creditclub.pos.models.PosTransaction
-import com.appzonegroup.creditclub.pos.models.from
+import com.cluster.pos.R
+import com.cluster.pos.models.DisputedPosTransaction
+import com.cluster.pos.models.PosTransaction
+import com.cluster.pos.models.from
 import com.cluster.core.data.model.Bank
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.includesSpecialCharacters

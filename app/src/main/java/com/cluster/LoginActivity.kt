@@ -11,11 +11,11 @@ import coil.Coil
 import coil.request.ImageRequest
 import com.cluster.databinding.ActivityLoginBinding
 import com.cluster.ui.SurveyDialog
-import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.data.PosDatabase
-import com.appzonegroup.creditclub.pos.data.PosPreferences
-import com.appzonegroup.creditclub.pos.extension.posConfig
-import com.appzonegroup.creditclub.pos.extension.posParameter
+import com.cluster.pos.Platform
+import com.cluster.pos.data.PosDatabase
+import com.cluster.pos.data.PosPreferences
+import com.cluster.pos.extension.posConfig
+import com.cluster.pos.extension.posParameter
 import com.cluster.core.data.TRANSACTIONS_CLIENT
 import com.cluster.core.data.api.AppConfig
 import com.cluster.core.data.api.StaticService

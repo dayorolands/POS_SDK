@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
 
-        <import type="com.appzonegroup.creditclub.pos.widget.EditText" />
+        <import type="com.cluster.pos.widget.EditText" />
 
         <variable
             name="hint"
@@ -57,7 +57,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
                 android:hint="@{hint, default=FIELD}">
 
-                <com.appzonegroup.creditclub.pos.widget.EditText
+                <com.cluster.pos.widget.EditText
                     android:id="@+id/input"
                     android:layout_width="match_parent"
                     android:text="@{text}"

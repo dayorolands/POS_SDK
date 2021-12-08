@@ -18,8 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
-import com.appzonegroup.creditclub.pos.data.PosDatabase
-import com.appzonegroup.creditclub.pos.models.PosTransaction
+import com.cluster.pos.data.PosDatabase
+import com.cluster.pos.models.PosTransaction
 import com.cluster.core.model.IntValueType
 import com.cluster.core.util.format
 import com.cluster.core.util.setResult

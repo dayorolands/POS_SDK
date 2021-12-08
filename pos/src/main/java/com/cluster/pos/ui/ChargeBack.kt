@@ -17,8 +17,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
-import com.appzonegroup.creditclub.pos.R
-import com.appzonegroup.creditclub.pos.models.DisputedPosTransaction
+import com.cluster.pos.R
+import com.cluster.pos.models.DisputedPosTransaction
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.model.IntValueType
 import com.cluster.core.ui.widget.DialogProvider

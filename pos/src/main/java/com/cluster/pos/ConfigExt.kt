@@ -1,8 +1,7 @@
 package com.cluster.pos
 
 import android.content.Context
-import com.appzonegroup.creditclub.pos.R
-import com.appzonegroup.creditclub.pos.service.ParameterService
+import com.cluster.pos.service.ParameterService
 import com.cluster.core.util.readRawFileText
 import org.json.JSONArray
 

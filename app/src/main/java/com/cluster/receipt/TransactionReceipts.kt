@@ -6,8 +6,8 @@ package com.cluster.receipt
 import android.content.Context
 import com.cluster.BuildConfig
 import com.cluster.R
-import com.appzonegroup.creditclub.pos.printer.logo
-import com.appzonegroup.creditclub.pos.receipt.transactionStatus
+import com.cluster.pos.printer.logo
+import com.cluster.pos.receipt.transactionStatus
 import com.cluster.core.data.model.AccountInfo
 import com.cluster.core.data.model.PayBillRequest
 import com.cluster.core.data.model.PayBillResponse

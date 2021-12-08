@@ -8,7 +8,7 @@ import com.cluster.R
 import com.cluster.app.LocalInstitutionConfig
 import com.cluster.ui.CreditClubDialogProvider
 import com.cluster.work.*
-import com.appzonegroup.creditclub.pos.Platform
+import com.cluster.pos.Platform
 import com.cluster.analytics.NetworkMetricsInterceptor
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.*

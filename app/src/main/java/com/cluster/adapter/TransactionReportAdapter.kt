@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import com.appzonegroup.creditclub.pos.Platform
+import com.cluster.pos.Platform
 import com.cluster.core.data.model.TransactionReport
 import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.SimpleAdapter

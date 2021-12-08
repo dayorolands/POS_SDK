@@ -8,7 +8,7 @@ import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.cluster.R
-import com.appzonegroup.creditclub.pos.Platform
+import com.cluster.pos.Platform
 import com.cluster.core.data.api.AppConfig
 import com.cluster.core.data.api.VersionService
 import com.cluster.core.data.prefs.AppDataStorage

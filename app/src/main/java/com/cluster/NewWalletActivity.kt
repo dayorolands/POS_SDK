@@ -15,7 +15,7 @@ import com.cluster.receipt.newAccountReceipt
 import com.cluster.ui.dataBinding
 import com.cluster.utility.FunctionIds
 import com.cluster.utility.Misc
-import com.appzonegroup.creditclub.pos.Platform
+import com.cluster.pos.Platform
 import com.cluster.core.data.api.StaticService
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.request.CustomerRequest

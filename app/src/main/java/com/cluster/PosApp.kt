@@ -8,9 +8,9 @@ import androidx.work.NetworkType
 import androidx.work.WorkManager
 import com.cluster.utility.extensions.registerPeriodicWorker
 import com.cluster.work.*
-import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.service.ConfigService
-import com.appzonegroup.creditclub.pos.util.SocketJob
+import com.cluster.pos.Platform
+import com.cluster.pos.service.ConfigService
+import com.cluster.pos.util.SocketJob
 import com.cluster.core.data.prefs.getEncryptedSharedPreferences
 import com.cluster.core.data.prefs.moveTo
 import com.cluster.pos.work.CallHomeWorker

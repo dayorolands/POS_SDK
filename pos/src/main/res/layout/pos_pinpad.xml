@@ -10,7 +10,7 @@
 
         <variable
             name="pinChangeHandler"
-            type="com.appzonegroup.creditclub.pos.widget.Dialogs.PinChangeHandler" />
+            type="com.cluster.pos.widget.Dialogs.PinChangeHandler" />
     </data>
 
     <androidx.cardview.widget.CardView

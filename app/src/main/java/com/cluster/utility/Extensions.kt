@@ -9,7 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.cluster.*
 import com.cluster.R
-import com.appzonegroup.creditclub.pos.Platform
+import com.cluster.pos.Platform
 import com.cluster.core.data.CoreDatabase
 import com.cluster.core.data.api.StaticService
 import com.cluster.core.data.api.retrofitService

@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.cluster.pos.data.PosDatabase
 import com.cluster.core.data.CreditClubMiddleWareAPI
 import com.cluster.core.data.api.AppConfig
 import com.cluster.core.data.prefs.LocalStorage

@@ -15,7 +15,7 @@ import androidx.core.app.ActivityCompat
 import com.cluster.R
 import com.cluster.databinding.ActivityUpdateBinding
 import com.cluster.ui.dataBinding
-import com.appzonegroup.creditclub.pos.Platform
+import com.cluster.pos.Platform
 import com.cluster.core.data.api.VersionService
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.prefs.AppDataStorage

@@ -3,8 +3,8 @@ package com.cluster.work
 import android.content.Context
 import android.os.Bundle
 import androidx.work.WorkerParameters
-import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.cluster.pos.Platform
+import com.cluster.pos.data.PosDatabase
 import com.cluster.core.data.CreditClubMiddleWareAPI
 import com.cluster.core.data.MIDDLEWARE_CLIENT
 import com.cluster.core.data.api.AppConfig

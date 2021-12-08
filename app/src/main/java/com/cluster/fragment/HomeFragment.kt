@@ -42,7 +42,7 @@ import com.cluster.R
 import com.cluster.clusterNavigation
 import com.cluster.utility.logout
 import com.cluster.utility.openPageById
-import com.appzonegroup.creditclub.pos.Platform
+import com.cluster.pos.Platform
 import com.cluster.Routes
 import com.cluster.activity.UpdateActivity
 import com.cluster.components.*

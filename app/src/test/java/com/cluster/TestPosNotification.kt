@@ -1,6 +1,6 @@
 package com.cluster
 
-import com.appzonegroup.creditclub.pos.models.PosNotification
+import com.cluster.pos.models.PosNotification
 import com.cluster.core.util.delegates.service
 import com.cluster.core.util.safeRunIO
 import com.cluster.pos.api.PosApiService

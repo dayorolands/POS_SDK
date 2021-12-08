@@ -3,10 +3,10 @@ package com.cluster.work
 import android.content.Context
 import android.os.Bundle
 import androidx.work.WorkerParameters
-import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.data.PosDatabase
-import com.appzonegroup.creditclub.pos.extension.responseCode39
-import com.appzonegroup.creditclub.pos.helpers.IsoSocketHelper
+import com.cluster.pos.Platform
+import com.cluster.pos.data.PosDatabase
+import com.cluster.pos.extension.responseCode39
+import com.cluster.pos.helpers.IsoSocketHelper
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.pos.PosConfig
 import com.cluster.pos.PosParameter

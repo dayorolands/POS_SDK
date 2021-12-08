@@ -1,8 +1,8 @@
 package com.cluster.pos.api
 
-import com.appzonegroup.creditclub.pos.models.IsoRequestLog
-import com.appzonegroup.creditclub.pos.models.PosNotification
-import com.appzonegroup.creditclub.pos.models.PosTransaction
+import com.cluster.pos.models.IsoRequestLog
+import com.cluster.pos.models.PosNotification
+import com.cluster.pos.models.PosTransaction
 import com.cluster.core.data.response.ApiResponse
 import com.cluster.core.data.response.PosNotificationResponse
 import com.cluster.core.data.response.RequestStatus

@@ -14,9 +14,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
-import com.appzonegroup.creditclub.pos.R
-import com.appzonegroup.creditclub.pos.models.DisputedPosTransaction
-import com.appzonegroup.creditclub.pos.util.CurrencyFormatter
+import com.cluster.pos.R
+import com.cluster.pos.models.DisputedPosTransaction
+import com.cluster.pos.util.CurrencyFormatter
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.format

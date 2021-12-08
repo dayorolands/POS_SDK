@@ -15,7 +15,7 @@ import com.cluster.di.*
 import com.cluster.model.online.AuthResponse
 import com.cluster.utility.extensions.registerWorkers
 import com.cluster.utility.registerAppFunctions
-import com.appzonegroup.creditclub.pos.Platform
+import com.cluster.pos.Platform
 import com.cluster.core.R
 import com.cluster.core.data.clusterObjectBoxModule
 import com.cluster.core.data.prefs.AppDataStorage

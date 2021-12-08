@@ -7,11 +7,11 @@ import android.text.InputType
 import android.view.View
 import com.cluster.databinding.ActivityAgentActivationBinding
 import com.cluster.utility.logout
-import com.appzonegroup.creditclub.pos.Platform
-import com.appzonegroup.creditclub.pos.TerminalOptionsActivity
-import com.appzonegroup.creditclub.pos.extension.posConfig
-import com.appzonegroup.creditclub.pos.extension.posParameter
-import com.appzonegroup.creditclub.pos.extension.getPosSerialNumber
+import com.cluster.pos.Platform
+import com.cluster.pos.TerminalOptionsActivity
+import com.cluster.pos.extension.posConfig
+import com.cluster.pos.extension.posParameter
+import com.cluster.pos.extension.getPosSerialNumber
 import com.cluster.core.data.api.StaticService
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.model.AuthResponse
@@ -296,7 +296,7 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
     private inline fun adminAction(crossinline next: () -> Unit) {
         val passwordType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
 
-        com.appzonegroup.creditclub.pos.widget.Dialogs.input(
+        com.cluster.pos.widget.Dialogs.input(
             this,
             "Administrator password",
             passwordType

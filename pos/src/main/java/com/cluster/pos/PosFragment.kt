@@ -1,7 +1,7 @@
 package com.cluster.pos
 
 import android.os.Bundle
-import com.appzonegroup.creditclub.pos.data.PosDatabase
+import com.cluster.pos.data.PosDatabase
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.pos.printer.PosPrinter
 import com.google.firebase.analytics.FirebaseAnalytics

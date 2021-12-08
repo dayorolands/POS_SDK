@@ -23,7 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.cluster.*
 import com.cluster.R
-import com.appzonegroup.creditclub.pos.Platform
+import com.cluster.pos.Platform
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.activity.UpdateActivity

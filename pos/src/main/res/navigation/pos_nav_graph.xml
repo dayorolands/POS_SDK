@@ -15,7 +15,7 @@
 
     <fragment
         android:id="@+id/cardMenuFragment"
-        android:name="com.appzonegroup.creditclub.pos.PosMenuFragment"
+        android:name="com.cluster.pos.PosMenuFragment"
         android:label="CardMenu"
         tools:layout="@layout/pos_menu_fragment">
 
