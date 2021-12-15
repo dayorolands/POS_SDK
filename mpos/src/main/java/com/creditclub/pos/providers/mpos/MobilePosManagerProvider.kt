@@ -56,7 +56,7 @@ class MobilePosManagerProvider : ContentProvider() {
         if (providerInfo == null) {
             throw NullPointerException("MobilePosManagerProvider ProviderInfo cannot be null.")
         }
-        val packageName = "com.temp.creditclub.pos.providers.mpos"
+        val packageName = "com.cluster.pos.providers.mpos"
         // So if the authorities equal the library internal ones, the developer forgot to set his applicationId
         check("$packageName.MobilePosManagerProvider" != providerInfo.authority) {
             ("Incorrect provider authority in manifest. Most likely due to a "

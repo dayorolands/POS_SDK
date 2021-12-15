@@ -73,7 +73,7 @@ val posModule = module {
         )
     }
     single {
-        PosPreferences(androidContext().getEncryptedSharedPreferences("com.temp.creditclub.pos.preferences"))
+        PosPreferences(androidContext().getEncryptedSharedPreferences("pos_preferences_0"))
     }
     worker { (workerParams: WorkerParameters) ->
         CallHomeWorker(
