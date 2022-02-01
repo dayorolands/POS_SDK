@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Grooming Agents</string>
     <string name="funds_transfer_same_bank">Grooming MFB</string>
+    <string name="ota_app_name">Grooming</string>
+    <string name="institution_name">Grooming MFB</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>
