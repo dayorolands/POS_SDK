@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <bool name="online_functions_enabled">false</bool>
+    <bool name="online_functions_enabled">true</bool>
     <bool name="hla_enabled">false</bool>
     <string-array name="customer_request_options">
         <item>1,Phone Number</item>

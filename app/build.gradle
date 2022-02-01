@@ -186,6 +186,7 @@ dependencies {
     polarisImplementation(project(":telpo"))
     accessImplementation(project(":telpo"))
     gtbankImplementation(project(":dspread"))
+    purpleImplementation(project(":telpo"))
     purpleImplementation(project(":nexgo"))
     purpleImplementation(project(":dspread"))
     groomingImplementation(project(":telpo"))
