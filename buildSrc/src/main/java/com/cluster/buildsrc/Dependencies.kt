@@ -9,16 +9,12 @@ object Versions {
     const val activityKtx = "1.4.0"
     const val appcompat = "1.4.0"
     const val coil = "1.4.0"
-    const val constraintLayout = "2.1.1"
+    const val constraintLayout = "2.1.2"
     const val coreKtx = "1.7.0"
     const val coroutines = "1.5.2"
     const val compose = "1.0.5"
     const val desugarJdk = "1.1.5"
-    const val espresso = "3.3.0"
-    const val extJunit = "1.1.0"
-    const val fragmentKtx = "1.3.2"
     const val googleServices = "4.3.3"
-    const val junit = "4.12"
     const val koin = "3.1.2"
     const val kotlin = "1.5.31"
     const val lifecycle = "2.4.0"
@@ -33,7 +29,7 @@ object Versions {
 }
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.3"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.4"
 
     object Accompanist {
         const val version = "0.21.2-beta"

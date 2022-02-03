@@ -15,11 +15,7 @@ buildscript {
         "coroutines": Versions.coroutines,
         "compose": Versions.compose,
         "desugarJdk": Versions.desugarJdk,
-        "espresso": Versions.espresso,
-        "extJunit": Versions.extJunit,
-        "fragmentKtx": Versions.fragmentKtx,
         "googleServices": Versions.googleServices,
-        "junit": Versions.junit,
         "koin": Versions.koin,
         "kotlin": Versions.kotlin,
         "lifecycle": Versions.lifecycle,
@@ -44,7 +40,7 @@ buildscript {
         classpath(Libs.Kotlin.gradlePlugin)
         classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
         classpath("com.google.gms:google-services:${Versions.googleServices}")
-        classpath("com.google.firebase:firebase-crashlytics-gradle:2.8.0")
+        classpath("com.google.firebase:firebase-crashlytics-gradle:2.8.1")
 //        classpath("com.google.firebase:perf-plugin:1.4.0")
         classpath("io.objectbox:objectbox-gradle-plugin:${Versions.objectBox}")
         // NOTE: Do not place your application dependencies here; they belong
