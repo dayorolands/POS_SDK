@@ -111,7 +111,7 @@ fun PinChange(navController: NavController) {
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                     OutlinedTextField(
                         value = oldPin,
-                        onValueChange = { oldPin = it },
+                        onValueChange = { if (it.length <= 4) oldPin = it },
                         label = { Text(text = "Old PIN") },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -122,7 +122,7 @@ fun PinChange(navController: NavController) {
                     )
                     OutlinedTextField(
                         value = newPin,
-                        onValueChange = { newPin = it },
+                        onValueChange = { if (it.length <= 4) newPin = it },
                         label = { Text(text = "New PIN") },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -133,7 +133,7 @@ fun PinChange(navController: NavController) {
                     )
                     OutlinedTextField(
                         value = confirmNewPin,
-                        onValueChange = { confirmNewPin = it },
+                        onValueChange = { if (it.length <= 4) confirmNewPin = it },
                         label = { Text(text = "Confirm New PIN") },
                         modifier = Modifier
                             .fillMaxWidth()
