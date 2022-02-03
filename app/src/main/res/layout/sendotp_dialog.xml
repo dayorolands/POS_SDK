@@ -66,7 +66,7 @@
         android:orientation="horizontal"
         android:gravity="center">
 
-        <com.appzonegroup.app.fasttrack.ui.CustomButton
+        <com.cluster.ui.CustomButton
             android:id="@+id/sendingotp_ok_btn"
             android:layout_width="80dp"
             android:layout_height="30dp"
@@ -75,7 +75,7 @@
             android:foregroundGravity="right"
             android:layout_gravity="center_horizontal" />
 
-        <com.appzonegroup.app.fasttrack.ui.CustomButton
+        <com.cluster.ui.CustomButton
             android:id="@+id/sendingotp_retry_btn"
             android:layout_width="80dp"
             android:layout_height="30dp"

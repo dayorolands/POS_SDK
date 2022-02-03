@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.appzonegroup.app.fasttrack.fragment.OpenAccountViewModel" />
+            type="com.cluster.fragment.OpenAccountViewModel" />
     </data>
 
     <ScrollView
@@ -55,7 +55,7 @@
                     android:text="@={viewModel.agentPIN}" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.appzonegroup.app.fasttrack.ui.CustomButton
+            <com.cluster.ui.CustomButton
                 android:id="@+id/account_info_next_btn"
                 style="@style/button_style"
                 android:layout_width="match_parent"

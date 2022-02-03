@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.appzonegroup.app.fasttrack.fragment.OpenAccountViewModel" />
+            type="com.cluster.fragment.OpenAccountViewModel" />
     </data>
 
     <ScrollView

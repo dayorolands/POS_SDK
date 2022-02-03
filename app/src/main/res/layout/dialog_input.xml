@@ -3,7 +3,7 @@
 
     <data>
 
-        <import type="com.appzonegroup.app.fasttrack.ui.EditText" />
+        <import type="com.cluster.ui.EditText" />
 
         <variable
             name="hint"

@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:clickable="false" />
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <com.cluster.ui.EditText
         android:id="@+id/amount_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
         android:layout_marginBottom="@dimen/ten_dp"/>
 
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <com.cluster.ui.EditText
         android:id="@+id/customer_phone_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
         android:layout_marginBottom="@dimen/ten_dp"/>
 
 
-    <com.appzonegroup.app.fasttrack.ui.EditText
+    <com.cluster.ui.EditText
         android:id="@+id/customer_otp_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

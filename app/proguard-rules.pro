@@ -103,8 +103,8 @@
 # OkHttp platform used only on JVM and when Conscrypt dependency is available.
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
 
--keep class com.appzonegroup.creditclub.pos.models.PosNotification { *; }
--keep class com.appzonegroup.app.fasttrack.model.** { *; }
+-keep class com.cluster.pos.models.PosNotification { *; }
+-keep class com.cluster.model.** { *; }
 
 # Kotlin Serializaion
 -keepattributes *Annotation*, InnerClasses
@@ -118,11 +118,11 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
--keep,includedescriptorclasses class com.appzonegroup.app.fasttrack.model.**$$serializer { *; }
--keepclassmembers class com.appzonegroup.app.fasttrack.model.** {
+-keep,includedescriptorclasses class com.cluster.model.**$$serializer { *; }
+-keepclassmembers class com.cluster.model.** {
     *** Companion;
 }
--keepclasseswithmembers class com.appzonegroup.app.fasttrack.model.** {
+-keepclasseswithmembers class com.cluster.model.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
@@ -186,11 +186,11 @@
 }
 -keep,includedescriptorclasses class kotlinx.serialization.json.**$$serializer { *; }
 
--keep,includedescriptorclasses class com.creditclub.core.**$$serializer { *; }
--keepclassmembers class com.creditclub.core.** {
+-keep,includedescriptorclasses class com.cluster.core.**$$serializer { *; }
+-keepclassmembers class com.cluster.core.** {
     *** Companion;
 }
--keepclasseswithmembers class com.creditclub.core.** {
+-keepclasseswithmembers class com.cluster.core.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 

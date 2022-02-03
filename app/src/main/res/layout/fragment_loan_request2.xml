@@ -19,7 +19,7 @@
             android:layout_marginBottom="@dimen/fifteen_dp"/>
 
 
-        <com.appzonegroup.app.fasttrack.ui.EditText
+        <com.cluster.ui.EditText
             android:id="@+id/agent_pin_et"
             android:layout_width="match_parent"
             style="@style/defaultEditText"
@@ -29,7 +29,7 @@
             android:inputType="numberPassword"
             android:layout_marginBottom="@dimen/fifteen_dp"/>
 
-        <!--<com.appzonegroup.app.fasttrack.ui.EditText
+        <!--<com.cluster.ui.EditText
             android:id="@+id/loanRequest2_loanproduct_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:text="@string/bvn"/>
 
-        <com.appzonegroup.app.fasttrack.ui.EditText
+        <com.cluster.ui.EditText
             android:id="@+id/loanRequest2_bvn_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
             android:layout_marginBottom="@dimen/fifteen_dp"
             android:maxLength="11"/>-->
 
-        <com.appzonegroup.app.fasttrack.ui.CustomButton
+        <com.cluster.ui.CustomButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/submit"

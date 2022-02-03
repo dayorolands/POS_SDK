@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:activity="com.appzonegroup.app.fasttrack.MainActivity">
+    tools:activity="com.cluster.MainActivity">
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/online_functions"

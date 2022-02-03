@@ -1,4 +1,4 @@
-package com.creditclub.pos.providers.sunmi.utils;
+package com.cluster.pos.providers.sunmi.utils;
 
 import android.text.TextUtils;
 import android.util.Log;

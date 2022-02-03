@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.creditclub.pos.providers.smartpeak">
+    package="com.cluster.pos.providers.smartpeak">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -30,7 +30,7 @@
             android:name="com.pos.sdk"
             android:required="false" />
         <provider
-            android:name=".p1000.SmartPeakPosManagerProvider"
+            android:name="com.cluster.pos.providers.smartpeak.p1000.SmartPeakPosManagerProvider"
             android:authorities="${applicationId}.p1000.SmartPeakPosManagerProvider"
             android:enabled="true"
             android:exported="false" />

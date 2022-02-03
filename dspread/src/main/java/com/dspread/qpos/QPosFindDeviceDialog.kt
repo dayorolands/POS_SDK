@@ -10,9 +10,9 @@ import android.view.View
 import android.view.Window
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.creditclub.core.ui.SimpleBindingAdapter
-import com.creditclub.core.ui.widget.DialogListenerBlock
-import com.creditclub.core.ui.widget.build
+import com.cluster.core.ui.SimpleBindingAdapter
+import com.cluster.core.ui.widget.DialogListenerBlock
+import com.cluster.core.ui.widget.build
 import com.dspread.R
 import com.dspread.databinding.DspreadDialogFindBluetoothDeviceBinding
 import com.dspread.databinding.DspreadItemBluetoothDeviceBinding

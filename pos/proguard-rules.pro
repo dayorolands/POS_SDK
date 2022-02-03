@@ -63,18 +63,18 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
--keep,includedescriptorclasses class com.appzonegroup.creditclub.pos.**$$serializer { *; }
--keepclassmembers class com.appzonegroup.creditclub.pos.** {
+-keep,includedescriptorclasses class com.cluster.pos.**$$serializer { *; }
+-keepclassmembers class com.cluster.pos.** {
     *** Companion;
 }
--keepclasseswithmembers class com.appzonegroup.creditclub.pos.** {
+-keepclasseswithmembers class com.cluster.pos.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
--keep,includedescriptorclasses class com.creditclub.pos.**$$serializer { *; }
--keepclassmembers class com.creditclub.pos.** {
+-keep,includedescriptorclasses class com.cluster.pos.**$$serializer { *; }
+-keepclassmembers class com.cluster.pos.** {
     *** Companion;
 }
--keepclasseswithmembers class com.creditclub.pos.** {
+-keepclasseswithmembers class com.cluster.pos.** {
     kotlinx.serialization.KSerializer serializer(...);
 }

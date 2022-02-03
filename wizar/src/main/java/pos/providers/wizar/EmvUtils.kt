@@ -1,7 +1,7 @@
 package pos.providers.wizar
 
 import com.cloudpos.jniinterface.EMVJNIInterface
-import com.creditclub.pos.extensions.hexBytes
+import com.cluster.pos.extensions.hexBytes
 import com.wizarpos.util.ByteUtil
 
 fun getTagValue(tag: Int, hex: Boolean = false, fPadded: Boolean = false): String {

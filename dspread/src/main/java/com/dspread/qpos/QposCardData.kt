@@ -1,6 +1,6 @@
 package com.dspread.qpos
 
-import com.creditclub.pos.card.CardData
+import com.cluster.pos.card.CardData
 import com.dspread.qpos.utils.TLV
 
 class QposCardData : CardData() {

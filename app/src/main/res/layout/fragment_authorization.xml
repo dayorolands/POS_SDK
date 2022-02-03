@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.appzonegroup.app.fasttrack.ui.EditText
+            <com.cluster.ui.EditText
                 android:id="@+id/accountDetails_bvn_et"
                 style="@style/defaultEditText"
                 android:layout_width="match_parent"
@@ -24,7 +24,7 @@
                 android:inputType="number"
                 android:maxLength="11" />
 
-            <com.appzonegroup.app.fasttrack.ui.EditText
+            <com.cluster.ui.EditText
                 android:id="@+id/customer_name_et"
                 style="@style/defaultEditText"
                 android:layout_width="match_parent"
@@ -33,7 +33,7 @@
                 android:hint="@string/customer_name"
                 android:inputType="text" />
 
-            <com.appzonegroup.app.fasttrack.ui.EditText
+            <com.cluster.ui.EditText
                 android:id="@+id/auth_agentPIN_et"
                 style="@style/defaultEditText"
                 android:layout_width="match_parent"
@@ -42,7 +42,7 @@
                 android:inputType="numberPassword"
                 android:maxLength="4" />
 
-            <com.appzonegroup.app.fasttrack.ui.CustomButton
+            <com.cluster.ui.CustomButton
                 android:id="@+id/button_update_bvn"
                 style="@style/button_style"
                 android:layout_width="match_parent"

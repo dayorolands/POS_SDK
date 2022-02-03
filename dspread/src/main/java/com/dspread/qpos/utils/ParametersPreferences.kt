@@ -1,10 +1,10 @@
 package com.dspread.qpos.utils
 
 import android.util.Log
-import com.creditclub.core.util.debugOnly
-import com.creditclub.core.util.safeRun
-import com.creditclub.pos.PosParameter
-import com.creditclub.pos.extensions.*
+import com.cluster.core.util.debugOnly
+import com.cluster.core.util.safeRun
+import com.cluster.pos.PosParameter
+import com.cluster.pos.extensions.*
 import org.json.JSONObject
 
 internal inline val String.fixedHex: String

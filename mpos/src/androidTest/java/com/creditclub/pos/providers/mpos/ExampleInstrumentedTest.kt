@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.creditclub.pos.providers.mpos.test", appContext.packageName)
+        assertEquals("com.cluster.pos.providers.mpos.test", appContext.packageName)
     }
 }

@@ -33,7 +33,7 @@
                         android:layout_height="wrap_content"
                         android:hint="Field">
 
-                        <com.appzonegroup.creditclub.pos.widget.EditText
+                        <com.cluster.pos.widget.EditText
                             android:id="@+id/input"
                             android:layout_width="match_parent"
                             android:layout_height="60dp" />

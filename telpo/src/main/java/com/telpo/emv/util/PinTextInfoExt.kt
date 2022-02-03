@@ -1,6 +1,6 @@
 package com.telpo.emv.util
 
-import com.creditclub.core.util.toCurrencyFormat
+import com.cluster.core.util.toCurrencyFormat
 import com.telpo.emv.EmvPinData
 import com.telpo.pinpad.PinParam
 import com.telpo.pinpad.PinTextInfo

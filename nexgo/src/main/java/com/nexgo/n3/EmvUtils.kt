@@ -2,7 +2,7 @@ package com.nexgo.n3
 
 import android.content.Context
 import android.util.Log
-import com.creditclub.pos.extensions.hexBytes
+import com.cluster.pos.extensions.hexBytes
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonParser

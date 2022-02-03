@@ -1,6 +1,6 @@
 package pos.providers.wizar
 
-import com.creditclub.pos.card.CardData
+import com.cluster.pos.card.CardData
 
 class WizarCardData : CardData() {
     override var track2 = ""

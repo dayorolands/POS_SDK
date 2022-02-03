@@ -1,14 +1,14 @@
 package com.nexgo.n3
 
 import android.os.Environment
-import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.util.debugOnly
-import com.creditclub.core.util.safeRunIO
-import com.creditclub.pos.PosConfig
-import com.creditclub.pos.PosManager
-import com.creditclub.pos.PosParameter
-import com.creditclub.pos.card.*
-import com.creditclub.pos.extensions.hexBytes
+import com.cluster.core.ui.CreditClubActivity
+import com.cluster.core.util.debugOnly
+import com.cluster.core.util.safeRunIO
+import com.cluster.pos.PosConfig
+import com.cluster.pos.PosManager
+import com.cluster.pos.PosParameter
+import com.cluster.pos.card.*
+import com.cluster.pos.extensions.hexBytes
 import com.nexgo.oaf.apiv3.DeviceEngine
 import com.nexgo.oaf.apiv3.device.reader.CardInfoEntity
 import com.nexgo.oaf.apiv3.device.reader.CardSlotTypeEnum
