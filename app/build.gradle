@@ -39,27 +39,20 @@ android {
         }
     }
 
-    lintOptions {
-        checkReleaseBuilds false
-        // Or, if you prefer, you can continue to check for errors in release builds,
-        // but continue the build even when errors are found:
-        abortOnError false
-    }
 
     buildFeatures {
         dataBinding true
         compose true
     }
-
-
     packagingOptions {
-        exclude 'META-INF/**'
-        exclude 'kotlin/**'
-        exclude 'okhttp3/**'
-        exclude 'org/**'
-        exclude '**.properties'
-        exclude '**.bin'
+        jniLibs {
+            excludes += ['META-INF/**', 'kotlin/**', 'okhttp3/**', 'org/**']
+        }
+        resources {
+            excludes += ['META-INF/**', 'kotlin/**', 'okhttp3/**', 'org/**', '**.properties', '**.bin']
+        }
     }
+
 
     signingConfigs {
         debug {
@@ -165,6 +158,10 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion versions.compose
+    }
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
     }
 }
 
