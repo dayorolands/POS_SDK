@@ -8,6 +8,9 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+const val DEFAULT_COMPONENT_KEY_1 = "3DFB3802940E8A546B3D38610852BA7A"
+const val DEFAULT_COMPONENT_KEY_2 = "0234E39861D3405E7A6B3185BA675873"
+
 @Serializable
 data class BinRoutes(
     @SerialName("BIN") var bin: String,
@@ -34,8 +37,8 @@ data class ConnectionInfo(
         timeout = 90,
         maxRetries = 1
     ),
-    @SerialName("Key1") override val key1: String = "3DFB3802940E8A546B3D38610852BA7A",
-    @SerialName("Key2") override val key2: String = "0234E39861D3405E7A6B3185BA675873",
+    @SerialName("Key1") override val key1: String = DEFAULT_COMPONENT_KEY_1,
+    @SerialName("Key2") override val key2: String = DEFAULT_COMPONENT_KEY_2,
 ) : RemoteConnectionInfo, Parcelable {
     override val id: String get() = nodeName
     override val label: String get() = nodeName

@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.os.Looper
 import androidx.annotation.RawRes
 import androidx.core.content.edit
-import com.cluster.pos.R
 import com.cluster.pos.data.PosDatabase
 import com.cluster.pos.extension.*
 import com.cluster.pos.models.IsoRequestLog
@@ -17,11 +16,10 @@ import com.cluster.core.util.*
 import com.cluster.core.util.delegates.defaultJson
 import com.cluster.core.util.delegates.stringStore
 import com.cluster.core.util.delegates.valueStore
-import com.cluster.pos.PosConfig
-import com.cluster.pos.PosParameter
-import com.cluster.pos.RemoteConnectionInfo
+import com.cluster.pos.*
 import com.cluster.pos.extensions.hexBytes
 import com.cluster.pos.model.ConnectionInfo
+import com.cluster.pos.util.xor
 import com.cluster.pos.utils.asDesEdeKey
 import com.cluster.pos.utils.decrypt
 import kotlinx.coroutines.Dispatchers
@@ -394,10 +392,10 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         override val cardAcceptorId: String = "",
 
         @SerialName("05")
-        override val currencyCode: String = "566",
+        override val currencyCode: String = DEFAULT_TRANSACTION_CURRENCY_CODE,
 
         @SerialName("06")
-        override val countryCode: String = "566",
+        override val countryCode: String = DEFAULT_TERMINAL_COUNTRY_CODE,
 
         @SerialName("08")
         override val merchantCategoryCode: String = "",

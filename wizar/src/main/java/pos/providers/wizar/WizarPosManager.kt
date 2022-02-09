@@ -6,7 +6,9 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
+import com.cloudpos.POSTerminal
 import com.cloudpos.jniinterface.EMVJNIInterface
+import com.cloudpos.smartcardreader.SmartCardReaderDevice
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.debug
@@ -21,7 +23,6 @@ import com.cluster.pos.printer.PosPrinter
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.wizarpos.security.injectkey.aidl.IKeyLoaderService
 import org.koin.dsl.module
-
 
 open class WizarPosManager(
     private val activity: CreditClubActivity,
@@ -123,7 +124,8 @@ open class WizarPosManager(
 
         override fun isCompatible(context: Context): Boolean {
             try {
-                val smartCardReaderDevice = getSmartCardDevice(context)
+                val smartCardReaderDevice = POSTerminal.getInstance(context)
+                    .getDevice(SMART_CARD_DEVICE_NAME) as SmartCardReaderDevice
                 smartCardReaderDevice.open()
                 smartCardReaderDevice.close()
                 return true

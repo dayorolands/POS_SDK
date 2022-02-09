@@ -16,7 +16,7 @@ class PosTransactionViewModel : ViewModel() {
     val cardReaderEvent = MutableLiveData<CardReaderEvent>()
     val cardData = MutableLiveData<CardData>()
 
-    private val nextOperation = MutableLiveData<Function0<Unit>>()
+    private val nextOperation = MutableLiveData<Function0<Unit>?>()
 
     fun setNextOperation(block: Function0<Unit>) {
         nextOperation.value = block

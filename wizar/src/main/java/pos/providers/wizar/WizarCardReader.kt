@@ -1,6 +1,5 @@
 package pos.providers.wizar
 
-import android.content.Context
 import android.util.Log
 import androidx.core.content.edit
 import com.cloudpos.*
@@ -10,7 +9,6 @@ import com.cloudpos.pinpad.KeyInfo
 import com.cloudpos.pinpad.PINPadDevice
 import com.cloudpos.pinpad.PINPadOperationResult
 import com.cloudpos.pinpad.extend.PINPadExtendDevice
-import com.cloudpos.smartcardreader.SmartCardReaderDevice
 import com.cluster.core.data.prefs.getEncryptedSharedPreferences
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.util.debugOnly
@@ -42,11 +40,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.experimental.and
 
-fun getSmartCardDevice(context: Context): SmartCardReaderDevice {
-    return POSTerminal.getInstance(context)
-        .getDevice("cloudpos.device.smartcardreader") as SmartCardReaderDevice
-}
-
+internal const val SMART_CARD_DEVICE_NAME = "cloudpos.device.smartcardreader"
 private const val TAG = "Wizar"
 private const val PREF_CURRENT_MASTER_KEY_FIELD_NAME = "currentMasterKey"
 
@@ -103,7 +97,7 @@ class WizarCardReader(
             }
         }
         cardReaderEvent = suspendCoroutine { continuation ->
-            EMVJNIInterface.registerFunctionListener(CardInsertListener(continuation))
+            EMVJNIInterface.registerFunctionListener(cardInsertListener(continuation))
             EMVJNIInterface.open_reader(1)
         }
         EMVJNIInterface.registerFunctionListener(this)
@@ -159,9 +153,11 @@ class WizarCardReader(
 
         val instant = Instant.now()
         EMVJNIInterface.emv_set_tag_data(0x9A, instant.format("uuMMdd").hexBytes, 3)
-        EMVJNIInterface.emv_set_tag_data(0x9F21,
+        EMVJNIInterface.emv_set_tag_data(
+            0x9F21,
             StringUtil.hexString2bytes(instant.format("HHmmss")),
-            3)
+            3
+        )
         EMVJNIInterface.emv_set_tag_data(
             0x9F41,
             StringUtil.hexString2bytes(
@@ -234,10 +230,6 @@ class WizarCardReader(
         when (emvStatus) {
             STATUS_CONTINUE -> when (emvRetCode) {
                 EMV_CANDIDATE_LIST -> {
-                    val aidList = ByteArray(300)
-                    val aidListLength =
-                        EMVJNIInterface.emv_get_candidate_list(aidList, aidList.size)
-
                     EMVJNIInterface.emv_set_candidate_list_result(0)
                 }
                 EMV_APP_SELECTED -> {
@@ -262,8 +254,7 @@ class WizarCardReader(
                     val tvr = ByteArray(5)
                     EMVJNIInterface.emv_get_tag_data(0x9B, tsi, 2) // TSI
                     EMVJNIInterface.emv_get_tag_data(0x95, tvr, 5) // TVR
-                    if ((tsi[0] and 0x80.toByte() == 0x80.toByte()) && (tvr[0] and 0x40.toByte() == 0x00.toByte()) && ((tvr.get(
-                            0) and 0x08.toByte()) == 0x00.toByte()) && ((tvr.get(0) and 0x04.toByte()) == 0x00.toByte())
+                    if ((tsi[0] and 0x80.toByte() == 0x80.toByte()) && (tvr[0] and 0x40.toByte() == 0x00.toByte()) && ((tvr[0] and 0x08.toByte()) == 0x00.toByte()) && ((tvr[0] and 0x04.toByte()) == 0x00.toByte())
                     ) {
                         promptOfflineDataAuthSucc = true
                     }
@@ -307,17 +298,21 @@ class WizarCardReader(
                 tagData = ByteArray(50)
                 if (EMVJNIInterface.emv_is_tag_present(0x95) >= 0) {
                     tagDataLength = EMVJNIInterface.emv_get_tag_data(0x95, tagData, tagData.size)
-                    terminalConfig.lastTvr = StringUtil.toHexString(tagData,
+                    terminalConfig.lastTvr = StringUtil.toHexString(
+                        tagData,
                         0,
                         tagDataLength,
-                        false)
+                        false
+                    )
                 }
                 if (EMVJNIInterface.emv_is_tag_present(0x9B) >= 0) {
                     tagDataLength = EMVJNIInterface.emv_get_tag_data(0x9B, tagData, tagData.size)
-                    terminalConfig.lastTsi = StringUtil.toHexString(tagData,
+                    terminalConfig.lastTsi = StringUtil.toHexString(
+                        tagData,
                         0,
                         tagDataLength,
-                        false)
+                        false
+                    )
                 }
                 getEMVCardInfo()
                 cardData.apply {
@@ -483,7 +478,12 @@ class WizarCardReader(
         val tagData = ByteArray(100)
         var tagDataLength: Int
         val iccData = ByteArray(1200)
-        val tagList = defaultTagList
+        val tagList = intArrayOf(
+            0x5F2A, 0x82, 0x84, 0x95, 0x9A, 0x9C,
+            0x9F02, 0x9F03, 0x9F09, 0x9F10, 0x9F1A,
+            0x9F26, 0x9F27, 0x9F33, 0x9F34, 0x9F35,
+            0x9F36, 0x9F37, 0x9F41,
+        )
         val offset: Int = EMVJNIInterface.emv_get_tag_list_data(
             tagList,
             tagList.size,
@@ -568,15 +568,17 @@ class WizarCardReader(
             if (offlinepinTimes > 0) {
                 wrongOfflinePinTimes = offlinepinTimes - if (offlinePinVerified == 1) 1 else 0
             }
-            if (debug) Log.d(TAG,
-                "offlinePinVerified = $offlinePinVerified")
-            if (debug) Log.d(TAG,
-                "Wrong offline Pin Times = $wrongOfflinePinTimes")
+            if (debug) {
+                Log.d(TAG, "offlinePinVerified = $offlinePinVerified")
+                Log.d(TAG, "Wrong offline Pin Times = $wrongOfflinePinTimes")
+            }
             if (offlinePinVerified == 1) {
                 trans.pinEntryMode = CAN_PIN // Offline PIN Verified
             } else if (offlinePinVerified == -1) {
-                if (debug) Log.d(TAG,
-                    "Wrong offline Pin")
+                if (debug) Log.d(
+                    TAG,
+                    "Wrong offline Pin"
+                )
             }
         }
     }
@@ -592,26 +594,32 @@ class WizarCardReader(
         tagData = ByteArray(100)
         if (EMVJNIInterface.emv_is_tag_present(0x5A) >= 0) {
             tagDataLength = EMVJNIInterface.emv_get_tag_data(0x5A, tagData, tagData.size)
-            trans.pan = StringUtil.toString(AppUtil.removeTailF(ByteUtil.bcdToAscii(
-                tagData,
-                0,
-                tagDataLength)))
+            trans.pan = StringUtil.toString(
+                AppUtil.removeTailF(
+                    ByteUtil.bcdToAscii(
+                        tagData,
+                        0,
+                        tagDataLength
+                    )
+                )
+            )
             cardData.pan = trans.pan
         }
         // Track2
         if (EMVJNIInterface.emv_is_tag_present(0x57) >= 0) {
             tagDataLength = EMVJNIInterface.emv_get_tag_data(0x57, tagData, tagData.size)
-            trans.track2Data = StringUtil.toString(AppUtil.removeTailF(
-                ByteUtil.bcdToAscii(tagData, 0, tagDataLength)))
+            trans.track2Data = StringUtil.toString(
+                AppUtil.removeTailF(
+                    ByteUtil.bcdToAscii(tagData, 0, tagDataLength)
+                )
+            )
         }
         // CSN
         if (EMVJNIInterface.emv_is_tag_present(0x5F34) >= 0) {
-            tagDataLength = EMVJNIInterface.emv_get_tag_data(0x5F34, tagData, tagData.size)
             trans.csn = tagData[0]
         }
         // Expiry
         if (EMVJNIInterface.emv_is_tag_present(0x5F24) >= 0) {
-            tagDataLength = EMVJNIInterface.emv_get_tag_data(0x5F24, tagData, tagData.size)
             trans.expiry = StringUtil.toHexString(tagData, 0, 3, false).substring(0, 4)
         }
     }
@@ -624,24 +632,48 @@ class WizarCardReader(
     }
 }
 
-private val defaultTagList = intArrayOf(
-    0x5F2A,
-    0x82,
-    0x84,
-    0x95,
-    0x9A,
-    0x9C,
-    0x9F02,
-    0x9F03,
-    0x9F09,
-    0x9F10,
-    0x9F1A,
-    0x9F26,
-    0x9F27,
-    0x9F33,
-    0x9F34,
-    0x9F35,
-    0x9F36,
-    0x9F37,
-    0x9F41
-)
+private fun getTagValue(tag: Int, hex: Boolean = false, fPadded: Boolean = false): String {
+    val tagData = ByteArray(50)
+    val tagDataLength = EMVJNIInterface.emv_get_tag_data(tag, tagData, tagData.size)
+    val rawValue = ByteUtil.arrayToHexStr(tagData, tagDataLength)
+
+    val value = when {
+        hex -> String(rawValue.hexBytes)
+        else -> rawValue
+    }
+
+    if (fPadded) {
+        val stringBuffer = StringBuffer(value)
+        if (stringBuffer[stringBuffer.toString().length - 1] == 'F') {
+            stringBuffer.deleteCharAt(stringBuffer.toString().length - 1)
+        }
+        return stringBuffer.toString()
+    }
+
+    return value
+}
+
+private fun cardInsertListener(continuation: Continuation<CardReaderEvent>): IFuntionListener {
+    return object : IFuntionListener {
+        override fun emvProcessCallback(data: ByteArray?) {
+        }
+
+        override fun cardEventOccured(eventType: Int) {
+            val cardReaderEvent: CardReaderEvent = when (eventType) {
+                SMART_CARD_EVENT_INSERT_CARD -> {
+                    when (EMVJNIInterface.get_card_type()) {
+                        CARD_CONTACT -> CardReaderEvent.CHIP
+                        CARD_CONTACTLESS -> CardReaderEvent.MAG_STRIPE
+                        else -> CardReaderEvent.HYBRID_FAILURE
+                    }
+                }
+                SMART_CARD_EVENT_POWERON_ERROR -> CardReaderEvent.CHIP_FAILURE
+                SMART_CARD_EVENT_REMOVE_CARD -> return
+                SMART_CARD_EVENT_CONTALESS_HAVE_MORE_CARD -> return
+                SMART_CARD_EVENT_CONTALESS_ANTI_SHAKE -> return
+                else -> CardReaderEvent.CHIP_FAILURE
+            }
+            continuation.resume(cardReaderEvent)
+        }
+    }
+}

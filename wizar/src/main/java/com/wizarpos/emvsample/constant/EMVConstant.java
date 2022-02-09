@@ -1,8 +1,10 @@
 package com.wizarpos.emvsample.constant;
 
+import pos.providers.wizar.BuildConfig;
+
 public interface EMVConstant
 {
-	boolean debug = true;
+	boolean debug = BuildConfig.DEBUG;
 	boolean enableLED = true;
 	boolean enableBeep = true;
 
