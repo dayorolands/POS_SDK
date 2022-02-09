@@ -2,6 +2,7 @@ package com.cluster
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import coil.load
 import com.cluster.databinding.ActivityBannerBinding
 import com.cluster.databinding.ItemBannerImageBinding
 import com.cluster.core.ui.SimpleBindingAdapter

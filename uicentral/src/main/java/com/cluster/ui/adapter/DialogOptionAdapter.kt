@@ -1,5 +1,6 @@
 package com.cluster.ui.adapter
 
+import android.view.View
 import com.cluster.core.ui.SimpleBindingAdapter
 import com.cluster.core.ui.widget.DialogOptionItem
 import com.cluster.ui.R

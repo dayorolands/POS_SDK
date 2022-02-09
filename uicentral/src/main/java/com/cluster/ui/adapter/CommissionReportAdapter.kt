@@ -2,6 +2,7 @@ package com.cluster.ui.adapter
 
 import com.cluster.core.data.model.CommissionReport
 import com.cluster.core.ui.SimpleBindingAdapter
+import com.cluster.core.util.CREDIT_CLUB_DATE_PATTERN
 import com.cluster.core.util.toInstant
 import com.cluster.core.util.toString
 import com.cluster.ui.R
