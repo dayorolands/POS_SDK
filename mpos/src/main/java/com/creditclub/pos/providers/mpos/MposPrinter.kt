@@ -1,11 +1,11 @@
-package com.creditclub.pos.providers.mpos
+package com.cluster.pos.providers.mpos
 
-import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.pos.printer.PosPrinter
-import com.creditclub.pos.printer.PrintJob
-import com.creditclub.pos.printer.PrintNode
-import com.creditclub.pos.printer.PrinterStatus
+import com.cluster.core.ui.CreditClubActivity
+import com.cluster.core.ui.widget.DialogProvider
+import com.cluster.pos.printer.PosPrinter
+import com.cluster.pos.printer.PrintJob
+import com.cluster.pos.printer.PrintNode
+import com.cluster.pos.printer.PrinterStatus
 
 class MposPrinter(override val context: CreditClubActivity) : PosPrinter {
     override val dialogProvider: DialogProvider = context.dialogProvider

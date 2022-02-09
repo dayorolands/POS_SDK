@@ -1,4 +1,4 @@
-package com.creditclub.pos.providers.mpos
+package com.cluster.pos.providers.mpos
 
 import android.app.Dialog
 import android.content.Context
@@ -9,11 +9,11 @@ import android.view.View
 import android.view.Window
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.creditclub.core.ui.SimpleBindingAdapter
-import com.creditclub.core.ui.widget.DialogListenerBlock
-import com.creditclub.core.ui.widget.build
-import com.creditclub.pos.providers.mpos.databinding.PosDialogFindDeviceBinding
-import com.creditclub.pos.providers.mpos.databinding.PosItemDeviceBinding
+import com.cluster.core.ui.SimpleBindingAdapter
+import com.cluster.core.ui.widget.DialogListenerBlock
+import com.cluster.core.ui.widget.build
+import com.cluster.pos.providers.mpos.databinding.PosDialogFindDeviceBinding
+import com.cluster.pos.providers.mpos.databinding.PosItemDeviceBinding
 import com.jhl.bluetooth.ibridge.BluetoothIBridgeDevice
 import java.util.*
 

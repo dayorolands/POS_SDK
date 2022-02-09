@@ -1,8 +1,8 @@
-package com.creditclub.pos.providers.mpos
+package com.cluster.pos.providers.mpos
 
-import com.creditclub.pos.card.CardData
-import com.creditclub.pos.card.CardReaderEvent
-import com.creditclub.pos.extensions.hexBytes
+import com.cluster.pos.card.CardData
+import com.cluster.pos.card.CardReaderEvent
+import com.cluster.pos.extensions.hexBytes
 
 
 /**

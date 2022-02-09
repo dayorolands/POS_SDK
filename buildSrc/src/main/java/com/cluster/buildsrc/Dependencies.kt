@@ -20,7 +20,7 @@ object Versions {
     const val lifecycle = "2.4.0"
     const val material = "1.4.0"
     const val navigation = "2.4.0"
-    const val objectBox = "3.0.1"
+    const val objectBox = "3.1.1"
     const val okhttp = "4.9.2"
     const val retrofit = "2.9.0"
     const val room = "2.4.1"

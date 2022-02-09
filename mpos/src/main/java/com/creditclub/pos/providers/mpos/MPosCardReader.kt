@@ -1,10 +1,10 @@
-package com.creditclub.pos.providers.mpos
+package com.cluster.pos.providers.mpos
 
-import com.creditclub.core.ui.widget.DialogProvider
-import com.creditclub.pos.card.CardData
-import com.creditclub.pos.card.CardReader
-import com.creditclub.pos.card.CardReaderEvent
-import com.creditclub.pos.card.CardReaderEventListener
+import com.cluster.core.ui.widget.DialogProvider
+import com.cluster.pos.card.CardData
+import com.cluster.pos.card.CardReader
+import com.cluster.pos.card.CardReaderEvent
+import com.cluster.pos.card.CardReaderEventListener
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 

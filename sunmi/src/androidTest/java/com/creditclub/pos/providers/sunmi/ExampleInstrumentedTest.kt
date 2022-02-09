@@ -1,4 +1,4 @@
-package com.creditclub.pos.providers.sunmi
+package com.cluster.pos.providers.sunmi
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -1,4 +1,4 @@
-package com.creditclub.pos.providers.mpos
+package com.cluster.pos.providers.mpos
 
 import org.junit.Test
 

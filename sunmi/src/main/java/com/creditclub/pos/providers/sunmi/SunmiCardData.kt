@@ -1,6 +1,6 @@
-package com.creditclub.pos.providers.sunmi
+package com.cluster.pos.providers.sunmi
 
-import com.creditclub.pos.card.CardData
+import com.cluster.pos.card.CardData
 
 internal class SunmiCardData : CardData() {
     override var track2 = ""

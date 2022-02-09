@@ -1,6 +1,6 @@
-package com.creditclub.pos.providers.mpos
+package com.cluster.pos.providers.mpos
 
-import com.creditclub.pos.card.CardTransactionStatus
+import com.cluster.pos.card.CardTransactionStatus
 
 
 /**

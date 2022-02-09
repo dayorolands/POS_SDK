@@ -86,14 +86,28 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     api 'com.google.android.play:core-ktx:1.8.1'
 
-    implementation platform('com.google.firebase:firebase-bom:29.0.0')
-    api "com.google.firebase:firebase-crashlytics-ktx"
-    api "com.google.firebase:firebase-core"
-    api "com.google.firebase:firebase-messaging-ktx"
-    api "com.google.firebase:firebase-analytics-ktx"
-//    api 'com.google.firebase:firebase-perf-ktx'
+    implementation platform('com.google.firebase:firebase-bom:29.0.0') {
+        exclude(group: "com.google.android.gms", module: "play-services-ads-identifier")
+    }
+    api("com.google.firebase:firebase-crashlytics-ktx") {
+        exclude(group: "com.google.android.gms", module: "play-services-ads-identifier")
+    }
+    api("com.google.firebase:firebase-core") {
+        exclude(group: "com.google.android.gms", module: "play-services-ads-identifier")
+    }
+    api("com.google.firebase:firebase-messaging-ktx") {
+        exclude(group: "com.google.android.gms", module: "play-services-ads-identifier")
+    }
+    api("com.google.firebase:firebase-analytics-ktx") {
+        exclude(group: "com.google.android.gms", module: "play-services-ads-identifier")
+    }
+//    api("com.google.firebase:firebase-perf-ktx")  {
+//        exclude(group: "com.google.android.gms", module: "play-services-ads-identifier")
+//    }
     api "androidx.work:work-runtime-ktx:${versions.work}"
-    api 'com.google.android.gms:play-services-location:18.0.0'
+    api("com.google.android.gms:play-services-location:19.0.1") {
+        exclude(group: "com.google.android.gms", module: "play-services-ads-identifier")
+    }
     api "androidx.security:security-crypto:1.1.0-alpha03"
 
     implementation "androidx.navigation:navigation-fragment-ktx:${versions.navigation}"
@@ -145,5 +159,4 @@ dependencies {
     api "com.google.accompanist:accompanist-swiperefresh:${versions.accompanist}"
     api "com.google.accompanist:accompanist-flowlayout:${versions.accompanist}"
     api "androidx.palette:palette-ktx:1.0.0"
-    api "org.jetbrains.kotlinx:kotlinx-datetime:0.2.0"
 }

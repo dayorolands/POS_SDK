@@ -1,4 +1,4 @@
-package com.creditclub.pos.providers.mpos
+package com.cluster.pos.providers.mpos
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

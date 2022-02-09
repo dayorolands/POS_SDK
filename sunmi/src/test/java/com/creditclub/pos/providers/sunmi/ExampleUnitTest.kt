@@ -1,4 +1,4 @@
-package com.creditclub.pos.providers.sunmi
+package com.cluster.pos.providers.sunmi
 
 import org.junit.Test
 

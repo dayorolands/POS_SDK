@@ -1,15 +1,15 @@
-package com.creditclub.pos.providers.sunmi
+package com.cluster.pos.providers.sunmi
 
 import android.os.Bundle
 import android.os.RemoteException
-import com.creditclub.core.ui.CreditClubActivity
-import com.creditclub.core.util.debug
-import com.creditclub.core.util.safeRun
-import com.creditclub.pos.PosManager
-import com.creditclub.pos.card.CardData
-import com.creditclub.pos.card.CardReader
-import com.creditclub.pos.card.CardReaderEvent
-import com.creditclub.pos.card.CardReaderEventListener
+import com.cluster.core.ui.CreditClubActivity
+import com.cluster.core.util.debug
+import com.cluster.core.util.safeRun
+import com.cluster.pos.PosManager
+import com.cluster.pos.card.CardData
+import com.cluster.pos.card.CardReader
+import com.cluster.pos.card.CardReaderEvent
+import com.cluster.pos.card.CardReaderEventListener
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.bean.EMVTransDataV2
 import com.sunmi.pay.hardware.aidlv2.readcard.CheckCardCallbackV2

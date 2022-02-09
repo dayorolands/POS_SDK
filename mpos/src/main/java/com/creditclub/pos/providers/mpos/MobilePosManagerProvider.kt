@@ -1,4 +1,4 @@
-package com.creditclub.pos.providers.mpos
+package com.cluster.pos.providers.mpos
 
 import android.content.ContentProvider
 import android.content.ContentValues
@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.pm.ProviderInfo
 import android.database.Cursor
 import android.net.Uri
-import com.creditclub.pos.PosProviders
+import com.cluster.pos.PosProviders
 
 class MobilePosManagerProvider : ContentProvider() {
     override fun onCreate(): Boolean {

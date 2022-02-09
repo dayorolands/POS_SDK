@@ -140,39 +140,6 @@
   public static void checkReturnedValueIsNotNull(java.lang.Object, java.lang.String, java.lang.String);
 }
 
-# remove unused string builders
--assumenoexternalsideeffects class java.lang.StringBuilder {
-    public java.lang.StringBuilder();
-    public java.lang.StringBuilder(int);
-    public java.lang.StringBuilder(java.lang.String);
-    public java.lang.StringBuilder append(java.lang.Object);
-    public java.lang.StringBuilder append(java.lang.String);
-    public java.lang.StringBuilder append(java.lang.StringBuffer);
-    public java.lang.StringBuilder append(char[]);
-    public java.lang.StringBuilder append(char[], int, int);
-    public java.lang.StringBuilder append(boolean);
-    public java.lang.StringBuilder append(char);
-    public java.lang.StringBuilder append(int);
-    public java.lang.StringBuilder append(long);
-    public java.lang.StringBuilder append(float);
-    public java.lang.StringBuilder append(double);
-    public java.lang.String toString();
-}
-
--assumenoexternalreturnvalues public final class java.lang.StringBuilder {
-    public java.lang.StringBuilder append(java.lang.Object);
-    public java.lang.StringBuilder append(java.lang.String);
-    public java.lang.StringBuilder append(java.lang.StringBuffer);
-    public java.lang.StringBuilder append(char[]);
-    public java.lang.StringBuilder append(char[], int, int);
-    public java.lang.StringBuilder append(boolean);
-    public java.lang.StringBuilder append(char);
-    public java.lang.StringBuilder append(int);
-    public java.lang.StringBuilder append(long);
-    public java.lang.StringBuilder append(float);
-    public java.lang.StringBuilder append(double);
-}
-
 # Core Kotlin Serializaion
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.serialization.AnnotationsKt # core serialization annotations

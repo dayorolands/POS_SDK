@@ -1,4 +1,4 @@
-package com.creditclub.core.util
+package com.cluster.core.util
 
 inline fun debugOnly(crossinline ignored: () -> Unit) {}
 
