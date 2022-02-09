@@ -30,6 +30,7 @@ import org.koin.androidx.fragment.koin.fragmentFactory
 import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
 
 class BankOneApplication : Application() {
     private val appDataStorage: AppDataStorage by inject()
@@ -56,7 +57,7 @@ class BankOneApplication : Application() {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 
         startKoin {
-            androidLogger()
+            androidLogger(if (BuildConfig.DEBUG) Level.ERROR else Level.NONE)
             androidContext(this@BankOneApplication)
             androidFileProperties()
             fragmentFactory()

@@ -76,8 +76,6 @@ dependencies {
 
     // Koin main features for Android (Scope,ViewModel ...)
     api "io.insert-koin:koin-android:${versions.koin}"
-    // Koin Java Compatibility
-    api "io.insert-koin:koin-android-compat:${versions.koin}"
     // Koin for Jetpack WorkManager
     api "io.insert-koin:koin-androidx-workmanager:${versions.koin}"
     // Koin for Jetpack Compose

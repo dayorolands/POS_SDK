@@ -15,7 +15,7 @@ object Versions {
     const val compose = "1.0.5"
     const val desugarJdk = "1.1.5"
     const val googleServices = "4.3.3"
-    const val koin = "3.1.2"
+    const val koin = "3.1.5"
     const val kotlin = "1.5.31"
     const val lifecycle = "2.4.0"
     const val material = "1.4.0"
