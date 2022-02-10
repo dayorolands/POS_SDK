@@ -1,4 +1,4 @@
-package com.cluster.components
+package com.cluster.screen.home
 
 
 import android.content.Intent
@@ -23,16 +23,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.cluster.*
 import com.cluster.R
-import com.cluster.pos.Platform
+import com.cluster.activity.UpdateActivity
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.prefs.LocalStorage
-import com.cluster.activity.UpdateActivity
+import com.cluster.pos.Platform
 import com.cluster.ui.rememberBean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun DrawerContent(
+fun HomeDrawerContent(
     scaffoldState: ScaffoldState,
     coroutineScope: CoroutineScope,
     openPage: (Int) -> Unit,

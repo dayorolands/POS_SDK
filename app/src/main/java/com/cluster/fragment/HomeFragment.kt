@@ -13,29 +13,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyGridScope
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.material.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -44,9 +28,7 @@ import com.cluster.R
 import com.cluster.Routes
 import com.cluster.activity.UpdateActivity
 import com.cluster.clusterNavigation
-import com.cluster.components.*
 import com.cluster.conversation.LocalBackPressedDispatcher
-import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.api.AppConfig
 import com.cluster.core.data.api.NotificationService
 import com.cluster.core.data.api.retrofitService
@@ -56,14 +38,11 @@ import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.ui.widget.DialogConfirmParams
 import com.cluster.core.ui.widget.DialogProvider
-import com.cluster.core.util.debugOnly
 import com.cluster.core.util.packageInfo
 import com.cluster.core.util.safeRunIO
 import com.cluster.pos.Platform
-import com.cluster.ui.rememberBean
+import com.cluster.screen.home.HomeScreen
 import com.cluster.ui.theme.CreditClubTheme
-import com.cluster.utility.logout
-import com.cluster.utility.openPageById
 import com.cluster.viewmodel.AppViewModel
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.insets.LocalWindowInsets
@@ -73,15 +52,6 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.io.File
-import java.util.*
-
-private val composableRouteFunctionIds = mapOf(
-    R.id.agent_change_pin_button to Routes.PinChange,
-    R.id.funds_transfer_button to Routes.FundsTransfer,
-    R.id.fn_support to Routes.SupportCases,
-    R.id.ussd_withdrawal_button to Routes.UssdWithdrawal,
-    R.id.fn_pending_transactions to Routes.PendingTransactions,
-)
 
 class HomeFragment : CreditClubFragment() {
     private val notificationViewModel: NotificationViewModel by activityViewModels()
@@ -151,7 +121,7 @@ class HomeFragment : CreditClubFragment() {
                                 startDestination = Routes.Home,
                             ) {
                                 composable(Routes.Home) {
-                                    HomeContent(
+                                    HomeScreen(
                                         mainNavController = fragmentNavController,
                                         composeNavController = composeNavController,
                                         activity = requireActivity(),
@@ -260,151 +230,6 @@ private fun Fragment.checkForUpdate(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalStdlibApi::class)
-@Composable
-private fun HomeContent(
-    mainNavController: NavController,
-    composeNavController: NavHostController,
-    activity: Activity,
-    fragment: CreditClubFragment,
-) {
-    val institutionConfig: InstitutionConfig by rememberBean()
-    val homeNavController = rememberNavController()
-    val coroutineScope = rememberCoroutineScope()
-    val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
-    val bottomNavigationItems = remember {
-        buildList {
-            add(BottomNavScreens.Home)
-            if (institutionConfig.categories.customers) {
-                add(BottomNavScreens.Customer)
-            }
-            add(BottomNavScreens.Agent)
-            add(BottomNavScreens.Transactions)
-            if (institutionConfig.categories.loans) {
-                add(BottomNavScreens.Loans)
-            }
-        }
-    }
-    val currentRoute = currentRoute(homeNavController)
-    val context = LocalContext.current
-    val greetingMessage = remember {
-        when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
-            in 0..11 -> "Good Morning"
-            in 12..15 -> "Good Afternoon"
-            in 16..23 -> "Good Evening"
-            else -> "Good Day"
-        }
-    }
-    val title = when (currentRoute) {
-        BottomNavScreens.Agent.route -> "Agent"
-        BottomNavScreens.Transactions.route -> "Transactions"
-        BottomNavScreens.Customer.route -> "Customer"
-        else -> greetingMessage
-    }
-
-    Scaffold(
-        scaffoldState = scaffoldState,
-        topBar = {
-            HomeAppBar(
-                scaffoldState = scaffoldState,
-                mainNavController = mainNavController,
-            )
-        },
-        bottomBar = { SubMenuBottomNavigation(homeNavController, bottomNavigationItems) },
-        drawerContent = {
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                item {
-                    DrawerContent(
-                        scaffoldState = scaffoldState,
-                        coroutineScope = coroutineScope,
-                        openPage = {
-                            if (composableRouteFunctionIds.containsKey(it)) {
-                                composeNavController.navigate(composableRouteFunctionIds[it]!!)
-                            } else {
-                                fragment.openPageById(it)
-                            }
-                        },
-                    )
-                }
-            }
-
-            debugOnly {
-                Text(
-                    text = "For testing purposes only",
-                    modifier = Modifier.padding(start = 16.dp, bottom = 5.dp),
-                    style = MaterialTheme.typography.caption,
-                    color = MaterialTheme.colors.onSurface.copy(0.5f),
-                )
-            }
-
-            Text(
-                text = "v${context.packageInfo?.versionName}. Powered by Cluster",
-                modifier = Modifier.padding(start = 16.dp),
-                style = MaterialTheme.typography.body1,
-                color = MaterialTheme.colors.onSurface.copy(0.5f),
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { activity.logout() },
-            ) {
-                Text(
-                    stringResource(R.string.logout),
-                    style = MaterialTheme.typography.h5,
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                )
-            }
-        },
-        backgroundColor = colorResource(R.color.menuBackground)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .weight(1f),
-            ) {
-                Text(
-                    title,
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
-                    style = MaterialTheme.typography.h4,
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp, vertical = 10.dp)
-                )
-                NavHost(
-                    homeNavController,
-                    startDestination = BottomNavScreens.Home.route
-                ) {
-                    homeRoutes(
-                        institutionConfig = institutionConfig,
-                        homeNavController = homeNavController,
-                        composeNavController = composeNavController,
-                        fragment = fragment,
-                    )
-                }
-            }
-
-            if (currentRoute == BottomNavScreens.Home.route) {
-                FrequentlyUsed(onItemClick = {
-                    if (composableRouteFunctionIds.containsKey(it)) {
-                        composeNavController.navigate(composableRouteFunctionIds[it]!!)
-                    } else {
-                        fragment.openPageById(it)
-                    }
-                })
-            }
-
-            Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-            )
-        }
-    }
-}
-
 @SuppressLint("QueryPermissionsNeeded")
 private fun openApk(context: Context, apkFile: File, appConfig: AppConfig) {
     val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -455,265 +280,6 @@ private fun loadFcmToken(fcmToken: MutableState<String>, retryOnFail: Boolean = 
 
         // Get new FCM registration token
         fcmToken.value = task.result
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun SubMenu(content: LazyGridScope.() -> Unit) {
-    LazyVerticalGrid(
-        cells = GridCells.Adaptive(minSize = 150.dp)
-    ) {
-        content()
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-private fun NavGraphBuilder.homeRoutes(
-    institutionConfig: InstitutionConfig,
-    homeNavController: NavHostController,
-    composeNavController: NavHostController,
-    fragment: CreditClubFragment,
-) {
-    val flows = institutionConfig.flows
-    composable(BottomNavScreens.Home.route) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            BalanceCard()
-            LazyVerticalGrid(
-                cells = GridCells.Adaptive(minSize = 100.dp)
-            ) {
-                if (institutionConfig.categories.customers) {
-                    item {
-                        SmallMenuButton(
-                            text = "Customer",
-                            icon = painterResource(R.drawable.payday_loan),
-                            onClick = {
-                                homeNavController.navigate(
-                                    BottomNavScreens.Customer.route
-                                ) {
-                                    launchSingleTop = true
-                                    popUpTo(BottomNavScreens.Home.route) {
-                                        inclusive = false
-                                    }
-                                }
-                            },
-                        )
-                    }
-                }
-
-                item {
-                    SmallMenuButton(
-                        text = "Agent",
-                        icon = painterResource(R.drawable.income),
-                        onClick = {
-                            homeNavController.navigate(BottomNavScreens.Agent.route) {
-                                launchSingleTop = true
-                                popUpTo(BottomNavScreens.Home.route) {
-                                    inclusive = false
-                                }
-                            }
-                        },
-                    )
-                }
-
-                item {
-                    SmallMenuButton(
-                        text = "Transactions",
-                        icon = painterResource(R.drawable.deposit),
-                        onClick = {
-                            homeNavController.navigate(BottomNavScreens.Transactions.route) {
-                                launchSingleTop = true
-                                popUpTo(BottomNavScreens.Home.route) {
-                                    inclusive = false
-                                }
-                            }
-                        },
-                    )
-                }
-
-                if (institutionConfig.categories.loans) {
-                    item {
-                        SmallMenuButton(
-                            text = "Loans",
-                            icon = painterResource(R.drawable.personal_income),
-                            onClick = {
-                                homeNavController.navigate(
-                                    BottomNavScreens.Loans.route
-                                ) {
-                                    launchSingleTop = true
-                                    popUpTo(BottomNavScreens.Home.route) {
-                                        inclusive = false
-                                    }
-                                }
-                            },
-                        )
-                    }
-                }
-            }
-        }
-    }
-    composable(BottomNavScreens.Agent.route) {
-        SubMenu {
-            item {
-                MenuButton(
-                    text = "Mini Statement",
-                    icon = painterResource(R.drawable.deposit),
-                    onClick = { fragment.openPageById(R.id.agent_mini_statement_button) }
-                )
-            }
-            item {
-                MenuButton(
-                    text = "Change PIN",
-                    icon = painterResource(R.drawable.login_password),
-                    onClick = {
-                        composeNavController.navigate(Routes.PinChange)
-                    }
-                )
-            }
-            if (flows.customerBalance != null) {
-                item {
-                    MenuButton(
-                        text = "Balance Enquiry",
-                        icon = painterResource(R.drawable.income),
-                        onClick = { fragment.openPageById(R.id.agent_balance_enquiry_button) }
-                    )
-                }
-            }
-        }
-    }
-    composable(BottomNavScreens.Customer.route) {
-        SubMenu {
-            if (flows.accountOpening != null) {
-                item {
-                    MenuButton(
-                        text = stringResource(R.string.account_opening),
-                        icon = painterResource(R.drawable.payday_loan),
-                        onClick = { fragment.openPageById(R.id.register_button) }
-                    )
-                }
-            }
-            if (flows.walletOpening != null) {
-                item {
-                    MenuButton(
-                        text = stringResource(R.string.title_activity_new_wallet),
-                        icon = painterResource(R.drawable.payday_loan),
-                        onClick = { fragment.openPageById(R.id.new_wallet_button) }
-                    )
-                }
-            }
-            item {
-                MenuButton(
-                    text = "Balance Enquiry",
-                    icon = painterResource(R.drawable.income),
-                    onClick = { fragment.openPageById(R.id.customer_balance_enquiry_button) }
-                )
-            }
-            if (flows.customerPinChange != null) {
-                item {
-                    MenuButton(
-                        text = "Change PIN",
-                        icon = painterResource(R.drawable.login_password),
-                        onClick = { fragment.openPageById(R.id.customer_change_pin_button) }
-                    )
-                }
-            }
-            if (flows.bvnUpdate != null) {
-                item {
-                    MenuButton(
-                        text = "BVN Update",
-                        icon = painterResource(R.drawable.secured_loan),
-                        onClick = { fragment.openPageById(R.id.bvn_update_button) }
-                    )
-                }
-            }
-        }
-    }
-    composable(BottomNavScreens.Transactions.route) {
-        LazyVerticalGrid(
-            cells = GridCells.Adaptive(minSize = 100.dp)
-        ) {
-            item {
-                SmallMenuButton(
-                    text = "Deposit",
-                    icon = painterResource(R.drawable.deposit),
-                    onClick = { fragment.openPageById(R.id.deposit_button) }
-                )
-            }
-            if (flows.tokenWithdrawal != null) {
-                item {
-                    SmallMenuButton(
-                        text = "Token Withdrawal",
-                        icon = painterResource(R.drawable.withdraw),
-                        onClick = { fragment.openPageById(R.id.token_withdrawal_button) }
-                    )
-                }
-            }
-            if (flows.ussdWithdrawal != null) {
-                item {
-                    SmallMenuButton(
-                        text = "USSD Withdrawal",
-                        icon = painterResource(R.drawable.withdraw),
-                        onClick = {
-                            composeNavController.navigate(Routes.UssdWithdrawal)
-                        }
-                    )
-                }
-            }
-            if (Platform.isPOS) {
-                item {
-                    SmallMenuButton(
-                        text = "Card Transactions",
-                        icon = painterResource(R.drawable.withdraw),
-                        onClick = { fragment.openPageById(R.id.card_withdrawal_button) }
-                    )
-                }
-            }
-            if (flows.billPayment != null) {
-                item {
-                    SmallMenuButton(
-                        text = "Bills Payment",
-                        icon = painterResource(R.drawable.payday_loan),
-                        onClick = { fragment.openPageById(R.id.pay_bill_button) }
-                    )
-                }
-            }
-            if (flows.airtime != null) {
-                item {
-                    SmallMenuButton(
-                        text = "Airtime Topup",
-                        icon = painterResource(R.drawable.payday_loan),
-                        onClick = { fragment.openPageById(R.id.airtime_button) }
-                    )
-                }
-            }
-            item {
-                SmallMenuButton(
-                    text = "Funds Transfer",
-                    icon = painterResource(R.drawable.payday_loan),
-                    onClick = { fragment.openPageById(R.id.funds_transfer_button) }
-                )
-            }
-            if (flows.collectionPayment != null) {
-                item {
-                    SmallMenuButton(
-                        text = "IGR Collections",
-                        icon = painterResource(R.drawable.payday_loan),
-                        onClick = { fragment.openPageById(R.id.collection_payment_button) }
-                    )
-                }
-            }
-        }
-    }
-    composable(BottomNavScreens.Loans.route) {
-        SubMenu {
-            item {
-                MenuButton(
-                    text = "Loan Request",
-                    icon = painterResource(R.drawable.personal_income),
-                    onClick = { fragment.openPageById(R.id.loan_request_button) }
-                )
-            }
-        }
     }
 }
 
