@@ -6,7 +6,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.cluster.components.BalanceCard
 import com.cluster.components.BottomNavScreens
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.ui.CreditClubFragment

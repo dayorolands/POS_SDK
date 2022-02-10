@@ -1,4 +1,4 @@
-package com.cluster.components
+package com.cluster.screen.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape

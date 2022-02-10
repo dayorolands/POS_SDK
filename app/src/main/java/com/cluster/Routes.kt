@@ -12,7 +12,6 @@ object Routes {
     const val UssdWithdrawal = "transactions/ussd/new"
     const val PendingTransactions = "transactions/ussd/new"
 
-    val supportConversation = { reference: String, title: String ->
+    fun supportConversation(reference: String, title: String) =
         "support/cases/${reference}/${title}/thread"
-    }
 }

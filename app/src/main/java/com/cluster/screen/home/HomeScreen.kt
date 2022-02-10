@@ -30,14 +30,6 @@ import com.cluster.utility.logout
 import com.cluster.utility.openPageById
 import java.util.*
 
-private val composableRouteFunctionIds = mapOf(
-    R.id.agent_change_pin_button to Routes.PinChange,
-    R.id.funds_transfer_button to Routes.FundsTransfer,
-    R.id.fn_support to Routes.SupportCases,
-    R.id.ussd_withdrawal_button to Routes.UssdWithdrawal,
-    R.id.fn_pending_transactions to Routes.PendingTransactions,
-)
-
 @OptIn(ExperimentalFoundationApi::class, ExperimentalStdlibApi::class)
 @Composable
 fun HomeScreen(
@@ -46,6 +38,15 @@ fun HomeScreen(
     activity: Activity,
     fragment: CreditClubFragment,
 ) {
+    val composableRouteFunctionIds = remember {
+        mapOf(
+            R.id.agent_change_pin_button to Routes.PinChange,
+            R.id.funds_transfer_button to Routes.FundsTransfer,
+            R.id.fn_support to Routes.SupportCases,
+            R.id.ussd_withdrawal_button to Routes.UssdWithdrawal,
+            R.id.fn_pending_transactions to Routes.PendingTransactions,
+        )
+    }
     val institutionConfig: InstitutionConfig by rememberBean()
     val homeNavController = rememberNavController()
     val coroutineScope = rememberCoroutineScope()

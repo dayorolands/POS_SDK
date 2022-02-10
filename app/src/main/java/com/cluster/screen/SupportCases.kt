@@ -25,24 +25,25 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.cluster.CaseLogActivity
 import com.cluster.R
-import com.cluster.utility.FunctionUsageTracker
-import com.cluster.utility.FunctionIds
 import com.cluster.Routes
 import com.cluster.core.data.api.CaseLogService
 import com.cluster.core.data.model.CaseDetail
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.data.request.CaseDetailsRequest
-import com.cluster.core.util.*
-import com.cluster.ui.*
+import com.cluster.core.util.format
+import com.cluster.core.util.getMessage
+import com.cluster.core.util.safeRunIO
+import com.cluster.ui.CreditClubAppBar
+import com.cluster.ui.ErrorFeedback
+import com.cluster.ui.rememberBean
+import com.cluster.ui.rememberRetrofitService
+import com.cluster.utility.FunctionIds
+import com.cluster.utility.FunctionUsageTracker
 import com.cluster.viewmodel.AppViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import java.time.LocalDate
 import java.util.*
-
-private val localDateNow = LocalDate.now()
-private val today = localDateNow.format("dd/MM/uuuu")
-private val yesterday = localDateNow.minusDays(1).format("dd/MM/uuuu")
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -173,6 +174,12 @@ fun SupportCases(navController: NavController) {
 
 @Composable
 private fun SupportThreadItem(caseDetail: CaseDetail, onClick: () -> Unit) {
+    val localDateNow = remember { LocalDate.now() }
+    val today = remember { localDateNow.format("dd/MM/uuuu") }
+    val yesterday = remember {
+        localDateNow.minusDays(1).format("dd/MM/uuuu")
+    }
+
     val formattedDate = remember(caseDetail.dateLogged) {
         when (val localDate = caseDetail.dateLogged.format("dd/MM/uuuu")) {
             today -> "Today"
