@@ -58,13 +58,13 @@ class IntStoreDelegate(
     private val key: String,
     private val defValue: Int,
 ) : ReadWriteProperty<Any, Int> {
-    override operator fun getValue(obj: Any, prop: KProperty<*>): Int {
+    override operator fun getValue(thisRef: Any, property: KProperty<*>): Int {
         return pref.getInt(key, defValue)
     }
 
-    override operator fun setValue(obj: Any, prop: KProperty<*>, newValue: Int) {
+    override operator fun setValue(thisRef: Any, property: KProperty<*>, value: Int) {
         pref.edit {
-            putInt(key, newValue)
+            putInt(key, value)
         }
     }
 }
@@ -87,9 +87,15 @@ class JsonStoreDelegate<T : Any>(
     private val serializer: KSerializer<T>,
     private val json: Json,
 ) {
+    private var _value: T? = null
+
     operator fun getValue(obj: Any?, prop: KProperty<*>): T? {
-        val value = prefs.getString(key, null) ?: return null
-        return json.decodeFromString(serializer, value)
+        if (_value == null) {
+            val value = prefs.getString(key, null) ?: return null
+            _value = json.decodeFromString(serializer, value)
+        }
+
+        return _value
     }
 
     operator fun setValue(obj: Any?, prop: KProperty<*>, newValue: T?) {
@@ -99,6 +105,7 @@ class JsonStoreDelegate<T : Any>(
         prefs.edit {
             putString(key, serializedValue)
         }
+        _value = newValue
     }
 }
 
