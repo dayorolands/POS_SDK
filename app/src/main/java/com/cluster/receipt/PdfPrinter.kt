@@ -34,8 +34,8 @@ import java.time.Instant
 class PdfPrinter(
     override val context: Activity,
     override val dialogProvider: DialogProvider,
-) : PosPrinter, KoinComponent {
-    private val appConfig: AppConfig by inject()
+    private val appConfig: AppConfig,
+) : PosPrinter {
     private val mainScope = MainScope()
 
     override fun check(): PrinterStatus {

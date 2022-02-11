@@ -1,4 +1,4 @@
-package com.cluster.app
+package com.cluster.config
 
 import android.content.Context
 import com.cluster.BuildConfig

@@ -5,11 +5,8 @@ import android.content.Context
 import androidx.work.WorkerParameters
 import com.cluster.BuildConfig
 import com.cluster.R
-import com.cluster.app.LocalInstitutionConfig
-import com.cluster.ui.CreditClubDialogProvider
-import com.cluster.work.*
-import com.cluster.pos.Platform
 import com.cluster.analytics.NetworkMetricsInterceptor
+import com.cluster.config.LocalInstitutionConfig
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.*
 import com.cluster.core.data.api.AppConfig
@@ -20,16 +17,19 @@ import com.cluster.core.data.prefs.AppDataStorage
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.debugOnly
+import com.cluster.pos.Platform
 import com.cluster.pos.printer.PosPrinter
 import com.cluster.receipt.PdfPrinter
-import okhttp3.*
+import com.cluster.ui.CreditClubDialogProvider
+import com.cluster.work.*
+import okhttp3.Cache
+import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.io.File
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -134,7 +134,7 @@ val configModule = module {
 
 val sharingModule = module {
     factory<PosPrinter> { (context: Activity, dialogProvider: DialogProvider) ->
-        PdfPrinter(context, dialogProvider)
+        PdfPrinter(context, dialogProvider, get())
     }
 }
 

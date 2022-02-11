@@ -11,11 +11,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.cluster.R
-import com.cluster.databinding.BillPaymentFragmentBinding
-import com.cluster.executeTransaction
-import com.cluster.receipt.billsPaymentReceipt
-import com.cluster.ui.dataBinding
-import com.cluster.utility.FunctionIds
 import com.cluster.core.data.ClusterObjectBox
 import com.cluster.core.data.api.BillsPaymentService
 import com.cluster.core.data.api.retrofitService
@@ -28,6 +23,11 @@ import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.*
 import com.cluster.core.util.delegates.defaultJson
+import com.cluster.databinding.BillPaymentFragmentBinding
+import com.cluster.executeTransaction
+import com.cluster.receipt.billsPaymentReceipt
+import com.cluster.ui.dataBinding
+import com.cluster.utility.FunctionIds
 import io.objectbox.Box
 import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.cancel
@@ -159,8 +159,8 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     }
 
     private inline fun <T> MutableStateFlow<T>.onChange(crossinline block: (value: T) -> Unit) {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 var oldValue = value
                 collect {
                     if (it != oldValue) {
@@ -188,14 +188,14 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         autoCompleteTextView: AutoCompleteTextView,
         crossinline mapFunction: List<T>.() -> List<Any>,
     ) {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 this@bindDropDown.collect { list ->
                     val items = list.mapFunction()
                     val adapter = ArrayAdapter(requireContext(), R.layout.list_item, items)
                     autoCompleteTextView.setAdapter(adapter)
                     autoCompleteTextView.setOnItemClickListener { parent, _, position, _ ->
-                        lifecycleScope.launchWhenStarted {
+                        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
                             selectedItemLiveData.emit(parent.getItemAtPosition(position) as T)
                         }
                     }
@@ -418,7 +418,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
     }
 
     private fun <T> MutableStateFlow<T>.postValue(value: T) {
-        lifecycleScope.launchWhenStarted {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             emit(value)
         }
     }

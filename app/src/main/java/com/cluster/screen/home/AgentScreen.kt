@@ -1,5 +1,6 @@
 package com.cluster.screen.home
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
@@ -10,6 +11,7 @@ import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.utility.openPageById
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AgentScreen(
     fragment: CreditClubFragment,

@@ -33,13 +33,6 @@ import kotlin.coroutines.suspendCoroutine
  * Appzone Ltd
  */
 
-val tokenParams = TextFieldParams(
-    "Enter Token",
-    maxLength = 10,
-    type = "number",
-    helperText = "A token has been sent to the customer's phone number",
-)
-
 /***
  * Show this [Dialog] when [DialogListener.onClose] is called
  */
@@ -259,9 +252,14 @@ inline fun CreditClubActivity.requireAndValidateToken(
     amount: Double = 1.0,
     operationType: TokenType,
     isPinChange: Boolean = false,
-    textFieldParams: TextFieldParams = tokenParams,
     crossinline block: DialogListenerBlock<Unit>,
 ) {
+    val textFieldParams = TextFieldParams(
+        "Enter Token",
+        maxLength = 10,
+        type = "number",
+        helperText = "A token has been sent to the customer's phone number",
+    )
     val staticService: StaticService by retrofitService()
     val reference = SecureRandom().nextInt(1000000)
 

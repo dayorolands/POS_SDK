@@ -3,16 +3,16 @@ package com.cluster.network.online
 import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
-import com.cluster.model.TransactionCountType
-import com.cluster.utility.Misc
 import com.cluster.core.data.CreditClubClient
 import com.cluster.core.data.Encryption
 import com.cluster.core.data.api.BankOneService
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.util.SafeRunResult
 import com.cluster.core.util.safeRunIO
+import com.cluster.model.TransactionCountType
+import com.cluster.utility.Misc
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeoutException
 
 class APIHelper @JvmOverloads constructor(
     private val ctx: Context,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
+    private val scope: CoroutineScope = MainScope(),
 ) {
     private val koin = GlobalContext.get()
     private val localStorage: LocalStorage by koin.inject()

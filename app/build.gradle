@@ -136,7 +136,6 @@ android {
     sourceSets {
         main {
             java.srcDirs = [
-                    "src/main",
                     "src/main/java"
             ]
         }

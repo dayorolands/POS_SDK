@@ -1,5 +1,6 @@
 package com.cluster.screen.home
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import com.cluster.R
@@ -7,6 +8,7 @@ import com.cluster.components.MenuButton
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.utility.openPageById
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LoansScreen(fragment: CreditClubFragment) {
     SubMenu {
