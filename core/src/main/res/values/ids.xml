@@ -9,4 +9,5 @@
     <item name="fn_bill_payment" type="id" />
     <item name="fn_pos_chargeback" type="id" />
     <item name="fn_pending_transactions" type="id" />
+    <item name="fn_subscription" type="id" />
 </resources>

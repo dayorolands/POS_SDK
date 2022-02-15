@@ -1,6 +1,7 @@
-package com.cluster.di
+package com.cluster.config
 
 import com.cluster.analytics.NetworkMetricsInterceptor
+import com.cluster.config.CACHE_SIZE
 import com.cluster.core.data.HttpClientConfiguration
 import com.cluster.core.data.api.AuthInterceptor
 import com.cluster.core.data.api.RequestFailureInterceptor

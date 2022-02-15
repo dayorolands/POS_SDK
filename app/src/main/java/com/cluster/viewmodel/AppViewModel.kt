@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.cluster.core.data.model.CaseDetail
 import com.cluster.core.data.model.Notification
+import com.cluster.core.data.model.SubscriptionPlan
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class AppViewModel : ViewModel() {
@@ -12,4 +13,8 @@ class AppViewModel : ViewModel() {
     val caseDetails = mutableStateOf<List<CaseDetail>>(emptyList())
     val fcmToken = mutableStateOf("")
     val sessionTimedOut = MutableLiveData(false)
+    val activePlan = MutableStateFlow<SubscriptionPlan?>(null)
+    val subscriptionHistory = MutableStateFlow<List<SubscriptionPlan>>(emptyList())
+
+
 }

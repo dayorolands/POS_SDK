@@ -435,6 +435,10 @@
     <string name="payment_item">Payment Item</string>
     <string name="customer_email_optional">Customer Email (optional)</string>
     <string name="biller">Biller</string>
+    <string name="subscription">Subscription</string>
+    <string name="profile">Profile</string>
+    <string name="balance_enquiry">Balance Enquiry</string>
+    <string name="check_balance">Check Balance</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>

@@ -109,6 +109,7 @@ dependencies {
         exclude(group: "com.google.android.gms", module: "play-services-ads-identifier")
     }
     api "androidx.security:security-crypto:1.1.0-alpha03"
+    api("androidx.datastore:datastore:1.0.0")
 
     implementation "androidx.navigation:navigation-fragment-ktx:${versions.navigation}"
     implementation "androidx.navigation:navigation-ui-ktx:${versions.navigation}"

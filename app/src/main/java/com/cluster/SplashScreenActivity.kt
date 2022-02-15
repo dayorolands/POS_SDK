@@ -44,19 +44,16 @@ class SplashScreenActivity : AppCompatActivity(R.layout.activity_splashscreen) {
 
     private suspend fun loadPage() {
         delay(3000)
-        if (localStorage.getString("ACTIVATED", null) == null) {
-            val intent = Intent(
-                this@SplashScreenActivity,
-                AgentActivationActivity::class.java
-            )
-            startActivity(intent)
+        val nextActivity = if (localStorage.getString("ACTIVATED", null) == null) {
+            AgentActivationActivity::class.java
         } else {
-            val intent = Intent(
-                this@SplashScreenActivity,
-                LoginActivity::class.java
-            )
-            startActivity(intent)
+            LoginActivity::class.java
         }
+        val intent = Intent(
+            this@SplashScreenActivity,
+            nextActivity
+        )
+        startActivity(intent)
         finish()
     }
 

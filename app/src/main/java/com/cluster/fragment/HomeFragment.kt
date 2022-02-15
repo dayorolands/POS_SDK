@@ -124,7 +124,6 @@ class HomeFragment : CreditClubFragment() {
                                     HomeScreen(
                                         mainNavController = fragmentNavController,
                                         composeNavController = composeNavController,
-                                        activity = requireActivity(),
                                         fragment = this@HomeFragment,
                                     )
                                 }

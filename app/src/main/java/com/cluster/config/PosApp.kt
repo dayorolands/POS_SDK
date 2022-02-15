@@ -1,4 +1,4 @@
-package com.cluster
+package com.cluster.config
 
 import android.app.Application
 import android.content.Context
@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.WorkManager
+import com.cluster.R
 import com.cluster.utility.extensions.registerPeriodicWorker
 import com.cluster.work.*
 import com.cluster.pos.Platform

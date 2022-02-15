@@ -11,7 +11,7 @@ import android.os.Build
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import androidx.appcompat.app.AppCompatDelegate
-import com.cluster.di.*
+import com.cluster.config.*
 import com.cluster.model.online.AuthResponse
 import com.cluster.utility.extensions.registerWorkers
 import com.cluster.utility.registerAppFunctions

@@ -24,10 +24,7 @@ import java.util.*
 class CollectionReferenceGenerationFragment :
     CreditClubFragment(R.layout.fragment_collection_reference_generation) {
 
-    private val args = object {
-        val offline by lazy { requireArguments().getBoolean("offline") }
-    }
-
+    private var argIsOffline = false
     private val request = CollectionReferenceGenerationRequest()
 
     private val binding by dataBinding<FragmentCollectionReferenceGenerationBinding>()
@@ -43,9 +40,9 @@ class CollectionReferenceGenerationFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        argIsOffline = requireArguments().getBoolean("offline")
         viewModel.run {
-            isOffline.value = args.offline
+            isOffline.value = argIsOffline
             categoryList.bindDropDown(category, binding.categoryInput)
             itemList.bindDropDown(item, binding.paymentItemInput)
 
@@ -53,7 +50,7 @@ class CollectionReferenceGenerationFragment :
             customerType.onChange { customer.postValue(null) }
             item.onChange { itemCode.postValue(item.value?.code) }
             category.onChange {
-                if (!args.offline) {
+                if (!argIsOffline) {
                     binding.paymentItemInput.clearSuggestions()
 
                     mainScope.launch { loadPaymentItems() }
@@ -182,7 +179,7 @@ class CollectionReferenceGenerationFragment :
             return dialogProvider.showErrorAndWait("Please enter a phone number")
         }
 
-        if (args.offline && viewModel.invoiceNumber.value.isNullOrBlank()) {
+        if (argIsOffline && viewModel.invoiceNumber.value.isNullOrBlank()) {
             return dialogProvider.showErrorAndWait("Please enter an invoice number")
         }
 
@@ -190,7 +187,7 @@ class CollectionReferenceGenerationFragment :
             return dialogProvider.showError("Please select a valid category")
         }
 
-        if (!args.offline && viewModel.itemCode.value.isNullOrBlank()) {
+        if (!argIsOffline && viewModel.itemCode.value.isNullOrBlank()) {
             return dialogProvider.showError("Please select a valid payment item")
         }
 
@@ -211,13 +208,13 @@ class CollectionReferenceGenerationFragment :
         request.apply {
             customerId =
                 "${viewModel.customerType.value}${viewModel.customerId.value?.trim()}"
-            if (args.offline) reference = viewModel.invoiceNumber.value?.trim()
+            if (argIsOffline) reference = viewModel.invoiceNumber.value?.trim()
             phoneNumber = viewModel.customerPhoneNumber.value?.trim()
             agentPin = pin
             region = viewModel.region.value
             categoryCode = viewModel.categoryCode.value
             collectionType = derivedCollectionType
-            itemCode = if (args.offline) "4000000"
+            itemCode = if (argIsOffline) "4000000"
             else viewModel.itemCode.value
 
             amount = binding.amountInput.value.toDoubleOrNull()
@@ -261,7 +258,7 @@ class CollectionReferenceGenerationFragment :
 
     private inline val derivedCollectionType
         get() = viewModel.run {
-            if (collectionTypeIsCbs.value == true && args.offline) "WEBGUID"
+            if (collectionTypeIsCbs.value == true && argIsOffline) "WEBGUID"
             else collectionType.value
         }
 }

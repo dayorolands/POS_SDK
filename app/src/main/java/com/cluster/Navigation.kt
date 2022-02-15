@@ -15,6 +15,7 @@ import com.cluster.pos.printer.ParcelablePrintJob
 import com.cluster.screen.PinChange
 import com.cluster.screen.SupportCases
 import com.cluster.screen.UssdWithdrawal
+import com.cluster.screen.subscription.SubscriptionScreen
 import com.cluster.viewmodel.AppViewModel
 import com.google.accompanist.insets.navigationBarsPadding
 
@@ -68,6 +69,9 @@ fun NavGraphBuilder.clusterNavigation(
             navController = navController,
             printJob = printJob ?: return@composable,
         )
+    }
+    composable(Routes.Subscription) {
+        SubscriptionScreen(navController = navController)
     }
 }
 

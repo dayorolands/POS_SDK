@@ -6,23 +6,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.cluster.R
-import com.cluster.core.util.safeRunSuspend
 import com.google.accompanist.insets.statusBarsHeight
-import kotlinx.coroutines.launch
 
 @Composable
-fun HomeAppBar(scaffoldState: ScaffoldState, mainNavController: NavController) {
+fun HomeAppBar(mainNavController: NavController, title: String, openProfile: () -> Unit) {
     val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
-    val coroutineScope = rememberCoroutineScope()
     // Draw a scrim over the status bar which matches the app bar
     Spacer(
         Modifier
@@ -33,6 +29,11 @@ fun HomeAppBar(scaffoldState: ScaffoldState, mainNavController: NavController) {
     TopAppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    title,
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+                    style = MaterialTheme.typography.h5,
+                )
                 Spacer(
                     modifier = Modifier
                         .weight(1f),
@@ -52,15 +53,9 @@ fun HomeAppBar(scaffoldState: ScaffoldState, mainNavController: NavController) {
         },
         backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0f),
         navigationIcon = {
-            IconButton(onClick = {
-                coroutineScope.launch {
-                    safeRunSuspend {
-                        scaffoldState.drawerState.open()
-                    }
-                }
-            }) {
+            IconButton(onClick = openProfile) {
                 Icon(
-                    Icons.Default.Menu,
+                    Icons.Outlined.AccountCircle,
                     contentDescription = null,
                     tint = MaterialTheme.colors.primary.copy(0.52f)
                 )

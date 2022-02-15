@@ -1,4 +1,4 @@
-package com.cluster.di
+package com.cluster.config
 
 import android.app.Activity
 import android.content.Context
@@ -6,7 +6,6 @@ import androidx.work.WorkerParameters
 import com.cluster.BuildConfig
 import com.cluster.R
 import com.cluster.analytics.NetworkMetricsInterceptor
-import com.cluster.config.LocalInstitutionConfig
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.*
 import com.cluster.core.data.api.AppConfig

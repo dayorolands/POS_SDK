@@ -25,13 +25,6 @@ fun NavGraphBuilder.homeRoutes(
             )
         }
     }
-    composable(BottomNavScreens.Agent.route) {
-        AgentScreen(
-            fragment = fragment,
-            institutionConfig = institutionConfig,
-            composeNavController = composeNavController,
-        )
-    }
     composable(BottomNavScreens.Customer.route) {
         CustomerScreen(
             fragment = fragment,
@@ -47,5 +40,11 @@ fun NavGraphBuilder.homeRoutes(
     }
     composable(BottomNavScreens.Loans.route) {
         LoansScreen(fragment = fragment)
+    }
+    composable(BottomNavScreens.Profile.route) {
+        ProfileScreen(
+            composeNavController = composeNavController,
+            fragment = fragment,
+        )
     }
 }
