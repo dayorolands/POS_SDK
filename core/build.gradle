@@ -79,7 +79,7 @@ dependencies {
     // Koin for Jetpack WorkManager
     api "io.insert-koin:koin-androidx-workmanager:${versions.koin}"
     // Koin for Jetpack Compose
-    implementation "io.insert-koin:koin-androidx-compose:${versions.koin}"
+    api "io.insert-koin:koin-androidx-compose:${versions.koin}"
 
     api "com.github.esafirm:android-image-picker:3.0.0-beta1"
     api "com.github.bumptech.glide:glide:4.12.0"

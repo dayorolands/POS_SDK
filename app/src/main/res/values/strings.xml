@@ -439,6 +439,8 @@
     <string name="profile">Profile</string>
     <string name="balance_enquiry">Balance Enquiry</string>
     <string name="check_balance">Check Balance</string>
+    <string name="subscription_history">Subscription History</string>
+    <string name="new_subscription">New subscription</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>

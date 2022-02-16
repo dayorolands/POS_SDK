@@ -19,7 +19,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -55,7 +56,7 @@ import java.io.File
 
 class HomeFragment : CreditClubFragment() {
     private val notificationViewModel: NotificationViewModel by activityViewModels()
-    private val appViewModel: AppViewModel by viewModels()
+    private val appViewModel: AppViewModel by activityViewModels()
     private val notificationService: NotificationService by retrofitService()
     private val appDataStorage: AppDataStorage by inject()
 
@@ -107,12 +108,14 @@ class HomeFragment : CreditClubFragment() {
                 // insets support. This allows our `ConversationContent` to animate with the
                 // on-screen keyboard (IME) as it enters/exits the screen.
                 .start(windowInsetsAnimationsEnabled = true)
+            val viewModelStoreOwner: ViewModelStoreOwner = requireActivity()
 
             setContent {
                 val composeNavController = rememberNavController()
                 CompositionLocalProvider(
                     LocalBackPressedDispatcher provides requireActivity().onBackPressedDispatcher,
                     LocalWindowInsets provides windowInsets,
+                    LocalViewModelStoreOwner provides viewModelStoreOwner,
                 ) {
                     CreditClubTheme {
                         ProvideWindowInsets {
