@@ -7,7 +7,7 @@ import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
-import com.cluster.BankOneApplication
+import com.cluster.ClusterApplication
 import com.cluster.OnlineActivity
 import com.cluster.R
 import com.cluster.databinding.FragmentEnterDetailBinding
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeoutException
 
 class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
     private val authResponse: AuthResponse by lazy {
-        (requireActivity().application as BankOneApplication).authResponse
+        (requireActivity().application as ClusterApplication).authResponse
     }
     private val binding by dataBinding<FragmentEnterDetailBinding>()
     private val ah by lazy { APIHelper(requireActivity(), mainScope) }
@@ -136,7 +136,7 @@ class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
                         TransactionCountType.ERROR_RESPONSE_COUNT,
                         authResponse.sessionId
                     )
-                    val (phoneNumber, sessionId) = (requireActivity().application as BankOneApplication).authResponse
+                    val (phoneNumber, sessionId) = (requireActivity().application as ClusterApplication).authResponse
                     val auth = JSONObject().apply {
                         put("phone_number", phoneNumber)
                         put("session_id", sessionId)
@@ -267,7 +267,7 @@ class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
             Misc.increaseTransactionMonitorCounter(
                 activity,
                 TransactionCountType.NO_INTERNET_COUNT,
-                (requireActivity().application as BankOneApplication).authResponse.sessionId
+                (requireActivity().application as ClusterApplication).authResponse.sessionId
             )
             dialogProvider.showError("Connection lost")
             return

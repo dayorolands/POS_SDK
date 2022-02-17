@@ -5,18 +5,18 @@ object Versions {
     const val minSdk = 21
     const val targetSdk = 31
 
-    const val accompanist = "0.20.0"
+    const val accompanist = "0.23.0"
     const val activityKtx = "1.4.0"
     const val appcompat = "1.4.0"
     const val coil = "1.4.0"
     const val constraintLayout = "2.1.2"
     const val coreKtx = "1.7.0"
-    const val coroutines = "1.5.2"
-    const val compose = "1.0.5"
+    const val coroutines = "1.6.0"
+    const val compose = "1.1.0"
     const val desugarJdk = "1.1.5"
     const val googleServices = "4.3.3"
     const val koin = "3.1.5"
-    const val kotlin = "1.5.31"
+    const val kotlin = "1.6.10"
     const val lifecycle = "2.4.0"
     const val material = "1.4.0"
     const val navigation = "2.4.0"
@@ -40,14 +40,13 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.5.31"
+        private const val version = Versions.kotlin
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
-        const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
     }
 
     object Coroutines {
-        private const val version = "1.5.2"
+        private const val version = Versions.coroutines
         const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
         const val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
@@ -58,7 +57,7 @@ object Libs {
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.0.5"
+            private const val version = Versions.compose
 
             const val foundation = "androidx.compose.foundation:foundation:${version}"
             const val layout = "androidx.compose.foundation:foundation-layout:${version}"

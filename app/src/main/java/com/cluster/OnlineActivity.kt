@@ -21,7 +21,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import java.util.concurrent.TimeoutException
 
 class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
-    private val authResponse get() = (application as BankOneApplication).authResponse
+    private val authResponse get() = (application as ClusterApplication).authResponse
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

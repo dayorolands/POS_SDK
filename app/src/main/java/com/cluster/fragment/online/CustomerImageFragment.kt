@@ -11,7 +11,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import com.cluster.BankOneApplication
+import com.cluster.ClusterApplication
 import com.cluster.OnlineActivity
 import com.cluster.R
 import com.cluster.databinding.FragmentCustomerImageBinding
@@ -69,7 +69,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
     private val binding by dataBinding<FragmentCustomerImageBinding>()
     private var optionsText: OptionsText? = null
     private val authResponse: AuthResponse by lazy {
-        (requireActivity().application as BankOneApplication).authResponse
+        (requireActivity().application as ClusterApplication).authResponse
     }
     private val ah by lazy { APIHelper(requireActivity(), mainScope) }
     private val launcher = registerImagePicker {
@@ -158,7 +158,7 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
 
     private suspend fun nextOperation() {
         val finalFile = File(creditClubImage?.path ?: return)
-        val bankOneApplication = activity?.application as BankOneApplication?
+        val bankOneApplication = activity?.application as ClusterApplication?
         val authResponse = bankOneApplication?.authResponse
 
         dialogProvider.showProgressBar("Uploading")

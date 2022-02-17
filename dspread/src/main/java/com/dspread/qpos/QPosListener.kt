@@ -74,6 +74,7 @@ class QPosListener(
             QPOSService.DoTradeResult.NO_RESPONSE -> {
                 statusEditText.setText(getString(R.string.card_no_response))
             }
+            else -> {}
         }
     }
 
@@ -390,6 +391,7 @@ class QPosListener(
                 pos.resetPosStatus()
                 statusEditText.setText(getString(R.string.device_reset))
             }
+            else -> {}
         }
         handleCardData()
         handleCardReaderEvent(CardReaderEvent.CANCELLED)
