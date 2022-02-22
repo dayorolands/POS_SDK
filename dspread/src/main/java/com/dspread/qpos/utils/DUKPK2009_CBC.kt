@@ -114,6 +114,7 @@ object DUKPK2009_CBC {
                 dataKeyStr
             Enum_key.DATA_VARIANT -> keySel =
                 dataKeyStrVariant
+            else -> {}
         }
         var buf: ByteArray? = null
         if (mode == Enum_mode.CBC) buf =

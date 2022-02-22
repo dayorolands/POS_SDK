@@ -32,7 +32,7 @@ import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 
-class BankOneApplication : Application() {
+class ClusterApplication : Application() {
     private val appDataStorage: AppDataStorage by inject()
     private val localStorage: LocalStorage by inject()
 
@@ -58,7 +58,7 @@ class BankOneApplication : Application() {
 
         startKoin {
             androidLogger(if (BuildConfig.DEBUG) Level.ERROR else Level.NONE)
-            androidContext(this@BankOneApplication)
+            androidContext(this@ClusterApplication)
             androidFileProperties()
             fragmentFactory()
             workManagerFactory()

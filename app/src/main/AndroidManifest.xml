@@ -17,7 +17,7 @@
     <uses-feature android:name="android.hardware.location.gps" />
 
     <application
-        android:name="com.cluster.BankOneApplication"
+        android:name="com.cluster.ClusterApplication"
         android:allowBackup="false"
         android:extractNativeLibs="true"
         android:icon="@mipmap/ic_launcher"

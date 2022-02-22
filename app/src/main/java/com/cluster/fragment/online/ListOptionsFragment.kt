@@ -8,7 +8,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
-import com.cluster.BankOneApplication
+import com.cluster.ClusterApplication
 import com.cluster.OnlineActivity
 import com.cluster.R
 import com.cluster.adapter.online.OptionsAdapter
@@ -34,7 +34,7 @@ import java.util.concurrent.TimeoutException
 class ListOptionsFragment : CreditClubFragment(R.layout.fragment_listview), OnItemClickListener,
     View.OnClickListener {
     private val authResponse: AuthResponse by lazy {
-        (requireActivity().application as BankOneApplication).authResponse
+        (requireActivity().application as ClusterApplication).authResponse
     }
     private val binding by dataBinding<FragmentListviewBinding>()
     private val ah by lazy { APIHelper(requireActivity()) }
