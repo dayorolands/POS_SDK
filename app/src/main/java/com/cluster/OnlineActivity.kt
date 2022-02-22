@@ -18,10 +18,19 @@ import com.cluster.core.data.Encryption.decrypt
 import com.cluster.core.data.Encryption.generateSessionId
 import com.cluster.core.ui.CreditClubActivity
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import org.koin.android.ext.android.get
 import java.util.concurrent.TimeoutException
 
 class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
     private val authResponse get() = (application as ClusterApplication).authResponse
+    private val apiHelper by lazy {
+        APIHelper(
+            ctx = baseContext,
+            scope = mainScope,
+            localStorage = localStorage,
+            client = get()
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +53,7 @@ class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
             val sessionId = generateSessionId(phoneNumber)
             dialogProvider.showProgressBar("Loading")
             Misc.resetTransactionMonitorCounter(baseContext)
-            APIHelper(baseContext, mainScope).attemptValidation(
+            apiHelper.attemptValidation(
                 phoneNumber,
                 sessionId,
                 verificationCode,

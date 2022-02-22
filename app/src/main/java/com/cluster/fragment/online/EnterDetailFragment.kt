@@ -24,6 +24,7 @@ import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.safeRun
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import org.koin.android.ext.android.get
 import java.util.*
 import java.util.concurrent.TimeoutException
 
@@ -32,7 +33,14 @@ class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
         (requireActivity().application as ClusterApplication).authResponse
     }
     private val binding by dataBinding<FragmentEnterDetailBinding>()
-    private val ah by lazy { APIHelper(requireActivity(), mainScope) }
+    private val ah by lazy {
+        APIHelper(
+            ctx = requireContext(),
+            scope = mainScope,
+            localStorage = localStorage,
+            client = get()
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
