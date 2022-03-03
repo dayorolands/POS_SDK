@@ -1,7 +1,7 @@
 package com.cluster.screen.home
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
@@ -12,30 +12,34 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.cluster.core.data.model.SubscriptionPlan
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cluster.viewmodel.AppViewModel
 
 @Composable
 fun ActiveSubscription(
-    subscriptionPlanStateFlow: MutableStateFlow<SubscriptionPlan?>,
     openSubscription: () -> Unit,
 ) {
-    val subscriptionPlan by subscriptionPlanStateFlow.collectAsState()
+    val viewModel: AppViewModel = viewModel()
+    val subscription by viewModel.activeSubscription.collectAsState()
+    val daysToExpire by viewModel.planDaysToExpire.collectAsState(null)
 
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = subscriptionPlan?.name ?: "Not subscribed",
+            text = subscription?.plan?.name ?: "Not subscribed",
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp),
             softWrap = true,
             style = MaterialTheme.typography.subtitle1,
             color = MaterialTheme.colors.onSurface,
+            overflow = TextOverflow.Ellipsis,
         )
         TextButton(
             onClick = openSubscription,
@@ -44,7 +48,19 @@ fun ActiveSubscription(
                 text = "Manage Subscription",
                 style = MaterialTheme.typography.body1,
                 color = MaterialTheme.colors.primary,
+                textAlign = TextAlign.Center,
             )
+            if (daysToExpire != null && daysToExpire!! < 5) {
+                Text(
+                    text = "(Expiring soon)",
+                    modifier = Modifier
+                        .padding(start = 5.dp),
+                    softWrap = true,
+                    style = MaterialTheme.typography.subtitle1,
+                    color = MaterialTheme.colors.error,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ object Versions {
     const val constraintLayout = "2.1.2"
     const val coreKtx = "1.7.0"
     const val coroutines = "1.6.0"
-    const val compose = "1.1.0"
+    const val compose = "1.1.1"
     const val desugarJdk = "1.1.5"
     const val googleServices = "4.3.3"
     const val koin = "3.1.5"
@@ -29,10 +29,8 @@ object Versions {
 }
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.4"
-
     object Accompanist {
-        const val version = "0.21.2-beta"
+        const val version = "0.23.1"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val systemuicontroller = "com.google.accompanist:accompanist-systemuicontroller:$version"
         const val flowlayouts = "com.google.accompanist:accompanist-flowlayout:$version"

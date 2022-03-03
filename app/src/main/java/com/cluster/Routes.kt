@@ -13,6 +13,8 @@ object Routes {
     const val PendingTransactions = "transactions/ussd/new"
     const val Subscription = "subscription"
     const val NewSubscription = "subscription/new"
+    const val UpgradeSubscription = "subscription/upgrade"
+    const val ExtendSubscription = "subscription/extend"
     const val SubscriptionHistory = "subscription/history"
 
     fun supportConversation(reference: String, title: String) =

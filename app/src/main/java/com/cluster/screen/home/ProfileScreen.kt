@@ -16,6 +16,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
@@ -32,12 +33,14 @@ import com.cluster.R
 import com.cluster.activity.UpdateActivity
 import com.cluster.components.NavigationRow
 import com.cluster.core.config.InstitutionConfig
+import com.cluster.core.data.api.SubscriptionService
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.debugOnly
 import com.cluster.core.util.packageInfo
 import com.cluster.pos.Platform
 import com.cluster.ui.rememberBean
+import com.cluster.ui.rememberRetrofitService
 import com.cluster.utility.logout
 import com.cluster.utility.openPageById
 import com.cluster.viewmodel.AppViewModel
@@ -54,6 +57,14 @@ fun ProfileScreen(
     val institutionConfig: InstitutionConfig by rememberBean()
     val agent = localStorage.agent
     val context = LocalContext.current
+    val subscriptionService: SubscriptionService by rememberRetrofitService()
+
+    LaunchedEffect(1) {
+        viewModel.loadActiveSubscription(
+            subscriptionService = subscriptionService,
+            localStorage = localStorage,
+        )
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -86,7 +97,6 @@ fun ProfileScreen(
 
         item {
             ActiveSubscription(
-                subscriptionPlanStateFlow = viewModel.activePlan,
                 openSubscription = { composeNavController.navigate(Routes.Subscription) },
             )
         }
@@ -244,7 +254,7 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ChipButton(label: String, icon: Painter, onClick: () -> Unit) {
+private fun ChipButton(label: String, icon: Painter, onClick: () -> Unit) {
     TextButton(
         onClick = onClick,
         shape = RoundedCornerShape(15.dp),

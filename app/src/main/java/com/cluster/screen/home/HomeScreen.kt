@@ -2,8 +2,9 @@ package com.cluster.screen.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Scaffold
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -80,16 +81,26 @@ fun HomeScreen(
         scaffoldState = scaffoldState,
         topBar = {
             HomeAppBar(
-                openProfile = {
-                    homeNavController.navigate(BottomNavScreens.Profile.route) {
-                        launchSingleTop = true
-                        popUpTo(BottomNavScreens.Home.route) {
-                            inclusive = false
-                        }
-                    }
-                },
                 mainNavController = mainNavController,
                 title = title,
+                navigationIcon = {
+                    if (currentRoute != BottomNavScreens.Profile.route) {
+                        IconButton(onClick = {
+                            homeNavController.navigate(BottomNavScreens.Profile.route) {
+                                launchSingleTop = true
+                                popUpTo(BottomNavScreens.Home.route) {
+                                    inclusive = false
+                                }
+                            }
+                        }) {
+                            Icon(
+                                Icons.Outlined.AccountCircle,
+                                contentDescription = null,
+                                tint = MaterialTheme.colors.primary.copy(0.52f)
+                            )
+                        }
+                    }
+                }
             )
         },
         bottomBar = { SubMenuBottomNavigation(homeNavController, bottomNavigationItems) },

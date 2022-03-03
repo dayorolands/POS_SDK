@@ -1,6 +1,5 @@
 package com.nexgo.n3
 
-import android.os.Environment
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.util.debugOnly
 import com.cluster.core.util.safeRunIO
@@ -19,6 +18,8 @@ import com.nexgo.oaf.apiv3.emv.EmvTransConfigurationEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.util.*
@@ -30,7 +31,7 @@ class N3CardReader(
     private val deviceEngine: DeviceEngine,
     private val sessionData: PosManager.SessionData,
     private val posManager: N3PosManager,
-    private val defaultPosParameter:PosParameter,
+    private val defaultPosParameter: PosParameter,
     private val posConfig: PosConfig,
 ) : CardReader {
     private var cardReader = deviceEngine.cardReader
@@ -82,10 +83,15 @@ class N3CardReader(
         }
         safeRunIO {
             debugOnly {
-                Runtime.getRuntime().exec(
-                    "logcat -v time -f " + Environment.getExternalStorageDirectory()
-                        .path + "/" + "emvlog_" + LocalDateTime.now().toString()
+                val outputFile = File(
+                    activity.getExternalFilesDir(null)!!.absolutePath,
+                    "emv_logcat_${LocalDateTime.now()}.txt"
                 )
+                try {
+                    Runtime.getRuntime().exec("logcat -f " + outputFile.absolutePath)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
             }
         }
         dialogProvider.hideProgressBar()

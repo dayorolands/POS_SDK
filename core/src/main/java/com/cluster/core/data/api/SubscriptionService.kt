@@ -13,8 +13,8 @@ import retrofit2.http.Query
 interface SubscriptionService {
     @GET("api/Subscription/GetActiveSubscription")
     suspend fun getActiveSubscription(
-        @Query("institutionCode") institutionCode: String,
-        @Query("agentPhoneNumber") agentPhoneNumber: String,
+        @Query("institutionCode") institutionCode: String?,
+        @Query("agentPhoneNumber") agentPhoneNumber: String?,
     ): ApiResponse<Subscription>
 
     @GET("api/Subscription/GetRenewalInformationByPlanID")
@@ -39,7 +39,7 @@ interface SubscriptionService {
         @Query("active") active: Boolean,
         @Query("startIndex") startIndex: Int,
         @Query("maxSize") maxSize: Int
-    ): ApiResponse<ReportResult<SubscriptionPlan>>
+    ): ApiResponse<ReportResult<Subscription>>
 
     @POST("api/Subscription/Subscribe")
     suspend fun subscribe(@Body request: SubscriptionRequest): ApiResponse<String>

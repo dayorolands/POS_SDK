@@ -6,71 +6,61 @@ import kotlinx.serialization.Serializable
 import java.time.Instant
 
 @Serializable
-data class SubscriptionOption(
-    @SerialName("FeeDiscount")
-    val feeDiscount: Int = 0,
-    @SerialName("ID")
-    val id: Int = 0,
-    @SerialName("MaximumBenefitVolume")
-    val maximumBenefitVolume: Int = 0,
-    @SerialName("TransactionType")
-    val transactionType: Int = 0
-)
-
-@Serializable
 data class SubscriptionPlan(
     @SerialName("DateCreated")
-    val dateCreated: String = "",
+    @Serializable(with = TimeInstantSerializer::class)
+    val dateCreated: Instant,
     @SerialName("DateUpdated")
-    val dateUpdated: String = "",
+    @Serializable(with = TimeInstantSerializer::class)
+    val dateUpdated: Instant,
     @SerialName("Description")
-    val description: String = "",
+    val description: String,
     @SerialName("DisplayMessage")
-    val displayMessage: String? = null,
+    val displayMessage: String?,
     @SerialName("Fee")
-    val fee: Int = 0,
+    val fee: Double,
     @SerialName("ID")
-    val id: Int = 0,
+    val id: Int,
     @SerialName("InstitutionCode")
-    val institutionCode: String = "",
+    val institutionCode: String,
     @SerialName("IsActive")
-    val isActive: Boolean = false,
+    val isActive: Boolean,
     @SerialName("Name")
-    val name: String = "",
-    @SerialName("Options")
-    val options: List<SubscriptionOption> = listOf(),
+    val name: String,
     @SerialName("ValidityPeriod")
-    val validityPeriod: Int = 0
+    val validityPeriod: Int,
 )
 
 @Serializable
 data class Subscription(
+    @SerialName("ID")
+    val id: Int,
     @SerialName("InstitutionCode")
-    val institutionCode: String = "",
+    val institutionCode: String,
     @SerialName("AgentPhoneNumber")
-    val agentPhoneNumber: String = "",
+    val agentPhoneNumber: String,
     @SerialName("AgentCode")
-    val agentCode: String = "",
+    val agentCode: String,
     @SerialName("Plan")
     val plan: SubscriptionPlan,
     @SerialName("StartDate")
     @Serializable(with = TimeInstantSerializer::class)
-    val startDate: Instant? = null,
+    val startDate: Instant,
     @SerialName("ExpiryDate")
     @Serializable(with = TimeInstantSerializer::class)
-    val expiryDate: Instant? = null,
+    val expiryDate: Instant,
 )
 
 @Serializable
 data class SubscriptionRequest(
     @SerialName("AgentPIN")
-    val agentPin: String = "",
+    val agentPin: String,
     @SerialName("AgentPhoneNumber")
-    val agentPhoneNumber: String = "",
+    val agentPhoneNumber: String,
     @SerialName("InstitutionCode")
-    val institutionCode: String = "",
+    val institutionCode: String,
     @SerialName("NewPlanID")
-    val newPlanId: Int = 0,
+    val newPlanId: Int,
     @SerialName("PlanID")
-    val planId: Int = 0
+    val planId: Int,
 )

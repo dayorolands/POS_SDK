@@ -441,6 +441,10 @@
     <string name="check_balance">Check Balance</string>
     <string name="subscription_history">Subscription History</string>
     <string name="new_subscription">New subscription</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="choose_a_plan">Choose a plan</string>
+    <string name="extend">Extend</string>
+    <string name="upgrade">Upgrade</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>

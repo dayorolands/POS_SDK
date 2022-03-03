@@ -123,6 +123,7 @@ interface DialogProvider {
         }
 
     suspend fun getPin(@StringRes title: Int) = getPin(context.getString(title))
+    suspend fun getAgentPin() = getPin(context.getString(R.string.agent_pin))
 
     suspend fun getConfirmation(title: CharSequence, subtitle: CharSequence = "") =
         suspendCoroutine<Boolean> { continuation ->

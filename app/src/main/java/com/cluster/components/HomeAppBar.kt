@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +16,11 @@ import com.cluster.R
 import com.google.accompanist.insets.statusBarsHeight
 
 @Composable
-fun HomeAppBar(mainNavController: NavController, title: String, openProfile: () -> Unit) {
+fun HomeAppBar(
+    mainNavController: NavController,
+    title: String,
+    navigationIcon: @Composable () -> Unit,
+) {
     val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
     // Draw a scrim over the status bar which matches the app bar
     Spacer(
@@ -52,15 +55,7 @@ fun HomeAppBar(mainNavController: NavController, title: String, openProfile: () 
             }
         },
         backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0f),
-        navigationIcon = {
-            IconButton(onClick = openProfile) {
-                Icon(
-                    Icons.Outlined.AccountCircle,
-                    contentDescription = null,
-                    tint = MaterialTheme.colors.primary.copy(0.52f)
-                )
-            }
-        },
+        navigationIcon = navigationIcon,
         elevation = 0.dp
     )
 }

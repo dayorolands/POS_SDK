@@ -23,7 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.core.data.api.SubscriptionService
-import com.cluster.core.data.model.SubscriptionPlan
+import com.cluster.core.data.model.Subscription
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.model.BooleanValueType
 import com.cluster.core.model.IntValueType
@@ -44,7 +44,6 @@ fun SubscriptionHistoryScreen(navController: NavController) {
     val localStorage: LocalStorage by rememberBean()
     var loading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
-    var refreshKey by remember { mutableStateOf("") }
     val viewModel: AppViewModel = viewModel()
     val statusList = remember {
         listOf(
@@ -68,7 +67,8 @@ fun SubscriptionHistoryScreen(navController: NavController) {
             else -> LocalDate.now()
         }
     }
-    val previousSubscriptions by produceState(emptyList<SubscriptionPlan>(), refreshKey) {
+    var refreshKey by remember(status, period) { mutableStateOf(UUID.randomUUID().toString()) }
+    val previousSubscriptions by produceState(emptyList<Subscription>(), refreshKey) {
         value = viewModel.subscriptionHistory.value
         loading = true
         val (response, error) = safeRunIO {
