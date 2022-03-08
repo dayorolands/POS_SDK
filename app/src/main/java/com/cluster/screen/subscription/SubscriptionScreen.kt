@@ -149,19 +149,19 @@ fun SubscriptionScreen(navController: NavController) {
                 }
 
                 item {
-                    if (activeSubscription == null) {
-                        ChipButton(
-                            label = stringResource(R.string.new_subscription),
-                            imageVector = Icons.Outlined.Add,
-                        ) {
-                            navController.navigate(Routes.NewSubscription)
-                        }
-                    } else {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 10.dp, horizontal = 16.dp),
-                        ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp, horizontal = 16.dp),
+                    ) {
+                        if (activeSubscription == null) {
+                            ChipButton(
+                                label = stringResource(R.string.new_subscription),
+                                imageVector = Icons.Outlined.Add,
+                            ) {
+                                navController.navigate(Routes.NewSubscription)
+                            }
+                        } else {
                             Text(
                                 text = activeSubscription!!.plan.name,
                                 softWrap = true,
