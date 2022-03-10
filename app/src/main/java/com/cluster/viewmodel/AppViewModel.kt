@@ -28,7 +28,7 @@ class AppViewModel : ViewModel() {
         if (it == null) {
             return@map null
         }
-        Duration.between(it.expiryDate, Instant.now()).toDays()
+        Duration.between(Instant.now(), it.expiryDate).toDays()
     }
 
     suspend fun loadActiveSubscription(
