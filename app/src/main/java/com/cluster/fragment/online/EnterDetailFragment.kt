@@ -10,6 +10,9 @@ import android.widget.Toast
 import com.cluster.ClusterApplication
 import com.cluster.OnlineActivity
 import com.cluster.R
+import com.cluster.core.data.Encryption.decrypt
+import com.cluster.core.ui.CreditClubFragment
+import com.cluster.core.util.safeRun
 import com.cluster.databinding.FragmentEnterDetailBinding
 import com.cluster.model.TransactionCountType
 import com.cluster.model.online.AuthResponse
@@ -19,9 +22,6 @@ import com.cluster.ui.dataBinding
 import com.cluster.utility.Misc
 import com.cluster.utility.online.ErrorMessages
 import com.cluster.utility.online.convertXmlToJson
-import com.cluster.core.data.Encryption.decrypt
-import com.cluster.core.ui.CreditClubFragment
-import com.cluster.core.util.safeRun
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import org.koin.android.ext.android.get
@@ -232,7 +232,7 @@ class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
                         }
                     }
                 } else {
-                    dialogProvider.showError(
+                    dialogProvider.showInfo(
                         Html.fromHtml(
                             responseBase.optString(
                                 "Menu",
