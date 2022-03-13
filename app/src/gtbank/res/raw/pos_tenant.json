@@ -7,7 +7,9 @@
       "EnableSSL": true,
       "Timeout": 60,
       "Key1": "25F7432326081AA82520647C61DCC83D",
-      "Key2": "F270D5A76ED6FB9298CD580E6D986723"
+      "Key2": "F270D5A76ED6FB9298CD580E6D986723",
+      "RequeryConfig": null,
+      "Dukpt": null
     },
     {
       "Name": "POSVAS",
@@ -16,7 +18,9 @@
       "EnableSSL": true,
       "Timeout": 60,
       "Key1": "25F7432326081AA82520647C61DCC83D",
-      "Key2": "F270D5A76ED6FB9298CD580E6D986723"
+      "Key2": "F270D5A76ED6FB9298CD580E6D986723",
+      "RequeryConfig": null,
+      "Dukpt": null
     },
     {
       "Name": "EPMS Test",
@@ -25,7 +29,9 @@
       "EnableSSL": true,
       "Timeout": 60,
       "Key1": "5D25072F04832A2329D93E4F91BA23A2",
-      "Key2": "86CBCDE3B0A22354853E04521686863D"
+      "Key2": "86CBCDE3B0A22354853E04521686863D",
+      "RequeryConfig": null,
+      "Dukpt": null
     },
     {
       "Name": "POSVAS Test",
@@ -34,7 +40,9 @@
       "EnableSSL": true,
       "Timeout": 60,
       "Key1": "5D25072F04832A2329D93E4F91BA23A2",
-      "Key2": "86CBCDE3B0A22354853E04521686863D"
+      "Key2": "86CBCDE3B0A22354853E04521686863D",
+      "RequeryConfig": null,
+      "Dukpt": null
     }
   ]
 }

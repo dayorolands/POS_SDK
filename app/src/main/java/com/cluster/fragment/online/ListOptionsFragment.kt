@@ -29,6 +29,7 @@ import com.cluster.core.ui.CreditClubFragment
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
+import org.koin.android.ext.android.get
 import java.util.concurrent.TimeoutException
 
 class ListOptionsFragment : CreditClubFragment(R.layout.fragment_listview), OnItemClickListener,
@@ -37,7 +38,14 @@ class ListOptionsFragment : CreditClubFragment(R.layout.fragment_listview), OnIt
         (requireActivity().application as ClusterApplication).authResponse
     }
     private val binding by dataBinding<FragmentListviewBinding>()
-    private val ah by lazy { APIHelper(requireActivity()) }
+    private val ah by lazy {
+        APIHelper(
+            ctx = requireContext(),
+            scope = mainScope,
+            localStorage = localStorage,
+            client = get()
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

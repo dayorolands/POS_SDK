@@ -40,6 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import org.koin.android.ext.android.get
 import java.io.File
 import java.io.FileOutputStream
 import java.time.Instant
@@ -71,7 +72,14 @@ class CustomerImageFragment : CreditClubFragment(R.layout.fragment_customer_imag
     private val authResponse: AuthResponse by lazy {
         (requireActivity().application as ClusterApplication).authResponse
     }
-    private val ah by lazy { APIHelper(requireActivity(), mainScope) }
+    private val ah by lazy {
+        APIHelper(
+            ctx = requireContext(),
+            scope = mainScope,
+            localStorage = localStorage,
+            client = get()
+        )
+    }
     private val launcher = registerImagePicker {
         try {
             val tmpImage = it.firstOrNull() ?: return@registerImagePicker

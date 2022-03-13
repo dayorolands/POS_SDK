@@ -12,24 +12,20 @@ import com.cluster.core.util.safeRunIO
 import com.cluster.model.TransactionCountType
 import com.cluster.utility.Misc
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import org.koin.core.context.GlobalContext
 import java.io.File
 import java.util.concurrent.TimeoutException
 
-class APIHelper @JvmOverloads constructor(
+class APIHelper(
     private val ctx: Context,
-    private val scope: CoroutineScope = MainScope(),
+    private val scope: CoroutineScope,
+    private val localStorage: LocalStorage,
+    private val client: CreditClubClient,
 ) {
-    private val koin = GlobalContext.get()
-    private val localStorage: LocalStorage by koin.inject()
-    private val client: CreditClubClient by koin.inject()
-
     fun interface Callback<T> {
         fun onCompleted(e: Exception?, result: T?, status: Boolean)
     }
