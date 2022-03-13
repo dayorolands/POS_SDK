@@ -3,14 +3,14 @@ package com.cluster.work
 import android.content.Context
 import android.os.Bundle
 import androidx.work.WorkerParameters
-import com.cluster.pos.Platform
-import com.cluster.pos.data.PosDatabase
 import com.cluster.core.data.CreditClubMiddleWareAPI
 import com.cluster.core.data.MIDDLEWARE_CLIENT
 import com.cluster.core.data.api.AppConfig
 import com.cluster.core.data.response.isSuccessful
 import com.cluster.core.util.safeRunSuspend
+import com.cluster.pos.Platform
 import com.cluster.pos.api.PosApiService
+import com.cluster.pos.data.PosDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -39,8 +39,10 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
 
         val posTransactionDao = posDatabase.posTransactionDao()
         posTransactionDao.deleteSyncedBefore(Instant.now().minus(7, ChronoUnit.DAYS))
-        val jobs = posTransactionDao.unSynced().map { receipt ->
-            if (receipt.nodeName == "EPMS") receipt.nodeName = null
+
+        val fiveMinsAgo = Instant.now().minusSeconds(5 * 60)
+        val jobs = posTransactionDao.syncable(before = fiveMinsAgo).map { receipt ->
+            if (receipt.nodeName == "EPMS" || receipt.nodeName == "POSVAS") receipt.nodeName = null
             async {
                 val (response) = safeRunSuspend {
                     posApiService.transactionLog(

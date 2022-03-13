@@ -10,28 +10,24 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.viewModels
-import com.cluster.pos.card.CardIsoMsg
-import com.cluster.pos.card.applyManagementData
-import com.cluster.pos.card.logPosNotification
+import com.cluster.core.data.api.retrofitService
+import com.cluster.core.util.*
+import com.cluster.pos.api.PosApiService
+import com.cluster.pos.card.*
 import com.cluster.pos.data.PosPreferences
 import com.cluster.pos.data.create
 import com.cluster.pos.extension.*
 import com.cluster.pos.helpers.IsoSocketHelper
+import com.cluster.pos.model.ConnectionInfo
+import com.cluster.pos.model.getSupportedRoute
 import com.cluster.pos.models.FinancialTransaction
 import com.cluster.pos.models.PosNotification
 import com.cluster.pos.models.PosTransaction
 import com.cluster.pos.models.Reversal
 import com.cluster.pos.models.messaging.ReversalRequest
+import com.cluster.pos.printer.PrinterStatus
 import com.cluster.pos.printer.Receipt
 import com.cluster.pos.service.CallHomeService
-import com.cluster.core.data.api.retrofitService
-import com.cluster.core.util.*
-import com.cluster.pos.*
-import com.cluster.pos.api.PosApiService
-import com.cluster.pos.card.*
-import com.cluster.pos.model.ConnectionInfo
-import com.cluster.pos.model.getSupportedRoute
-import com.cluster.pos.printer.PrinterStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -285,6 +281,13 @@ abstract class CardTransactionActivity : PosActivity() {
             parameters = posParameter,
             remoteConnectionInfo = remoteConnectionInfo,
         )
+        val posTransaction = PosTransaction.create(request).apply {
+            bankName = getString(R.string.pos_acquirer)
+            cardHolder = cardData.holder
+            cardType = cardData.type
+            nodeName = remoteConnectionInfo.nodeName
+            responseCode = "XX"
+        }
         mainScope.launch {
             if (cardData.pinBlock.isEmpty()) {
                 dialogProvider.showProgressBar("Pin Ok")
@@ -294,6 +297,10 @@ abstract class CardTransactionActivity : PosActivity() {
             dialogProvider.showProgressBar("Receiving...")
             try {
                 callHomeService.stopCallHomeTimer()
+                // Log transaction before making request
+                val posTransactionId = posDatabase.posTransactionDao().save(posTransaction)
+                posTransaction.apply { id = posTransactionId }
+
                 val (response, error) = withContext(Dispatchers.IO) {
                     val maxAttempts = 1 + (remoteConnectionInfo.requeryConfig?.maxRetries ?: 0)
                     if (request.mti == "0200" && maxAttempts > 1) {
@@ -324,14 +331,6 @@ abstract class CardTransactionActivity : PosActivity() {
 
                 if (error != null) {
                     firebaseCrashlytics.recordException(error)
-                    withContext(Dispatchers.IO) {
-                        val posTransaction = PosTransaction.create(request).apply {
-                            bankName = getString(R.string.pos_acquirer)
-                            cardHolder = cardData.holder
-                            cardType = cardData.type
-                        }
-                        posDatabase.posTransactionDao().save(posTransaction)
-                    }
                 }
                 if (response == null) {
                     renderTransactionFailure("Transmission Error")
@@ -355,14 +354,11 @@ abstract class CardTransactionActivity : PosActivity() {
 
                 withContext(Dispatchers.IO) {
                     posDatabase.runInTransaction {
-                        val posTransaction = PosTransaction.create(response).apply {
-                            bankName = getString(R.string.pos_acquirer)
-                            cardHolder = cardData.holder
-                            cardType = cardData.type
-                            nodeName = remoteConnectionInfo.nodeName
+                        posTransaction.apply {
+                            responseCode = response.responseCode39
                         }
                         posDatabase.financialTransactionDao().save(transaction)
-                        posDatabase.posTransactionDao().save(posTransaction)
+                        posDatabase.posTransactionDao().update(posTransaction)
                     }
                 }
 

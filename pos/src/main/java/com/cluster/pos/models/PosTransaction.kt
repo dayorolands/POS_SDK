@@ -108,7 +108,7 @@ interface PosTransactionDao {
     fun saveAll(posTransactions: List<PosTransaction>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun save(posTransaction: PosTransaction)
+    fun save(posTransaction: PosTransaction): Int
 
     @Update
     fun update(posTransaction: PosTransaction)
@@ -128,8 +128,8 @@ interface PosTransactionDao {
     @Query("SELECT * FROM PosTransaction")
     fun allAsync(): LiveData<List<PosTransaction>>
 
-    @Query("SELECT * FROM PosTransaction where isSynced = 0")
-    fun unSynced(): List<PosTransaction>
+    @Query("SELECT * FROM PosTransaction where isSynced = 0 and dateTime < :before")
+    fun syncable(before: Instant): List<PosTransaction>
 
     @Query("SELECT * FROM PosTransaction where responseCode in ('06', '09', '20', '22', '68', '91', '96') and dateTime BETWEEN :from AND :to and (stan like :query or retrievalReferenceNumber like :query)")
     fun disputable(query: String, from: Instant, to: Instant): Flow<List<PosTransaction>>
