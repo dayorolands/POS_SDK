@@ -108,7 +108,7 @@ interface PosTransactionDao {
     fun saveAll(posTransactions: List<PosTransaction>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun save(posTransaction: PosTransaction): Int
+    fun save(posTransaction: PosTransaction): Long
 
     @Update
     fun update(posTransaction: PosTransaction)

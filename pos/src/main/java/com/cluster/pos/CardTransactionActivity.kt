@@ -299,7 +299,7 @@ abstract class CardTransactionActivity : PosActivity() {
                 callHomeService.stopCallHomeTimer()
                 // Log transaction before making request
                 val posTransactionId = posDatabase.posTransactionDao().save(posTransaction)
-                posTransaction.apply { id = posTransactionId }
+                posTransaction.apply { id = posTransactionId.toInt() }
 
                 val (response, error) = withContext(Dispatchers.IO) {
                     val maxAttempts = 1 + (remoteConnectionInfo.requeryConfig?.maxRetries ?: 0)
