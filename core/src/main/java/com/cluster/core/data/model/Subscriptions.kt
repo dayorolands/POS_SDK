@@ -64,3 +64,15 @@ data class SubscriptionRequest(
     @SerialName("PlanID")
     val planId: Int,
 )
+
+@Serializable
+data class SubscriptionMilestone(
+    @SerialName("ID")
+    val id: Int,
+    @SerialName("TargetVolumeLeft")
+    val targetVolumeLeft: Double,
+    @SerialName("TargetVolumeMaxLimit")
+    val targetVolumeMaxLimit: Double,
+    @SerialName("TransactionType")
+    val transactionType: Int,
+)

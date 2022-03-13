@@ -78,6 +78,13 @@ class HomeFragment : CreditClubFragment() {
                     subscriptionService = subscriptionService,
                     localStorage = localStorage,
                 )
+                val subscriptionId = appViewModel.activeSubscription.value?.id
+                if (subscriptionId != null) {
+                    appViewModel.loadMilestones(
+                        subscriptionService = subscriptionService,
+                        subscriptionId = subscriptionId.toLong(),
+                    )
+                }
             }
         }
 

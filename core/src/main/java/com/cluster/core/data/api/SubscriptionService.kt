@@ -1,9 +1,6 @@
 package com.cluster.core.data.api
 
-import com.cluster.core.data.model.ReportResult
-import com.cluster.core.data.model.Subscription
-import com.cluster.core.data.model.SubscriptionPlan
-import com.cluster.core.data.model.SubscriptionRequest
+import com.cluster.core.data.model.*
 import com.cluster.core.data.response.ApiResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -29,6 +26,11 @@ interface SubscriptionService {
         @Query("institutionCode") institutionCode: String,
         @Query("agentPhoneNumber") agentPhoneNumber: String,
     ): ApiResponse<List<SubscriptionPlan>>
+
+    @GET("api/Subscription/GetMilestonesBySubscriptionID")
+    suspend fun getMilestonesBySubscriptionId(
+        @Query("subscriptionID") subscriptionId: Long,
+    ): ApiResponse<List<SubscriptionMilestone>>
 
     @GET("api/Subscription/GetSubscriptionHistory")
     suspend fun getSubscriptionHistory(
