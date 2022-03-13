@@ -281,13 +281,19 @@ abstract class CardTransactionActivity : PosActivity() {
             parameters = posParameter,
             remoteConnectionInfo = remoteConnectionInfo,
         )
-        val posTransaction = PosTransaction.create(request).apply {
-            bankName = getString(R.string.pos_acquirer)
-            cardHolder = cardData.holder
-            cardType = cardData.type
-            nodeName = remoteConnectionInfo.nodeName
-            responseCode = "XX"
-        }
+        val posTransaction = PosTransaction.create(
+            isoMsg = request,
+            institutionCode = localStorage.institutionCode!!,
+            agent = localStorage.agent!!,
+            appName = "${getString(R.string.app_name)} ${appConfig.versionName}",
+            ptsp = getString(R.string.ptsp_name),
+            website = getString(R.string.institution_website),
+            bankName = getString(R.string.pos_acquirer),
+            cardHolder = cardData.holder,
+            cardType = cardData.type,
+            nodeName = remoteConnectionInfo.nodeName,
+            responseCode = "XX",
+        )
         mainScope.launch {
             if (cardData.pinBlock.isEmpty()) {
                 dialogProvider.showProgressBar("Pin Ok")
@@ -339,6 +345,17 @@ abstract class CardTransactionActivity : PosActivity() {
                     return@launch
                 }
 
+                // Abort if response rrn does not match request
+                if (request.retrievalReferenceNumber37 != response.retrievalReferenceNumber37) {
+                    withContext(Dispatchers.IO) {
+                        posTransaction.responseCode = "X6"
+                        posDatabase.posTransactionDao().update(posTransaction)
+                    }
+                    renderTransactionFailure("Bad response")
+
+                    return@launch
+                }
+
                 response.set(4, request.transactionAmount4)
 
                 val transaction = FinancialTransaction(response).apply {
@@ -354,10 +371,8 @@ abstract class CardTransactionActivity : PosActivity() {
 
                 withContext(Dispatchers.IO) {
                     posDatabase.runInTransaction {
-                        posTransaction.apply {
-                            responseCode = response.responseCode39
-                        }
                         posDatabase.financialTransactionDao().save(transaction)
+                        posTransaction.responseCode = response.responseCode39
                         posDatabase.posTransactionDao().update(posTransaction)
                     }
                 }

@@ -11,6 +11,7 @@ import com.cluster.core.util.safeRunSuspend
 import com.cluster.pos.Platform
 import com.cluster.pos.api.PosApiService
 import com.cluster.pos.data.PosDatabase
+import com.cluster.pos.model.nibssNodeNameSet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -41,8 +42,11 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
         posTransactionDao.deleteSyncedBefore(Instant.now().minus(7, ChronoUnit.DAYS))
 
         val fiveMinsAgo = Instant.now().minusSeconds(5 * 60)
+        val nibssNodeNames = nibssNodeNameSet()
         val jobs = posTransactionDao.syncable(before = fiveMinsAgo).map { receipt ->
-            if (receipt.nodeName == "EPMS" || receipt.nodeName == "POSVAS") receipt.nodeName = null
+            if (nibssNodeNames.contains(receipt.nodeName)) {
+                receipt.nodeName = null
+            }
             async {
                 val (response) = safeRunSuspend {
                     posApiService.transactionLog(

@@ -12,6 +12,7 @@ import com.cluster.core.util.toInstant
 import com.cluster.pos.PosConfig
 import com.cluster.pos.api.PosApiService
 import com.cluster.pos.data.PosDatabase
+import com.cluster.pos.model.nibssNodeNameSet
 import com.cluster.pos.models.PosNotification
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
@@ -45,9 +46,11 @@ class PosNotificationWorker(
             val instant = it.paymentDate!!.toInstant(PosNotification.PAYMENT_DATE_PATTERN)
             instant.isBefore(threeMinsAgo)
         }
+        val nibssNodeNames = nibssNodeNameSet()
         val jobs = posNotifications.map { notification ->
-            if (notification.nodeName == "EPMS" || notification.nodeName == "POSVAS") notification.nodeName =
-                null
+            if (nibssNodeNames.contains(notification.nodeName)) {
+                notification.nodeName = null
+            }
             async {
                 val (response) = safeRunSuspend {
                     posApiService.posCashOutNotification(
