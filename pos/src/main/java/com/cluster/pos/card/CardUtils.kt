@@ -20,23 +20,19 @@ inline fun <T : CardIsoMsg> cardIsoMsg(
     }
 }
 
-fun cardTransactionType(msg: ISOMsg) = when (msg.mti) {
-    "0100", "0110" -> when (msg.processingCode3?.substring(0, 2)) {
+fun cardTransactionType(msg: ISOMsg): TransactionType {
+    val transactionType = when (msg.processingCode3?.substring(0, 2)) {
+        "00" -> TransactionType.Purchase
+        "01" -> TransactionType.CashAdvance
+        "09" -> TransactionType.CashBack
+        "20" -> TransactionType.Refund
         "31" -> TransactionType.Balance
         "60" -> TransactionType.PreAuth
-        else -> TransactionType.Unknown
-    }
-    "0200", "0210" -> when (msg.processingCode3?.substring(0, 2)) {
-        "00" -> TransactionType.Purchase
-        "20" -> TransactionType.Refund
-        "09" -> TransactionType.CashBack
-        "01" -> TransactionType.CashAdvance
-        else -> TransactionType.Unknown
-    }
-    "0220", "0221", "0230" -> when (msg.processingCode3?.substring(0, 2)) {
         "61" -> TransactionType.SalesComplete
-        else -> TransactionType.Unknown
+        else -> when (msg.mti) {
+            "0420", "0421", "0430" -> TransactionType.Reversal
+            else -> TransactionType.Unknown
+        }
     }
-    "0420", "0421", "0430" -> TransactionType.Reversal
-    else -> TransactionType.Unknown
+    return transactionType
 }
