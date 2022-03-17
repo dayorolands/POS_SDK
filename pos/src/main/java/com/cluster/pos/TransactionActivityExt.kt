@@ -8,23 +8,19 @@ import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
-import com.cluster.pos.card.cardTransactionType
-import com.cluster.pos.databinding.*
-import com.cluster.pos.extension.isSuccessful
-import com.cluster.pos.extension.responseMessage
-import com.cluster.pos.extension.transactionAmount4
-import com.cluster.pos.models.FinancialTransaction
-import com.cluster.pos.printer.Receipt
-import com.cluster.pos.util.CurrencyFormatter
 import com.cluster.core.util.format
 import com.cluster.pos.card.AccountType
 import com.cluster.pos.card.CardReaderEvent
 import com.cluster.pos.card.TransactionType
+import com.cluster.pos.card.isoResponseMessage
+import com.cluster.pos.databinding.*
+import com.cluster.pos.models.FinancialTransaction
+import com.cluster.pos.models.PosTransaction
 import com.cluster.pos.printer.PrinterStatus
+import com.cluster.pos.printer.posReceipt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jpos.iso.ISOMsg
 
 internal inline fun ComponentActivity.showSelectAccountScreen(crossinline block: (AccountType) -> Unit) {
     val binding = DataBindingUtil.setContentView<PageSelectAccountTypeBinding>(
@@ -139,20 +135,15 @@ internal fun CardTransactionActivity.renderTransactionFailure(
     binding.goBack.setOnClickListener(closeListener)
 }
 
-internal fun CardTransactionActivity.showTransactionStatusPage(
-    isoMsg: ISOMsg,
-    transaction: FinancialTransaction
-) {
-    val receipt = Receipt(this, transaction)
+internal fun CardTransactionActivity.showTransactionStatusPage(posTransaction: PosTransaction) {
     onTransactionDidFinish()
-    val transactionType = cardTransactionType(isoMsg)
     val binding = DataBindingUtil.setContentView<PageVerifyCashoutBinding>(
         this,
         R.layout.page_verify_cashout
     )
     binding.lifecycleOwner = this
 
-    if (isoMsg.isSuccessful) {
+    if (posTransaction.responseCode == "00") {
         binding.message.text = getString(R.string.transaction_successful)
         binding.transactionStatusIcon.setImageResource(R.drawable.ic_sentiment_satisfied)
         ImageViewCompat.setImageTintList(
@@ -162,7 +153,7 @@ internal fun CardTransactionActivity.showTransactionStatusPage(
         )
         binding.message.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary))
     } else {
-        binding.message.text = isoMsg.responseMessage
+        binding.message.text = isoResponseMessage(posTransaction.responseCode)
         binding.transactionStatusIcon.setImageResource(R.drawable.ic_sentiment_very_dissatisfied)
         ImageViewCompat.setImageTintList(
             binding.transactionStatusIcon, ColorStateList.valueOf(
@@ -172,25 +163,25 @@ internal fun CardTransactionActivity.showTransactionStatusPage(
         binding.message.setTextColor(ContextCompat.getColor(this, R.color.app_orange))
     }
 
+    binding.amountText.text = posTransaction.amount
     if (transactionType == TransactionType.Balance) {
-        val balance = try {
-            isoMsg.getString(54)?.substring(8, 20) ?: "0"
-        } catch (ex: Exception) {
-            "0"
-        }
-
-        binding.amountText.text = CurrencyFormatter.format(balance)
         binding.printMerchantCopy.visibility = View.GONE
-    } else {
-        binding.amountText.text = CurrencyFormatter.format(isoMsg.transactionAmount4)
     }
 
     binding.printMerchantCopy.setOnClickListener {
-        printer.printAsync(receipt.apply { isCustomerCopy = false })
+        val receipt = posReceipt(
+            posTransaction = posTransaction,
+            isCustomerCopy = false,
+        )
+        printer.printAsync(receipt)
     }
 
     binding.printCustomerCopy.setOnClickListener {
-        printer.printAsync(receipt.apply { isCustomerCopy = true })
+        val receipt = posReceipt(
+            posTransaction = posTransaction,
+            isCustomerCopy = true,
+        )
+        printer.printAsync(receipt)
     }
 
     val closeListener = View.OnClickListener { finish() }

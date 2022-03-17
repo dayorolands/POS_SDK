@@ -63,6 +63,7 @@ class TransactionLogWorker(context: Context, params: WorkerParameters) :
                 firebaseAnalytics.logEvent("transaction_log_attempt", Bundle().apply {
                     putString("terminal_id", receipt.terminalId)
                     putString("rrn", receipt.retrievalReferenceNumber)
+                    putString("transaction_type", receipt.transactionType)
                     putString("agent_code", receipt.agentCode)
                     putString("agent_phone", receipt.agentPhoneNumber)
                     putString("institution_code", receipt.institutionCode)

@@ -110,9 +110,6 @@ interface PosTransactionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun save(posTransaction: PosTransaction): Long
 
-    @Update
-    fun update(posTransaction: PosTransaction)
-
     @Delete
     fun delete(posTransaction: PosTransaction)
 

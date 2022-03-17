@@ -26,7 +26,7 @@ import com.cluster.pos.models.PosTransaction
 import com.cluster.pos.models.Reversal
 import com.cluster.pos.models.messaging.ReversalRequest
 import com.cluster.pos.printer.PrinterStatus
-import com.cluster.pos.printer.Receipt
+import com.cluster.pos.printer.posReceipt
 import com.cluster.pos.service.CallHomeService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -210,12 +210,14 @@ abstract class CardTransactionActivity : PosActivity() {
         mainScope.launch {
             posManager.cardReader.endWatch()
             val cardData = posManager.cardReader.read(viewModel.amountCurrencyFormat.value!!)
-            cardData ?: return@launch renderTransactionFailure("Transaction Cancelled", "")
+            if (cardData == null) {
+                renderTransactionFailure("Transaction Cancelled", "")
+                return@launch
+            }
             this@CardTransactionActivity.cardData = cardData
 
             when (CardTransactionStatus.find(cardData.ret)) {
                 CardTransactionStatus.Success -> {
-
                     if (cardData.pan.isEmpty()) {
                         dialogProvider.hideProgressBar()
                         renderTransactionFailure("Could not read card")
@@ -268,12 +270,12 @@ abstract class CardTransactionActivity : PosActivity() {
         return supportedRoute ?: config.remoteConnectionInfo
     }
 
-    fun makeRequest(request: ISOMsg) {
+    fun makeRequest(request: ISOMsg) = mainScope.launch {
         stopTimer()
         val supportedRoute =
             posPreferences.binRoutes?.getSupportedRoute(request.pan!!, viewModel.amount.value!!)
         val remoteConnectionInfo = supportedRoute ?: config.remoteConnectionInfo
-        val posParameter = remoteConnectionInfo.getParameter(this)
+        val posParameter = remoteConnectionInfo.getParameter(this@CardTransactionActivity)
         request.applyManagementData(posParameter.managementData)
         request.acquiringInstIdCode32 = localStorage.institutionCode
         val isoSocketHelper = IsoSocketHelper(
@@ -294,147 +296,195 @@ abstract class CardTransactionActivity : PosActivity() {
             nodeName = remoteConnectionInfo.nodeName,
             responseCode = "XX",
         )
-        mainScope.launch {
-            if (cardData.pinBlock.isEmpty()) {
-                dialogProvider.showProgressBar("Pin Ok")
-                delay(1000)
+        if (cardData.pinBlock.isEmpty()) {
+            dialogProvider.showProgressBar("Pin Ok")
+            delay(1000)
+        }
+
+        dialogProvider.showProgressBar("Receiving...")
+        callHomeService.stopCallHomeTimer()
+        // Log transaction before making request
+        withContext(Dispatchers.IO) {
+            val posTransactionId = posDatabase.posTransactionDao().save(posTransaction)
+            posTransaction.apply { id = posTransactionId.toInt() }
+        }
+
+        val requeryConfig = remoteConnectionInfo.requeryConfig
+        val (response, error) = withContext(Dispatchers.IO) {
+            if (requeryConfig == null) {
+                return@withContext isoSocketHelper.send(request)
             }
 
-            dialogProvider.showProgressBar("Receiving...")
-            try {
-                callHomeService.stopCallHomeTimer()
-                // Log transaction before making request
-                withContext(Dispatchers.IO) {
-                    val posTransactionId = posDatabase.posTransactionDao().save(posTransaction)
-                    posTransaction.apply { id = posTransactionId.toInt() }
-                }
+            handleRetryableRequest(
+                requeryConfig = requeryConfig,
+                request = request,
+            )
+        }
 
-                val (response, error) = withContext(Dispatchers.IO) {
-                    val maxAttempts = 1 + (remoteConnectionInfo.requeryConfig?.maxRetries ?: 0)
-                    if (request.mti == "0200" && maxAttempts > 1) {
-                        var result = SafeRunResult<ISOMsg>(null)
-                        for (attempt in 1..maxAttempts) {
-                            val isRetry = attempt > 1
-                            if (isRetry) {
-                                delay(2000)
-                                request.mti =
-                                    if (attempt > 2 && result.error !is ConnectException) "0221" else "0220"
-                                runOnUiThread { dialogProvider.showProgressBar("Retrying...$attempt") }
-                            }
+        try {
+            callHomeService.startCallHomeTimer()
 
-                            val newResult = isoSocketHelper.send(request, isRetry)
-                            if (result.data == null || (result.data!!.responseCode39 != "00" && newResult.isSuccess)) {
-                                result = newResult
-                            }
-                            val responseMsg = result.data ?: continue
-                            if (responseMsg.responseCode39 == "91") continue
-                            if (result.error == null) break
-                        }
-                        result
-                    } else {
-                        isoSocketHelper.send(request)
-                    }
-                }
-                callHomeService.startCallHomeTimer()
+            if (error != null) {
+                firebaseCrashlytics.recordException(error)
+            }
 
-                if (error != null) {
-                    firebaseCrashlytics.recordException(error)
-                }
-                if (response == null) {
-                    renderTransactionFailure("Transmission Error")
+            if (response == null) {
+                showTransactionStatusPage(posTransaction)
+
+                // Routes currently only support either Requery or Reversal but not both
+                if (requeryConfig != null) {
                     isoSocketHelper.attemptReversal(request)
-
-                    return@launch
                 }
 
-                // Abort if response rrn does not match request
-                if (request.retrievalReferenceNumber37 != response.retrievalReferenceNumber37) {
-                    withContext(Dispatchers.IO) {
-                        posTransaction.responseCode = "X6"
-                        posDatabase.posTransactionDao().update(posTransaction)
-                    }
-                    renderTransactionFailure("Bad response")
+                val receipt = posReceipt(
+                    posTransaction = posTransaction,
+                    isCustomerCopy = true,
+                )
+                printer.printAsync(receipt)
 
-                    return@launch
-                }
+                return@launch
+            }
 
-                response.set(4, request.transactionAmount4)
-
-                val transaction = FinancialTransaction(response).apply {
-                    createdAt = Instant.now()
-                    cardHolder = cardData.holder
-                    aid = cardData.aid
-                    cardType = cardData.type
-                    nodeName = remoteConnectionInfo.nodeName
-                    if (remoteConnectionInfo is ConnectionInfo) {
-                        connectionInfo = remoteConnectionInfo
-                    }
-                }
-
+            // Abort if response rrn does not match request
+            if (request.retrievalReferenceNumber37 != response.retrievalReferenceNumber37) {
                 withContext(Dispatchers.IO) {
-                    posDatabase.runInTransaction {
-                        posDatabase.financialTransactionDao().save(transaction)
-                        posTransaction.responseCode = response.responseCode39
-                        posDatabase.posTransactionDao().update(posTransaction)
-                    }
+                    posTransaction.responseCode = "X6"
+                    posDatabase.posTransactionDao().save(posTransaction)
                 }
+            }
 
-                if (response.isSuccessful) {
-                    when (transactionType) {
-                        TransactionType.Purchase,
-                        TransactionType.CashAdvance,
-                        TransactionType.CashBack,
-                        TransactionType.PreAuth,
-                        TransactionType.SalesComplete,
-                        -> {
-                            val posNotification = PosNotification.create(transaction)
-                            posNotification.terminalId = config.terminalId
-                            posNotification.nodeName = remoteConnectionInfo.nodeName
-                            if (remoteConnectionInfo is ConnectionInfo) {
-                                posNotification.connectionInfo = remoteConnectionInfo
-                            }
-                            withContext(Dispatchers.IO) {
-                                posDatabase.posNotificationDao().save(posNotification)
-                            }
-                            posApiService.logPosNotification(
-                                posDatabase,
-                                appConfig,
-                                posConfig,
-                                posNotification
-                            )
-                        }
-                        else -> {
+            response.set(4, request.transactionAmount4)
 
-                        }
-                    }
+            val transaction = FinancialTransaction(response).apply {
+                createdAt = Instant.now()
+                cardHolder = cardData.holder
+                aid = cardData.aid
+                cardType = cardData.type
+                nodeName = remoteConnectionInfo.nodeName
+                if (remoteConnectionInfo is ConnectionInfo) {
+                    connectionInfo = remoteConnectionInfo
                 }
+            }
 
-                showTransactionStatusPage(response, transaction)
-
-                val receipt = Receipt(this@CardTransactionActivity, transaction).apply {
-                    isCustomerCopy = true
+            withContext(Dispatchers.IO) {
+                posDatabase.runInTransaction {
+                    posDatabase.financialTransactionDao().save(transaction)
+                    posTransaction.responseCode = response.responseCode39
+                    posDatabase.posTransactionDao().save(posTransaction)
                 }
-                printer.printAsync(receipt.apply {
-                    isCustomerCopy = true
-                })
-            } catch (ex: Exception) {
-                firebaseCrashlytics.recordException(ex)
-                debugOnly { Log.e("CardTrans", ex.message, ex) }
-                renderTransactionFailure("Transmission Error")
+            }
 
-                isoSocketHelper.attemptReversal(request)
-            } finally {
-                dialogProvider.hideProgressBar()
+            if (response.isSuccessful) {
+                handleSettlement(
+                    remoteConnectionInfo = remoteConnectionInfo,
+                    transaction = transaction,
+                )
+            }
+
+            showTransactionStatusPage(posTransaction)
+            val receipt = posReceipt(
+                posTransaction = posTransaction,
+                isCustomerCopy = true,
+            )
+            printer.printAsync(receipt)
+        } catch (ex: Exception) {
+            showTransactionStatusPage(posTransaction)
+            firebaseCrashlytics.recordException(ex)
+            debugOnly { Log.e("CardTrans", ex.message, ex) }
+            isoSocketHelper.attemptReversal(request)
+        } finally {
+            dialogProvider.hideProgressBar()
+        }
+    }
+
+    private suspend fun handleRetryableRequest(
+        requeryConfig: RequeryConfig,
+        request: ISOMsg
+    ): SafeRunResult<ISOMsg> {
+        val maxAttempts = 1 + requeryConfig.maxRetries
+        if (request.mti != "0200" || maxAttempts <= 1) {
+            return isoSocketHelper.send(request)
+        }
+        var result = SafeRunResult<ISOMsg>(null)
+        for (attempt in 1..maxAttempts) {
+            val isRetry = attempt > 1
+            if (isRetry) {
+                delay(2000)
+                request.mti =
+                    if (attempt > 2 && result.error !is ConnectException) "0221" else "0220"
+                runOnUiThread { dialogProvider.showProgressBar("Retrying...$attempt") }
+            }
+
+            val newResult = isoSocketHelper.send(request, isRetry)
+            if (result.data == null || (result.data!!.responseCode39 != "00" && newResult.isSuccess)) {
+                result = newResult
+            }
+
+            // Continue on error
+            val responseMsg = result.data ?: continue
+
+            // Continue on rrn mismatch
+            if (request.retrievalReferenceNumber37 != responseMsg.retrievalReferenceNumber37) {
+                continue
+            }
+
+            // Continue on "Issuer or switch" response
+            if (responseMsg.responseCode39 == "91") {
+                continue
+            }
+
+            // Exit loop on success
+            if (result.error == null) {
+                break
+            }
+        }
+
+        return result
+    }
+
+    private suspend fun handleSettlement(
+        remoteConnectionInfo: RemoteConnectionInfo,
+        transaction: FinancialTransaction,
+    ) {
+        when (transactionType) {
+            TransactionType.Purchase,
+            TransactionType.CashAdvance,
+            TransactionType.CashBack,
+            TransactionType.PreAuth,
+            TransactionType.SalesComplete,
+            -> {
+                val posNotification = PosNotification.create(transaction)
+                posNotification.terminalId = config.terminalId
+                posNotification.nodeName = remoteConnectionInfo.nodeName
+                if (remoteConnectionInfo is ConnectionInfo) {
+                    posNotification.connectionInfo = remoteConnectionInfo
+                }
+                withContext(Dispatchers.IO) {
+                    posDatabase.posNotificationDao().save(posNotification)
+                }
+                posApiService.logPosNotification(
+                    posDatabase,
+                    appConfig,
+                    posConfig,
+                    posNotification
+                )
+            }
+            else -> {
+
             }
         }
     }
 
     private suspend fun IsoSocketHelper.attemptReversal(request: ISOMsg) {
-        if (request.mti == "0200") withContext(Dispatchers.IO) {
-            runOnUiThread {
-                dialogProvider.showProgressBar("Transmission Error \nReversing...")
-            }
+        if (request.mti != "0200") {
+            return
+        }
 
+        runOnUiThread {
+            dialogProvider.showProgressBar("Transmission Error \nReversing...")
+        }
+
+        withContext(Dispatchers.IO) {
             delay(1000)
 
             val reversal = ReversalRequest.generate(request, cardData).apply {
@@ -462,6 +512,10 @@ abstract class CardTransactionActivity : PosActivity() {
                 }
                 posDatabase.reversalDao().save(reversalRecord)
             }
+        }
+
+        runOnUiThread {
+            dialogProvider.hideProgressBar()
         }
     }
 

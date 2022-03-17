@@ -1,12 +1,12 @@
 package com.cluster.pos.extension
 
-import com.cluster.pos.card.NibssResponseMessage
+import com.cluster.core.util.debugOnly
+import com.cluster.pos.card.isoResponseMessage
+import com.cluster.pos.extensions.hexBytes
 import com.cluster.pos.models.IsoRequestLog
 import com.cluster.pos.util.ISO87Packager
 import com.cluster.pos.util.TransmissionDateParams
 import com.cluster.pos.util.sha256String
-import com.cluster.core.util.debugOnly
-import com.cluster.pos.extensions.hexBytes
 import org.jpos.iso.ISOException
 import org.jpos.iso.ISOMsg
 import java.security.SecureRandom
@@ -20,7 +20,7 @@ inline val ISOMsg.hasFailed: Boolean
     get() = responseCode39 != "00"
 
 inline val ISOMsg.responseMessage: String
-    get() = NibssResponseMessage[responseCode39]
+    get() = isoResponseMessage(responseCode39)
 
 fun ISOMsg.log() = debugOnly {
     println("----ISO MESSAGE-----")

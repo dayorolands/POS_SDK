@@ -4,7 +4,7 @@ import com.cluster.core.data.model.AgentInfo
 import com.cluster.core.util.mask
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.pos.card.TransactionType
-import com.cluster.pos.card.getTransactionType
+import com.cluster.pos.card.cardTransactionType
 import com.cluster.pos.extension.*
 import com.cluster.pos.models.PosTransaction
 import org.jpos.iso.ISOMsg
@@ -22,7 +22,7 @@ fun PosTransaction.Companion.create(
     nodeName: String?,
     responseCode: String,
 ): PosTransaction {
-    val transactionType = isoMsg.getTransactionType()
+    val transactionType = cardTransactionType(isoMsg)
     val amountString =
         if (transactionType == TransactionType.Balance) isoMsg.additionalAmounts54
         else isoMsg.transactionAmount4
