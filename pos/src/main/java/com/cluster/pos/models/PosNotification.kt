@@ -2,6 +2,10 @@ package com.cluster.pos.models
 
 import androidx.room.*
 import com.cluster.core.util.format
+import com.cluster.pos.extension.responseCode39
+import com.cluster.pos.extension.responseMessage
+import com.cluster.pos.extension.retrievalReferenceNumber37
+import com.cluster.pos.extension.transactionAmount4
 import com.cluster.pos.model.ConnectionInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Required

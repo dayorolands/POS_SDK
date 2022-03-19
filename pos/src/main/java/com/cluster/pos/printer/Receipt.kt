@@ -6,10 +6,7 @@ import com.cluster.core.util.format
 import com.cluster.core.util.localStorage
 import com.cluster.pos.R
 import com.cluster.pos.card.isoResponseMessage
-import com.cluster.pos.extension.additionalAmounts54
-import com.cluster.pos.extension.cardAcceptorIdCode42
-import com.cluster.pos.extension.cardAcceptorNameLocation43
-import com.cluster.pos.extension.cardExpirationDate14
+import com.cluster.pos.extension.*
 import com.cluster.pos.models.FinancialTransaction
 import com.cluster.pos.models.PosTransaction
 import com.cluster.pos.util.CurrencyFormatter

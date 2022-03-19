@@ -14,6 +14,7 @@ import com.cluster.pos.card.CardReaderEvent
 import com.cluster.pos.card.TransactionType
 import com.cluster.pos.card.isoResponseMessage
 import com.cluster.pos.databinding.*
+import com.cluster.pos.extension.transactionAmount4
 import com.cluster.pos.models.FinancialTransaction
 import com.cluster.pos.models.PosTransaction
 import com.cluster.pos.printer.PrinterStatus

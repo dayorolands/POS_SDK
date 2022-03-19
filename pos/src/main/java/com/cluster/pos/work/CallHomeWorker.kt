@@ -3,6 +3,7 @@ package com.cluster.pos.work
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.cluster.pos.extension.init
 import com.cluster.pos.extension.isSuccessful
 import com.cluster.pos.extension.processingCode3
 import com.cluster.pos.helpers.IsoSocketHelper
@@ -18,6 +19,7 @@ class CallHomeWorker(
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val isoMsg = ISOMsg().apply {
+            init()
             mti = "0800"
             processingCode3 = "9D0000"
         }

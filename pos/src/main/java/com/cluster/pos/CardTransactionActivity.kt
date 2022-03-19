@@ -24,7 +24,6 @@ import com.cluster.pos.models.FinancialTransaction
 import com.cluster.pos.models.PosNotification
 import com.cluster.pos.models.PosTransaction
 import com.cluster.pos.models.Reversal
-import com.cluster.pos.models.messaging.ReversalRequest
 import com.cluster.pos.printer.PrinterStatus
 import com.cluster.pos.printer.posReceipt
 import com.cluster.pos.service.CallHomeService
@@ -33,6 +32,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jpos.iso.ISOMsg
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import java.net.ConnectException
@@ -45,16 +45,18 @@ abstract class CardTransactionActivity : PosActivity() {
     private val posManager: PosManager by inject { parametersOf(this) }
     internal val sessionData: PosManager.SessionData get() = posManager.sessionData
     internal val viewModel: PosTransactionViewModel by viewModels()
-    internal var previousMessage: CardIsoMsg? = null
+    internal var previousMessage: ISOMsg? = null
     abstract var transactionType: TransactionType
     private lateinit var cardData: CardData
     private val posApiService: PosApiService by retrofitService()
     private val posPreferences: PosPreferences by inject()
     private val callHomeService: CallHomeService by inject()
+    lateinit var posParameter: PosParameter
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        posParameter = get()
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -80,16 +82,16 @@ abstract class CardTransactionActivity : PosActivity() {
     abstract fun onPosReady()
 
     private fun checkParameters() {
-        val noKeysPresent = parameters.pinKey.isEmpty()
-                || parameters.masterKey.isEmpty()
-                || parameters.sessionKey.isEmpty()
+        val noKeysPresent = posParameter.pinKey.isEmpty()
+                || posParameter.masterKey.isEmpty()
+                || posParameter.sessionKey.isEmpty()
 
         when {
             noKeysPresent -> {
                 finishWithError("Please perform key download before proceeding")
                 return
             }
-            parameters.managementDataString.isEmpty() -> {
+            posParameter.managementDataString.isEmpty() -> {
                 finishWithError("Please perform parameter download before proceeding")
                 return
             }
@@ -275,9 +277,27 @@ abstract class CardTransactionActivity : PosActivity() {
         val supportedRoute =
             posPreferences.binRoutes?.getSupportedRoute(request.pan!!, viewModel.amount.value!!)
         val remoteConnectionInfo = supportedRoute ?: config.remoteConnectionInfo
-        val posParameter = remoteConnectionInfo.getParameter(this@CardTransactionActivity)
-        request.applyManagementData(posParameter.managementData)
-        request.acquiringInstIdCode32 = localStorage.institutionCode
+        posParameter = remoteConnectionInfo.getParameter(this@CardTransactionActivity)
+
+        request.apply {
+            applyManagementData(posParameter.managementData)
+            acquiringInstIdCode32 = localStorage.institutionCode
+            terminalId41 = config.terminalId
+        }
+        val cardType = when (cardData.aid) {
+            "A0000000032020" -> "VISA"
+            "A0000000031010", "A0000000032010" -> "VISA Debit"
+            "A0000004540010" -> "Etranzact Genesis Card"
+            "A0000004540011" -> "Etranzact Genesis Card"
+            "A0000000042203" -> "MasterCard US"
+            "A0000000041010" -> "MasterCard"
+            "A0000000042010" -> "MasterCard Specific"
+            "A0000000043010" -> "MasterCard Specific"
+            "A0000000045010" -> "MasterCard Specific"
+            "A0000003710001" -> "InterSwitch Verve Card"
+            else -> "Unknown Card"
+        }
+
         val isoSocketHelper = IsoSocketHelper(
             config = config,
             parameters = posParameter,
@@ -292,7 +312,7 @@ abstract class CardTransactionActivity : PosActivity() {
             website = getString(R.string.institution_website),
             bankName = getString(R.string.pos_acquirer),
             cardHolder = cardData.holder,
-            cardType = cardData.type,
+            cardType = cardType,
             nodeName = remoteConnectionInfo.nodeName,
             responseCode = "XX",
         )
@@ -311,11 +331,12 @@ abstract class CardTransactionActivity : PosActivity() {
 
         val requeryConfig = remoteConnectionInfo.requeryConfig
         val (response, error) = withContext(Dispatchers.IO) {
-            if (requeryConfig == null) {
+            if (request.mti != "0200" || requeryConfig == null || requeryConfig.maxRetries < 1) {
                 return@withContext isoSocketHelper.send(request)
             }
 
             handleRetryableRequest(
+                isoSocketHelper = isoSocketHelper,
                 requeryConfig = requeryConfig,
                 request = request,
             )
@@ -347,19 +368,16 @@ abstract class CardTransactionActivity : PosActivity() {
 
             // Abort if response rrn does not match request
             if (request.retrievalReferenceNumber37 != response.retrievalReferenceNumber37) {
-                withContext(Dispatchers.IO) {
-                    posTransaction.responseCode = "X6"
-                    posDatabase.posTransactionDao().save(posTransaction)
-                }
+                response.responseCode39 = "X6"
+                posTransaction.responseCode = "X6"
             }
 
             response.set(4, request.transactionAmount4)
 
-            val transaction = FinancialTransaction(response).apply {
+            val transaction = FinancialTransaction(response, cardType = cardType).apply {
                 createdAt = Instant.now()
                 cardHolder = cardData.holder
                 aid = cardData.aid
-                cardType = cardData.type
                 nodeName = remoteConnectionInfo.nodeName
                 if (remoteConnectionInfo is ConnectionInfo) {
                     connectionInfo = remoteConnectionInfo
@@ -399,14 +417,12 @@ abstract class CardTransactionActivity : PosActivity() {
 
     private suspend fun handleRetryableRequest(
         requeryConfig: RequeryConfig,
-        request: ISOMsg
+        request: ISOMsg,
+        isoSocketHelper: IsoSocketHelper,
     ): SafeRunResult<ISOMsg> {
-        val maxAttempts = 1 + requeryConfig.maxRetries
-        if (request.mti != "0200" || maxAttempts <= 1) {
-            return isoSocketHelper.send(request)
-        }
         var result = SafeRunResult<ISOMsg>(null)
-        for (attempt in 1..maxAttempts) {
+
+        for (attempt in 1..(requeryConfig.maxRetries + 1)) {
             val isRetry = attempt > 1
             if (isRetry) {
                 delay(2000)
@@ -416,7 +432,13 @@ abstract class CardTransactionActivity : PosActivity() {
             }
 
             val newResult = isoSocketHelper.send(request, isRetry)
-            if (result.data == null || (result.data!!.responseCode39 != "00" && newResult.isSuccess)) {
+
+            // Criteria for adopting new result
+            if (
+                result.data == null
+                || result.data!!.responseCode39 != "00" // previous response code failed
+                || request.retrievalReferenceNumber37 != result.data!!.retrievalReferenceNumber37 // previous response rrn mismatch
+            ) {
                 result = newResult
             }
 
@@ -487,10 +509,10 @@ abstract class CardTransactionActivity : PosActivity() {
         withContext(Dispatchers.IO) {
             delay(1000)
 
-            val reversal = ReversalRequest.generate(request, cardData).apply {
+            val reversal = request.generateReversal(cardData).apply {
                 processingCode3 = processingCode("00")
                 messageReasonCode56 = "4021"
-                withParameters(parameters.parameters)
+                applyManagementData(parameters.managementData)
             }
 
             val success = attempt(reversal, 4, onReattempt = {
@@ -504,7 +526,10 @@ abstract class CardTransactionActivity : PosActivity() {
             })
 
             if (!success) {
-                val reversalRecord = Reversal(reversal).apply {
+                val reversalRecord = Reversal(
+                    isoMsg = reversal,
+                    cardType = cardTransactionType(request).type,
+                ).apply {
                     nodeName = remoteConnectionInfo.nodeName
                     if (remoteConnectionInfo is ConnectionInfo) {
                         connectionInfo = remoteConnectionInfo
@@ -561,21 +586,3 @@ abstract class CardTransactionActivity : PosActivity() {
         }
     }
 }
-
-inline val CardData.type: String
-    get() = when (aid) {
-        "A0000000032020" -> "VISA"
-        // "A0000000031010" -> "VISA Debit Credit Classic"
-        "A0000000031010" -> "VISA Debit"
-        // "A0000000031010" -> "VISA Credit"
-        // "A0000000032010" -> "VISA Electron"
-        "A0000004540010" -> "Etranzact Genesis Card"
-        "A0000004540011" -> "Etranzact Genesis Card"
-        "A0000000042203" -> "MasterCard US"
-        "A0000000041010" -> "MasterCard"
-        "A0000000042010" -> "MasterCard Specific"
-        "A0000000043010" -> "MasterCard Specific"
-        "A0000000045010" -> "MasterCard Specific"
-        "A0000003710001" -> "InterSwitch Verve Card"
-        else -> "Unknown Card"
-    }

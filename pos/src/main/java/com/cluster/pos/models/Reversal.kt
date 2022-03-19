@@ -1,7 +1,7 @@
 package com.cluster.pos.models
 
 import androidx.room.*
-import com.cluster.pos.models.messaging.BaseIsoMsg
+import org.jpos.iso.ISOMsg
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 2/25/2019.
@@ -12,7 +12,7 @@ import com.cluster.pos.models.messaging.BaseIsoMsg
 open class Reversal : FinancialTransaction {
     constructor() : super()
 
-    constructor(isoMsg: BaseIsoMsg) : super(isoMsg)
+    constructor(isoMsg: ISOMsg, cardType: String) : super(isoMsg, cardType)
 }
 
 @Dao
