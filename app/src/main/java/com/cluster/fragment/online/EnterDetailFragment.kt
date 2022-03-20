@@ -212,7 +212,7 @@ class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
                         .getJSONObject("Menu")
                         .getJSONObject("Response")
                         .getString("Display")
-                    dialogProvider.showError(Html.fromHtml(message))
+                    dialogProvider.showInfo(Html.fromHtml(message))
                 }
             } else {
                 Misc.increaseTransactionMonitorCounter(
@@ -221,7 +221,7 @@ class EnterDetailFragment : CreditClubFragment(R.layout.fragment_enter_detail) {
                     authResponse.sessionId
                 )
                 if (responseBase.toString().contains("Display")) {
-                    dialogProvider.showError(
+                    dialogProvider.showInfo(
                         responseBase
                             .getJSONObject("Menu")
                             .getJSONObject("Response")
