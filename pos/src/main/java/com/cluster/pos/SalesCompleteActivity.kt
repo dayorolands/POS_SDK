@@ -1,8 +1,11 @@
 package com.cluster.pos
 
-import com.cluster.pos.models.messaging.FinancialAdviceMessage
 import com.cluster.pos.card.CardData
 import com.cluster.pos.card.TransactionType
+import com.cluster.pos.card.applyCardData
+import com.cluster.pos.extension.*
+import com.cluster.pos.util.ISO87Packager
+import org.jpos.iso.ISOMsg
 
 class SalesCompleteActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.SalesComplete
@@ -14,10 +17,9 @@ class SalesCompleteActivity : CardTransactionActivity() {
     override fun onReadCard(cardData: CardData) {
         previousMessage ?: return showError("Transaction not found")
 
-        makeRequest(FinancialAdviceMessage.generate(previousMessage!!, cardData).apply {
-            processingCode3 = processingCode("61")
-            withParameters(parameters.parameters)
-        })
+        val request = generateFinancialAdvice(previousMessage!!, cardData)
+        request.processingCode3 = processingCode("61")
+        makeRequest(request)
     }
 
     override fun onSelectAccountType() {
@@ -25,6 +27,34 @@ class SalesCompleteActivity : CardTransactionActivity() {
             viewModel.amountString.value = amount.toString()
             sessionData.amount = amount
             readCard()
+        }
+    }
+
+    private fun generateFinancialAdvice(financialMessage: ISOMsg, cardData: CardData): ISOMsg {
+        val elements = financialMessage.run {
+            "0100$stan11$transmissionDateTime7" +
+                    "${acquiringInstIdCode32?.padStart(11, '0')}" +
+                    "${forwardingInstIdCode33?.padStart(11, '0')}"
+        }
+
+        return ISOMsg().apply {
+            packager = ISO87Packager()
+            mti = "0220"
+            processingCode3 = "000000"
+            applyCardData(cardData)
+            transactionAmount4 = financialMessage.transactionAmount4
+            replacementAmounts95 =
+                "${transactionAmount4?.padStart(12, '0')}" +
+                        "000000000000" +
+                        "${transactionFee28?.padStart(9, '0')}" +
+                        "000000000"
+
+            originalDataElements90 = elements
+            stan11 = financialMessage.stan11
+            localTransactionDate13 = financialMessage.localTransactionDate13
+            localTransactionTime12 = financialMessage.localTransactionTime12
+            retrievalReferenceNumber37 = financialMessage.retrievalReferenceNumber37
+//                messageReasonCode56 = "4000"
         }
     }
 }

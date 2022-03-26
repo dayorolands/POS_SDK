@@ -1,18 +1,17 @@
 package com.cluster.pos.helpers
 
 import android.os.Looper
-import com.cluster.pos.card.CardIsoMsg
-import com.cluster.pos.data.PosDatabase
-import com.cluster.pos.extension.*
-import com.cluster.pos.util.ISO87Packager
-import com.cluster.pos.util.SocketJob
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.util.SafeRunResult
 import com.cluster.core.util.safeRun
 import com.cluster.pos.PosConfig
 import com.cluster.pos.PosParameter
 import com.cluster.pos.RemoteConnectionInfo
+import com.cluster.pos.data.PosDatabase
+import com.cluster.pos.extension.*
 import com.cluster.pos.model.ConnectionInfo
+import com.cluster.pos.util.ISO87Packager
+import com.cluster.pos.util.SocketJob
 import org.jpos.iso.ISOMsg
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -37,6 +36,9 @@ class IsoSocketHelper(
             derivedTimeout = remoteConnectionInfo.requeryConfig?.timeout ?: derivedTimeout
         }
 
+        if (request.packager == null) {
+            request.packager = ISO87Packager()
+        }
         request.terminalId41 = config.terminalId
 
         Looper.myLooper() ?: Looper.prepare()
@@ -84,7 +86,7 @@ class IsoSocketHelper(
     }
 
     suspend inline fun attempt(
-        request: CardIsoMsg,
+        request: ISOMsg,
         maxAttempts: Int,
         crossinline onReattempt: suspend (attempt: Int) -> Unit,
     ): Boolean {

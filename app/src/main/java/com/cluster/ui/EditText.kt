@@ -64,7 +64,7 @@ class EditText : TextInputEditText {
 
     companion object {
         @JvmStatic
-        fun deriveInputType(inputType: String = "text"): Int = when (inputType) {
+        fun deriveInputType(inputType: String? = "text"): Int = when (inputType) {
             "date" -> InputType.TYPE_CLASS_DATETIME or InputType.TYPE_DATETIME_VARIATION_DATE
             "datetime" -> InputType.TYPE_CLASS_DATETIME or InputType.TYPE_DATETIME_VARIATION_NORMAL
             "none" -> InputType.TYPE_NULL

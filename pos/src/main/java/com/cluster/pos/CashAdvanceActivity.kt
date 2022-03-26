@@ -1,9 +1,11 @@
 package com.cluster.pos
 
-import com.cluster.pos.card.cardIsoMsg
-import com.cluster.pos.models.messaging.FinancialMessage
 import com.cluster.pos.card.CardData
 import com.cluster.pos.card.TransactionType
+import com.cluster.pos.card.applyCardData
+import com.cluster.pos.extension.processingCode3
+import com.cluster.pos.util.ISO87Packager
+import org.jpos.iso.ISOMsg
 
 class CashAdvanceActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.CashAdvance
@@ -12,9 +14,11 @@ class CashAdvanceActivity : CardTransactionActivity() {
         requestCard()
     }
     override fun onReadCard(cardData: CardData) {
-        val request = cardIsoMsg(cardData, ::FinancialMessage) {
+        val request = ISOMsg().apply {
+            packager = ISO87Packager()
+            mti = "0200"
             processingCode3 = processingCode("01")
-            withParameters(parameters.parameters)
+            applyCardData(cardData)
         }
 
         makeRequest(request)

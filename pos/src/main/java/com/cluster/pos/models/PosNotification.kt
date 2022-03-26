@@ -2,6 +2,10 @@ package com.cluster.pos.models
 
 import androidx.room.*
 import com.cluster.core.util.format
+import com.cluster.pos.extension.responseCode39
+import com.cluster.pos.extension.responseMessage
+import com.cluster.pos.extension.retrievalReferenceNumber37
+import com.cluster.pos.extension.transactionAmount4
 import com.cluster.pos.model.ConnectionInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Required
@@ -75,6 +79,8 @@ data class PosNotification(
 
 
     companion object {
+        const val PAYMENT_DATE_PATTERN = "dd-MM-yyyy hh:mm:ss"
+
         fun create(trn: FinancialTransaction): PosNotification {
             val transactionReference = trn.isoMsg.retrievalReferenceNumber37
             return PosNotification(
@@ -85,7 +91,7 @@ data class PosNotification(
                 currency = "NGN",
                 cardScheme = trn.cardType,
                 statusCode = trn.isoMsg.responseCode39,
-                paymentDate = trn.createdAt.format("dd-MM-yyyy hh:mm:ss"),
+                paymentDate = trn.createdAt.format(PAYMENT_DATE_PATTERN),
                 retrievalReferenceNumber = trn.isoMsg.retrievalReferenceNumber37,
                 maskedPAN = trn.pan,
                 nuban = "",

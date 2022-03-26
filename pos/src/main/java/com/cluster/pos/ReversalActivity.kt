@@ -1,8 +1,10 @@
 package com.cluster.pos
 
-import com.cluster.pos.models.messaging.ReversalRequest
 import com.cluster.pos.card.CardData
 import com.cluster.pos.card.TransactionType
+import com.cluster.pos.card.generateReversal
+import com.cluster.pos.extension.messageReasonCode56
+import com.cluster.pos.extension.processingCode3
 
 class ReversalActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.Reversal
@@ -14,11 +16,11 @@ class ReversalActivity : CardTransactionActivity() {
     override fun onReadCard(cardData: CardData) {
         previousMessage ?: return showError("Transaction not found")
 
-        makeRequest(ReversalRequest.generate(previousMessage!!, cardData).apply {
+        val request = previousMessage!!.generateReversal(cardData).apply {
             processingCode3 = processingCode("00")
-            withParameters(parameters.parameters)
             messageReasonCode56 = "4000"
-        })
+        }
+        makeRequest(request)
     }
 
     override fun onSelectAccountType() {

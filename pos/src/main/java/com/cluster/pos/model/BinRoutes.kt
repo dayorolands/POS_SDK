@@ -11,6 +11,8 @@ import kotlinx.serialization.Serializable
 const val DEFAULT_COMPONENT_KEY_1 = "3DFB3802940E8A546B3D38610852BA7A"
 const val DEFAULT_COMPONENT_KEY_2 = "0234E39861D3405E7A6B3185BA675873"
 
+fun nibssNodeNameSet() = setOf("EPMS", "POSVAS", "EPMS_TEST", "POSVAS_TEST")
+
 @Serializable
 data class BinRoutes(
     @SerialName("BIN") var bin: String,

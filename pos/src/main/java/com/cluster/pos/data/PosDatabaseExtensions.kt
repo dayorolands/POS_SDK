@@ -1,32 +1,40 @@
 package com.cluster.pos.data
 
-import com.cluster.pos.card.getTransactionType
-import com.cluster.pos.extension.*
-import com.cluster.pos.models.PosTransaction
-import com.cluster.core.data.prefs.LocalStorage
+import com.cluster.core.data.model.AgentInfo
 import com.cluster.core.util.mask
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.pos.card.TransactionType
+import com.cluster.pos.card.cardTransactionType
+import com.cluster.pos.extension.*
+import com.cluster.pos.models.PosTransaction
 import org.jpos.iso.ISOMsg
-import org.koin.core.context.GlobalContext
 
-fun PosTransaction.Companion.create(isoMsg: ISOMsg): PosTransaction {
-    val koin = GlobalContext.get()
-    val localStorage = koin.get<LocalStorage>()
-    val agent = localStorage.agent
-    val transactionType = isoMsg.getTransactionType()
+fun PosTransaction.Companion.create(
+    isoMsg: ISOMsg,
+    agent: AgentInfo,
+    institutionCode: String,
+    appName: String,
+    ptsp: String,
+    website: String,
+    bankName: String,
+    cardHolder: String,
+    cardType: String,
+    nodeName: String?,
+    responseCode: String,
+): PosTransaction {
+    val transactionType = cardTransactionType(isoMsg)
     val amountString =
         if (transactionType == TransactionType.Balance) isoMsg.additionalAmounts54
         else isoMsg.transactionAmount4
 
     return PosTransaction(
-        institutionCode = localStorage.institutionCode,
-        agentPhoneNumber = agent?.phoneNumber,
-        agentName = agent?.agentName,
-        agentCode = agent?.agentCode,
-        appName = "Cluster POS v1.0.1",
-        ptsp = "3GEE PAY",
-        website = "https://www.appzonegroup.com/group/appzone-pos",
+        institutionCode = institutionCode,
+        agentPhoneNumber = agent.phoneNumber,
+        agentName = agent.agentName,
+        agentCode = agent.agentCode,
+        appName = appName,
+        ptsp = ptsp,
+        website = website,
         pan = isoMsg.pan.mask(6, 4),
         merchantDetails = isoMsg.cardAcceptorNameLocation43,
         merchantId = isoMsg.cardAcceptorIdCode42,
@@ -36,10 +44,12 @@ fun PosTransaction.Companion.create(isoMsg: ISOMsg): PosTransaction {
         },
         stan = isoMsg.stan11,
         retrievalReferenceNumber = isoMsg.retrievalReferenceNumber37,
-//                cardType = isoMsg.cardType,
-        responseCode = isoMsg.responseCode39,
-//                cardHolder = isoMsg.cardHolder,
+        cardType = cardType,
+        responseCode = responseCode,
+        cardHolder = cardHolder,
         transactionType = transactionType.type,
         amount = amountString?.toDoubleOrNull()?.div(100)?.toCurrencyFormat() ?: "NGN0.00",
+        bankName = bankName,
+        nodeName = nodeName,
     )
 }

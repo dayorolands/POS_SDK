@@ -1,9 +1,9 @@
 package com.cluster.pos.card
 
+import com.cluster.pos.PosParameter
 import com.cluster.pos.extension.*
 import com.cluster.pos.util.ISO87Packager
 import com.cluster.pos.util.TransmissionDateParams
-import com.cluster.pos.PosParameter
 import org.jpos.iso.ISOMsg
 import java.security.SecureRandom
 
@@ -14,7 +14,9 @@ fun ISOMsg.applyCardData(data: CardData): ISOMsg = apply {
     val stanString = String.format("%06d", stan)
     val rrnString = String.format("1%05d", rrnPart) + stanString
 
-    packager = ISO87Packager()
+    if (packager == null) {
+        packager = ISO87Packager()
+    }
 
     pan = data.pan.trim { it <= ' ' }
     transactionAmount4 = data.transactionAmount
@@ -40,15 +42,18 @@ fun ISOMsg.applyCardData(data: CardData): ISOMsg = apply {
     if (data.pinBlock.isNotBlank()) {
         pinData = data.pinBlock
     }
-    if(!data.ksnData.isNullOrBlank()){
+    if (!data.ksnData.isNullOrBlank()) {
         ksnData120 = data.ksnData
     }
 
     posDataCode123 = run {
-        //            val tmpPosDataCode = StringBuilder("511501513344101")
         val tmpPosDataCode = StringBuilder("510101511344101")
-        if (data.holder.isNotEmpty()) tmpPosDataCode[4] = '0'
-        if (data.cardMethod == CardReaderEvent.MAG_STRIPE) tmpPosDataCode[6] = '2'
+        if (data.holder.isNotEmpty()) {
+            tmpPosDataCode[4] = '0'
+        }
+        if (data.cardMethod == CardReaderEvent.MAG_STRIPE) {
+            tmpPosDataCode[6] = '2'
+        }
         tmpPosDataCode.toString()
     }
 }
@@ -65,6 +70,7 @@ fun ISOMsg.generateReversal(cardData: CardData): ISOMsg {
         setTransactionTime()
         applyCardData(cardData)
         mti = "0420"
+        processingCode3 = "000000"
         transactionAmount4 = financialMessage.transactionAmount4
         replacementAmounts95 =
             "${transactionAmount4?.padStart(12, '0')}000000000000" +
@@ -77,7 +83,7 @@ fun ISOMsg.generateReversal(cardData: CardData): ISOMsg {
         retrievalReferenceNumber37 = financialMessage.retrievalReferenceNumber37
 
         processingCode3 = financialMessage.processingCode3
-        messageReasonCode56 = "4021"
+        messageReasonCode56 = "4000"
         cardAcceptorIdCode42 = financialMessage.cardAcceptorIdCode42
         cardAcceptorNameLocation43 = financialMessage.cardAcceptorNameLocation43
         currencyCode49 = financialMessage.currencyCode49

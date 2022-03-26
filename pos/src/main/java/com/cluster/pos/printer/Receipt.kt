@@ -1,16 +1,15 @@
 package com.cluster.pos.printer
 
 import android.content.Context
-import com.cluster.pos.R
-import com.cluster.pos.extension.additionalAmounts54
-import com.cluster.pos.extension.cardAcceptorIdCode42
-import com.cluster.pos.extension.cardAcceptorNameLocation43
-import com.cluster.pos.extension.cardExpirationDate14
-import com.cluster.pos.models.FinancialTransaction
-import com.cluster.pos.util.CurrencyFormatter
 import com.cluster.core.data.api.AppConfig
 import com.cluster.core.util.format
 import com.cluster.core.util.localStorage
+import com.cluster.pos.R
+import com.cluster.pos.card.isoResponseMessage
+import com.cluster.pos.extension.*
+import com.cluster.pos.models.FinancialTransaction
+import com.cluster.pos.models.PosTransaction
+import com.cluster.pos.util.CurrencyFormatter
 import org.jpos.iso.ISOMsg
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -134,6 +133,82 @@ RRN: $rrn"""
 
             return nodes
         }
+}
+
+fun posReceipt(
+    posTransaction: PosTransaction,
+    isCustomerCopy: Boolean = false,
+    isReprint: Boolean = false,
+) = printJob {
+    logo()
+    if (isReprint) {
+        text(
+            text = "***REPRINT***",
+            align = Alignment.MIDDLE,
+        )
+    }
+    text(
+        text = if (isCustomerCopy) "***CUSTOMER COPY***" else "***MERCHANT COPY***",
+        align = Alignment.MIDDLE,
+    )
+    text(
+        """${posTransaction.merchantDetails}
+            |Merchant Id: ${posTransaction.merchantId}
+            |Agent Name: ${posTransaction.agentName}
+            |Agent Code: ${posTransaction.agentCode}
+            |TID: ${posTransaction.terminalId}
+            |
+            |${posTransaction.dateTime?.format("dd/MM/yyyy hh:mm", "+0100")}
+            |
+            |${posTransaction.cardType}
+            |Card: ${posTransaction.pan}
+            |STAN: ${posTransaction.stan}
+            |PAN Seq No: 01
+            |Cardholder: ${posTransaction.cardHolder}
+            |EXP:${posTransaction.expiryDate}
+            |Acquirer: ${posTransaction.bankName}
+            |PTSP:${posTransaction.ptsp}
+            |Verification Mode: PIN""".trimMargin()
+    )
+    text(
+        text = posTransaction.transactionType!!,
+        align = Alignment.MIDDLE,
+        fontSize = 25,
+    )
+    text(
+        text = """AMOUNT: ${posTransaction.amount}
+            |RRN: ${posTransaction.retrievalReferenceNumber}""".trimMargin()
+    )
+
+    val isSuccessful = posTransaction.responseCode == "00"
+    val message = if (isSuccessful) "TRANSACTION APPROVED" else "TRANSACTION DECLINED"
+    text(
+        text = message,
+        align = Alignment.MIDDLE,
+        fontSize = 25,
+    )
+    if (!isSuccessful) {
+        text(
+            text = isoResponseMessage(posTransaction.responseCode),
+            align = Alignment.MIDDLE,
+        )
+    }
+    text(
+        text = "-----------------------------",
+        align = Alignment.MIDDLE,
+        fontSize = 15,
+    )
+    text(
+        text = "${posTransaction.appName}. Powered by ${posTransaction.bankName}",
+        align = Alignment.MIDDLE,
+        fontSize = 15,
+    )
+    text(
+        text = posTransaction.website!!,
+        align = Alignment.MIDDLE,
+        walkPaperAfterPrint = 10,
+        fontSize = 15,
+    )
 }
 
 inline val ISOMsg.additionalAmount: String

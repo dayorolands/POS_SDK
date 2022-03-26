@@ -2,12 +2,13 @@ package com.cluster.pos.models
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.cluster.pos.card.CardIsoMsg
+import com.cluster.core.util.mask
 import com.cluster.pos.card.cardTransactionType
 import com.cluster.pos.extension.*
-import com.cluster.pos.util.hexString
-import com.cluster.core.util.mask
+import com.cluster.pos.extensions.hexBytes
 import com.cluster.pos.model.ConnectionInfo
+import com.cluster.pos.util.ISO87Packager
+import com.cluster.pos.util.hexString
 import org.jpos.iso.ISOMsg
 import java.time.Instant
 
@@ -73,14 +74,15 @@ open class FinancialTransaction {
     @delegate:Ignore
     @delegate:Transient
     val isoMsg by lazy {
-        CardIsoMsg().apply {
-            unpack(content)
+        ISOMsg().apply {
+            packager = ISO87Packager()
+            unpack(content.replace(" ", "").hexBytes)
         }
     }
 
     constructor()
 
-    constructor(msg: ISOMsg) {
+    constructor(msg: ISOMsg, cardType: String) {
         stan = msg.stan11 ?: ""
         date = msg.localTransactionDate13 ?: ""
         content = msg.pack().hexString
@@ -95,6 +97,7 @@ open class FinancialTransaction {
         responseCode39 = msg.responseCode39 ?: ""
         additionalAmount = msg.additionalAmounts54 ?: ""
         transactionAmount4 = msg.transactionAmount4 ?: ""
+        this.cardType = cardType
     }
 }
 

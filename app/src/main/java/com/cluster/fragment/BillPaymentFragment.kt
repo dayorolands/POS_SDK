@@ -21,8 +21,11 @@ import com.cluster.core.data.model.ValidateCustomerInfoRequest
 import com.cluster.core.data.prefs.newTransactionReference
 import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.CreditClubFragment
-import com.cluster.core.util.*
 import com.cluster.core.util.delegates.defaultJson
+import com.cluster.core.util.includesSpecialCharacters
+import com.cluster.core.util.isValidEmail
+import com.cluster.core.util.safeRunIO
+import com.cluster.core.util.toString
 import com.cluster.databinding.BillPaymentFragmentBinding
 import com.cluster.executeTransaction
 import com.cluster.receipt.billsPaymentReceipt
@@ -33,7 +36,6 @@ import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.time.Instant
@@ -331,7 +333,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
         }
         if (viewModel.category.value?.isAirtime != true) {
             if (customerName.isBlank()) return dialogProvider.showError("Customer Name is required")
-            if (customerName.includesSpecialCharacters() || customerName.includesNumbers()) {
+            if (customerName.includesSpecialCharacters()) {
                 return dialogProvider.showError("Customer Name is invalid")
             }
 

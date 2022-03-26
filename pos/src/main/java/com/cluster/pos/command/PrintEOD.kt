@@ -1,10 +1,13 @@
 package com.cluster.pos.command
 
 import android.content.Context
-import com.cluster.pos.data.PosDatabase
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.format
 import com.cluster.core.util.toCurrencyFormat
+import com.cluster.pos.data.PosDatabase
+import com.cluster.pos.extension.isSuccessful
+import com.cluster.pos.extension.retrievalReferenceNumber37
+import com.cluster.pos.extension.transactionAmount4
 import com.cluster.pos.printer.PosPrinter
 import com.cluster.pos.printer.PrinterStatus
 import com.cluster.pos.printer.printJob
