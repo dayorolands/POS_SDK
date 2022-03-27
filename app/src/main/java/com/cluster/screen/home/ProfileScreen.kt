@@ -60,10 +60,12 @@ fun ProfileScreen(
     val subscriptionService: SubscriptionService by rememberRetrofitService()
 
     LaunchedEffect(1) {
-        viewModel.loadActiveSubscription(
-            subscriptionService = subscriptionService,
-            localStorage = localStorage,
-        )
+        if (institutionConfig.categories.subscriptions) {
+            viewModel.loadActiveSubscription(
+                subscriptionService = subscriptionService,
+                localStorage = localStorage,
+            )
+        }
     }
 
     LazyColumn(
@@ -95,10 +97,12 @@ fun ProfileScreen(
             )
         }
 
-        item {
-            ActiveSubscription(
-                openSubscription = { composeNavController.navigate(Routes.Subscription) },
-            )
+        if (institutionConfig.categories.subscriptions) {
+            item {
+                ActiveSubscription(
+                    openSubscription = { composeNavController.navigate(Routes.Subscription) },
+                )
+            }
         }
 
         item {

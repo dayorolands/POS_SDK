@@ -14,9 +14,6 @@ import com.cluster.screen.*
 import com.cluster.screen.subscription.ChooseSubscriptionScreen
 import com.cluster.screen.subscription.SubscriptionHistoryScreen
 import com.cluster.screen.subscription.SubscriptionScreen
-import com.cluster.ui.FundsTransfer
-import com.cluster.ui.PendingTransactions
-import com.cluster.ui.ReceiptDetails
 import com.cluster.viewmodel.AppViewModel
 import com.cluster.viewmodel.ProvideViewModelStoreOwner
 import com.google.accompanist.insets.navigationBarsPadding
@@ -25,7 +22,6 @@ fun NavGraphBuilder.clusterNavigation(
     navController: NavController,
     dialogProvider: DialogProvider,
     appViewModel: AppViewModel,
-    viewModelStoreOwner: ViewModelStoreOwner,
 ) {
     composable(Routes.FundsTransfer) {
         FundsTransfer(
@@ -76,6 +72,12 @@ fun NavGraphBuilder.clusterNavigation(
             printJob = printJob ?: return@composable,
         )
     }
+}
+
+fun NavGraphBuilder.subscriptionRoutes(
+    navController: NavController,
+    viewModelStoreOwner: ViewModelStoreOwner,
+) {
     composable(Routes.Subscription) {
         ProvideViewModelStoreOwner(
             viewModelStoreOwner = viewModelStoreOwner,
