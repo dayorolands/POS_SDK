@@ -74,7 +74,7 @@ fun NavGraphBuilder.clusterNavigation(
     }
 }
 
-fun NavGraphBuilder.subscriptionRoutes(
+fun NavGraphBuilder.subscriptionNavigation(
     navController: NavController,
     viewModelStoreOwner: ViewModelStoreOwner,
 ) {

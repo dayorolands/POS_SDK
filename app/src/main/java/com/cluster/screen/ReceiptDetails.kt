@@ -1,4 +1,4 @@
-package com.cluster.ui
+package com.cluster.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,6 +18,9 @@ import androidx.navigation.NavController
 import com.cluster.pos.Platform
 import com.cluster.pos.printer.*
 import com.cluster.pos.rememberPosPrinter
+import com.cluster.ui.AppButton
+import com.cluster.ui.CreditClubAppBar
+import com.cluster.ui.ErrorMessage
 import kotlinx.coroutines.launch
 
 @Composable

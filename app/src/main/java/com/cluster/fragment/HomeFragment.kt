@@ -43,7 +43,7 @@ import com.cluster.core.util.packageInfo
 import com.cluster.core.util.safeRunIO
 import com.cluster.pos.Platform
 import com.cluster.screen.home.HomeScreen
-import com.cluster.subscriptionRoutes
+import com.cluster.subscriptionNavigation
 import com.cluster.ui.theme.CreditClubTheme
 import com.cluster.viewmodel.AppViewModel
 import com.cluster.viewmodel.ProvideViewModelStoreOwner
@@ -148,7 +148,7 @@ class HomeFragment : CreditClubFragment() {
                                     appViewModel = appViewModel,
                                 )
                                 if (institutionConfig.categories.subscriptions) {
-                                    subscriptionRoutes(
+                                    subscriptionNavigation(
                                         navController = composeNavController,
                                         viewModelStoreOwner = viewModelStoreOwner,
                                     )

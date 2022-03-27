@@ -165,10 +165,6 @@ fun CreditClubFragment.openPageById(id: Int) {
 
         R.id.bvn_update_button -> startActivity(BVNUpdateActivity::class.java)
 
-        R.id.funds_transfer_button -> {
-            findNavController().navigate(R.id.action_to_funds_transfer)
-        }
-
         R.id.agent_mini_statement_button -> startActivity(MiniStatementActivity::class.java)
 
         R.id.fn_hla_tagging -> startActivity(HlaTaggingActivity::class.java)
