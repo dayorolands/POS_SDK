@@ -2,15 +2,14 @@ package com.cluster.pos
 
 import android.app.Application
 import androidx.work.WorkerParameters
+import com.cluster.core.data.prefs.getEncryptedSharedPreferences
+import com.cluster.core.util.readRawJsonFile
 import com.cluster.pos.data.PosDatabase
 import com.cluster.pos.data.PosPreferences
 import com.cluster.pos.helpers.IsoSocketHelper
+import com.cluster.pos.model.PosTenant
 import com.cluster.pos.service.CallHomeService
 import com.cluster.pos.service.ConfigService
-import com.cluster.core.data.prefs.getEncryptedSharedPreferences
-import com.cluster.core.util.readRawJsonFile
-import com.cluster.pos.*
-import com.cluster.pos.model.PosTenant
 import com.cluster.pos.work.CallHomeWorker
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.worker
@@ -29,7 +28,7 @@ object Platform {
         private set
 
     @JvmStatic
-    var deviceType = 2
+    var deviceType = 2 // default to mobile type
         private set
 
     @JvmStatic

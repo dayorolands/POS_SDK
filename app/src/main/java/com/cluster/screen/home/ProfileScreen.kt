@@ -182,10 +182,20 @@ fun ProfileScreen(
 
         item {
             NavigationRow(
-                title = stringResource(R.string.change_pin),
+                title = stringResource(R.string.change_transaction_pin),
                 imageVector = Icons.Outlined.Lock,
                 onClick = {
                     composeNavController.navigate(Routes.PinChange)
+                }
+            )
+        }
+
+        item {
+            NavigationRow(
+                title = stringResource(R.string.change_password),
+                imageVector = Icons.Outlined.Lock,
+                onClick = {
+                    composeNavController.navigate(Routes.ChangePassword)
                 }
             )
         }

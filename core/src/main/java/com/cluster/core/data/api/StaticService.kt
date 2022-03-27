@@ -2,7 +2,10 @@ package com.cluster.core.data.api
 
 import com.cluster.core.data.model.*
 import com.cluster.core.data.request.*
-import com.cluster.core.data.response.*
+import com.cluster.core.data.response.ApiResponse
+import com.cluster.core.data.response.BackendResponse
+import com.cluster.core.data.response.GenericResponse
+import com.cluster.core.data.response.MiniStatementResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -57,25 +60,11 @@ interface StaticService {
         @Query("IsRetrial") isRetrial: Boolean = false
     ): BackendResponse?
 
-    @POST("CreditClubStatic/CompleteActivationWithPinChange")
-    suspend fun completeActivationWithPinChange(@Body request: PinChangeRequest): AgentActivationResponse?
-
     @POST("CreditClubStatic/PinChange")
-    suspend fun pinChange(@Body request: PinChangeRequest): BackendResponse?
+    suspend fun changeCustomerPin(@Body request: CustomerPinChangeRequest): BackendResponse?
 
     @POST("CreditClubStatic/LoanRequest")
     suspend fun loanRequest(request: LoanRequestCreditClub): BackendResponse?
-
-    @GET("CreditClubStatic/AgentVerification")
-    suspend fun agentVerification(
-        @Query("verificationCode") verificationCode: String,
-        @Query("agentPhoneNumber") agentPhoneNumber: String,
-        @Query("institutionCode") institutionCode: String?,
-        @Query("deviceId") deviceId: String?
-    ): BackendResponse?
-
-    @POST("CreditClubStatic/AgentActivation")
-    suspend fun agentActivation(): BackendResponse?
 
     @GET("CreditClubStatic/AccountOpeningStatus")
     suspend fun accountOpeningStatus(
@@ -92,9 +81,6 @@ interface StaticService {
         @Query("customerAccountNumber") customerAccountNumber: String
     ): List<LoanProduct>
 
-    @GET("CreditClubStatic/GetAllLoanProducts")
-    suspend fun getAllLoanProducts(@Query("institutionCode") institutionCode: String?): List<LoanProduct>
-
     @GET("CreditClubStatic/GetAllProducts")
     suspend fun getAllProducts(
         @Query("institutionCode") institutionCode: String?,
@@ -106,15 +92,6 @@ interface StaticService {
         @Query("verificationCode") verificationCode: String,
         @Query("agentPhoneNumber") agentPhoneNumber: String,
         @Query("institutionCode") institutionCode: String?
-    ): BackendResponse?
-
-    @GET("CreditClubStatic/ConfirmAgentInformation")
-    suspend fun confirmAgentInformation(
-        @Query("institutionCode") institutionCode: String?,
-        @Query("agentPhoneNumber") agentPhoneNumber: String,
-        @Query("agentPIN") agentPin: String,
-        @Query("AppVersion") appVersion: String,
-        @Query("DeviceType") deviceType: Int
     ): BackendResponse?
 
     @GET("CreditClubStatic/GetCustomerAccountByPhoneNumber")

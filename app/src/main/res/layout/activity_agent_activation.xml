@@ -29,16 +29,16 @@
                     android:layout_marginLeft="@dimen/form_margin_horizontal"
                     android:layout_marginTop="10dp"
                     android:layout_marginRight="@dimen/form_margin_horizontal"
-                    android:layout_marginBottom="@dimen/ten_dp"
+                    android:layout_marginBottom="@dimen/twenty_dp"
                     android:text="@string/verifyAccount"
                     android:textColor="@color/blue"
                     android:textSize="25dp" />
 
                 <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/activation_hint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/form_margin_horizontal"
-                    android:layout_marginTop="10dp"
                     android:layout_marginRight="@dimen/form_margin_horizontal"
                     android:layout_marginBottom="@dimen/ten_dp"
                     android:text="@string/activation_instructions"
@@ -74,17 +74,48 @@
                     android:orientation="vertical"
                     android:visibility="gone">
 
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/form_margin_horizontal"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginRight="@dimen/form_margin_horizontal"
+                        android:layout_marginBottom="@dimen/ten_dp"
+                        android:text="@string/setYourLoginPassword"
+                        android:textSize="20sp" />
+
                     <com.cluster.ui.EditText
-                        android:id="@+id/old_pin_et"
+                        android:id="@+id/new_password_et"
                         style="@style/defaultEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/fifteen_dp"
                         android:drawableStart="@drawable/ic_password"
-                        android:hint="@string/old_pin"
+                        android:hint="@string/newPassword"
                         android:inputType="numberPassword"
-                        android:maxLength="4"
-                        android:visibility="gone" />
+                        android:maxLength="6" />
+
+
+                    <com.cluster.ui.EditText
+                        android:id="@+id/new_password_confirmation_et"
+                        style="@style/defaultEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/fifteen_dp"
+                        android:drawableStart="@drawable/ic_password"
+                        android:hint="@string/confirmPassword"
+                        android:inputType="numberPassword"
+                        android:maxLength="6" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/form_margin_horizontal"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginRight="@dimen/form_margin_horizontal"
+                        android:layout_marginBottom="@dimen/ten_dp"
+                        android:text="@string/setYourTransactionPin"
+                        android:textSize="20sp" />
 
                     <com.cluster.ui.EditText
                         android:id="@+id/new_pin_et"

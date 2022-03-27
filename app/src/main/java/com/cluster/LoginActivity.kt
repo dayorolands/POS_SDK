@@ -9,18 +9,9 @@ import android.view.View
 import androidx.core.content.edit
 import coil.Coil
 import coil.request.ImageRequest
-import com.cluster.databinding.ActivityLoginBinding
-import com.cluster.ui.SurveyDialog
-import com.cluster.pos.Platform
-import com.cluster.pos.data.PosDatabase
-import com.cluster.pos.data.PosPreferences
-import com.cluster.pos.extension.posConfig
-import com.cluster.pos.extension.posParameter
 import com.cluster.core.data.TRANSACTIONS_CLIENT
-import com.cluster.core.data.api.AppConfig
-import com.cluster.core.data.api.StaticService
-import com.cluster.core.data.api.VersionService
-import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.api.*
+import com.cluster.core.data.model.LoginRequest
 import com.cluster.core.data.model.SurveyQuestion
 import com.cluster.core.data.request.SubmitSurveyRequest
 import com.cluster.core.data.response.isSuccessful
@@ -28,10 +19,17 @@ import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.getLatestVersion
 import com.cluster.core.util.*
 import com.cluster.core.util.delegates.jsonStore
+import com.cluster.databinding.ActivityLoginBinding
 import com.cluster.pos.InvalidRemoteConnectionInfo
+import com.cluster.pos.Platform
 import com.cluster.pos.PosConfig
 import com.cluster.pos.api.PosApiService
+import com.cluster.pos.data.PosDatabase
+import com.cluster.pos.data.PosPreferences
+import com.cluster.pos.extension.posConfig
+import com.cluster.pos.extension.posParameter
 import com.cluster.pos.model.PosTenant
+import com.cluster.ui.SurveyDialog
 import com.cluster.ui.dataBinding
 import kotlinx.coroutines.*
 import kotlinx.serialization.builtins.ListSerializer
@@ -49,6 +47,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     private val binding: ActivityLoginBinding by dataBinding()
     private val posApiService: PosApiService by retrofitService()
     private val staticService: StaticService by retrofitService()
+    private val authService: AuthService by retrofitService()
     private val versionService: VersionService by retrofitService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -302,13 +301,14 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         if (!syncAgentInfo()) return
         dialogProvider.showProgressBar("Logging you in")
         val (response, error) = safeRunIO {
-            staticService.confirmAgentInformation(
-                localStorage.institutionCode,
-                phoneNumber,
-                pin,
-                appVersionName,
-                Platform.deviceType
+            val request = LoginRequest(
+                agentPhoneNumber = phoneNumber,
+                appVersion = appVersionName,
+                deviceType = Platform.deviceType,
+                institutionCode = localStorage.institutionCode!!,
+                password = pin,
             )
+            authService.login(request)
         }
         dialogProvider.hideProgressBar()
 

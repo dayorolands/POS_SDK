@@ -5,6 +5,7 @@ object Routes {
     const val FundsTransfer = "transactions/funds-transfer"
     const val TransactionSummary = "transactions/summary"
     const val PinChange = "agent/pin-change"
+    const val ChangePassword = "auth/password/change"
     const val Receipt = "transactions/receipt"
     const val SupportCases = "support/cases"
     const val SupportConversation = "support/cases/{reference}/{title}/thread"

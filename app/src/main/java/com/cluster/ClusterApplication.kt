@@ -12,15 +12,16 @@ import android.provider.Settings
 import android.telephony.TelephonyManager
 import androidx.appcompat.app.AppCompatDelegate
 import com.cluster.config.*
-import com.cluster.model.online.AuthResponse
-import com.cluster.utility.extensions.registerWorkers
-import com.cluster.utility.registerAppFunctions
-import com.cluster.pos.Platform
 import com.cluster.core.R
 import com.cluster.core.data.clusterObjectBoxModule
 import com.cluster.core.data.prefs.AppDataStorage
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.data.prefs.moveTo
+import com.cluster.model.online.AuthResponse
+import com.cluster.pos.Platform
+import com.cluster.pos.extension.getPosSerialNumber
+import com.cluster.utility.extensions.registerWorkers
+import com.cluster.utility.registerAppFunctions
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
@@ -78,17 +79,19 @@ class ClusterApplication : Application() {
 
         encryptAgentInfo()
         observeNetworkState()
-        @SuppressLint("HardwareIds")
-        appDataStorage.deviceId = Settings.Secure.getString(
-            contentResolver,
-            Settings.Secure.ANDROID_ID
-        )
         registerAppFunctions()
         Platform.test(this)
 
         if (Platform.isPOS) {
             loadKoinModules(posWorkerModule)
             startPosApp()
+            appDataStorage.deviceId = getPosSerialNumber()
+        } else {
+            @SuppressLint("HardwareIds")
+            appDataStorage.deviceId = Settings.Secure.getString(
+                contentResolver,
+                Settings.Secure.ANDROID_ID
+            )
         }
         registerWorkers()
     }

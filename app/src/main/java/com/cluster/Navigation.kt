@@ -10,9 +10,7 @@ import com.cluster.conversation.ConversationContent
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.setResult
 import com.cluster.pos.printer.ParcelablePrintJob
-import com.cluster.screen.PinChange
-import com.cluster.screen.SupportCases
-import com.cluster.screen.UssdWithdrawal
+import com.cluster.screen.*
 import com.cluster.screen.subscription.ChooseSubscriptionScreen
 import com.cluster.screen.subscription.SubscriptionHistoryScreen
 import com.cluster.screen.subscription.SubscriptionScreen
@@ -37,6 +35,9 @@ fun NavGraphBuilder.clusterNavigation(
     }
     composable(Routes.PinChange) {
         PinChange(navController = navController)
+    }
+    composable(Routes.ChangePassword) {
+        ChangePasswordScreen(navController = navController)
     }
     composable(Routes.SupportCases) {
         SupportCases(navController = navController)
@@ -114,6 +115,8 @@ fun NavGraphBuilder.clusterNavigation(
 fun NavController.navigateToReceipt(receipt: ParcelablePrintJob, popBackStack: Boolean = true) {
     setResult(receipt, "receipt")
     currentBackStackEntry?.arguments?.putParcelable("receipt", receipt)
-    if (popBackStack) popBackStack()
+    if (popBackStack) {
+        popBackStack()
+    }
     navigate(Routes.Receipt)
 }

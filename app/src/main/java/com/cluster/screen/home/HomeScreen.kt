@@ -37,6 +37,7 @@ fun HomeScreen(
     val composableRouteFunctionIds = remember {
         mapOf(
             R.id.agent_change_pin_button to Routes.PinChange,
+            R.id.change_password_button to Routes.ChangePassword,
             R.id.funds_transfer_button to Routes.FundsTransfer,
             R.id.fn_support to Routes.SupportCases,
             R.id.ussd_withdrawal_button to Routes.UssdWithdrawal,

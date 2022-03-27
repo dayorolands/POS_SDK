@@ -9,7 +9,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.cluster.*
 import com.cluster.R
-import com.cluster.pos.Platform
 import com.cluster.core.data.CoreDatabase
 import com.cluster.core.data.api.StaticService
 import com.cluster.core.data.api.retrofitService
@@ -22,6 +21,7 @@ import com.cluster.core.util.debug
 import com.cluster.core.util.logFunctionUsage
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
+import com.cluster.pos.Platform
 import com.cluster.ui.rememberBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -124,8 +124,6 @@ fun CreditClubFragment.openPageById(id: Int) {
                 safeRunIO { logFunctionUsage(FunctionIds.AGENT_BALANCE_ENQUIRY) }
             }
         }
-
-        R.id.agent_change_pin_button -> startActivity(ChangePinActivity::class.java)
 
         R.id.case_logging_button -> startActivity(CaseLogActivity::class.java)
 
