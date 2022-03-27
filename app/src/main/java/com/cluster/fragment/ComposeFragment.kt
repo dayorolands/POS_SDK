@@ -25,7 +25,6 @@ class ComposeFragment : CreditClubFragment() {
     ): View {
         val mainNavController = findNavController()
         val route = requireArguments().getString("route", Routes.FundsTransfer)
-        val viewModelStoreOwner = requireActivity()
 
         return ComposeView(requireContext()).apply {
             setContent {
@@ -37,7 +36,6 @@ class ComposeFragment : CreditClubFragment() {
                                 navController = mainNavController,
                                 dialogProvider = dialogProvider,
                                 appViewModel = appViewModel,
-                                viewModelStoreOwner = viewModelStoreOwner,
                             )
                         }
                     }

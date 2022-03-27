@@ -33,6 +33,7 @@ data class TokenWithdrawalConfig(
 data class CategoryConfig(
     val loans: Boolean = false,
     val customers: Boolean = true,
+    val subscriptions: Boolean = false,
 )
 
 data class AccountOpeningConfig(

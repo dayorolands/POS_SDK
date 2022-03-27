@@ -43,6 +43,7 @@ import com.cluster.core.util.packageInfo
 import com.cluster.core.util.safeRunIO
 import com.cluster.pos.Platform
 import com.cluster.screen.home.HomeScreen
+import com.cluster.subscriptionRoutes
 import com.cluster.ui.theme.CreditClubTheme
 import com.cluster.viewmodel.AppViewModel
 import com.cluster.viewmodel.ProvideViewModelStoreOwner
@@ -73,17 +74,19 @@ class HomeFragment : CreditClubFragment() {
                     localStorage = localStorage,
                 )
             }
-            coroutineScope {
-                appViewModel.loadActiveSubscription(
-                    subscriptionService = subscriptionService,
-                    localStorage = localStorage,
-                )
-                val subscriptionId = appViewModel.activeSubscription.value?.id
-                if (subscriptionId != null) {
-                    appViewModel.loadMilestones(
+            if (institutionConfig.categories.subscriptions) {
+                coroutineScope {
+                    appViewModel.loadActiveSubscription(
                         subscriptionService = subscriptionService,
-                        subscriptionId = subscriptionId.toLong(),
+                        localStorage = localStorage,
                     )
+                    val subscriptionId = appViewModel.activeSubscription.value?.id
+                    if (subscriptionId != null) {
+                        appViewModel.loadMilestones(
+                            subscriptionService = subscriptionService,
+                            subscriptionId = subscriptionId.toLong(),
+                        )
+                    }
                 }
             }
         }
@@ -143,8 +146,13 @@ class HomeFragment : CreditClubFragment() {
                                     navController = composeNavController,
                                     dialogProvider = dialogProvider,
                                     appViewModel = appViewModel,
-                                    viewModelStoreOwner = viewModelStoreOwner,
                                 )
+                                if (institutionConfig.categories.subscriptions) {
+                                    subscriptionRoutes(
+                                        navController = composeNavController,
+                                        viewModelStoreOwner = viewModelStoreOwner,
+                                    )
+                                }
                             }
                         }
                     }
