@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.navigation.fragment.findNavController
-import com.cluster.ui.ReceiptDetails
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.pos.printer.ParcelablePrintJob
+import com.cluster.screen.ReceiptDetails
 import com.cluster.ui.theme.CreditClubTheme
 import com.google.accompanist.insets.ProvideWindowInsets
 
