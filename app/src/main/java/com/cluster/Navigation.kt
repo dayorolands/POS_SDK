@@ -11,6 +11,9 @@ import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.setResult
 import com.cluster.pos.printer.ParcelablePrintJob
 import com.cluster.screen.*
+import com.cluster.screen.subscription.ChooseSubscriptionScreen
+import com.cluster.screen.subscription.SubscriptionHistoryScreen
+import com.cluster.screen.subscription.SubscriptionScreen
 import com.cluster.viewmodel.AppViewModel
 import com.cluster.viewmodel.ProvideViewModelStoreOwner
 import com.google.accompanist.insets.navigationBarsPadding
@@ -68,7 +71,7 @@ fun NavGraphBuilder.clusterNavigation(
     }
 }
 
-fun NavGraphBuilder.subscriptionRoutes(
+fun NavGraphBuilder.subscriptionNavigation(
     navController: NavController,
     viewModelStoreOwner: ViewModelStoreOwner,
 ) {
