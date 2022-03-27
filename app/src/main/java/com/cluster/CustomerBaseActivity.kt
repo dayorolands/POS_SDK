@@ -11,8 +11,6 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.cluster.ui.ReceiptDetails
-import com.cluster.ui.TransactionSummary
 import com.cluster.core.data.model.AccountInfo
 import com.cluster.core.data.model.AgentFee
 import com.cluster.core.data.response.GenericResponse
@@ -20,6 +18,8 @@ import com.cluster.core.type.CustomerRequestOption
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.util.SuspendCallback
 import com.cluster.pos.printer.PrintJob
+import com.cluster.screen.ReceiptDetails
+import com.cluster.ui.TransactionSummary
 import com.cluster.ui.theme.CreditClubTheme
 import com.google.accompanist.insets.ProvideWindowInsets
 import java.util.*

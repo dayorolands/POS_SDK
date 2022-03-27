@@ -5,16 +5,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.cluster.ui.FundsTransfer
-import com.cluster.ui.PendingTransactions
-import com.cluster.ui.ReceiptDetails
 import com.cluster.conversation.ConversationContent
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.setResult
 import com.cluster.pos.printer.ParcelablePrintJob
-import com.cluster.screen.PinChange
-import com.cluster.screen.SupportCases
-import com.cluster.screen.UssdWithdrawal
+import com.cluster.screen.*
 import com.cluster.viewmodel.AppViewModel
 import com.google.accompanist.insets.navigationBarsPadding
 

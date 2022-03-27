@@ -3,7 +3,8 @@ package com.cluster.pos.extensions
 import org.json.JSONObject
 import kotlin.reflect.KProperty
 
-private class ManagementDataDelegate(private val key: String) {
+@JvmInline
+value class ManagementDataDelegate(private val key: String) {
     operator fun getValue(jsonObject: JSONObject, prop: KProperty<*>): String {
         return jsonObject.optString(key)
     }

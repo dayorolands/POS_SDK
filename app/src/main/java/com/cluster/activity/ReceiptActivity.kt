@@ -5,10 +5,10 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.cluster.ui.ReceiptDetails
 import com.cluster.Routes
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.pos.printer.ParcelablePrintJob
+import com.cluster.screen.ReceiptDetails
 import com.cluster.ui.theme.CreditClubTheme
 import com.google.accompanist.insets.ProvideWindowInsets
 

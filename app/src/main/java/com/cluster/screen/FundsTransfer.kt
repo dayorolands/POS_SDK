@@ -1,4 +1,4 @@
-package com.cluster.ui
+package com.cluster.screen
 
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.cluster.R
-import com.cluster.receipt.fundsTransferReceipt
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.ClusterObjectBox
 import com.cluster.core.data.TRANSACTIONS_CLIENT
@@ -48,6 +47,7 @@ import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.*
 import com.cluster.core.util.delegates.defaultJson
 import com.cluster.pos.printer.PrintJob
+import com.cluster.receipt.fundsTransferReceipt
 import com.cluster.ui.*
 import io.objectbox.Box
 import io.objectbox.kotlin.boxFor
