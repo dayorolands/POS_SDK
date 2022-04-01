@@ -38,6 +38,8 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.time.Instant
 
+private const val PASSWORD_LENGTH = 6
+
 class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     private val posTenant: PosTenant by inject()
     private val posPreferences: PosPreferences by inject()
@@ -289,12 +291,12 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
 
         if (TextUtils.isEmpty(pin)) {
-            showError("PIN is required", R.id.login_pin)
+            showError("Password is required", R.id.login_pin)
             return
         }
 
-        if (pin.length != 4) {
-            dialogProvider.showError("PIN must be 4 digits")
+        if (pin.length != PASSWORD_LENGTH) {
+            dialogProvider.showError("Password must be $PASSWORD_LENGTH digits")
             return
         }
 
