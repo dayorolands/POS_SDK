@@ -6,14 +6,14 @@ import android.os.Build
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.WorkManager
-import com.cluster.utility.extensions.registerPeriodicWorker
-import com.cluster.work.*
+import com.cluster.core.data.prefs.getEncryptedSharedPreferences
+import com.cluster.core.data.prefs.moveTo
 import com.cluster.pos.Platform
 import com.cluster.pos.service.ConfigService
 import com.cluster.pos.util.SocketJob
-import com.cluster.core.data.prefs.getEncryptedSharedPreferences
-import com.cluster.core.data.prefs.moveTo
 import com.cluster.pos.work.CallHomeWorker
+import com.cluster.utility.extensions.registerPeriodicWorker
+import com.cluster.work.*
 import okio.use
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.KeyStore
@@ -84,7 +84,7 @@ private fun getTrustManagers(context: Context): Array<TrustManager?> {
     Security.insertProviderAt(BouncyCastleProvider(), 1)
     val trustStore = KeyStore.getInstance("BKS")
     context.resources.openRawResource(R.raw.pos_trust_store).use { inputStream ->
-        trustStore.load(inputStream, "cluster".toCharArray())
+        trustStore.load(inputStream, "P@55w0rd123".toCharArray())
     }
     val tmf = TrustManagerFactory.getInstance("X509")
     tmf.init(trustStore)
