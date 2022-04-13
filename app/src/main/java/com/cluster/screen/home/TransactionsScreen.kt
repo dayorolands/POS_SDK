@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.Routes
 import com.cluster.components.SmallMenuButton
@@ -20,7 +20,7 @@ import com.cluster.utility.openPageById
 fun TransactionsScreen(
     fragment: CreditClubFragment,
     institutionConfig: InstitutionConfig,
-    composeNavController: NavHostController
+    composeNavController: NavController,
 ) {
     val flows = institutionConfig.flows
 
@@ -85,7 +85,7 @@ fun TransactionsScreen(
             SmallMenuButton(
                 text = "Funds Transfer",
                 icon = painterResource(R.drawable.payday_loan),
-                onClick = { fragment.openPageById(R.id.funds_transfer_button) }
+                onClick = { composeNavController.navigate(Routes.FundsTransfer) }
             )
         }
         if (flows.collectionPayment != null) {
