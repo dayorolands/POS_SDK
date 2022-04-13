@@ -1,9 +1,9 @@
 package com.cluster.screen.home
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -41,8 +41,18 @@ fun ActiveSubscription(
             color = MaterialTheme.colors.onSurface,
             overflow = TextOverflow.Ellipsis,
         )
+        Spacer(modifier = Modifier.height(10.dp))
         TextButton(
             onClick = openSubscription,
+            shape = RoundedCornerShape(15.dp),
+            modifier = Modifier
+                .border(
+                    BorderStroke(
+                        1.dp,
+                        MaterialTheme.colors.primary
+                    ),
+                    RoundedCornerShape(15.dp),
+                )
         ) {
             Text(
                 text = "Manage Subscription",
