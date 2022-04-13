@@ -353,7 +353,7 @@ abstract class CardTransactionActivity : PosActivity() {
                 showTransactionStatusPage(posTransaction)
 
                 // Routes currently only support either Requery or Reversal but not both
-                if (requeryConfig != null) {
+                if (requeryConfig == null) {
                     isoSocketHelper.attemptReversal(request)
                 }
 
