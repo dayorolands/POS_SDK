@@ -9,7 +9,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.cluster.*
 import com.cluster.R
-import com.cluster.pos.Platform
 import com.cluster.core.data.CoreDatabase
 import com.cluster.core.data.api.StaticService
 import com.cluster.core.data.api.retrofitService
@@ -22,6 +21,7 @@ import com.cluster.core.util.debug
 import com.cluster.core.util.logFunctionUsage
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
+import com.cluster.pos.Platform
 import com.cluster.ui.rememberBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -166,10 +166,6 @@ fun CreditClubFragment.openPageById(id: Int) {
         R.id.loan_request_button -> startActivity(CreditClubLoanRequestActivity::class.java)
 
         R.id.bvn_update_button -> startActivity(BVNUpdateActivity::class.java)
-
-        R.id.funds_transfer_button -> {
-            findNavController().navigate(R.id.action_to_funds_transfer)
-        }
 
         R.id.agent_mini_statement_button -> startActivity(MiniStatementActivity::class.java)
 

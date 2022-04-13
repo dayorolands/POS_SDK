@@ -24,14 +24,6 @@
         app:popExitAnim="@anim/fade_out" />
 
     <action
-        android:id="@+id/action_to_funds_transfer"
-        app:destination="@id/fundsTransferFragment"
-        app:enterAnim="@anim/fade_in"
-        app:exitAnim="@anim/fade_out"
-        app:popEnterAnim="@anim/fade_in"
-        app:popExitAnim="@anim/fade_out" />
-
-    <action
         android:id="@+id/action_to_receipt"
         app:destination="@id/receiptFragment"
         app:enterAnim="@anim/fade_in"
@@ -47,24 +39,11 @@
         app:popEnterAnim="@anim/fade_in"
         app:popExitAnim="@anim/fade_out" />
 
-    <action
-        android:id="@+id/action_to_compose"
-        app:destination="@id/composeFragment"
-        app:enterAnim="@anim/fade_in"
-        app:exitAnim="@anim/fade_out"
-        app:popEnterAnim="@anim/fade_in"
-        app:popExitAnim="@anim/fade_out" />
-
     <fragment
         android:id="@+id/billPaymentFragment"
         android:name="com.cluster.fragment.BillPaymentFragment"
         android:label="Bill Payment"
         tools:layout="@layout/bill_payment_fragment" />
-
-    <fragment
-        android:id="@+id/fundsTransferFragment"
-        android:name="com.cluster.FundsTransferFragment"
-        android:label="Funds Transfer" />
 
     <fragment
         android:id="@+id/notificationFragment"
@@ -120,9 +99,4 @@
             android:label="Generate Collection Reference"
             tools:layout="@layout/fragment_collection_reference_generation" />
     </navigation>
-
-    <fragment
-        android:id="@+id/composeFragment"
-        android:name="com.cluster.fragment.ComposeFragment"
-        android:label="Compose" />
 </navigation>

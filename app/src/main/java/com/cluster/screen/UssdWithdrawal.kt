@@ -2,7 +2,10 @@ package com.cluster.screen
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
@@ -22,10 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.cluster.R
-import com.cluster.receipt.footer
-import com.cluster.ui.ReceiptDetails
-import com.cluster.utility.FunctionUsageTracker
-import com.cluster.utility.FunctionIds
 import com.cluster.core.data.api.UssdCashoutService
 import com.cluster.core.data.model.CoraPayReference
 import com.cluster.core.data.model.CoraPayTransactionStatus
@@ -36,7 +35,10 @@ import com.cluster.core.util.getMessage
 import com.cluster.core.util.safeRunIO
 import com.cluster.pos.printer.ParcelablePrintJob
 import com.cluster.pos.printer.printJob
+import com.cluster.receipt.footer
 import com.cluster.ui.*
+import com.cluster.utility.FunctionIds
+import com.cluster.utility.FunctionUsageTracker
 import kotlinx.coroutines.launch
 import java.util.*
 
