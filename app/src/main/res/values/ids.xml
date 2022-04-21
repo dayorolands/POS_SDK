@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="agent_change_pin_button" type="id" />
+    <item name="change_password_button" type="id" />
     <item name="agent_balance_enquiry_button" type="id" />
     <item name="case_logging_button" type="id" />
     <item name="register_button" type="id" />

@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.cluster.components.BottomNavScreens
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.ui.CreditClubFragment
+import com.cluster.viewmodel.ProvideViewModelStoreOwner
 
 fun NavGraphBuilder.homeRoutes(
     institutionConfig: InstitutionConfig,
@@ -25,13 +26,6 @@ fun NavGraphBuilder.homeRoutes(
             )
         }
     }
-    composable(BottomNavScreens.Agent.route) {
-        AgentScreen(
-            fragment = fragment,
-            institutionConfig = institutionConfig,
-            composeNavController = composeNavController,
-        )
-    }
     composable(BottomNavScreens.Customer.route) {
         CustomerScreen(
             fragment = fragment,
@@ -47,5 +41,15 @@ fun NavGraphBuilder.homeRoutes(
     }
     composable(BottomNavScreens.Loans.route) {
         LoansScreen(fragment = fragment)
+    }
+    composable(BottomNavScreens.Profile.route) {
+        ProvideViewModelStoreOwner(
+            viewModelStoreOwner = fragment.requireActivity(),
+        ) {
+            ProfileScreen(
+                composeNavController = composeNavController,
+                fragment = fragment,
+            )
+        }
     }
 }

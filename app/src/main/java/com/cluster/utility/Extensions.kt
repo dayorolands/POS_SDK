@@ -125,8 +125,6 @@ fun CreditClubFragment.openPageById(id: Int) {
             }
         }
 
-        R.id.agent_change_pin_button -> startActivity(ChangePinActivity::class.java)
-
         R.id.case_logging_button -> startActivity(CaseLogActivity::class.java)
 
         R.id.airtime_button -> {

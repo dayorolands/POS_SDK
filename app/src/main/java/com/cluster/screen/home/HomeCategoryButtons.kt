@@ -42,21 +42,6 @@ fun HomeCategoryButtons(
 
         item {
             SmallMenuButton(
-                text = "Agent",
-                icon = painterResource(R.drawable.income),
-                onClick = {
-                    homeNavController.navigate(BottomNavScreens.Agent.route) {
-                        launchSingleTop = true
-                        popUpTo(BottomNavScreens.Home.route) {
-                            inclusive = false
-                        }
-                    }
-                },
-            )
-        }
-
-        item {
-            SmallMenuButton(
                 text = "Transactions",
                 icon = painterResource(R.drawable.deposit),
                 onClick = {

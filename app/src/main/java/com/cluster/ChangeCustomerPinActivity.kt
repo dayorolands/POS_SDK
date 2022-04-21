@@ -9,18 +9,20 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import com.cluster.databinding.ActivityChangeCustomerPinBinding
-import com.cluster.ui.dataBinding
-import com.cluster.utility.FunctionIds
 import com.cluster.core.data.api.StaticService
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.model.AccountInfo
-import com.cluster.core.data.request.PinChangeRequest
+import com.cluster.core.data.prefs.AppDataStorage
+import com.cluster.core.data.request.CustomerPinChangeRequest
 import com.cluster.core.type.TokenType
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.util.safeRunIO
+import com.cluster.databinding.ActivityChangeCustomerPinBinding
+import com.cluster.ui.dataBinding
+import com.cluster.utility.FunctionIds
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 class ChangeCustomerPinActivity : CreditClubActivity(R.layout.activity_change_customer_pin) {
     private val binding: ActivityChangeCustomerPinBinding by dataBinding()
@@ -40,11 +42,13 @@ class ChangeCustomerPinActivity : CreditClubActivity(R.layout.activity_change_cu
     private var customerPhoneEt: EditText? = null
     private var submitBtn: Button? = null
     private val staticService: StaticService by retrofitService()
+    private val appDataStorage: AppDataStorage by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mSectionsPagerAdapter = SectionsPagerAdapter(
-            supportFragmentManager)
+            supportFragmentManager
+        )
 
         // Set up the ViewPager with the sections adapter.
         binding.container.adapter = mSectionsPagerAdapter
@@ -101,13 +105,17 @@ class ChangeCustomerPinActivity : CreditClubActivity(R.layout.activity_change_cu
         }
         confirmNewPin = confirmNewPinET!!.text.toString()
         if (confirmNewPin != newPin) {
-            dialogProvider.indicateError(getString(R.string.new_pin_confirmation_mismatch),
-                confirmNewPinET)
+            dialogProvider.indicateError(
+                getString(R.string.new_pin_confirmation_mismatch),
+                confirmNewPinET
+            )
             return
         }
         if (customerPhoneEt!!.text.toString().trim { it <= ' ' }.length != 11) {
-            dialogProvider.indicateError(getString(R.string.please_enter_customers_phone_number),
-                customerPhoneEt)
+            dialogProvider.indicateError(
+                getString(R.string.please_enter_customers_phone_number),
+                customerPhoneEt
+            )
             return
         }
         customerToken = customerTokenET!!.text.toString()
@@ -116,7 +124,7 @@ class ChangeCustomerPinActivity : CreditClubActivity(R.layout.activity_change_cu
             return
         }
 
-        val changePinRequest = PinChangeRequest(
+        val changePinRequest = CustomerPinChangeRequest(
             agentPhoneNumber = localStorage.agentPhone,
             institutionCode = localStorage.institutionCode,
             newPin = newPin,
@@ -126,11 +134,13 @@ class ChangeCustomerPinActivity : CreditClubActivity(R.layout.activity_change_cu
             customerPhoneNumber = customerPhoneEt!!.value,
             agentPin = "0000",
             customerToken = customerToken,
+            activationCode = null,
+            deviceId = appDataStorage.deviceId,
         )
 
         dialogProvider.showProgressBar("Processing")
         val (response, error) = safeRunIO {
-            staticService.pinChange(request = changePinRequest)
+            staticService.changeCustomerPin(request = changePinRequest)
         }
         dialogProvider.hideProgressBar()
 
@@ -190,7 +200,8 @@ class ChangeCustomerPinActivity : CreditClubActivity(R.layout.activity_change_cu
      * one of the sections/tabs/pages.
      */
     inner class SectionsPagerAdapter(fm: FragmentManager?) : FragmentPagerAdapter(
-        fm!!) {
+        fm!!
+    ) {
         override fun getItem(position: Int): Fragment {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).

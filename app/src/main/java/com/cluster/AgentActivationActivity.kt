@@ -5,75 +5,76 @@ import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
 import android.view.View
+import com.cluster.core.data.api.AuthService
+import com.cluster.core.data.api.StaticService
+import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.model.ActivationRequest
+import com.cluster.core.data.model.AuthResponse
+import com.cluster.core.data.model.VerificationRequest
+import com.cluster.core.data.prefs.AppDataStorage
+import com.cluster.core.ui.CreditClubActivity
+import com.cluster.core.util.debugOnly
+import com.cluster.core.util.safeRunIO
 import com.cluster.databinding.ActivityAgentActivationBinding
-import com.cluster.utility.logout
+import com.cluster.pos.InvalidRemoteConnectionInfo
 import com.cluster.pos.Platform
 import com.cluster.pos.TerminalOptionsActivity
 import com.cluster.pos.extension.posConfig
 import com.cluster.pos.extension.posParameter
-import com.cluster.pos.extension.getPosSerialNumber
-import com.cluster.core.data.api.StaticService
-import com.cluster.core.data.api.retrofitService
-import com.cluster.core.data.model.AuthResponse
-import com.cluster.core.data.prefs.AppDataStorage
-import com.cluster.core.data.request.PinChangeRequest
-import com.cluster.core.ui.CreditClubActivity
-import com.cluster.core.util.debugOnly
-import com.cluster.core.util.safeRunIO
-import com.cluster.pos.InvalidRemoteConnectionInfo
 import com.cluster.pos.model.PosTenant
 import com.cluster.ui.dataBinding
+import com.cluster.utility.logout
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
+
+private const val PASSWORD_LENGTH = 6
+private const val PIN_LENGTH = 4
 
 class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activation) {
     private val binding: ActivityAgentActivationBinding by dataBinding()
 
     private var isActivation = false
-    private var code = ""
     private var institutionCode: String = ""
-    private var phoneNumber = ""
-    private var pin = ""
     private val appDataStorage: AppDataStorage by inject()
     private val staticService: StaticService by retrofitService()
+    private val authService: AuthService by retrofitService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         debugOnly {
             binding.skipButton.visibility = View.VISIBLE
-            binding.skipButton.setOnClickListener(View.OnClickListener {
-                phoneNumber = binding.phoneNumberEt.text.toString().trim(' ')
-
+            binding.skipButton.setOnClickListener {
+                val phoneNumber = binding.phoneNumberEt.text.toString().trim(' ')
                 if (phoneNumber.isEmpty()) {
                     dialogProvider.indicateError(
                         "You did not enter your phone number",
                         binding.phoneNumberEt
                     )
-                    return@OnClickListener
+                    return@setOnClickListener
                 }
 
-                code = binding.codeEt.value
-                if (code.length < 6) {
+                val institutionCode = binding.codeEt.value
+                if (institutionCode.length != 6) {
                     dialogProvider.indicateError(
-                        "Enter institution code in the verification code input",
+                        "Enter a valid institution code",
                         binding.codeEt
                     )
-                    return@OnClickListener
+                    return@setOnClickListener
                 }
 
-                localStorage.institutionCode = code
+                localStorage.institutionCode = institutionCode
                 localStorage.agentPhone = phoneNumber
                 localStorage.cacheAuth = Json.encodeToString(
                     AuthResponse.serializer(),
-                    AuthResponse(phoneNumber, code)
+                    AuthResponse(phoneNumber, institutionCode)
                 )
                 localStorage.putString("ACTIVATED", "ACTIVATED")
-                localStorage.putString("AGENT_CODE", code)
+                localStorage.putString("AGENT_CODE", institutionCode)
 
                 logout()
-            })
+            }
         }
 
         if (Platform.isPOS) {
@@ -86,7 +87,13 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
         }
 
         binding.submitBtn.setOnClickListener {
-            mainScope.launch { submit() }
+            mainScope.launch {
+                if (isActivation) {
+                    activate()
+                } else {
+                    verify()
+                }
+            }
         }
 
         val phoneNumber = intent.getStringExtra("phone_number")
@@ -98,86 +105,63 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
         }
     }
 
-    private suspend fun submit() {
-        code = binding.codeEt.text.toString().trim(' ')
-        phoneNumber = binding.phoneNumberEt.text.toString().trim(' ')
+    private suspend fun activate() {
+        val activationCode = binding.codeEt.text.toString().trim(' ')
+        val phoneNumber = binding.phoneNumberEt.text.toString().trim(' ')
+        val pin = binding.newPinEt.text.toString().trim()
+        val pinConfirmation = binding.newPinConfirmationEt.text.toString().trim()
+        val password = binding.newPasswordEt.text.toString().trim()
+        val passwordConfirmation = binding.newPasswordConfirmationEt.text.toString().trim()
 
-        if (phoneNumber.isEmpty()) {
+        if (activationCode.isEmpty()) {
             dialogProvider.indicateError(
-                "You did not enter your phone number",
-                binding.phoneNumberEt
-            )
-            firebaseCrashlytics.recordException(Exception("No phone number was entered"))
-            return
-        }
-
-        if (code.isEmpty() && !isActivation) {
-            dialogProvider.indicateError(
-                "You did not enter your verification code",
+                "Enter an activation code",
                 binding.codeEt
             )
-            firebaseCrashlytics.recordException(Exception("verification code not inputted"))
+            firebaseCrashlytics.recordException(Exception("activation code not inputted"))
             return
         }
 
-        if (isActivation && binding.newPinEt.text.toString().isEmpty()) {
-            dialogProvider.indicateError("You did not enter the PIN", binding.newPinEt)
-            firebaseCrashlytics.recordException(Exception("No PIN was entered"))
-            return
-        }
-
-        if (isActivation && binding.newPinConfirmationEt.text.toString().isEmpty()) {
+        if (password.length != PASSWORD_LENGTH) {
             dialogProvider.indicateError(
-                "You did not confirm the PIN",
-                binding.newPinConfirmationEt
+                "Your password must have $PASSWORD_LENGTH digits",
+                binding.newPasswordEt
             )
-            firebaseCrashlytics.recordException(Exception("PIN entry was not confirmed"))
+            firebaseCrashlytics.recordException(Exception("Password was not $PASSWORD_LENGTH digits"))
             return
         }
-
-        if (isActivation && binding.newPinEt.text.toString().length != 4) {
-            dialogProvider.indicateError("Your PIN must have 4-digit", binding.newPinEt)
-            firebaseCrashlytics.recordException(Exception("Pin was not 4 digits"))
-            return
-        }
-
-        if (isActivation && binding.newPinConfirmationEt.text.toString().length != 4) {
+        if (password != passwordConfirmation) {
             dialogProvider.indicateError(
-                "Your PIN Confirmation must have 4-digit",
-                binding.newPinConfirmationEt
+                "Passwords do not match",
+                binding.newPasswordConfirmationEt
             )
-            firebaseCrashlytics.recordException(Exception("confirmation pin was not 4 digits"))
+            return
+        }
+        if (pin.length != PIN_LENGTH) {
+            dialogProvider.indicateError("Your PIN must have $PIN_LENGTH digits", binding.newPinEt)
+            firebaseCrashlytics.recordException(Exception("Pin was not $PIN_LENGTH digits"))
+            return
+        }
+        if (pin != pinConfirmation) {
+            dialogProvider.indicateError("PINs do not match", binding.newPinConfirmationEt)
             return
         }
 
-        if (binding.newPinConfirmationEt.text.toString() != binding.newPinEt.text.toString()) {
-            dialogProvider.indicateError("PIN mismatch", binding.newPinConfirmationEt)
-            return
-        }
-
-        pin = binding.newPinEt.text.toString()
-
-        dialogProvider.showProgressBar("Processing...")
-
-        if (isActivation) activate()
-        else verify()
-    }
-
-    private suspend inline fun activate() {
-        val request = PinChangeRequest(
-            activationCode = code,
+        val request = ActivationRequest(
+            activationCode = activationCode,
             institutionCode = institutionCode,
             agentPhoneNumber = phoneNumber,
-            confirmNewPin = pin,
-            newPin = pin,
+            confirmNewTransactionPin = pin,
+            newTransactionPin = pinConfirmation,
             geoLocation = localStorage.lastKnownLocation,
-            oldPin = code,
-            deviceId = appDataStorage.deviceId,
+            deviceId = appDataStorage.deviceId!!,
+            newLoginPassword = password,
+            confirmLoginPassword = passwordConfirmation,
         )
 
         dialogProvider.showProgressBar("Activating")
         val (response, error) = safeRunIO {
-            staticService.completeActivationWithPinChange(request)
+            authService.activate(request)
         }
         dialogProvider.hideProgressBar()
 
@@ -196,10 +180,10 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
             localStorage.agentPhone = phoneNumber
             localStorage.cacheAuth = Json.encodeToString(
                 AuthResponse.serializer(),
-                AuthResponse(phoneNumber, code)
+                AuthResponse(phoneNumber, activationCode)
             )
             localStorage.putString("ACTIVATED", "ACTIVATED")
-            localStorage.putString("AGENT_CODE", code)
+            localStorage.putString("AGENT_CODE", activationCode)
 
             firebaseAnalytics.logEvent("activation", Bundle().apply {
                 putString("agent_code", localStorage.agent?.agentCode)
@@ -244,15 +228,36 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
         return true
     }
 
-    private suspend inline fun verify() {
+    private suspend fun verify() {
+        val verificationCode = binding.codeEt.text.toString().trim(' ')
+        val phoneNumber = binding.phoneNumberEt.text.toString().trim(' ')
+        if (phoneNumber.isEmpty()) {
+            dialogProvider.indicateError(
+                "You did not enter your phone number",
+                binding.phoneNumberEt
+            )
+            firebaseCrashlytics.recordException(Exception("No phone number was entered"))
+            return
+        }
+
+        if (verificationCode.isEmpty()) {
+            dialogProvider.indicateError(
+                "You did not enter your verification code",
+                binding.codeEt
+            )
+            firebaseCrashlytics.recordException(Exception("verification code not inputted"))
+            return
+        }
+
+        val verificationRequest = VerificationRequest(
+            verificationCode = verificationCode,
+            agentPhoneNumber = phoneNumber,
+            deviceId = appDataStorage.deviceId!!,
+        )
+
         dialogProvider.showProgressBar("Verifying")
         val (response, error) = safeRunIO {
-            staticService.agentVerification(
-                code,
-                phoneNumber,
-                institutionCode,
-                if (Platform.isPOS) getPosSerialNumber() else appDataStorage.deviceId
-            )
+            authService.verify(verificationRequest)
         }
         dialogProvider.hideProgressBar()
 
@@ -275,7 +280,12 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
             binding.codeEt.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(4))
             binding.codeEt.requestFocus()
             institutionCode =
-                response.responseMessage ?: if (code.length >= 6) code.substring(0, 6) else code
+                response.responseMessage
+                    ?: if (verificationCode.length >= 6) {
+                        verificationCode.substring(0, 6)
+                    } else {
+                        verificationCode
+                    }
 
             dialogProvider.showSuccess("Verification successful")
         } else {

@@ -16,9 +16,9 @@ class LocalInstitutionConfig private constructor(
     override var hasOnlineFunctions: Boolean,
     override var hasHlaTagging: Boolean,
     override var transactionTypes: List<TransactionType>,
-    override var flows: FlowConfig,
+    override val flows: FlowConfig,
     override var categories: CategoryConfig,
-    override var bankAccountNumberLength: Int,
+    override val bankAccountNumberLength: Int,
 ) : InstitutionConfig {
 
     companion object {
@@ -32,6 +32,7 @@ class LocalInstitutionConfig private constructor(
                 categories = CategoryConfig(
                     loans = resources.getBoolean(R.bool.category_loan),
                     customers = resources.getBoolean(R.bool.category_customer),
+                    subscriptions = resources.getBoolean(R.bool.category_subscriptions),
                 ),
                 transactionTypes = resources.getStringArray(R.array.transaction_types).map {
                     TransactionType.valueOf(it)

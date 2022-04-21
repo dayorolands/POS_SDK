@@ -2,6 +2,7 @@ package com.cluster
 
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -10,7 +11,11 @@ import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.setResult
 import com.cluster.pos.printer.ParcelablePrintJob
 import com.cluster.screen.*
+import com.cluster.screen.subscription.ChooseSubscriptionScreen
+import com.cluster.screen.subscription.SubscriptionHistoryScreen
+import com.cluster.screen.subscription.SubscriptionScreen
 import com.cluster.viewmodel.AppViewModel
+import com.cluster.viewmodel.ProvideViewModelStoreOwner
 import com.google.accompanist.insets.navigationBarsPadding
 
 fun NavGraphBuilder.clusterNavigation(
@@ -26,6 +31,9 @@ fun NavGraphBuilder.clusterNavigation(
     }
     composable(Routes.PinChange) {
         PinChange(navController = navController)
+    }
+    composable(Routes.ChangePassword) {
+        ChangePasswordScreen(navController = navController)
     }
     composable(Routes.SupportCases) {
         SupportCases(navController = navController)
@@ -66,9 +74,51 @@ fun NavGraphBuilder.clusterNavigation(
     }
 }
 
+fun NavGraphBuilder.subscriptionNavigation(
+    navController: NavController,
+    viewModelStoreOwner: ViewModelStoreOwner,
+) {
+    composable(Routes.Subscription) {
+        ProvideViewModelStoreOwner(
+            viewModelStoreOwner = viewModelStoreOwner,
+        ) {
+            SubscriptionScreen(navController = navController)
+        }
+    }
+    composable(Routes.SubscriptionHistory) {
+        ProvideViewModelStoreOwner(
+            viewModelStoreOwner = viewModelStoreOwner,
+        ) {
+            SubscriptionHistoryScreen(navController = navController)
+        }
+    }
+    composable(Routes.NewSubscription) {
+        ProvideViewModelStoreOwner(
+            viewModelStoreOwner = viewModelStoreOwner,
+        ) {
+            ChooseSubscriptionScreen(
+                navController = navController,
+                isUpgrade = false,
+            )
+        }
+    }
+    composable(Routes.UpgradeSubscription) {
+        ProvideViewModelStoreOwner(
+            viewModelStoreOwner = viewModelStoreOwner,
+        ) {
+            ChooseSubscriptionScreen(
+                navController = navController,
+                isUpgrade = true,
+            )
+        }
+    }
+}
+
 fun NavController.navigateToReceipt(receipt: ParcelablePrintJob, popBackStack: Boolean = true) {
     setResult(receipt, "receipt")
     currentBackStackEntry?.arguments?.putParcelable("receipt", receipt)
-    if (popBackStack) popBackStack()
+    if (popBackStack) {
+        popBackStack()
+    }
     navigate(Routes.Receipt)
 }

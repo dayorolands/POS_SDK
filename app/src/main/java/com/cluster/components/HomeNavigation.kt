@@ -36,7 +36,7 @@ fun SubMenuBottomNavigation(
                         modifier = Modifier.size(24.dp),
                     )
                 },
-                label = { Text(stringResource(id = screen.resourceId)) },
+                label = { Text(stringResource(id = screen.stringRes)) },
                 selected = currentRoute == screen.route,
                 onClick = {
                     // This if check gives us a "singleTop" behavior where we do not create a
@@ -63,14 +63,14 @@ fun currentRoute(navController: NavHostController): String? {
 
 sealed class BottomNavScreens(
     val route: String,
-    @StringRes val resourceId: Int,
+    @StringRes val stringRes: Int,
     @DrawableRes val icon: Int
 ) {
     object Home : BottomNavScreens("Home", R.string.home, R.drawable.ic_home)
-    object Agent : BottomNavScreens("Agent", R.string.agent, R.drawable.income)
     object Customer : BottomNavScreens("Customer", R.string.customer, R.drawable.payday_loan)
     object Transactions :
         BottomNavScreens("Transactions", R.string.transactions, R.drawable.deposit)
 
     object Loans : BottomNavScreens("Loans", R.string.loans, R.drawable.personal_income)
+    object Profile : BottomNavScreens("My Profile", R.string.profile, R.drawable.ic_person)
 }

@@ -1,4 +1,4 @@
-package com.cluster
+package com.cluster.config
 
 import android.app.Application
 import android.content.Context
@@ -6,14 +6,15 @@ import android.os.Build
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.WorkManager
-import com.cluster.core.data.prefs.getEncryptedSharedPreferences
-import com.cluster.core.data.prefs.moveTo
+import com.cluster.R
+import com.cluster.utility.extensions.registerPeriodicWorker
+import com.cluster.work.*
 import com.cluster.pos.Platform
 import com.cluster.pos.service.ConfigService
 import com.cluster.pos.util.SocketJob
+import com.cluster.core.data.prefs.getEncryptedSharedPreferences
+import com.cluster.core.data.prefs.moveTo
 import com.cluster.pos.work.CallHomeWorker
-import com.cluster.utility.extensions.registerPeriodicWorker
-import com.cluster.work.*
 import okio.use
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.KeyStore

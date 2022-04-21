@@ -31,18 +31,6 @@ import com.cluster.ui.Select
 import com.cluster.ui.util.LocalDateSaver
 import java.time.LocalDate
 
-private val statusList = listOf(
-    IntValueType(0, "Not processed"),
-    IntValueType(1, "Pending"),
-    IntValueType(2, "Reversed"),
-    IntValueType(3, "Approved"),
-)
-
-private val periodList = listOf(
-    IntValueType(0, "Today"),
-    IntValueType(1, "Last 7 days"),
-)
-
 @Composable
 fun ChargeBack(
     navController: NavHostController,
@@ -51,6 +39,20 @@ fun ChargeBack(
     localStorage: LocalStorage,
     dialogProvider: DialogProvider,
 ) {
+    val statusList = remember {
+        listOf(
+            IntValueType(0, "Not processed"),
+            IntValueType(1, "Pending"),
+            IntValueType(2, "Reversed"),
+            IntValueType(3, "Approved"),
+        )
+    }
+    val periodList = remember {
+        listOf(
+            IntValueType(0, "Today"),
+            IntValueType(1, "Last 7 days"),
+        )
+    }
     val (disputeStatus, setDisputeStatus) = remember { mutableStateOf(statusList.first()) }
     val (period, setPeriod) = remember { mutableStateOf(periodList[1]) }
     val endDate = rememberSaveable(saver = LocalDateSaver) { LocalDate.now() }

@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  * Created by Joseph on 7/18/2018.
  */
 @Serializable
-data class PinChangeRequest(
+data class CustomerPinChangeRequest(
     @SerialName("AgentPhoneNumber")
     val agentPhoneNumber: String? = null,
 

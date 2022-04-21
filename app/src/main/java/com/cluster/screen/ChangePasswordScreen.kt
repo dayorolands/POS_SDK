@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.core.data.api.AuthService
-import com.cluster.core.data.model.TransactionPinChangeRequest
+import com.cluster.core.data.model.PasswordChangeRequest
 import com.cluster.core.data.prefs.AppDataStorage
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.util.SuspendCallback
@@ -26,14 +26,16 @@ import com.cluster.utility.FunctionIds
 import com.cluster.utility.FunctionUsageTracker
 import kotlinx.coroutines.launch
 
+private const val PASSWORD_LENGTH = 6
+
 @Composable
-fun PinChange(navController: NavController) {
-    FunctionUsageTracker(FunctionIds.AGENT_CHANGE_PIN)
+fun ChangePasswordScreen(navController: NavController) {
+    FunctionUsageTracker(FunctionIds.CHANGE_PASSWORD)
 
     val dialogProvider by rememberDialogProvider()
-    var oldPin by remember { mutableStateOf("") }
-    var newPin by remember { mutableStateOf("") }
-    var confirmNewPin by remember { mutableStateOf("") }
+    var oldPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmNewPassword by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
     var loadingMessage by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -42,40 +44,40 @@ fun PinChange(navController: NavController) {
     val localStorage: LocalStorage by rememberBean()
     val appDataStorage: AppDataStorage by rememberBean()
 
-    val changePin: SuspendCallback =
-        remember(confirmNewPin, oldPin, newPin) {
-            changePin@{
-                if (oldPin.isEmpty()) {
-                    dialogProvider.showError("Please enter the customer's old PIN")
-                    return@changePin
+    val changePassword: SuspendCallback =
+        remember(confirmNewPassword, oldPassword, newPassword) {
+            changePassword@{
+                if (oldPassword.isEmpty()) {
+                    dialogProvider.showError("Please enter your password")
+                    return@changePassword
                 }
-                if (oldPin.length != 4) {
-                    dialogProvider.showError("Please enter the complete PIN")
-                    return@changePin
+                if (oldPassword.length != PASSWORD_LENGTH) {
+                    dialogProvider.showError("Please enter a ${PASSWORD_LENGTH}-digit password")
+                    return@changePassword
                 }
-                if (newPin.isEmpty()) {
-                    dialogProvider.showError("Please enter your PIN")
-                    return@changePin
+                if (newPassword.isEmpty()) {
+                    dialogProvider.showError("Please enter your Password")
+                    return@changePassword
                 }
-                if (newPin.length != 4) {
-                    dialogProvider.showError("Please enter the complete new PIN")
-                    return@changePin
+                if (newPassword.length != PASSWORD_LENGTH) {
+                    dialogProvider.showError("New password must be a ${PASSWORD_LENGTH}-digit number")
+                    return@changePassword
                 }
-                if (confirmNewPin != newPin) {
-                    dialogProvider.showError(context.getString(R.string.new_pin_confirmation_mismatch))
-                    return@changePin
+                if (confirmNewPassword != newPassword) {
+                    dialogProvider.showError(context.getString(R.string.new_password_confirmation_mismatch))
+                    return@changePassword
                 }
 
                 errorMessage = ""
                 loadingMessage = "Processing Request"
                 val (response, error) = safeRunIO {
-                    authService.changeTransactionPin(
-                        request = TransactionPinChangeRequest(
+                    authService.changePassword(
+                        request = PasswordChangeRequest(
                             agentPhoneNumber = localStorage.agentPhone!!,
                             institutionCode = localStorage.institutionCode!!,
-                            newPin = newPin,
-                            confirmNewPin = confirmNewPin,
-                            oldPin = oldPin,
+                            password = newPassword,
+                            confirmPassword = confirmNewPassword,
+                            oldPassword = oldPassword,
                             geoLocation = localStorage.lastKnownLocation,
                             deviceId = appDataStorage.deviceId!!,
                         )
@@ -84,14 +86,14 @@ fun PinChange(navController: NavController) {
                 loadingMessage = ""
                 if (error != null) {
                     dialogProvider.showErrorAndWait(error)
-                    return@changePin
+                    return@changePassword
                 }
                 if (response!!.isFailure()) {
                     dialogProvider.showErrorAndWait(response.responseMessage!!)
-                    return@changePin
+                    return@changePassword
                 }
                 dialogProvider.showSuccessAndWait(
-                    response.responseMessage ?: "Your pin has been changed."
+                    response.responseMessage ?: "Your password has been changed."
                 )
                 navController.popBackStack()
             }
@@ -99,7 +101,7 @@ fun PinChange(navController: NavController) {
 
     Column {
         CreditClubAppBar(
-            title = stringResource(R.string.change_pin),
+            title = stringResource(R.string.change_password),
             onBackPressed = { navController.popBackStack() },
         )
         LazyColumn(modifier = Modifier.weight(1f)) {
@@ -112,9 +114,9 @@ fun PinChange(navController: NavController) {
             item {
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                     OutlinedTextField(
-                        value = oldPin,
-                        onValueChange = { if (it.length <= 4) oldPin = it },
-                        label = { Text(text = "Old PIN") },
+                        value = oldPassword,
+                        onValueChange = { if (it.length <= PASSWORD_LENGTH) oldPassword = it },
+                        label = { Text(text = "Old Password") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),
@@ -123,9 +125,9 @@ fun PinChange(navController: NavController) {
                         visualTransformation = PasswordVisualTransformation(),
                     )
                     OutlinedTextField(
-                        value = newPin,
-                        onValueChange = { if (it.length <= 4) newPin = it },
-                        label = { Text(text = "New PIN") },
+                        value = newPassword,
+                        onValueChange = { if (it.length <= PASSWORD_LENGTH) newPassword = it },
+                        label = { Text(text = "New Password") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),
@@ -134,9 +136,11 @@ fun PinChange(navController: NavController) {
                         visualTransformation = PasswordVisualTransformation(),
                     )
                     OutlinedTextField(
-                        value = confirmNewPin,
-                        onValueChange = { if (it.length <= 4) confirmNewPin = it },
-                        label = { Text(text = "Confirm New PIN") },
+                        value = confirmNewPassword,
+                        onValueChange = {
+                            if (it.length <= PASSWORD_LENGTH) confirmNewPassword = it
+                        },
+                        label = { Text(text = "Confirm New Password") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),
@@ -157,9 +161,10 @@ fun PinChange(navController: NavController) {
                 modifier = Modifier
                     .padding(16.dp)
                     .height(45.dp)
-                    .width(130.dp),
-                onClick = { coroutineScope.launch { changePin() } }) {
-                Text(text = stringResource(R.string.change_pin))
+                    .width(160.dp),
+                onClick = { coroutineScope.launch { changePassword() } },
+            ) {
+                Text(text = stringResource(R.string.change_password))
             }
         }
     }

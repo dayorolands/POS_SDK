@@ -1,17 +1,15 @@
 package com.cluster.pos
 
-import com.cluster.pos.extension.*
-import com.cluster.pos.service.ParameterService
-import com.cluster.pos.util.*
-import com.cluster.pos.util.xor
 import com.cluster.core.CreditClubException
 import com.cluster.core.util.debug
 import com.cluster.core.util.debugOnly
 import com.cluster.core.util.delegates.defaultJson
 import com.cluster.core.util.safeRun
+import com.cluster.pos.extension.*
 import com.cluster.pos.extensions.hexBytes
-import com.cluster.pos.model.DEFAULT_COMPONENT_KEY_1
-import com.cluster.pos.model.DEFAULT_COMPONENT_KEY_2
+import com.cluster.pos.service.ParameterService
+import com.cluster.pos.util.*
+import com.cluster.pos.util.xor
 import com.cluster.pos.utils.asDesEdeKey
 import com.cluster.pos.utils.decrypt
 import kotlinx.coroutines.runBlocking
@@ -30,17 +28,17 @@ import java.util.*
 import javax.net.ssl.TrustManager
 import javax.net.ssl.TrustManagerFactory
 
-const val TERMINAL_ID = "2APP3000" // 2APP3000
+const val TERMINAL_ID = "2039OP98" // 2APP3000
 val posMode = object : RemoteConnectionInfo {
     override val id: String = "test"
     override val label: String = "test"
-    override val key1: String = DEFAULT_COMPONENT_KEY_1
-    override val key2: String = DEFAULT_COMPONENT_KEY_2
-    override val host: String = "52.255.236.235"
-    override val port: Int = 8081
-    override val sslEnabled: Boolean = false
+    override val key1: String = "25F7432326081AA82520647C61DCC83D"
+    override val key2: String = "F270D5A76ED6FB9298CD580E6D986723"
+    override val host: String = "197.253.19.75"
+    override val port: Int = 5007
+    override val sslEnabled: Boolean = true
     override val dukptConfig: DukptConfig? = null
-    override val timeout: Int = 60
+    override val timeout: Int = 90
     override val nodeName: String? = null
     override val requeryConfig: RequeryConfig? = null
 }
@@ -71,8 +69,8 @@ class KeyDownloadTest : PosParameter {
         runBlocking {
             downloadKeys()
             downloadParameters()
-            downloadAid()
-            downloadCapk()
+//            downloadAid()
+//            downloadCapk()
         }
     }
 

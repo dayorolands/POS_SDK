@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -31,6 +31,7 @@ import com.cluster.clusterNavigation
 import com.cluster.conversation.LocalBackPressedDispatcher
 import com.cluster.core.data.api.AppConfig
 import com.cluster.core.data.api.NotificationService
+import com.cluster.core.data.api.SubscriptionService
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.model.NotificationRequest
 import com.cluster.core.data.prefs.AppDataStorage
@@ -42,33 +43,52 @@ import com.cluster.core.util.packageInfo
 import com.cluster.core.util.safeRunIO
 import com.cluster.pos.Platform
 import com.cluster.screen.home.HomeScreen
+import com.cluster.subscriptionNavigation
 import com.cluster.ui.theme.CreditClubTheme
 import com.cluster.viewmodel.AppViewModel
+import com.cluster.viewmodel.ProvideViewModelStoreOwner
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
-import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.insets.ViewWindowInsetObserver
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import java.io.File
 
 class HomeFragment : CreditClubFragment() {
     private val notificationViewModel: NotificationViewModel by activityViewModels()
-    private val appViewModel: AppViewModel by viewModels()
+    private val appViewModel: AppViewModel by activityViewModels()
     private val notificationService: NotificationService by retrofitService()
+    private val subscriptionService: SubscriptionService by retrofitService()
     private val appDataStorage: AppDataStorage by inject()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         mainScope.launch {
-            getNotifications(
-                notificationService = notificationService,
-                notificationViewModel = notificationViewModel,
-                appViewModel = appViewModel,
-                localStorage = localStorage,
-            )
+            coroutineScope {
+                getNotifications(
+                    notificationService = notificationService,
+                    notificationViewModel = notificationViewModel,
+                    appViewModel = appViewModel,
+                    localStorage = localStorage,
+                )
+            }
+            if (institutionConfig.categories.subscriptions) {
+                coroutineScope {
+                    appViewModel.loadActiveSubscription(
+                        subscriptionService = subscriptionService,
+                        localStorage = localStorage,
+                    )
+                    val subscriptionId = appViewModel.activeSubscription.value?.id
+                    if (subscriptionId != null) {
+                        appViewModel.loadMilestones(
+                            subscriptionService = subscriptionService,
+                            subscriptionId = subscriptionId.toLong(),
+                        )
+                    }
+                }
+            }
         }
 
         val hasPosUpdateManager = Platform.isPOS && Platform.deviceType != 2
@@ -98,41 +118,41 @@ class HomeFragment : CreditClubFragment() {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT,
             )
-
-            // Create a ViewWindowInsetObserver using this view, and call start() to
-            // start listening now. The WindowInsets instance is returned, allowing us to
-            // provide it to AmbientWindowInsets in our content below.
-            val windowInsets = ViewWindowInsetObserver(this)
-                // We use the `windowInsetsAnimationsEnabled` parameter to enable animated
-                // insets support. This allows our `ConversationContent` to animate with the
-                // on-screen keyboard (IME) as it enters/exits the screen.
-                .start(windowInsetsAnimationsEnabled = true)
+            val viewModelStoreOwner: ViewModelStoreOwner = requireActivity()
 
             setContent {
                 val composeNavController = rememberNavController()
-                CompositionLocalProvider(
-                    LocalBackPressedDispatcher provides requireActivity().onBackPressedDispatcher,
-                    LocalWindowInsets provides windowInsets,
-                ) {
-                    CreditClubTheme {
-                        ProvideWindowInsets {
+                CreditClubTheme {
+                    ProvideWindowInsets {
+                        CompositionLocalProvider(
+                            LocalBackPressedDispatcher provides requireActivity().onBackPressedDispatcher,
+                        ) {
                             NavHost(
                                 navController = composeNavController,
                                 startDestination = Routes.Home,
                             ) {
                                 composable(Routes.Home) {
-                                    HomeScreen(
-                                        mainNavController = fragmentNavController,
-                                        composeNavController = composeNavController,
-                                        activity = requireActivity(),
-                                        fragment = this@HomeFragment,
-                                    )
+                                    ProvideViewModelStoreOwner(
+                                        viewModelStoreOwner = viewModelStoreOwner,
+                                    ) {
+                                        HomeScreen(
+                                            mainNavController = fragmentNavController,
+                                            composeNavController = composeNavController,
+                                            fragment = this@HomeFragment,
+                                        )
+                                    }
                                 }
                                 clusterNavigation(
                                     navController = composeNavController,
                                     dialogProvider = dialogProvider,
                                     appViewModel = appViewModel,
                                 )
+                                if (institutionConfig.categories.subscriptions) {
+                                    subscriptionNavigation(
+                                        navController = composeNavController,
+                                        viewModelStoreOwner = viewModelStoreOwner,
+                                    )
+                                }
                             }
                         }
                     }

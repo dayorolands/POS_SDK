@@ -382,6 +382,7 @@
     <string name="appbar_scrolling_view_behavior" translatable="false">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
     <string name="commission">Commission</string>
     <string name="new_pin_confirmation_mismatch">New PIN and new PIN confirmation do not match</string>
+    <string name="new_password_confirmation_mismatch">You new passwords do not match</string>
     <string name="enter">Enter</string>
     <string name="oops">Oops</string>
     <string name="title_activity_support">Support</string>
@@ -427,6 +428,7 @@
     <string name="support_cases">Support Cases</string>
     <string name="loading_cases">Loading cases</string>
     <string name="change_pin">Change PIN</string>
+    <string name="change_transaction_pin">Change Transaction PIN</string>
     <string name="ussd_withdrawal">USSD Withdrawal</string>
     <string name="generate_reference">Generate Reference</string>
     <string name="ive_made_payment">I\'ve made payment</string>
@@ -435,6 +437,21 @@
     <string name="payment_item">Payment Item</string>
     <string name="customer_email_optional">Customer Email (optional)</string>
     <string name="biller">Biller</string>
+    <string name="subscription">Subscription</string>
+    <string name="profile">Profile</string>
+    <string name="balance_enquiry">Balance Enquiry</string>
+    <string name="check_balance">Check Balance</string>
+    <string name="subscription_history">Subscription History</string>
+    <string name="new_subscription">New subscription</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="choose_a_plan">Choose a plan</string>
+    <string name="extend">Extend</string>
+    <string name="upgrade">Upgrade</string>
+    <string name="change_password">Change Password</string>
+    <string name="setYourTransactionPin">Set your transaction pin</string>
+    <string name="setYourLoginPassword">Set your login password</string>
+    <string name="newPassword">New Password</string>
+    <string name="confirmPassword">Confirm Password</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>

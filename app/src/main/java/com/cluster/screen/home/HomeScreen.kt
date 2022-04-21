@@ -1,16 +1,13 @@
 package com.cluster.screen.home
 
-import android.app.Activity
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -20,13 +17,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.cluster.R
 import com.cluster.Routes
-import com.cluster.components.*
+import com.cluster.components.BottomNavScreens
+import com.cluster.components.HomeAppBar
+import com.cluster.components.SubMenuBottomNavigation
+import com.cluster.components.currentRoute
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.ui.CreditClubFragment
-import com.cluster.core.util.debugOnly
-import com.cluster.core.util.packageInfo
 import com.cluster.ui.rememberBean
-import com.cluster.utility.logout
 import com.cluster.utility.openPageById
 import java.util.*
 
@@ -35,37 +32,36 @@ import java.util.*
 fun HomeScreen(
     mainNavController: NavController,
     composeNavController: NavHostController,
-    activity: Activity,
     fragment: CreditClubFragment,
 ) {
     val composableRouteFunctionIds = remember {
         mapOf(
             R.id.agent_change_pin_button to Routes.PinChange,
+            R.id.change_password_button to Routes.ChangePassword,
             R.id.funds_transfer_button to Routes.FundsTransfer,
             R.id.fn_support to Routes.SupportCases,
             R.id.ussd_withdrawal_button to Routes.UssdWithdrawal,
             R.id.fn_pending_transactions to Routes.PendingTransactions,
+            R.id.fn_subscription to Routes.Subscription,
         )
     }
     val institutionConfig: InstitutionConfig by rememberBean()
     val homeNavController = rememberNavController()
-    val coroutineScope = rememberCoroutineScope()
-    val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+    val scaffoldState = rememberScaffoldState()
     val bottomNavigationItems = remember {
         buildList {
             add(BottomNavScreens.Home)
             if (institutionConfig.categories.customers) {
                 add(BottomNavScreens.Customer)
             }
-            add(BottomNavScreens.Agent)
             add(BottomNavScreens.Transactions)
             if (institutionConfig.categories.loans) {
                 add(BottomNavScreens.Loans)
             }
+            add(BottomNavScreens.Profile)
         }
     }
     val currentRoute = currentRoute(homeNavController)
-    val context = LocalContext.current
     val greetingMessage = remember {
         when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
             in 0..11 -> "Good Morning"
@@ -75,9 +71,10 @@ fun HomeScreen(
         }
     }
     val title = when (currentRoute) {
-        BottomNavScreens.Agent.route -> "Agent"
-        BottomNavScreens.Transactions.route -> "Transactions"
-        BottomNavScreens.Customer.route -> "Customer"
+        BottomNavScreens.Transactions.route -> stringResource(BottomNavScreens.Transactions.stringRes)
+        BottomNavScreens.Customer.route -> stringResource(BottomNavScreens.Customer.stringRes)
+        BottomNavScreens.Loans.route -> stringResource(BottomNavScreens.Loans.stringRes)
+        BottomNavScreens.Profile.route -> ""
         else -> greetingMessage
     }
 
@@ -85,56 +82,29 @@ fun HomeScreen(
         scaffoldState = scaffoldState,
         topBar = {
             HomeAppBar(
-                scaffoldState = scaffoldState,
                 mainNavController = mainNavController,
+                title = title,
+                navigationIcon = {
+                    if (currentRoute != BottomNavScreens.Profile.route) {
+                        IconButton(onClick = {
+                            homeNavController.navigate(BottomNavScreens.Profile.route) {
+                                launchSingleTop = true
+                                popUpTo(BottomNavScreens.Home.route) {
+                                    inclusive = false
+                                }
+                            }
+                        }) {
+                            Icon(
+                                Icons.Outlined.AccountCircle,
+                                contentDescription = null,
+                                tint = MaterialTheme.colors.primary.copy(0.52f)
+                            )
+                        }
+                    }
+                }
             )
         },
         bottomBar = { SubMenuBottomNavigation(homeNavController, bottomNavigationItems) },
-        drawerContent = {
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                item {
-                    HomeDrawerContent(
-                        scaffoldState = scaffoldState,
-                        coroutineScope = coroutineScope,
-                        openPage = {
-                            if (composableRouteFunctionIds.containsKey(it)) {
-                                composeNavController.navigate(composableRouteFunctionIds[it]!!)
-                            } else {
-                                fragment.openPageById(it)
-                            }
-                        },
-                    )
-                }
-            }
-
-            debugOnly {
-                Text(
-                    text = "For testing purposes only",
-                    modifier = Modifier.padding(start = 16.dp, bottom = 5.dp),
-                    style = MaterialTheme.typography.caption,
-                    color = MaterialTheme.colors.onSurface.copy(0.5f),
-                )
-            }
-
-            Text(
-                text = "v${context.packageInfo?.versionName}. Powered by Cluster",
-                modifier = Modifier.padding(start = 16.dp),
-                style = MaterialTheme.typography.body1,
-                color = MaterialTheme.colors.onSurface.copy(0.5f),
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { activity.logout() },
-            ) {
-                Text(
-                    stringResource(R.string.logout),
-                    style = MaterialTheme.typography.h5,
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                )
-            }
-        },
         backgroundColor = colorResource(R.color.menuBackground)
     ) {
         Column(
@@ -145,13 +115,6 @@ fun HomeScreen(
                     .padding(horizontal = 10.dp)
                     .weight(1f),
             ) {
-                Text(
-                    title,
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
-                    style = MaterialTheme.typography.h4,
-                    modifier = Modifier
-                        .padding(horizontal = 20.dp, vertical = 10.dp)
-                )
                 NavHost(
                     homeNavController,
                     startDestination = BottomNavScreens.Home.route
