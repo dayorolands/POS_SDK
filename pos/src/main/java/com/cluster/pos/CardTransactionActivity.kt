@@ -66,7 +66,7 @@ abstract class CardTransactionActivity : PosActivity() {
             addAction(Intent.ACTION_SCREEN_ON)
         }
 
-        registerReceiver(mBatInfoReceiver, filter)
+        registerReceiver(screenStateReceiver, filter)
         viewModel.amount.observe(this) {
             viewModel.amountCurrencyFormat.value = it?.toCurrencyFormat()
             viewModel.amountNumberFormat.value = it?.format()
@@ -192,7 +192,7 @@ abstract class CardTransactionActivity : PosActivity() {
     override fun onDestroy() {
         safeRun {
             stopTimer()
-            unregisterReceiver(mBatInfoReceiver)
+            unregisterReceiver(screenStateReceiver)
             posManager.cardReader.endWatch()
             posManager.cleanUpEmv()
         }
@@ -354,7 +354,7 @@ abstract class CardTransactionActivity : PosActivity() {
 
                 // Routes currently only support either Requery or Reversal but not both
                 if (requeryConfig == null) {
-                    isoSocketHelper.attemptReversal(request)
+                    attemptReversal(isoSocketHelper, request)
                 }
 
                 val receipt = posReceipt(
@@ -409,7 +409,9 @@ abstract class CardTransactionActivity : PosActivity() {
             showTransactionStatusPage(posTransaction)
             firebaseCrashlytics.recordException(ex)
             debugOnly { Log.e("CardTrans", ex.message, ex) }
-            isoSocketHelper.attemptReversal(request)
+            if (request.mti == "0200") {
+                attemptReversal(isoSocketHelper, request)
+            }
         } finally {
             dialogProvider.hideProgressBar()
         }
@@ -425,7 +427,7 @@ abstract class CardTransactionActivity : PosActivity() {
         for (attempt in 1..(requeryConfig.maxRetries + 1)) {
             val isRetry = attempt > 1
             if (isRetry) {
-                delay(2000)
+                delay(20000)
                 request.mti =
                     if (attempt > 2 && result.error !is ConnectException) "0221" else "0220"
                 runOnUiThread { dialogProvider.showProgressBar("Retrying...$attempt") }
@@ -497,7 +499,7 @@ abstract class CardTransactionActivity : PosActivity() {
         }
     }
 
-    private suspend fun IsoSocketHelper.attemptReversal(request: ISOMsg) {
+    private suspend fun attemptReversal(isoSocketHelper: IsoSocketHelper, request: ISOMsg) {
         if (request.mti != "0200") {
             return
         }
@@ -512,10 +514,13 @@ abstract class CardTransactionActivity : PosActivity() {
             val reversal = request.generateReversal(cardData).apply {
                 processingCode3 = processingCode("00")
                 messageReasonCode56 = "4021"
-                applyManagementData(parameters.managementData)
+                applyManagementData(isoSocketHelper.parameters.managementData)
             }
 
-            val success = attempt(reversal, 4, onReattempt = {
+            val success = isoSocketHelper.attempt(
+                request = reversal,
+                maxAttempts = 4,
+            ) {
                 runOnUiThread {
                     dialogProvider.showProgressBar("Reversing...$it")
                 }
@@ -523,16 +528,16 @@ abstract class CardTransactionActivity : PosActivity() {
                 delay(1000)
 
                 reversal.mti = "0421"
-            })
+            }
 
             if (!success) {
                 val reversalRecord = Reversal(
                     isoMsg = reversal,
                     cardType = cardTransactionType(request).type,
                 ).apply {
-                    nodeName = remoteConnectionInfo.nodeName
-                    if (remoteConnectionInfo is ConnectionInfo) {
-                        connectionInfo = remoteConnectionInfo
+                    nodeName = isoSocketHelper.remoteConnectionInfo.nodeName
+                    if (isoSocketHelper.remoteConnectionInfo is ConnectionInfo) {
+                        connectionInfo = isoSocketHelper.remoteConnectionInfo
                     }
                 }
                 posDatabase.reversalDao().save(reversalRecord)
@@ -550,8 +555,8 @@ abstract class CardTransactionActivity : PosActivity() {
         onBackPressed()
     }
 
-    protected fun showAmountPage(title: String = "Enter Amount (Naira)") =
-        showAmountPage(title) { amount ->
+    protected fun showAmountPage() =
+        showAmountPage("Enter Amount (Naira)") { amount ->
             viewModel.amountString.value = amount.toString()
             sessionData.amount = amount
             sessionData.transactionType = transactionType
@@ -577,7 +582,7 @@ abstract class CardTransactionActivity : PosActivity() {
         }
     }
 
-    private val mBatInfoReceiver = object : BroadcastReceiver() {
+    private val screenStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == Intent.ACTION_SCREEN_OFF) {
                 posManager.cardReader.endWatch()
