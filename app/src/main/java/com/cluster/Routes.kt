@@ -17,6 +17,7 @@ object Routes {
     const val UpgradeSubscription = "subscription/upgrade"
     const val ExtendSubscription = "subscription/extend"
     const val SubscriptionHistory = "subscription/history"
+    const val AgentLoanRequest = "agent/loan/request"
 
     fun supportConversation(reference: String, title: String) =
         "support/cases/${reference}/${title}/thread"

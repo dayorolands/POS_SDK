@@ -89,6 +89,7 @@ class HomeFragment : CreditClubFragment() {
                     }
                 }
             }
+            appViewModel.agentLoan.value = localStorage.agentLoan
         }
 
         val hasPosUpdateManager = Platform.isPOS && Platform.deviceType != 2
@@ -146,6 +147,7 @@ class HomeFragment : CreditClubFragment() {
                                     navController = composeNavController,
                                     dialogProvider = dialogProvider,
                                     appViewModel = appViewModel,
+                                    viewModelStoreOwner = viewModelStoreOwner,
                                 )
                                 if (institutionConfig.categories.subscriptions) {
                                     subscriptionNavigation(

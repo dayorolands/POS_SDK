@@ -4,7 +4,7 @@ import com.cluster.core.data.model.AgentFee
 import com.cluster.core.data.model.Bank
 import com.cluster.core.data.request.FundsTransferRequest
 import com.cluster.core.data.response.BackendResponse
-import com.cluster.core.data.response.GenericResponse
+import com.cluster.core.data.response.BackendResponseWithPayload
 import com.cluster.core.data.response.NameEnquiryResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -30,5 +30,5 @@ interface FundsTransferService {
     suspend fun getBanks(@Query("institutionCode") institutionCode: String?): List<Bank>?
 
     @POST("FundsTransfer/GetTransferFee")
-    suspend fun getTransferFee(@Body request: FundsTransferRequest): GenericResponse<AgentFee>?
+    suspend fun getTransferFee(@Body request: FundsTransferRequest): BackendResponseWithPayload<AgentFee>?
 }

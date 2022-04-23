@@ -51,3 +51,9 @@ class AgentActivationResponse(
     @SerialName("DeviceNumber")
     val deviceNumber: Int = 0,
 ) : BackendResponse()
+
+@Serializable
+class BackendResponseWithPayload<T>(
+    @SerialName("Data")
+    val data: T? = null,
+) : BackendResponse()

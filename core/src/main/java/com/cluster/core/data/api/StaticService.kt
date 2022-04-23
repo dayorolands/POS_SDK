@@ -4,7 +4,7 @@ import com.cluster.core.data.model.*
 import com.cluster.core.data.request.*
 import com.cluster.core.data.response.ApiResponse
 import com.cluster.core.data.response.BackendResponse
-import com.cluster.core.data.response.GenericResponse
+import com.cluster.core.data.response.BackendResponseWithPayload
 import com.cluster.core.data.response.MiniStatementResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -40,10 +40,10 @@ interface StaticService {
     suspend fun withdrawal(@Body request: WithdrawalRequest): BackendResponse?
 
     @POST("CreditClubStatic/GetWithDrawalFee")
-    suspend fun getWithdrawalFee(@Body request: WithdrawalRequest): GenericResponse<AgentFee>?
+    suspend fun getWithdrawalFee(@Body request: WithdrawalRequest): BackendResponseWithPayload<AgentFee>?
 
     @POST("CreditClubStatic/GetDepositFee")
-    suspend fun getDepositFee(@Body request: DepositRequest): GenericResponse<AgentFee>?
+    suspend fun getDepositFee(@Body request: DepositRequest): BackendResponseWithPayload<AgentFee>?
 
     @POST("CreditClubStatic/SendToken")
     suspend fun sendToken(@Body sendTokenRequest: SendTokenRequest): BackendResponse?

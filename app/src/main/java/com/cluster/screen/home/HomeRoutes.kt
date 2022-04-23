@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.cluster.Routes
 import com.cluster.components.BottomNavScreens
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.ui.CreditClubFragment
@@ -18,12 +19,21 @@ fun NavGraphBuilder.homeRoutes(
     fragment: CreditClubFragment,
 ) {
     composable(BottomNavScreens.Home.route) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            BalanceCard()
-            HomeCategoryButtons(
-                homeNavController = homeNavController,
-                institutionConfig = institutionConfig,
-            )
+        ProvideViewModelStoreOwner(
+            viewModelStoreOwner = fragment.requireActivity(),
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                BalanceCard()
+                LoanOfferSection(
+                    onRequestLoan = {
+                        composeNavController.navigate(Routes.AgentLoanRequest)
+                    }
+                )
+                HomeCategoryButtons(
+                    homeNavController = homeNavController,
+                    institutionConfig = institutionConfig,
+                )
+            }
         }
     }
     composable(BottomNavScreens.Customer.route) {

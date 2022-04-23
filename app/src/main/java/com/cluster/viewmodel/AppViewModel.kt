@@ -60,4 +60,7 @@ class AppViewModel : ViewModel() {
             subscriptionMilestones.value = result.data!!.data!!
         }
     }
+
+    // Agent loan
+    val agentLoan = MutableStateFlow<AgentLoan?>(null)
 }

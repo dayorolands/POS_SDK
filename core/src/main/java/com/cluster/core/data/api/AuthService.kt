@@ -3,12 +3,13 @@ package com.cluster.core.data.api
 import com.cluster.core.data.model.*
 import com.cluster.core.data.response.AgentActivationResponse
 import com.cluster.core.data.response.BackendResponse
+import com.cluster.core.data.response.BackendResponseWithPayload
 import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface AuthService {
     @POST("Auth/Login")
-    suspend fun login(@Body loginRequest: LoginRequest): BackendResponse?
+    suspend fun login(@Body loginRequest: LoginRequest): BackendResponseWithPayload<AuthResponsePayload>?
 
     @POST("Auth/Activate")
     suspend fun activate(@Body request: ActivationRequest): AgentActivationResponse?

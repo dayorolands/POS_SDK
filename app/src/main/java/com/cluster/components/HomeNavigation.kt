@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -36,7 +37,13 @@ fun SubMenuBottomNavigation(
                         modifier = Modifier.size(24.dp),
                     )
                 },
-                label = { Text(stringResource(id = screen.stringRes)) },
+                label = {
+                    Text(
+                        text = stringResource(id = screen.stringRes),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                },
                 selected = currentRoute == screen.route,
                 onClick = {
                     // This if check gives us a "singleTop" behavior where we do not create a

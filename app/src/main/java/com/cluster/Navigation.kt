@@ -11,6 +11,7 @@ import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.setResult
 import com.cluster.pos.printer.ParcelablePrintJob
 import com.cluster.screen.*
+import com.cluster.screen.loan.AgentLoanRequestScreen
 import com.cluster.screen.subscription.ChooseSubscriptionScreen
 import com.cluster.screen.subscription.SubscriptionHistoryScreen
 import com.cluster.screen.subscription.SubscriptionScreen
@@ -22,6 +23,7 @@ fun NavGraphBuilder.clusterNavigation(
     navController: NavController,
     dialogProvider: DialogProvider,
     appViewModel: AppViewModel,
+    viewModelStoreOwner: ViewModelStoreOwner,
 ) {
     composable(Routes.FundsTransfer) {
         FundsTransfer(
@@ -71,6 +73,13 @@ fun NavGraphBuilder.clusterNavigation(
             navController = navController,
             printJob = printJob ?: return@composable,
         )
+    }
+    composable(Routes.AgentLoanRequest) {
+        ProvideViewModelStoreOwner(
+            viewModelStoreOwner = viewModelStoreOwner,
+        ) {
+            AgentLoanRequestScreen(navController = navController)
+        }
     }
 }
 

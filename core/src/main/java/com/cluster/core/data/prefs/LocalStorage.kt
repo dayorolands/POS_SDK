@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.cluster.core.data.model.AgentInfo
+import com.cluster.core.data.model.AgentLoan
 import com.cluster.core.data.model.AuthResponse
 import com.cluster.core.util.delegates.*
 
@@ -25,6 +26,7 @@ class LocalStorage(
     var agent: AgentInfo? by jsonStore(AGENT_INFO, AgentInfo.serializer(), defaultJson)
     var transactionSequenceNumber: Long by longStore("transaction_sequence_number", 1)
     var deviceNumber: Int by intStore("device_number", 0)
+    var agentLoan: AgentLoan? by jsonStore("loan", AgentLoan.serializer(), defaultJson)
 
     fun getString(key: String): String? = getString(key, null)
 

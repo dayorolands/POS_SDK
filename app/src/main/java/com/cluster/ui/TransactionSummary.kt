@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.cluster.R
 import com.cluster.core.data.model.AccountInfo
 import com.cluster.core.data.model.AgentFee
-import com.cluster.core.data.response.GenericResponse
+import com.cluster.core.data.response.BackendResponseWithPayload
 import com.cluster.core.util.SuspendCallback
 import com.cluster.core.util.getMessage
 import com.cluster.core.util.safeRunIO
@@ -60,7 +60,7 @@ fun DataItem(label: String, value: String) {
 fun TransactionSummary(
     amount: Double,
     onProceed: SuspendCallback,
-    fetchFeeAgent: suspend () -> GenericResponse<AgentFee>?,
+    fetchFeeAgent: suspend () -> BackendResponseWithPayload<AgentFee>?,
     accountInfo: AccountInfo,
 ) {
     val formattedAmount = remember { amount.toCurrencyFormat() }

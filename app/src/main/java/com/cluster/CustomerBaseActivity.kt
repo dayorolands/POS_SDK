@@ -13,7 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cluster.core.data.model.AccountInfo
 import com.cluster.core.data.model.AgentFee
-import com.cluster.core.data.response.GenericResponse
+import com.cluster.core.data.response.BackendResponseWithPayload
 import com.cluster.core.type.CustomerRequestOption
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.util.SuspendCallback
@@ -61,7 +61,7 @@ abstract class CustomerBaseActivity(protected var flowName: String? = null) : Cr
     protected fun renderTransactionSummary(
         amount: Double,
         onProceed: SuspendCallback,
-        fetchFeeAgent: suspend () -> GenericResponse<AgentFee>?,
+        fetchFeeAgent: suspend () -> BackendResponseWithPayload<AgentFee>?,
     ) {
         setContent {
             TransactionSummary(

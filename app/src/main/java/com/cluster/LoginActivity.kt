@@ -326,6 +326,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             putString("terminal_id", agent?.terminalID)
         })
 
+        localStorage.agentLoan = response.data?.loan
         localStorage.edit {
             putString(
                 "LAST_LOGIN",

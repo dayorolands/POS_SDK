@@ -106,7 +106,7 @@ fun SmallMenuButton(
             }
         }
 
-        Column(modifier = Modifier.height(20.dp)) {
+        Column(modifier = Modifier.height(40.dp)) {
             Text(
                 text = text.uppercase(Locale.ROOT),
                 style = MaterialTheme.typography.button,
