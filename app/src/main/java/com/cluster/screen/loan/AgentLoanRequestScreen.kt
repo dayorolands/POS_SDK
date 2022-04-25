@@ -86,6 +86,8 @@ fun AgentLoanRequestScreen(
             return@requestLoan
         }
 
+        localStorage.agentLoan = localStorage.agentLoan?.copy(isEligible = false)
+        appViewModel.agentLoan.value = localStorage.agentLoan
         dialogProvider.showSuccessAndWait(response.responseMessage ?: "Successful")
         navController.popBackStack()
     }
@@ -106,7 +108,6 @@ fun AgentLoanRequestScreen(
             )
             return@Column
         }
-
 
         OutlinedTextField(
             label = { Text(text = "Amount") },
