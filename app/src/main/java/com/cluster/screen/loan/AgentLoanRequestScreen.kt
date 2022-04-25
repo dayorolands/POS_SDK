@@ -58,7 +58,7 @@ fun AgentLoanRequestScreen(
         }
         val pin = dialogProvider.getAgentPin() ?: return@requestLoan
 
-        loadingMessage = "Validating account information"
+        loadingMessage = "Processing request"
         val agentLoanRequest = AgentLoanRequest(
             institutionCode = localStorage.institutionCode,
             agentPhoneNumber = localStorage.agentPhone,
@@ -82,6 +82,7 @@ fun AgentLoanRequestScreen(
             return@requestLoan
         }
         if (response!!.isFailure()) {
+            dialogProvider.showErrorAndWait(response.responseMessage!!)
             return@requestLoan
         }
 
@@ -105,6 +106,7 @@ fun AgentLoanRequestScreen(
             )
             return@Column
         }
+
 
         OutlinedTextField(
             label = { Text(text = "Amount") },

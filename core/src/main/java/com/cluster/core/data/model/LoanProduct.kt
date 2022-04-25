@@ -52,7 +52,7 @@ data class AgentLoanRequest(
 @Serializable
 data class AgentLoan(
     @SerialName("LoanProductID")
-    val loanProductId: Int = 1,
+    val loanProductId: Int,
     @SerialName("FeeRate")
     val feeRate: Double = 0.0,
     @SerialName("IsEligible")
@@ -62,7 +62,7 @@ data class AgentLoan(
     @SerialName("MaxAmount")
     val maxAmount: Double = 0.0,
     @SerialName("Message")
-    val message: String,
+    val message: String? = null,
     @SerialName("ProductName")
     val productName: String? = null,
     @SerialName("Tenure")
