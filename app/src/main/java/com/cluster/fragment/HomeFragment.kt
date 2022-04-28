@@ -89,7 +89,7 @@ class HomeFragment : CreditClubFragment() {
                     }
                 }
             }
-            appViewModel.agentLoan.value = localStorage.agentLoan
+            appViewModel.agentLoan.value = localStorage.agentLoanEligibility
         }
 
         val hasPosUpdateManager = Platform.isPOS && Platform.deviceType != 2

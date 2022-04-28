@@ -1,7 +1,9 @@
 package com.cluster.core.data.model
 
+import com.cluster.core.serializer.TimeInstantSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.Instant
 
 @kotlinx.serialization.Serializable
 data class LoanProduct(
@@ -50,7 +52,7 @@ data class AgentLoanRequest(
 )
 
 @Serializable
-data class AgentLoan(
+data class AgentLoanEligibility(
     @SerialName("LoanProductID")
     val loanProductId: Int,
     @SerialName("FeeRate")
@@ -67,4 +69,40 @@ data class AgentLoan(
     val productName: String? = null,
     @SerialName("Tenure")
     val tenure: Int = 0
+)
+
+@Serializable
+data class AgentLoanRecord(
+    @SerialName("DisbursementDate")
+    @Serializable(with = TimeInstantSerializer::class)
+    val disbursementDate: Instant? = null,
+    @SerialName("Fee")
+    val fee: Double = 0.0,
+    @SerialName("Name")
+    val name: String = "",
+    @SerialName("QualifiedAmount")
+    val qualifiedAmount: Double = 0.0,
+    @SerialName("RepaymentDate")
+    @Serializable(with = TimeInstantSerializer::class)
+    val repaymentDate: Instant? = null,
+    @SerialName("RequestedAmount")
+    val requestedAmount: Double = 0.0,
+    @SerialName("TerminalID")
+    val terminalId: String = ""
+)
+
+@Serializable
+data class AgentLoanSearchRequest(
+    @SerialName("FromDate")
+    val fromDate: String = "",
+    @SerialName("InstitutionCode")
+    val institutionCode: String = "",
+    @SerialName("MaxSize")
+    val maxSize: Int = 0,
+    @SerialName("PhoneNumber")
+    val phoneNumber: String = "",
+    @SerialName("StartIndex")
+    val startIndex: Int = 0,
+    @SerialName("ToDate")
+    val toDate: String = ""
 )

@@ -27,6 +27,9 @@ fun NavGraphBuilder.homeRoutes(
                 LoanOfferSection(
                     onRequestLoan = {
                         composeNavController.navigate(Routes.AgentLoanRequest)
+                    },
+                    onShowHistory = {
+                        composeNavController.navigate(Routes.AgentLoanHistory)
                     }
                 )
                 HomeCategoryButtons(

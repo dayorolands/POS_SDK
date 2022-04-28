@@ -62,5 +62,6 @@ class AppViewModel : ViewModel() {
     }
 
     // Agent loan
-    val agentLoan = MutableStateFlow<AgentLoan?>(null)
+    val agentLoan = MutableStateFlow<AgentLoanEligibility?>(null)
+    val agentLoanHistory = MutableStateFlow<List<AgentLoanRecord>>(emptyList())
 }

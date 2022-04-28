@@ -382,7 +382,7 @@
     <string name="appbar_scrolling_view_behavior" translatable="false">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
     <string name="commission">Commission</string>
     <string name="new_pin_confirmation_mismatch">New PIN and new PIN confirmation do not match</string>
-    <string name="new_password_confirmation_mismatch">You new passwords do not match</string>
+    <string name="new_password_confirmation_mismatch">Your new passwords do not match</string>
     <string name="enter">Enter</string>
     <string name="oops">Oops</string>
     <string name="title_activity_support">Support</string>
@@ -452,6 +452,7 @@
     <string name="setYourLoginPassword">Set your login password</string>
     <string name="newPassword">New Password</string>
     <string name="confirmPassword">Confirm Password</string>
+    <string name="loan_history">Loan History</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>

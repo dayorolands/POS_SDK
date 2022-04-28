@@ -11,6 +11,7 @@ import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.setResult
 import com.cluster.pos.printer.ParcelablePrintJob
 import com.cluster.screen.*
+import com.cluster.screen.loan.AgentLoanHistoryScreen
 import com.cluster.screen.loan.AgentLoanRequestScreen
 import com.cluster.screen.subscription.ChooseSubscriptionScreen
 import com.cluster.screen.subscription.SubscriptionHistoryScreen
@@ -79,6 +80,13 @@ fun NavGraphBuilder.clusterNavigation(
             viewModelStoreOwner = viewModelStoreOwner,
         ) {
             AgentLoanRequestScreen(navController = navController)
+        }
+    }
+    composable(Routes.AgentLoanHistory) {
+        ProvideViewModelStoreOwner(
+            viewModelStoreOwner = viewModelStoreOwner,
+        ) {
+            AgentLoanHistoryScreen(navController = navController)
         }
     }
 }

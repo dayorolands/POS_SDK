@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AuthResponsePayload(
     @SerialName("Loan")
-    val loan: AgentLoan? = null,
+    val loanEligibility: AgentLoanEligibility? = null,
 )

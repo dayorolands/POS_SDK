@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,13 +20,13 @@ import com.cluster.core.util.toCurrencyFormat
 import com.cluster.viewmodel.AppViewModel
 
 @Composable
-fun LoanOfferSection(onRequestLoan: () -> Unit) {
+fun LoanOfferSection(
+    onRequestLoan: () -> Unit,
+    onShowHistory: () -> Unit
+) {
     val appViewModel: AppViewModel = viewModel()
     val loan by appViewModel.agentLoan.collectAsState()
-
-    if (loan == null || !loan!!.isEligible) {
-        return
-    }
+    val isEligible = loan?.isEligible == true
 
     Card(
         modifier = Modifier
@@ -44,19 +45,38 @@ fun LoanOfferSection(onRequestLoan: () -> Unit) {
                 .padding(horizontal = 16.dp, vertical = 5.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Get a loan of up to ${loan!!.maxAmount.toCurrencyFormat()}",
-                    style = MaterialTheme.typography.button,
-                    color = MaterialTheme.colors.onSecondary,
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .weight(1f),
-                )
-                IconButton(onClick = onRequestLoan) {
+                if (isEligible) {
+                    Text(
+                        text = "Get a loan of up to ${loan!!.maxAmount.toCurrencyFormat()}",
+                        style = MaterialTheme.typography.button,
+                        color = MaterialTheme.colors.onSecondary,
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp)
+                            .weight(1f),
+                    )
+                } else {
+                    Text(
+                        text = "View your loan history",
+                        style = MaterialTheme.typography.button,
+                        color = MaterialTheme.colors.onSecondary,
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp)
+                            .weight(1f),
+                    )
+                }
+                IconButton(onClick = onShowHistory) {
                     Icon(
-                        imageVector = Icons.Outlined.ArrowForward,
+                        imageVector = Icons.Outlined.History,
                         contentDescription = null
                     )
+                }
+                if (isEligible) {
+                    IconButton(onClick = onRequestLoan) {
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowForward,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         }
