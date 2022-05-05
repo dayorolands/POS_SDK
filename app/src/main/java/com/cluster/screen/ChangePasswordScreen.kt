@@ -48,19 +48,19 @@ fun ChangePasswordScreen(navController: NavController) {
         remember(confirmNewPassword, oldPassword, newPassword) {
             changePassword@{
                 if (oldPassword.isEmpty()) {
-                    dialogProvider.showError("Please enter your password")
+                    dialogProvider.showError("Please enter your current login PIN")
                     return@changePassword
                 }
                 if (oldPassword.length != PASSWORD_LENGTH) {
-                    dialogProvider.showError("Please enter a ${PASSWORD_LENGTH}-digit password")
+                    dialogProvider.showError("Please enter a ${PASSWORD_LENGTH}-digit login PIN")
                     return@changePassword
                 }
                 if (newPassword.isEmpty()) {
-                    dialogProvider.showError("Please enter your Password")
+                    dialogProvider.showError("Please enter your login PIN")
                     return@changePassword
                 }
                 if (newPassword.length != PASSWORD_LENGTH) {
-                    dialogProvider.showError("New password must be a ${PASSWORD_LENGTH}-digit number")
+                    dialogProvider.showError("New login PIN must be a ${PASSWORD_LENGTH}-digit number")
                     return@changePassword
                 }
                 if (confirmNewPassword != newPassword) {
@@ -93,7 +93,7 @@ fun ChangePasswordScreen(navController: NavController) {
                     return@changePassword
                 }
                 dialogProvider.showSuccessAndWait(
-                    response.responseMessage ?: "Your password has been changed."
+                    response.responseMessage ?: "Your login PIN has been changed."
                 )
                 navController.popBackStack()
             }
@@ -116,7 +116,7 @@ fun ChangePasswordScreen(navController: NavController) {
                     OutlinedTextField(
                         value = oldPassword,
                         onValueChange = { if (it.length <= PASSWORD_LENGTH) oldPassword = it },
-                        label = { Text(text = "Old Password") },
+                        label = { Text(text = "Old login PIN") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),
@@ -127,7 +127,7 @@ fun ChangePasswordScreen(navController: NavController) {
                     OutlinedTextField(
                         value = newPassword,
                         onValueChange = { if (it.length <= PASSWORD_LENGTH) newPassword = it },
-                        label = { Text(text = "New Password") },
+                        label = { Text(text = "New login PIN") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),
@@ -140,7 +140,7 @@ fun ChangePasswordScreen(navController: NavController) {
                         onValueChange = {
                             if (it.length <= PASSWORD_LENGTH) confirmNewPassword = it
                         },
-                        label = { Text(text = "Confirm New Password") },
+                        label = { Text(text = "Confirm new login PIN") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp),

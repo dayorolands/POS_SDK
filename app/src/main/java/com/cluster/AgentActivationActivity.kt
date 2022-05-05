@@ -124,15 +124,15 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
 
         if (password.length != PASSWORD_LENGTH) {
             dialogProvider.indicateError(
-                "Your password must have $PASSWORD_LENGTH digits",
+                "Your login PIN must have $PASSWORD_LENGTH digits",
                 binding.newPasswordEt
             )
-            firebaseCrashlytics.recordException(Exception("Password was not $PASSWORD_LENGTH digits"))
+            firebaseCrashlytics.recordException(Exception("login PIN was not $PASSWORD_LENGTH digits"))
             return
         }
         if (password != passwordConfirmation) {
             dialogProvider.indicateError(
-                "Passwords do not match",
+                "Login PINs do not match",
                 binding.newPasswordConfirmationEt
             )
             return

@@ -92,7 +92,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="10dp"
-                    android:hint="@string/password"
+                    android:hint="@string/login_pin"
                     android:textColorHint="@color/white"
                     app:boxBackgroundColor="#2fff"
                     app:boxBackgroundMode="outline"
@@ -122,7 +122,7 @@
                     android:layout_marginStart="@dimen/ten_dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="10dp"
-                    android:text="Forgot password?"
+                    android:text="Forgot login PIN?"
                     android:textColor="@color/white"
                     android:textStyle="bold" />
 

@@ -291,12 +291,12 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
 
         if (TextUtils.isEmpty(pin)) {
-            showError("Password is required", R.id.login_pin)
+            showError("Login PIN is required", R.id.login_pin)
             return
         }
 
         if (pin.length != PASSWORD_LENGTH) {
-            dialogProvider.showError("Password must be $PASSWORD_LENGTH digits")
+            dialogProvider.showError("Login PIN must be $PASSWORD_LENGTH digits")
             return
         }
 
