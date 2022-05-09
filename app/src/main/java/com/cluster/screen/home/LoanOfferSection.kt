@@ -33,7 +33,7 @@ fun LoanOfferSection(
             .heightIn(50.dp, 80.dp)
             .fillMaxWidth()
             .padding(6.dp)
-            .clickable(onClick = onRequestLoan),
+            .clickable(onClick = if (isEligible) onRequestLoan else onShowHistory),
         elevation = 2.dp,
         backgroundColor = colorResource(R.color.colorBalanceCardBg),
         contentColor = MaterialTheme.colors.onSecondary,
