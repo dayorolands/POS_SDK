@@ -1,12 +1,13 @@
 package com.dspread.qpos
 
-import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import com.cluster.core.config.getBluetoothMessage
+import com.cluster.core.config.requestBluetoothPermissions
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.util.format
 import com.cluster.pos.DukptConfig
@@ -19,7 +20,6 @@ import com.dspread.qpos.utils.hexBytes
 import com.dspread.qpos.utils.hexString
 import com.dspread.xpos.QPOSService
 import com.eazypermissions.common.model.PermissionResult
-import com.eazypermissions.coroutinespermission.PermissionManager
 import kotlinx.coroutines.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -44,8 +44,11 @@ class QPosCardReader(
     private val dialogProvider = activity.dialogProvider
 
     override suspend fun waitForCard(): CardReaderEvent {
-        val canUseBluetooth = checkBluetoothPermission()
-        if (!canUseBluetooth) return CardReaderEvent.CANCELLED
+        val bluetoothPermission = requestBluetoothPermissions(activity = activity)
+        if (bluetoothPermission !is PermissionResult.PermissionGranted) {
+            dialogProvider.showErrorAndWait(bluetoothPermission.getBluetoothMessage())
+            return CardReaderEvent.CANCELLED
+        }
         val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if (!bluetoothAdapter.isEnabled && !turnOnBluetooth()) {
             dialogProvider.showErrorAndWait("Could not turn on bluetooth")
@@ -71,35 +74,6 @@ class QPosCardReader(
         val turnOn = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
         val result = ActivityResultManager.getActivityResult(activity, turnOn, 2012)
         return result.resultCode == Activity.RESULT_OK
-    }
-
-    private suspend fun checkBluetoothPermission(): Boolean {
-        val permissionResult = PermissionManager.requestPermissions(
-            activity,
-            2000,
-            Manifest.permission.BLUETOOTH_ADMIN,
-            Manifest.permission.BLUETOOTH,
-        )
-
-        when (permissionResult) {
-            is PermissionResult.PermissionGranted -> {
-                return true
-            }
-            is PermissionResult.PermissionDenied -> {
-                dialogProvider.showErrorAndWait("Bluetooth access is required to use mPOS")
-            }
-            is PermissionResult.PermissionDeniedPermanently -> {
-                dialogProvider.showErrorAndWait(
-                    "Bluetooth access is required to use mPOS.\n" +
-                            "Please manually go to settings and enable permission(s)"
-                )
-            }
-            is PermissionResult.ShowRational -> {
-                dialogProvider.showErrorAndWait("Bluetooth access is required to use mPOS")
-            }
-        }
-
-        return false
     }
 
     override suspend fun read(amountStr: String): CardData? {

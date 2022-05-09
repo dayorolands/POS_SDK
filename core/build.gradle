@@ -160,4 +160,6 @@ dependencies {
     api "com.google.accompanist:accompanist-swiperefresh:${versions.accompanist}"
     api "com.google.accompanist:accompanist-flowlayout:${versions.accompanist}"
     api "androidx.palette:palette-ktx:1.0.0"
+
+    api 'com.sagar:coroutinespermission:2.0.3'
 }
