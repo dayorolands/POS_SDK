@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -27,9 +28,9 @@ import com.cluster.core.data.model.Subscription
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.model.BooleanValueType
 import com.cluster.core.model.IntValueType
-import com.cluster.core.util.format
 import com.cluster.core.util.getMessage
 import com.cluster.core.util.safeRunIO
+import com.cluster.core.util.timeAgo
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.ui.*
 import com.cluster.ui.util.LocalDateSaver
@@ -200,30 +201,41 @@ fun SubscriptionHistoryScreen(navController: NavController) {
 @Composable
 private fun SubscriptionHistoryItem(item: Subscription) {
     val fee = remember { item.plan.fee.toCurrencyFormat() }
-    val startDate = remember { item.startDate.format("MM/dd/uuuu hh:mm:ss") }
-    val expiryDate = remember { item.expiryDate.format("MM/dd/uuuu hh:mm:ss") }
+    val startDate = remember { item.startDate.timeAgo() }
     val captionColor = MaterialTheme.colors.onSurface.copy(alpha = 0.52f)
-    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
-        Row {
+    val duration = remember {
+        buildString {
+            append(item.plan.validityPeriod)
+            append(" day")
+            append(if (item.plan.validityPeriod != 1) "s" else "")
+        }
+    }
+
+    Column {
+        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
             Text(
                 text = item.plan.name,
                 style = MaterialTheme.typography.subtitle1,
-                color = captionColor,
                 modifier = Modifier
                     .weight(1f)
             )
             Text(
                 text = "Fee: $fee",
                 style = MaterialTheme.typography.subtitle1,
+                color = captionColor,
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(start = 4.dp)
             )
         }
         Text(
-            text = "Started at $startDate \u2022 Expiry $expiryDate",
+            text = "Started $startDate \u2022 valid for $duration",
             style = MaterialTheme.typography.caption,
             color = captionColor,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            textAlign = TextAlign.End,
         )
+        Divider(startIndent = 16.dp, modifier = Modifier.padding(vertical = 10.dp))
     }
 }
