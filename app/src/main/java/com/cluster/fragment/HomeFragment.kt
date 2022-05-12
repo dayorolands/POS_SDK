@@ -76,17 +76,10 @@ class HomeFragment : CreditClubFragment() {
             }
             if (institutionConfig.categories.subscriptions) {
                 coroutineScope {
-                    appViewModel.loadActiveSubscription(
+                    appViewModel.loadSubscriptionData(
                         subscriptionService = subscriptionService,
                         localStorage = localStorage,
                     )
-                    val subscriptionId = appViewModel.activeSubscription.value?.id
-                    if (subscriptionId != null) {
-                        appViewModel.loadMilestones(
-                            subscriptionService = subscriptionService,
-                            subscriptionId = subscriptionId.toLong(),
-                        )
-                    }
                 }
             }
             appViewModel.agentLoan.value = localStorage.agentLoanEligibility

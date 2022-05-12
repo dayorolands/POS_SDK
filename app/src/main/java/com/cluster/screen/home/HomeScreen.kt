@@ -1,16 +1,17 @@
 package com.cluster.screen.home
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -22,12 +23,16 @@ import com.cluster.components.HomeAppBar
 import com.cluster.components.SubMenuBottomNavigation
 import com.cluster.components.currentRoute
 import com.cluster.core.config.InstitutionConfig
+import com.cluster.core.data.api.SubscriptionService
+import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.ui.rememberBean
+import com.cluster.ui.rememberRetrofitService
 import com.cluster.utility.openPageById
+import com.cluster.viewmodel.AppViewModel
+import kotlinx.coroutines.coroutineScope
 import java.util.*
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalStdlibApi::class)
 @Composable
 fun HomeScreen(
     mainNavController: NavController,
@@ -45,6 +50,9 @@ fun HomeScreen(
             R.id.fn_subscription to Routes.Subscription,
         )
     }
+    val viewModel: AppViewModel = viewModel()
+    val localStorage: LocalStorage by rememberBean()
+    val subscriptionService: SubscriptionService by rememberRetrofitService()
     val institutionConfig: InstitutionConfig by rememberBean()
     val homeNavController = rememberNavController()
     val scaffoldState = rememberScaffoldState()
@@ -76,6 +84,17 @@ fun HomeScreen(
         BottomNavScreens.Loans.route -> stringResource(BottomNavScreens.Loans.stringRes)
         BottomNavScreens.Profile.route -> ""
         else -> greetingMessage
+    }
+
+    LaunchedEffect(key1 = 1) {
+        if (institutionConfig.categories.subscriptions) {
+            coroutineScope {
+                viewModel.loadSubscriptionData(
+                    subscriptionService = subscriptionService,
+                    localStorage = localStorage,
+                )
+            }
+        }
     }
 
     Scaffold(

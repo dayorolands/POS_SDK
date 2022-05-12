@@ -3,7 +3,6 @@ package com.cluster.screen.home
 import android.app.Activity
 import android.content.Intent
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -46,7 +45,6 @@ import com.cluster.utility.openPageById
 import com.cluster.viewmodel.AppViewModel
 import java.util.*
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProfileScreen(
     composeNavController: NavHostController,
@@ -61,7 +59,7 @@ fun ProfileScreen(
 
     LaunchedEffect(1) {
         if (institutionConfig.categories.subscriptions) {
-            viewModel.loadActiveSubscription(
+            viewModel.loadSubscriptionData(
                 subscriptionService = subscriptionService,
                 localStorage = localStorage,
             )

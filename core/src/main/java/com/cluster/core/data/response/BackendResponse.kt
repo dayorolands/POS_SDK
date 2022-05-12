@@ -1,6 +1,5 @@
 package com.cluster.core.data.response
 
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -22,7 +21,6 @@ interface BackendResponseContract {
 
 @Serializable
 open class BackendResponse : BackendResponseContract {
-    @OptIn(ExperimentalSerializationApi::class)
     @SerialName("ReponseMessage")
     override val responseMessage: String? = null
         get() = if (field.isNullOrEmpty()) message else field

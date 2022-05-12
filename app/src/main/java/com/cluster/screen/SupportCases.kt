@@ -1,7 +1,6 @@
 package com.cluster.screen
 
 import android.content.Intent
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -45,7 +44,6 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import java.time.LocalDate
 import java.util.*
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SupportCases(navController: NavController) {
     FunctionUsageTracker(FunctionIds.SUPPORT)

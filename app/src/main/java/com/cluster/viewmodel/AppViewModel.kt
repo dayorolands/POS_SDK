@@ -32,7 +32,7 @@ class AppViewModel : ViewModel() {
         Duration.between(Instant.now(), it.expiryDate).toDays()
     }
 
-    suspend fun loadActiveSubscription(
+    private suspend fun loadActiveSubscription(
         subscriptionService: SubscriptionService,
         localStorage: LocalStorage,
     ) {
@@ -47,7 +47,7 @@ class AppViewModel : ViewModel() {
         }
     }
 
-    suspend fun loadMilestones(
+    private suspend fun loadMilestones(
         subscriptionService: SubscriptionService,
         subscriptionId: Long,
     ) {
@@ -60,6 +60,24 @@ class AppViewModel : ViewModel() {
             subscriptionMilestones.value = result.data!!.data!!
         }
     }
+
+    suspend fun loadSubscriptionData(
+        subscriptionService: SubscriptionService,
+        localStorage: LocalStorage,
+    ) {
+        loadActiveSubscription(
+            subscriptionService = subscriptionService,
+            localStorage = localStorage,
+        )
+        val subscriptionId = activeSubscription.value?.id
+        if (subscriptionId != null) {
+            loadMilestones(
+                subscriptionService = subscriptionService,
+                subscriptionId = subscriptionId.toLong(),
+            )
+        }
+    }
+
 
     // Agent loan
     val agentLoan = MutableStateFlow<AgentLoanEligibility?>(null)

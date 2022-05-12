@@ -295,8 +295,8 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
             return
         }
 
-        if (pin.length != PASSWORD_LENGTH) {
-            dialogProvider.showError("Login PIN must be $PASSWORD_LENGTH digits")
+        if (pin.length != PASSWORD_LENGTH && pin.length != 4) {
+            dialogProvider.showError("Login PIN must be $PASSWORD_LENGTH digits or 4 digits for old PIN")
             return
         }
 

@@ -89,7 +89,7 @@ fun SubscriptionScreen(navController: NavController) {
             }
 
             kotlinx.coroutines.coroutineScope {
-                viewModel.loadActiveSubscription(
+                viewModel.loadSubscriptionData(
                     subscriptionService = subscriptionService,
                     localStorage = localStorage,
                 )
@@ -101,17 +101,10 @@ fun SubscriptionScreen(navController: NavController) {
 
     LaunchedEffect(refreshKey) {
         loadingMessage = "Loading Subscription"
-        viewModel.loadActiveSubscription(
+        viewModel.loadSubscriptionData(
             subscriptionService = subscriptionService,
             localStorage = localStorage,
         )
-        val subscriptionId = viewModel.activeSubscription.value?.id
-        if (subscriptionId != null) {
-            viewModel.loadMilestones(
-                subscriptionService = subscriptionService,
-                subscriptionId = subscriptionId.toLong(),
-            )
-        }
         loadingMessage = ""
     }
 
