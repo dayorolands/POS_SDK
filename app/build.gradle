@@ -132,6 +132,11 @@ android {
             dimension "flavor"
             applicationId "africa.cluster.heritage"
         }
+
+        halo {
+            dimension "flavor"
+            applicationId "africa.cluster.halo"
+        }
     }
     sourceSets {
         main {

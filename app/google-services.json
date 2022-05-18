@@ -8,6 +8,35 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:374244995616:android:da794f5633d67f6e114245",
+        "android_client_info": {
+          "package_name": "africa.cluster.halo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "374244995616-r5b0hcls5cbcritv8unbids9934uau4m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxV_Hi6_sN84FD9Ha3rAFRcuK2FT2Zozs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "374244995616-r5b0hcls5cbcritv8unbids9934uau4m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:374244995616:android:a31b45f9d56b4d3a114245",
         "android_client_info": {
           "package_name": "africa.cluster.heritage"
