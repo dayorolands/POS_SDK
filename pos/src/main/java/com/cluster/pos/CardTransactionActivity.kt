@@ -303,6 +303,7 @@ abstract class CardTransactionActivity : PosActivity() {
             parameters = posParameter,
             remoteConnectionInfo = remoteConnectionInfo,
         )
+        val amount = request.transactionAmount4?.toDoubleOrNull()?.div(100)
         val posTransaction = PosTransaction.create(
             isoMsg = request,
             institutionCode = localStorage.institutionCode!!,
@@ -315,6 +316,7 @@ abstract class CardTransactionActivity : PosActivity() {
             cardType = cardType,
             nodeName = remoteConnectionInfo.nodeName,
             responseCode = "XX",
+            amountString = amount?.toCurrencyFormat() ?: "NGN0.00",
         )
         if (cardData.pinBlock.isEmpty()) {
             dialogProvider.showProgressBar("Pin Ok")
@@ -398,7 +400,11 @@ abstract class CardTransactionActivity : PosActivity() {
                     transaction = transaction,
                 )
             }
-
+            if (transactionType == TransactionType.Balance) {
+                val additionalAmount = response.additionalAmounts54?.substring(8)
+                val amountDouble = additionalAmount?.toDoubleOrNull()?.div(100)
+                posTransaction.amount = amountDouble?.toCurrencyFormat() ?: "NGN0.00"
+            }
             showTransactionStatusPage(posTransaction)
             val receipt = posReceipt(
                 posTransaction = posTransaction,

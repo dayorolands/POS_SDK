@@ -2,8 +2,6 @@ package com.cluster.pos.data
 
 import com.cluster.core.data.model.AgentInfo
 import com.cluster.core.util.mask
-import com.cluster.core.util.toCurrencyFormat
-import com.cluster.pos.card.TransactionType
 import com.cluster.pos.card.cardTransactionType
 import com.cluster.pos.extension.*
 import com.cluster.pos.models.PosTransaction
@@ -21,11 +19,9 @@ fun PosTransaction.Companion.create(
     cardType: String,
     nodeName: String?,
     responseCode: String,
+    amountString: String,
 ): PosTransaction {
     val transactionType = cardTransactionType(isoMsg)
-    val amountString =
-        if (transactionType == TransactionType.Balance) isoMsg.additionalAmounts54
-        else isoMsg.transactionAmount4
 
     return PosTransaction(
         institutionCode = institutionCode,
@@ -48,7 +44,7 @@ fun PosTransaction.Companion.create(
         responseCode = responseCode,
         cardHolder = cardHolder,
         transactionType = transactionType.type,
-        amount = amountString?.toDoubleOrNull()?.div(100)?.toCurrencyFormat() ?: "NGN0.00",
+        amount = amountString,
         bankName = bankName,
         nodeName = nodeName,
     )

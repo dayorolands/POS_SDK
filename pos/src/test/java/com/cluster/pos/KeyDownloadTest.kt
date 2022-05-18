@@ -28,14 +28,14 @@ import java.util.*
 import javax.net.ssl.TrustManager
 import javax.net.ssl.TrustManagerFactory
 
-const val TERMINAL_ID = "2039OP98" // 2APP3000
+const val TERMINAL_ID = "2076KT13" // 2APP3000
 val posMode = object : RemoteConnectionInfo {
     override val id: String = "test"
     override val label: String = "test"
-    override val key1: String = "25F7432326081AA82520647C61DCC83D"
-    override val key2: String = "F270D5A76ED6FB9298CD580E6D986723"
-    override val host: String = "197.253.19.75"
-    override val port: Int = 5007
+    override val key1: String = "C48A1564CBFB3213A485BCE9195D321C"
+    override val key2: String = "FE169BD37C34B06215E919C4D3F75E79"
+    override val host: String = "196.6.103.18"
+    override val port: Int = 5023
     override val sslEnabled: Boolean = true
     override val dukptConfig: DukptConfig? = null
     override val timeout: Int = 90
@@ -88,7 +88,7 @@ class KeyDownloadTest : PosParameter {
     @Throws(Exception::class)
     fun getTrustManagers(): Array<TrustManager?> {
         Security.insertProviderAt(BouncyCastleProvider(), 1)
-        val password = "cluster".toCharArray()
+        val password = "P@55w0rd123".toCharArray()
         val url = javaClass.getResource("/pos_trust_store.bks") ?: return emptyArray()
         val trustStoreFile = File(url.path)
         val trustStore = KeyStore.getInstance("BKS")
