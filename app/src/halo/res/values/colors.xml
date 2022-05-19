@@ -3,9 +3,9 @@
     <color name="colorPrimary">#0A3060</color>
     <color name="colorPrimaryTransparent">#DD0A3060</color>
     <color name="colorPrimaryDark">#061B36</color>
-    <color name="colorAccent">#F17C1C</color>
-    <color name="colorAccentDark">#B15B15</color>
-    <color name="colorAccentTransparent">#DDF17C1C</color>
+    <color name="colorAccent">#707070</color>
+    <color name="colorAccentDark">#454545</color>
+    <color name="colorAccentTransparent">#DD707070</color>
     <color name="colorSplashBg">#FFF</color>
     <color name="colorLoginBg">#D000</color>
     <color name="toolbarLogoTint">#FFF</color>
