@@ -404,13 +404,10 @@ abstract class CardTransactionActivity : PosActivity() {
                 val additionalAmount = response.additionalAmounts54?.substring(8)
                 val amountDouble = additionalAmount?.toDoubleOrNull()?.div(100)
                 posTransaction.amount = amountDouble?.toCurrencyFormat() ?: "NGN0.00"
+                showAndPrintTransactionStatus(posTransaction)
+            } else {
+                showAndPrintTransactionStatus(posTransaction)
             }
-            showTransactionStatusPage(posTransaction)
-            val receipt = posReceipt(
-                posTransaction = posTransaction,
-                isCustomerCopy = true,
-            )
-            printer.printAsync(receipt)
         } catch (ex: Exception) {
             showTransactionStatusPage(posTransaction)
             firebaseCrashlytics.recordException(ex)
@@ -421,6 +418,15 @@ abstract class CardTransactionActivity : PosActivity() {
         } finally {
             dialogProvider.hideProgressBar()
         }
+    }
+
+    private fun showAndPrintTransactionStatus(posTransaction: PosTransaction) {
+        showTransactionStatusPage(posTransaction)
+        val receipt = posReceipt(
+            posTransaction = posTransaction,
+            isCustomerCopy = true,
+        )
+        printer.printAsync(receipt)
     }
 
     private suspend fun handleRetryableRequest(
