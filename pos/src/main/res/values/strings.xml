@@ -100,6 +100,7 @@
     <string name="day_label">Day</string>
     <string name="year_label">Year</string>
     <string name="transaction_successful">Transaction Successful</string>
+    <string name="transaction_pending">Transaction Pending</string>
     <string name="pos_enter_supervisor_pin">Enter Device PIN</string>
     <string name="pos_new_supervisor_pin">New Device PIN</string>
     <string name="pos_confirm_supervisor_pin">Confirm Device PIN</string>
