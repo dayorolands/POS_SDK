@@ -153,15 +153,6 @@ internal fun CardTransactionActivity.showTransactionStatusPage(posTransaction: P
             )
         )
         binding.message.setTextColor(ContextCompat.getColor(this, R.color.colorPrimary))
-    } else if (posTransaction.responseCode == "24") {
-        binding.message.text = getString(R.string.transaction_pending)
-        binding.transactionStatusIcon.setImageResource(R.drawable.ic_sentiment_very_dissatisfied)
-        ImageViewCompat.setImageTintList(
-            binding.transactionStatusIcon, ColorStateList.valueOf(
-                ContextCompat.getColor(this, R.color.colorPrimary)
-            )
-        )
-        binding.message.setTextColor(ContextCompat.getColor(this, R.color.app_orange))
     } else {
         binding.message.text = isoResponseMessage(posTransaction.responseCode)
         binding.transactionStatusIcon.setImageResource(R.drawable.ic_sentiment_very_dissatisfied)
