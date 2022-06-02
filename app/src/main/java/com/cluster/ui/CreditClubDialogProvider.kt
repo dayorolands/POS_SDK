@@ -100,6 +100,24 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         }
     }
 
+    override suspend fun showErrorAndWait(title: CharSequence, message: CharSequence) {
+        suspendCoroutine<Unit> { continuation ->
+            activity.runOnUiThread {
+                hideProgressBar()
+                val dialog = getErrorDialogWithTitle(activity, title, message).apply {
+                    setOnDismissListener {
+                        continuation.resume(Unit)
+                    }
+                }
+                dialog.findViewById<View>(R.id.close_btn).setOnClickListener {
+                    dialog.dismiss()
+                }
+
+                dialog.show()
+            }
+        }
+    }
+
     override suspend fun showErrorAndWait(exception: Exception) {
         showErrorAndWait(exception.getMessage(context))
     }
@@ -457,6 +475,15 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         val dialog = getDialog(R.layout.dialog_error, activity)
         message?.also { dialog.findViewById<TextView>(R.id.message_tv).text = message }
         dialog.findViewById<View>(R.id.close_btn).setOnClickListener { dialog.dismiss() }
+
+        return dialog
+    }
+
+    private fun getErrorDialogWithTitle(activity: Activity, title: CharSequence?, message: CharSequence?): Dialog {
+        val dialog = getDialog(R.layout.dialog_error, activity)
+
+        title?.also { dialog.findViewById<TextView>(R.id.error_header).text = title}
+        message?.also { dialog.findViewById<TextView>(R.id.message_tv).text = message }
 
         return dialog
     }

@@ -294,6 +294,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
                     isSuccessful = response!!.isSuccessful,
                     reason = response.responseMessage,
+                    responseCode = response.responseCode
                 )
                 transferAttemptCount++
                 if (!response.isPendingOnMiddleware()) {

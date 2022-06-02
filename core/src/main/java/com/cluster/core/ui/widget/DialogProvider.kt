@@ -138,6 +138,8 @@ interface DialogProvider {
 
     suspend fun showErrorAndWait(message: CharSequence)
 
+    suspend fun showErrorAndWait(title: CharSequence, message: CharSequence)
+
     suspend fun showErrorAndWait(exception: Exception)
 
     suspend fun showSuccessAndWait(message: CharSequence) =
