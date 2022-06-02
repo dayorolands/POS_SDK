@@ -23,7 +23,6 @@ interface BackendResponseContract {
 open class BackendResponse : BackendResponseContract {
     @SerialName("ReponseMessage")
     override val responseMessage: String? = null
-        get() = if (field.isNullOrEmpty()) message else field
 
     @SerialName("IsSuccessful")
     override var isSuccessful: Boolean = false

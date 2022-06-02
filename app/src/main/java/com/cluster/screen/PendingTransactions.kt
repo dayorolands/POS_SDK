@@ -100,7 +100,7 @@ fun PendingTransactions(
                 return@checkStatus
             }
             if (response!!.isPending()) {
-                dialogProvider.showErrorAndWait(response.responseMessage ?: "Pending")
+                dialogProvider.showErrorAndWait(response.responseMessage ?: "Transaction Pending")
                 return@checkStatus
             } else {
                 pendingTransactionsBox.remove(transaction.id)
