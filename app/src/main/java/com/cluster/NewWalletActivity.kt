@@ -159,6 +159,7 @@ class NewWalletActivity : CreditClubActivity(R.layout.activity_open_account) {
             uniqueReferenceID = request.uniqueReferenceID!!,
             accountName = accountName,
             accountNumber = accountNumber,
+            responseCode = response.responseCode
         )
 
         printer.printAsync(receipt) { printerStatus ->

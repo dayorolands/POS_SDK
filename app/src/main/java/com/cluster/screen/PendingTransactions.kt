@@ -100,7 +100,10 @@ fun PendingTransactions(
                 return@checkStatus
             }
             if (response!!.isPending()) {
-                dialogProvider.showErrorAndWait(response.responseMessage ?: "Transaction Pending")
+                dialogProvider.showErrorAndWait(
+                    "Transaction Pending",
+                    response.responseMessage ?: "Transaction Pending"
+                )
                 return@checkStatus
             } else {
                 pendingTransactionsBox.remove(transaction.id)
@@ -119,6 +122,7 @@ fun PendingTransactions(
                         transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
                         isSuccessful = response.isSuccessful,
                         reason = response.responseMessage,
+                        responseCode = response.responseCode
                     )
                 }
                 TransactionType.BillsPayment,

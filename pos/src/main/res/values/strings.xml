@@ -100,7 +100,7 @@
     <string name="day_label">Day</string>
     <string name="year_label">Year</string>
     <string name="transaction_successful">Transaction Successful</string>
-    <string name="transaction_pending">Transaction Pending</string>
+    <string name="pos_transaction_pending">Transaction Pending</string>
     <string name="pos_enter_supervisor_pin">Enter Device PIN</string>
     <string name="pos_new_supervisor_pin">New Device PIN</string>
     <string name="pos_confirm_supervisor_pin">Confirm Device PIN</string>
@@ -108,6 +108,7 @@
     <string name="pos_card_purchase">Withdrawal</string>
     <string name="pos_transaction_declined">Transaction Declined</string>
     <string name="pos_transaction_approved">Transaction Approved</string>
+    <string name="pos_transaction_not_found">Transaction Not Found</string>
     <string name="pos_terminal_id_required">You need a terminal ID to access card functions. Please contact your administrator for assistance</string>
     <string name="pos_card_transactions">Card Transactions</string>
     <string name="pos_select_mpos_device">Select mPOS device</string>
