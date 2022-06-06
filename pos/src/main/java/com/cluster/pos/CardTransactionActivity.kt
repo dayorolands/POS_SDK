@@ -399,12 +399,13 @@ abstract class CardTransactionActivity : PosActivity() {
                     remoteConnectionInfo = remoteConnectionInfo,
                     transaction = transaction,
                 )
+                if (transactionType == TransactionType.Balance) {
+                    val additionalAmount = response.additionalAmounts54?.substring(8)
+                    val amountDouble = additionalAmount?.toDoubleOrNull()?.div(100)
+                    posTransaction.amount = amountDouble?.toCurrencyFormat() ?: "NGN0.00"
+                }
             }
-            if (transactionType == TransactionType.Balance) {
-                val additionalAmount = response.additionalAmounts54?.substring(8)
-                val amountDouble = additionalAmount?.toDoubleOrNull()?.div(100)
-                posTransaction.amount = amountDouble?.toCurrencyFormat() ?: "NGN0.00"
-            }
+
             showTransactionStatusPage(posTransaction)
             val receipt = posReceipt(
                 posTransaction = posTransaction,
