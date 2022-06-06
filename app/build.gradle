@@ -187,6 +187,7 @@ dependencies {
     groomingImplementation(project(":telpo"))
     groomingImplementation(project(":nexgo"))
     heritageImplementation(project(":wizar"))
+    haloImplementation(project(":dspread"))
 
     implementation("androidx.activity:activity-ktx:${Versions.activityKtx}")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
