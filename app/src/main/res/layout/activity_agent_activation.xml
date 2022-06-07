@@ -91,7 +91,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/fifteen_dp"
                         android:drawableStart="@drawable/ic_password"
-                        android:hint="@string/new_login_pin"
+                        android:hint="@string/newPassword"
                         android:inputType="numberPassword"
                         android:maxLength="6" />
 
@@ -103,7 +103,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/fifteen_dp"
                         android:drawableStart="@drawable/ic_password"
-                        android:hint="@string/confirm_login_pin"
+                        android:hint="@string/confirmPassword"
                         android:inputType="numberPassword"
                         android:maxLength="6" />
 
