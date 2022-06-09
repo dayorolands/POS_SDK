@@ -63,6 +63,7 @@ private const val FUNDS_TRANSFER_AUTH_TOKEN = "95C1D8B4-7589-4F70-8F20-473E89FB5
 
 @Composable
 fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) {
+    var transactionPending = false
     val context = LocalContext.current
     val fundsTransferService: FundsTransferService by rememberRetrofitService()
     val fundsTransferTransactionService: FundsTransferService by rememberRetrofitService(
@@ -264,9 +265,11 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
 
                 when {
                     response!!.isPendingOnBank() -> {
+                        transactionPending = true
                         retryPolicy = RetryPolicy.RetryLater
                     }
                     response.isPendingOnMiddleware() -> {
+                        transactionPending = true
                         retryPolicy = RetryPolicy.AutoRetry
                     }
                     response.isFailure() -> {
@@ -319,7 +322,8 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     }
 
     if (retryPolicy == RetryPolicy.ManualRetry || retryPolicy == RetryPolicy.RetryLater) {
-        TransactionStatusQuery(
+        retryPolicy = null
+        /*TransactionStatusQuery(
             onClose = {
                 retryPolicy = null
             },
@@ -331,13 +335,17 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     activeJob = coroutineScope.launch { transferFunds() }
                 }
             } else null,
-        )
+        )*/
         return
     }
 
     if (retryPolicy == null) {
         if (receipt != null && loadingMessage.isBlank()) {
-            ReceiptDetails(navController = navController, printJob = receipt!!)
+            ReceiptDetails(
+                navController = navController,
+                printJob = receipt!!,
+                transactionPending = transactionPending
+            )
             return
         }
 
