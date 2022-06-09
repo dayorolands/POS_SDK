@@ -125,9 +125,19 @@ interface DialogProvider {
     suspend fun getPin(@StringRes title: Int) = getPin(context.getString(title))
     suspend fun getAgentPin() = getPin(context.getString(R.string.agent_pin))
 
-    suspend fun getConfirmation(title: CharSequence, subtitle: CharSequence = "") =
+    suspend fun getConfirmation(
+        title: CharSequence,
+        subtitle: CharSequence = "",
+        yesButtonText: CharSequence = "Ok",
+        noButtonText: CharSequence = "Cancel"
+    ) =
         suspendCoroutine<Boolean> { continuation ->
-            confirm(DialogConfirmParams(title, subtitle)) {
+            confirm(DialogConfirmParams(
+                title = title,
+                subtitle = subtitle,
+                yesButtonTex = yesButtonText,
+                noButtonTex = noButtonText
+            )) {
                 onSubmit {
                     dismiss()
                     continuation.resume(it)
