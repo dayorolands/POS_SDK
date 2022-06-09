@@ -15,10 +15,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.cluster.Routes
 import com.cluster.pos.Platform
 import com.cluster.pos.printer.*
 import com.cluster.pos.rememberPosPrinter
 import com.cluster.ui.AppButton
+import com.cluster.ui.AppSecondButton
 import com.cluster.ui.CreditClubAppBar
 import com.cluster.ui.ErrorMessage
 import kotlinx.coroutines.launch
@@ -28,6 +30,7 @@ fun ReceiptDetails(
     navController: NavController,
     printJob: PrintJob,
     showAppBar: Boolean = true,
+    transactionPending: Boolean = false,
     onBackPressed: () -> Unit = { navController.popBackStack() },
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -93,6 +96,17 @@ fun ReceiptDetails(
         }
 
         ErrorMessage(content = errorMessage)
+        
+        if(transactionPending) {
+            AppSecondButton(
+                modifier = Modifier.padding(horizontal = 10.dp),
+                onClick = {
+                    navController.navigate(Routes.PendingTransactions)
+                },
+            ) {
+                Text(text = "CHECK STATUS")
+            }
+        }
 
         AppButton(
             modifier = Modifier.padding(horizontal = 10.dp),

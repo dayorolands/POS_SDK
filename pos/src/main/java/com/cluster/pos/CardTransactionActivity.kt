@@ -5,11 +5,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.window.SplashScreen
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.util.*
 import com.cluster.pos.api.PosApiService
@@ -243,6 +246,17 @@ abstract class CardTransactionActivity : PosActivity() {
                     }
 
                     val route = getSupportedRoute(cardData.pan, viewModel.amount.value!!)
+                    Log.d("Result", "Just here to check the route ${route.id}")
+                    Log.d("Result", "Just here to check the route ${route.host}")
+                    Log.d("Result", "Just here to check the route ${route.dukptConfig}")
+                    Log.d("Result", "Just here to check the route ${route.key1}")
+                    Log.d("Result", "Just here to check the route ${route.key2}")
+                    Log.d("Result", "Just here to check the route ${route.label}")
+                    Log.d("Result", "Just here to check the route ${route.nodeName}")
+                    Log.d("Result", "Just here to check the route ${route.port}")
+                    Log.d("Result", "Just here to check the route ${route.requeryConfig}")
+                    Log.d("Result", "Just here to check the route ${route.sslEnabled}")
+                    Log.d("Result", "Just here to check the route ${route.timeout}")
                     if (route == InvalidRemoteConnectionInfo) {
                         dialogProvider.hideProgressBar()
                         renderTransactionFailure("No supported route for this card/amount combination")
@@ -284,6 +298,7 @@ abstract class CardTransactionActivity : PosActivity() {
             acquiringInstIdCode32 = localStorage.institutionCode
             terminalId41 = config.terminalId
         }
+
         val cardType = when (cardData.aid) {
             "A0000000032020" -> "VISA"
             "A0000000031010", "A0000000032010" -> "VISA Debit"
@@ -291,6 +306,10 @@ abstract class CardTransactionActivity : PosActivity() {
             "A0000004540011" -> "Etranzact Genesis Card"
             "A0000000042203" -> "MasterCard US"
             "A0000000041010" -> "MasterCard"
+            "A0000000044010" -> "MasterCard"
+            "A0000000041030" -> "MasterCard"
+            "A0000000046000" -> "MasterCard Specific"
+            "A0000000043060" -> "MasterCard Specific"
             "A0000000042010" -> "MasterCard Specific"
             "A0000000043010" -> "MasterCard Specific"
             "A0000000045010" -> "MasterCard Specific"
@@ -400,9 +419,12 @@ abstract class CardTransactionActivity : PosActivity() {
                     transaction = transaction,
                 )
                 if (transactionType == TransactionType.Balance) {
-                    val additionalAmount = response.additionalAmounts54?.substring(8)
+                    val additionalAmount = response.additionalAmounts54?.substring(8,20)
+                    Log.d("System.out", "Here to check the additional amount ${additionalAmount}")
                     val amountDouble = additionalAmount?.toDoubleOrNull()?.div(100)
+                    Log.d("System.out", "Here to check the amount double ${amountDouble}")
                     posTransaction.amount = amountDouble?.toCurrencyFormat() ?: "NGN0.00"
+                    Log.d("System.out", "Here to check the posTransaction amount ${posTransaction.amount}")
                 }
             }
 

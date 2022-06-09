@@ -37,6 +37,29 @@ inline fun AppButton(
 }
 
 @Composable
+inline fun AppSecondButton(
+    modifier: Modifier = Modifier,
+    noinline onClick: () -> Unit,
+    crossinline content: @Composable RowScope.() -> Unit,
+) {
+    Button(
+        modifier = Modifier
+            .padding(16.dp)
+            .height(50.dp)
+            .fillMaxWidth()
+            .then(modifier),
+        shape = RoundedCornerShape(8.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = colorResource(R.color.colorPrimary),
+            contentColor = colorResource(R.color.colorAccentContrast),
+        ),
+        onClick = onClick
+    ) {
+        content()
+    }
+}
+
+@Composable
 inline fun AppTextButton(
     modifier: Modifier = Modifier,
     noinline onClick: () -> Unit,
