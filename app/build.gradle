@@ -172,7 +172,7 @@ dependencies {
     implementation(project(":analytics"))
 
     creditclubImplementation(project(":telpo"))
-    //polarisImplementation(project(":nexgo"))
+    polarisImplementation(project(":nexgo"))
     polarisImplementation(project(":telpo"))
     accessImplementation(project(":telpo"))
     gtbankImplementation(project(":dspread"))
