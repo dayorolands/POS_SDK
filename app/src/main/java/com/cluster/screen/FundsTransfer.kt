@@ -265,11 +265,9 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
 
                 when {
                     response!!.isPendingOnBank() -> {
-                        transactionPending = true
                         retryPolicy = RetryPolicy.RetryLater
                     }
                     response.isPendingOnMiddleware() -> {
-                        transactionPending = true
                         retryPolicy = RetryPolicy.AutoRetry
                     }
                     response.isFailure() -> {
@@ -322,6 +320,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     }
 
     if (retryPolicy == RetryPolicy.ManualRetry || retryPolicy == RetryPolicy.RetryLater) {
+        transactionPending = true
         retryPolicy = null
         /*TransactionStatusQuery(
             onClose = {
