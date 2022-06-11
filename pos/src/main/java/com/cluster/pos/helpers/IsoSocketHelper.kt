@@ -37,7 +37,8 @@ class IsoSocketHelper(
 ) : KoinComponent {
     private val database: PosDatabase by inject()
     private val localStorage: LocalStorage by inject()
-    private val firebaseAnalytics = FirebaseAnalytics.getInstance(get())
+    private var firebaseAnalytics = FirebaseAnalytics.getInstance(get())
+        private set
 
     fun send(request: ISOMsg, isRetry: Boolean = false): SafeRunResult<ISOMsg> {
 
