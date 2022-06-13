@@ -46,7 +46,7 @@ fun AgentLoanRequestScreen(
         val notice = """
             |1. You are about to request for loan liquidity support. 
             |2. Your loan offer is ${amount.toCurrencyFormat()}
-            |3. Your defaulting interest is so so.
+            |3. Your defaulting interest is ${loan!!.interest}.
             |3. A processing fee of ${loan!!.feeRate}% will be surcharged.
             |4. The automatic repayment will be processed after 24hrs.
             |5. You can only request for another loan only after repayment of previous loan.
