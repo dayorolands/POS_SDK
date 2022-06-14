@@ -63,6 +63,8 @@ data class SubscriptionRequest(
     val newPlanId: Int,
     @SerialName("PlanID")
     val planId: Int,
+    @SerialName("AutoRenew")
+    val autoRenew: Boolean
 )
 
 @Serializable

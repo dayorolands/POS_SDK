@@ -80,8 +80,8 @@ fun ChooseSubscriptionScreen(
     )
     val coroutineScope = rememberCoroutineScope()
 
-    val chooseSubscription: suspend (plan: SubscriptionPlan, agentPin: String) -> Unit = remember {
-        chooseSubscription@{ plan, agentPin ->
+    val chooseSubscription: suspend (plan: SubscriptionPlan, agentPin: String, autoRenew: Boolean) -> Unit = remember {
+        chooseSubscription@{ plan, agentPin, autoRenew ->
             loadingMessage = "Processing"
             val request = SubscriptionRequest(
                 agentPin = agentPin,
@@ -89,6 +89,7 @@ fun ChooseSubscriptionScreen(
                 institutionCode = localStorage.institutionCode!!,
                 planId = activePlanId,
                 newPlanId = plan.id,
+                autoRenew = autoRenew
             )
             val result = safeRunIO {
                 if (isUpgrade) {
@@ -134,7 +135,15 @@ fun ChooseSubscriptionScreen(
                         )
                     }
 
-                    SimpleCheckboxComponent()
+                    var checkedState = false
+                    Row {
+                        Checkbox(
+                            checked = checkedState,
+                            modifier = Modifier.padding(16.dp),
+                            onCheckedChange = { checkedState = it },
+                        )
+                        Text(text = "Auto-renew subscription", modifier = Modifier.padding(16.dp))
+                    }
 
                     Text(
                         text = "By choosing ${selectedPlan!!.name}, you are agreeing to our terms and conditions",
@@ -156,7 +165,7 @@ fun ChooseSubscriptionScreen(
                             bottomSheetScaffoldState.bottomSheetState.collapse()
                             val agentPin = dialogProvider
                                 .getAgentPin(subtitle = feeMessage) ?: return@launch
-                            chooseSubscription(selectedPlan!!, agentPin)
+                            chooseSubscription(selectedPlan!!, agentPin, checkedState)
                         }
                     }) {
                         Text("I accept")
@@ -278,18 +287,5 @@ private fun SubscriptionPlanItemPreview() {
             )
             SubscriptionPlanItem(item = subscriptionPlan, onClick = {})
         }
-    }
-}
-
-@Composable
-private fun SimpleCheckboxComponent() {
-    val checkedState = remember { mutableStateOf(false) }
-    Row {
-        Checkbox(
-            checked = checkedState.value,
-            modifier = Modifier.padding(16.dp),
-            onCheckedChange = { checkedState.value = it },
-        )
-        Text(text = "Auto-renew subscription", modifier = Modifier.padding(16.dp))
     }
 }

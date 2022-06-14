@@ -80,6 +80,7 @@ fun SubscriptionScreen(navController: NavController) {
                 institutionCode = localStorage.institutionCode!!,
                 planId = activePlanId,
                 newPlanId = activePlanId,
+                autoRenew = true
             )
             val result = safeRunIO {
                 subscriptionService.extend(request)
