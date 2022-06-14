@@ -132,6 +132,9 @@ fun ChooseSubscriptionScreen(
                             tint = MaterialTheme.colors.primary.copy(0.52f)
                         )
                     }
+
+                    SimpleCheckboxComponent()
+
                     Text(
                         text = "By choosing ${selectedPlan!!.name}, you are agreeing to our terms and conditions",
                         modifier = Modifier
@@ -264,5 +267,18 @@ private fun SubscriptionPlanItemPreview() {
             )
             SubscriptionPlanItem(item = subscriptionPlan, onClick = {})
         }
+    }
+}
+
+@Composable
+private fun SimpleCheckboxComponent() {
+    val checkedState = remember { mutableStateOf(false) }
+    Row {
+        Checkbox(
+            checked = checkedState.value,
+            modifier = Modifier.padding(16.dp),
+            onCheckedChange = { checkedState.value = it },
+        )
+        Text(text = "Auto-renew subscription", modifier = Modifier.padding(16.dp))
     }
 }
