@@ -11,10 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Update
-import androidx.compose.material.icons.outlined.Upgrade
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -200,6 +197,15 @@ fun SubscriptionScreen(navController: NavController) {
                                     navController.navigate(Routes.UpgradeSubscription)
                                 },
                                 imageVector = Icons.Outlined.Upgrade,
+                            )
+                            ChipButton(
+                                label = stringResource(R.string.opt_out_auto_renewal),
+                                onClick = {
+                                    coroutineScope.launch {
+                                        extendSubscription()
+                                    }
+                                },
+                                imageVector = Icons.Outlined.Cancel
                             )
                         }
                     }

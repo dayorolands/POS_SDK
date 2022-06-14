@@ -68,7 +68,9 @@ data class AgentLoanEligibility(
     @SerialName("ProductName")
     val productName: String? = null,
     @SerialName("Tenure")
-    val tenure: Int = 0
+    val tenure: Int = 0,
+    @SerialName("Interest")
+    val interest: Double = 0.0
 )
 
 @Serializable
