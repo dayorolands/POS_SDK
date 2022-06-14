@@ -43,6 +43,14 @@ interface SubscriptionService {
         @Query("maxSize") maxSize: Int
     ): ApiResponse<ReportResult<Subscription>>
 
+    @GET("api/Subscription/Fee")
+    suspend fun getSubscriptionFee(
+        @Query("planID") planId: Int,
+        @Query("paymentType") paymentType: Int,
+        @Query("institutionCode") institutionCode: String,
+        @Query("phoneNumber") phoneNumber: String
+    ): ApiResponse<Double>
+
     @POST("api/Subscription/Subscribe")
     suspend fun subscribe(@Body request: SubscriptionRequest): ApiResponse<String>
 

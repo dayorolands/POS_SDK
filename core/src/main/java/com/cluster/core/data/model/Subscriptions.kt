@@ -76,3 +76,9 @@ data class SubscriptionMilestone(
     @SerialName("TransactionType")
     val transactionType: Int,
 )
+
+@Serializable
+data class SubscriptionFee(
+    @SerialName("Fee")
+    val fee: Double
+)

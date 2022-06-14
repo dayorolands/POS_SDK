@@ -28,6 +28,7 @@ import com.cluster.core.util.getMessage
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.ui.*
+import com.cluster.utility.roundTo2dp
 import com.cluster.viewmodel.AppViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -143,8 +144,18 @@ fun ChooseSubscriptionScreen(
 
                     AppButton(onClick = {
                         coroutineScope.launch {
+                            val subscriptionFeeResult = safeRunIO {
+                                subscriptionService.getSubscriptionFee(
+                                    planId = activePlanId,
+                                    paymentType = if(isUpgrade) 2 else 0,
+                                    institutionCode = localStorage.institutionCode!!,
+                                    phoneNumber = localStorage.agentPhone!!,
+                                )
+                            }
+                            val feeMessage = "Subscription Fee is ${subscriptionFeeResult.data?.data?.roundTo2dp()}"
                             bottomSheetScaffoldState.bottomSheetState.collapse()
-                            val agentPin = dialogProvider.getAgentPin() ?: return@launch
+                            val agentPin = dialogProvider
+                                .getAgentPin(subtitle = feeMessage) ?: return@launch
                             chooseSubscription(selectedPlan!!, agentPin)
                         }
                     }) {
