@@ -32,4 +32,5 @@ data class PendingTransaction(
     @Serializable(with = TimeInstantSerializer::class)
     @Convert(converter = TimeInstantConverter::class, dbType = String::class)
     var lastCheckedAt: Instant?,
+    var transactionPending: Boolean
 )
