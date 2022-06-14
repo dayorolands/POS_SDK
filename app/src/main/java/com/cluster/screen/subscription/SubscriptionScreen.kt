@@ -36,6 +36,7 @@ import com.cluster.core.util.format
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.ui.*
+import com.cluster.utility.roundTo2dp
 import com.cluster.viewmodel.AppViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -61,7 +62,17 @@ fun SubscriptionScreen(navController: NavController) {
 
     val extendSubscription: SuspendCallback = remember {
         extendSubscription@{
-            val agentPin = dialogProvider.getAgentPin() ?: return@extendSubscription
+            val subscriptionFeeResult = safeRunIO {
+                subscriptionService.getSubscriptionFee(
+                    planId = activePlanId,
+                    paymentType = 1,
+                    institutionCode = localStorage.institutionCode!!,
+                    phoneNumber = localStorage.agentPhone!!,
+                )
+            }
+            val feeMessage = "Subscription Fee is ${subscriptionFeeResult.data?.data?.roundTo2dp()}"
+            val agentPin = dialogProvider
+                .getAgentPin(subtitle = feeMessage) ?: return@extendSubscription
             loadingMessage = "Processing"
             val request = SubscriptionRequest(
                 agentPin = agentPin,
@@ -69,6 +80,7 @@ fun SubscriptionScreen(navController: NavController) {
                 institutionCode = localStorage.institutionCode!!,
                 planId = activePlanId,
                 newPlanId = activePlanId,
+                autoRenew = true
             )
             val result = safeRunIO {
                 subscriptionService.extend(request)

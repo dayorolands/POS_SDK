@@ -67,7 +67,7 @@ interface DialogProvider {
         return showProgressBar(title, message, true, block)
     }
 
-    fun requestPIN(title: CharSequence, block: DialogListenerBlock<String>)
+    fun requestPIN(title: CharSequence, subtitle: CharSequence = "", block: DialogListenerBlock<String>)
 
     fun showInput(params: TextFieldParams, block: DialogListenerBlock<String>)
 
@@ -111,9 +111,12 @@ interface DialogProvider {
             }
         }
 
-    suspend fun getPin(title: CharSequence) =
+    suspend fun getPin(title: CharSequence, subtitle: CharSequence = "") =
         suspendCoroutine<String?> { continuation ->
-            requestPIN(title) {
+            requestPIN(
+                title = title,
+                subtitle = subtitle
+            ) {
                 onSubmit {
                     dismiss()
                     continuation.resume(it)
@@ -123,7 +126,10 @@ interface DialogProvider {
         }
 
     suspend fun getPin(@StringRes title: Int) = getPin(context.getString(title))
-    suspend fun getAgentPin() = getPin(context.getString(R.string.agent_pin))
+    suspend fun getAgentPin(subtitle: CharSequence = "") = getPin(
+        title = context.getString(R.string.agent_pin),
+        subtitle = subtitle
+    )
 
     suspend fun getConfirmation(
         title: CharSequence,

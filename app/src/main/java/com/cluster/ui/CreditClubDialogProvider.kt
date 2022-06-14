@@ -204,7 +204,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         return progressDialog
     }
 
-    override fun requestPIN(title: CharSequence, block: DialogListenerBlock<String>) {
+    override fun requestPIN(title: CharSequence, subtitle: CharSequence, block: DialogListenerBlock<String>) {
         val dialog = getDialog(activity)
         dialog.setCancelable(true)
         dialog.setCanceledOnTouchOutside(false)
@@ -216,6 +216,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
             R.layout.pinpad, null, false
         )
         binding.title = title
+        binding.subtitle = subtitle
 
         binding.pinChangeHandler = object : Dialogs.PinChangeHandler {
             val pin = mutableListOf<Byte>()
