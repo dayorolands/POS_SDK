@@ -396,6 +396,7 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             reference = request.retrievalReferenceNumber,
             createdAt = requestTime,
             lastCheckedAt = null,
+            transactionPending = false,
         )
         val (response, error) = executeTransaction(
             fetcher = { billsPaymentService.runTransaction(request) },

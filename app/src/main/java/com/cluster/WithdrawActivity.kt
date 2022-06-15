@@ -217,6 +217,7 @@ class WithdrawActivity : CustomerBaseActivity(flowName = "withdrawal") {
             reference = request.retrievalReferenceNumber,
             createdAt = requestTime,
             lastCheckedAt = null,
+            transactionPending = false
         )
         val (response, error) = executeTransaction(
             fetcher = { transactionService.withdrawal(request) },

@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:8080937486238742064",
-      "lastPropertyId": "9:5022845206279744351",
+      "lastPropertyId": "10:38655383603099012",
       "name": "PendingTransaction",
       "properties": [
         {
@@ -53,6 +53,11 @@
           "id": "9:5022845206279744351",
           "name": "lastCheckedAt",
           "type": 9
+        },
+        {
+          "id": "10:38655383603099012",
+          "name": "transactionPending",
+          "type": 1
         }
       ],
       "relations": []
