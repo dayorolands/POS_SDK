@@ -63,7 +63,6 @@ private const val FUNDS_TRANSFER_AUTH_TOKEN = "95C1D8B4-7589-4F70-8F20-473E89FB5
 
 @Composable
 fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) {
-    var transactionPending = false
     val context = LocalContext.current
     val fundsTransferService: FundsTransferService by rememberRetrofitService()
     val fundsTransferTransactionService: FundsTransferService by rememberRetrofitService(
@@ -93,6 +92,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     }
 
     // variables for requery
+    var transactionPending by remember { mutableStateOf(false)}
     var transferAttemptCount by remember { mutableStateOf(0) }
     var retryPolicy: RetryPolicy? by remember { mutableStateOf(null) }
     var pendingTransactionId: Long? by remember { mutableStateOf(null) }
@@ -246,6 +246,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                         reference = transactionReference,
                         createdAt = Instant.now(),
                         lastCheckedAt = null,
+                        transactionPending = transactionPending
                     )
                     pendingTransactionId = pendingTransactionsBox.put(pendingTransaction)
                 }

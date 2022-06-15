@@ -120,6 +120,7 @@ class DepositActivity : CustomerBaseActivity() {
             reference = request.retrievalReferenceNumber,
             createdAt = requestTime,
             lastCheckedAt = null,
+            transactionPending = false,
         )
         val (response, error) = executeTransaction(
             fetcher = { transactionService.deposit(request) },
