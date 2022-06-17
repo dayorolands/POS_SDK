@@ -63,6 +63,8 @@ data class SubscriptionRequest(
     val newPlanId: Int,
     @SerialName("PlanID")
     val planId: Int,
+    @SerialName("AutoRenew")
+    val autoRenew: Boolean
 )
 
 @Serializable
@@ -75,4 +77,10 @@ data class SubscriptionMilestone(
     val targetVolumeMaxLimit: Double,
     @SerialName("TransactionType")
     val transactionType: Int,
+)
+
+@Serializable
+data class SubscriptionFee(
+    @SerialName("Fee")
+    val fee: Double
 )

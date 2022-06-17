@@ -146,6 +146,7 @@ internal fun CardTransactionActivity.showTransactionStatusPage(posTransaction: P
 
     if (posTransaction.responseCode == "00") {
         binding.message.text = getString(R.string.transaction_successful)
+        binding.amountText.text = posTransaction.amount
         binding.transactionStatusIcon.setImageResource(R.drawable.ic_sentiment_satisfied)
         ImageViewCompat.setImageTintList(
             binding.transactionStatusIcon, ColorStateList.valueOf(

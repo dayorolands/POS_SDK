@@ -18,6 +18,7 @@ import com.cluster.core.data.response.CollectionPaymentResponse
 import com.cluster.core.util.*
 import com.cluster.core.util.delegates.defaultJson
 import com.cluster.pos.printer.*
+import com.cluster.pos.receipt.withdrawalTransactionStatus
 import java.time.Instant
 
 
@@ -83,7 +84,7 @@ fun withdrawalReceipt(
         |Transaction Date: $transactionDate
         |RRN: ${request.deviceNumber}${request.retrievalReferenceNumber}""".trimMargin()
     )
-    transactionStatus(
+    withdrawalTransactionStatus(
         context = context,
         isSuccessful = isSuccessful,
         reason = reason,
@@ -110,6 +111,7 @@ fun collectionPaymentReceipt(context: Context, response: CollectionPaymentRespon
     transactionStatus(
         context = context,
         isSuccessful = response.isSuccessful == true,
+        responseCode = response.responseCode ?: "06",
         reason = response.responseMessage,
     )
     footer(context)
@@ -158,6 +160,7 @@ fun billsPaymentReceipt(
     transactionStatus(
         context = context,
         isSuccessful = response?.isSuccessful == true,
+        responseCode = response?.responseCode ?: if (response!!.isSuccessful) "00" else "06",
         reason = response?.responseMessage,
     )
     footer(context)
@@ -169,6 +172,7 @@ fun fundsTransferReceipt(
     transactionDate: String,
     isSuccessful: Boolean = false,
     reason: String? = null,
+    responseCode: String? = null
 ) = printJob {
     val beneficiary =
         "${request.beneficiaryAccountName} ${request.beneficiaryAccountNumber.mask(4, 2)}"
@@ -192,6 +196,7 @@ fun fundsTransferReceipt(
     transactionStatus(
         context = context,
         isSuccessful = isSuccessful,
+        responseCode = responseCode ?: if (isSuccessful) "00" else "06",
         reason = reason,
     )
     footer(context)
@@ -205,6 +210,7 @@ fun newAccountReceipt(
     accountName: String? = null,
     isSuccessful: Boolean = false,
     reason: String? = null,
+    responseCode: String? = null
 ) = printJob {
     val isWalletAccount = bvn.isNullOrEmpty()
     val title = if (isWalletAccount) "New Wallet" else "New Account"
@@ -231,6 +237,7 @@ fun newAccountReceipt(
     transactionStatus(
         context = context,
         isSuccessful = isSuccessful,
+        responseCode = responseCode ?: if (isSuccessful) "00" else "06",
         reason = reason,
     )
     footer(context)

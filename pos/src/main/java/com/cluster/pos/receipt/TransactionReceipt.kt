@@ -48,13 +48,35 @@ abstract class TransactionReceipt(
     }
 }
 
+fun PrintJobScope.withdrawalTransactionStatus(
+    context: Context,
+    isSuccessful: Boolean,
+    statusMessage: String = (if (isSuccessful)
+        context.getString(R.string.pos_transaction_approved)
+        else context.getString(R.string.pos_transaction_declined)),
+    reason: String? = null
+) {
+    text(
+        text = statusMessage.uppercase(Locale.getDefault()),
+        align = Alignment.MIDDLE,
+        fontSize = 30,
+    )
+
+    if (!isSuccessful) {
+        text(reason ?: "Error", align = Alignment.MIDDLE)
+    }
+}
+
 fun PrintJobScope.transactionStatus(
     context: Context,
     isSuccessful: Boolean,
-    statusMessage: String = (if (isSuccessful) {
-        context.getString(R.string.pos_transaction_approved)
-    } else {
-        context.getString(R.string.pos_transaction_declined)
+    responseCode: String = "00",
+    statusMessage: String = (when (responseCode) {
+        "00" -> context.getString(R.string.pos_transaction_approved)
+        "06" -> context.getString(R.string.pos_transaction_declined)
+        "24" -> context.getString(R.string.pos_transaction_pending)
+        "XX" -> context.getString(R.string.pos_transaction_not_found)
+        else -> context.getString(R.string.pos_transaction_declined)
     }),
     reason: String? = null,
 ) {

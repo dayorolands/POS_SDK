@@ -92,6 +92,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     }
 
     // variables for requery
+    var transactionPending by remember { mutableStateOf(false)}
     var transferAttemptCount by remember { mutableStateOf(0) }
     var retryPolicy: RetryPolicy? by remember { mutableStateOf(null) }
     var pendingTransactionId: Long? by remember { mutableStateOf(null) }
@@ -245,6 +246,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                         reference = transactionReference,
                         createdAt = Instant.now(),
                         lastCheckedAt = null,
+                        transactionPending = transactionPending
                     )
                     pendingTransactionId = pendingTransactionsBox.put(pendingTransaction)
                 }
@@ -294,6 +296,7 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
                     isSuccessful = response!!.isSuccessful,
                     reason = response.responseMessage,
+                    responseCode = response.responseCode
                 )
                 transferAttemptCount++
                 if (!response.isPendingOnMiddleware()) {
@@ -318,7 +321,9 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     }
 
     if (retryPolicy == RetryPolicy.ManualRetry || retryPolicy == RetryPolicy.RetryLater) {
-        TransactionStatusQuery(
+        transactionPending = true
+        retryPolicy = null
+        /*TransactionStatusQuery(
             onClose = {
                 retryPolicy = null
             },
@@ -330,13 +335,17 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                     activeJob = coroutineScope.launch { transferFunds() }
                 }
             } else null,
-        )
+        )*/
         return
     }
 
     if (retryPolicy == null) {
         if (receipt != null && loadingMessage.isBlank()) {
-            ReceiptDetails(navController = navController, printJob = receipt!!)
+            ReceiptDetails(
+                navController = navController,
+                printJob = receipt!!,
+                transactionPending = transactionPending
+            )
             return
         }
 

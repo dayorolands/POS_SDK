@@ -32,6 +32,7 @@
                 android:layout_marginBottom="10dp"
                 android:gravity="center"
                 android:text="@string/oops"
+                android:id="@+id/error_header"
                 android:textColor="@color/black"
                 android:textSize="@dimen/large_sized_text"
                 android:textStyle="bold" />

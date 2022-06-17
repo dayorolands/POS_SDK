@@ -24,14 +24,16 @@ fun NavGraphBuilder.homeRoutes(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 BalanceCard()
-                LoanOfferSection(
-                    onRequestLoan = {
-                        composeNavController.navigate(Routes.AgentLoanRequest)
-                    },
-                    onShowHistory = {
-                        composeNavController.navigate(Routes.AgentLoanHistory)
-                    }
-                )
+                if(institutionConfig.categories.loans) {
+                    LoanOfferSection(
+                        onRequestLoan = {
+                            composeNavController.navigate(Routes.AgentLoanRequest)
+                        },
+                        onShowHistory = {
+                            composeNavController.navigate(Routes.AgentLoanHistory)
+                        }
+                    )
+                }
                 HomeCategoryButtons(
                     homeNavController = homeNavController,
                     institutionConfig = institutionConfig,

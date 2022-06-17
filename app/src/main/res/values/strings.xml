@@ -447,11 +447,14 @@
     <string name="choose_a_plan">Choose a plan</string>
     <string name="extend">Extend</string>
     <string name="upgrade">Upgrade</string>
+    <string name="opt_out_auto_renewal">Cancel Auto-renew</string>
     <string name="change_password">Change Login PIN</string>
     <string name="setYourTransactionPin">Set your transaction PIN</string>
     <string name="setYourLoginPassword">Set your login PIN</string>
     <string name="newPassword">New Password</string>
     <string name="confirmPassword">Confirm Password</string>
+    <string name="new_login_pin">New Login PIN</string>
+    <string name="confirm_login_pin">Confirm Login PIN</string>
     <string name="loan_history">Loan History</string>
     <string name="login_pin">Login PIN</string>
     <string-array name="transaction_types">
