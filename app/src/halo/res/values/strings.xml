@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Halo</string>
+    <string name="ota_app_name">Halo</string>
+    <string name="institution_name">ENRICH MFB</string>
+    <string name="institution_website">https://enrichmicrofinancebank.com</string>
+    <string name="funds_transfer_same_bank">Enrich MFB</string>
+    <!--    <string name="bills_airtime_category_id">93</string>-->
+</resources>
