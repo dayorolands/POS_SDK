@@ -492,6 +492,8 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
             dialog.setContentView(binding.root)
             binding.title = params.title
             binding.subtitle = params.subtitle
+            binding.okButton.text = params.yesButtonTex
+            binding.cancelButton.text = params.noButtonTex
             binding.okButton.setOnClickListener {
                 if (block != null) {
                     dialog.dismiss()
