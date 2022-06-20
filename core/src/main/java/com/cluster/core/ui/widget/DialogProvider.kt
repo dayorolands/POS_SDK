@@ -82,12 +82,18 @@ interface DialogProvider {
     )
 
     fun confirm(params: DialogConfirmParams, block: DialogListenerBlock<Boolean>?)
+    fun confirm(params: LoanDialogConfirmParams, block: DialogListenerBlock<Boolean>?)
 
     fun confirm(
         title: CharSequence,
         subtitle: CharSequence? = null,
         block: DialogListenerBlock<Boolean>?,
-    ) = confirm(DialogConfirmParams(title, subtitle), block)
+    ) = confirm(DialogConfirmParams(
+            title = title,
+            subtitle = subtitle,
+            yesButtonTex = "Ok",
+            noButtonTex = "Cancel")
+        , block)
 
     suspend fun getInput(params: TextFieldParams) =
         suspendCoroutine<String?> { continuation ->
@@ -133,17 +139,27 @@ interface DialogProvider {
 
     suspend fun getConfirmation(
         title: CharSequence,
-        subtitle: CharSequence = "",
-        yesButtonText: CharSequence = "Ok",
-        noButtonText: CharSequence = "Cancel"
+        subtitle: CharSequence = ""
     ) =
         suspendCoroutine<Boolean> { continuation ->
             confirm(DialogConfirmParams(
                 title = title,
-                subtitle = subtitle,
-                yesButtonTex = yesButtonText,
-                noButtonTex = noButtonText
+                subtitle = subtitle
             )) {
+                onSubmit {
+                    dismiss()
+                    continuation.resume(it)
+                }
+                onClose { continuation.resume(false) }
+            }
+        }
+
+    suspend fun getLoanConfirmation(
+        title: CharSequence,
+        subtitle: CharSequence = ""
+    ) =
+        suspendCoroutine<Boolean> { continuation ->
+            confirm(LoanDialogConfirmParams(title, subtitle)) {
                 onSubmit {
                     dismiss()
                     continuation.resume(it)

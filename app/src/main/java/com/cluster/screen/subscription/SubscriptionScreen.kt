@@ -1,5 +1,6 @@
 package com.cluster.screen.subscription
 
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -27,6 +28,7 @@ import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.Routes
 import com.cluster.core.data.api.SubscriptionService
+import com.cluster.core.data.model.Subscription
 import com.cluster.core.data.model.SubscriptionMilestone
 import com.cluster.core.data.model.SubscriptionRequest
 import com.cluster.core.data.prefs.LocalStorage
@@ -79,7 +81,6 @@ fun SubscriptionScreen(navController: NavController) {
                 agentPhoneNumber = localStorage.agentPhone!!,
                 institutionCode = localStorage.institutionCode!!,
                 planId = activePlanId,
-                newPlanId = activePlanId,
                 autoRenew = true
             )
             val result = safeRunIO {
@@ -95,6 +96,38 @@ fun SubscriptionScreen(navController: NavController) {
             if (result.data!!.isFailure()) {
                 dialogProvider.showError(result.data!!.message!!)
                 return@extendSubscription
+            }
+
+            kotlinx.coroutines.coroutineScope {
+                viewModel.loadSubscriptionData(
+                    subscriptionService = subscriptionService,
+                    localStorage = localStorage,
+                )
+            }
+
+            dialogProvider.showSuccess(result.data!!.message!!)
+        }
+    }
+
+    val cancelAutoRenew: SuspendCallback = remember {
+        cancelAutoRenew@{
+            Log.d("OkHttpClient", "*************The auto renew status is ${activeSubscription?.autoRenew}")
+            val activeSubscriptionId = activeSubscription?.id
+            val result = safeRunIO{
+                subscriptionService.optOutOfAutoRenew(activeSubscriptionId?.toLong())
+            }
+            loadingMessage = "Processing"
+
+            if (result.isFailure) {
+                dialogProvider.showError(result.error!!)
+                return@cancelAutoRenew
+            }
+
+            loadingMessage = ""
+
+            if (result.data!!.isFailure()) {
+                dialogProvider.showError(result.data!!.message!!)
+                return@cancelAutoRenew
             }
 
             kotlinx.coroutines.coroutineScope {
@@ -194,31 +227,17 @@ fun SubscriptionScreen(navController: NavController) {
                                 color = MaterialTheme.colors.onSurface,
                             )
                             Spacer(modifier = Modifier.padding(top = 20.dp))
-                            ChipButton(
-                                label = stringResource(R.string.extend),
-                                onClick = {
-                                    coroutineScope.launch {
-                                        extendSubscription()
-                                    }
-                                },
-                                imageVector = Icons.Outlined.Update
-                            )
-                            ChipButton(
-                                label = stringResource(R.string.upgrade),
-                                onClick = {
-                                    navController.navigate(Routes.UpgradeSubscription)
-                                },
-                                imageVector = Icons.Outlined.Upgrade,
-                            )
-                            ChipButton(
-                                label = stringResource(R.string.opt_out_auto_renewal),
-                                onClick = {
-                                    coroutineScope.launch {
-                                        extendSubscription()
-                                    }
-                                },
-                                imageVector = Icons.Outlined.Cancel
-                            )
+                            if(activeSubscription?.autoRenew == true) {
+                                ChipButton(
+                                    label = stringResource(R.string.opt_out_auto_renewal),
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            cancelAutoRenew()
+                                        }
+                                    },
+                                    imageVector = Icons.Outlined.Cancel
+                                )
+                            }
                         }
                     }
                 }
@@ -291,6 +310,7 @@ private fun MilestoneItem(item: SubscriptionMilestone) {
         (item.targetVolumeMaxLimit - item.targetVolumeLeft).toCurrencyFormat()
     }
     val formattedTarget = remember(item) { item.targetVolumeMaxLimit.toCurrencyFormat() }
+    val transactionCount = remember(item) { item.targetCountLeft }
 
     Column(
         modifier = Modifier
@@ -303,6 +323,10 @@ private fun MilestoneItem(item: SubscriptionMilestone) {
             Text("Current Volume: $formattedCurrent")
             Spacer(modifier = Modifier.weight(1f))
             Text("Target: $formattedTarget")
+        }
+        Spacer(modifier = Modifier.padding(top = 5.dp))
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("Transaction Count: $transactionCount")
         }
     }
 }

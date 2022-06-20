@@ -50,9 +50,8 @@ fun ChooseSubscriptionScreen(
     val viewModel: AppViewModel = viewModel()
     var refreshKey by remember { mutableStateOf(UUID.randomUUID().toString()) }
     val dialogProvider by rememberDialogProvider()
-    val activeSubscription by viewModel.activeSubscription.collectAsState()
-    val activePlanId = activeSubscription?.plan?.id ?: 0
     var selectedPlan: SubscriptionPlan? by remember { mutableStateOf(null) }
+    val activePlanId = selectedPlan?.id
     var isRefreshing by remember { mutableStateOf(false) }
 
     val subscriptionPlans by produceState(emptyList(), refreshKey) {
@@ -87,8 +86,7 @@ fun ChooseSubscriptionScreen(
                 agentPin = agentPin,
                 agentPhoneNumber = localStorage.agentPhone!!,
                 institutionCode = localStorage.institutionCode!!,
-                planId = activePlanId,
-                newPlanId = plan.id,
+                planId = plan.id,
                 autoRenew = autoRenew
             )
             val result = safeRunIO {
@@ -135,12 +133,12 @@ fun ChooseSubscriptionScreen(
                         )
                     }
 
-                    var checkedState = false
-                    Row {
+                    var checkedState = remember { mutableStateOf(false) }
+                    Row(verticalAlignment = Alignment.CenterVertically){
                         Checkbox(
-                            checked = checkedState,
+                            checked = checkedState.value,
                             modifier = Modifier.padding(16.dp),
-                            onCheckedChange = { checkedState = it },
+                            onCheckedChange = { checkedState.value = it },
                         )
                         Text(text = "Auto-renew subscription", modifier = Modifier.padding(16.dp))
                     }
@@ -155,7 +153,7 @@ fun ChooseSubscriptionScreen(
                         coroutineScope.launch {
                             val subscriptionFeeResult = safeRunIO {
                                 subscriptionService.getSubscriptionFee(
-                                    planId = activePlanId,
+                                    planId = activePlanId!!,
                                     paymentType = if(isUpgrade) 2 else 0,
                                     institutionCode = localStorage.institutionCode!!,
                                     phoneNumber = localStorage.agentPhone!!,
@@ -165,7 +163,7 @@ fun ChooseSubscriptionScreen(
                             bottomSheetScaffoldState.bottomSheetState.collapse()
                             val agentPin = dialogProvider
                                 .getAgentPin(subtitle = feeMessage) ?: return@launch
-                            chooseSubscription(selectedPlan!!, agentPin, checkedState)
+                            chooseSubscription(selectedPlan!!, agentPin, checkedState.value)
                         }
                     }) {
                         Text("I accept")
