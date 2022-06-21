@@ -1,29 +1,28 @@
 package com.cluster.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.cluster.R
-import com.cluster.databinding.CollectionPaymentFragmentBinding
-import com.cluster.receipt.collectionPaymentReceipt
-import com.cluster.ui.dataBinding
-import com.cluster.utility.FunctionIds
-import com.cluster.pos.Platform
 import com.cluster.core.data.api.CollectionsService
 import com.cluster.core.data.api.retrofitService
-import com.cluster.core.data.prefs.newTransactionReference
 import com.cluster.core.data.request.CollectionPaymentRequest
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.safeRunIO
+import com.cluster.databinding.CollectionPaymentFragmentBinding
+import com.cluster.pos.Platform
 import com.cluster.pos.printer.PosPrinter
+import com.cluster.receipt.collectionPaymentReceipt
+import com.cluster.ui.dataBinding
+import com.cluster.utility.FunctionIds
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
@@ -32,8 +31,6 @@ import java.time.Instant
 import java.util.*
 
 class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment_fragment) {
-    private var regions: List<String>? = null
-    private var collectionTypes: List<String>? = null
     private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
     private val binding by dataBinding<CollectionPaymentFragmentBinding>()
     private val viewModel: CollectionPaymentViewModel by navGraphViewModels(R.id.collectionGraph)
@@ -50,49 +47,37 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (viewModel.retrievalReferenceNumber.value.isNullOrBlank()) {
-            viewModel.retrievalReferenceNumber.value = localStorage.newTransactionReference()
-        }
         binding.viewModel = viewModel
-        binding.toolbar.title = "IGR Collections"
-        mainScope.launch { loadRegions() }
-        binding.completePaymentButton.setOnClickListener {
-            mainScope.launch { completePayment() }
-        }
+        binding.toolbar.title = "Collections"
+        mainScope.launch { loadBillers() }
 
-        binding.generateReferenceButton.setOnClickListener {
-            mainScope.launch { onGenerateButtonClick(false) }
+        viewModel.run {
+            billerList.bindDropDown(billers, binding.billerInput)
+            paymentItemList.bindDropDown(paymentItem, binding.paymentItemInput)
         }
-
-        binding.generateOfflineBillButton.setOnClickListener {
-            mainScope.launch { onGenerateButtonClick(true) }
-        }
-
-        binding.collectionReferenceInputLayout.setEndIconOnClickListener {
-            mainScope.launch { loadReference() }
-        }
-
-        binding.collectionReferenceInput.doOnTextChanged { _, _, _, _ ->
-            if (viewModel.collectionReference.value == null) {
-                viewModel.collectionReference.postValue(null)
-            }
-        }
-
-        viewModel.region.onChange {
+        viewModel.billerName.onChange {
             mainScope.launch {
-                viewModel.customer.postValue(null)
-                collectionTypes = null
-                loadCollectionTypes()
+//                binding.amountInput.value = "0.00"
+                viewModel.paymentItemName.value = ""
+                viewModel.paymentItemAmount?.value
+                loadCollectionPaymentItems()
+                Log.d("OkHttpClient", "Checking the amount here ${viewModel.paymentItemAmount.value}")
             }
         }
 
-        viewModel.collectionType.onChange {
-            viewModel.collectionReference.postValue(null)
-        }
+        Log.d("OkHttpClient", "Checking the amount here ${viewModel.paymentItemAmount.value}")
 
-        if (viewModel.region.value != null) {
-            mainScope.launch { loadCollectionTypes() }
+        if (viewModel.billerName.value != null) {
+            mainScope.launch {
+                loadCollectionPaymentItems()
+            }
         }
+    }
+
+    private fun AutoCompleteTextView.clearSuggestions() {
+        clearListSelection()
+        val adapter = ArrayAdapter(requireContext(), R.layout.list_item, emptyList<String>())
+        setAdapter(adapter)
     }
 
     private inline fun <T> MutableLiveData<T>.onChange(crossinline block: () -> Unit) {
@@ -105,23 +90,37 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         })
     }
 
-    private suspend fun loadRegions() = loadDependencies("regions", regions, binding.regionInput) {
-        regions = collectionsService.getCollectionRegions(
+
+    private suspend fun loadBillers() = viewModel.billerList.download("billers"){
+        collectionsService.getCollectionBillers(
             localStorage.institutionCode,
             viewModel.collectionService.value
         )
-        regions
     }
 
-    private suspend fun loadCollectionTypes() =
-        loadDependencies("collection types", collectionTypes, binding.collectionTypeInput) {
-            collectionTypes = collectionsService.getCollectionTypes(
-                localStorage.institutionCode,
-                viewModel.region.value,
-                viewModel.collectionService.value
-            )
-            collectionTypes
-        }
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> MutableLiveData<List<T>>.bindDropDown(
+        selectedItemLiveData: MutableLiveData<T>,
+        autoCompleteTextView: AutoCompleteTextView
+    ) {
+        observe(viewLifecycleOwner, Observer { list ->
+            val items = list ?: emptyList()
+            val adapter = ArrayAdapter(requireContext(), R.layout.list_item, items)
+            autoCompleteTextView.setAdapter(adapter)
+            if (list != null) {
+                autoCompleteTextView.setOnItemClickListener { parent, _, position, _ ->
+                    selectedItemLiveData.postValue(parent.getItemAtPosition(position) as T)
+                }
+            }
+        })
+    }
+
+    private suspend fun loadCollectionPaymentItems() = viewModel.paymentItemList.download("biller items"){
+        collectionsService.getCollectionPaymentItems(
+            localStorage.institutionCode,
+            viewModel.billerId.value
+        )
+    }
 
     private suspend fun loadReference() {
         if (viewModel.region.value.isNullOrBlank())
@@ -209,6 +208,23 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             R.id.action_collection_payment_to_reference_generation,
             bundleOf("offline" to true),
         )
+    }
+
+
+    private suspend inline fun <T> MutableLiveData<T>.download(
+        dependencyName: String,
+        crossinline fetcher: suspend () -> T?
+    ) {
+        dialogProvider.showProgressBar("Loading $dependencyName")
+        val (data) = safeRunIO { fetcher() }
+        dialogProvider.hideProgressBar()
+
+        if (data == null) {
+            dialogProvider.showErrorAndWait("An error occurred while loading $dependencyName")
+            return
+        }
+
+        postValue(data)
     }
 
     private fun clearData(vararg liveData: MutableLiveData<*>) {

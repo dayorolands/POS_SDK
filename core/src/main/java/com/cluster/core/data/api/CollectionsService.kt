@@ -76,4 +76,16 @@ interface CollectionsService {
         @Query("region") region: String?,
         @Query("collectionService") collectionService: String?
     ): CollectionPaymentResponse?
+
+    @GET("api/Collections/GetBillers")
+    suspend fun getCollectionBillers(
+        @Query("institutionCode") institutionCode: String?,
+        @Query("collectionService") collectionService: String?
+    ): List<CollectionCategory>
+
+    @GET("api/Collections/GetBillerItems")
+    suspend fun getCollectionPaymentItems(
+        @Query("institutionCode") institutionCode: String?,
+        @Query("billerId") billerId: String?
+    ): List<CollectionPaymentItem>
 }

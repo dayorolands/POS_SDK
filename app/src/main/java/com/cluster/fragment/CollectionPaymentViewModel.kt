@@ -15,6 +15,17 @@ class CollectionPaymentViewModel : ViewModel() {
     val collectionReferenceCategoryCode =
         Transformations.map(collectionReference) { it?.categoryCode }
 
+    val billerList: MutableLiveData<List<CollectionCategory>> = MutableLiveData()
+    val billers: MutableLiveData<CollectionCategory> = MutableLiveData()
+    val billerName: MutableLiveData<String> = MutableLiveData()
+    val billerId = Transformations.map(billers) {it.id}
+
+    val paymentItemList: MutableLiveData<List<CollectionPaymentItem>> = MutableLiveData()
+    val paymentItem: MutableLiveData<CollectionPaymentItem> = MutableLiveData()
+    val paymentItemName: MutableLiveData<String> = MutableLiveData()
+    val paymentItemCode= Transformations.map(paymentItem) {it.code}
+    val paymentItemAmount = Transformations.map(paymentItem) {it.amount}
+
     val region: MutableLiveData<String> = MutableLiveData()
     val category: MutableLiveData<CollectionCategory> = MutableLiveData()
     val categoryCode = Transformations.map(category) { it?.code }
@@ -30,12 +41,12 @@ class CollectionPaymentViewModel : ViewModel() {
     val customerType: MutableLiveData<String> = MutableLiveData()
     val referenceString: MutableLiveData<String> = MutableLiveData()
     val customer: MutableLiveData<CollectionCustomer> = MutableLiveData()
+    val amountString = MutableLiveData<String>()
 
     val referenceName = Transformations.map(collectionReference) { it?.referenceName }
     val paymentReferenceName: MutableLiveData<String> = MutableLiveData()
     val customerPhoneNumber: MutableLiveData<String> = MutableLiveData()
     val customerName = Transformations.map(customer) { it?.name }
-    val amountString = MutableLiveData<String>()
     val validReference = Transformations.map(collectionReference) { it != null }
     val collectionTypeIsWebGuid = Transformations.map(collectionType) { it == "WEBGUID" }
     val collectionTypeIsCbs = Transformations.map(collectionType) { it == "CBS" }
