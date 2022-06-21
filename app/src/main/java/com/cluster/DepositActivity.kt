@@ -149,6 +149,7 @@ class DepositActivity : CustomerBaseActivity() {
             transactionDate = requestTime
                 .toString(CREDIT_CLUB_REQUEST_DATE_PATTERN)
                 .replace("T", " "),
+            responseCode = response.responseCode
         )
         renderReceiptDetails(receipt)
     }

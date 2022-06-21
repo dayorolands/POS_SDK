@@ -22,7 +22,7 @@ data class DialogConfirmParams(
 data class LoanDialogConfirmParams(
     val title: CharSequence,
     val subtitle: CharSequence? = null,
-    val yesButtonTex: CharSequence = "Agree",
+    val yesButtonTex: CharSequence = "Accept",
     val noButtonTex: CharSequence = "Decline",
 )
 
