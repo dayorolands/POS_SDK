@@ -14,6 +14,7 @@ import com.cluster.databinding.FragmentCollectionReferenceGenerationBinding
 import com.cluster.ui.dataBinding
 import com.cluster.core.data.api.CollectionsService
 import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.request.CollectionCustomerValidationRequest
 import com.cluster.core.data.request.CollectionReferenceGenerationRequest
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.safeRunIO
@@ -40,38 +41,7 @@ class CollectionReferenceGenerationFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        argIsOffline = requireArguments().getBoolean("offline")
-        viewModel.run {
-            isOffline.value = argIsOffline
-            categoryList.bindDropDown(category, binding.categoryInput)
-            itemList.bindDropDown(item, binding.paymentItemInput)
 
-            customerId.onChange { customer.postValue(null) }
-            customerType.onChange { customer.postValue(null) }
-            item.onChange { itemCode.postValue(item.value?.code) }
-            category.onChange {
-                if (!argIsOffline) {
-                    binding.paymentItemInput.clearSuggestions()
-
-                    mainScope.launch { loadPaymentItems() }
-                }
-            }
-        }
-        binding.viewModel = viewModel
-
-        binding.generateReferenceButton.setOnClickListener {
-            mainScope.launch { generateReference() }
-        }
-
-        binding.customerIdInputLayout.setEndIconOnClickListener {
-            mainScope.launch { loadCustomer() }
-        }
-
-        val customerTypes = listOf("N-", "C-")
-        val adapter = ArrayAdapter(requireContext(), R.layout.list_item, customerTypes)
-        binding.customerTypeInput.setAdapter(adapter)
-
-        mainScope.launch { loadCategories() }
     }
 
     private inline fun <T> MutableLiveData<T>.onChange(crossinline block: () -> Unit) {

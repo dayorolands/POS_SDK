@@ -1,5 +1,6 @@
 package com.cluster.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -57,21 +58,24 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
         viewModel.billerName.onChange {
             mainScope.launch {
-//                binding.amountInput.value = "0.00"
+                binding.amountInput.value = "0.00"
                 viewModel.paymentItemName.value = ""
-                viewModel.paymentItemAmount?.value
-                loadCollectionPaymentItems()
-                Log.d("OkHttpClient", "Checking the amount here ${viewModel.paymentItemAmount.value}")
-            }
-        }
-
-        Log.d("OkHttpClient", "Checking the amount here ${viewModel.paymentItemAmount.value}")
-
-        if (viewModel.billerName.value != null) {
-            mainScope.launch {
                 loadCollectionPaymentItems()
             }
         }
+
+        binding.continuePaymentBtn.setOnClickListener{
+            if(binding.amountInput.value.isBlank() || binding.amountInput.value == "0.00"){
+                dialogProvider.showError("Please enter a valid amount greater than 0")
+            }
+            else{
+                viewModel.paymentItemAmount.value = binding.amountInput.value
+                Log.d("OkHttpClient", "Checking the amount Input for the transaction ${binding.amountInput.value}")
+                Log.d("OkHttpClient", "Checking the amount Input for the transaction ${viewModel.paymentItemAmount.value}")
+                findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
+            }
+        }
+
     }
 
     private fun AutoCompleteTextView.clearSuggestions() {

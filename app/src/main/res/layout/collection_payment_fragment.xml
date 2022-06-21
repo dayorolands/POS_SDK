@@ -88,97 +88,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:editable="false"
-                        android:enabled="false"
-                        android:inputType="numberDecimal"
-                        android:text="Value"/>
+                        android:enabled="true"
+                        android:inputType="numberDecimal"/>
                 </com.google.android.material.textfield.TextInputLayout>
-
-<!--                <com.google.android.material.textfield.TextInputLayout-->
-<!--                    android:id="@+id/collection_reference_input_layout"-->
-<!--                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:hint="Collection Reference"-->
-<!--                    app:endIconDrawable="@drawable/ic_baseline_search_24"-->
-<!--                    app:endIconMode="custom"-->
-<!--                    app:showEndIconIfPresent="@{viewModel.referenceString}">-->
-
-<!--                    <com.google.android.material.textfield.TextInputEditText-->
-<!--                        android:id="@+id/collection_reference_input"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:singleLine="true"-->
-<!--                        android:text="@={viewModel.referenceString}" />-->
-<!--                </com.google.android.material.textfield.TextInputLayout>-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:orientation="horizontal"-->
-<!--                    app:goneUnless="@{viewModel.collectionTypeIsWebGuid}">-->
-
-<!--                    <TextView-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="Don't have a reference? "-->
-<!--                        app:goneIf="@{viewModel.validReference}" />-->
-
-<!--                    <Button-->
-<!--                        android:id="@+id/generate_reference_button"-->
-<!--                        style="@style/Widget.MaterialComponents.Button.TextButton"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="Generate one"-->
-<!--                        app:goneIf="@{viewModel.validReference}" />-->
-<!--                </LinearLayout>-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:orientation="horizontal"-->
-<!--                    app:goneUnless="@{viewModel.collectionTypeIsCbs}">-->
-
-<!--                    <com.google.android.material.checkbox.MaterialCheckBox-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:checked="@={viewModel.isOffline}"-->
-<!--                        android:text="Offline Bill"-->
-<!--                        app:goneUnlessPresent="@{viewModel.referenceString}" />-->
-<!--                </LinearLayout>-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:orientation="horizontal"-->
-<!--                    app:goneUnless="@{viewModel.collectionTypeIsCbs}">-->
-
-<!--                    <TextView-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="Unable to validate reference? "-->
-<!--                        app:goneIfPresent="@{viewModel.referenceString}" />-->
-
-<!--                    <Button-->
-<!--                        android:id="@+id/generate_offline_bill_button"-->
-<!--                        style="@style/Widget.MaterialComponents.Button.TextButton"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="Register the offline reference"-->
-<!--                        app:goneIfPresent="@{viewModel.referenceString}" />-->
-<!--                </LinearLayout>-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginTop="15dp"-->
-<!--                    android:orientation="vertical"-->
-<!--                    app:goneUnless="@{viewModel.validReference}">-->
 
             </LinearLayout>
         </ScrollView>
 
         <Button
-            android:id="@+id/complete_payment_button"
+            android:id="@+id/continue_payment_btn"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_alignParentEnd="true"
