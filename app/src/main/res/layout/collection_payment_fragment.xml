@@ -90,14 +90,31 @@
                         android:editable="false"
                         android:enabled="false"
                         android:inputType="numberDecimal"
-                        android:text="Value"/>
+                        android:text=""/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:hint="Customer Account">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/customer_value_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="number"
+                        android:visibility="gone"
+                        android:text=""
+                        android:singleLine="true" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
         </ScrollView>
 
         <Button
-            android:id="@+id/continue_payment_btn"
+            android:id="@+id/validate_customer_btn"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_alignParentEnd="true"
@@ -106,7 +123,7 @@
             android:layout_margin="20dp"
             android:width="180dp"
             android:gravity="center"
-            android:text="Continue"
+            android:text="Validate Customer"
             android:textColor="#fff" />
 
     </RelativeLayout>

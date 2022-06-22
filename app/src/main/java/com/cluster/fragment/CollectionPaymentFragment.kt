@@ -63,9 +63,10 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
         viewModel.paymentItem.onChange {
             binding.amountInput.value = viewModel.paymentItem.value?.amount!!
+            binding.customerValueInput.visibility = View.VISIBLE
         }
 
-        binding.continuePaymentBtn.setOnClickListener{
+        binding.validateCustomerBtn.setOnClickListener{
             if(binding.amountInput.value.isBlank()){
                 dialogProvider.showError("Please enter a valid amount greater than 0")
             }
