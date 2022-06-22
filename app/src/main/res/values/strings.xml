@@ -447,7 +447,7 @@
     <string name="choose_a_plan">Choose a plan</string>
     <string name="extend">Extend</string>
     <string name="upgrade">Upgrade</string>
-    <string name="change">Change</string>
+    <string name="change">Change Plan</string>
     <string name="opt_out_auto_renewal">Cancel Auto-renew</string>
     <string name="renewal">Renew</string>
     <string name="change_password">Change Login PIN</string>
