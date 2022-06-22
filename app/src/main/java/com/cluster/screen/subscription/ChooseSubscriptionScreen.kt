@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.core.data.api.SubscriptionService
+import com.cluster.core.data.model.ChangeSubscriptionRequest
 import com.cluster.core.data.model.SubscriptionPlan
 import com.cluster.core.data.model.SubscriptionRequest
 import com.cluster.core.data.prefs.LocalStorage
@@ -40,7 +41,8 @@ import java.util.*
 @Composable
 fun ChooseSubscriptionScreen(
     navController: NavController,
-    isUpgrade: Boolean
+    isUpgrade: Boolean,
+    isChangeSubscription: Boolean
 ) {
     val context = LocalContext.current
     val subscriptionService: SubscriptionService by rememberRetrofitService()
@@ -113,6 +115,37 @@ fun ChooseSubscriptionScreen(
         }
     }
 
+    val changeSubscriptionRequest: suspend(plan: SubscriptionPlan, agentPin: String, autoRenew: Boolean) -> Unit = remember {
+        changeSubscriptionRequest@{plan, agentPin, autoRenew ->
+            loadingMessage = "Processing"
+            val request = ChangeSubscriptionRequest(
+                planId = plan.id,
+                agentPhoneNumber = localStorage.agentPhone!!,
+                agentPin = agentPin,
+                institutionCode = localStorage.institutionCode!!,
+                autoRenew = autoRenew,
+            )
+
+            val result = safeRunIO {
+                subscriptionService.changeSubscriptionPlan(request)
+            }
+            loadingMessage = ""
+
+            if (result.isFailure) {
+                dialogProvider.showError(result.error!!)
+                return@changeSubscriptionRequest
+            }
+
+            if (result.data!!.isFailure()) {
+                dialogProvider.showError(result.data!!.message!!)
+                return@changeSubscriptionRequest
+            }
+
+            dialogProvider.showSuccess(result.data!!.message!!)
+            navController.popBackStack()
+        }
+    }
+
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
         sheetContent = {
@@ -148,7 +181,6 @@ fun ChooseSubscriptionScreen(
                         modifier = Modifier
                             .padding(horizontal = 16.dp, vertical = 20.dp),
                     )
-
                     AppButton(onClick = {
                         coroutineScope.launch {
                             val subscriptionFeeResult = safeRunIO {
@@ -163,7 +195,11 @@ fun ChooseSubscriptionScreen(
                             bottomSheetScaffoldState.bottomSheetState.collapse()
                             val agentPin = dialogProvider
                                 .getAgentPin(subtitle = feeMessage) ?: return@launch
-                            chooseSubscription(selectedPlan!!, agentPin, checkedState.value)
+                            if(isChangeSubscription){
+                                changeSubscriptionRequest(selectedPlan!!, agentPin, checkedState.value)
+                            }else{
+                                chooseSubscription(selectedPlan!!, agentPin, checkedState.value)
+                            }
                         }
                     }) {
                         Text("I accept")
@@ -176,7 +212,7 @@ fun ChooseSubscriptionScreen(
         sheetPeekHeight = 0.dp,
         topBar = {
             CreditClubAppBar(
-                title = if (isUpgrade) stringResource(R.string.upgrade) else stringResource(R.string.choose_a_plan),
+                title = if (isUpgrade) stringResource(R.string.upgrade) else if (isChangeSubscription) stringResource(R.string.change) else stringResource(R.string.choose_a_plan),
                 onBackPressed = { navController.popBackStack() },
             )
         }
