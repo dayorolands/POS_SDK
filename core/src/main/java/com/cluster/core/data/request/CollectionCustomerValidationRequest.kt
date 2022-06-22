@@ -4,29 +4,41 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CollectionCustomerValidationRequest(
+class CollectionCustomerValidationRequest {
     @SerialName("Channel")
-    val channel: String? = null,
+    var channel: String? = null
 
     @SerialName("ItemCode")
-    val currency: String? = null,
+    var itemCode: String? = null
 
     @SerialName("Amount")
-    val amount: Double? = null,
+    var amount: Double? = null
 
     @SerialName("CustomFields")
-    val customFields: CollectionValidationCustomFields,
+    var customFields: String? = null
 
     @SerialName("CustomerPhoneNumber")
-    val customerPhoneNumber: String? = null,
+    var customerPhoneNumber: String? = null
 
-    @SerialName("CollectionService")
-    val collectionService: String? = null,
+    @SerialName("CustomerName")
+    var customerName: String? = null
 
     @SerialName("InstitutionCode")
-    val institutionCode: String? = null,
+    var institutionCode: String? = null
 
     @SerialName("CustomerEmail")
-    val customerEmail: String? = null,
+    var customerEmail: String? = null
 
-)
+    @Serializable
+    class CustomFields {
+        @SerialName("Id")
+        var id: Int? = null
+
+        @SerialName("Name")
+        var name: String? = null
+
+        @SerialName("Value")
+        var value: String? = null
+    }
+
+}

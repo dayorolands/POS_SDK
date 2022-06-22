@@ -23,13 +23,15 @@ class CollectionPaymentViewModel : ViewModel() {
     val paymentItemList: MutableLiveData<List<CollectionPaymentItem>> = MutableLiveData()
     val paymentItem: MutableLiveData<CollectionPaymentItem> = MutableLiveData()
     val paymentItemName: MutableLiveData<String> = MutableLiveData()
-    val paymentItemCode= Transformations.map(paymentItem) {it.code}
     val paymentItemAmount = MutableLiveData<String>()
 
     val validCustomerName = MutableLiveData<String>()
     val validCustomerEmail = MutableLiveData<String>()
     val customerPhoneNumber= MutableLiveData<String>()
     val customerValue = MutableLiveData<String>()
+
+    val paymentReference = MutableLiveData<String>()
+    val surchargeFee = MutableLiveData<Int>()
 
     val region: MutableLiveData<String> = MutableLiveData()
     val category: MutableLiveData<CollectionCategory> = MutableLiveData()
@@ -58,6 +60,4 @@ class CollectionPaymentViewModel : ViewModel() {
     val isOffline: MutableLiveData<Boolean> = MutableLiveData()
     val invoiceNumber: MutableLiveData<String> = MutableLiveData()
 
-    val itemList = MutableLiveData<List<CollectionPaymentItem>>()
-    val categoryList = MutableLiveData<List<CollectionCategory>>()
 }

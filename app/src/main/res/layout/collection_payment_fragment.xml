@@ -88,8 +88,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:editable="false"
-                        android:enabled="true"
-                        android:inputType="numberDecimal"/>
+                        android:enabled="false"
+                        android:inputType="numberDecimal"
+                        android:text="Value"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>

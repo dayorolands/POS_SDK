@@ -32,12 +32,9 @@ import java.time.Instant
 import java.util.*
 
 class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment_fragment) {
-    private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
     private val binding by dataBinding<CollectionPaymentFragmentBinding>()
     private val viewModel: CollectionPaymentViewModel by navGraphViewModels(R.id.collectionGraph)
     override val functionId = FunctionIds.COLLECTION_PAYMENT
-    private val request = CollectionPaymentRequest()
-    private val uniqueReference = UUID.randomUUID().toString()
     private val collectionsService: CollectionsService by retrofitService()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -58,14 +55,18 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
         viewModel.billerName.onChange {
             mainScope.launch {
-                binding.amountInput.value = "0.00"
+                binding.amountInput.value = ""
                 viewModel.paymentItemName.value = ""
                 loadCollectionPaymentItems()
             }
         }
 
+        viewModel.paymentItem.onChange {
+            binding.amountInput.value = viewModel.paymentItem.value?.amount!!
+        }
+
         binding.continuePaymentBtn.setOnClickListener{
-            if(binding.amountInput.value.isBlank() || binding.amountInput.value == "0.00"){
+            if(binding.amountInput.value.isBlank()){
                 dialogProvider.showError("Please enter a valid amount greater than 0")
             }
             else{
@@ -78,12 +79,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
 
     }
 
-    private fun AutoCompleteTextView.clearSuggestions() {
-        clearListSelection()
-        val adapter = ArrayAdapter(requireContext(), R.layout.list_item, emptyList<String>())
-        setAdapter(adapter)
-    }
-
     private inline fun <T> MutableLiveData<T>.onChange(crossinline block: () -> Unit) {
         var oldValue = value
         observe(viewLifecycleOwner, Observer {
@@ -93,7 +88,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             }
         })
     }
-
 
     private suspend fun loadBillers() = viewModel.billerList.download("billers"){
         collectionsService.getCollectionBillers(
@@ -126,95 +120,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         )
     }
 
-    private suspend fun loadReference() {
-        if (viewModel.region.value.isNullOrBlank())
-            return dialogProvider.showErrorAndWait("Please select a region")
-
-        if (viewModel.collectionType.value.isNullOrBlank())
-            return dialogProvider.showErrorAndWait("Please select a collection type")
-
-        viewModel.collectionReference.value = null
-        dialogProvider.showProgressBar("Loading reference")
-        val (response, error) = safeRunIO {
-            collectionsService.getCollectionReferenceByReference(
-                localStorage.institutionCode,
-                viewModel.referenceString.value?.trim(),
-                viewModel.region.value,
-                viewModel.collectionService.value,
-                derivedCollectionType
-            )
-        }
-        dialogProvider.hideProgressBar()
-
-        if (error != null) return dialogProvider.showErrorAndWait(error)
-        response?.reference
-            ?: return dialogProvider.showErrorAndWait("Please enter a valid reference")
-        if (response.isSuccessful != true) {
-            if (response.responseMessage?.contains("invoice not found", true) == true) {
-                viewModel.referenceString.value = ""
-            }
-            return dialogProvider.showError(response.responseMessage)
-        }
-        viewModel.collectionReference.value = response
-        viewModel.amountString.value = response.amount?.toString()
-    }
-
-    private suspend inline fun loadDependencies(
-        dependencyName: String,
-        currentValue: List<String>?,
-        autoCompleteTextView: AutoCompleteTextView,
-        crossinline fetcher: suspend () -> List<String>?,
-    ) {
-        val items = if (currentValue == null) {
-            dialogProvider.showProgressBar("Loading $dependencyName")
-            val (items) = safeRunIO { fetcher() }
-            dialogProvider.hideProgressBar()
-            items
-        } else {
-            currentValue
-        }
-
-        if (items == null) {
-            dialogProvider.showErrorAndWait("An error occurred while loading $dependencyName")
-//            findNavController().popBackStack()
-            return
-        }
-
-        val adapter = ArrayAdapter(requireContext(), R.layout.list_item, items)
-        autoCompleteTextView.setAdapter(adapter)
-    }
-
-    private suspend fun onGenerateButtonClick(offline: Boolean) {
-        viewModel.run {
-            clearData(
-                customerId,
-                customer,
-                customerPhoneNumber,
-                item,
-                itemCode,
-                itemName,
-                category,
-                categoryName,
-                referenceString,
-                collectionReference
-            )
-        }
-
-        if (viewModel.region.value.isNullOrBlank()) {
-            return dialogProvider.showErrorAndWait("Please select a region")
-        }
-
-        if (viewModel.collectionType.value.isNullOrBlank()) {
-            return dialogProvider.showErrorAndWait("Please enter a collection type")
-        }
-
-        findNavController().navigate(
-            R.id.action_collection_payment_to_reference_generation,
-            bundleOf("offline" to true),
-        )
-    }
-
-
     private suspend inline fun <T> MutableLiveData<T>.download(
         dependencyName: String,
         crossinline fetcher: suspend () -> T?
@@ -227,95 +132,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             dialogProvider.showErrorAndWait("An error occurred while loading $dependencyName")
             return
         }
-
         postValue(data)
     }
-
-    private fun clearData(vararg liveData: MutableLiveData<*>) {
-        for (liveDatum in liveData) {
-            liveDatum.value = null
-        }
-    }
-
-    private suspend fun completePayment() {
-        if (viewModel.referenceString.value.isNullOrBlank()) {
-            return dialogProvider.showErrorAndWait("Please enter a reference")
-        } else if (viewModel.collectionReference.value == null) {
-            loadReference()
-            viewModel.collectionReference.value ?: return
-        }
-
-        val amountDouble = viewModel.amountString.value?.toDouble()
-        amountDouble ?: return dialogProvider.showErrorAndWait("Please enter a reference")
-        if (amountDouble == 0.0) return dialogProvider.showErrorAndWait("Amount cannot be zero")
-
-        if (viewModel.collectionTypeIsCbs.value == true || viewModel.collectionTypeIsWebGuid.value == true) {
-            if (amountDouble > viewModel.collectionReference.value?.amount ?: 0.0) {
-                return dialogProvider.showErrorAndWait("You cannot pay above the amount of bill generated")
-            }
-        }
-
-        val pin = dialogProvider.getPin("Agent PIN") ?: return
-        if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
-
-        val serializer = CollectionPaymentRequest.Additional.serializer()
-        val agent = localStorage.agent
-        val additional = CollectionPaymentRequest.Additional().apply {
-            agentCode = agent?.agentCode
-            terminalId = agent?.terminalID
-        }
-        request.apply {
-            collectionReference = viewModel.collectionReference.value?.reference
-            agentPin = pin
-            region = viewModel.region.value
-            categoryCode = viewModel.categoryCode.value
-            collectionType = derivedCollectionType
-            itemCode = viewModel.itemCode.value
-            amount = amountDouble
-            geoLocation = localStorage.lastKnownLocation
-            currency = "NGN"
-            institutionCode = localStorage.institutionCode
-            agentPhoneNumber = localStorage.agentPhone
-            collectionService = viewModel.collectionService.value
-            requestReference = uniqueReference
-            retrievalReferenceNumber = viewModel.retrievalReferenceNumber.value
-            additionalInformation = Json.encodeToString(serializer, additional)
-            deviceNumber = localStorage.deviceNumber
-        }
-        dialogProvider.showProgressBar("Processing request")
-        val (response, error) = safeRunIO {
-            collectionsService.collectionPayment(request)
-        }
-        dialogProvider.hideProgressBar()
-        if (error != null) return dialogProvider.showErrorAndWait(error)
-        if (response == null) {
-            dialogProvider.showErrorAndWait("An error occurred. Please try again later")
-            activity?.onBackPressed()
-            return
-        }
-
-        response.date = Instant.now()
-        response.collectionPaymentItemName =
-            response.collectionPaymentItemName
-                ?: "${viewModel.itemName.value} (${viewModel.itemCode.value})"
-        response.collectionCategoryName =
-            response.collectionCategoryName
-                ?: "${viewModel.categoryName.value} (${viewModel.categoryCode.value})"
-
-        if (response.isSuccessful == true) {
-            dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
-            if (Platform.hasPrinter) {
-                posPrinter.print(collectionPaymentReceipt(requireContext(), response))
-            }
-            activity?.onBackPressed()
-        } else {
-            dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
-        }
-    }
-
-    private inline val derivedCollectionType
-        get() = viewModel.run {
-            if (collectionTypeIsCbs.value == true && isOffline.value == true) "WEBGUID"
-            else collectionType.value
-        }
 }

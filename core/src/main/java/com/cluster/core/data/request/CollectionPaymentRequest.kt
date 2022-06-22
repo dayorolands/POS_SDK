@@ -5,8 +5,32 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class CollectionPaymentRequest {
-    @SerialName("CollectionReference")
-    var collectionReference: String? = null
+    @SerialName("PaymentReference")
+    var paymentReference: String? = null
+
+    @SerialName("PaymentMethod")
+    var paymentMethod: Int? = null
+
+    @SerialName("Channel")
+    var channel: String? = null
+
+    @SerialName("CustomerAccountName")
+    var customerAcctName: String? = null
+
+    @SerialName("CustomerPhoneNumber")
+    var customerPhoneNumber: String? = null
+
+    @SerialName("CustomerName")
+    var customerName: String? = null
+
+    @SerialName("CustomerEmail")
+    var customerEmail: String? = null
+
+    @SerialName("ClientReference")
+    var clientReference: String? = null
+
+    @SerialName("PaymentGateway")
+    var paymentGateway: String? = null
 
     @SerialName("CategoryCode")
     var categoryCode: String? = null
@@ -32,14 +56,8 @@ class CollectionPaymentRequest {
     @SerialName("InstitutionCode")
     var institutionCode: String? = null
 
-    @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null
-
     @SerialName("GeoLocation")
     var geoLocation: String? = null
-
-    @SerialName("Region")
-    var region: String? = null
 
     @SerialName("AdditionalInformation")
     var additionalInformation: String? = null
@@ -49,6 +67,9 @@ class CollectionPaymentRequest {
 
     @SerialName("RetrievalReferenceNumber")
     var retrievalReferenceNumber: String? = null
+
+    @SerialName("BillerId")
+    var billerId: String? = null
 
     @SerialName("DeviceNumber")
     var deviceNumber: Int? = null

@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CollectionValidationCustomFields (
     @SerialName("Id")
-    var id: String? = null,
+    var id: Int? = null,
 
     @SerialName("Name")
     var name: String? = null,

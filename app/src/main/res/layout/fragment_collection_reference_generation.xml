@@ -52,6 +52,7 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:id="@+id/customerName_input"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:editable="false"
@@ -69,6 +70,7 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:id="@+id/customer_email_input"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:editable="false"
@@ -89,6 +91,7 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:id="@+id/customer_phone_no_input"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:inputType="phone"
@@ -112,13 +115,14 @@
                     android:hint="Amount">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/amount_input"
+                        android:id="@+id/amount_input_pay"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:inputType="numberDecimal"
+                        android:visibility="visible"
                         android:maxLength="7"
                         android:singleLine="true"
-                        android:text="@={viewModel.paymentItemAmount}"/>
+                        android:text=""/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -126,9 +130,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    android:hint="Customer Value">
+                    android:hint="Customer Account">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/customer_value_input"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:inputType="number"

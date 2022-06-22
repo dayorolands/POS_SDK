@@ -87,9 +87,13 @@ interface CollectionsService {
         @Query("billerId") billerId: String?
     ): List<CollectionPaymentItem>
 
-    @POST("/api/Collections/ValidateCustomer")
+    @POST("api/Collections/ValidateCustomer")
     suspend fun validateCustomer(
         @Body request: CollectionCustomerValidationRequest
     ) : CustomerValidationResponse?
 
+    @POST("api/Collections/Payment")
+    suspend fun completePayment(
+        @Body request: CollectionPaymentRequest
+    ): CollectionPaymentResponse?
 }
