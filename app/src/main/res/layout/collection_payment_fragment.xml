@@ -2,9 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-
     <data>
-
         <variable
             name="viewModel"
             type="com.cluster.fragment.CollectionPaymentViewModel" />
@@ -26,7 +24,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:elevation="0dp"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark"
-                app:title="IGR Collections" />
+                app:title="Collections" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -50,15 +48,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    android:hint="Region">
+                    android:hint="Select Biller">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/region_input"
+                        android:id="@+id/biller_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:editable="false"
                         android:inputType="none"
-                        android:text="@={viewModel.region}" />
+                        android:text="@={viewModel.billerName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -66,183 +64,67 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    android:hint="Collection Type"
-                    app:dependsOn="@{viewModel.region}">
+                    android:hint="Select Biller Item"
+                    app:goneUnlessPresent="@{viewModel.billers}"
+                    app:dependsOn="@{viewModel.billerId}">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/collection_type_input"
+                        android:id="@+id/payment_item_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:editable="false"
                         android:inputType="none"
-                        android:text="@={viewModel.collectionType}" />
+                        android:text="@={viewModel.paymentItemName}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/collection_reference_input_layout"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Collection Reference"
-                    app:endIconDrawable="@drawable/ic_baseline_search_24"
-                    app:endIconMode="custom"
-                    app:showEndIconIfPresent="@{viewModel.referenceString}">
+                    android:layout_marginBottom="15dp"
+                    android:hint="Amount">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/collection_reference_input"
+                        android:id="@+id/amount_input"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:singleLine="true"
-                        android:text="@={viewModel.referenceString}" />
+                        android:editable="false"
+                        android:enabled="false"
+                        android:inputType="numberDecimal"
+                        android:text=""/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:goneUnless="@{viewModel.collectionTypeIsWebGuid}">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Don't have a reference? "
-                        app:goneIf="@{viewModel.validReference}" />
-
-                    <Button
-                        android:id="@+id/generate_reference_button"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Generate one"
-                        app:goneIf="@{viewModel.validReference}" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:goneUnless="@{viewModel.collectionTypeIsCbs}">
-
-                    <com.google.android.material.checkbox.MaterialCheckBox
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="@={viewModel.isOffline}"
-                        android:text="Offline Bill"
-                        app:goneUnlessPresent="@{viewModel.referenceString}" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:goneUnless="@{viewModel.collectionTypeIsCbs}">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Unable to validate reference? "
-                        app:goneIfPresent="@{viewModel.referenceString}" />
-
-                    <Button
-                        android:id="@+id/generate_offline_bill_button"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Register the offline reference"
-                        app:goneIfPresent="@{viewModel.referenceString}" />
-                </LinearLayout>
-
-                <LinearLayout
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:orientation="vertical"
-                    app:goneUnless="@{viewModel.validReference}">
+                    android:layout_marginBottom="15dp"
+                    android:hint="">
 
-                    <LinearLayout
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/customer_value_input"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:layout_height="match_parent"
+                        android:inputType="number"
+                        android:visibility="gone"
+                        android:text=""
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="10dp"
-                            android:layout_marginBottom="15dp"
-                            android:layout_weight="1"
-                            android:enabled="false"
-                            android:hint="Category">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:editable="false"
-                                android:inputType="none"
-                                android:text="@{viewModel.collectionReferenceCategoryCode}" />
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginBottom="15dp"
-                            android:layout_weight="1"
-                            android:enabled="false"
-                            android:hint="Item">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="@{viewModel.collectionReferenceItemCode}" />
-                        </com.google.android.material.textfield.TextInputLayout>
-                    </LinearLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="15dp"
-                        android:hint="Reference Name">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:editable="false"
-                            android:inputType="none"
-                            android:text="@{viewModel.referenceName}" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="15dp"
-                        android:hint="Amount">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:inputType="numberDecimal"
-                            android:text="@={viewModel.amountString}" />
-                    </com.google.android.material.textfield.TextInputLayout>
-                </LinearLayout>
             </LinearLayout>
         </ScrollView>
 
         <Button
-            android:id="@+id/complete_payment_button"
+            android:id="@+id/validate_customer_btn"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_gravity="bottom|end"
+            android:layout_gravity="bottom"
             android:layout_margin="20dp"
             android:width="180dp"
             android:gravity="center"
-            android:text="Complete Payment"
+            android:text="Validate Customer"
             android:textColor="#fff" />
 
     </RelativeLayout>
