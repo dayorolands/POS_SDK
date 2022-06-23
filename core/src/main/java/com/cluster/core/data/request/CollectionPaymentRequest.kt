@@ -5,20 +5,44 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class CollectionPaymentRequest {
-    @SerialName("CollectionReference")
-    var collectionReference: String? = null
+    @SerialName("PaymentReference")
+    var paymentReference: String? = null
 
-    @SerialName("CategoryCode")
-    var categoryCode: String? = null
+    @SerialName("PaymentMethod")
+    var paymentMethod: Int? = null
 
-    @SerialName("CollectionType")
-    var collectionType: String? = null
+    @SerialName("Channel")
+    var channel: String? = null
 
-    @SerialName("ItemCode")
-    var itemCode: String? = null
+    @SerialName("CustomerAccountName")
+    var customerAcctName: String? = null
 
-    @SerialName("CollectionService")
-    var collectionService: String? = null
+    @SerialName("CustomerPhoneNumber")
+    var customerPhoneNumber: String? = null
+
+    @SerialName("CustomerName")
+    var customerName: String? = null
+
+    @SerialName("CustomerEmail")
+    var customerEmail: String? = null
+
+    @SerialName("BillerCode")
+    var billerCode: String? = null
+
+    @SerialName("BillerName")
+    var billerName: String? = null
+
+    @SerialName("BillerItemName")
+    var billerItemName: String? = null
+
+    @SerialName("ClientReference")
+    var clientReference: String? = null
+
+    @SerialName("PaymentGateway")
+    var paymentGateway: String? = null
+
+    @SerialName("BillerItemCode")
+    var billerItemCode: String? = null
 
     @SerialName("Amount")
     var amount: Double? = null
@@ -32,14 +56,8 @@ class CollectionPaymentRequest {
     @SerialName("InstitutionCode")
     var institutionCode: String? = null
 
-    @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null
-
     @SerialName("GeoLocation")
     var geoLocation: String? = null
-
-    @SerialName("Region")
-    var region: String? = null
 
     @SerialName("AdditionalInformation")
     var additionalInformation: String? = null
@@ -57,7 +75,7 @@ class CollectionPaymentRequest {
     var applyFee: Boolean? = null
 
     @SerialName("FeeAmount")
-    var feeAmount: Double? = null
+    var feeAmount: Int? = null
 
     @SerialName("FeeBearerAccount")
     var feeBearerAccount: String? = null

@@ -82,7 +82,7 @@
         <fragment
             android:id="@+id/collectionPaymentFragment"
             android:name="com.cluster.fragment.CollectionPaymentFragment"
-            android:label="IGR Collections"
+            android:label="Collections"
             tools:layout="@layout/collection_payment_fragment">
             <action
                 android:id="@+id/action_collection_payment_to_reference_generation"
