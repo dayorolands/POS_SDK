@@ -15,6 +15,7 @@ import androidx.navigation.navGraphViewModels
 import com.cluster.R
 import com.cluster.core.data.api.CollectionsService
 import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.request.CollectionCustomerValidationRequest
 import com.cluster.core.data.request.CollectionPaymentRequest
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.safeRunIO
@@ -36,6 +37,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     private val viewModel: CollectionPaymentViewModel by navGraphViewModels(R.id.collectionGraph)
     override val functionId = FunctionIds.COLLECTION_PAYMENT
     private val collectionsService: CollectionsService by retrofitService()
+    private val customerValidationRequest = CollectionCustomerValidationRequest()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -64,17 +66,12 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         viewModel.paymentItem.onChange {
             binding.amountInput.value = viewModel.paymentItem.value?.amount!!
             binding.customerValueInput.visibility = View.VISIBLE
+            binding.customerValueInput.setHint(viewModel.paymentItem.value?.customFields?.displayText)
         }
 
         binding.validateCustomerBtn.setOnClickListener{
-            if(binding.amountInput.value.isBlank()){
-                dialogProvider.showError("Please enter a valid amount greater than 0")
-            }
-            else{
-                viewModel.paymentItemAmount.value = binding.amountInput.value
-                Log.d("OkHttpClient", "Checking the amount Input for the transaction ${binding.amountInput.value}")
-                Log.d("OkHttpClient", "Checking the amount Input for the transaction ${viewModel.paymentItemAmount.value}")
-                findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
+            mainScope.launch {
+                validateCustomer()
             }
         }
 
@@ -88,13 +85,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
                 block()
             }
         })
-    }
-
-    private suspend fun loadBillers() = viewModel.billerList.download("billers"){
-        collectionsService.getCollectionBillers(
-            localStorage.institutionCode,
-            viewModel.collectionService.value
-        )
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -112,6 +102,66 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
                 }
             }
         })
+    }
+
+    private suspend fun loadBillers() = viewModel.billerList.download("billers"){
+        collectionsService.getCollectionBillers(
+            localStorage.institutionCode,
+            viewModel.collectionService.value
+        )
+    }
+
+    private suspend fun validateCustomer(){
+        if (binding.customerValueInput.value.isNullOrBlank()) {
+            dialogProvider.showError("Please enter a valid customer value")
+        } else{
+            viewModel.customerValue.value = binding.customerValueInput.value
+        }
+
+        if(binding.amountInput.value.isBlank()){
+            dialogProvider.showError("Please enter a valid amount greater than 0")
+        }
+        else{
+            viewModel.paymentItemAmount.value = binding.amountInput.value
+            Log.d("OkHttpClient", "Checking the amount Input for the transaction ${binding.amountInput.value}")
+            Log.d("OkHttpClient", "Checking the amount Input for the transaction ${viewModel.paymentItemAmount.value}")
+        }
+
+        val serializer = CollectionCustomerValidationRequest.CustomFields.serializer()
+        val customFieldRequest = CollectionCustomerValidationRequest.CustomFields().apply {
+            id = viewModel.paymentItem.value?.customFields?.id
+            name = viewModel.paymentItem.value?.customFields?.name
+            value = viewModel.customerValue.value
+        }
+        customerValidationRequest.apply{
+            channel = "mobile"
+            itemCode = viewModel.paymentItem.value?.code
+            amount = viewModel.paymentItem.value?.amount?.toDoubleOrNull()
+            customFields = Json.encodeToString(serializer, customFieldRequest)
+            customerPhoneNumber = ""
+            customerName = ""
+            customerEmail = ""
+            institutionCode = localStorage.institutionCode
+        }
+
+        dialogProvider.showProgressBar("Validating customer")
+        val (response, error) = safeRunIO {
+            collectionsService.validateCustomer(customerValidationRequest)
+        }
+        dialogProvider.hideProgressBar()
+
+        if (error != null) return dialogProvider.showError(error)
+        response ?: return dialogProvider.showError("An error occurred while generating reference")
+
+        if (response.isSuccessful == true) {
+            dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
+            viewModel.customerValidResp.value = response
+            viewModel.paymentInformation.value = response.paymentInformation
+            findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
+        } else {
+            dialogProvider.showError(response.responseMessage ?: "Error")
+            return
+        }
     }
 
     private suspend fun loadCollectionPaymentItems() = viewModel.paymentItemList.download("biller items"){

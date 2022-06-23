@@ -15,6 +15,7 @@ import com.cluster.databinding.FragmentCollectionReferenceGenerationBinding
 import com.cluster.ui.dataBinding
 import com.cluster.core.data.api.CollectionsService
 import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.prefs.newTransactionReference
 import com.cluster.core.data.request.CollectionCustomerValidationRequest
 import com.cluster.core.data.request.CollectionPaymentRequest
 import com.cluster.core.data.request.CollectionReferenceGenerationRequest
@@ -52,6 +53,9 @@ class CollectionReferenceGenerationFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if(viewModel.retrievalReferenceNumber.value.isNullOrBlank()){
+            viewModel.retrievalReferenceNumber.value = localStorage.newTransactionReference()
+        }
         Log.d("OkHttpClient", "Checking the amount Input for the transaction:::: ${viewModel.paymentItemAmount.value!!}")
 
 
@@ -65,71 +69,31 @@ class CollectionReferenceGenerationFragment :
         }
     }
 
-    private suspend fun validateCustomer(){
-        if(binding.customerNameInput.value.isNullOrBlank()){
+    private suspend fun completePayment() {
+        if (binding.customerNameInput.value.isNullOrBlank()) {
             return dialogProvider.showErrorAndWait("Please enter a valid customer name")
-        } else{
+        } else {
             viewModel.validCustomerName.value = binding.customerNameInput.value
         }
 
         if (binding.customerEmailInput.value.isNullOrBlank()) {
             return dialogProvider.showErrorAndWait("Please enter a valid email address")
-        } else{
+        } else {
             viewModel.validCustomerEmail.value = binding.customerEmailInput.value
         }
 
         if (binding.customerPhoneNoInput.value.isNullOrBlank()) {
             return dialogProvider.showErrorAndWait("Please enter a phone number")
-        }else{
+        } else {
             viewModel.customerPhoneNumber.value = binding.customerPhoneNoInput.value
         }
 
         if (binding.customerValueInput.value.isNullOrBlank()) {
             dialogProvider.showError("Please enter a valid customer value")
-        } else{
+        } else {
             viewModel.customerValue.value = binding.customerValueInput.value
         }
 
-        val serializer = CollectionCustomerValidationRequest.CustomFields.serializer()
-        val customFieldRequest = CollectionCustomerValidationRequest.CustomFields().apply {
-            id = viewModel.paymentItem.value?.id?.toInt()
-            name = "Virtual Accounts"
-            value = viewModel.customerValue.value
-        }
-        customerValidationRequest.apply{
-            channel = "mobile"
-            itemCode = viewModel.paymentItem.value?.code
-            amount = viewModel.paymentItemAmount.value?.toDoubleOrNull()
-            customFields = Json.encodeToString(serializer, customFieldRequest)
-            customerPhoneNumber = viewModel.customerPhoneNumber.value
-            customerName = viewModel.validCustomerName.value
-            customerEmail = viewModel.validCustomerEmail.value
-            institutionCode = localStorage.institutionCode
-        }
-
-        dialogProvider.showProgressBar("Validating customer")
-        val (response, error) = safeRunIO {
-            collectionsService.validateCustomer(customerValidationRequest)
-        }
-        dialogProvider.hideProgressBar()
-
-        if (error != null) return dialogProvider.showError(error)
-        response ?: return dialogProvider.showError("An error occurred while generating reference")
-
-        if (response.isSuccessful == true) {
-            dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
-            viewModel.paymentReference.value = response.paymentReference.toString()
-            viewModel.surchargeFee.value = response.surcharge?.toInt()
-        } else {
-            dialogProvider.showError(response.responseMessage ?: "Error")
-            return
-        }
-    }
-
-    private suspend fun completePayment() {
-        mainScope.launch {
-            validateCustomer()
-        }
         val amountDouble = viewModel.paymentItemAmount.value?.toDouble()
         if (amountDouble == 0.0) return dialogProvider.showErrorAndWait("Amount cannot be zero")
 
@@ -143,7 +107,7 @@ class CollectionReferenceGenerationFragment :
             terminalId = agent?.terminalID
         }
         request.apply {
-            paymentReference = viewModel.paymentReference.value
+            paymentReference = viewModel.customerValidResp.value?.paymentReference
             paymentMethod = 0
             agentPin = pin
             channel = "mobile"
@@ -151,8 +115,8 @@ class CollectionReferenceGenerationFragment :
             categoryCode = viewModel.billers.value?.code
             collectionType = viewModel.paymentItem.value?.name
             itemCode = viewModel.paymentItem.value?.code
-            customerAcctName = viewModel.customerValue.value
-            customerName = viewModel.customerName.value
+            customerAcctName = viewModel.validCustomerName.value
+            customerName = viewModel.validCustomerName.value
             customerEmail = viewModel.validCustomerEmail.value
             customerPhoneNumber = viewModel.customerPhoneNumber.value
             amount = amountDouble

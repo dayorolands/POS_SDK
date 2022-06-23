@@ -40,4 +40,22 @@ class CustomerValidationResponse {
 
     @SerialName("isMultiplePayment")
     var isMultpilePayment: String? = null
+
+    @SerialName("PaymentInformation")
+    var paymentInformation: PaymentInformation? = null
+
+    @Serializable
+    class PaymentInformation{
+        @SerialName("AccountId")
+        var accountId: String? = null
+
+        @SerialName("Amount")
+        var amount: String? = null
+
+        @SerialName("IsFlatCharge")
+        var isFlatCharge: Boolean? = false
+
+        @SerialName("Charge")
+        var charge: Int? = null
+    }
 }

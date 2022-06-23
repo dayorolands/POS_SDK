@@ -4,13 +4,13 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CollectionValidationCustomFields (
+class CollectionValidationCustomFields {
     @SerialName("Id")
-    var id: Int? = null,
+    var id: Int? = null
 
     @SerialName("Name")
-    var name: String? = null,
+    var name: String? = null
 
     @SerialName("Value")
-    var value: String? = null,
-)
+    var value: String? = null
+}

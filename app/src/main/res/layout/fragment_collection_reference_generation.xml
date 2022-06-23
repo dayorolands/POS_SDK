@@ -58,7 +58,7 @@
                         android:editable="false"
                         android:inputType="textPersonName"
                         android:singleLine="true"
-                        android:text="@{viewModel.customerName}"
+                        android:text="@{viewModel.validCustomerName}"
                         android:textAllCaps="true" />
 
                 </com.google.android.material.textfield.TextInputLayout><com.google.android.material.textfield.TextInputLayout
@@ -76,7 +76,7 @@
                         android:editable="false"
                         android:inputType="textEmailAddress"
                         android:singleLine="true"
-                        android:text="@{viewModel.customerName}"
+                        android:text="@{viewModel.validCustomerEmail}"
                         android:textAllCaps="true" />
                 </com.google.android.material.textfield.TextInputLayout>
 
