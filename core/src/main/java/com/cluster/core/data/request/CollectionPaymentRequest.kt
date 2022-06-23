@@ -26,6 +26,15 @@ class CollectionPaymentRequest {
     @SerialName("CustomerEmail")
     var customerEmail: String? = null
 
+    @SerialName("BillerCode")
+    var billerCode: String? = null
+
+    @SerialName("BillerName")
+    var billerName: String? = null
+
+    @SerialName("BillerItemName")
+    var billerItemName: String? = null
+
     @SerialName("ClientReference")
     var clientReference: String? = null
 
@@ -38,8 +47,8 @@ class CollectionPaymentRequest {
     @SerialName("CollectionType")
     var collectionType: String? = null
 
-    @SerialName("ItemCode")
-    var itemCode: String? = null
+    @SerialName("BillerItemCode")
+    var billerItemCode: String? = null
 
     @SerialName("CollectionService")
     var collectionService: String? = null
@@ -78,7 +87,7 @@ class CollectionPaymentRequest {
     var applyFee: Boolean? = null
 
     @SerialName("FeeAmount")
-    var feeAmount: Double? = null
+    var feeAmount: Int? = null
 
     @SerialName("FeeBearerAccount")
     var feeBearerAccount: String? = null
@@ -87,11 +96,32 @@ class CollectionPaymentRequest {
     var feeSuspenseAccount: String? = null
 
     @Serializable
+    class SurchargeConfiguration{
+        @SerialName("Name")
+        var surchargeName: String? = null
+
+        @SerialName("Value")
+        var surchargeValue: Int? = null
+
+        @SerialName("MinAmount")
+        var minAmount: Int? = null
+
+        @SerialName("MaxAmount")
+        var maxAmount: Int? = null
+
+        @SerialName("IsPercentange")
+        var isPercentange: Boolean? = false
+    }
+
+    @Serializable
     class Additional {
         @SerialName("TerminalID")
         var terminalId: String? = null
 
         @SerialName("AgentCode")
         var agentCode: String? = null
+
+        @SerialName("SurchargeConfiguration")
+        var surchargeConfig: List<SurchargeConfiguration>? = null
     }
 }

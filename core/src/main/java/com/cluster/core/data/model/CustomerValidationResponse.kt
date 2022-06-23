@@ -38,24 +38,30 @@ class CustomerValidationResponse {
     @SerialName("ResponseMessage")
     var responseMessage: String? = null
 
+    @SerialName("Message")
+    var message: String? = null
+
     @SerialName("isMultiplePayment")
     var isMultpilePayment: String? = null
 
-    @SerialName("PaymentInformation")
-    var paymentInformation: PaymentInformation? = null
+    @SerialName("SurchargeConfiguration")
+    var surchargeConfiguration: List<SurchargeConfiguration>? = null
 
     @Serializable
-    class PaymentInformation{
-        @SerialName("AccountId")
-        var accountId: String? = null
+    class SurchargeConfiguration{
+        @SerialName("Name")
+        var surchargeName: String? = null
 
-        @SerialName("Amount")
-        var amount: String? = null
+        @SerialName("Value")
+        var surchargeValue: Int? = null
 
-        @SerialName("IsFlatCharge")
-        var isFlatCharge: Boolean? = false
+        @SerialName("MinAmount")
+        var minAmount: Int? = null
 
-        @SerialName("Charge")
-        var charge: Int? = null
+        @SerialName("MaxAmount")
+        var maxAmount: Int? = null
+
+        @SerialName("IsPercentange")
+        var isPercentange: Boolean? = false
     }
 }

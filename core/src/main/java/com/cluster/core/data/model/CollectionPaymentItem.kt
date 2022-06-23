@@ -1,6 +1,5 @@
 package com.cluster.core.data.model
 
-import com.cluster.core.data.request.CollectionValidationCustomFields
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -25,15 +24,15 @@ class CollectionPaymentItem {
     var collectionAccount: String? = null
 
     @SerialName("CustomFields")
-    var customFields: CollectionValidationCustomFields? = null
+    var customFields: List<CollectionValidationCustomFields>? = null
 
     @Serializable
     class CollectionValidationCustomFields {
         @SerialName("Id")
-        var id: Int? = null
+        var customId: Int? = null
 
         @SerialName("Name")
-        var name: String? = null
+        var customName: String? = null
 
         @SerialName("DisplayText")
         var displayText: String? = null

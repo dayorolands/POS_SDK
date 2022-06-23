@@ -15,6 +15,7 @@ import androidx.navigation.navGraphViewModels
 import com.cluster.R
 import com.cluster.core.data.api.CollectionsService
 import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.model.CollectionPaymentItem
 import com.cluster.core.data.request.CollectionCustomerValidationRequest
 import com.cluster.core.data.request.CollectionPaymentRequest
 import com.cluster.core.ui.CreditClubFragment
@@ -55,10 +56,12 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             billerList.bindDropDown(billers, binding.billerInput)
             paymentItemList.bindDropDown(paymentItem, binding.paymentItemInput)
         }
+
         viewModel.billerName.onChange {
             mainScope.launch {
                 binding.amountInput.value = ""
                 viewModel.paymentItemName.value = ""
+                binding.customerValueInput.value = ""
                 loadCollectionPaymentItems()
             }
         }
@@ -66,7 +69,12 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         viewModel.paymentItem.onChange {
             binding.amountInput.value = viewModel.paymentItem.value?.amount!!
             binding.customerValueInput.visibility = View.VISIBLE
-            binding.customerValueInput.setHint(viewModel.paymentItem.value?.customFields?.displayText)
+            val customFields = viewModel.paymentItem.value?.customFields
+            if(!customFields.isNullOrEmpty()) {
+                binding.customerValueInput.setHint(
+                    customFields[0].displayText ?: ""
+                )
+            }
         }
 
         binding.validateCustomerBtn.setOnClickListener{
@@ -127,18 +135,25 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             Log.d("OkHttpClient", "Checking the amount Input for the transaction ${viewModel.paymentItemAmount.value}")
         }
 
-        val serializer = CollectionCustomerValidationRequest.CustomFields.serializer()
-        val customFieldRequest = CollectionCustomerValidationRequest.CustomFields().apply {
-            id = viewModel.paymentItem.value?.customFields?.id
-            name = viewModel.paymentItem.value?.customFields?.name
-            value = viewModel.customerValue.value
+        var customFieldRequest = arrayListOf<CollectionCustomerValidationRequest.CustomFields>()
+        val customerFieldCheck = viewModel.paymentItem.value?.customFields
+        if(!customerFieldCheck.isNullOrEmpty()) {
+            val items = CollectionCustomerValidationRequest.CustomFields().apply {
+                //id = customerFieldCheck[0].customId
+                //name = customerFieldCheck[0].customName
+                id = 3
+                name = "Virtual Account"
+                value = viewModel.customerValue.value
+            }
+            customFieldRequest.add(items)
         }
         customerValidationRequest.apply{
             channel = "mobile"
-            itemCode = viewModel.paymentItem.value?.code
+            //itemCode = viewModel.paymentItem.value?.code
+            itemCode = "802168"
             amount = viewModel.paymentItem.value?.amount?.toDoubleOrNull()
-            customFields = Json.encodeToString(serializer, customFieldRequest)
-            customerPhoneNumber = ""
+            customFields = customFieldRequest
+            customerPhoneNumber = localStorage.agentPhone
             customerName = ""
             customerEmail = ""
             institutionCode = localStorage.institutionCode
@@ -154,12 +169,22 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         response ?: return dialogProvider.showError("An error occurred while generating reference")
 
         if (response.isSuccessful == true) {
-            dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
-            viewModel.customerValidResp.value = response
-            viewModel.paymentInformation.value = response.paymentInformation
+            //dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
+            viewModel.surchargeConfiguration.value = response.surchargeConfiguration
+            viewModel.acceptPartPayment.value = response.acceptPartPayment
+            viewModel.minimumAmount.value = response.minimumAmount.toString()
+            viewModel.maximumAmount.value = response.maximumAmount.toString()
+            viewModel.paymentReferece.value = response.paymentReference
+
+            Log.d("OkHttpClient", "Check the following values::::::::: ${viewModel.acceptPartPayment.value}")
+            Log.d("OkHttpClient", "Check the following values::::::::: ${viewModel.minimumAmount.value}")
+            Log.d("OkHttpClient", "Check the following values::::::::: ${viewModel.maximumAmount.value}")
+            Log.d("OkHttpClient", "Check the following values::::::::: ${viewModel.paymentReferece.value}")
+
             findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
-        } else {
-            dialogProvider.showError(response.responseMessage ?: "Error")
+        }
+        else {
+            dialogProvider.showError(response.message ?: "Error")
             return
         }
     }

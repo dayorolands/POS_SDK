@@ -22,6 +22,7 @@ import com.cluster.core.data.request.CollectionReferenceGenerationRequest
 import com.cluster.core.data.request.CollectionValidationCustomFields
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.safeRunIO
+import com.cluster.core.util.toCurrencyFormat
 import com.cluster.pos.Platform
 import com.cluster.pos.printer.PosPrinter
 import com.cluster.receipt.collectionPaymentReceipt
@@ -38,7 +39,6 @@ class CollectionReferenceGenerationFragment :
 
     private val posPrinter: PosPrinter by inject { parametersOf(requireContext(), dialogProvider) }
     private val request = CollectionPaymentRequest()
-    private val customerValidationRequest = CollectionCustomerValidationRequest()
 
     private val binding by dataBinding<FragmentCollectionReferenceGenerationBinding>()
     private val viewModel: CollectionPaymentViewModel by navGraphViewModels(R.id.collectionGraph)
@@ -56,11 +56,19 @@ class CollectionReferenceGenerationFragment :
         if(viewModel.retrievalReferenceNumber.value.isNullOrBlank()){
             viewModel.retrievalReferenceNumber.value = localStorage.newTransactionReference()
         }
-        Log.d("OkHttpClient", "Checking the amount Input for the transaction:::: ${viewModel.paymentItemAmount.value!!}")
+        Log.d("OkHttpClient", "Checking thee accept payment value:::: ${viewModel.acceptPartPayment.value}")
 
-
-        ///TODO Please check to ensure that this part of the app doesn't crash
-        binding.amountInputPay.setText(viewModel.paymentItemAmount.value!!).toString()
+        mainScope.launch {
+            if(viewModel.acceptPartPayment.value == true){
+                binding.amountInputPay.isEnabled = true
+                binding.amountInputPay.value = ""
+            }
+            else{
+                binding.amountInputPay.isEnabled = false
+                binding.amountInputPay.setText(viewModel.paymentItemAmount.value!!).toString()
+                binding.amountInputPay.value = viewModel.paymentItemAmount.value.toString()
+            }
+        }
 
         binding.confirmPaymentButton.setOnClickListener{
             mainScope.launch {
@@ -88,40 +96,53 @@ class CollectionReferenceGenerationFragment :
             viewModel.customerPhoneNumber.value = binding.customerPhoneNoInput.value
         }
 
-        if (binding.customerValueInput.value.isNullOrBlank()) {
-            dialogProvider.showError("Please enter a valid customer value")
-        } else {
-            viewModel.customerValue.value = binding.customerValueInput.value
-        }
-
-        val amountDouble = viewModel.paymentItemAmount.value?.toDouble()
-        if (amountDouble == 0.0) return dialogProvider.showErrorAndWait("Amount cannot be zero")
+        val amountDouble = binding.amountInputPay.value.toDouble()
+//        val maximumAmount = viewModel.maximumAmount.value?.toDouble()
+//        val minimumAmount = viewModel.minimumAmount.value?.toDouble()
+//
+//        if(amountDouble < minimumAmount!!)
+//            return dialogProvider.showErrorAndWait("Amount cannot be less ${minimumAmount.toDouble().toCurrencyFormat()} and greater than ${maximumAmount!!.toDouble().toCurrencyFormat()}")
+//        if (amountDouble == 0.0) return dialogProvider.showErrorAndWait("Amount cannot be zero")
 
         val pin = dialogProvider.getPin("Agent PIN") ?: return
         if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
+
+//        var surchargeConfiguration = arrayListOf<CollectionPaymentRequest.SurchargeConfiguration>()
+//        val surchargeConfigCheck = viewModel.customerValidationSur.value?.surchargeConfiguration
+//        if(!surchargeConfigCheck.isNullOrEmpty()) {
+//            val items = CollectionPaymentRequest.SurchargeConfiguration().apply {
+//                surchargeValue = surchargeConfigCheck[0].surchargeValue
+//                surchargeName = surchargeConfigCheck[0].surchargeName
+//                minAmount = surchargeConfigCheck[0].minAmount
+//                maxAmount = surchargeConfigCheck[0].maxAmount
+//                isPercentange = surchargeConfigCheck[0].isPercentange
+//            }
+//            surchargeConfiguration.add(items)
+//        }
 
         val serializer = CollectionPaymentRequest.Additional.serializer()
         val agent = localStorage.agent
         val additional = CollectionPaymentRequest.Additional().apply {
             agentCode = agent?.agentCode
             terminalId = agent?.terminalID
+            //surchargeConfig = surchargeConfiguration
         }
         request.apply {
-            paymentReference = viewModel.customerValidResp.value?.paymentReference
-            paymentMethod = 0
+            paymentReference = "78C25325B3704D90B406232022053118"
+            paymentMethod = 1
             agentPin = pin
             channel = "mobile"
             paymentGateway = "web"
-            categoryCode = viewModel.billers.value?.code
-            collectionType = viewModel.paymentItem.value?.name
-            itemCode = viewModel.paymentItem.value?.code
+            billerItemName = viewModel.paymentItem.value?.name
+            billerItemCode = viewModel.paymentItem.value?.code
             customerAcctName = viewModel.validCustomerName.value
             customerName = viewModel.validCustomerName.value
             customerEmail = viewModel.validCustomerEmail.value
             customerPhoneNumber = viewModel.customerPhoneNumber.value
             amount = amountDouble
             geoLocation = localStorage.lastKnownLocation
-            billerId = viewModel.billerId.value
+            billerName = viewModel.billers.value?.name
+            billerCode = viewModel.billers.value?.code
             currency = "NGN"
             institutionCode = localStorage.institutionCode
             collectionService = viewModel.collectionService.value
@@ -129,6 +150,10 @@ class CollectionReferenceGenerationFragment :
             retrievalReferenceNumber = viewModel.retrievalReferenceNumber.value
             additionalInformation = Json.encodeToString(serializer, additional)
             deviceNumber = localStorage.deviceNumber
+            applyFee = true
+            feeAmount = 0
+            feeBearerAccount = "Agent"
+            feeSuspenseAccount = localStorage.agentPhone
         }
         dialogProvider.showProgressBar("Processing request")
         val (response, error) = safeRunIO {

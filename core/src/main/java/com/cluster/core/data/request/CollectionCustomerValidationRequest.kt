@@ -15,7 +15,7 @@ class CollectionCustomerValidationRequest {
     var amount: Double? = null
 
     @SerialName("CustomFields")
-    var customFields: String? = null
+    var customFields: List<CustomFields>? = null
 
     @SerialName("CustomerPhoneNumber")
     var customerPhoneNumber: String? = null
