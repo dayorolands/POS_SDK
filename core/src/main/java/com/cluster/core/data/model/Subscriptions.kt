@@ -82,6 +82,36 @@ data class SubscriptionMilestone(
 )
 
 @Serializable
+data class ChangeSubscriptionRequest(
+    @SerialName("PlanID")
+    val planId: Int,
+    @SerialName("AgentPhoneNumber")
+    val agentPhoneNumber: String,
+    @SerialName("AgentPin")
+    val agentPin: String,
+    @SerialName("InstitutionCode")
+    val institutionCode: String,
+    @SerialName("AutoRenew")
+    val autoRenew: Boolean,
+)
+
+@Serializable
+data class RenewSuscriptionRequest(
+    @SerialName("ID")
+    val id: Int,
+    @SerialName("AgentPhoneNumber")
+    val agentPhoneNumber: String,
+    @SerialName("AgentPin")
+    val agentPin: String,
+    @SerialName("InstitutionCode")
+    val institutionCode: String,
+    @SerialName("AutoRenew")
+    val autoRenew: Boolean,
+    @SerialName("Renew")
+    val renew: Boolean,
+)
+
+@Serializable
 data class SubscriptionFee(
     @SerialName("Fee")
     val fee: Double

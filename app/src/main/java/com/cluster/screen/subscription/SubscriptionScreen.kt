@@ -23,20 +23,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.Routes
 import com.cluster.core.data.api.SubscriptionService
-import com.cluster.core.data.model.Subscription
-import com.cluster.core.data.model.SubscriptionMilestone
-import com.cluster.core.data.model.SubscriptionRequest
+import com.cluster.core.data.model.*
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.type.TransactionType
-import com.cluster.core.util.SuspendCallback
-import com.cluster.core.util.format
-import com.cluster.core.util.safeRunIO
-import com.cluster.core.util.toCurrencyFormat
+import com.cluster.core.util.*
+import com.cluster.pos.model.Route
 import com.cluster.ui.*
 import com.cluster.utility.roundTo2dp
 import com.cluster.viewmodel.AppViewModel
@@ -58,6 +55,8 @@ fun SubscriptionScreen(navController: NavController) {
         activeSubscription?.expiryDate?.format("dd/MM/uuuu") ?: ""
     }
     val activePlanId = activeSubscription?.plan?.id ?: 0
+    val subscriptionId = activeSubscription?.id ?: 0
+    val subValidityPeriod = activeSubscription?.plan?.validityPeriod
     val dialogProvider by rememberDialogProvider()
     val coroutineScope = rememberCoroutineScope()
     val subscriptionMilestones by viewModel.subscriptionMilestones.collectAsState()
@@ -108,6 +107,46 @@ fun SubscriptionScreen(navController: NavController) {
             dialogProvider.showSuccess(result.data!!.message!!)
         }
     }
+
+    val renewSubscriptionRequest: SuspendCallback = remember{
+        renewSubscriptionRequest@{
+            val agentPin = dialogProvider.getAgentPin(subtitle = "Agent Pin") ?: return@renewSubscriptionRequest
+            loadingMessage = "Processing"
+            val request = RenewSuscriptionRequest(
+                id = subscriptionId,
+                agentPhoneNumber = localStorage.agentPhone!!,
+                agentPin = agentPin,
+                institutionCode = localStorage.institutionCode!!,
+                autoRenew = true,
+                renew = true
+            )
+
+            val result = safeRunIO {
+                subscriptionService.renewSubscription(request)
+            }
+            loadingMessage = ""
+
+            if (result.isFailure) {
+                dialogProvider.showError(result.error!!)
+                return@renewSubscriptionRequest
+            }
+
+            if (result.data!!.isFailure()) {
+                dialogProvider.showError(result.data!!.message!!)
+                return@renewSubscriptionRequest
+            }
+
+            kotlinx.coroutines.coroutineScope {
+                viewModel.loadSubscriptionData(
+                    subscriptionService = subscriptionService,
+                    localStorage = localStorage,
+                )
+            }
+
+            dialogProvider.showSuccess(result.data!!.message!!)
+        }
+    }
+
 
     val cancelAutoRenew: SuspendCallback = remember {
         cancelAutoRenew@{
@@ -226,8 +265,9 @@ fun SubscriptionScreen(navController: NavController) {
                                 style = MaterialTheme.typography.body1,
                                 color = MaterialTheme.colors.onSurface,
                             )
+                            Log.d("OkHttpClient","The validity period remaining is ${subValidityPeriod}")
                             Spacer(modifier = Modifier.padding(top = 20.dp))
-                            if(activeSubscription?.autoRenew == true) {
+                            if((activeSubscription?.autoRenew == true)) {
                                 ChipButton(
                                     label = stringResource(R.string.opt_out_auto_renewal),
                                     onClick = {
@@ -237,6 +277,37 @@ fun SubscriptionScreen(navController: NavController) {
                                     },
                                     imageVector = Icons.Outlined.Cancel
                                 )
+                            }
+                            if(subValidityPeriod != null){
+                                if(subValidityPeriod <= 5){
+                                    ChipButton(
+                                        label = stringResource(R.string.renewal),
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                renewSubscriptionRequest()
+                                            }
+                                        },
+                                        imageVector = Icons.Outlined.Upgrade
+                                    )
+                                    ChipButton(
+                                        label = stringResource(R.string.change),
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                navController.navigate(Routes.ChangeSubscription)
+                                            }
+                                        },
+                                        imageVector = Icons.Outlined.Update
+                                    )
+                                    Spacer(modifier = Modifier.padding(top = 20.dp))
+                                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = "You have ${subValidityPeriod} days remaining as your validity period. Kindly Renew or Change your plan.",
+                                            softWrap = true,
+                                            style = MaterialTheme.typography.body1,
+                                            color = MaterialTheme.colors.onSurface,
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -319,9 +390,12 @@ private fun MilestoneItem(item: SubscriptionMilestone) {
     ) {
         Text(label, style = MaterialTheme.typography.subtitle1)
         LinearProgressIndicator(progress = animatedProgress)
+        Spacer(modifier = Modifier.padding(5.dp))
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Current Volume: $formattedCurrent")
-            Spacer(modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.padding(5.dp))
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Target: $formattedTarget")
         }
         Spacer(modifier = Modifier.padding(top = 5.dp))
