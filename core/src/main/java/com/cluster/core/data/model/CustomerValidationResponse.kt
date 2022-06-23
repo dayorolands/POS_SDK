@@ -14,23 +14,23 @@ class CustomerValidationResponse {
     @SerialName("IsSuccessful")
     var isSuccessful: Boolean? = false
 
-    @Serializable
-    class SurchargeConfiguration{
-        @SerialName("Name")
-        var surchargeName: String? = null
-
-        @SerialName("Value")
-        var surchargeValue: Int? = null
-
-        @SerialName("MinAmount")
-        var minAmount: Int? = null
-
-        @SerialName("MaxAmount")
-        var maxAmount: Int? = null
-
-        @SerialName("IsPercentange")
-        var isPercentange: Boolean? = false
-    }
+//    @Serializable
+//    class SurchargeConfiguration{
+//        @SerialName("Name")
+//        var surchargeName: String? = null
+//
+//        @SerialName("Value")
+//        var surchargeValue: Int? = null
+//
+//        @SerialName("MinAmount")
+//        var minAmount: Int? = null
+//
+//        @SerialName("MaxAmount")
+//        var maxAmount: Int? = null
+//
+//        @SerialName("IsPercentange")
+//        var isPercentange: Boolean? = false
+//    }
 
     @Serializable
     class Result{
@@ -67,8 +67,8 @@ class CustomerValidationResponse {
         @SerialName("ResponseMessage")
         var responseMessage: String? = null
 
-        @SerialName("SurchargeConfiguration")
-        var surchargeConfiguration: List<SurchargeConfiguration>? = null
+//        @SerialName("SurchargeConfiguration")
+//        var surchargeConfiguration: List<SurchargeConfiguration>? = null
 
         @SerialName("isMultiplePayment")
         var isMultpilePayment: String? = null

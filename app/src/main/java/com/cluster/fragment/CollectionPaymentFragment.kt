@@ -138,8 +138,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             val items = CollectionCustomerValidationRequest.CustomFields().apply {
                 id = customerFieldCheck[0].customId
                 name = customerFieldCheck[0].customName
-//                id = 3
-//                name = "Virtual Account"
                 value = viewModel.customerValue.value
             }
             customFieldRequest.add(items)
@@ -147,7 +145,6 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         customerValidationRequest.apply{
             channel = "mobile"
             itemCode = viewModel.paymentItem.value?.code
-//            itemCode = "802168"
             amount = viewModel.paymentItem.value?.amount?.toDoubleOrNull()
             customFields = customFieldRequest
             customerPhoneNumber = localStorage.agentPhone
