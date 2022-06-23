@@ -186,7 +186,7 @@ fun ChooseSubscriptionScreen(
                             val subscriptionFeeResult = safeRunIO {
                                 subscriptionService.getSubscriptionFee(
                                     planId = activePlanId!!,
-                                    paymentType = if(isUpgrade) 2 else 0,
+                                    paymentType = if(isUpgrade) 2 else if (isChangeSubscription) 5 else 0,
                                     institutionCode = localStorage.institutionCode!!,
                                     phoneNumber = localStorage.agentPhone!!,
                                 )
