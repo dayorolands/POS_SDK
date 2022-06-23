@@ -309,6 +309,25 @@ fun SubscriptionScreen(navController: NavController) {
                                     }
                                 }
                             }
+                            ChipButton(
+                                label = stringResource(R.string.renewal),
+                                onClick = {
+                                    coroutineScope.launch {
+                                        renewSubscriptionRequest()
+                                    }
+                                },
+                                imageVector = Icons.Outlined.Upgrade
+                            )
+                            ChipButton(
+                                label = stringResource(R.string.change),
+                                onClick = {
+                                    coroutineScope.launch {
+                                        navController.navigate(Routes.ChangeSubscription)
+                                    }
+                                },
+                                imageVector = Icons.Outlined.Update
+                            )
+
                         }
                     }
                 }
