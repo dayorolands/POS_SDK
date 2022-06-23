@@ -55,14 +55,18 @@ fun ChooseSubscriptionScreen(
     var selectedPlan: SubscriptionPlan? by remember { mutableStateOf(null) }
     val activePlanId = selectedPlan?.id
     var isRefreshing by remember { mutableStateOf(false) }
+    var changePlan by remember { mutableStateOf(false)}
 
     val subscriptionPlans by produceState(emptyList(), refreshKey) {
         value = viewModel.subscriptionPlans.value
         isRefreshing = true
+
+        if(isChangeSubscription) changePlan = true
         val subscriptionPlansResult = safeRunIO {
             subscriptionService.getSubscriptionPlans(
                 institutionCode = localStorage.institutionCode!!,
                 agentPhoneNumber = localStorage.agentPhone!!,
+                changePlan = changePlan
             )
         }
         isRefreshing = false
@@ -94,7 +98,10 @@ fun ChooseSubscriptionScreen(
             val result = safeRunIO {
                 if (isUpgrade) {
                     subscriptionService.upgrade(request)
-                } else {
+                } else if(isChangeSubscription){
+                    subscriptionService.changeSubscriptionPlan(request)
+                }
+                else {
                     subscriptionService.subscribe(request)
                 }
             }
@@ -115,36 +122,36 @@ fun ChooseSubscriptionScreen(
         }
     }
 
-    val changeSubscriptionRequest: suspend(plan: SubscriptionPlan, agentPin: String, autoRenew: Boolean) -> Unit = remember {
-        changeSubscriptionRequest@{plan, agentPin, autoRenew ->
-            loadingMessage = "Processing"
-            val request = ChangeSubscriptionRequest(
-                planId = plan.id,
-                agentPhoneNumber = localStorage.agentPhone!!,
-                agentPin = agentPin,
-                institutionCode = localStorage.institutionCode!!,
-                autoRenew = autoRenew,
-            )
-
-            val result = safeRunIO {
-                subscriptionService.changeSubscriptionPlan(request)
-            }
-            loadingMessage = ""
-
-            if (result.isFailure) {
-                dialogProvider.showError(result.error!!)
-                return@changeSubscriptionRequest
-            }
-
-            if (result.data!!.isFailure()) {
-                dialogProvider.showError(result.data!!.message!!)
-                return@changeSubscriptionRequest
-            }
-
-            dialogProvider.showSuccess(result.data!!.message!!)
-            navController.popBackStack()
-        }
-    }
+//    val changeSubscriptionRequest: suspend(plan: SubscriptionPlan, agentPin: String, autoRenew: Boolean) -> Unit = remember {
+//        changeSubscriptionRequest@{plan, agentPin, autoRenew ->
+//            loadingMessage = "Processing"
+//            val request = ChangeSubscriptionRequest(
+//                planId = plan.id,
+//                agentPhoneNumber = localStorage.agentPhone!!,
+//                agentPin = agentPin,
+//                institutionCode = localStorage.institutionCode!!,
+//                autoRenew = autoRenew,
+//            )
+//
+//            val result = safeRunIO {
+//                subscriptionService.changeSubscriptionPlan(request)
+//            }
+//            loadingMessage = ""
+//
+//            if (result.isFailure) {
+//                dialogProvider.showError(result.error!!)
+//                return@changeSubscriptionRequest
+//            }
+//
+//            if (result.data!!.isFailure()) {
+//                dialogProvider.showError(result.data!!.message!!)
+//                return@changeSubscriptionRequest
+//            }
+//
+//            dialogProvider.showSuccess(result.data!!.message!!)
+//            navController.popBackStack()
+//        }
+//    }
 
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
@@ -195,11 +202,8 @@ fun ChooseSubscriptionScreen(
                             bottomSheetScaffoldState.bottomSheetState.collapse()
                             val agentPin = dialogProvider
                                 .getAgentPin(subtitle = feeMessage) ?: return@launch
-                            if(isChangeSubscription){
-                                changeSubscriptionRequest(selectedPlan!!, agentPin, checkedState.value)
-                            }else{
                                 chooseSubscription(selectedPlan!!, agentPin, checkedState.value)
-                            }
+
                         }
                     }) {
                         Text("I accept")

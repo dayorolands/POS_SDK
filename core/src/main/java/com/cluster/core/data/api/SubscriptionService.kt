@@ -22,6 +22,7 @@ interface SubscriptionService {
     suspend fun getSubscriptionPlans(
         @Query("institutionCode") institutionCode: String,
         @Query("agentPhoneNumber") agentPhoneNumber: String,
+        @Query("changePlan") changePlan: Boolean
     ): ApiResponse<List<SubscriptionPlan>>
 
     @GET("api/Subscription/GetMilestonesBySubscriptionID")
@@ -61,7 +62,7 @@ interface SubscriptionService {
     suspend fun optOutOfAutoRenew(@Query("id") id : Long?): ApiResponse<String>
 
     @POST("api/Subscription/ChangePlan")
-    suspend fun changeSubscriptionPlan(@Body request: ChangeSubscriptionRequest): ApiResponse<String>
+    suspend fun changeSubscriptionPlan(@Body request: SubscriptionRequest): ApiResponse<String>
 
     @POST("api/Subscription/Renew")
     suspend fun renewSubscription(@Body request: RenewSuscriptionRequest): ApiResponse<String>

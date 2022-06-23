@@ -150,7 +150,6 @@ fun SubscriptionScreen(navController: NavController) {
 
     val cancelAutoRenew: SuspendCallback = remember {
         cancelAutoRenew@{
-            Log.d("OkHttpClient", "*************The auto renew status is ${activeSubscription?.autoRenew}")
             val activeSubscriptionId = activeSubscription?.id
             val result = safeRunIO{
                 subscriptionService.optOutOfAutoRenew(activeSubscriptionId?.toLong())
