@@ -55,6 +55,7 @@ fun SubscriptionScreen(navController: NavController) {
         activeSubscription?.expiryDate?.format("dd/MM/uuuu") ?: ""
     }
     val activePlanId = activeSubscription?.plan?.id ?: 0
+    val subscriptionId = activeSubscription?.id ?: 0
     val subValidityPeriod = activeSubscription?.plan?.validityPeriod
     val dialogProvider by rememberDialogProvider()
     val coroutineScope = rememberCoroutineScope()
@@ -112,7 +113,7 @@ fun SubscriptionScreen(navController: NavController) {
             val agentPin = dialogProvider.getAgentPin(subtitle = "Agent Pin") ?: return@renewSubscriptionRequest
             loadingMessage = "Processing"
             val request = RenewSuscriptionRequest(
-                id = activePlanId,
+                id = subscriptionId,
                 agentPhoneNumber = localStorage.agentPhone!!,
                 agentPin = agentPin,
                 institutionCode = localStorage.institutionCode!!,
