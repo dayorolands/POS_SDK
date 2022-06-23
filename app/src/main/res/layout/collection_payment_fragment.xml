@@ -65,6 +65,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
                     android:hint="Select Biller Item"
+                    app:goneUnlessPresent="@{viewModel.billers}"
                     app:dependsOn="@{viewModel.billerId}">
 
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -81,6 +82,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
+                    app:goneUnlessPresent="@={viewModel.paymentItem}"
                     android:hint="Amount">
 
                     <com.google.android.material.textfield.TextInputEditText

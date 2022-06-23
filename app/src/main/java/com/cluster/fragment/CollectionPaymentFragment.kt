@@ -1,13 +1,11 @@
 package com.cluster.fragment
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -17,7 +15,6 @@ import com.cluster.core.data.api.CollectionsService
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.model.CollectionPaymentItem
 import com.cluster.core.data.request.CollectionCustomerValidationRequest
-import com.cluster.core.data.request.CollectionPaymentRequest
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.safeRunIO
 import com.cluster.databinding.CollectionPaymentFragmentBinding
@@ -139,18 +136,18 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         val customerFieldCheck = viewModel.paymentItem.value?.customFields
         if(!customerFieldCheck.isNullOrEmpty()) {
             val items = CollectionCustomerValidationRequest.CustomFields().apply {
-                //id = customerFieldCheck[0].customId
-                //name = customerFieldCheck[0].customName
-                id = 3
-                name = "Virtual Account"
+                id = customerFieldCheck[0].customId
+                name = customerFieldCheck[0].customName
+//                id = 3
+//                name = "Virtual Account"
                 value = viewModel.customerValue.value
             }
             customFieldRequest.add(items)
         }
         customerValidationRequest.apply{
             channel = "mobile"
-            //itemCode = viewModel.paymentItem.value?.code
-            itemCode = "802168"
+            itemCode = viewModel.paymentItem.value?.code
+           // itemCode = "802168"
             amount = viewModel.paymentItem.value?.amount?.toDoubleOrNull()
             customFields = customFieldRequest
             customerPhoneNumber = localStorage.agentPhone
@@ -169,17 +166,12 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         response ?: return dialogProvider.showError("An error occurred while generating reference")
 
         if (response.isSuccessful == true) {
-            //dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
-            viewModel.surchargeConfiguration.value = response.surchargeConfiguration
-            viewModel.acceptPartPayment.value = response.acceptPartPayment
-            viewModel.minimumAmount.value = response.minimumAmount.toString()
-            viewModel.maximumAmount.value = response.maximumAmount.toString()
-            viewModel.paymentReferece.value = response.paymentReference
-
-            Log.d("OkHttpClient", "Check the following values::::::::: ${viewModel.acceptPartPayment.value}")
-            Log.d("OkHttpClient", "Check the following values::::::::: ${viewModel.minimumAmount.value}")
-            Log.d("OkHttpClient", "Check the following values::::::::: ${viewModel.maximumAmount.value}")
-            Log.d("OkHttpClient", "Check the following values::::::::: ${viewModel.paymentReferece.value}")
+            viewModel.surchargeConfiguration.value = response.result!!.surchargeConfiguration
+            viewModel.acceptPartPayment.value = response.result!!.acceptPartPayment
+            viewModel.minimumAmount.value = response.result!!.minimumAmount.toString()
+            viewModel.maximumAmount.value = response.result!!.maximumAmount.toString()
+            viewModel.paymentReferece.value = response.result!!.paymentReference
+            viewModel.customerValidResp.value = response
 
             findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
         }

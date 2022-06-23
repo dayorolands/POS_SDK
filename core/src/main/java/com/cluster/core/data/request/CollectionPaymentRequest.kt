@@ -41,17 +41,8 @@ class CollectionPaymentRequest {
     @SerialName("PaymentGateway")
     var paymentGateway: String? = null
 
-    @SerialName("CategoryCode")
-    var categoryCode: String? = null
-
-    @SerialName("CollectionType")
-    var collectionType: String? = null
-
     @SerialName("BillerItemCode")
     var billerItemCode: String? = null
-
-    @SerialName("CollectionService")
-    var collectionService: String? = null
 
     @SerialName("Amount")
     var amount: Double? = null
@@ -76,9 +67,6 @@ class CollectionPaymentRequest {
 
     @SerialName("RetrievalReferenceNumber")
     var retrievalReferenceNumber: String? = null
-
-    @SerialName("BillerId")
-    var billerId: String? = null
 
     @SerialName("DeviceNumber")
     var deviceNumber: Int? = null

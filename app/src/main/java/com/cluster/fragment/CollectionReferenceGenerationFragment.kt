@@ -97,38 +97,44 @@ class CollectionReferenceGenerationFragment :
         }
 
         val amountDouble = binding.amountInputPay.value.toDouble()
-//        val maximumAmount = viewModel.maximumAmount.value?.toDouble()
-//        val minimumAmount = viewModel.minimumAmount.value?.toDouble()
-//
-//        if(amountDouble < minimumAmount!!)
-//            return dialogProvider.showErrorAndWait("Amount cannot be less ${minimumAmount.toDouble().toCurrencyFormat()} and greater than ${maximumAmount!!.toDouble().toCurrencyFormat()}")
-//        if (amountDouble == 0.0) return dialogProvider.showErrorAndWait("Amount cannot be zero")
+        val maximumAmount = viewModel.maximumAmount.value?.toDouble()
+        val minimumAmount = viewModel.minimumAmount.value?.toDouble()
+
+        if(amountDouble < minimumAmount!!){
+            return dialogProvider.showErrorAndWait("Amount cannot be less ${minimumAmount.toDouble().toCurrencyFormat()}")
+        }
+
+        if(amountDouble > maximumAmount!!){
+            return dialogProvider.showErrorAndWait("Amount cannot be more than ${maximumAmount.toDouble().toCurrencyFormat()}")
+        }
+
+        if (amountDouble == 0.0) return dialogProvider.showErrorAndWait("Amount cannot be zero")
 
         val pin = dialogProvider.getPin("Agent PIN") ?: return
         if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
-//        var surchargeConfiguration = arrayListOf<CollectionPaymentRequest.SurchargeConfiguration>()
-//        val surchargeConfigCheck = viewModel.customerValidationSur.value?.surchargeConfiguration
-//        if(!surchargeConfigCheck.isNullOrEmpty()) {
-//            val items = CollectionPaymentRequest.SurchargeConfiguration().apply {
-//                surchargeValue = surchargeConfigCheck[0].surchargeValue
-//                surchargeName = surchargeConfigCheck[0].surchargeName
-//                minAmount = surchargeConfigCheck[0].minAmount
-//                maxAmount = surchargeConfigCheck[0].maxAmount
-//                isPercentange = surchargeConfigCheck[0].isPercentange
-//            }
-//            surchargeConfiguration.add(items)
-//        }
+        var surchargeConfiguration = arrayListOf<CollectionPaymentRequest.SurchargeConfiguration>()
+        val surchargeConfigCheck = viewModel.surchargeConfiguration.value
+        if(!surchargeConfigCheck.isNullOrEmpty()) {
+            val items = CollectionPaymentRequest.SurchargeConfiguration().apply {
+                surchargeValue = surchargeConfigCheck[0].surchargeValue
+                surchargeName = surchargeConfigCheck[0].surchargeName
+                minAmount = surchargeConfigCheck[0].minAmount
+                maxAmount = surchargeConfigCheck[0].maxAmount
+                isPercentange = surchargeConfigCheck[0].isPercentange
+            }
+            surchargeConfiguration.add(items)
+        }
 
         val serializer = CollectionPaymentRequest.Additional.serializer()
         val agent = localStorage.agent
         val additional = CollectionPaymentRequest.Additional().apply {
             agentCode = agent?.agentCode
             terminalId = agent?.terminalID
-            //surchargeConfig = surchargeConfiguration
+            surchargeConfig = surchargeConfiguration
         }
         request.apply {
-            paymentReference = "78C25325B3704D90B406232022053118"
+            paymentReference = viewModel.paymentReferece.value
             paymentMethod = 1
             agentPin = pin
             channel = "mobile"
@@ -145,7 +151,6 @@ class CollectionReferenceGenerationFragment :
             billerCode = viewModel.billers.value?.code
             currency = "NGN"
             institutionCode = localStorage.institutionCode
-            collectionService = viewModel.collectionService.value
             requestReference = uniqueReference
             retrievalReferenceNumber = viewModel.retrievalReferenceNumber.value
             additionalInformation = Json.encodeToString(serializer, additional)
