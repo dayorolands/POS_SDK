@@ -147,7 +147,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         customerValidationRequest.apply{
             channel = "mobile"
             itemCode = viewModel.paymentItem.value?.code
-           // itemCode = "802168"
+//            itemCode = "802168"
             amount = viewModel.paymentItem.value?.amount?.toDoubleOrNull()
             customFields = customFieldRequest
             customerPhoneNumber = localStorage.agentPhone
@@ -166,12 +166,10 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         response ?: return dialogProvider.showError("An error occurred while generating reference")
 
         if (response.isSuccessful == true) {
-            viewModel.surchargeConfiguration.value = response.result!!.surchargeConfiguration
             viewModel.acceptPartPayment.value = response.result!!.acceptPartPayment
             viewModel.minimumAmount.value = response.result!!.minimumAmount.toString()
             viewModel.maximumAmount.value = response.result!!.maximumAmount.toString()
             viewModel.paymentReferece.value = response.result!!.paymentReference
-            viewModel.customerValidResp.value = response
 
             findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
         }

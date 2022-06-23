@@ -113,25 +113,11 @@ class CollectionReferenceGenerationFragment :
         val pin = dialogProvider.getPin("Agent PIN") ?: return
         if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
-        var surchargeConfiguration = arrayListOf<CollectionPaymentRequest.SurchargeConfiguration>()
-        val surchargeConfigCheck = viewModel.surchargeConfiguration.value
-        if(!surchargeConfigCheck.isNullOrEmpty()) {
-            val items = CollectionPaymentRequest.SurchargeConfiguration().apply {
-                surchargeValue = surchargeConfigCheck[0].surchargeValue
-                surchargeName = surchargeConfigCheck[0].surchargeName
-                minAmount = surchargeConfigCheck[0].minAmount
-                maxAmount = surchargeConfigCheck[0].maxAmount
-                isPercentange = surchargeConfigCheck[0].isPercentange
-            }
-            surchargeConfiguration.add(items)
-        }
-
         val serializer = CollectionPaymentRequest.Additional.serializer()
         val agent = localStorage.agent
         val additional = CollectionPaymentRequest.Additional().apply {
             agentCode = agent?.agentCode
             terminalId = agent?.terminalID
-            surchargeConfig = surchargeConfiguration
         }
         request.apply {
             paymentReference = viewModel.paymentReferece.value
