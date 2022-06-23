@@ -59,4 +59,10 @@ interface SubscriptionService {
 
     @POST("api/Subscription/OptOutOfAutoRenew")
     suspend fun optOutOfAutoRenew(@Query("id") id : Long?): ApiResponse<String>
+
+    @POST("api/Subscription/ChangePlan")
+    suspend fun changeSubscriptionPlan(@Body request: ChangeSubscriptionRequest): ApiResponse<String>
+
+    @POST("api/Subscription/Renew")
+    suspend fun renewSubscription(@Body request: RenewSuscriptionRequest): ApiResponse<String>
 }
