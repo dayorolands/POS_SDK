@@ -22,7 +22,7 @@ class AppViewModel : ViewModel() {
 
     // Subscriptions
     val validityPeriodCheck = MutableStateFlow(0)
-    val checkAutoRenew = MutableStateFlow(false)
+    val isSubActive = MutableStateFlow(false)
     val activeSubscription = MutableStateFlow<Subscription?>(null)
     val subscriptionMilestones = MutableStateFlow<List<SubscriptionMilestone>>(emptyList())
     val subscriptionHistory = MutableStateFlow<List<Subscription>>(emptyList())

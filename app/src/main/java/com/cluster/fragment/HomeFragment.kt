@@ -60,9 +60,9 @@ class HomeFragment : CreditClubFragment() {
     private val notificationService: NotificationService by retrofitService()
     private val subscriptionService: SubscriptionService by retrofitService()
     private val appDataStorage: AppDataStorage by inject()
-    private val expectedValidityPeriod = 7
+    private val expectedValidityPeriod = 5
     private var validityPeriod = 0
-    var checkRenew = false
+    private var isCurrentActive = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -90,12 +90,13 @@ class HomeFragment : CreditClubFragment() {
         mainScope.launch {
             getValidityPeriod(appViewModel, localStorage, subscriptionService)
             validityPeriod = appViewModel.validityPeriodCheck.value
-            checkRenew = appViewModel.checkAutoRenew.value
-            if(validityPeriod <= expectedValidityPeriod)
-                if(checkRenew)
-                dialogProvider.showInfo("Kindly note that you will be automatically debited for your auto-renewal by month-end")
-            else
-                dialogProvider.showInfo("You have ${validityPeriod} days remaining as your Plan validity period. Kindly Renew or Change your plan")
+            isCurrentActive = appViewModel.isSubActive.value
+            if(isCurrentActive) {
+                if (validityPeriod <= expectedValidityPeriod)
+                    return@launch dialogProvider.showInfo("You have $validityPeriod days remaining as your Plan validity period.")
+                else
+                    return@launch
+            }
         }
 
         val hasPosUpdateManager = Platform.isPOS && Platform.deviceType != 2
@@ -179,7 +180,7 @@ class HomeFragment : CreditClubFragment() {
         }
         if (subscription?.data != null) {
             viewModel.validityPeriodCheck.value = subscription.data!!.plan.validityPeriod
-            viewModel.checkAutoRenew.value = subscription.data!!.autoRenew
+            viewModel.isSubActive.value = subscription.data!!.plan.isActive
         }
     }
 
