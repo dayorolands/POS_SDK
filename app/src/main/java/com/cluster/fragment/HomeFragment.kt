@@ -61,7 +61,7 @@ class HomeFragment : CreditClubFragment() {
     private val subscriptionService: SubscriptionService by retrofitService()
     private val appDataStorage: AppDataStorage by inject()
     private val expectedValidityPeriod = 7
-    var validityPeriod = 0
+    private var validityPeriod = 0
     var checkRenew = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

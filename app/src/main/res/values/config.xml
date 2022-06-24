@@ -17,4 +17,5 @@
     <bool name="flow_token_withdrawal">true</bool>
     <bool name="flow_customer_balance">true</bool>
     <bool name="flow_ussd_withdrawal">false</bool>
+    <bool name="flow_get_a_loan">false</bool>
 </resources>

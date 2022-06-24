@@ -21,7 +21,6 @@ import com.cluster.pos.printer.*
 import com.cluster.pos.receipt.withdrawalTransactionStatus
 import java.time.Instant
 
-
 fun depositReceipt(
     context: Context,
     request: DepositRequest,
@@ -29,6 +28,7 @@ fun depositReceipt(
     transactionDate: String,
     isSuccessful: Boolean = false,
     reason: String? = null,
+    responseCode: String? = null
 ) = printJob {
     logo()
     text(
@@ -52,6 +52,7 @@ fun depositReceipt(
     transactionStatus(
         context = context,
         isSuccessful = isSuccessful,
+        responseCode = responseCode ?: if (isSuccessful) "00" else "06",
         reason = reason,
     )
     footer(context)

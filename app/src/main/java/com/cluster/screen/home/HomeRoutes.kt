@@ -35,7 +35,7 @@ fun NavGraphBuilder.homeRoutes(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 BalanceCard()
-                if(institutionConfig.categories.loans) {
+                if(institutionConfig.flows.getALoan != null) {
                     LoanOfferSection(
                         onRequestLoan = {
                             composeNavController.navigate(Routes.AgentLoanRequest)

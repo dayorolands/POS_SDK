@@ -1,9 +1,7 @@
 package com.cluster.core.data.api
 
-import com.cluster.core.data.model.CollectionCategory
-import com.cluster.core.data.model.CollectionCustomer
-import com.cluster.core.data.model.CollectionPaymentItem
-import com.cluster.core.data.model.CollectionReference
+import com.cluster.core.data.model.*
+import com.cluster.core.data.request.CollectionCustomerValidationRequest
 import com.cluster.core.data.request.CollectionPaymentRequest
 import com.cluster.core.data.request.CollectionReferenceGenerationRequest
 import com.cluster.core.data.response.CollectionPaymentResponse
@@ -75,5 +73,27 @@ interface CollectionsService {
         @Query("paymentReference") paymentReference: String?,
         @Query("region") region: String?,
         @Query("collectionService") collectionService: String?
+    ): CollectionPaymentResponse?
+
+    @GET("api/Collections/GetBillers")
+    suspend fun getCollectionBillers(
+        @Query("institutionCode") institutionCode: String?,
+        @Query("collectionService") collectionService: String?
+    ): List<CollectionCategory>
+
+    @GET("api/Collections/GetBillerItems")
+    suspend fun getCollectionPaymentItems(
+        @Query("institutionCode") institutionCode: String?,
+        @Query("billerId") billerId: String?
+    ): List<CollectionPaymentItem>
+
+    @POST("api/Collections/ValidateCustomer")
+    suspend fun validateCustomer(
+        @Body request: CollectionCustomerValidationRequest
+    ) : CustomerValidationResponse?
+
+    @POST("api/Collections/Payment")
+    suspend fun completePayment(
+        @Body request: CollectionPaymentRequest
     ): CollectionPaymentResponse?
 }

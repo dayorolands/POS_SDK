@@ -132,6 +132,11 @@ android {
             dimension "flavor"
             applicationId "africa.cluster.heritage"
         }
+
+        halo {
+            dimension "flavor"
+            applicationId "africa.cluster.halo"
+        }
     }
     sourceSets {
         main {
@@ -182,6 +187,9 @@ dependencies {
     groomingImplementation(project(":telpo"))
     groomingImplementation(project(":nexgo"))
     heritageImplementation(project(":wizar"))
+    haloImplementation(project(":dspread"))
+    haloImplementation(project(":nexgo"))
+
 
     implementation("androidx.activity:activity-ktx:${Versions.activityKtx}")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
