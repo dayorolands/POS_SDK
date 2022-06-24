@@ -141,6 +141,7 @@ class CollectionReferenceGenerationFragment :
             retrievalReferenceNumber = viewModel.retrievalReferenceNumber.value
             additionalInformation = Json.encodeToString(serializer, additional)
             deviceNumber = localStorage.deviceNumber
+            agentPhoneNumber = localStorage.agentPhone
             applyFee = true
             feeAmount = 0
             feeBearerAccount = "Agent"
