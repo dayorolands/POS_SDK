@@ -167,6 +167,8 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             viewModel.minimumAmount.value = response.result!!.minimumAmount.toString()
             viewModel.maximumAmount.value = response.result!!.maximumAmount.toString()
             viewModel.paymentReferece.value = response.result!!.paymentReference
+            viewModel.feeAmount.value = response.result!!.surcharge?.toInt()
+            viewModel.customerName.value = response.result!!.customerName
 
             findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
         }

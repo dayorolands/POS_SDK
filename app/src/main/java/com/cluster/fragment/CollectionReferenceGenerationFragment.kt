@@ -59,6 +59,16 @@ class CollectionReferenceGenerationFragment :
         Log.d("OkHttpClient", "Checking thee accept payment value:::: ${viewModel.acceptPartPayment.value}")
 
         mainScope.launch {
+            if(!viewModel.customerName.value?.isBlank()!!){
+                binding.customerNameInput.isEnabled = false
+                binding.customerNameInput.setText(viewModel.customerName.value)
+                binding.customerNameInput.value = viewModel.customerName.value.toString()
+            }
+            else{
+                binding.customerNameInput.isEnabled = true
+                binding.customerNameInput.value = ""
+            }
+
             if(viewModel.acceptPartPayment.value == true){
                 binding.amountInputPay.isEnabled = true
                 binding.amountInputPay.value = ""
@@ -143,7 +153,7 @@ class CollectionReferenceGenerationFragment :
             deviceNumber = localStorage.deviceNumber
             agentPhoneNumber = localStorage.agentPhone
             applyFee = true
-            feeAmount = 0
+            feeAmount = viewModel.feeAmount.value
             feeBearerAccount = "Agent"
             feeSuspenseAccount = localStorage.agentPhone
         }

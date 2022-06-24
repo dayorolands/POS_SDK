@@ -49,7 +49,7 @@ class CustomerValidationResponse {
         @SerialName("CustomerName")
         var customerName: String? = null
 
-        @SerialName("Surcharge")
+        @SerialName("SurCharge")
         var surcharge: Double? = null
 
         @SerialName("MinimumAmount")
