@@ -4,10 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -37,7 +36,7 @@ import java.util.*
 fun HomeScreen(
     mainNavController: NavController,
     composeNavController: NavHostController,
-    fragment: CreditClubFragment,
+    fragment: CreditClubFragment
 ) {
     val composableRouteFunctionIds = remember {
         mapOf(
@@ -163,5 +162,29 @@ fun HomeScreen(
                     .height(60.dp)
             )
         }
+    }
+}
+
+@Composable
+fun alertDialog(
+    viewModel: AppViewModel
+){
+    val openDialog = remember{ mutableStateOf(true) }
+    val activeSubscription by viewModel.activeSubscription.collectAsState()
+
+    if(openDialog.value){
+        AlertDialog(
+            onDismissRequest = { openDialog.value = false },
+            title = {Text(text= "AlertDialog", color = MaterialTheme.colors.onSurface)},
+            text = { Text(text = "Your validity period is ${activeSubscription?.plan?.validityPeriod}")},
+
+            confirmButton = {
+                TextButton(onClick = {
+                    openDialog.value = false
+                }) {
+                    Text(text = "Close", color = MaterialTheme.colors.onSurface)
+                }
+            }
+        )
     }
 }
