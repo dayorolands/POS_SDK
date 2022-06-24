@@ -171,7 +171,11 @@ class HomeFragment : CreditClubFragment() {
     }
 }
 
-    private suspend fun getValidityPeriod(viewModel: AppViewModel,localStorage: LocalStorage, subscriptionService: SubscriptionService) {
+    private suspend fun getValidityPeriod(
+        viewModel: AppViewModel,
+        localStorage: LocalStorage,
+        subscriptionService: SubscriptionService
+    ) {
         val (subscription) = safeRunIO {
             subscriptionService.getActiveSubscription(
                 institutionCode = localStorage.institutionCode,

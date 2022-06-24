@@ -123,17 +123,59 @@ fun ChooseSubscriptionScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.surface),
-    ){
-        CreditClubAppBar(
-            title = if (isUpgrade) stringResource(R.string.upgrade) else if (isChangeSubscription) stringResource(R.string.change) else stringResource(R.string.choose_a_plan),
-            onBackPressed = { navController.popBackStack() },
-        )
-    }
-    SwipeRefresh(
+    BottomSheetScaffold(
+        scaffoldState = bottomSheetScaffoldState,
+        sheetContent = {
+            if (selectedPlan != null) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    IconButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                bottomSheetScaffoldState.bottomSheetState.collapse()
+                            }
+                        },
+                        modifier = Modifier.padding(top = 5.dp),
+                    ) {
+                        Icon(
+                            Icons.Filled.Close,
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.primary.copy(0.52f)
+                        )
+                    }
+                    AppButton(onClick = {
+                        coroutineScope.launch {
+                            val subscriptionFeeResult = safeRunIO {
+                                subscriptionService.getSubscriptionFee(
+                                    planId = activePlanId!!,
+                                    paymentType = if(isUpgrade) 2 else if (isChangeSubscription) 5 else 0,
+                                    institutionCode = localStorage.institutionCode!!,
+                                    phoneNumber = localStorage.agentPhone!!,
+                                )
+                            }
+                            val feeMessage = "Subscription Fee is ${subscriptionFeeResult.data?.data?.roundTo2dp()}"
+                            bottomSheetScaffoldState.bottomSheetState.collapse()
+                            val agentPin = dialogProvider
+                                .getAgentPin(subtitle = feeMessage) ?: return@launch
+                                chooseSubscription(selectedPlan!!, agentPin, false)
+
+                        }
+                    }) {
+                        Text("Confirm ${selectedPlan!!.name} plan?")
+                    }
+                }
+            }
+        },
+        sheetShape = RoundedCornerShape(topEnd = 20.dp, topStart = 20.dp),
+        backgroundColor = MaterialTheme.colors.surface,
+        sheetPeekHeight = 0.dp,
+        topBar = {
+            CreditClubAppBar(
+                title = if (isUpgrade) stringResource(R.string.upgrade) else if (isChangeSubscription) stringResource(R.string.change) else stringResource(R.string.choose_a_plan),
+                onBackPressed = { navController.popBackStack() },
+            )
+        }
+    ) {
+        SwipeRefresh(
             state = rememberSwipeRefreshState(isRefreshing),
             onRefresh = { refreshKey = UUID.randomUUID().toString() },
             swipeEnabled = loadingMessage.isNotBlank(),
@@ -160,33 +202,24 @@ fun ChooseSubscriptionScreen(
                         onClick = {
                             selectedPlan = it
                             coroutineScope.launch {
-                                val subscriptionFeeResult = safeRunIO {
-                                    subscriptionService.getSubscriptionFee(
-                                        planId = activePlanId!!,
-                                        paymentType = if(isUpgrade) 2 else if (isChangeSubscription) 5 else 0,
-                                        institutionCode = localStorage.institutionCode!!,
-                                        phoneNumber = localStorage.agentPhone!!,
-                                    )
-                                }
-                                val feeMessage = "Subscription Fee is ${subscriptionFeeResult.data?.data?.roundTo2dp()}"
-                                //bottomSheetScaffoldState.bottomSheetState.collapse()
-                                val agentPin = dialogProvider
-                                    .getAgentPin(subtitle = feeMessage) ?: return@launch
-                                chooseSubscription(selectedPlan!!, agentPin, false)
+                                bottomSheetScaffoldState.bottomSheetState.expand()
                             }
                         },
                     )
                 }
 
                 item {
-                    Spacer(modifier = Modifier.height(70.dp))
+                    Spacer(modifier = Modifier.height(96.dp))
                 }
             }
         }
     }
+}
 
 @Composable
-private fun SubscriptionPlanItem(item: SubscriptionPlan, onClick: () -> Unit) {
+private inline fun SubscriptionPlanItem(
+    item: SubscriptionPlan,
+    noinline onClick: () -> Unit) {
     val formattedFee = remember { item.fee.toCurrencyFormat() }
 
     Column(
