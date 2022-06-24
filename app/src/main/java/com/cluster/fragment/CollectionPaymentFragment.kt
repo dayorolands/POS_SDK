@@ -36,6 +36,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     override val functionId = FunctionIds.COLLECTION_PAYMENT
     private val collectionsService: CollectionsService by retrofitService()
     private val customerValidationRequest = CollectionCustomerValidationRequest()
+    private var isFixedAmount = false
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -64,7 +65,16 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         }
 
         viewModel.paymentItem.onChange {
-            binding.amountInput.value = viewModel.paymentItem.value?.amount!!
+            isFixedAmount = viewModel.paymentItem.value?.isFixedAmount!!
+            viewModel.isFixedAmountCheck.value = viewModel.paymentItem.value?.isFixedAmount
+            if(isFixedAmount) {
+                binding.amountInput.isEnabled = false
+                binding.amountInput.visibility = View.VISIBLE
+                binding.amountInput.value = viewModel.paymentItem.value?.amount!!
+            }else{
+                binding.amountInput.visibility = View.INVISIBLE
+            }
+
             binding.customerValueInput.visibility = View.VISIBLE
             val customFields = viewModel.paymentItem.value?.customFields
             if(!customFields.isNullOrEmpty()) {
@@ -117,7 +127,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
     }
 
     private suspend fun validateCustomer(){
-        if (binding.customerValueInput.value.isNullOrBlank()) {
+        if (binding.customerValueInput.value.isBlank()) {
             dialogProvider.showError("Please enter a valid customer value")
         } else{
             viewModel.customerValue.value = binding.customerValueInput.value
@@ -127,7 +137,11 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             dialogProvider.showError("Please enter a valid amount greater than 0")
         }
         else{
-            viewModel.paymentItemAmount.value = binding.amountInput.value
+            if(isFixedAmount){
+                viewModel.paymentItemAmount.value = binding.amountInput.value
+            }else{
+                viewModel.paymentItemAmount.value = "0"
+            }
             Log.d("OkHttpClient", "Checking the amount Input for the transaction ${binding.amountInput.value}")
             Log.d("OkHttpClient", "Checking the amount Input for the transaction ${viewModel.paymentItemAmount.value}")
         }
@@ -169,6 +183,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
             viewModel.paymentReferece.value = response.result!!.paymentReference
             viewModel.feeAmount.value = response.result!!.surcharge?.toInt()
             viewModel.customerName.value = response.result!!.customerName
+            viewModel.amountDue.value = response.result!!.amountDue
 
             findNavController().navigate(R.id.action_collection_payment_to_reference_generation)
         }

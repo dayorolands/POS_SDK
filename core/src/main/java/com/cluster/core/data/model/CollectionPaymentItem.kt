@@ -23,6 +23,9 @@ class CollectionPaymentItem {
     @SerialName("CollectionAccount")
     var collectionAccount: String? = null
 
+    @SerialName("IsFixedAmount")
+    var isFixedAmount: Boolean? = false
+
     @SerialName("CustomFields")
     var customFields: List<CollectionValidationCustomFields>? = null
 
