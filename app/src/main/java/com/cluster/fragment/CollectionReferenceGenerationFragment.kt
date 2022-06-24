@@ -82,8 +82,8 @@ class CollectionReferenceGenerationFragment :
 
             if(viewModel.feeAmount.value?.toInt() != null){
                 binding.feeInputPay.isEnabled = false
-                binding.feeInputPay.setText(viewModel.customerName.value)
-                binding.feeInputPay.value = viewModel.customerName.value.toString()
+                binding.feeInputPay.setText(viewModel.feeAmount.value.toString())
+                binding.feeInputPay.value = viewModel.feeAmount.value.toString()
             }
             else{
                 binding.feeInputPay.isEnabled = true

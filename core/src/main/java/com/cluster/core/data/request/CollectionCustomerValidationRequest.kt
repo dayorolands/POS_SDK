@@ -29,6 +29,9 @@ class CollectionCustomerValidationRequest {
     @SerialName("CustomerEmail")
     var customerEmail: String? = null
 
+    @SerialName("AgentPhoneNumber")
+    var agentPhoneNumber: String? = null
+
     @Serializable
     class CustomFields {
         @SerialName("Id")

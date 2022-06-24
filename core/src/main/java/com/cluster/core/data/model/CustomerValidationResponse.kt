@@ -44,7 +44,7 @@ class CustomerValidationResponse {
         var paymentReference: String? = null
 
         @SerialName("AmountDue")
-        var amountDue: Int? = null
+        var amountDue: Double? = null
 
         @SerialName("CustomerName")
         var customerName: String? = null
