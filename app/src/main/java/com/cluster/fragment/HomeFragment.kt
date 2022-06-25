@@ -63,6 +63,7 @@ class HomeFragment : CreditClubFragment() {
     private val expectedValidityPeriod = 5
     private var validityPeriod = 0
     private var isCurrentActive = false
+    private var isAlreadyDisplayed = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -91,12 +92,16 @@ class HomeFragment : CreditClubFragment() {
             getValidityPeriod(appViewModel, localStorage, subscriptionService)
             validityPeriod = appViewModel.validityPeriodCheck.value
             isCurrentActive = appViewModel.isSubActive.value
-            if(isCurrentActive) {
-                if (validityPeriod <= expectedValidityPeriod)
-                    return@launch dialogProvider.showInfo("You have $validityPeriod days remaining as your Plan validity period.")
-                else
-                    return@launch
+            if(!isAlreadyDisplayed) {
+                if (isCurrentActive) {
+                    if (validityPeriod <= expectedValidityPeriod) {
+                        isAlreadyDisplayed = true
+                        return@launch dialogProvider.showInfo("You have $validityPeriod days remaining as your Plan validity period.")
+                    }
+                }
             }
+            else
+                return@launch
         }
 
         val hasPosUpdateManager = Platform.isPOS && Platform.deviceType != 2
