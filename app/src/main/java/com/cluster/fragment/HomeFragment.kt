@@ -62,6 +62,7 @@ class HomeFragment : CreditClubFragment() {
     private val appDataStorage: AppDataStorage by inject()
     private val expectedValidityPeriod = 5
     private var validityPeriod = 0
+    private var daysToExpiry = 0
     private var isCurrentActive = false
     private var isAlreadyDisplayed = false
 
@@ -91,12 +92,13 @@ class HomeFragment : CreditClubFragment() {
         mainScope.launch {
             getValidityPeriod(appViewModel, localStorage, subscriptionService)
             validityPeriod = appViewModel.validityPeriodCheck.value
+            daysToExpiry = appViewModel.daysToExpiry.value
             isCurrentActive = appViewModel.isSubActive.value
             if(!isAlreadyDisplayed) {
                 if (isCurrentActive) {
-                    if (validityPeriod <= expectedValidityPeriod) {
+                    if (daysToExpiry <= expectedValidityPeriod) {
                         isAlreadyDisplayed = true
-                        return@launch dialogProvider.showInfo("You have $validityPeriod days remaining as your Plan validity period.")
+                        return@launch dialogProvider.showInfo("You have $daysToExpiry days remaining as your Plan validity period.")
                     }
                 }
             }
@@ -190,6 +192,7 @@ class HomeFragment : CreditClubFragment() {
         if (subscription?.data != null) {
             viewModel.validityPeriodCheck.value = subscription.data!!.plan.validityPeriod
             viewModel.isSubActive.value = subscription.data!!.plan.isActive
+            viewModel.daysToExpiry.value = subscription.data!!.daysToExpiry
         }
     }
 

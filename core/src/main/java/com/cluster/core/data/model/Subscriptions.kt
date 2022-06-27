@@ -51,6 +51,8 @@ data class Subscription(
     val expiryDate: Instant,
     @SerialName("AutoRenew")
     val autoRenew: Boolean,
+    @SerialName("DaysToExpiry")
+    val daysToExpiry: Int
 )
 
 @Serializable
