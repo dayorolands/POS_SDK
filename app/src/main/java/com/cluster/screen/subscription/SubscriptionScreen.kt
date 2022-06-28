@@ -1,6 +1,5 @@
 package com.cluster.screen.subscription
 
-import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -12,7 +11,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -23,23 +23,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.Routes
 import com.cluster.core.data.api.SubscriptionService
-import com.cluster.core.data.model.*
+import com.cluster.core.data.model.RenewSuscriptionRequest
+import com.cluster.core.data.model.SubscriptionMilestone
+import com.cluster.core.data.model.SubscriptionRequest
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.type.TransactionType
-import com.cluster.core.util.*
-import com.cluster.pos.model.Route
+import com.cluster.core.util.SuspendCallback
+import com.cluster.core.util.format
+import com.cluster.core.util.safeRunIO
+import com.cluster.core.util.toCurrencyFormat
 import com.cluster.ui.*
 import com.cluster.utility.roundTo2dp
 import com.cluster.viewmodel.AppViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
@@ -150,7 +152,6 @@ fun SubscriptionScreen(navController: NavController) {
 
     val cancelAutoRenew: SuspendCallback = remember {
         cancelAutoRenew@{
-            Log.d("OkHttpClient", "*************The auto renew status is ${activeSubscription?.autoRenew}")
             val activeSubscriptionId = activeSubscription?.id
             val result = safeRunIO{
                 subscriptionService.optOutOfAutoRenew(activeSubscriptionId?.toLong())
@@ -265,55 +266,54 @@ fun SubscriptionScreen(navController: NavController) {
                                 style = MaterialTheme.typography.body1,
                                 color = MaterialTheme.colors.onSurface,
                             )
-                            Log.d("OkHttpClient","The validity period remaining is ${subValidityPeriod}")
-                            Spacer(modifier = Modifier.padding(top = 20.dp))
-                            if((activeSubscription?.autoRenew == true)) {
-                                ChipButton(
-                                    label = stringResource(R.string.opt_out_auto_renewal),
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            cancelAutoRenew()
-                                        }
-                                    },
-                                    imageVector = Icons.Outlined.Cancel
-                                )
-                            }
-                            if(subValidityPeriod != null){
-                                if(subValidityPeriod <= 5){
-                                    ChipButton(
-                                        label = stringResource(R.string.renewal),
-                                        onClick = {
-                                            coroutineScope.launch {
-                                                renewSubscriptionRequest()
-                                            }
-                                        },
-                                        imageVector = Icons.Outlined.Upgrade
-                                    )
-                                    ChipButton(
-                                        label = stringResource(R.string.change),
-                                        onClick = {
-                                            coroutineScope.launch {
-                                                navController.navigate(Routes.ChangeSubscription)
-                                            }
-                                        },
-                                        imageVector = Icons.Outlined.Update
-                                    )
-                                    Spacer(modifier = Modifier.padding(top = 20.dp))
-                                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                        Text(
-                                            text = "You have ${subValidityPeriod} days remaining as your validity period. Kindly Renew or Change your plan.",
-                                            softWrap = true,
-                                            style = MaterialTheme.typography.body1,
-                                            color = MaterialTheme.colors.onSurface,
-                                        )
-                                    }
-                                }
-                            }
+//                            Spacer(modifier = Modifier.padding(top = 20.dp))
+//                            if((activeSubscription?.autoRenew == true)) {
+//                                ChipButton(
+//                                    label = stringResource(R.string.opt_out_auto_renewal),
+//                                    onClick = {
+//                                        coroutineScope.launch {
+//                                            cancelAutoRenew()
+//                                        }
+//                                    },
+//                                    imageVector = Icons.Outlined.Cancel
+//                                )
+//                            }
+//                            if(subValidityPeriod != null){
+//                                if(subValidityPeriod <= 5){
+//                                    ChipButton(
+//                                        label = stringResource(R.string.renewal),
+//                                        onClick = {
+//                                            coroutineScope.launch {
+//                                                renewSubscriptionRequest()
+//                                            }
+//                                        },
+//                                        imageVector = Icons.Outlined.Upgrade
+//                                    )
+//                                    ChipButton(
+//                                        label = stringResource(R.string.change),
+//                                        onClick = {
+//                                            coroutineScope.launch {
+//                                                navController.navigate(Routes.ChangeSubscription)
+//                                            }
+//                                        },
+//                                        imageVector = Icons.Outlined.Update
+//                                    )
+//                                    Spacer(modifier = Modifier.padding(top = 20.dp))
+//                                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+//                                        Text(
+//                                            text = "You have ${subValidityPeriod} days remaining as your validity period. Kindly Renew or Change your plan.",
+//                                            softWrap = true,
+//                                            style = MaterialTheme.typography.body1,
+//                                            color = MaterialTheme.colors.onSurface,
+//                                        )
+//                                    }
+//                                }
+//                            }
                         }
                     }
                 }
                 item {
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(15.dp))
                 }
                 item {
                     Text(

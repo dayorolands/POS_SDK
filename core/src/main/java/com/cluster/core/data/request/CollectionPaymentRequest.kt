@@ -77,6 +77,9 @@ class CollectionPaymentRequest {
     @SerialName("FeeAmount")
     var feeAmount: Int? = null
 
+    @SerialName("AgentPhoneNumber")
+    var agentPhoneNumber: String? = null
+
     @SerialName("FeeBearerAccount")
     var feeBearerAccount: String? = null
 

@@ -44,12 +44,12 @@ class CustomerValidationResponse {
         var paymentReference: String? = null
 
         @SerialName("AmountDue")
-        var amountDue: String? = null
+        var amountDue: Double? = null
 
         @SerialName("CustomerName")
         var customerName: String? = null
 
-        @SerialName("Surcharge")
+        @SerialName("SurCharge")
         var surcharge: Double? = null
 
         @SerialName("MinimumAmount")

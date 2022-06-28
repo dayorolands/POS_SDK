@@ -112,6 +112,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
+                    android:hint="Fee">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/fee_input_pay"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="numberDecimal"
+                        android:visibility="visible"
+                        android:maxLength="7"
+                        android:singleLine="true"
+                        android:text=""/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
                     android:hint="Amount">
 
                     <com.google.android.material.textfield.TextInputEditText
