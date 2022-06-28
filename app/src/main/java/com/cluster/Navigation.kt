@@ -116,6 +116,7 @@ fun NavGraphBuilder.subscriptionNavigation(
             ChooseSubscriptionScreen(
                 navController = navController,
                 isUpgrade = false,
+                isChangeSubscription = false
             )
         }
     }
@@ -126,6 +127,19 @@ fun NavGraphBuilder.subscriptionNavigation(
             ChooseSubscriptionScreen(
                 navController = navController,
                 isUpgrade = true,
+                isChangeSubscription = false
+            )
+        }
+    }
+
+    composable(Routes.ChangeSubscription){
+        ProvideViewModelStoreOwner(
+            viewModelStoreOwner = viewModelStoreOwner,
+        ) {
+            ChooseSubscriptionScreen(
+                navController = navController,
+                isUpgrade = false,
+                isChangeSubscription = true,
             )
         }
     }

@@ -23,5 +23,26 @@ class CollectionPaymentItem {
     @SerialName("CollectionAccount")
     var collectionAccount: String? = null
 
+    @SerialName("IsFixedAmount")
+    var isFixedAmount: Boolean? = false
+
+    @SerialName("CustomFields")
+    var customFields: List<CollectionValidationCustomFields>? = null
+
+    @Serializable
+    class CollectionValidationCustomFields {
+        @SerialName("Id")
+        var customId: Int? = null
+
+        @SerialName("Name")
+        var customName: String? = null
+
+        @SerialName("DisplayText")
+        var displayText: String? = null
+
+        @SerialName("IsRequired")
+        var isRequired: Boolean? = false
+    }
+
     override fun toString() = "$name"
 }

@@ -91,7 +91,7 @@ fun TransactionsScreen(
         if (flows.collectionPayment != null) {
             item {
                 SmallMenuButton(
-                    text = "IGR Collections",
+                    text = "Collections",
                     icon = painterResource(R.drawable.payday_loan),
                     onClick = { fragment.openPageById(R.id.collection_payment_button) }
                 )

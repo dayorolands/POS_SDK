@@ -1,5 +1,6 @@
 package com.cluster.screen.subscription
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.core.data.api.SubscriptionService
+import com.cluster.core.data.model.ChangeSubscriptionRequest
 import com.cluster.core.data.model.SubscriptionPlan
 import com.cluster.core.data.model.SubscriptionRequest
 import com.cluster.core.data.prefs.LocalStorage
@@ -40,7 +42,8 @@ import java.util.*
 @Composable
 fun ChooseSubscriptionScreen(
     navController: NavController,
-    isUpgrade: Boolean
+    isUpgrade: Boolean,
+    isChangeSubscription: Boolean
 ) {
     val context = LocalContext.current
     val subscriptionService: SubscriptionService by rememberRetrofitService()
@@ -50,18 +53,21 @@ fun ChooseSubscriptionScreen(
     val viewModel: AppViewModel = viewModel()
     var refreshKey by remember { mutableStateOf(UUID.randomUUID().toString()) }
     val dialogProvider by rememberDialogProvider()
-    val activeSubscription by viewModel.activeSubscription.collectAsState()
-    val activePlanId = activeSubscription?.plan?.id ?: 0
     var selectedPlan: SubscriptionPlan? by remember { mutableStateOf(null) }
+    val activePlanId = selectedPlan?.id
     var isRefreshing by remember { mutableStateOf(false) }
+    var changePlan by remember { mutableStateOf(false)}
 
     val subscriptionPlans by produceState(emptyList(), refreshKey) {
         value = viewModel.subscriptionPlans.value
         isRefreshing = true
+
+        if(isChangeSubscription) changePlan = true
         val subscriptionPlansResult = safeRunIO {
             subscriptionService.getSubscriptionPlans(
                 institutionCode = localStorage.institutionCode!!,
                 agentPhoneNumber = localStorage.agentPhone!!,
+                changePlan = changePlan
             )
         }
         isRefreshing = false
@@ -87,14 +93,16 @@ fun ChooseSubscriptionScreen(
                 agentPin = agentPin,
                 agentPhoneNumber = localStorage.agentPhone!!,
                 institutionCode = localStorage.institutionCode!!,
-                planId = activePlanId,
-                newPlanId = plan.id,
+                planId = plan.id,
                 autoRenew = autoRenew
             )
             val result = safeRunIO {
                 if (isUpgrade) {
                     subscriptionService.upgrade(request)
-                } else {
+                } else if(isChangeSubscription){
+                    subscriptionService.changeSubscriptionPlan(request)
+                }
+                else {
                     subscriptionService.subscribe(request)
                 }
             }
@@ -134,29 +142,12 @@ fun ChooseSubscriptionScreen(
                             tint = MaterialTheme.colors.primary.copy(0.52f)
                         )
                     }
-
-                    var checkedState = false
-                    Row {
-                        Checkbox(
-                            checked = checkedState,
-                            modifier = Modifier.padding(16.dp),
-                            onCheckedChange = { checkedState = it },
-                        )
-                        Text(text = "Auto-renew subscription", modifier = Modifier.padding(16.dp))
-                    }
-
-                    Text(
-                        text = "By choosing ${selectedPlan!!.name}, you are agreeing to our terms and conditions",
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 20.dp),
-                    )
-
                     AppButton(onClick = {
                         coroutineScope.launch {
                             val subscriptionFeeResult = safeRunIO {
                                 subscriptionService.getSubscriptionFee(
-                                    planId = activePlanId,
-                                    paymentType = if(isUpgrade) 2 else 0,
+                                    planId = activePlanId!!,
+                                    paymentType = if(isUpgrade) 2 else if (isChangeSubscription) 5 else 0,
                                     institutionCode = localStorage.institutionCode!!,
                                     phoneNumber = localStorage.agentPhone!!,
                                 )
@@ -165,10 +156,11 @@ fun ChooseSubscriptionScreen(
                             bottomSheetScaffoldState.bottomSheetState.collapse()
                             val agentPin = dialogProvider
                                 .getAgentPin(subtitle = feeMessage) ?: return@launch
-                            chooseSubscription(selectedPlan!!, agentPin, checkedState)
+                                chooseSubscription(selectedPlan!!, agentPin, false)
+
                         }
                     }) {
-                        Text("I accept")
+                        Text("Confirm ${selectedPlan!!.name} plan?")
                     }
                 }
             }
@@ -178,7 +170,7 @@ fun ChooseSubscriptionScreen(
         sheetPeekHeight = 0.dp,
         topBar = {
             CreditClubAppBar(
-                title = if (isUpgrade) stringResource(R.string.upgrade) else stringResource(R.string.choose_a_plan),
+                title = if (isUpgrade) stringResource(R.string.upgrade) else if (isChangeSubscription) stringResource(R.string.change) else stringResource(R.string.choose_a_plan),
                 onBackPressed = { navController.popBackStack() },
             )
         }
@@ -225,7 +217,9 @@ fun ChooseSubscriptionScreen(
 }
 
 @Composable
-private fun SubscriptionPlanItem(item: SubscriptionPlan, onClick: () -> Unit) {
+private inline fun SubscriptionPlanItem(
+    item: SubscriptionPlan,
+    noinline onClick: () -> Unit) {
     val formattedFee = remember { item.fee.toCurrencyFormat() }
 
     Column(

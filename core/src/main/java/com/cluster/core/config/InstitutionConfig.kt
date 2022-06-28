@@ -23,6 +23,7 @@ data class FlowConfig(
     var bvnUpdate: Any? = null,
     var collectionPayment: Any? = null,
     var billPayment: Any? = null,
+    var getALoan: Any? = null
 )
 
 data class TokenWithdrawalConfig(

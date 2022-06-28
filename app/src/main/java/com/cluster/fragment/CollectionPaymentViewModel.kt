@@ -1,47 +1,42 @@
 package com.cluster.fragment
 
+import android.widget.EditText
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.cluster.core.data.model.CollectionCategory
-import com.cluster.core.data.model.CollectionCustomer
-import com.cluster.core.data.model.CollectionPaymentItem
-import com.cluster.core.data.model.CollectionReference
+import com.cluster.core.data.model.*
+import com.cluster.core.data.request.CollectionCustomerValidationRequest
+import com.cluster.core.data.request.CollectionPaymentRequest
+import com.google.android.material.textfield.TextInputEditText
+import org.json.JSONObject
+import java.lang.StringBuilder
 
 class CollectionPaymentViewModel : ViewModel() {
     val retrievalReferenceNumber: MutableLiveData<String> = MutableLiveData()
-    val collectionReference: MutableLiveData<CollectionReference> = MutableLiveData()
-    val collectionReferenceItemCode = Transformations.map(collectionReference) { it?.itemCode }
-    val collectionReferenceCategoryCode =
-        Transformations.map(collectionReference) { it?.categoryCode }
 
-    val region: MutableLiveData<String> = MutableLiveData()
-    val category: MutableLiveData<CollectionCategory> = MutableLiveData()
-    val categoryCode = Transformations.map(category) { it?.code }
-    val categoryName: MutableLiveData<String> = MutableLiveData()
+    val billerList: MutableLiveData<List<CollectionCategory>> = MutableLiveData()
+    val billers: MutableLiveData<CollectionCategory> = MutableLiveData()
+    val billerName: MutableLiveData<String> = MutableLiveData()
+    val billerId = Transformations.map(billers) {it.id}
 
-    val item: MutableLiveData<CollectionPaymentItem> = MutableLiveData()
-    val itemName: MutableLiveData<String> = MutableLiveData()
-    val itemCode: MutableLiveData<String> = MutableLiveData()
+    val paymentItemList: MutableLiveData<List<CollectionPaymentItem>> = MutableLiveData()
+    val paymentItem: MutableLiveData<CollectionPaymentItem> = MutableLiveData()
+    val paymentItemName: MutableLiveData<String> = MutableLiveData()
+    val paymentItemAmount = MutableLiveData<String>()
 
-    val collectionType: MutableLiveData<String> = MutableLiveData()
+    val validCustomerName = MutableLiveData<String>()
+    val validCustomerEmail = MutableLiveData<String>()
+    val customerPhoneNumber= MutableLiveData<String>()
+    val customerValue = MutableLiveData<String>()
+
+    val acceptPartPayment = MutableLiveData<Boolean>()
+    val minimumAmount = MutableLiveData<String>()
+    val maximumAmount = MutableLiveData<String>()
+    val paymentReferece = MutableLiveData<String>()
+    val feeAmount = MutableLiveData<Int>()
+    val customerName = MutableLiveData<String>()
+    val isFixedAmountCheck = MutableLiveData<Boolean>()
+    val amountDue = MutableLiveData<Int>()
+
     val collectionService: MutableLiveData<String> = MutableLiveData()
-    val customerId: MutableLiveData<String> = MutableLiveData()
-    val customerType: MutableLiveData<String> = MutableLiveData()
-    val referenceString: MutableLiveData<String> = MutableLiveData()
-    val customer: MutableLiveData<CollectionCustomer> = MutableLiveData()
-
-    val referenceName = Transformations.map(collectionReference) { it?.referenceName }
-    val paymentReferenceName: MutableLiveData<String> = MutableLiveData()
-    val customerPhoneNumber: MutableLiveData<String> = MutableLiveData()
-    val customerName = Transformations.map(customer) { it?.name }
-    val amountString = MutableLiveData<String>()
-    val validReference = Transformations.map(collectionReference) { it != null }
-    val collectionTypeIsWebGuid = Transformations.map(collectionType) { it == "WEBGUID" }
-    val collectionTypeIsCbs = Transformations.map(collectionType) { it == "CBS" }
-    val isOffline: MutableLiveData<Boolean> = MutableLiveData()
-    val invoiceNumber: MutableLiveData<String> = MutableLiveData()
-
-    val itemList = MutableLiveData<List<CollectionPaymentItem>>()
-    val categoryList = MutableLiveData<List<CollectionCategory>>()
 }

@@ -49,6 +49,10 @@ data class Subscription(
     @SerialName("ExpiryDate")
     @Serializable(with = TimeInstantSerializer::class)
     val expiryDate: Instant,
+    @SerialName("AutoRenew")
+    val autoRenew: Boolean,
+    @SerialName("DaysToExpiry")
+    val daysToExpiry: Int
 )
 
 @Serializable
@@ -59,8 +63,6 @@ data class SubscriptionRequest(
     val agentPhoneNumber: String,
     @SerialName("InstitutionCode")
     val institutionCode: String,
-    @SerialName("NewPlanID")
-    val newPlanId: Int,
     @SerialName("PlanID")
     val planId: Int,
     @SerialName("AutoRenew")
@@ -77,6 +79,38 @@ data class SubscriptionMilestone(
     val targetVolumeMaxLimit: Double,
     @SerialName("TransactionType")
     val transactionType: Int,
+    @SerialName("TargetCountLeft")
+    val targetCountLeft: Int,
+)
+
+@Serializable
+data class ChangeSubscriptionRequest(
+    @SerialName("PlanID")
+    val planId: Int,
+    @SerialName("AgentPhoneNumber")
+    val agentPhoneNumber: String,
+    @SerialName("AgentPin")
+    val agentPin: String,
+    @SerialName("InstitutionCode")
+    val institutionCode: String,
+    @SerialName("AutoRenew")
+    val autoRenew: Boolean,
+)
+
+@Serializable
+data class RenewSuscriptionRequest(
+    @SerialName("ID")
+    val id: Int,
+    @SerialName("AgentPhoneNumber")
+    val agentPhoneNumber: String,
+    @SerialName("AgentPin")
+    val agentPin: String,
+    @SerialName("InstitutionCode")
+    val institutionCode: String,
+    @SerialName("AutoRenew")
+    val autoRenew: Boolean,
+    @SerialName("Renew")
+    val renew: Boolean,
 )
 
 @Serializable

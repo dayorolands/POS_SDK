@@ -2,10 +2,7 @@ package com.cluster.core.data.api
 
 import com.cluster.core.data.model.*
 import com.cluster.core.data.response.ApiResponse
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface SubscriptionService {
     @GET("api/Subscription/GetActiveSubscription")
@@ -25,6 +22,7 @@ interface SubscriptionService {
     suspend fun getSubscriptionPlans(
         @Query("institutionCode") institutionCode: String,
         @Query("agentPhoneNumber") agentPhoneNumber: String,
+        @Query("changePlan") changePlan: Boolean
     ): ApiResponse<List<SubscriptionPlan>>
 
     @GET("api/Subscription/GetMilestonesBySubscriptionID")
@@ -59,4 +57,13 @@ interface SubscriptionService {
 
     @POST("api/Subscription/Upgrade")
     suspend fun upgrade(@Body request: SubscriptionRequest): ApiResponse<String>
+
+    @POST("api/Subscription/OptOutOfAutoRenew")
+    suspend fun optOutOfAutoRenew(@Query("id") id : Long?): ApiResponse<String>
+
+    @POST("api/Subscription/ChangePlan")
+    suspend fun changeSubscriptionPlan(@Body request: SubscriptionRequest): ApiResponse<String>
+
+    @POST("api/Subscription/Renew")
+    suspend fun renewSubscription(@Body request: RenewSuscriptionRequest): ApiResponse<String>
 }

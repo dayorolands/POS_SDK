@@ -13,8 +13,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
@@ -61,6 +60,11 @@ class HomeFragment : CreditClubFragment() {
     private val notificationService: NotificationService by retrofitService()
     private val subscriptionService: SubscriptionService by retrofitService()
     private val appDataStorage: AppDataStorage by inject()
+    private val expectedValidityPeriod = 5
+    private var validityPeriod = 0
+    private var daysToExpiry = 0
+    private var isCurrentActive = false
+    private var isAlreadyDisplayed = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -83,6 +87,23 @@ class HomeFragment : CreditClubFragment() {
                 }
             }
             appViewModel.agentLoan.value = localStorage.agentLoanEligibility
+        }
+
+        mainScope.launch {
+            getValidityPeriod(appViewModel, localStorage, subscriptionService)
+            validityPeriod = appViewModel.validityPeriodCheck.value
+            daysToExpiry = appViewModel.daysToExpiry.value
+            isCurrentActive = appViewModel.isSubActive.value
+            if(!isAlreadyDisplayed) {
+                if (isCurrentActive) {
+                    if (daysToExpiry <= expectedValidityPeriod) {
+                        isAlreadyDisplayed = true
+                        return@launch dialogProvider.showInfo("You have $daysToExpiry days remaining as your Plan validity period.")
+                    }
+                }
+            }
+            else
+                return@launch
         }
 
         val hasPosUpdateManager = Platform.isPOS && Platform.deviceType != 2
@@ -157,56 +178,97 @@ class HomeFragment : CreditClubFragment() {
     }
 }
 
-private suspend fun getNotifications(
-    notificationService: NotificationService,
-    notificationViewModel: NotificationViewModel,
-    appViewModel: AppViewModel,
-    localStorage: LocalStorage
-) {
-    val (response) = safeRunIO {
-        notificationService.getNotifications(
-            NotificationRequest(
-                localStorage.agentPhone,
-                localStorage.institutionCode,
-                20,
-                0
+    private suspend fun getValidityPeriod(
+        viewModel: AppViewModel,
+        localStorage: LocalStorage,
+        subscriptionService: SubscriptionService
+    ) {
+        val (subscription) = safeRunIO {
+            subscriptionService.getActiveSubscription(
+                institutionCode = localStorage.institutionCode,
+                agentPhoneNumber = localStorage.agentPhone,
             )
-        )
+        }
+        if (subscription?.data != null) {
+            viewModel.validityPeriodCheck.value = subscription.data!!.plan.validityPeriod
+            viewModel.isSubActive.value = subscription.data!!.plan.isActive
+            viewModel.daysToExpiry.value = subscription.data!!.daysToExpiry
+        }
     }
 
-    if (response?.response != null) {
-        notificationViewModel.notificationList.value = response.response!!
-        appViewModel.notificationList.value = response.response!!
-    }
-}
 
-private fun Fragment.checkForUpdate(
-    activity: Activity,
-    dialogProvider: DialogProvider,
-    appDataStorage: AppDataStorage,
-    context: Context,
-    appConfig: AppConfig,
-) {
-    val latestVersion = appDataStorage.latestVersion ?: return
-    val currentVersion = context.packageInfo!!.versionName
-    if (!latestVersion.isNewerThan(currentVersion)) {
-        return
-    }
-    val canUpdate = latestVersion.updateIsRequired(currentVersion)
-    val mustUpdate = canUpdate && latestVersion.daysOfGraceLeft() < 1
-    val message = "A new version (v${latestVersion.version}) is available."
-    val subtitle = when {
-        canUpdate && mustUpdate -> "You need to update now"
-        canUpdate -> "Kindly update within ${latestVersion.daysOfGraceLeft()} days"
-        else -> "Kindly update"
+    private suspend fun getNotifications(
+        notificationService: NotificationService,
+        notificationViewModel: NotificationViewModel,
+        appViewModel: AppViewModel,
+        localStorage: LocalStorage
+    ) {
+        val (response) = safeRunIO {
+            notificationService.getNotifications(
+                NotificationRequest(
+                    localStorage.agentPhone,
+                    localStorage.institutionCode,
+                    20,
+                    0
+                )
+            )
+        }
+
+        if (response?.response != null) {
+            notificationViewModel.notificationList.value = response.response!!
+            appViewModel.notificationList.value = response.response!!
+        }
     }
 
-    val latestApkFile = appDataStorage.latestApkFile
-    if (latestApkFile?.exists() == true) {
+    private fun Fragment.checkForUpdate(
+        activity: Activity,
+        dialogProvider: DialogProvider,
+        appDataStorage: AppDataStorage,
+        context: Context,
+        appConfig: AppConfig,
+    ) {
+        val latestVersion = appDataStorage.latestVersion ?: return
+        val currentVersion = context.packageInfo!!.versionName
+        if (!latestVersion.isNewerThan(currentVersion)) {
+            return
+        }
+        val canUpdate = latestVersion.updateIsRequired(currentVersion)
+        val mustUpdate = canUpdate && latestVersion.daysOfGraceLeft() < 1
+        val message = "A new version (v${latestVersion.version}) is available."
+        val subtitle = when {
+            canUpdate && mustUpdate -> "You need to update now"
+            canUpdate -> "Kindly update within ${latestVersion.daysOfGraceLeft()} days"
+            else -> "Kindly update"
+        }
+
+        val latestApkFile = appDataStorage.latestApkFile
+        if (latestApkFile?.exists() == true) {
+            dialogProvider.confirm(DialogConfirmParams(message, subtitle)) {
+                onSubmit {
+                    if (it) {
+                        openApk(context, latestApkFile, appConfig)
+                        if (mustUpdate) {
+                            activity.finish()
+                        }
+                    } else if (mustUpdate) {
+                        activity.finish()
+                    }
+                }
+
+                onClose {
+                    if (mustUpdate) {
+                        activity.finish()
+                    }
+                }
+            }
+            return
+        }
+
         dialogProvider.confirm(DialogConfirmParams(message, subtitle)) {
             onSubmit {
                 if (it) {
-                    openApk(context, latestApkFile, appConfig)
+                    val intent = Intent(context, UpdateActivity::class.java)
+                    startActivity(intent)
                     if (mustUpdate) {
                         activity.finish()
                     }
@@ -221,80 +283,58 @@ private fun Fragment.checkForUpdate(
                 }
             }
         }
-        return
     }
 
-    dialogProvider.confirm(DialogConfirmParams(message, subtitle)) {
-        onSubmit {
-            if (it) {
-                val intent = Intent(context, UpdateActivity::class.java)
-                startActivity(intent)
-                if (mustUpdate) {
-                    activity.finish()
-                }
-            } else if (mustUpdate) {
-                activity.finish()
-            }
+    @SuppressLint("QueryPermissionsNeeded")
+    private fun openApk(context: Context, apkFile: File, appConfig: AppConfig) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
-
-        onClose {
-            if (mustUpdate) {
-                activity.finish()
-            }
-        }
-    }
-}
-
-@SuppressLint("QueryPermissionsNeeded")
-private fun openApk(context: Context, apkFile: File, appConfig: AppConfig) {
-    val intent = Intent(Intent.ACTION_VIEW).apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        val uri = FileProvider.getUriForFile(
-            context.applicationContext,
-            appConfig.fileProviderAuthority,
-            apkFile,
-        )
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        intent.setDataAndType(uri, "application/vnd.android.package-archive")
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-        //GRANTING THE PERMISSIONS EXPLICITLY HERE! to all possible choosers (3rd party apps):
-        val resolvedInfoActivities: List<ResolveInfo> = context.packageManager
-            .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
-
-        for (ri in resolvedInfoActivities) {
-            context.grantUriPermission(
-                ri.activityInfo.packageName,
-                uri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val uri = FileProvider.getUriForFile(
+                context.applicationContext,
+                appConfig.fileProviderAuthority,
+                apkFile,
             )
-        }
-    } else {
-        val uri = Uri.fromFile(apkFile)
-        intent.setDataAndType(uri, "application/vnd.android.package-archive")
-    }
-    context.startActivity(
-        Intent.createChooser(
-            intent,
-            context.resources.getText(R.string.share_receipt_to)
-        ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION),
-    )
-}
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.setDataAndType(uri, "application/vnd.android.package-archive")
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-private fun loadFcmToken(fcmToken: MutableState<String>, retryOnFail: Boolean = true) {
-    FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-        if (!task.isSuccessful) {
-            Log.e("Support", "Fetching FCM registration token failed", task.exception)
-            if (retryOnFail) {
-                loadFcmToken(fcmToken = fcmToken, retryOnFail = false)
+            //GRANTING THE PERMISSIONS EXPLICITLY HERE! to all possible choosers (3rd party apps):
+            val resolvedInfoActivities: List<ResolveInfo> = context.packageManager
+                .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+
+            for (ri in resolvedInfoActivities) {
+                context.grantUriPermission(
+                    ri.activityInfo.packageName,
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                )
             }
-            return@addOnCompleteListener
+        } else {
+            val uri = Uri.fromFile(apkFile)
+            intent.setDataAndType(uri, "application/vnd.android.package-archive")
         }
-
-        // Get new FCM registration token
-        fcmToken.value = task.result
+        context.startActivity(
+            Intent.createChooser(
+                intent,
+                context.resources.getText(R.string.share_receipt_to)
+            ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION),
+        )
     }
-}
+
+    private fun loadFcmToken(fcmToken: MutableState<String>, retryOnFail: Boolean = true) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.e("Support", "Fetching FCM registration token failed", task.exception)
+                if (retryOnFail) {
+                    loadFcmToken(fcmToken = fcmToken, retryOnFail = false)
+                }
+                return@addOnCompleteListener
+            }
+
+            // Get new FCM registration token
+            fcmToken.value = task.result
+        }
+    }
 

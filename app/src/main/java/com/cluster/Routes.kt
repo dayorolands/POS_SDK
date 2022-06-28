@@ -15,6 +15,7 @@ object Routes {
     const val Subscription = "subscription"
     const val NewSubscription = "subscription/new"
     const val UpgradeSubscription = "subscription/upgrade"
+    const val ChangeSubscription = "subscription/change"
     const val ExtendSubscription = "subscription/extend"
     const val SubscriptionHistory = "subscription/history"
     const val AgentLoanRequest = "agent/loan/request"

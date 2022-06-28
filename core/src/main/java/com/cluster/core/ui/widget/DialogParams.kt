@@ -19,6 +19,13 @@ data class DialogConfirmParams(
     val noButtonTex: CharSequence = "Cancel",
 )
 
+data class LoanDialogConfirmParams(
+    val title: CharSequence,
+    val subtitle: CharSequence? = null,
+    val yesButtonTex: CharSequence = "Accept",
+    val noButtonTex: CharSequence = "Decline",
+)
+
 data class DateInputParams(
     val title: String,
     val maxDate: LocalDate? = null,
