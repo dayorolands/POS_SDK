@@ -33,6 +33,10 @@ class CollectionPaymentViewModel : ViewModel() {
     val minimumAmount = MutableLiveData<String>()
     val maximumAmount = MutableLiveData<String>()
     val paymentReferece = MutableLiveData<String>()
+    val feeAmount = MutableLiveData<Int>()
+    val customerName = MutableLiveData<String>()
+    val isFixedAmountCheck = MutableLiveData<Boolean>()
+    val amountDue = MutableLiveData<Int>()
 
     val collectionService: MutableLiveData<String> = MutableLiveData()
 }

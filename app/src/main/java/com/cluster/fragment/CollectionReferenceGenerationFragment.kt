@@ -56,10 +56,21 @@ class CollectionReferenceGenerationFragment :
         if(viewModel.retrievalReferenceNumber.value.isNullOrBlank()){
             viewModel.retrievalReferenceNumber.value = localStorage.newTransactionReference()
         }
-        Log.d("OkHttpClient", "Checking thee accept payment value:::: ${viewModel.acceptPartPayment.value}")
+        Log.d("OkHttpClient", "Checking the isFixedAmount value:::: ${viewModel.isFixedAmountCheck.value}")
+        Log.d("OkHttpClient", "Checking the fee amount value:::: ${viewModel.feeAmount.value}")
 
         mainScope.launch {
-            if(viewModel.acceptPartPayment.value == true){
+            if(!viewModel.customerName.value?.isBlank()!!){
+                binding.customerNameInput.isEnabled = false
+                binding.customerNameInput.setText(viewModel.customerName.value)
+                binding.customerNameInput.value = viewModel.customerName.value.toString()
+            }
+            else{
+                binding.customerNameInput.isEnabled = true
+                binding.customerNameInput.value = ""
+            }
+
+            if(viewModel.isFixedAmountCheck.value == false){
                 binding.amountInputPay.isEnabled = true
                 binding.amountInputPay.value = ""
             }
@@ -67,6 +78,16 @@ class CollectionReferenceGenerationFragment :
                 binding.amountInputPay.isEnabled = false
                 binding.amountInputPay.setText(viewModel.paymentItemAmount.value!!).toString()
                 binding.amountInputPay.value = viewModel.paymentItemAmount.value.toString()
+            }
+
+            if(viewModel.feeAmount.value?.toInt() != null){
+                binding.feeInputPay.isEnabled = false
+                binding.feeInputPay.setText(viewModel.feeAmount.value.toString())
+                binding.feeInputPay.value = viewModel.feeAmount.value.toString()
+            }
+            else{
+                binding.feeInputPay.isEnabled = true
+                binding.feeInputPay.value = ""
             }
         }
 
@@ -78,34 +99,29 @@ class CollectionReferenceGenerationFragment :
     }
 
     private suspend fun completePayment() {
-        if (binding.customerNameInput.value.isNullOrBlank()) {
+        if (binding.customerNameInput.value.isBlank()) {
             return dialogProvider.showErrorAndWait("Please enter a valid customer name")
         } else {
             viewModel.validCustomerName.value = binding.customerNameInput.value
         }
 
-        if (binding.customerEmailInput.value.isNullOrBlank()) {
+        if (binding.customerEmailInput.value.isBlank()) {
             return dialogProvider.showErrorAndWait("Please enter a valid email address")
         } else {
             viewModel.validCustomerEmail.value = binding.customerEmailInput.value
         }
 
-        if (binding.customerPhoneNoInput.value.isNullOrBlank()) {
+        if (binding.customerPhoneNoInput.value.isBlank()) {
             return dialogProvider.showErrorAndWait("Please enter a phone number")
         } else {
             viewModel.customerPhoneNumber.value = binding.customerPhoneNoInput.value
         }
 
         val amountDouble = binding.amountInputPay.value.toDouble()
-        val maximumAmount = viewModel.maximumAmount.value?.toDouble()
-        val minimumAmount = viewModel.minimumAmount.value?.toDouble()
+        val amountDue = viewModel.amountDue.value?.toDouble()
 
-        if(amountDouble < minimumAmount!!){
-            return dialogProvider.showErrorAndWait("Amount cannot be less ${minimumAmount.toDouble().toCurrencyFormat()}")
-        }
-
-        if(amountDouble > maximumAmount!!){
-            return dialogProvider.showErrorAndWait("Amount cannot be more than ${maximumAmount.toDouble().toCurrencyFormat()}")
+        if(amountDouble > amountDue!!){
+            return dialogProvider.showErrorAndWait("Amount cannot be more than ${amountDue.toDouble().toCurrencyFormat()}")
         }
 
         if (amountDouble == 0.0) return dialogProvider.showErrorAndWait("Amount cannot be zero")
@@ -141,8 +157,9 @@ class CollectionReferenceGenerationFragment :
             retrievalReferenceNumber = viewModel.retrievalReferenceNumber.value
             additionalInformation = Json.encodeToString(serializer, additional)
             deviceNumber = localStorage.deviceNumber
+            agentPhoneNumber = localStorage.agentPhone
             applyFee = true
-            feeAmount = 0
+            feeAmount = viewModel.feeAmount.value
             feeBearerAccount = "Agent"
             feeSuspenseAccount = localStorage.agentPhone
         }
