@@ -68,8 +68,7 @@ android {
             shrinkResources false
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
-            //buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
-            buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
+            buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
             manifestPlaceholders = [usesCleartextTraffic: "false"]
         }
