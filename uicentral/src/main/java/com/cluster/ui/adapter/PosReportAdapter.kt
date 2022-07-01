@@ -1,6 +1,8 @@
 package com.cluster.ui.adapter
 
 import com.cluster.core.data.model.PosTransactionReport
+import com.cluster.core.data.model.TransactionReport
+import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.SimpleBindingAdapter
 import com.cluster.core.util.CREDIT_CLUB_DATE_PATTERN
 import com.cluster.core.util.timeAgo
@@ -16,6 +18,16 @@ import com.cluster.ui.databinding.ItemPosCashoutBinding
 class PosReportAdapter(override var values: List<PosTransactionReport.Report>) :
     SimpleBindingAdapter<PosTransactionReport.Report, ItemPosCashoutBinding>(R.layout.item_pos_cashout) {
 
+    private var listener: OnPrintClickListener? = null
+
+    fun setOnPrintClickListener(listener: OnPrintClickListener) {
+        this.listener = listener
+    }
+
+    fun interface OnPrintClickListener {
+        fun onClick(item: PosTransactionReport.Report, type: TransactionType)
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val transaction = values[position]
 
@@ -30,12 +42,14 @@ class PosReportAdapter(override var values: List<PosTransactionReport.Report>) :
                 dateSettledTv.setTextColor(
                     dateSettledTv.context.resources.getColor(R.color.colorAccent)
                 )
+                printReceiptButton.setOnClickListener{listener?.onClick(transaction, TransactionType.POSCashOut)}
             } else {
                 dateSettledTv.text =
                     "Settled ${transaction.settlementDate?.toInstant(CREDIT_CLUB_DATE_PATTERN)?.timeAgo()} with NGN${transaction.amountCreditedToAgent}"
                 dateSettledTv.setTextColor(
                     dateSettledTv.context.resources.getColor(R.color.green)
                 )
+                printReceiptButton.setOnClickListener{listener?.onClick(transaction, TransactionType.POSCashOut)}
             }
         }
     }

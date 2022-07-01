@@ -9,11 +9,8 @@ import com.cluster.receipt.*
 import com.cluster.core.data.api.CollectionsService
 import com.cluster.core.data.api.ReportService
 import com.cluster.core.data.api.retrofitService
-import com.cluster.core.data.model.AccountInfo
-import com.cluster.core.data.model.PayBillRequest
-import com.cluster.core.data.model.TransactionReport
+import com.cluster.core.data.model.*
 import com.cluster.core.data.request.*
-import com.cluster.core.data.model.PayBillResponse
 import com.cluster.core.type.TransactionStatus
 import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.CreditClubActivity
@@ -218,6 +215,11 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
         if (selectedTransactionType == TransactionType.POSCashOut) {
             posReportAdapter = PosReportAdapter(emptyList())
             binding.content.container.adapter = posReportAdapter
+            posReportAdapter.setOnPrintClickListener{item, type ->
+                mainScope.launch {
+                    printPosCashoutReceipt(item, type)
+                }
+            }
         } else {
             transactionAdapter =
                 TransactionReportAdapter(
@@ -229,6 +231,16 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                 mainScope.launch {
                     printReceipt(item, type)
                 }
+            }
+        }
+    }
+
+    private suspend fun printPosCashoutReceipt(item: PosTransactionReport.Report, type: TransactionType){
+        when(type) {
+            TransactionType.POSCashOut -> {
+            }
+            else -> {
+
             }
         }
     }
