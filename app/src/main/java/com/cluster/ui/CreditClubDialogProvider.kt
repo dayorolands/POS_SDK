@@ -472,7 +472,7 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         }
     }
 
-    override fun confirm(params: LoanDialogConfirmParams, block: DialogListenerBlock<Boolean>?) {
+    override fun OnConfirm(params: LoanDialogConfirmParams, block: DialogListenerBlock<Boolean>?) {
         activity.runOnUiThread {
             val dialog = getDialog(context)
 

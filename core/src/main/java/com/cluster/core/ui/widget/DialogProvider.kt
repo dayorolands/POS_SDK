@@ -82,7 +82,7 @@ interface DialogProvider {
     )
 
     fun confirm(params: DialogConfirmParams, block: DialogListenerBlock<Boolean>?)
-    fun confirm(params: LoanDialogConfirmParams, block: DialogListenerBlock<Boolean>?)
+    fun OnConfirm(params: LoanDialogConfirmParams, block: DialogListenerBlock<Boolean>?)
 
     fun confirm(
         title: CharSequence,
@@ -159,7 +159,10 @@ interface DialogProvider {
         subtitle: CharSequence = ""
     ) =
         suspendCoroutine<Boolean> { continuation ->
-            confirm(LoanDialogConfirmParams(title, subtitle)) {
+            OnConfirm(LoanDialogConfirmParams(
+                title = title,
+                subtitle = subtitle
+            )) {
                 onSubmit {
                     dismiss()
                     continuation.resume(it)
