@@ -135,11 +135,11 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     }
 
     private suspend fun attemptForgetDevice() {
-//        val confirmed = dialogProvider.getConfirmation(
-//            title = "Forget Device",
-//            subtitle = "Are you sure you want to remove your ${getString(R.string.app_name)} profile from this device"
-//        )
-//        if (!confirmed) return
+        val confirmed = dialogProvider.getConfirmation(
+            title = "Forget Device",
+            subtitle = "Are you sure you want to remove your ${getString(R.string.app_name)} profile from this device"
+        )
+        if (!confirmed) return
         if (Platform.isPOS) {
             dialogProvider.showProgressBar("Processing")
             settle()

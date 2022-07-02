@@ -89,22 +89,22 @@ class HomeFragment : CreditClubFragment() {
             appViewModel.agentLoan.value = localStorage.agentLoanEligibility
         }
 
-        mainScope.launch {
-            getValidityPeriod(appViewModel, localStorage, subscriptionService)
-            validityPeriod = appViewModel.validityPeriodCheck.value
-            daysToExpiry = appViewModel.daysToExpiry.value
-            isCurrentActive = appViewModel.isSubActive.value
-            if(!isAlreadyDisplayed) {
-                if (isCurrentActive) {
-                    if (daysToExpiry <= expectedValidityPeriod) {
-                        isAlreadyDisplayed = true
-                        return@launch dialogProvider.showInfo("You have $daysToExpiry days remaining as your Plan validity period.")
-                    }
-                }
-            }
-            else
-                return@launch
-        }
+//        mainScope.launch {
+//            getValidityPeriod(appViewModel, localStorage, subscriptionService)
+//            validityPeriod = appViewModel.validityPeriodCheck.value
+//            daysToExpiry = appViewModel.daysToExpiry.value
+//            isCurrentActive = appViewModel.isSubActive.value
+//            if(!isAlreadyDisplayed) {
+//                if (isCurrentActive) {
+//                    if (daysToExpiry <= expectedValidityPeriod) {
+//                        isAlreadyDisplayed = true
+//                        return@launch dialogProvider.showInfo("You have $daysToExpiry days remaining as your Plan validity period.")
+//                    }
+//                }
+//            }
+//            else
+//                return@launch
+//        }
 
         val hasPosUpdateManager = Platform.isPOS && Platform.deviceType != 2
 
