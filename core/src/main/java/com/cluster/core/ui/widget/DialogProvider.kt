@@ -159,7 +159,10 @@ interface DialogProvider {
         subtitle: CharSequence = ""
     ) =
         suspendCoroutine<Boolean> { continuation ->
-            confirm(LoanDialogConfirmParams(title, subtitle)) {
+            confirm(LoanDialogConfirmParams(
+                title = title,
+                subtitle = subtitle
+            )) {
                 onSubmit {
                     dismiss()
                     continuation.resume(it)
