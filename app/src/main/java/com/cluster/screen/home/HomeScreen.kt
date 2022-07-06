@@ -165,27 +165,3 @@ fun HomeScreen(
         }
     }
 }
-
-@Composable
-fun alertDialog(
-    viewModel: AppViewModel
-){
-    val openDialog = remember{ mutableStateOf(true) }
-    val activeSubscription by viewModel.activeSubscription.collectAsState()
-
-    if(openDialog.value){
-        AlertDialog(
-            onDismissRequest = { openDialog.value = false },
-            title = {Text(text= "AlertDialog", color = MaterialTheme.colors.onSurface)},
-            text = { Text(text = "Your validity period is ${activeSubscription?.plan?.validityPeriod}")},
-
-            confirmButton = {
-                TextButton(onClick = {
-                    openDialog.value = false
-                }) {
-                    Text(text = "Close", color = MaterialTheme.colors.onSurface)
-                }
-            }
-        )
-    }
-}
