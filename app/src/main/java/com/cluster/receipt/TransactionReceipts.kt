@@ -11,8 +11,10 @@ import com.cluster.pos.receipt.transactionStatus
 import com.cluster.core.data.model.AccountInfo
 import com.cluster.core.data.model.PayBillRequest
 import com.cluster.core.data.model.PayBillResponse
+import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.data.request.DepositRequest
 import com.cluster.core.data.request.FundsTransferRequest
+import com.cluster.core.data.request.POSCashoutRequest
 import com.cluster.core.data.request.WithdrawalRequest
 import com.cluster.core.data.response.CollectionPaymentResponse
 import com.cluster.core.util.*
@@ -163,6 +165,43 @@ fun billsPaymentReceipt(
         isSuccessful = response?.isSuccessful == true,
         responseCode = response?.responseCode ?: if (response!!.isSuccessful) "00" else "06",
         reason = response?.responseMessage,
+    )
+    footer(context)
+}
+
+fun posCashoutReceipt(
+    context: Context,
+    request: POSCashoutRequest,
+    transactionDate: String,
+    settlementDate: String?,
+    isSuccessful: Boolean = false,
+    reason: String? = null,
+    responseCode: String? = null,
+    localStorage: LocalStorage
+) = printJob {
+
+    logo()
+    text(
+        text = "POS CASHOUT",
+        align = Alignment.MIDDLE,
+        fontSize = 35,
+    )
+    text(
+        """
+        |Agent Code: ${context.localStorage.agent?.agentCode}
+        |Agent Phone: ${request.agentPhoneNumber}
+        |--------------------------
+        |Amount: NGN${request.amount}
+        |Transaction Ref: ${request.transactionReference}
+        |Settlement Date: $settlementDate
+        |Transaction Date: $transactionDate
+        |RRN: ${localStorage.deviceNumber}${request.transactionReference}""".trimMargin()
+    )
+    transactionStatus(
+        context = context,
+        isSuccessful = isSuccessful,
+        responseCode = responseCode ?: if (isSuccessful) "00" else "06",
+        reason = reason,
     )
     footer(context)
 }

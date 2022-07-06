@@ -18,7 +18,7 @@ import com.cluster.core.ui.widget.DateInputParams
 import com.cluster.core.ui.widget.DialogOptionItem
 import com.cluster.core.util.*
 import com.cluster.pos.printer.PosPrinter
-import com.cluster.ui.adapter.PosReportAdapter
+import com.cluster.adapter.PosReportAdapter
 import com.cluster.ui.dataBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -238,10 +238,26 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
     private suspend fun printPosCashoutReceipt(item: PosTransactionReport.Report, type: TransactionType){
         when(type) {
             TransactionType.POSCashOut -> {
+                val posCashoutRequest = POSCashoutRequest(
+                    agentPhoneNumber = item.agentPhoneNumber,
+                    agentCode = localStorage.agent?.agentCode,
+                    amount = item.transactionAmount,
+                    transactionReference = item.transactionReference,
+                    deviceNumber = localStorage.deviceNumber,
+                )
+                posPrinter.print(
+                    posCashoutReceipt(
+                        context = this,
+                        request = posCashoutRequest,
+                        transactionDate = item.dateLogged.toInstant(CREDIT_CLUB_DATE_PATTERN).toString().replace("T"," "),
+                        settlementDate = item.settlementDate?.toInstant(CREDIT_CLUB_DATE_PATTERN).toString().replace("T", " "),
+                        isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
+                        reason = selectedTransactionStatus.label,
+                        localStorage = localStorage
+                    )
+                )
             }
-            else -> {
-
-            }
+            else -> {}
         }
     }
 

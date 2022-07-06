@@ -71,3 +71,21 @@ data class FundsTransferRequest(
         val currency: String = "NGN",
     )
 }
+
+@Serializable
+data class POSCashoutRequest(
+    @SerialName("AgentPhoneNumber")
+    val agentPhoneNumber: String? = null,
+
+    @SerialName("AgentCode")
+    val agentCode: String? = null,
+
+    @SerialName("Amount")
+    val amount: Double = 0.0,
+
+    @SerialName("TransactionReference")
+    val transactionReference: String?,
+
+    @SerialName("DeviceNumber")
+    val deviceNumber: Int = 0,
+)

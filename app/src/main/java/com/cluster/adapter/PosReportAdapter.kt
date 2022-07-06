@@ -1,9 +1,10 @@
-package com.cluster.ui.adapter
+package com.cluster.adapter
 
+import android.view.View
 import com.cluster.core.data.model.PosTransactionReport
-import com.cluster.core.data.model.TransactionReport
 import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.SimpleBindingAdapter
+import com.cluster.pos.Platform
 import com.cluster.core.util.CREDIT_CLUB_DATE_PATTERN
 import com.cluster.core.util.timeAgo
 import com.cluster.core.util.toInstant
@@ -49,7 +50,11 @@ class PosReportAdapter(override var values: List<PosTransactionReport.Report>) :
                 dateSettledTv.setTextColor(
                     dateSettledTv.context.resources.getColor(R.color.green)
                 )
-                printReceiptButton.setOnClickListener{listener?.onClick(transaction, TransactionType.POSCashOut)}
+                if (Platform.hasPrinter) {
+                    printReceiptButton.visibility = View.VISIBLE
+                    printReceiptButton.setOnClickListener{
+                        listener?.onClick(transaction, TransactionType.POSCashOut)}
+                } else printReceiptButton.visibility = View.GONE
             }
         }
     }
