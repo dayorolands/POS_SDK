@@ -9,11 +9,8 @@ import com.cluster.receipt.*
 import com.cluster.core.data.api.CollectionsService
 import com.cluster.core.data.api.ReportService
 import com.cluster.core.data.api.retrofitService
-import com.cluster.core.data.model.AccountInfo
-import com.cluster.core.data.model.PayBillRequest
-import com.cluster.core.data.model.TransactionReport
+import com.cluster.core.data.model.*
 import com.cluster.core.data.request.*
-import com.cluster.core.data.model.PayBillResponse
 import com.cluster.core.type.TransactionStatus
 import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.CreditClubActivity
@@ -21,7 +18,7 @@ import com.cluster.core.ui.widget.DateInputParams
 import com.cluster.core.ui.widget.DialogOptionItem
 import com.cluster.core.util.*
 import com.cluster.pos.printer.PosPrinter
-import com.cluster.ui.adapter.PosReportAdapter
+import com.cluster.adapter.PosReportAdapter
 import com.cluster.ui.dataBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -218,6 +215,11 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
         if (selectedTransactionType == TransactionType.POSCashOut) {
             posReportAdapter = PosReportAdapter(emptyList())
             binding.content.container.adapter = posReportAdapter
+            posReportAdapter.setOnPrintClickListener{item, type ->
+                mainScope.launch {
+                    printPosCashoutReceipt(item, type)
+                }
+            }
         } else {
             transactionAdapter =
                 TransactionReportAdapter(
@@ -230,6 +232,32 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     printReceipt(item, type)
                 }
             }
+        }
+    }
+
+    private suspend fun printPosCashoutReceipt(item: PosTransactionReport.Report, type: TransactionType){
+        when(type) {
+            TransactionType.POSCashOut -> {
+                val posCashoutRequest = POSCashoutRequest(
+                    agentPhoneNumber = item.agentPhoneNumber,
+                    agentCode = localStorage.agent?.agentCode,
+                    amount = item.transactionAmount,
+                    transactionReference = item.transactionReference,
+                    deviceNumber = localStorage.deviceNumber,
+                )
+                posPrinter.print(
+                    posCashoutReceipt(
+                        context = this,
+                        request = posCashoutRequest,
+                        transactionDate = item.dateLogged.toInstant(CREDIT_CLUB_DATE_PATTERN).toString().replace("T"," "),
+                        settlementDate = item.settlementDate?.toInstant(CREDIT_CLUB_DATE_PATTERN).toString().replace("T", " "),
+                        isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
+                        reason = selectedTransactionStatus.label,
+                        localStorage = localStorage
+                    )
+                )
+            }
+            else -> {}
         }
     }
 
