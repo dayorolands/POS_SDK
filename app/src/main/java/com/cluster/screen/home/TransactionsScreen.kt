@@ -37,9 +37,12 @@ fun TransactionsScreen(
         if (flows.tokenWithdrawal != null) {
             item {
                 SmallMenuButton(
-                    text = "Token Withdrawal",
+                    text = "Cardless Withdrawal",
                     icon = painterResource(R.drawable.withdraw),
-                    onClick = { fragment.openPageById(R.id.token_withdrawal_button) }
+                    //onClick = { fragment.openPageById(R.id.token_withdrawal_button) }
+                    onClick = {
+                        composeNavController.navigate(Routes.CardlessWithdrawal)
+                    }
                 )
             }
         }

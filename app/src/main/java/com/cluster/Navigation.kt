@@ -32,6 +32,11 @@ fun NavGraphBuilder.clusterNavigation(
             dialogProvider = dialogProvider,
         )
     }
+    composable(Routes.CardlessWithdrawal) {
+        CardlessWithdrawalActivity(
+            navController = navController
+        )
+    }
     composable(Routes.PinChange) {
         PinChange(navController = navController)
     }

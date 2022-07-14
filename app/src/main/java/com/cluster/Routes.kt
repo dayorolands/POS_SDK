@@ -3,6 +3,7 @@ package com.cluster
 object Routes {
     const val Home = "home"
     const val FundsTransfer = "transactions/funds-transfer"
+    const val CardlessWithdrawal = "transactions/cardless-withdrawal"
     const val TransactionSummary = "transactions/summary"
     const val PinChange = "agent/pin-change"
     const val ChangePassword = "auth/password/change"
