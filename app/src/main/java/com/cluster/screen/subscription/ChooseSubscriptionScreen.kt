@@ -1,6 +1,5 @@
 package com.cluster.screen.subscription
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +21,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.core.data.api.SubscriptionService
-import com.cluster.core.data.model.ChangeSubscriptionRequest
 import com.cluster.core.data.model.SubscriptionPlan
 import com.cluster.core.data.model.SubscriptionRequest
 import com.cluster.core.data.prefs.LocalStorage

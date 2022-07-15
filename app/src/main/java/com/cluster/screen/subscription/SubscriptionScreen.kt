@@ -1,5 +1,7 @@
 package com.cluster.screen.subscription
 
+import android.content.Context
+import android.os.Bundle
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -18,6 +20,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,10 +45,13 @@ import com.cluster.utility.roundTo2dp
 import com.cluster.viewmodel.AppViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.google.firebase.analytics.FirebaseAnalytics
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Composable
-fun SubscriptionScreen(navController: NavController) {
+fun SubscriptionScreen(navController: NavController, context: Context) {
     val subscriptionService: SubscriptionService by rememberRetrofitService()
     val localStorage: LocalStorage by rememberBean()
     var loadingMessage by remember { mutableStateOf("") }
@@ -56,12 +62,22 @@ fun SubscriptionScreen(navController: NavController) {
     val formattedExpiry = remember(activeSubscription) {
         activeSubscription?.expiryDate?.format("dd/MM/uuuu") ?: ""
     }
+    val firebaseAnalytics by lazy { FirebaseAnalytics.getInstance(context) }
     val activePlanId = activeSubscription?.plan?.id ?: 0
     val subscriptionId = activeSubscription?.id ?: 0
     val subValidityPeriod = activeSubscription?.plan?.validityPeriod
     val dialogProvider by rememberDialogProvider()
     val coroutineScope = rememberCoroutineScope()
     val subscriptionMilestones by viewModel.subscriptionMilestones.collectAsState()
+    val currentTime = LocalDateTime.now()
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
+    firebaseAnalytics.logEvent("OnEntryAVC", Bundle().apply {
+        firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
+        putString("activity_type", "Agent Volume Covenant")
+        putString("start_time", currentTime.format(formatter))
+
+    })
 
     val extendSubscription: SuspendCallback = remember {
         extendSubscription@{
@@ -199,7 +215,16 @@ fun SubscriptionScreen(navController: NavController) {
 
         CreditClubAppBar(
             title = stringResource(R.string.subscription),
-            onBackPressed = { navController.popBackStack() },
+            onBackPressed =
+            {
+                navController.popBackStack()
+                firebaseAnalytics.logEvent("OnExitAVC", Bundle().apply {
+                    firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
+                    putString("activity_type", "Agent Volume Covenant")
+                    putString("exit_time", currentTime.format(formatter))
+                })
+
+            },
             modifier = Modifier.constrainAs(appBar) {
                 top.linkTo(parent.top)
                 linkTo(

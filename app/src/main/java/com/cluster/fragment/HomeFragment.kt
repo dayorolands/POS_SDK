@@ -167,6 +167,7 @@ class HomeFragment : CreditClubFragment() {
                                     subscriptionNavigation(
                                         navController = composeNavController,
                                         viewModelStoreOwner = viewModelStoreOwner,
+                                        context = context
                                     )
                                 }
                             }

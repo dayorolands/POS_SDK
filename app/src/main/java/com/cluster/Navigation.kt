@@ -1,5 +1,6 @@
 package com.cluster
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelStoreOwner
@@ -94,12 +95,13 @@ fun NavGraphBuilder.clusterNavigation(
 fun NavGraphBuilder.subscriptionNavigation(
     navController: NavController,
     viewModelStoreOwner: ViewModelStoreOwner,
+    context: Context
 ) {
     composable(Routes.Subscription) {
         ProvideViewModelStoreOwner(
             viewModelStoreOwner = viewModelStoreOwner,
         ) {
-            SubscriptionScreen(navController = navController)
+            SubscriptionScreen(navController = navController, context = context)
         }
     }
     composable(Routes.SubscriptionHistory) {
