@@ -23,6 +23,7 @@ import com.cluster.core.data.request.CollectionValidationCustomFields
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
+import com.cluster.core.util.toString
 import com.cluster.pos.Platform
 import com.cluster.pos.printer.PosPrinter
 import com.cluster.receipt.collectionPaymentReceipt
@@ -175,22 +176,16 @@ class CollectionReferenceGenerationFragment :
             return
         }
 
-        response.date = Instant.now()
         response.collectionPaymentItemName = response.collectionPaymentItemName ?: "${viewModel.paymentItem.value?.name} (${viewModel.paymentItem.value?.code})"
         response.collectionCategoryName = response.collectionCategoryName ?: "${viewModel.billers.value?.name} (${viewModel.billers.value?.code})"
 
-        if (response.isSuccessful == true) {
-            dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
-            if (Platform.hasPrinter) {
-                posPrinter.print(collectionPaymentReceipt(requireContext(), response))
-            }
-            activity?.onBackPressed()
-        } else {
-            dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
-            if(Platform.hasPrinter){
-                posPrinter.print(collectionPaymentReceipt(requireContext(), response))
-            }
-            activity?.onBackPressed()
-        }
+        val receipt = collectionPaymentReceipt(
+            context = requireContext(),
+            response = response,
+            request = request,
+            transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm")
+        )
+        navigateToReceipt(receipt, popBackStack = true)
+
     }
 }

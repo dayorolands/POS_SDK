@@ -58,5 +58,26 @@ class PosTransactionReport {
 
         @SerialName("IsASystemChange")
         var isASystemChange = false
+
+        @SerialName("PAN")
+        var maskedPan: String? = ""
+
+        @SerialName("STAN")
+        var transactionStan: String? = ""
+
+        @SerialName("CardType")
+        var cardType: String? = ""
+
+        @SerialName("ExpiryDate")
+        var expiryDate: String? = ""
+
+        @SerialName("RetrievalReferenceNumber")
+        var retrievalReferenceNumber: String? = ""
+
+        @SerialName("CardHolder")
+        var cardHolderName: String? = ""
+
+        @SerialName("DateTime")
+        var transactionDateTime: String? = ""
     }
 }
