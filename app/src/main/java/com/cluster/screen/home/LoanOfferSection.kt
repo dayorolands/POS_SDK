@@ -21,8 +21,9 @@ import com.cluster.viewmodel.AppViewModel
 
 @Composable
 fun LoanOfferSection(
-    onRequestLoan: () -> Unit,
-    onShowHistory: () -> Unit
+    onRequestOverdraft: () -> Unit,
+    onShowHistory: () -> Unit,
+    onOverdraftQualify: () -> Unit
 ) {
     val appViewModel: AppViewModel = viewModel()
     val loan by appViewModel.agentLoan.collectAsState()
@@ -33,7 +34,7 @@ fun LoanOfferSection(
             .heightIn(50.dp, 80.dp)
             .fillMaxWidth()
             .padding(6.dp)
-            .clickable(onClick = if (isEligible) onRequestLoan else onShowHistory),
+            .clickable(onClick = if (isEligible) onRequestOverdraft else if(!isEligible) onOverdraftQualify else onShowHistory),
         elevation = 2.dp,
         backgroundColor = colorResource(R.color.colorBalanceCardBg),
         contentColor = MaterialTheme.colors.onSecondary,
@@ -47,7 +48,17 @@ fun LoanOfferSection(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (isEligible) {
                     Text(
-                        text = "Get a loan of up to ${loan!!.maxAmount.toCurrencyFormat()}",
+                        //text = "Get a loan of up to ${loan!!.maxAmount.toCurrencyFormat()}",
+                        text = "Request an Overdraft",
+                        style = MaterialTheme.typography.button,
+                        color = MaterialTheme.colors.onSecondary,
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp)
+                            .weight(1f),
+                    )
+                } else if(!isEligible){
+                    Text(
+                        text = "Request an Overdraft",
                         style = MaterialTheme.typography.button,
                         color = MaterialTheme.colors.onSecondary,
                         modifier = Modifier
@@ -71,7 +82,15 @@ fun LoanOfferSection(
                     )
                 }
                 if (isEligible) {
-                    IconButton(onClick = onRequestLoan) {
+                    IconButton(onClick = onRequestOverdraft) {
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowForward,
+                            contentDescription = null
+                        )
+                    }
+                }
+                if(!isEligible) {
+                    IconButton(onClick = onOverdraftQualify) {
                         Icon(
                             imageVector = Icons.Outlined.ArrowForward,
                             contentDescription = null

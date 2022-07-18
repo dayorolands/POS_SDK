@@ -14,6 +14,7 @@ import com.cluster.pos.printer.ParcelablePrintJob
 import com.cluster.screen.*
 import com.cluster.screen.loan.AgentLoanHistoryScreen
 import com.cluster.screen.loan.AgentLoanRequestScreen
+import com.cluster.screen.loan.OverdraftQualifyScreen
 import com.cluster.screen.subscription.ChooseSubscriptionScreen
 import com.cluster.screen.subscription.SubscriptionHistoryScreen
 import com.cluster.screen.subscription.SubscriptionScreen
@@ -92,6 +93,13 @@ fun NavGraphBuilder.clusterNavigation(
             viewModelStoreOwner = viewModelStoreOwner,
         ) {
             AgentLoanHistoryScreen(navController = navController)
+        }
+    }
+    composable(Routes.OverdraftQualify){
+        ProvideViewModelStoreOwner(
+            viewModelStoreOwner = viewModelStoreOwner
+        ) {
+            OverdraftQualifyScreen(navController = navController, context = context)
         }
     }
 }

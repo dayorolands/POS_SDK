@@ -53,12 +53,12 @@ fun AgentLoanRequestScreen(
 
     val requestLoan = suspend requestLoan@{
         val notice = """
-            |1. You are about to request for loan liquidity support. 
-            |2. Your loan offer is ${amount.toCurrencyFormat()}
-            |3. Your defaulting interest is ${loan!!.interest} per annum.
-            |4. A processing fee of ${loan!!.feeRate}% will be surcharged.
+            |1. You are about to request for an overdraft. 
+            |2. Your overdraft offer is ${amount.toCurrencyFormat()}
+            |3. A processing fee of ${loan!!.feeRate}% will be charged upfront.
+            |4. The overdraft amount will be available for use within 24hrs.
             |5. The automatic repayment will be processed after 24hrs.
-            |6. You can only request for another loan only after repayment of previous loan.
+            |6. A defaulting fee of ${loan!!.interest} will be charged if Overdraft isn't paid fully after 24hrs.
         """.trimMargin()
         val shouldProceed = dialogProvider.getLoanConfirmation(
             title = "Kindly Note",
@@ -106,7 +106,7 @@ fun AgentLoanRequestScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
         CreditClubAppBar(
-            title = "Request Loan",
+            title = "Request Overdraft",
             onBackPressed =
             { navController.popBackStack()
                 firebaseAnalytics.logEvent("OnExitLoan", Bundle().apply {
@@ -148,7 +148,7 @@ fun AgentLoanRequestScreen(
             isError = amountString.isNotBlank() && !amountIsValid,
         )
         Text(
-            text = "Can be up to ${loan!!.maxAmount.toCurrencyFormat()}",
+            text = "You can borrow up to ${loan!!.maxAmount.toCurrencyFormat()}",
             style = MaterialTheme.typography.caption,
             modifier = Modifier
                 .padding(top = 3.dp, start = 16.dp, end = 16.dp)
