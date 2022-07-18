@@ -72,13 +72,6 @@ fun SubscriptionScreen(navController: NavController, context: Context) {
     val currentTime = LocalDateTime.now()
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
-    firebaseAnalytics.logEvent("OnEntryAVC", Bundle().apply {
-        firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
-        putString("activity_type", "Agent Volume Covenant")
-        putString("start_time", currentTime.format(formatter))
-
-    })
-
     val extendSubscription: SuspendCallback = remember {
         extendSubscription@{
             val subscriptionFeeResult = safeRunIO {
@@ -213,6 +206,13 @@ fun SubscriptionScreen(navController: NavController, context: Context) {
     ) {
         val (appBar, list) = createRefs()
 
+        firebaseAnalytics.logEvent("OnEntryAVC", Bundle().apply {
+            firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
+            putString("activity_type", "AVC (Active Sub)")
+            putString("avc_start_time", currentTime.format(formatter))
+
+        })
+
         CreditClubAppBar(
             title = stringResource(R.string.subscription),
             onBackPressed =
@@ -220,8 +220,8 @@ fun SubscriptionScreen(navController: NavController, context: Context) {
                 navController.popBackStack()
                 firebaseAnalytics.logEvent("OnExitAVC", Bundle().apply {
                     firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
-                    putString("activity_type", "Agent Volume Covenant")
-                    putString("exit_time", currentTime.format(formatter))
+                    putString("activity_type", "AVC (Active Sub)")
+                    putString("avc_exit_time", currentTime.format(formatter))
                 })
 
             },

@@ -1,5 +1,7 @@
 package com.cluster.screen.loan
 
+import android.content.Context
+import android.os.Bundle
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
@@ -18,12 +20,16 @@ import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.ui.*
 import com.cluster.viewmodel.AppViewModel
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun AgentLoanRequestScreen(
-    navController: NavController
+    navController: NavController,
+    context: Context
 ) {
     val appViewModel: AppViewModel = viewModel()
     val dialogProvider by rememberDialogProvider()
@@ -38,9 +44,12 @@ fun AgentLoanRequestScreen(
             this != null && this > 0.0 && this <= loan!!.maxAmount
         }
     }
+    val firebaseAnalytics by lazy { FirebaseAnalytics.getInstance(context) }
     val transactionReference = rememberTransactionReference()
     val agentLoansService: AgentLoansService by rememberRetrofitService()
     val amount = remember(amountString) { if (amountIsValid) amountString.toDouble() else 0.0 }
+    val currentLoanTime = LocalDateTime.now()
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     val requestLoan = suspend requestLoan@{
         val notice = """
@@ -98,7 +107,14 @@ fun AgentLoanRequestScreen(
     Column(modifier = Modifier.fillMaxSize()) {
         CreditClubAppBar(
             title = "Request Loan",
-            onBackPressed = { navController.popBackStack() },
+            onBackPressed =
+            { navController.popBackStack()
+                firebaseAnalytics.logEvent("OnExitLoan", Bundle().apply {
+                    firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
+                    putString("activity_type", "Loan Exit")
+                    putString("loan_exit_time", currentLoanTime.format(formatter))
+                })
+            },
         )
         if (loadingMessage.isNotBlank()) {
             Loading(
@@ -111,6 +127,13 @@ fun AgentLoanRequestScreen(
             )
             return@Column
         }
+
+        firebaseAnalytics.logEvent("OnEntryLoan", Bundle().apply {
+            firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
+            putString("activity_type", "Loan Entry")
+            putString("loan_start_time", currentLoanTime.format(formatter))
+
+        })
 
         OutlinedTextField(
             label = { Text(text = "Amount") },

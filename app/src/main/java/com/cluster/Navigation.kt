@@ -26,6 +26,7 @@ fun NavGraphBuilder.clusterNavigation(
     dialogProvider: DialogProvider,
     appViewModel: AppViewModel,
     viewModelStoreOwner: ViewModelStoreOwner,
+    context: Context
 ) {
     composable(Routes.FundsTransfer) {
         FundsTransfer(
@@ -80,7 +81,10 @@ fun NavGraphBuilder.clusterNavigation(
         ProvideViewModelStoreOwner(
             viewModelStoreOwner = viewModelStoreOwner,
         ) {
-            AgentLoanRequestScreen(navController = navController)
+            AgentLoanRequestScreen(
+                navController = navController,
+                context = context
+            )
         }
     }
     composable(Routes.AgentLoanHistory) {
@@ -118,7 +122,8 @@ fun NavGraphBuilder.subscriptionNavigation(
             ChooseSubscriptionScreen(
                 navController = navController,
                 isUpgrade = false,
-                isChangeSubscription = false
+                isChangeSubscription = false,
+                context = context
             )
         }
     }
@@ -129,7 +134,8 @@ fun NavGraphBuilder.subscriptionNavigation(
             ChooseSubscriptionScreen(
                 navController = navController,
                 isUpgrade = true,
-                isChangeSubscription = false
+                isChangeSubscription = false,
+                context = context
             )
         }
     }
@@ -142,6 +148,7 @@ fun NavGraphBuilder.subscriptionNavigation(
                 navController = navController,
                 isUpgrade = false,
                 isChangeSubscription = true,
+                context = context
             )
         }
     }

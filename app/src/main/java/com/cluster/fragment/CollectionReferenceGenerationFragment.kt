@@ -187,6 +187,10 @@ class CollectionReferenceGenerationFragment :
             activity?.onBackPressed()
         } else {
             dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
+            if(Platform.hasPrinter){
+                posPrinter.print(collectionPaymentReceipt(requireContext(), response))
+            }
+            activity?.onBackPressed()
         }
     }
 }
