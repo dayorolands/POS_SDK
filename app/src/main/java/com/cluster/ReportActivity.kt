@@ -280,14 +280,14 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     return dialogProvider.showError("An error occurred. Please try again later")
                 }
                 response.date = item.date?.toInstant(CREDIT_CLUB_DATE_PATTERN)
-                when (response.responseCode) {
-                    "00" -> dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
-                    "24" -> dialogProvider.showErrorAndWait(
-                        "Transaction Pending",
-                        response.responseMessage ?: "Transaction Pending"
-                    )
-                    else -> dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
-                }
+//                when (response.responseCode) {
+//                    "00" -> dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
+//                    "24" -> dialogProvider.showErrorAndWait(
+//                        "Transaction Pending",
+//                        response.responseMessage ?: "Transaction Pending"
+//                    )
+//                    else -> dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
+//                }
                 posPrinter.print(collectionPaymentReceipt(this, response))
             }
             TransactionType.FundsTransferCommercialBank,
