@@ -55,10 +55,12 @@ fun AgentLoanRequestScreen(
         val notice = """
             |1. You are about to request for an overdraft. 
             |2. Your overdraft offer is ${amount.toCurrencyFormat()}
-            |3. A processing fee of ${loan!!.feeRate}% will be charged upfront.
-            |4. The overdraft amount will be available for use within 24hrs.
-            |5. The automatic repayment will be processed after 24hrs.
-            |6. A defaulting fee of ${loan!!.interest} will be charged if Overdraft isn't paid fully after 24hrs.
+            |3. You will be able to access ${amount.toCurrencyFormat()} more than your current balance.
+            |4. This is not Loan.
+            |5. A processing fee of ${loan!!.feeRate}% will be charged upfront.
+            |6. The overdraft amount will be available for use within 24hrs.
+            |7. The automatic repayment will be processed after 24hrs.
+            |8. A defaulting fee of ${loan!!.interest} will be charged if Overdraft isn't paid fully after 24hrs.
         """.trimMargin()
         val shouldProceed = dialogProvider.getLoanConfirmation(
             title = "Kindly Note",

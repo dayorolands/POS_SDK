@@ -99,7 +99,7 @@ fun AgentLoanHistoryScreen(navController: NavController) {
         val (appBar, list) = createRefs()
 
         CreditClubAppBar(
-            title = stringResource(R.string.loan_history),
+            title = stringResource(R.string.overdraft_history),
             onBackPressed = { navController.popBackStack() },
             modifier = Modifier.constrainAs(appBar) {
                 top.linkTo(parent.top)
