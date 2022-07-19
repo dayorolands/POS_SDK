@@ -244,16 +244,21 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     amount = item.transactionAmount,
                     transactionReference = item.transactionReference,
                     deviceNumber = localStorage.deviceNumber,
+                    maskedPan = item.maskedPan,
+                    transactionStan = item.transactionStan,
+                    cardType = item.cardType,
+                    expiryDate = item.expiryDate,
+                    retrievalReferenceNumber = item.retrievalReferenceNumber,
+                    cardHolderName = item.cardHolderName,
                 )
                 posPrinter.print(
                     posCashoutReceipt(
                         context = this,
                         request = posCashoutRequest,
-                        transactionDate = item.dateLogged.toInstant(CREDIT_CLUB_DATE_PATTERN).toString().replace("T"," "),
+                        transactionDate = item.transactionDateTime?.toInstant(CREDIT_CLUB_DATE_PATTERN).toString().replace("T"," "),
                         settlementDate = item.settlementDate?.toInstant(CREDIT_CLUB_DATE_PATTERN).toString().replace("T", " "),
                         isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
-                        reason = selectedTransactionStatus.label,
-                        localStorage = localStorage
+                        reason = selectedTransactionStatus.label
                     )
                 )
             }
@@ -280,15 +285,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     return dialogProvider.showError("An error occurred. Please try again later")
                 }
                 response.date = item.date?.toInstant(CREDIT_CLUB_DATE_PATTERN)
-                when (response.responseCode) {
-                    "00" -> dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
-                    "24" -> dialogProvider.showErrorAndWait(
-                        "Transaction Pending",
-                        response.responseMessage ?: "Transaction Pending"
-                    )
-                    else -> dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
-                }
-                posPrinter.print(collectionPaymentReceipt(this, response))
+                posPrinter.print(collectionReportReceipt(this, response))
             }
             TransactionType.FundsTransferCommercialBank,
             TransactionType.LocalFundsTransfer,

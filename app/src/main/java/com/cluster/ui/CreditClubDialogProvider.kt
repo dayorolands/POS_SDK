@@ -518,6 +518,52 @@ class CreditClubDialogProvider(override val context: Context) : DialogProvider {
         }
     }
 
+    override fun confirm(params: OverdraftDialogConfirmParams, block: DialogListenerBlock<Boolean>?) {
+        activity.runOnUiThread {
+            val dialog = getDialog(context)
+
+            dialog.setCancelable(true)
+            dialog.setCanceledOnTouchOutside(false)
+
+            val listener by lazy {
+                if (block != null) DialogListener.create(block)
+                else null
+            }
+            val binding = DataBindingUtil.inflate<DialogConfirmBinding>(
+                LayoutInflater.from(context),
+                R.layout.dialog_confirm,
+                null,
+                false
+            )
+            dialog.setContentView(binding.root)
+            binding.title = params.title
+            binding.subtitle = params.subtitle
+            binding.okButton.text = params.yesButtonTex
+            binding.cancelButton.text = ""
+            binding.okButton.setOnClickListener {
+                if (block != null) {
+                    dialog.dismiss()
+                    listener?.submit(dialog, true)
+                }
+            }
+//            binding.cancelButton.setOnClickListener {
+//                if (block != null) {
+//                    dialog.dismiss()
+//                    listener?.close()
+//                }
+//            }
+
+            dialog.setOnCancelListener {
+                if (block != null) {
+                    dialog.dismiss()
+                    listener?.close()
+                }
+            }
+
+            dialog.show()
+        }
+    }
+
     private fun getErrorDialog(activity: Activity, message: CharSequence?): Dialog {
         val dialog = getDialog(R.layout.dialog_error, activity)
         message?.also { dialog.findViewById<TextView>(R.id.message_tv).text = message }

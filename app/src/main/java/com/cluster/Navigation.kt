@@ -1,5 +1,6 @@
 package com.cluster
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelStoreOwner
@@ -13,6 +14,7 @@ import com.cluster.pos.printer.ParcelablePrintJob
 import com.cluster.screen.*
 import com.cluster.screen.loan.AgentLoanHistoryScreen
 import com.cluster.screen.loan.AgentLoanRequestScreen
+import com.cluster.screen.loan.OverdraftQualifyScreen
 import com.cluster.screen.subscription.ChooseSubscriptionScreen
 import com.cluster.screen.subscription.SubscriptionHistoryScreen
 import com.cluster.screen.subscription.SubscriptionScreen
@@ -25,6 +27,7 @@ fun NavGraphBuilder.clusterNavigation(
     dialogProvider: DialogProvider,
     appViewModel: AppViewModel,
     viewModelStoreOwner: ViewModelStoreOwner,
+    context: Context
 ) {
     composable(Routes.FundsTransfer) {
         FundsTransfer(
@@ -79,7 +82,10 @@ fun NavGraphBuilder.clusterNavigation(
         ProvideViewModelStoreOwner(
             viewModelStoreOwner = viewModelStoreOwner,
         ) {
-            AgentLoanRequestScreen(navController = navController)
+            AgentLoanRequestScreen(
+                navController = navController,
+                context = context
+            )
         }
     }
     composable(Routes.AgentLoanHistory) {
@@ -89,17 +95,25 @@ fun NavGraphBuilder.clusterNavigation(
             AgentLoanHistoryScreen(navController = navController)
         }
     }
+    composable(Routes.OverdraftQualify){
+        ProvideViewModelStoreOwner(
+            viewModelStoreOwner = viewModelStoreOwner
+        ) {
+            OverdraftQualifyScreen(navController = navController, context = context)
+        }
+    }
 }
 
 fun NavGraphBuilder.subscriptionNavigation(
     navController: NavController,
     viewModelStoreOwner: ViewModelStoreOwner,
+    context: Context
 ) {
     composable(Routes.Subscription) {
         ProvideViewModelStoreOwner(
             viewModelStoreOwner = viewModelStoreOwner,
         ) {
-            SubscriptionScreen(navController = navController)
+            SubscriptionScreen(navController = navController, context = context)
         }
     }
     composable(Routes.SubscriptionHistory) {
@@ -116,7 +130,8 @@ fun NavGraphBuilder.subscriptionNavigation(
             ChooseSubscriptionScreen(
                 navController = navController,
                 isUpgrade = false,
-                isChangeSubscription = false
+                isChangeSubscription = false,
+                context = context
             )
         }
     }
@@ -127,7 +142,8 @@ fun NavGraphBuilder.subscriptionNavigation(
             ChooseSubscriptionScreen(
                 navController = navController,
                 isUpgrade = true,
-                isChangeSubscription = false
+                isChangeSubscription = false,
+                context = context
             )
         }
     }
@@ -140,6 +156,7 @@ fun NavGraphBuilder.subscriptionNavigation(
                 navController = navController,
                 isUpgrade = false,
                 isChangeSubscription = true,
+                context = context
             )
         }
     }
