@@ -48,7 +48,7 @@ class PosTransactionReport {
         var settlementDate: String? = null
 
         @SerialName("Status")
-        var status = 1
+        var status : String? = ""
 
         @SerialName("TransactionReference")
         var transactionReference = ""
