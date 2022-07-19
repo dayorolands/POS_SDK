@@ -44,7 +44,7 @@ fun OverdraftQualifyScreen(
     val requestOverdraft = suspend requestOverdraft@{
         val notice = """
             |1. Be an active agent for a minimum of 3 months. 
-            |2. Have a verifiable/tagged business location for full KYC.
+            |2. Have a verifiable/tagged business location.
             |3. Consistently transaction month on month for 3 months.
             |4. Achieve a consistent monthly transaction average inflow of N1,000,000 minimum.
         """.trimMargin()
