@@ -22,6 +22,7 @@ import com.cluster.core.util.logFunctionUsage
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.pos.Platform
+import com.cluster.fragment.CardlessTokenFragment
 import com.cluster.ui.rememberBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -181,6 +182,10 @@ fun CreditClubFragment.openPageById(id: Int) {
 
         R.id.fn_pos_chargeback -> {
             findNavController().navigate(R.id.action_to_chargeback)
+        }
+
+        R.id.fn_token_withdrawal ->{
+            findNavController().navigate(R.id.action_to_cardless_token)
         }
 
         else -> dialogProvider.showError(

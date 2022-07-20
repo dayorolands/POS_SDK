@@ -31,6 +31,15 @@
         app:popEnterAnim="@anim/fade_in"
         app:popExitAnim="@anim/fade_out" />
 
+
+    <action
+        android:id="@+id/action_to_cardless_token"
+        app:destination="@id/cardlessTokenGraph"
+        app:enterAnim="@anim/fade_in"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/fade_out" />
+
     <action
         android:id="@+id/action_to_collection_payment"
         app:destination="@id/collectionGraph"
@@ -99,4 +108,23 @@
             android:label="Generate Collection Reference"
             tools:layout="@layout/fragment_collection_reference_generation" />
     </navigation>
+
+    <navigation
+        android:id="@+id/cardlessTokenGraph"
+        app:startDestination="@id/cardlessTokenWithdrawal">
+        <fragment
+            android:id="@+id/cardlessTokenWithdrawal"
+            android:name="com.cluster.fragment.CardlessTokenFragment"
+            android:label="Cardless Token Withdrawal"
+            tools:layout="@layout/cardless_token_withdrawal">
+        <action
+            android:id="@+id/action_to_cardless_token"
+            app:destination="@id/cardlessTokenWithdrawal"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        </fragment>
+    </navigation>
+
 </navigation>

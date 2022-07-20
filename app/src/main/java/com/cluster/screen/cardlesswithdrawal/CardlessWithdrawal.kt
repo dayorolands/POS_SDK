@@ -1,4 +1,4 @@
-package com.cluster
+package com.cluster.screen.cardlesswithdrawal
 
 import android.print.PrintJob
 import androidx.annotation.DrawableRes
@@ -12,14 +12,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.outlined.TransferWithinAStation
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.colorResource
 import androidx.navigation.NavController
-import com.cluster.core.ui.widget.DialogProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
@@ -33,18 +31,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cluster.R
 import com.cluster.core.data.model.Bank
 import com.cluster.core.data.response.NameEnquiryResponse
+import com.cluster.core.ui.CreditClubFragment
+import com.cluster.fragment.CardlessWithdrawalViewModel
 import com.cluster.ui.CreditClubAppBar
 import com.cluster.ui.Loading
+import com.cluster.utility.openPageById
 import kotlinx.coroutines.Job
 import java.util.*
 import kotlin.math.roundToInt
 
 @Composable
-fun CardlessWithdrawalActivity(navController: NavController) {
-
+fun CardlessWithdrawal(
+    navController: NavController,
+    fragment: CreditClubFragment
+) {
     var isSameBank: Boolean? by rememberSaveable { mutableStateOf(null) }
     var bank: Bank? by remember(isSameBank) { mutableStateOf(null) }
     var receiverAccountNumber by remember(bank) { mutableStateOf("") }
@@ -52,12 +56,11 @@ fun CardlessWithdrawalActivity(navController: NavController) {
         mutableStateOf(null)
     }
     var receipt: PrintJob? by remember { mutableStateOf(null) }
-    var amountString by remember(bank) { mutableStateOf("")}
-    var loadingMessage by remember { mutableStateOf("") }
     var activeJob: Job? by remember { mutableStateOf(null) }
+    val viewModel : CardlessWithdrawalViewModel = viewModel()
     val isVerified = nameEnquiryResponse != null
     var isTokenWithdrawal: Boolean? by rememberSaveable { mutableStateOf(null)}
-    var selectType by remember{ mutableStateOf(null) }
+    var selectType : Boolean? by rememberSaveable{ mutableStateOf(null) }
     var title = when{
         isSameBank == null -> "Cardless Withdrawal"
         selectType == null -> "Select Payment Mode"
@@ -67,7 +70,11 @@ fun CardlessWithdrawalActivity(navController: NavController) {
     }
 
     Column(modifier = Modifier
-        .background(colorResource(id = R.color.menuBackground))
+        .background(
+            colorResource(
+                id = R.color.menuBackground
+            )
+        )
         .fillMaxSize()
     ) {
         CreditClubAppBar(
@@ -78,29 +85,15 @@ fun CardlessWithdrawalActivity(navController: NavController) {
                 }else{
                     isSameBank = null
                     bank = null
+                    selectType = null
                     isTokenWithdrawal = null
                     nameEnquiryResponse = null
                     receiverAccountNumber = ""
-                    amountString = ""
-                    loadingMessage = ""
                 }
             }
 
         )
         LazyColumn(modifier = Modifier.weight(1f)){
-            if(loadingMessage.isNotBlank()){
-                item(key = "loading"){
-                    Loading(
-                        message = loadingMessage,
-                        onCancel = {
-                            activeJob?.cancel()
-                            activeJob = null
-                            loadingMessage = ""
-                        }
-                    )
-                }
-                return@LazyColumn
-            }
             if (isSameBank == null) {
                 item(key = "select-type") {
                     Row(
@@ -111,28 +104,57 @@ fun CardlessWithdrawalActivity(navController: NavController) {
                         SmallMenuButton(
                             text = stringResource(R.string.funds_transfer_same_bank),
                             icon = R.drawable.funds_transfer_same_bank,
-                            onClick = { isSameBank = true },
+                            onClick = {
+                                isSameBank = true
+                                viewModel.isSameBank.value = isSameBank as Boolean },
                             draw = true,
                         )
                         SmallMenuButton(
                             text = stringResource(R.string.other_bank),
                             icon = R.drawable.ic_bank_building,
-                            onClick = { isSameBank = false },
+                            onClick = {
+                                isSameBank = false
+                                viewModel.isSameBank.value = isSameBank as Boolean },
                         )
                     }
                 }
             }
-            
-            if(selectType != null){
+
+            if(selectType == null && isSameBank != null){
                 item ( key = "Select-type" ){
-                    ChipButton(
-                        label = stringResource(id = R.string.withdraw_using_token),
-                        onClick = {
-                        },
-                        imageVector = Icons.Outlined.TransferWithinAStation
-                    )
+                    Column(
+                        modifier = Modifier
+                            .padding(vertical = 20.dp, horizontal = 16.dp)
+                            .fillMaxWidth(),
+                    ){
+                        ChipButton(
+                            label = stringResource(id = R.string.withdraw_using_token),
+                            onClick = { fragment.openPageById(R.id.fn_token_withdrawal) },
+                            imageVector = Icons.Outlined.SendToMobile
+                        )
+                        Spacer(modifier = Modifier.padding(top = 10.dp))
+                        ChipButton(
+                            label = stringResource(id = R.string.withdraw_using_ussd),
+                            onClick = {
+                            },
+                            imageVector = Icons.Outlined.TransferWithinAStation
+                        )
+                        Spacer(modifier = Modifier.padding(top = 10.dp))
+                        ChipButton(
+                            label = stringResource(id = R.string.withdraw_using_mmo_wallet),
+                            onClick = {
+                            },
+                            imageVector = Icons.Outlined.PhoneAndroid
+                        )
+                        Spacer(modifier = Modifier.padding(top = 10.dp))
+                        ChipButton(
+                            label = stringResource(id = R.string.withdraw_using_qr_code),
+                            onClick = {
+                            },
+                            imageVector = Icons.Outlined.QrCode
+                        )
+                    }
                 }
-                
             }
         }
     }

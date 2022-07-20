@@ -10,4 +10,5 @@
     <item name="fn_pos_chargeback" type="id" />
     <item name="fn_pending_transactions" type="id" />
     <item name="fn_subscription" type="id" />
+    <item name="fn_token_withdrawal" type="id" />
 </resources>

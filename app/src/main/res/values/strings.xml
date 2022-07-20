@@ -421,6 +421,9 @@
     <string name="make_transfer">Make Transfer</string>
     <string name="other_bank">Other Bank</string>
     <string name="withdraw_using_token">Withdraw using Token</string>
+    <string name="withdraw_using_ussd">Withdraw using USSD</string>
+    <string name="withdraw_using_mmo_wallet">Withdraw using MMO Wallet</string>
+    <string name="withdraw_using_qr_code">Withdraw using QR Code</string>
     <string name="confirm">Confirm</string>
     <string name="select_bank">Select Bank</string>
     <string name="enter_account">Enter Account</string>
@@ -460,6 +463,7 @@
     <string name="confirm_login_pin">Confirm Login PIN</string>
     <string name="loan_history">Loan History</string>
     <string name="login_pin">Login PIN</string>
+    <string name="customer_token_name">Customer Name</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>
