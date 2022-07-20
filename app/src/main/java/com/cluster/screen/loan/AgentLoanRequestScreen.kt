@@ -60,7 +60,7 @@ fun AgentLoanRequestScreen(
             |5. A processing fee of ${loan!!.feeRate}% will be charged upfront.
             |6. The overdraft amount will be available for use within 24hrs.
             |7. The automatic repayment will be processed after 24hrs.
-            |8. A defaulting fee of ${loan!!.interest} will be charged if Overdraft isn't paid fully after 24hrs.
+            |8. A defaulting fee of ${loan!!.interest}% will be charged daily if Overdraft isn't paid fully after 24hrs.
         """.trimMargin()
         val shouldProceed = dialogProvider.getLoanConfirmation(
             title = "Kindly Note",
