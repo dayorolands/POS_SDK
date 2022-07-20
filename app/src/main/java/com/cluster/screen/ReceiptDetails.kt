@@ -15,7 +15,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.cluster.R
 import com.cluster.Routes
+import com.cluster.core.type.TransactionType
 import com.cluster.pos.Platform
 import com.cluster.pos.printer.*
 import com.cluster.pos.rememberPosPrinter
@@ -36,6 +38,7 @@ fun ReceiptDetails(
     val coroutineScope = rememberCoroutineScope()
     val posPrinter by rememberPosPrinter()
     var errorMessage by remember { mutableStateOf("") }
+    var transactionType : TransactionType = TransactionType.CollectionPayment
 
     Column(
         modifier = Modifier
@@ -43,7 +46,14 @@ fun ReceiptDetails(
             .background(MaterialTheme.colors.surface),
     ) {
         if (showAppBar) {
-            CreditClubAppBar(title = "", onBackPressed = onBackPressed)
+            CreditClubAppBar(title = "",
+                onBackPressed = {
+                    if(transactionType == TransactionType.CollectionPayment){
+                        navController.navigate(R.id.nav_graph)
+                    } else{
+                        onBackPressed
+                    }
+                })
         }
 
         LazyColumn(modifier = Modifier.weight(1f)) {
