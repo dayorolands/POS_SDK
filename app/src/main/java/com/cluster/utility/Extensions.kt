@@ -15,6 +15,7 @@ import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.model.AppFunctionUsage
 import com.cluster.core.data.request.BalanceEnquiryRequest
 import com.cluster.core.type.CustomerRequestOption
+import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.debug
@@ -177,6 +178,7 @@ fun CreditClubFragment.openPageById(id: Int) {
                 null,
                 navOptions = navOptions { restoreState = false },
             )
+            TransactionType.CollectionPayment
         }
 
         R.id.fn_pos_chargeback -> {
