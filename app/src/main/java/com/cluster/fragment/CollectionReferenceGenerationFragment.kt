@@ -58,8 +58,6 @@ class CollectionReferenceGenerationFragment :
         if(viewModel.retrievalReferenceNumber.value.isNullOrBlank()){
             viewModel.retrievalReferenceNumber.value = localStorage.newTransactionReference()
         }
-        Log.d("OkHttpClient", "Checking the isFixedAmount value:::: ${viewModel.isFixedAmountCheck.value}")
-        Log.d("OkHttpClient", "Checking the fee amount value:::: ${viewModel.feeAmount.value}")
 
         mainScope.launch {
             if(!viewModel.customerName.value?.isBlank()!!){
@@ -90,6 +88,15 @@ class CollectionReferenceGenerationFragment :
             else{
                 binding.feeInputPay.isEnabled = true
                 binding.feeInputPay.value = ""
+            }
+
+            if(viewModel.amountDue.value?.toInt() != null){
+                binding.amountDueInput.isEnabled = false
+                binding.amountDueInput.setText(viewModel.amountDue.value.toString())
+            }
+            else{
+                binding.amountDueInput.isEnabled =  true
+                binding.amountDueInput.value = ""
             }
         }
 
@@ -174,9 +181,7 @@ class CollectionReferenceGenerationFragment :
         dialogProvider.hideProgressBar()
         if (error != null) return dialogProvider.showErrorAndWait(error)
         if (response == null) {
-            dialogProvider.showErrorAndWait("An error occurred. Please try again later")
-//            activity?.onBackPressed()
-            return
+           return dialogProvider.showErrorAndWait("An error occurred. Please try again later")
         }
 
         response.collectionPaymentItemName = response.collectionPaymentItemName ?: "${viewModel.paymentItem.value?.name} (${viewModel.paymentItem.value?.code})"
@@ -188,7 +193,7 @@ class CollectionReferenceGenerationFragment :
             request = request,
             transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm")
         )
-        navigateToReceipt(receipt, popBackStack = true)
+        navigateToCollectionsReceipt(receipt, popBackStack = true)
 
     }
 }

@@ -61,7 +61,45 @@
                         android:text="@{viewModel.validCustomerName}"
                         android:textAllCaps="true" />
 
-                </com.google.android.material.textfield.TextInputLayout><com.google.android.material.textfield.TextInputLayout
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:hint="Fee">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/fee_input_pay"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="numberDecimal"
+                        android:visibility="visible"
+                        android:maxLength="7"
+                        android:singleLine="true"
+                        android:text=""/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:hint="Amount Due">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/amount_due_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="numberDecimal"
+                        android:visibility="visible"
+                        android:maxLength="7"
+                        android:singleLine="true"
+                        android:text=""/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -106,24 +144,6 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="15dp"
                     android:background="#ddd" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
-                    android:hint="Fee">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/fee_input_pay"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:inputType="numberDecimal"
-                        android:visibility="visible"
-                        android:maxLength="7"
-                        android:singleLine="true"
-                        android:text=""/>
-                </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
