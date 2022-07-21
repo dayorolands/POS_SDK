@@ -258,7 +258,8 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                         transactionDate = item.transactionDateTime?.toInstant(CREDIT_CLUB_DATE_PATTERN).toString().replace("T"," "),
                         settlementDate = item.settlementDate?.toInstant(CREDIT_CLUB_DATE_PATTERN).toString().replace("T", " "),
                         isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
-                        reason = selectedTransactionStatus.label
+                        reason = selectedTransactionStatus.label,
+                        responseCode = item.responseCode
                     )
                 )
             }

@@ -14,7 +14,7 @@ enum class TransactionStatus(
     val label: String,
     @StringRes val labelRes: Int = R.string.please_replace
 ) {
-    Pending(1, "Pending"),
+    Pending(1, "Pending Settlement"),
     Failed(2, "Failed"),
     Successful(3, "Successful"),
     Reversed(4, "Reversed"),
