@@ -1,5 +1,6 @@
 package com.cluster.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,10 +18,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.Routes
+import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.type.TransactionType
+import com.cluster.core.ui.CreditClubFragment
 import com.cluster.pos.Platform
 import com.cluster.pos.printer.*
 import com.cluster.pos.rememberPosPrinter
+import com.cluster.screen.home.TransactionsScreen
 import com.cluster.ui.AppButton
 import com.cluster.ui.AppSecondButton
 import com.cluster.ui.CreditClubAppBar
@@ -46,14 +50,7 @@ fun ReceiptDetails(
             .background(MaterialTheme.colors.surface),
     ) {
         if (showAppBar) {
-            CreditClubAppBar(title = "",
-                onBackPressed = {
-                    if(transactionType == TransactionType.CollectionPayment){
-                        navController.navigate(R.id.nav_graph)
-                    } else{
-                        onBackPressed
-                    }
-                })
+            CreditClubAppBar(title = "", onBackPressed = onBackPressed)
         }
 
         LazyColumn(modifier = Modifier.weight(1f)) {
