@@ -77,6 +77,9 @@ class PosTransactionReport {
         @SerialName("CardHolder")
         var cardHolderName: String? = ""
 
+        @SerialName("ResponseCode")
+        var responseCode: String? = ""
+
         @SerialName("DateTime")
         var transactionDateTime: String? = ""
     }

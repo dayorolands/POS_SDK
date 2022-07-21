@@ -249,7 +249,7 @@ fun posCashoutReceipt(
     transactionStatus(
         context = context,
         isSuccessful = isSuccessful,
-        responseCode = responseCode ?: if (isSuccessful) "00" else "06",
+        responseCode = responseCode!!,
         reason = reason,
     )
     footer(context)

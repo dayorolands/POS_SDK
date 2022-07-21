@@ -16,3 +16,15 @@ fun CreditClubFragment.navigateToReceipt(
     }
     navController.navigate(R.id.action_to_receipt, bundleOf("receipt" to receipt))
 }
+
+fun CreditClubFragment.navigateToCollectionsReceipt(
+    receipt: ParcelablePrintJob,
+    popBackStack: Boolean = true,
+) {
+    val navController = findNavController()
+    if (popBackStack) {
+        navController.popBackStack()
+        navController.popBackStack()
+    }
+    navController.navigate(R.id.action_to_receipt, bundleOf("receipt" to receipt))
+}
