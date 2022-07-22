@@ -461,7 +461,7 @@
     <string name="confirmPassword">Confirm Password</string>
     <string name="new_login_pin">New Login PIN</string>
     <string name="confirm_login_pin">Confirm Login PIN</string>
-    <string name="loan_history">Loan History</string>
+    <string name="overdraft_history">Overdraft History</string>
     <string name="login_pin">Login PIN</string>
     <string name="customer_token_name">Customer Name</string>
     <string-array name="transaction_types">

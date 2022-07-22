@@ -12,10 +12,7 @@ import com.cluster.core.data.model.AccountInfo
 import com.cluster.core.data.model.PayBillRequest
 import com.cluster.core.data.model.PayBillResponse
 import com.cluster.core.data.prefs.LocalStorage
-import com.cluster.core.data.request.DepositRequest
-import com.cluster.core.data.request.FundsTransferRequest
-import com.cluster.core.data.request.POSCashoutRequest
-import com.cluster.core.data.request.WithdrawalRequest
+import com.cluster.core.data.request.*
 import com.cluster.core.data.response.CollectionPaymentResponse
 import com.cluster.core.util.*
 import com.cluster.core.util.delegates.defaultJson
@@ -95,27 +92,74 @@ fun withdrawalReceipt(
     footer(context)
 }
 
-fun collectionPaymentReceipt(context: Context, response: CollectionPaymentResponse) = printJob {
+fun collectionPaymentReceipt(
+    context: Context,
+    request: CollectionPaymentRequest,
+    transactionDate: String,
+    response: CollectionPaymentResponse?
+) = printJob {
     logo()
+    text(
+        text = "Collections",
+        align = Alignment.MIDDLE,
+        fontSize = 35,
+    )
     text(
         """
         |Agent Code: ${context.localStorage.agent?.agentCode}
         |Agent Phone: ${context.localStorage.agentPhone}
         |--------------------------
-        |Amount NGN${response.amount}
+        |Amount NGN${request.amount}
         |
-        |Category ${response.collectionCategoryName}
-        |Payment Item: ${response.collectionPaymentItemName}
-        |
-        |Reference: ${response.collectionReference}
-        |Transaction Date: ${response.date?.format("dd-MM-yyyy hh:mm")}
+        |Payment Item Name: ${request.billerItemName}
+        |Payment Item Code: ${request.billerItemCode}
+        |Biller Name: ${request.billerName}
+        |Biller Code: ${request.billerCode}
+        |Category: ${response?.collectionCategoryName}
+        |Customer Phone number: ${request.customerPhoneNumber}
+        |Customer Name: ${request.customerName}
+        |RRN: ${request.deviceNumber}${request.retrievalReferenceNumber}
+        |Reference: ${response?.collectionReference}
+        |Transaction Date: $transactionDate
         """.trimMargin()
     )
     transactionStatus(
         context = context,
-        isSuccessful = response.isSuccessful == true,
-        responseCode = response.responseCode ?: "06",
-        reason = response.responseMessage,
+        isSuccessful = response?.isSuccessful == true,
+        responseCode = response?.responseCode ?: "06",
+        reason = response?.responseMessage,
+    )
+    footer(context)
+}
+
+fun collectionReportReceipt(
+    context: Context,
+    response: CollectionPaymentResponse?
+) = printJob {
+    logo()
+    text(
+        text = "Collections",
+        align = Alignment.MIDDLE,
+        fontSize = 35,
+    )
+    text(
+        """
+        |Agent Code: ${context.localStorage.agent?.agentCode}
+        |Agent Phone: ${context.localStorage.agentPhone}
+        |--------------------------
+        |Amount NGN${response?.amount}
+        |
+        |Category: ${response?.collectionCategoryName}
+        |Payment Item Name: ${response?.collectionPaymentItemName}
+        |Reference: ${response?.collectionReference}
+        |Transaction Date: ${response?.date?.toString("dd-MM-yyyy hh:mm:ss")?.replace("T"," ")}
+        """.trimMargin()
+    )
+    transactionStatus(
+        context = context,
+        isSuccessful = response?.isSuccessful == true,
+        responseCode = response?.responseCode ?: "06",
+        reason = response?.responseMessage,
     )
     footer(context)
 }
@@ -176,8 +220,7 @@ fun posCashoutReceipt(
     settlementDate: String?,
     isSuccessful: Boolean = false,
     reason: String? = null,
-    responseCode: String? = null,
-    localStorage: LocalStorage
+    responseCode: String? = null
 ) = printJob {
 
     logo()
@@ -195,12 +238,18 @@ fun posCashoutReceipt(
         |Transaction Ref: ${request.transactionReference}
         |Settlement Date: $settlementDate
         |Transaction Date: $transactionDate
-        |RRN: ${localStorage.deviceNumber}${request.transactionReference}""".trimMargin()
+        |Masked Pan : ${request.maskedPan}
+        |Transaction Stan: ${request.transactionStan}
+        |CardType : ${request.cardType}
+        |Expiry Date: ${request.expiryDate}
+        |CardHolder Name: ${request.cardHolderName}
+        |RRN: ${request.retrievalReferenceNumber}
+        """.trimMargin()
     )
     transactionStatus(
         context = context,
         isSuccessful = isSuccessful,
-        responseCode = responseCode ?: if (isSuccessful) "00" else "06",
+        responseCode = responseCode!!,
         reason = reason,
     )
     footer(context)

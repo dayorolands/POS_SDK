@@ -83,6 +83,7 @@ interface DialogProvider {
 
     fun confirm(params: DialogConfirmParams, block: DialogListenerBlock<Boolean>?)
     fun confirm(params: LoanDialogConfirmParams, block: DialogListenerBlock<Boolean>?)
+    fun confirm(params: OverdraftDialogConfirmParams, block: DialogListenerBlock<Boolean>?)
 
     fun confirm(
         title: CharSequence,
@@ -170,6 +171,22 @@ interface DialogProvider {
                 onClose { continuation.resume(false) }
             }
         }
+
+    suspend fun getOverdraftConfirmation(
+        title: CharSequence,
+        subtitle: CharSequence = ""
+    ) = suspendCoroutine<Boolean> { continuation ->
+        confirm(OverdraftDialogConfirmParams(
+            title = title,
+            subtitle = subtitle
+        )) {
+            onSubmit {
+                dismiss()
+                continuation.resume(it)
+            }
+            onClose { continuation.resume(false) }
+        }
+    }
 
     suspend fun showErrorAndWait(message: CharSequence)
 

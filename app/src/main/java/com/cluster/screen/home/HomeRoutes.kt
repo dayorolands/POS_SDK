@@ -37,11 +37,14 @@ fun NavGraphBuilder.homeRoutes(
                 BalanceCard()
                 if(institutionConfig.flows.getALoan != null) {
                     LoanOfferSection(
-                        onRequestLoan = {
+                        onRequestOverdraft = {
                             composeNavController.navigate(Routes.AgentLoanRequest)
                         },
                         onShowHistory = {
                             composeNavController.navigate(Routes.AgentLoanHistory)
+                        },
+                        onOverdraftQualify = {
+                            composeNavController.navigate(Routes.OverdraftQualify)
                         }
                     )
                 }

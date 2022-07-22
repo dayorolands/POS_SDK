@@ -21,8 +21,10 @@ import com.cluster.core.data.request.CollectionPaymentRequest
 import com.cluster.core.data.request.CollectionReferenceGenerationRequest
 import com.cluster.core.data.request.CollectionValidationCustomFields
 import com.cluster.core.ui.CreditClubFragment
+import com.cluster.core.util.isValidEmail
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
+import com.cluster.core.util.toString
 import com.cluster.pos.Platform
 import com.cluster.pos.printer.PosPrinter
 import com.cluster.receipt.collectionPaymentReceipt
@@ -56,8 +58,6 @@ class CollectionReferenceGenerationFragment :
         if(viewModel.retrievalReferenceNumber.value.isNullOrBlank()){
             viewModel.retrievalReferenceNumber.value = localStorage.newTransactionReference()
         }
-        Log.d("OkHttpClient", "Checking the isFixedAmount value:::: ${viewModel.isFixedAmountCheck.value}")
-        Log.d("OkHttpClient", "Checking the fee amount value:::: ${viewModel.feeAmount.value}")
 
         mainScope.launch {
             if(!viewModel.customerName.value?.isBlank()!!){
@@ -89,6 +89,15 @@ class CollectionReferenceGenerationFragment :
                 binding.feeInputPay.isEnabled = true
                 binding.feeInputPay.value = ""
             }
+
+            if(viewModel.amountDue.value?.toInt() != null){
+                binding.amountDueInput.isEnabled = false
+                binding.amountDueInput.setText(viewModel.amountDue.value.toString())
+            }
+            else{
+                binding.amountDueInput.isEnabled =  true
+                binding.amountDueInput.value = ""
+            }
         }
 
         binding.confirmPaymentButton.setOnClickListener{
@@ -105,26 +114,28 @@ class CollectionReferenceGenerationFragment :
             viewModel.validCustomerName.value = binding.customerNameInput.value
         }
 
-        if (binding.customerEmailInput.value.isBlank()) {
-            return dialogProvider.showErrorAndWait("Please enter a valid email address")
-        } else {
-            viewModel.validCustomerEmail.value = binding.customerEmailInput.value
+        viewModel.validCustomerEmail.value = binding.customerEmailInput.value
+        val customerEmailAddress = viewModel.validCustomerEmail.value
+        if (customerEmailAddress!!.isBlank()) { return dialogProvider.showErrorAndWait("Please enter a valid email address") }
+        if (customerEmailAddress.isNotBlank() && !customerEmailAddress.isValidEmail()){
+            return dialogProvider.showErrorAndWait("Customer Email is invalid")
         }
 
-        if (binding.customerPhoneNoInput.value.isBlank()) {
-            return dialogProvider.showErrorAndWait("Please enter a phone number")
-        } else {
-            viewModel.customerPhoneNumber.value = binding.customerPhoneNoInput.value
-        }
+        viewModel.customerPhoneNumber.value = binding.customerPhoneNoInput.value
+        val customerPhoneNo = viewModel.customerPhoneNumber.value
+        if (customerPhoneNo!!.isBlank()) { return dialogProvider.showErrorAndWait("Please enter a phone number") }
+        if(customerPhoneNo.length != 11){ return dialogProvider.showErrorAndWait("Customer Phone number must be 11 digits") }
 
+
+        val amountValue = binding.amountInputPay.value
+        if(amountValue.isBlank() || amountValue.isEmpty()) return dialogProvider.showErrorAndWait("Amount cannot be Blank")
         val amountDouble = binding.amountInputPay.value.toDouble()
+        if (amountDouble == 0.0) return dialogProvider.showErrorAndWait("Amount cannot be zero")
         val amountDue = viewModel.amountDue.value?.toDouble()
 
         if(amountDouble > amountDue!!){
             return dialogProvider.showErrorAndWait("Amount cannot be more than ${amountDue.toDouble().toCurrencyFormat()}")
         }
-
-        if (amountDouble == 0.0) return dialogProvider.showErrorAndWait("Amount cannot be zero")
 
         val pin = dialogProvider.getPin("Agent PIN") ?: return
         if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
@@ -145,8 +156,8 @@ class CollectionReferenceGenerationFragment :
             billerItemCode = viewModel.paymentItem.value?.code
             customerAcctName = viewModel.validCustomerName.value
             customerName = viewModel.validCustomerName.value
-            customerEmail = viewModel.validCustomerEmail.value
-            customerPhoneNumber = viewModel.customerPhoneNumber.value
+            customerEmail = customerEmailAddress
+            customerPhoneNumber = customerPhoneNo
             amount = amountDouble
             geoLocation = localStorage.lastKnownLocation
             billerName = viewModel.billers.value?.name
@@ -170,23 +181,19 @@ class CollectionReferenceGenerationFragment :
         dialogProvider.hideProgressBar()
         if (error != null) return dialogProvider.showErrorAndWait(error)
         if (response == null) {
-            dialogProvider.showErrorAndWait("An error occurred. Please try again later")
-            activity?.onBackPressed()
-            return
+           return dialogProvider.showErrorAndWait("An error occurred. Please try again later")
         }
 
-        response.date = Instant.now()
         response.collectionPaymentItemName = response.collectionPaymentItemName ?: "${viewModel.paymentItem.value?.name} (${viewModel.paymentItem.value?.code})"
         response.collectionCategoryName = response.collectionCategoryName ?: "${viewModel.billers.value?.name} (${viewModel.billers.value?.code})"
 
-        if (response.isSuccessful == true) {
-            dialogProvider.showSuccessAndWait(response.responseMessage ?: "Success")
-            if (Platform.hasPrinter) {
-                posPrinter.print(collectionPaymentReceipt(requireContext(), response))
-            }
-            activity?.onBackPressed()
-        } else {
-            dialogProvider.showErrorAndWait(response.responseMessage ?: "Error")
-        }
+        val receipt = collectionPaymentReceipt(
+            context = requireContext(),
+            response = response,
+            request = request,
+            transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm")
+        )
+        navigateToCollectionsReceipt(receipt, popBackStack = true)
+
     }
 }

@@ -21,6 +21,7 @@ object Routes {
     const val SubscriptionHistory = "subscription/history"
     const val AgentLoanRequest = "agent/loan/request"
     const val AgentLoanHistory = "agent/loan/history"
+    const val OverdraftQualify = "agent/loan/overdraftQualify"
 
     fun supportConversation(reference: String, title: String) =
         "support/cases/${reference}/${title}/thread"

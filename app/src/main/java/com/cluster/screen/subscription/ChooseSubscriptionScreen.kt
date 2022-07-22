@@ -1,6 +1,7 @@
 package com.cluster.screen.subscription
 
-import androidx.compose.foundation.background
+import android.content.Context
+import android.os.Bundle
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +23,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.core.data.api.SubscriptionService
-import com.cluster.core.data.model.ChangeSubscriptionRequest
 import com.cluster.core.data.model.SubscriptionPlan
 import com.cluster.core.data.model.SubscriptionRequest
 import com.cluster.core.data.prefs.LocalStorage
@@ -34,8 +34,11 @@ import com.cluster.utility.roundTo2dp
 import com.cluster.viewmodel.AppViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -43,7 +46,8 @@ import java.util.*
 fun ChooseSubscriptionScreen(
     navController: NavController,
     isUpgrade: Boolean,
-    isChangeSubscription: Boolean
+    isChangeSubscription: Boolean,
+    context: Context
 ) {
     val context = LocalContext.current
     val subscriptionService: SubscriptionService by rememberRetrofitService()
@@ -52,6 +56,9 @@ fun ChooseSubscriptionScreen(
     var errorMessage by remember { mutableStateOf("") }
     val viewModel: AppViewModel = viewModel()
     var refreshKey by remember { mutableStateOf(UUID.randomUUID().toString()) }
+    val firebaseAnalytics by lazy { FirebaseAnalytics.getInstance(context) }
+    val currentSubTime = LocalDateTime.now()
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     val dialogProvider by rememberDialogProvider()
     var selectedPlan: SubscriptionPlan? by remember { mutableStateOf(null) }
     val activePlanId = selectedPlan?.id
@@ -171,7 +178,14 @@ fun ChooseSubscriptionScreen(
         topBar = {
             CreditClubAppBar(
                 title = if (isUpgrade) stringResource(R.string.upgrade) else if (isChangeSubscription) stringResource(R.string.change) else stringResource(R.string.choose_a_plan),
-                onBackPressed = { navController.popBackStack() },
+                onBackPressed =
+                { navController.popBackStack()
+                    firebaseAnalytics.logEvent("OnExitAVCSub", Bundle().apply {
+                        firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
+                        putString("activity_type", "AVC (Choose Sub)")
+                        putString("sub_exit_time", currentSubTime.format(formatter))
+                    })
+                },
             )
         }
     ) {

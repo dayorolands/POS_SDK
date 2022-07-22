@@ -3,9 +3,11 @@ package com.cluster
 import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Html
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.cluster.fragment.online.EnterDetailFragment
 import com.cluster.fragment.online.ListOptionsFragment
 import com.cluster.model.TransactionCountType
@@ -17,8 +19,11 @@ import com.cluster.utility.online.convertXmlToJson
 import com.cluster.core.data.Encryption.decrypt
 import com.cluster.core.data.Encryption.generateSessionId
 import com.cluster.core.ui.CreditClubActivity
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.koin.android.ext.android.get
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeoutException
 
 class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
@@ -31,15 +36,28 @@ class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
             client = get()
         )
     }
+    private val currentTime: LocalDateTime = LocalDateTime.now()
+    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isHome = false
+        firebaseAnalytics.logEvent("OnEntryHLATagging", Bundle().apply {
+            firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
+            putString("activity_type", "HLA Tagging(Entry)")
+            putString("hla_entry_time", currentTime.format(formatter))
+        })
+
         goHome()
     }
 
     fun goHome() {
         if (isHome) {
+            firebaseAnalytics.logEvent("OnExitHLATagging", Bundle().apply {
+                firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
+                putString("activity_type", "HLA Tagging(Exit)")
+                putString("hla_exit_time", currentTime.format(formatter))
+            })
             showCloseDialog()
             return
         }
@@ -208,6 +226,11 @@ class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
     }
 
     override fun onBackPressed() {
+        firebaseAnalytics.logEvent("OnExitHLATagging", Bundle().apply {
+            firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
+            putString("activity_type", "HLA Tagging(Exit)")
+            putString("hla_exit_time", currentTime.format(formatter))
+        })
         goHome()
     }
 
@@ -219,6 +242,11 @@ class OnlineActivity : CreditClubActivity(R.layout.bottom_sheet) {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_go_offline) {
+            firebaseAnalytics.logEvent("OnExitHLATagging", Bundle().apply {
+                firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
+                putString("activity_type", "HLA Tagging(Exit)")
+                putString("hla_exit_time", currentTime.format(formatter))
+            })
             showCloseDialog()
         }
         if (item.itemId == android.R.id.home) {

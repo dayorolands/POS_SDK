@@ -162,12 +162,14 @@ class HomeFragment : CreditClubFragment() {
                                     dialogProvider = dialogProvider,
                                     appViewModel = appViewModel,
                                     viewModelStoreOwner = viewModelStoreOwner,
+                                    context = context,
                                     fragment = this@HomeFragment
                                 )
                                 if (institutionConfig.categories.subscriptions) {
                                     subscriptionNavigation(
                                         navController = composeNavController,
                                         viewModelStoreOwner = viewModelStoreOwner,
+                                        context = context
                                     )
                                 }
                             }

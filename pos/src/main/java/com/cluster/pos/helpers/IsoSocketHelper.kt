@@ -1,5 +1,6 @@
 package com.cluster.pos.helpers
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Looper
 import androidx.core.content.ContentProviderCompat.requireContext
@@ -37,7 +38,7 @@ class IsoSocketHelper(
 ) : KoinComponent {
     private val database: PosDatabase by inject()
     private val localStorage: LocalStorage by inject()
-    private var firebaseAnalytics = FirebaseAnalytics.getInstance(get())
+    private var firebaseAnalytics = FirebaseAnalytics.getInstance(get<Context>().applicationContext)
         private set
 
     fun send(request: ISOMsg, isRetry: Boolean = false): SafeRunResult<ISOMsg> {

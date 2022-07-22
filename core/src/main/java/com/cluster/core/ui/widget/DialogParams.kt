@@ -26,6 +26,12 @@ data class LoanDialogConfirmParams(
     val noButtonTex: CharSequence = "Decline",
 )
 
+data class OverdraftDialogConfirmParams(
+    val title: CharSequence,
+    val subtitle: CharSequence? = null,
+    val yesButtonTex: CharSequence = "I understand"
+)
+
 data class DateInputParams(
     val title: String,
     val maxDate: LocalDate? = null,

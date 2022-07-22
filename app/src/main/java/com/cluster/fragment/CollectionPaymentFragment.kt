@@ -8,6 +8,7 @@ import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.cluster.R
@@ -23,6 +24,7 @@ import com.cluster.pos.printer.PosPrinter
 import com.cluster.receipt.collectionPaymentReceipt
 import com.cluster.ui.dataBinding
 import com.cluster.utility.FunctionIds
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
@@ -48,45 +50,48 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         super.onViewCreated(view, savedInstanceState)
         binding.viewModel = viewModel
         binding.toolbar.title = "Collections"
-        mainScope.launch { loadBillers() }
+        mainScope.launch {
+            loadBillers()
+        }
 
         viewModel.run {
             billerList.bindDropDown(billers, binding.billerInput)
             paymentItemList.bindDropDown(paymentItem, binding.paymentItemInput)
-        }
 
-        viewModel.billerName.onChange {
-            mainScope.launch {
-                binding.amountInput.value = ""
-                viewModel.paymentItemName.value = ""
-                binding.customerValueInput.value = ""
-                loadCollectionPaymentItems()
+            viewModel.billerName.onChange {
+                mainScope.launch {
+                    binding.amountInput.value = ""
+                    paymentItemName.value = ""
+                    binding.customerValueInput.value = ""
+                    loadCollectionPaymentItems()
+                }
             }
-        }
 
-        viewModel.paymentItem.onChange {
-            binding.amountInput.visibility = View.INVISIBLE
-            isFixedAmount = viewModel.paymentItem.value?.isFixedAmount!!
-            Log.d("OkHttpClient", "***********************Checking if isFixedAmount is valid: $isFixedAmount")
-
-            viewModel.isFixedAmountCheck.value = viewModel.paymentItem.value?.isFixedAmount
-            if(isFixedAmount) {
-                binding.amountInput.isEnabled = false
-                binding.amountInput.visibility = View.VISIBLE
-                binding.amountInput.value = viewModel.paymentItem.value?.amount!!
-            }else{
+            viewModel.paymentItem.onChange {
                 binding.amountInput.visibility = View.INVISIBLE
-                binding.amountInput.value = "0"
-            }
+                isFixedAmount = viewModel.paymentItem.value?.isFixedAmount!!
 
-            binding.customerValueInput.visibility = View.VISIBLE
-            val customFields = viewModel.paymentItem.value?.customFields
-            if(!customFields.isNullOrEmpty()) {
-                binding.customerValueInput.setHint(
-                    customFields[0].displayText ?: ""
-                )
+                viewModel.isFixedAmountCheck.value = viewModel.paymentItem.value?.isFixedAmount
+                if(isFixedAmount) {
+                    binding.amountInput.isEnabled = false
+                    binding.amountInput.visibility = View.VISIBLE
+                    binding.amountInput.value = viewModel.paymentItem.value?.amount!!
+                }else{
+                    binding.amountInput.visibility = View.INVISIBLE
+                    binding.amountInput.value = "0"
+                }
+
+                binding.customerValueInput.visibility = View.VISIBLE
+                val customFields = viewModel.paymentItem.value?.customFields
+                if(!customFields.isNullOrEmpty()) {
+                    binding.customerValueInput.setHint(
+                        customFields[0].displayText ?: ""
+                    )
+                }
             }
         }
+
+
 
         binding.validateCustomerBtn.setOnClickListener{
             mainScope.launch {

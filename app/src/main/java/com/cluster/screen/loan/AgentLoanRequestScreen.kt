@@ -1,5 +1,7 @@
 package com.cluster.screen.loan
 
+import android.content.Context
+import android.os.Bundle
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
@@ -18,12 +20,16 @@ import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.ui.*
 import com.cluster.viewmodel.AppViewModel
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun AgentLoanRequestScreen(
-    navController: NavController
+    navController: NavController,
+    context: Context
 ) {
     val appViewModel: AppViewModel = viewModel()
     val dialogProvider by rememberDialogProvider()
@@ -38,18 +44,23 @@ fun AgentLoanRequestScreen(
             this != null && this > 0.0 && this <= loan!!.maxAmount
         }
     }
+    val firebaseAnalytics by lazy { FirebaseAnalytics.getInstance(context) }
     val transactionReference = rememberTransactionReference()
     val agentLoansService: AgentLoansService by rememberRetrofitService()
     val amount = remember(amountString) { if (amountIsValid) amountString.toDouble() else 0.0 }
+    val currentLoanTime = LocalDateTime.now()
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     val requestLoan = suspend requestLoan@{
         val notice = """
-            |1. You are about to request for loan liquidity support. 
-            |2. Your loan offer is ${amount.toCurrencyFormat()}
-            |3. Your defaulting interest is ${loan!!.interest} per annum.
-            |4. A processing fee of ${loan!!.feeRate}% will be surcharged.
-            |5. The automatic repayment will be processed after 24hrs.
-            |6. You can only request for another loan only after repayment of previous loan.
+            |1. You are about to request for an overdraft. 
+            |2. Your overdraft offer is ${amount.toCurrencyFormat()}
+            |3. You will be able to access ${amount.toCurrencyFormat()} more than your current balance.
+            |4. This is not Loan.
+            |5. A processing fee of ${loan!!.feeRate}% will be charged upfront.
+            |6. The overdraft amount will be available for use within 24hrs.
+            |7. The automatic repayment will be processed after 24hrs.
+            |8. A defaulting fee of ${loan!!.interest}% will be charged daily if Overdraft isn't paid fully after 24hrs.
         """.trimMargin()
         val shouldProceed = dialogProvider.getLoanConfirmation(
             title = "Kindly Note",
@@ -97,8 +108,15 @@ fun AgentLoanRequestScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
         CreditClubAppBar(
-            title = "Request Loan",
-            onBackPressed = { navController.popBackStack() },
+            title = "Request Overdraft",
+            onBackPressed =
+            { navController.popBackStack()
+                firebaseAnalytics.logEvent("OnExitLoan", Bundle().apply {
+                    firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
+                    putString("activity_type", "Loan Exit")
+                    putString("loan_exit_time", currentLoanTime.format(formatter))
+                })
+            },
         )
         if (loadingMessage.isNotBlank()) {
             Loading(
@@ -111,6 +129,13 @@ fun AgentLoanRequestScreen(
             )
             return@Column
         }
+
+        firebaseAnalytics.logEvent("OnEntryLoan", Bundle().apply {
+            firebaseAnalytics.setUserId(localStorage.agent!!.agentCode)
+            putString("activity_type", "Loan Entry")
+            putString("loan_start_time", currentLoanTime.format(formatter))
+
+        })
 
         OutlinedTextField(
             label = { Text(text = "Amount") },
@@ -125,7 +150,7 @@ fun AgentLoanRequestScreen(
             isError = amountString.isNotBlank() && !amountIsValid,
         )
         Text(
-            text = "Can be up to ${loan!!.maxAmount.toCurrencyFormat()}",
+            text = "You can borrow up to ${loan!!.maxAmount.toCurrencyFormat()}",
             style = MaterialTheme.typography.caption,
             modifier = Modifier
                 .padding(top = 3.dp, start = 16.dp, end = 16.dp)
