@@ -1,5 +1,6 @@
 package com.cluster.fragment
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -13,6 +14,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.cluster.R
 import com.cluster.core.data.api.CardlessWithdrawalService
 import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.model.SendCustomerTokenRequest
 import com.cluster.core.data.model.ValidatingCustomerRequest
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.safeRunIO
@@ -30,6 +32,7 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
     private val cardlessTokenService : CardlessWithdrawalService by retrofitService()
     override val functionId = FunctionIds.CARDLESS_TOKEN
     private val validatingCustomerRequest = ValidatingCustomerRequest()
+    private val sendCustomerTokenRequest = SendCustomerTokenRequest()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -64,6 +67,12 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
                 validatingCustomerInfo()
             }
         }
+
+        binding.sendTokenBtn.setOnClickListener {
+            mainScope.launch {
+                sendToken()
+            }
+        }
     }
 
 
@@ -90,7 +99,7 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
     }
 
     private suspend fun loadBanks() =
-        loadDependencies("getBanks"){
+        loadDependencies("Banks"){
             val bankNameList = cardlessTokenService.getBanks(
                 localStorage.institutionCode
             )
@@ -113,6 +122,60 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
         }
     }
 
+    private suspend fun sendToken() {
+        val accountNumberField = viewModel.accountNumber.value
+
+        val amountEntered = viewModel.amountString.value
+        if(amountEntered.isBlank()){
+            return dialogProvider.showErrorAndWait("Amount cannot be empty")
+        }
+        if (amountEntered == "0") return dialogProvider.showErrorAndWait("Amount cannot be zero")
+
+        val pin = dialogProvider.getPin("Agent PIN") ?: return
+        if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
+
+        val customerPhoneNo = viewModel.customerPhoneNumber.value
+        sendCustomerTokenRequest.apply {
+            institutionCode = localStorage.institutionCode
+            agentPhoneNumber = localStorage.agentPhone
+            destinationBankCode = viewModel.bankName.value!!.dataCode
+            agentPin = pin
+            customerPhoneNumber = customerPhoneNo
+            customerAccountNumber = accountNumberField
+            amount = amountEntered
+        }
+
+        dialogProvider.showProgressBar("Sending Token")
+
+        val (response, error) = safeRunIO {
+            cardlessTokenService.sendCustomerToken(sendCustomerTokenRequest)
+        }
+
+        dialogProvider.hideProgressBar()
+
+        if (error != null) {
+            dialogProvider.showErrorAndWait(error)
+            return
+        }
+        if (response == null) {
+            dialogProvider.showErrorAndWait("A network-related error occurred while sending token")
+            return
+        }
+
+        if (!response.isSuccessful) {
+            val errorMessage = response.responseMessage ?: "An error occurred while sending token"
+            dialogProvider.showErrorAndWait(errorMessage)
+            return
+        }
+
+        dialogProvider.showSuccess(response.responseMessage)
+
+        binding.sendTokenBtn.visibility = View.INVISIBLE
+        binding.customerTokenTv.visibility = View.VISIBLE
+        binding.amountInput.isEnabled = false
+        binding.confirmTokenBtn.visibility = View.VISIBLE
+    }
+
     private suspend fun validatingCustomerInfo() = coroutineScope {
         val accountNumberField = viewModel.accountNumber.value
         if(accountNumberField.isBlank()){
@@ -121,7 +184,7 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
         }
 
         val maxLength = institutionConfig.bankAccountNumberLength
-        if(accountNumberField.length > maxLength){
+        if(accountNumberField.length != maxLength){
             dialogProvider.showError("Account number cannot be more than $maxLength")
             return@coroutineScope
         }
@@ -161,6 +224,8 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
         }
 
         viewModel.customerNameValidationResponse.postValue(response)
+        val phoneNumber = response.data?.phoneNumber.let { it } ?: ""
+        viewModel.customerPhoneNumber.value = phoneNumber
         binding.customerAccountName.visibility = View.VISIBLE
         binding.customerAccountName.setText(response.data!!.accountName)
         binding.customerAccountName.isEnabled = false

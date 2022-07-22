@@ -1,6 +1,8 @@
 package com.cluster.core.data.api
 
 import com.cluster.core.data.model.GetBankResponse
+import com.cluster.core.data.model.SendCustomerTokenRequest
+import com.cluster.core.data.model.SendTokenResponse
 import com.cluster.core.data.model.ValidatingCustomerRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -18,4 +20,9 @@ interface CardlessWithdrawalService {
     suspend fun validatingCustomerRequestInfo(
         @Body request: ValidatingCustomerRequest
     ) : CustomerValidationInfoResponse?
+
+    @POST("api/CrossBankTransaction/SendToken")
+    suspend fun sendCustomerToken(
+        @Body request: SendCustomerTokenRequest
+    ) : SendTokenResponse?
 }

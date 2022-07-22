@@ -129,6 +129,24 @@
                             android:text="@={viewModel.amountString}" />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="15dp"
+                        android:text="@string/customer_token">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/customer_token_tv"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:singleLine="true"
+                            android:visibility="gone"
+                            android:text="@={viewModel.customerToken}"/>
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
@@ -157,6 +175,18 @@
                     android:width="160dp"
                     android:gravity="center"
                     android:text="Send Token"
+                    android:textColor="#fff" />
+                <Button
+                    android:id="@+id/confirm_token_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginVertical="5dp"
+                    android:layout_marginEnd="16dp"
+                    android:width="160dp"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    android:text="Confirm Token"
                     android:textColor="#fff" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>

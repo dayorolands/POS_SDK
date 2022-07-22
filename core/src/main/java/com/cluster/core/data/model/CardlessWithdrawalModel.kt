@@ -1,5 +1,6 @@
 package com.cluster.core.data.model
 
+import com.cluster.core.data.response.BackendResponseContract
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -47,3 +48,42 @@ class ValidatingCustomerRequest {
     var customerAccountNumber: String? = ""
 }
 
+@Serializable
+class SendCustomerTokenRequest {
+    @SerialName("InstitutionCode")
+    var institutionCode: String? = null
+
+    @SerialName("AgentPhoneNumber")
+    var agentPhoneNumber: String? = null
+
+    @SerialName("DestinationBankCode")
+    var destinationBankCode: String? = null
+
+    @SerialName("CustomerAccountNumber")
+    var customerAccountNumber: String? = ""
+
+    @SerialName("CustomerPhoneNumber")
+    var customerPhoneNumber: String? = ""
+
+    @SerialName("AgentPin")
+    var agentPin: String? = ""
+
+    @SerialName("Amount")
+    var amount: String? = ""
+}
+
+
+@Serializable
+class SendTokenResponse  {
+    @SerialName("Status")
+    var status: Int? = null
+
+    @SerialName("IsSuccessful")
+    var isSuccessful: Boolean = false
+
+    @SerialName("Message")
+    var responseMessage: String? = null
+
+    @SerialName("Code")
+    var responseCode: String? = null
+}

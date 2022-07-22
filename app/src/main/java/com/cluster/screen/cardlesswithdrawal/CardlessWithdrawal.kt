@@ -57,7 +57,6 @@ fun CardlessWithdrawal(
     }
     var receipt: PrintJob? by remember { mutableStateOf(null) }
     var activeJob: Job? by remember { mutableStateOf(null) }
-    val viewModel : CardlessWithdrawalViewModel = viewModel()
     val isVerified = nameEnquiryResponse != null
     var isTokenWithdrawal: Boolean? by rememberSaveable { mutableStateOf(null)}
     var selectType : Boolean? by rememberSaveable{ mutableStateOf(null) }
@@ -104,17 +103,13 @@ fun CardlessWithdrawal(
                         SmallMenuButton(
                             text = stringResource(R.string.funds_transfer_same_bank),
                             icon = R.drawable.funds_transfer_same_bank,
-                            onClick = {
-                                isSameBank = true
-                                viewModel.isSameBank.value = isSameBank as Boolean },
+                            onClick = { isSameBank = true },
                             draw = true,
                         )
                         SmallMenuButton(
                             text = stringResource(R.string.other_bank),
                             icon = R.drawable.ic_bank_building,
-                            onClick = {
-                                isSameBank = false
-                                viewModel.isSameBank.value = isSameBank as Boolean },
+                            onClick = { isSameBank = false },
                         )
                     }
                 }
@@ -129,7 +124,7 @@ fun CardlessWithdrawal(
                     ){
                         ChipButton(
                             label = stringResource(id = R.string.withdraw_using_token),
-                            onClick = { fragment.openPageById(R.id.fn_token_withdrawal) },
+                            onClick = { if(isSameBank == true) fragment.openPageById(R.id.token_withdrawal_button) else fragment.openPageById(R.id.fn_token_withdrawal) },
                             imageVector = Icons.Outlined.SendToMobile
                         )
                         Spacer(modifier = Modifier.padding(top = 10.dp))

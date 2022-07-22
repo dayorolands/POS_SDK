@@ -21,8 +21,6 @@ class CardlessWithdrawalViewModel : ViewModel() {
         bankNameList.value.isNotEmpty()
     }.asLiveData()
 
-    var isSameBank = MutableStateFlow(false)
-
     //Customer Validation
     val customerNameValidationResponse = MutableStateFlow<CustomerValidationInfoResponse?>(null)
     val customerValidationName = customerNameValidationResponse.map {
@@ -31,4 +29,6 @@ class CardlessWithdrawalViewModel : ViewModel() {
 
     val amountString = MutableStateFlow("")
     val customerName = MutableStateFlow("")
+    val customerToken = MutableStateFlow("")
+    val customerPhoneNumber = MutableStateFlow("")
 }

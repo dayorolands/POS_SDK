@@ -322,7 +322,7 @@
     <string name="other_bank_customer_token">Other Bank Customer (Token)</string>
     <string name="other_bank_customer_card">Other Bank Customer (Card)</string>
     <string name="title_activity_withdrawal_by_apitoken">Withdrawal</string>
-    <string name="send_token_to_customer">Send token to customer</string>
+    <string name="send_token_to_customer">Send token</string>
     <string name="enter_amount_to_withdraw">Enter amount to withdraw&#8230;</string>
     <string name="customer_token">Customer Token</string>
     <string name="enter_the_token_you_received">Enter the token you received</string>
