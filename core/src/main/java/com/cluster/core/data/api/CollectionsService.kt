@@ -4,6 +4,7 @@ import com.cluster.core.data.model.*
 import com.cluster.core.data.request.CollectionCustomerValidationRequest
 import com.cluster.core.data.request.CollectionPaymentRequest
 import com.cluster.core.data.request.CollectionReferenceGenerationRequest
+import com.cluster.core.data.response.CollectionGetFeeResponse
 import com.cluster.core.data.response.CollectionPaymentResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -96,4 +97,11 @@ interface CollectionsService {
     suspend fun completePayment(
         @Body request: CollectionPaymentRequest
     ): CollectionPaymentResponse?
+
+    @GET("api/Collections/Fee")
+    suspend fun getTransactionFee(
+        @Query("institutionCode") institutionCode: String?,
+        @Query("agentPhoneNumber") agentPhoneNumber: String,
+        @Query("amount") amount: Double
+    ): CollectionGetFeeResponse
 }

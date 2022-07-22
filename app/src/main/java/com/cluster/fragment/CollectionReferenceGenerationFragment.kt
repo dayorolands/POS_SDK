@@ -1,35 +1,24 @@
 package com.cluster.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.cluster.R
-import com.cluster.databinding.FragmentCollectionReferenceGenerationBinding
-import com.cluster.ui.dataBinding
 import com.cluster.core.data.api.CollectionsService
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.prefs.newTransactionReference
-import com.cluster.core.data.request.CollectionCustomerValidationRequest
 import com.cluster.core.data.request.CollectionPaymentRequest
-import com.cluster.core.data.request.CollectionReferenceGenerationRequest
-import com.cluster.core.data.request.CollectionValidationCustomFields
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.isValidEmail
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.core.util.toString
-import com.cluster.pos.Platform
+import com.cluster.databinding.FragmentCollectionReferenceGenerationBinding
 import com.cluster.pos.printer.PosPrinter
 import com.cluster.receipt.collectionPaymentReceipt
+import com.cluster.ui.dataBinding
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
@@ -80,15 +69,15 @@ class CollectionReferenceGenerationFragment :
                 binding.amountInputPay.value = viewModel.paymentItemAmount.value.toString()
             }
 
-            if(viewModel.feeAmount.value?.toInt() != null){
-                binding.feeInputPay.isEnabled = false
-                binding.feeInputPay.setText(viewModel.feeAmount.value.toString())
-                binding.feeInputPay.value = viewModel.feeAmount.value.toString()
-            }
-            else{
-                binding.feeInputPay.isEnabled = true
-                binding.feeInputPay.value = ""
-            }
+//            if(viewModel.feeAmount.value?.toInt() != null){
+//                binding.feeInputPay.isEnabled = false
+//                binding.feeInputPay.setText(viewModel.feeAmount.value.toString())
+//                binding.feeInputPay.value = viewModel.feeAmount.value.toString()
+//            }
+//            else{
+//                binding.feeInputPay.isEnabled = true
+//                binding.feeInputPay.value = ""
+//            }
 
             if(viewModel.amountDue.value?.toInt() != null){
                 binding.amountDueInput.isEnabled = false
@@ -104,6 +93,32 @@ class CollectionReferenceGenerationFragment :
             mainScope.launch {
                 completePayment()
             }
+        }
+    }
+
+    private suspend fun getTransactionFee(amountDouble: Double, institutionCode: String, agentPhoneNumber: String){
+        dialogProvider.showProgressBar("Getting Fee")
+        val (response, error) = safeRunIO {
+            collectionsService.getTransactionFee(
+                amount = amountDouble,
+                institutionCode = institutionCode,
+                agentPhoneNumber = agentPhoneNumber
+            )
+        }
+        dialogProvider.hideProgressBar()
+        if (error != null) return dialogProvider.showErrorAndWait(error)
+        if (response == null) {
+            return dialogProvider.showErrorAndWait("An error occurred. Please try again later")
+        }
+
+        if(response.isSuccessful!!){
+            mainScope.launch {
+                dialogProvider.showInfo("The fee for this transaction is ${response.result!!.toCurrencyFormat()}")
+            }
+            viewModel.feeAmount.value = response.result!!.toInt()
+        } else{
+            dialogProvider.showErrorAndWait("${response.responseMessage}")
+            return
         }
     }
 
@@ -137,6 +152,11 @@ class CollectionReferenceGenerationFragment :
             return dialogProvider.showErrorAndWait("Amount cannot be more than ${amountDue.toDouble().toCurrencyFormat()}")
         }
 
+        var agentPhoneNo = localStorage.agentPhone!!
+        var instituteCode = localStorage.institutionCode!!
+
+        getTransactionFee(amountDouble, instituteCode, agentPhoneNo)
+
         val pin = dialogProvider.getPin("Agent PIN") ?: return
         if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
 
@@ -163,12 +183,12 @@ class CollectionReferenceGenerationFragment :
             billerName = viewModel.billers.value?.name
             billerCode = viewModel.billers.value?.code
             currency = "NGN"
-            institutionCode = localStorage.institutionCode
+            institutionCode = instituteCode
             requestReference = uniqueReference
             retrievalReferenceNumber = viewModel.retrievalReferenceNumber.value
             additionalInformation = Json.encodeToString(serializer, additional)
             deviceNumber = localStorage.deviceNumber
-            agentPhoneNumber = localStorage.agentPhone
+            agentPhoneNumber = agentPhoneNo
             applyFee = true
             feeAmount = viewModel.feeAmount.value
             feeBearerAccount = "Agent"

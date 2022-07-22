@@ -182,7 +182,7 @@ class CollectionPaymentFragment : CreditClubFragment(R.layout.collection_payment
         if (response.isSuccessful == true) {
             viewModel.acceptPartPayment.value = response.result!!.acceptPartPayment
             viewModel.paymentReferece.value = response.result!!.paymentReference
-            viewModel.feeAmount.value = response.result!!.surcharge?.toInt()
+            //viewModel.feeAmount.value = response.result!!.surcharge?.toInt()
             viewModel.customerName.value = response.result!!.customerName
             viewModel.amountDue.value = response.result!!.amountDue?.toInt()
 
