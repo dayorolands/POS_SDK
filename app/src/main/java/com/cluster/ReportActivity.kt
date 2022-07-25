@@ -286,7 +286,12 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     return dialogProvider.showError("An error occurred. Please try again later")
                 }
                 response.date = item.date?.toInstant(CREDIT_CLUB_DATE_PATTERN)
-                posPrinter.print(collectionReportReceipt(this, response))
+                val collectionReportRequest = CollectionReportRequest(
+                    deviceNumber = localStorage.deviceNumber,
+                    retrievalReferenceNumber = item.uniqueReference,
+                    customerName = item.customerName
+                )
+                posPrinter.print(collectionReportReceipt(this, response, collectionReportRequest))
             }
             TransactionType.FundsTransferCommercialBank,
             TransactionType.LocalFundsTransfer,

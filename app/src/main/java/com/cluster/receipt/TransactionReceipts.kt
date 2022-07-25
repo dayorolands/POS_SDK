@@ -11,6 +11,7 @@ import com.cluster.pos.receipt.transactionStatus
 import com.cluster.core.data.model.AccountInfo
 import com.cluster.core.data.model.PayBillRequest
 import com.cluster.core.data.model.PayBillResponse
+import com.cluster.core.data.model.TransactionReport
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.data.request.*
 import com.cluster.core.data.response.CollectionPaymentResponse
@@ -134,7 +135,8 @@ fun collectionPaymentReceipt(
 
 fun collectionReportReceipt(
     context: Context,
-    response: CollectionPaymentResponse?
+    response: CollectionPaymentResponse?,
+    request: CollectionReportRequest
 ) = printJob {
     logo()
     text(
@@ -151,6 +153,8 @@ fun collectionReportReceipt(
         |
         |Category: ${response?.collectionCategoryName}
         |Payment Item Name: ${response?.collectionPaymentItemName}
+        |Customer Name: ${request.customerName}
+        |RRN: ${request.deviceNumber}${request.retrievalReferenceNumber}
         |Reference: ${response?.collectionReference}
         |Transaction Date: ${response?.date?.toString("dd-MM-yyyy hh:mm:ss")?.replace("T"," ")}
         """.trimMargin()

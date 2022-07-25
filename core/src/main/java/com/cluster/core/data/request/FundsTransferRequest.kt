@@ -107,3 +107,15 @@ data class POSCashoutRequest(
     @SerialName("CardHolder")
     var cardHolderName: String? = "",
 )
+
+@Serializable
+data class CollectionReportRequest(
+    @SerialName("DeviceNumber")
+    val deviceNumber: Int = 0,
+
+    @SerialName("RetrievalReferenceNumber")
+    var retrievalReferenceNumber: String? = "",
+
+    @SerialName("CustomerName")
+    var customerName: String? = "",
+)
