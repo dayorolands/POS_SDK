@@ -317,7 +317,6 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
             return@coroutineScope
         }
 
-//        dialogProvider.showSuccess(response.responseMessage)
         val customerName = viewModel.customerName.value
 
         val receipt = tokenWithdrawalReceipt(
