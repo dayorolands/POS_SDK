@@ -147,58 +147,6 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
         }
     }
 
-    private suspend fun sendToken() {
-        val accountNumberField = viewModel.accountNumber.value
-
-        val amountEntered = viewModel.amountString.value
-        if(amountEntered.isBlank()){
-            return dialogProvider.showErrorAndWait("Amount cannot be empty")
-        }
-        if (amountEntered == "0") return dialogProvider.showErrorAndWait("Amount cannot be zero")
-
-        val customerPhoneNo = viewModel.customerPhoneNumber.value
-        val bankCode = viewModel.bankName.value!!.dataCode
-        val cbnBankCode = viewModel.bankName.value!!.cbnCode
-        sendCustomerTokenRequest.apply {
-            institutionCode = localStorage.institutionCode
-            destinationBankCode = bankCode.ifEmpty { cbnBankCode }
-            customerAccountNumber = accountNumberField
-            amount = amountEntered
-        }
-
-        dialogProvider.showProgressBar("Sending Token")
-
-        val (response, error) = safeRunIO {
-            cardlessTokenService.sendCustomerToken(sendCustomerTokenRequest)
-        }
-
-        dialogProvider.hideProgressBar()
-
-        if (error != null) {
-            dialogProvider.showErrorAndWait(error)
-            return
-        }
-        if (response == null) {
-            dialogProvider.showErrorAndWait("A network-related error occurred while sending token")
-            return
-        }
-
-        if (!response.isSuccessful) {
-            val errorMessage = response.responseMessage ?: "An error occurred while sending token"
-            dialogProvider.showErrorAndWait(errorMessage)
-            return
-        }
-
-        dialogProvider.showSuccess(response.responseMessage)
-
-        binding.sendTokenBtn.visibility = View.GONE
-        binding.inquiryLayout.visibility = View.GONE
-        binding.sendTokenLayout.visibility = View.VISIBLE
-        binding.customerPhoneNumber.text = "Please input the token sent to $customerPhoneNo"
-        binding.confirmTokenBtn.visibility = View.VISIBLE
-        binding.resendTokenBtn.visibility = View.VISIBLE
-    }
-
     private suspend fun validatingCustomerInfo() = coroutineScope {
         val accountNumberField = viewModel.accountNumber.value
         if(accountNumberField.isBlank()){
@@ -253,6 +201,58 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
         binding.customerAccountName.setText(response.data!!.accountName)
         binding.customerAccountName.isEnabled = false
         binding.amountInput.visibility = View.VISIBLE
+    }
+
+    private suspend fun sendToken() {
+        val accountNumberField = viewModel.accountNumber.value
+
+        val amountEntered = viewModel.amountString.value
+        if(amountEntered.isBlank()){
+            return dialogProvider.showErrorAndWait("Amount cannot be empty")
+        }
+        if (amountEntered == "0") return dialogProvider.showErrorAndWait("Amount cannot be zero")
+
+        val customerPhoneNo = viewModel.customerPhoneNumber.value
+        val bankCode = viewModel.bankName.value!!.dataCode
+        val cbnBankCode = viewModel.bankName.value!!.cbnCode
+        sendCustomerTokenRequest.apply {
+            institutionCode = localStorage.institutionCode
+            destinationBankCode = bankCode.ifEmpty { cbnBankCode }
+            customerAccountNumber = accountNumberField
+            amount = amountEntered
+        }
+
+        dialogProvider.showProgressBar("Sending Token")
+
+        val (response, error) = safeRunIO {
+            cardlessTokenService.sendCustomerToken(sendCustomerTokenRequest)
+        }
+
+        dialogProvider.hideProgressBar()
+
+        if (error != null) {
+            dialogProvider.showErrorAndWait(error)
+            return
+        }
+        if (response == null) {
+            dialogProvider.showErrorAndWait("A network-related error occurred while sending token")
+            return
+        }
+
+        if (!response.isSuccessful) {
+            val errorMessage = response.responseMessage ?: "An error occurred while sending token"
+            dialogProvider.showErrorAndWait(errorMessage)
+            return
+        }
+
+        dialogProvider.showSuccess(response.responseMessage)
+
+        binding.sendTokenBtn.visibility = View.GONE
+        binding.inquiryLayout.visibility = View.GONE
+        binding.sendTokenLayout.visibility = View.VISIBLE
+        binding.customerPhoneNumber.text = "Please input the token sent to $customerPhoneNo"
+        binding.confirmTokenBtn.visibility = View.VISIBLE
+        binding.resendTokenBtn.visibility = View.VISIBLE
     }
 
     private suspend fun confirmToken() = coroutineScope{
