@@ -168,7 +168,8 @@ fun collectionPaymentReceipt(
 
 fun collectionReportReceipt(
     context: Context,
-    response: CollectionPaymentResponse?
+    response: CollectionPaymentResponse?,
+    request: CollectionReportRequest
 ) = printJob {
     logo()
     text(
@@ -185,6 +186,8 @@ fun collectionReportReceipt(
         |
         |Category: ${response?.collectionCategoryName}
         |Payment Item Name: ${response?.collectionPaymentItemName}
+        |Customer Name: ${request.customerName}
+        |RRN: ${request.deviceNumber}${request.retrievalReferenceNumber}
         |Reference: ${response?.collectionReference}
         |Transaction Date: ${response?.date?.toString("dd-MM-yyyy hh:mm:ss")?.replace("T"," ")}
         """.trimMargin()
