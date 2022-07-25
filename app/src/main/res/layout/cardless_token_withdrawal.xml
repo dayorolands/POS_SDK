@@ -99,8 +99,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:singleLine="true"
-                        android:visibility="gone"
-                        android:text="@={viewModel.customerName}"/>
+                        android:text="@={viewModel.customerName}"
+                        android:visibility="gone" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -125,8 +125,8 @@
                             android:inputType="numberDecimal"
                             android:maxLength="7"
                             android:singleLine="true"
-                            android:visibility="gone"
-                            android:text="@={viewModel.amountString}" />
+                            android:text="@={viewModel.amountString}"
+                            android:visibility="gone" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -134,7 +134,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="15dp"
-                        android:text="@string/customer_token">
+                        android:hint="@string/customer_token">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/customer_token_tv"
@@ -142,12 +142,32 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:singleLine="true"
-                            android:visibility="gone"
-                            android:text="@={viewModel.customerToken}"/>
-
+                            android:text="@={viewModel.customerToken}"
+                            android:visibility="gone" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/refresh_token_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="35dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginVertical="5dp"
+                        android:layout_marginEnd="16dp"
+                        android:width="160dp"
+                        android:gravity="center"
+                        android:text="@string/resend_token"
+                        android:textColor="#fff"
+                        android:visibility="gone"/>
+                </LinearLayout>
+
             </LinearLayout>
         </ScrollView>
 

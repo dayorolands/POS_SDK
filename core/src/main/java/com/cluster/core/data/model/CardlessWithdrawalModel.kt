@@ -87,3 +87,66 @@ class SendTokenResponse  {
     @SerialName("Code")
     var responseCode: String? = null
 }
+
+@Serializable
+class SubmitTokenRequest{
+    @SerialName("InstitutionCode")
+    var institutionCode: String? = null
+
+    @SerialName("AgentPhoneNumber")
+    var agentPhoneNumber: String? = null
+
+    @SerialName("RetrievalReferenceNumber")
+    var retrievalReferenceNumber: String? = null
+
+    @SerialName("DestinationBankCode")
+    var destinationBankCode: String? = null
+
+    @SerialName("CustomerAccountNumber")
+    var customerAccountNumber: String? = ""
+
+    @SerialName("GeoLocation")
+    var geoLocation: String? = ""
+
+    @SerialName("DeviceNumber")
+    var deviceNumber: Int? = 0
+
+    @SerialName("AgentPin")
+    var agentPin: String? = ""
+
+    @SerialName("Token")
+    var customerToken: String? = ""
+
+    @SerialName("Amount")
+    var amount: String? = ""
+
+    @SerialName("AdditionalInformation")
+    var additionalInformation: String? = null
+
+    @SerialName("RequestReference")
+    var requestReference: String? = null
+
+    @Serializable
+    class Additional {
+        @SerialName("TerminalID")
+        var terminalId: String? = null
+
+        @SerialName("AgentCode")
+        var agentCode: String? = null
+    }
+}
+
+@Serializable
+class SubmitTokenResponse  {
+    @SerialName("Status")
+    var status: Int? = null
+
+    @SerialName("IsSuccessful")
+    var isSuccessful: Boolean = false
+
+    @SerialName("Message")
+    var responseMessage: String? = null
+
+    @SerialName("Code")
+    var responseCode: String? = null
+}

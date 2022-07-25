@@ -31,4 +31,5 @@ class CardlessWithdrawalViewModel : ViewModel() {
     val customerName = MutableStateFlow("")
     val customerToken = MutableStateFlow("")
     val customerPhoneNumber = MutableStateFlow("")
+    val retrievalReferenceNumber = MutableStateFlow("")
 }

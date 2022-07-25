@@ -1,8 +1,6 @@
 package com.cluster.fragment
 
-import android.opengl.Visibility
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -15,7 +13,9 @@ import com.cluster.R
 import com.cluster.core.data.api.CardlessWithdrawalService
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.model.SendCustomerTokenRequest
+import com.cluster.core.data.model.SubmitTokenRequest
 import com.cluster.core.data.model.ValidatingCustomerRequest
+import com.cluster.core.data.prefs.newTransactionReference
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.safeRunIO
 import com.cluster.databinding.CardlessTokenWithdrawalBinding
@@ -25,6 +25,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import java.util.*
 
 class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdrawal) {
     private val viewModel : CardlessWithdrawalViewModel by viewModels()
@@ -33,6 +35,9 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
     override val functionId = FunctionIds.CARDLESS_TOKEN
     private val validatingCustomerRequest = ValidatingCustomerRequest()
     private val sendCustomerTokenRequest = SendCustomerTokenRequest()
+    private val submitTokenRequest = SubmitTokenRequest()
+    private val additionalString = SubmitTokenRequest.Additional()
+    private val uniqueReference = UUID.randomUUID().toString()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -42,6 +47,10 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if(viewModel.retrievalReferenceNumber.value.isBlank()){
+            viewModel.retrievalReferenceNumber.value = localStorage.newTransactionReference()
+        }
 
         binding.viewModel = viewModel
         binding.toolbar.title = "Token Withdrawal"
@@ -60,6 +69,13 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
                     }
                 }
             }
+
+            binding.refreshTokenBtn.setOnClickListener {
+                mainScope.launch {
+                    customerToken.postValue("")
+                    sendToken()
+                }
+            }
         }
 
         binding.accountNumberInput.setEndIconOnClickListener {
@@ -71,6 +87,12 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
         binding.sendTokenBtn.setOnClickListener {
             mainScope.launch {
                 sendToken()
+            }
+        }
+
+        binding.confirmTokenBtn.setOnClickListener {
+            mainScope.launch {
+                confirmToken()
             }
         }
     }
@@ -174,6 +196,7 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
         binding.customerTokenTv.visibility = View.VISIBLE
         binding.amountInput.isEnabled = false
         binding.confirmTokenBtn.visibility = View.VISIBLE
+        binding.refreshTokenBtn.visibility = View.VISIBLE
     }
 
     private suspend fun validatingCustomerInfo() = coroutineScope {
@@ -230,6 +253,72 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
         binding.customerAccountName.setText(response.data!!.accountName)
         binding.customerAccountName.isEnabled = false
         binding.amountInput.visibility = View.VISIBLE
+    }
+
+    private suspend fun confirmToken() = coroutineScope{
+        val token = viewModel.customerToken.value
+        if(token.isBlank()){
+            dialogProvider.showError("Token cannot be blank")
+            return@coroutineScope
+        }
+
+        val pin = dialogProvider.getPin("Agent PIN") ?: return@coroutineScope
+        if (pin.length != 4) {
+            dialogProvider.showError("Agent PIN must be 4 digits long")
+            return@coroutineScope
+        }
+
+        val serializer = SubmitTokenRequest.Additional.serializer()
+        val agent = localStorage.agent
+        val additional = additionalString.apply {
+            agentCode = agent?.agentCode
+            terminalId = agent?.terminalID
+        }
+
+        submitTokenRequest.apply {
+            institutionCode = localStorage.institutionCode
+            agentPhoneNumber = localStorage.agentPhone
+            customerAccountNumber = viewModel.accountNumber.value
+            amount = viewModel.amountString.value
+            agentPin = pin
+            customerToken = viewModel.customerToken.value
+            geoLocation = localStorage.lastKnownLocation
+            retrievalReferenceNumber = viewModel.retrievalReferenceNumber.value
+            deviceNumber = localStorage.deviceNumber
+            additionalInformation = Json.encodeToString(serializer, additional)
+            destinationBankCode = viewModel.bankName.value!!.dataCode
+            requestReference = uniqueReference
+        }
+
+        dialogProvider.showProgressBar("Processing..", isCancellable = true) {
+            onClose {
+                cancel()
+            }
+        }
+
+        val (response, error) = safeRunIO {
+            cardlessTokenService.confirmToken(submitTokenRequest)
+        }
+
+        dialogProvider.hideProgressBar()
+
+        if (error != null) {
+            dialogProvider.showErrorAndWait(error)
+            return@coroutineScope
+        }
+        if (response == null) {
+            dialogProvider.showErrorAndWait("A network-related error occurred while confirming token")
+            return@coroutineScope
+        }
+
+
+        if (!response.isSuccessful) {
+            val errorMessage = response.responseMessage ?: "An error occurred while confirming token"
+            dialogProvider.showErrorAndWait(errorMessage)
+            return@coroutineScope
+        }
+
+        dialogProvider.showSuccess(response.responseMessage)
     }
 
     private suspend inline fun loadDependencies(
