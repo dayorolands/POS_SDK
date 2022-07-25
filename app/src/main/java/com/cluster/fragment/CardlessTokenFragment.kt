@@ -18,7 +18,9 @@ import com.cluster.core.data.model.ValidatingCustomerRequest
 import com.cluster.core.data.prefs.newTransactionReference
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.safeRunIO
+import com.cluster.core.util.toString
 import com.cluster.databinding.CardlessTokenWithdrawalBinding
+import com.cluster.receipt.tokenWithdrawalReceipt
 import com.cluster.ui.dataBinding
 import com.cluster.utility.FunctionIds
 import kotlinx.coroutines.cancel
@@ -26,6 +28,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import java.time.Instant
 import java.util.*
 
 class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdrawal) {
@@ -70,7 +73,7 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
                 }
             }
 
-            binding.refreshTokenBtn.setOnClickListener {
+            binding.resendTokenBtn.setOnClickListener {
                 mainScope.launch {
                     customerToken.postValue("")
                     sendToken()
@@ -153,16 +156,12 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
         }
         if (amountEntered == "0") return dialogProvider.showErrorAndWait("Amount cannot be zero")
 
-        val pin = dialogProvider.getPin("Agent PIN") ?: return
-        if (pin.length != 4) return dialogProvider.showError("Agent PIN must be 4 digits long")
-
         val customerPhoneNo = viewModel.customerPhoneNumber.value
+        val bankCode = viewModel.bankName.value!!.dataCode
+        val cbnBankCode = viewModel.bankName.value!!.cbnCode
         sendCustomerTokenRequest.apply {
             institutionCode = localStorage.institutionCode
-            agentPhoneNumber = localStorage.agentPhone
-            destinationBankCode = viewModel.bankName.value!!.dataCode
-            agentPin = pin
-            customerPhoneNumber = customerPhoneNo
+            destinationBankCode = bankCode.ifEmpty { cbnBankCode }
             customerAccountNumber = accountNumberField
             amount = amountEntered
         }
@@ -192,11 +191,12 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
 
         dialogProvider.showSuccess(response.responseMessage)
 
-        binding.sendTokenBtn.visibility = View.INVISIBLE
-        binding.customerTokenTv.visibility = View.VISIBLE
-        binding.amountInput.isEnabled = false
+        binding.sendTokenBtn.visibility = View.GONE
+        binding.inquiryLayout.visibility = View.GONE
+        binding.sendTokenLayout.visibility = View.VISIBLE
+        binding.customerPhoneNumber.text = "Please input the token sent to $customerPhoneNo"
         binding.confirmTokenBtn.visibility = View.VISIBLE
-        binding.refreshTokenBtn.visibility = View.VISIBLE
+        binding.resendTokenBtn.visibility = View.VISIBLE
     }
 
     private suspend fun validatingCustomerInfo() = coroutineScope {
@@ -311,14 +311,24 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
             return@coroutineScope
         }
 
-
-        if (!response.isSuccessful) {
+        if (!response.isSuccessful!!) {
             val errorMessage = response.responseMessage ?: "An error occurred while confirming token"
             dialogProvider.showErrorAndWait(errorMessage)
             return@coroutineScope
         }
 
-        dialogProvider.showSuccess(response.responseMessage)
+//        dialogProvider.showSuccess(response.responseMessage)
+        val customerName = viewModel.customerName.value
+
+        val receipt = tokenWithdrawalReceipt(
+            context = requireContext(),
+            request = submitTokenRequest,
+            response = response,
+            transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
+            customerName = customerName
+        )
+
+        navigateToReceipt(receipt, true)
     }
 
     private suspend inline fun loadDependencies(

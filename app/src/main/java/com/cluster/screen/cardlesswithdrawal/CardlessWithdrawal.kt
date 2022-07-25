@@ -127,27 +127,27 @@ fun CardlessWithdrawal(
                             onClick = { if(isSameBank == true) fragment.openPageById(R.id.token_withdrawal_button) else fragment.openPageById(R.id.fn_token_withdrawal) },
                             imageVector = Icons.Outlined.SendToMobile
                         )
-                        Spacer(modifier = Modifier.padding(top = 10.dp))
-                        ChipButton(
-                            label = stringResource(id = R.string.withdraw_using_ussd),
-                            onClick = {
-                            },
-                            imageVector = Icons.Outlined.TransferWithinAStation
-                        )
-                        Spacer(modifier = Modifier.padding(top = 10.dp))
-                        ChipButton(
-                            label = stringResource(id = R.string.withdraw_using_mmo_wallet),
-                            onClick = {
-                            },
-                            imageVector = Icons.Outlined.PhoneAndroid
-                        )
-                        Spacer(modifier = Modifier.padding(top = 10.dp))
-                        ChipButton(
-                            label = stringResource(id = R.string.withdraw_using_qr_code),
-                            onClick = {
-                            },
-                            imageVector = Icons.Outlined.QrCode
-                        )
+//                        Spacer(modifier = Modifier.padding(top = 10.dp))
+//                        ChipButton(
+//                            label = stringResource(id = R.string.withdraw_using_ussd),
+//                            onClick = {
+//                            },
+//                            imageVector = Icons.Outlined.TransferWithinAStation
+//                        )
+//                        Spacer(modifier = Modifier.padding(top = 10.dp))
+//                        ChipButton(
+//                            label = stringResource(id = R.string.withdraw_using_mmo_wallet),
+//                            onClick = {
+//                            },
+//                            imageVector = Icons.Outlined.PhoneAndroid
+//                        )
+//                        Spacer(modifier = Modifier.padding(top = 10.dp))
+//                        ChipButton(
+//                            label = stringResource(id = R.string.withdraw_using_qr_code),
+//                            onClick = {
+//                            },
+//                            imageVector = Icons.Outlined.QrCode
+//                        )
                     }
                 }
             }

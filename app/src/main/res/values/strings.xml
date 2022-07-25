@@ -465,6 +465,7 @@
     <string name="overdraft_history">Overdraft History</string>
     <string name="login_pin">Login PIN</string>
     <string name="customer_token_name">Customer Name</string>
+    <string name="token_verification_txt">Token Verification</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>

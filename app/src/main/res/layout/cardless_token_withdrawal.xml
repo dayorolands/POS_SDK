@@ -44,70 +44,71 @@
                 android:paddingTop="20dp"
                 android:paddingBottom="80dp">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/bank_input_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
-                    android:hint="Select Bank"
-                    app:goneIf="@{viewModel.hideCategoryField}"
-                    app:showStartIconIfEmpty="@{viewModel.bankNameList}"
-                    app:startIconDrawable="@drawable/ic_refresh_black_24dp">
-
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/bank_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:singleLine="true"
-                        android:text="@={viewModel.bankNames}" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/account_number_input"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
-                    android:hint="Account Number"
-                    app:endIconDrawable="@drawable/ic_baseline_search_24"
-                    app:endIconMode="custom"
-                    app:goneUnlessPresent="@{viewModel.bankName}"
-                    app:showEndIconIfPresent="@{viewModel.requiresValidation}">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/account_number_value"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:inputType="number"
-                        android:singleLine="true"
-                        android:text="@={viewModel.accountNumber}" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
-                    android:text="@string/customer_token_name"
-                    app:dependsOn="@{viewModel.accountNumber}">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/customer_account_name"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:singleLine="true"
-                        android:text="@={viewModel.customerName}"
-                        android:visibility="gone" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
                 <LinearLayout
+                    android:id="@+id/inquiry_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/bank_input_layout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="15dp"
+                        android:hint="Select Bank"
+                        app:goneIf="@{viewModel.hideCategoryField}"
+                        app:showStartIconIfEmpty="@{viewModel.bankNameList}"
+                        app:startIconDrawable="@drawable/ic_refresh_black_24dp">
+
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/bank_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="@={viewModel.bankNames}" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/account_number_input"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="15dp"
+                        android:hint="Account Number"
+                        app:endIconDrawable="@drawable/ic_baseline_search_24"
+                        app:endIconMode="custom"
+                        app:goneUnlessPresent="@{viewModel.bankName}"
+                        app:showEndIconIfPresent="@{viewModel.requiresValidation}">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/account_number_value"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:inputType="number"
+                            android:singleLine="true"
+                            android:text="@={viewModel.accountNumber}" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="15dp"
+                        android:hint="@string/customer_token_name"
+                        app:dependsOn="@{viewModel.accountNumber}">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/customer_account_name"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="gone"
+                            android:singleLine="true"
+                            android:text="@={viewModel.customerName}" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -124,10 +125,37 @@
                             android:layout_height="match_parent"
                             android:inputType="numberDecimal"
                             android:maxLength="7"
+                            android:visibility="gone"
                             android:singleLine="true"
-                            android:text="@={viewModel.amountString}"
-                            android:visibility="gone" />
+                            android:text="@={viewModel.amountString}" />
                     </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/send_token_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="15dp"
+                        android:textSize="20sp"
+                        android:gravity="center"
+                        android:text="@string/token_verification_txt"/>
+
+                    <TextView
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:id="@+id/customer_phone_number"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="15dp"
+                        android:hint="@string/customer_phone_number"
+                        android:text=""/>
+
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -142,32 +170,28 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:singleLine="true"
-                            android:text="@={viewModel.customerToken}"
-                            android:visibility="gone" />
+                            android:text="@={viewModel.customerToken}"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/resend_token_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginVertical="5dp"
+                            android:layout_marginEnd="16dp"
+                            android:width="160dp"
+                            android:gravity="center"
+                            android:text="@string/resend_token"
+                            android:textColor="#fff"/>
+                    </LinearLayout>
                 </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="start"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/refresh_token_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="35dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginVertical="5dp"
-                        android:layout_marginEnd="16dp"
-                        android:width="160dp"
-                        android:gravity="center"
-                        android:text="@string/resend_token"
-                        android:textColor="#fff"
-                        android:visibility="gone"/>
-                </LinearLayout>
-
             </LinearLayout>
         </ScrollView>
 

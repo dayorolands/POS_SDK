@@ -53,20 +53,11 @@ class SendCustomerTokenRequest {
     @SerialName("InstitutionCode")
     var institutionCode: String? = null
 
-    @SerialName("AgentPhoneNumber")
-    var agentPhoneNumber: String? = null
-
     @SerialName("DestinationBankCode")
     var destinationBankCode: String? = null
 
     @SerialName("CustomerAccountNumber")
     var customerAccountNumber: String? = ""
-
-    @SerialName("CustomerPhoneNumber")
-    var customerPhoneNumber: String? = ""
-
-    @SerialName("AgentPin")
-    var agentPin: String? = ""
 
     @SerialName("Amount")
     var amount: String? = ""
@@ -142,7 +133,7 @@ class SubmitTokenResponse  {
     var status: Int? = null
 
     @SerialName("IsSuccessful")
-    var isSuccessful: Boolean = false
+    var isSuccessful: Boolean? = false
 
     @SerialName("Message")
     var responseMessage: String? = null
