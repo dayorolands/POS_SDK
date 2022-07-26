@@ -34,12 +34,14 @@ object FunctionIds {
     const val USSD_WITHDRAWAL = 21
     const val PENDING_TRANSACTIONS = 22
     const val CHANGE_PASSWORD = 23
+    const val CARDLESS_TOKEN = 24
 }
 
 fun registerAppFunctions() {
     AppFunctions.register(FunctionIds.ACCOUNT_OPENING, AppFunction(R.id.register_button, R.string.account_opening, R.drawable.payday_loan))
     AppFunctions.register(FunctionIds.NEW_WALLET, AppFunction(R.id.new_wallet_button, R.string.title_activity_new_wallet, R.drawable.payday_loan))
     AppFunctions.register(FunctionIds.DEPOSIT, AppFunction(R.id.deposit_button, R.string.cash_deposit, R.drawable.deposit))
+    AppFunctions.register(FunctionIds.CARDLESS_TOKEN, AppFunction(R.id.fn_token_withdrawal, R.string.withdrawal_by_token,R.drawable.withdrawal))
     AppFunctions.register(FunctionIds.TOKEN_WITHDRAWAL, AppFunction(R.id.token_withdrawal_button, R.string.withdrawal_by_token, R.drawable.withdrawal))
     AppFunctions.register(FunctionIds.LOAN_REQUEST, AppFunction(R.id.loan_request_button, R.string.loan_request, R.drawable.personal_income))
     AppFunctions.register(FunctionIds.BVN_UPDATE, AppFunction(R.id.bvn_update_button, R.string.title_activity_bvnUpdate, R.drawable.secured_loan))

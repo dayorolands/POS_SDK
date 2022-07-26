@@ -6,12 +6,9 @@ package com.cluster.receipt
 import android.content.Context
 import com.cluster.BuildConfig
 import com.cluster.R
+import com.cluster.core.data.model.*
 import com.cluster.pos.printer.logo
 import com.cluster.pos.receipt.transactionStatus
-import com.cluster.core.data.model.AccountInfo
-import com.cluster.core.data.model.PayBillRequest
-import com.cluster.core.data.model.PayBillResponse
-import com.cluster.core.data.model.TransactionReport
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.data.request.*
 import com.cluster.core.data.response.CollectionPaymentResponse
@@ -89,6 +86,42 @@ fun withdrawalReceipt(
         context = context,
         isSuccessful = isSuccessful,
         reason = reason,
+    )
+    footer(context)
+}
+
+fun tokenWithdrawalReceipt(
+    context: Context,
+    request: SubmitTokenRequest,
+    response: SubmitTokenResponse?,
+    transactionDate: String,
+    customerName: String?
+) = printJob {
+    logo()
+    text(
+        text = "Token Withdrawal",
+        align = Alignment.MIDDLE,
+        fontSize = 35
+    )
+    text(
+        """
+        |Agent Code: ${context.localStorage.agent?.agentCode}
+        |Agent Phone: ${context.localStorage.agentPhone}
+        |--------------------------
+        |Amount NGN${request.amount}
+        |
+        |Account Number: ${request.customerAccountNumber.mask(4,2)}
+        |Customer Name: $customerName
+        |Token : ${request.customerToken}
+        |RRN: ${request.deviceNumber}${request.retrievalReferenceNumber}
+        |Transaction Date: $transactionDate
+        """.trimMargin()
+    )
+    transactionStatus(
+        context = context,
+        isSuccessful = response?.isSuccessful == true,
+        responseCode = response?.responseCode ?: "06",
+        reason = response?.responseMessage,
     )
     footer(context)
 }
