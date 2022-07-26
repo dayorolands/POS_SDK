@@ -56,12 +56,12 @@
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="collectionPaymentFragment">
+                            <entry key="cardlessTokenWithdrawal">
                               <value>
                                 <LayoutPositions>
                                   <option name="myPosition">
                                     <Point>
-                                      <option name="x" value="12" />
+                                      <option name="x" value="32" />
                                       <option name="y" value="12" />
                                     </Point>
                                   </option>
@@ -87,8 +87,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="6" />
-                            <option name="y" value="158" />
+                            <option name="x" value="12" />
+                            <option name="y" value="12" />
                           </Point>
                         </option>
                       </LayoutPositions>

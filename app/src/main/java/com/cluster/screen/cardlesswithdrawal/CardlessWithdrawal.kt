@@ -78,18 +78,7 @@ fun CardlessWithdrawal(
     ) {
         CreditClubAppBar(
             title = title,
-            onBackPressed = {
-                if (isSameBank == null || receipt != null){
-                    navController.popBackStack()
-                }else{
-                    isSameBank = null
-                    bank = null
-                    selectType = null
-                    isTokenWithdrawal = null
-                    nameEnquiryResponse = null
-                    receiverAccountNumber = ""
-                }
-            }
+            onBackPressed = { navController.popBackStack() }
 
         )
         LazyColumn(modifier = Modifier.weight(1f)){
