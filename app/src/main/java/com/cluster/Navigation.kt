@@ -8,10 +8,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.cluster.conversation.ConversationContent
+import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.setResult
 import com.cluster.pos.printer.ParcelablePrintJob
 import com.cluster.screen.*
+import com.cluster.screen.cardlesswithdrawal.CardlessWithdrawal
 import com.cluster.screen.loan.AgentLoanHistoryScreen
 import com.cluster.screen.loan.AgentLoanRequestScreen
 import com.cluster.screen.loan.OverdraftQualifyScreen
@@ -27,7 +29,8 @@ fun NavGraphBuilder.clusterNavigation(
     dialogProvider: DialogProvider,
     appViewModel: AppViewModel,
     viewModelStoreOwner: ViewModelStoreOwner,
-    context: Context
+    context: Context,
+    fragment: CreditClubFragment
 ) {
     composable(Routes.FundsTransfer) {
         FundsTransfer(
@@ -35,6 +38,14 @@ fun NavGraphBuilder.clusterNavigation(
             dialogProvider = dialogProvider,
         )
     }
+
+    composable(Routes.CardlessWithdrawal) {
+        CardlessWithdrawal(
+            navController = navController,
+            fragment = fragment
+        )
+    }
+
     composable(Routes.PinChange) {
         PinChange(navController = navController)
     }
