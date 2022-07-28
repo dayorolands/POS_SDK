@@ -43,18 +43,19 @@ class PosReportAdapter(override var values: List<PosTransactionReport.Report>) :
                 dateSettledTv.setTextColor(
                     dateSettledTv.context.resources.getColor(R.color.colorAccent)
                 )
-                printReceiptButton.setOnClickListener{listener?.onClick(transaction, TransactionType.POSCashOut)}
             } else {
                 dateSettledTv.text =
                     "Settled ${transaction.settlementDate?.toInstant(CREDIT_CLUB_DATE_PATTERN)?.timeAgo()} with NGN${transaction.amountCreditedToAgent}"
                 dateSettledTv.setTextColor(
                     dateSettledTv.context.resources.getColor(R.color.green)
                 )
-                if (Platform.hasPrinter) {
-                    printReceiptButton.visibility = View.VISIBLE
-                    printReceiptButton.setOnClickListener{
-                        listener?.onClick(transaction, TransactionType.POSCashOut)}
-                } else printReceiptButton.visibility = View.GONE
+            }
+            if (Platform.hasPrinter) {
+                printReceiptButton.visibility = View.VISIBLE
+                printReceiptButton.setOnClickListener{
+                    listener?.onClick(transaction, TransactionType.POSCashOut)}
+            } else {
+                printReceiptButton.visibility = View.GONE
             }
         }
     }
