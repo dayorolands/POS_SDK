@@ -95,11 +95,11 @@ fun CardlessWithdrawal(
                             onClick = { isSameBank = true },
                             draw = true,
                         )
-                        SmallMenuButton(
-                            text = stringResource(R.string.other_bank),
-                            icon = R.drawable.ic_bank_building,
-                            onClick = { isSameBank = false },
-                        )
+//                        SmallMenuButton(
+//                            text = stringResource(R.string.other_bank),
+//                            icon = R.drawable.ic_bank_building,
+//                            onClick = { isSameBank = false },
+//                        )
                     }
                 }
             }
