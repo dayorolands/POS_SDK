@@ -8,7 +8,7 @@
     </string-array>
     <bool name="category_loan">false</bool>
     <bool name="flow_get_a_loan">true</bool>
-    <bool name="category_subscriptions">true</bool>
+    <bool name="category_subscriptions">false</bool>
     <bool name="account_opening_products">false</bool>
     <bool name="bill_payment_enabled">true</bool>
     <bool name="flow_account_opening">false</bool>

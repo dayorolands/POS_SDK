@@ -68,7 +68,7 @@ interface CollectionsService {
         @Query("collectionService") collectionService: String?
     ): List<String>?
 
-    @GET("api/Collections/VerifyCollectionPayment")
+    @GET("api/Collections/CollectionPaymentVerification")
     suspend fun verifyCollectionPayment(
         @Query("institutionCode") institutionCode: String?,
         @Query("paymentReference") paymentReference: String?,
