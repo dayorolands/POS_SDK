@@ -13,3 +13,17 @@ data class AgentFee(
     @SerialName("Vat")
     val vat: Double = 0.0
 )
+
+@Serializable
+data class GetFeatureResponse(
+    @SerialName("Name")
+    val name: String? = null,
+    @SerialName("Code")
+    val code: String? = null,
+    @SerialName("IsActive")
+    val isActive: Boolean = false,
+    @SerialName("DisplayMessage")
+    val displayMessage: String? = null,
+    @SerialName("ID")
+    val id: Int = 0,
+)

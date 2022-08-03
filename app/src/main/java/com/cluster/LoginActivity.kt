@@ -37,6 +37,7 @@ import kotlinx.serialization.builtins.serializer
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import java.time.Instant
+import java.util.*
 
 private const val PASSWORD_LENGTH = 6
 
@@ -302,6 +303,12 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
 
         if (!syncAgentInfo()) return
         dialogProvider.showProgressBar("Logging you in")
+        val deviceID = localStorage.deviceNumber
+        val terminalID = posConfig.terminalId
+        val flowID = "LGN"
+        val uniqueReference = UUID.randomUUID().toString()
+        val locationTracking = localStorage.lastKnownLocation
+        val currentTimeStamp = Instant.now().toString("dd-MM-yyyy hh:mm")
         val (response, error) = safeRunIO {
             val request = LoginRequest(
                 agentPhoneNumber = phoneNumber,
@@ -310,7 +317,13 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                 institutionCode = localStorage.institutionCode!!,
                 password = pin,
             )
-            authService.login(request)
+            authService.login(
+                deviceReference = "$deviceID-$terminalID",
+                flowReference = "$flowID-$uniqueReference-$locationTracking",
+                operationReference = "$uniqueReference-$currentTimeStamp",
+                userReference = localStorage.institutionCode!!,
+                request
+            )
         }
         dialogProvider.hideProgressBar()
 
@@ -386,6 +399,10 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
 
         jobs.awaitAll()
+    }
+
+    private suspend fun getInstitutionFeatures() {
+
     }
 
     private suspend fun syncAgentInfo(): Boolean {

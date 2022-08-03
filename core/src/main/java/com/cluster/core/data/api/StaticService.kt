@@ -30,6 +30,11 @@ interface StaticService {
         @Query("institutionCode") institutionCode: String?,
     ): BackendResponse?
 
+    @GET("api/Institution/GetFeatures")
+    suspend fun getInstitutionFeatures(
+        @Query("institutionCode") institutionCode: String
+    ) : BackendResponseWithPayload<GetFeatureResponse>
+
     @POST("CreditClubStatic/BalanceEnquiry")
     suspend fun balanceEnquiry(@Body request: BalanceEnquiryRequest): Balance?
 
