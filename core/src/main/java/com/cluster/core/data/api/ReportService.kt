@@ -28,6 +28,6 @@ interface ReportService {
         @Query("maxSize") maxSize: Int
     ): TransactionReport
 
-    @POST("api/Report/POSTransactionsReport")
+    @POST("api/Report/POSCashOutTransactionsReport")
     suspend fun getPOSTransactions(@Body request: POSTransactionReportRequest): PosTransactionReport
 }
