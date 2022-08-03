@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import androidx.core.content.edit
 import coil.Coil
@@ -52,6 +53,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     private val staticService: StaticService by retrofitService()
     private val authService: AuthService by retrofitService()
     private val versionService: VersionService by retrofitService()
+    private lateinit var featureCodes: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -302,6 +304,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
 
         if (!syncAgentInfo()) return
+        if (!getInstitutionFeatures()) return
         dialogProvider.showProgressBar("Logging you in")
         val deviceID = localStorage.deviceNumber
         val terminalID = posConfig.terminalId
@@ -401,8 +404,34 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         jobs.awaitAll()
     }
 
-    private suspend fun getInstitutionFeatures() {
+    private suspend fun getInstitutionFeatures(): Boolean {
+        dialogProvider.showProgressBar("Getting Agent Features")
+        val(features, error) = safeRunIO {
+            staticService.getInstitutionFeatures(
+                localStorage.institutionCode!!
+            )
+        }
+        dialogProvider.hideProgressBar()
 
+        if(error != null){
+            dialogProvider.showErrorAndWait(error)
+            return false
+        }
+
+        if(features == null){
+            dialogProvider.showErrorAndWait("Error getting agent features")
+            return false
+        }
+
+        if(features.isSuccessful){
+            for (i in features.data?.code!!){
+                if (localStorage.featureResponse!!.code!!.contains("RPT")){
+                    Log.d("OkHttpClient", "$i")
+                }
+            }
+        }
+
+        return true
     }
 
     private suspend fun syncAgentInfo(): Boolean {
