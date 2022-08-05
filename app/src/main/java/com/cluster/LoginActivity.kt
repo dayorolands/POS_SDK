@@ -126,6 +126,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                     setOnClickListener {
                         mainScope.launch {
                             if (!syncAgentInfo()) return@launch
+                            if (!getInstitutionFeatures()) return@launch
                             val intent = Intent(this@LoginActivity, MainActivity::class.java)
                             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
                             startActivity(intent)
