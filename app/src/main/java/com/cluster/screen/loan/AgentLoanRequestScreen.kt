@@ -99,9 +99,9 @@ fun AgentLoanRequestScreen(
             return@requestLoan
         }
 
-        val newAgentLoanEligibility = localStorage.agentLoanEligibility?.copy(isEligible = false)
+        /*val newAgentLoanEligibility = localStorage.agentLoanEligibility?.copy(isEligible = false)
         localStorage.agentLoanEligibility = newAgentLoanEligibility
-        //appViewModel.agentLoan.value = newAgentLoanEligibility
+        appViewModel.agentLoan.value = newAgentLoanEligibility*/
         dialogProvider.showSuccessAndWait(response.responseMessage ?: "Successful")
         navController.popBackStack()
     }
