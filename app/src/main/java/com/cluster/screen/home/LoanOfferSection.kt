@@ -34,7 +34,7 @@ fun LoanOfferSection(
             .heightIn(50.dp, 80.dp)
             .fillMaxWidth()
             .padding(6.dp)
-            .clickable(onClick = if (isEligible) onRequestOverdraft else if(!isEligible) onRequestOverdraft else onShowHistory),
+            .clickable(onClick = if (isEligible) onRequestOverdraft else if(!isEligible) onOverdraftQualify else onShowHistory),
         elevation = 2.dp,
         backgroundColor = colorResource(R.color.colorBalanceCardBg),
         contentColor = MaterialTheme.colors.onSecondary,
@@ -90,7 +90,7 @@ fun LoanOfferSection(
                     }
                 }
                 if(!isEligible) {
-                    IconButton(onClick = onRequestOverdraft) {
+                    IconButton(onClick = onOverdraftQualify) {
                         Icon(
                             imageVector = Icons.Outlined.ArrowForward,
                             contentDescription = null
