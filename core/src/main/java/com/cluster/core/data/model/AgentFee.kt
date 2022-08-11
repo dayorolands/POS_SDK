@@ -18,14 +18,30 @@ data class AgentFee(
 
 @Serializable
 data class GetFeatureResponse(
+    @SerialName("ReponseMessage")
+    val responseMessage: String? = null,
+    @SerialName("UniqueIdentifier")
+    val uniqueIdentifier: String? = null,
+    @SerialName("ResponseCode")
+    val responseCode: String? = null,
+    @SerialName("Data")
+    val data : List<FeatureData>,
+    @SerialName("IsSuccessful")
+    val isSuccessful: Boolean = false
+)
+
+@Serializable
+data class FeatureData(
     @SerialName("Name")
     val name: String? = null,
     @SerialName("Code")
     val code: String? = null,
+    @SerialName("UserType")
+    val userType: Int = 0,
     @SerialName("IsActive")
     val isActive: Boolean = false,
     @SerialName("DisplayMessage")
     val displayMessage: String? = null,
     @SerialName("ID")
-    val id: Int = 0,
+    val id: Int = 0
 )

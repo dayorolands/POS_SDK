@@ -5,6 +5,8 @@ import androidx.core.content.edit
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import javax.annotation.Nonnull
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -138,4 +140,27 @@ inline fun <reified T> SharedPreferences.valueStore(
         Long::class -> LongStoreDelegate(this, key, defValue as Long)
         else -> throw IllegalArgumentException("type ${T::class.java.name} is not supported in valueStore")
     } as ReadWriteProperty<Any, T>
+}
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified T> SharedPreferences.addItemToList(
+    spListKey: String ,
+    item: T
+){
+    val savedList = getList<T>(spListKey).toMutableList()
+    savedList.add(item)
+    val listJson = Gson().toJson(savedList)
+    edit { putString(spListKey, listJson) }
+}
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified T> SharedPreferences.getList(
+    spListKey: String
+): List<T>{
+    val listJson = getString(spListKey, "")
+    if(!listJson.isNullOrBlank()){
+        val type = object : TypeToken<List<T>>() {}.type
+        return Gson().fromJson(listJson, type)
+    }
+    return listOf()
 }

@@ -12,6 +12,8 @@ import coil.Coil
 import coil.request.ImageRequest
 import com.cluster.core.data.TRANSACTIONS_CLIENT
 import com.cluster.core.data.api.*
+import com.cluster.core.data.model.FeatureData
+import com.cluster.core.data.model.GetFeatureResponse
 import com.cluster.core.data.model.LoginRequest
 import com.cluster.core.data.model.SurveyQuestion
 import com.cluster.core.data.request.SubmitSurveyRequest
@@ -19,6 +21,8 @@ import com.cluster.core.data.response.isSuccessful
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.getLatestVersion
 import com.cluster.core.util.*
+import com.cluster.core.util.delegates.addItemToList
+import com.cluster.core.util.delegates.getList
 import com.cluster.core.util.delegates.jsonStore
 import com.cluster.databinding.ActivityLoginBinding
 import com.cluster.pos.InvalidRemoteConnectionInfo
@@ -308,11 +312,14 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         if (!getInstitutionFeatures()) return
         dialogProvider.showProgressBar("Logging you in")
         val deviceID = localStorage.deviceNumber
-        val terminalID = posConfig.terminalId
+        val terminalID = localStorage.agent?.terminalID
         val flowID = "LGN"
         val uniqueReference = UUID.randomUUID().toString()
         val locationTracking = localStorage.lastKnownLocation
         val currentTimeStamp = Instant.now().toString("dd-MM-yyyy hh:mm")
+        val agentCategory = localStorage.agent!!.agentCategory
+        val userType = "UserType"
+        val instituteCode = localStorage.institutionCode
         val (response, error) = safeRunIO {
             val request = LoginRequest(
                 agentPhoneNumber = phoneNumber,
@@ -325,7 +332,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                 deviceReference = "$deviceID-$terminalID",
                 flowReference = "$flowID-$uniqueReference-$locationTracking",
                 operationReference = "$uniqueReference-$currentTimeStamp",
-                userReference = localStorage.institutionCode!!,
+                userReference = "$instituteCode-$agentCategory-$userType",
                 request
             )
         }
@@ -409,7 +416,8 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         dialogProvider.showProgressBar("Getting Agent Features")
         val(features, error) = safeRunIO {
             staticService.getInstitutionFeatures(
-                localStorage.institutionCode!!
+                localStorage.institutionCode!!,
+                localStorage.agent!!.agentCategory
             )
         }
         dialogProvider.hideProgressBar()
@@ -425,10 +433,9 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
 
         if(features.isSuccessful){
-            for (i in features.data?.code!!){
-                if (localStorage.featureResponse!!.code!!.contains("RPT")){
-                    Log.d("OkHttpClient", "$i")
-                }
+            for (i in features.data) {
+                Log.d("OkHttpClient", "${i.code}")
+                jsonPrefs.addItemToList("Feature_code", i.code)
             }
         }
 
