@@ -32,6 +32,7 @@ import com.cluster.R
 import com.cluster.Routes
 import com.cluster.core.data.api.SubscriptionService
 import com.cluster.core.data.model.RenewSuscriptionRequest
+import com.cluster.core.data.model.Subscription
 import com.cluster.core.data.model.SubscriptionMilestone
 import com.cluster.core.data.model.SubscriptionRequest
 import com.cluster.core.data.prefs.LocalStorage
@@ -348,7 +349,7 @@ fun SubscriptionScreen(navController: NavController, context: Context) {
                     )
                 }
                 items(subscriptionMilestones, key = { it.id }) {
-                    MilestoneItem(item = it)
+                    MilestoneItem(item = it, subscription = activeSubscription!!)
                 }
                 item {
                     Spacer(modifier = Modifier.height(96.dp))
@@ -393,7 +394,7 @@ private fun ChipButton(label: String, onClick: () -> Unit, imageVector: ImageVec
 }
 
 @Composable
-private fun MilestoneItem(item: SubscriptionMilestone) {
+private fun MilestoneItem(item: SubscriptionMilestone, subscription: Subscription) {
     val progress = remember(item) {
         1 - (item.targetVolumeLeft / item.targetVolumeMaxLimit).toFloat()
     }
@@ -407,6 +408,7 @@ private fun MilestoneItem(item: SubscriptionMilestone) {
     }
     val formattedTarget = remember(item) { item.targetVolumeMaxLimit.toCurrencyFormat() }
     val transactionCount = remember(item) { item.targetCountLeft }
+    val daysToExpiry = remember(subscription) { subscription.daysToExpiry }
 
     Column(
         modifier = Modifier
@@ -426,6 +428,10 @@ private fun MilestoneItem(item: SubscriptionMilestone) {
         Spacer(modifier = Modifier.padding(top = 5.dp))
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Transaction Count: $transactionCount")
+        }
+        Spacer(modifier = Modifier.padding(top = 5.dp))
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
+            Text("Days remaining till expiry: $daysToExpiry")
         }
     }
 }
