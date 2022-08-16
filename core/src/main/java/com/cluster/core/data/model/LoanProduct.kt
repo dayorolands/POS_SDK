@@ -59,8 +59,6 @@ data class AgentLoanEligibility(
     val feeRate: Double = 0.0,
     @SerialName("IsEligible")
     val isEligible: Boolean = false,
-    @SerialName("LastRequestDate")
-    val lastRequestDate: Boolean = false,
     @SerialName("MaxAmount")
     val maxAmount: Double = 0.0,
     @SerialName("Message")
