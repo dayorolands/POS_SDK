@@ -10,7 +10,7 @@ import retrofit2.http.POST
 
 interface AgentLoansService {
     @POST("AgentLoans/Process")
-    suspend fun process(@Body request: AgentLoanRequest): BackendResponse?
+    suspend fun process(@Body request: AgentLoanRequest?): BackendResponse?
 
     @POST("AgentLoans/Search")
     suspend fun search(@Body request: AgentLoanSearchRequest): ReportResult<AgentLoanRecord>?
