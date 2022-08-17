@@ -9,7 +9,7 @@ object Versions {
     const val activityKtx = "1.4.0"
     const val appcompat = "1.4.0"
     const val coil = "1.4.0"
-    const val constraintLayout = "1.1.3"
+    const val constraintLayout = "2.1.2"
     const val coreKtx = "1.7.0"
     const val coroutines = "1.6.0"
     const val compose = "1.1.1"
