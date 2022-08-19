@@ -28,27 +28,27 @@ data class LoanProduct(
 @Serializable
 data class AgentLoanRequest(
     @SerialName("AgentPhoneNumber")
-    val agentPhoneNumber: String?,
+    val agentPhoneNumber: String? = null,
     @SerialName("AgentPin")
-    val agentPin: String,
+    val agentPin: String? = null,
     @SerialName("Amount")
-    val amount: Double,
+    val amount: Double? = 0.0,
     @SerialName("DeviceNumber")
-    val deviceNumber: Int,
+    val deviceNumber: Int? = 0,
     @SerialName("FeeAmount")
-    val feeAmount: Double,
+    val feeAmount: Double? = 0.0,
     @SerialName("GeoLocation")
-    val geoLocation: String,
+    val geoLocation: String? = null,
     @SerialName("InstitutionCode")
-    val institutionCode: String?,
+    val institutionCode: String? = null,
     @SerialName("LoanProductID")
-    val loanProductId: Int,
+    val loanProductId: Int? = 0,
     @SerialName("RequestReference")
-    val requestReference: String,
+    val requestReference: String? = null,
     @SerialName("RetrievalReferenceNumber")
-    val retrievalReferenceNumber: String,
+    val retrievalReferenceNumber: String? = null,
     @SerialName("Tenure")
-    val tenure: Int,
+    val tenure: Int? = 0,
 )
 
 @Serializable

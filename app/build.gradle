@@ -137,6 +137,11 @@ android {
             dimension "flavor"
             applicationId "africa.cluster.halo"
         }
+
+        standardmfb {
+            dimension "flavor"
+            applicationId "com.creditclub.standardmfb"
+        }
     }
     sourceSets {
         main {
