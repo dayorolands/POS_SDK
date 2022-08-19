@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Cluster</string>
+    <string name="ota_app_name">CreditClub</string>
+    <string name="institution_name">Cluster</string>
+    <string name="funds_transfer_same_bank">Cluster</string>
+    <string-array name="transaction_types">
+        <item>CashIn</item>
+        <item>CashOut</item>
+        <item>POSCashOut</item>
+        <item>Recharge</item>
+        <item>BillsPayment</item>
+        <item>Registration</item>
+        <item>FundsTransferCommercialBank</item>
+        <item>LocalFundsTransfer</item>
+    </string-array>
+</resources>
