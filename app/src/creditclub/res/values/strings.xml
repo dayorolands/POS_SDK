@@ -12,5 +12,6 @@
         <item>KiaKiaToOtherBanks</item>
         <item>FundsTransferCommercialBank</item>
         <item>LocalFundsTransfer</item>
+        <item>CrossBankTokenWithdrawal</item>
     </string-array>
 </resources>

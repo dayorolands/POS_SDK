@@ -15,5 +15,6 @@
         <item>FundsTransferCommercialBank</item>
         <item>LocalFundsTransfer</item>
         <item>CollectionPayment</item>
+        <item>CrossBankTokenWithdrawal</item>
     </string-array>
 </resources>

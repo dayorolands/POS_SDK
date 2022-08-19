@@ -67,6 +67,25 @@ fun PrintJobScope.withdrawalTransactionStatus(
     }
 }
 
+fun PrintJobScope.crossBankTransactionStatus(
+    context: Context,
+    isSuccessful: Boolean,
+    statusMessage: String = (if (isSuccessful)
+        context.getString(R.string.pos_transaction_approved)
+    else context.getString(R.string.pos_transaction_declined)),
+    reason: String? = null
+) {
+    text(
+        text = statusMessage.uppercase(Locale.getDefault()),
+        align = Alignment.MIDDLE,
+        fontSize = 30,
+    )
+
+    if (!isSuccessful) {
+        text(reason ?: "Error", align = Alignment.MIDDLE)
+    }
+}
+
 fun PrintJobScope.transactionStatus(
     context: Context,
     isSuccessful: Boolean,

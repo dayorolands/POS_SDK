@@ -1,5 +1,6 @@
 package com.cluster.core.data.model
 
+import com.cluster.core.data.response.BackendResponse
 import com.cluster.core.data.response.BackendResponseContract
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -128,16 +129,13 @@ class SubmitTokenRequest{
 }
 
 @Serializable
-class SubmitTokenResponse  {
+class SubmitTokenResponse  (
     @SerialName("Status")
-    var status: Int? = null
+    var status: Int? = null,
 
-    @SerialName("IsSuccessful")
-    var isSuccessful: Boolean? = false
-
-    @SerialName("Message")
-    var responseMessage: String? = null
+    @SerialName("IsSuccessFul")
+    override var isSuccessful: Boolean = false,
 
     @SerialName("Code")
-    var responseCode: String? = null
-}
+    var respCode: String? = null
+) : BackendResponse()
