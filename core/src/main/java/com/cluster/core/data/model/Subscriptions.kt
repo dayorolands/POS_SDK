@@ -29,6 +29,24 @@ data class SubscriptionPlan(
     val name: String,
     @SerialName("ValidityPeriod")
     val validityPeriod: Int,
+    @SerialName("Options")
+    val options: List<Options>? = null
+)
+
+@Serializable
+data class Options(
+    @SerialName("ID")
+    val id: Int,
+    @SerialName("IsActive")
+    val isActive: Boolean,
+    @SerialName("FeeDiscount")
+    val feeDiscount: Double,
+    @SerialName("MaximumBenefitVolume")
+    val maximumBenefitVolume: Double,
+    @SerialName("MaximumTransactionCount")
+    val maximumTransactionCount: Double,
+    @SerialName("TransactionType")
+    val transactionType: Int
 )
 
 @Serializable
@@ -81,6 +99,8 @@ data class SubscriptionMilestone(
     val transactionType: Int,
     @SerialName("TargetCountLeft")
     val targetCountLeft: Int,
+    @SerialName("TargetCountMaxLimit")
+    val targetCountMaxLimit: Int
 )
 
 @Serializable

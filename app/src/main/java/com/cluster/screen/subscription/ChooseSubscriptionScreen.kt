@@ -23,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.core.data.api.SubscriptionService
+import com.cluster.core.data.model.SubscriptionMilestone
 import com.cluster.core.data.model.SubscriptionPlan
 import com.cluster.core.data.model.SubscriptionRequest
 import com.cluster.core.data.prefs.LocalStorage
@@ -35,6 +36,7 @@ import com.cluster.viewmodel.AppViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.firebase.analytics.FirebaseAnalytics
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
@@ -83,6 +85,14 @@ fun ChooseSubscriptionScreen(
             return@produceState
         }
         errorMessage = ""
+
+        coroutineScope {
+            viewModel.loadSubscriptionData(
+                subscriptionService = subscriptionService,
+                localStorage = localStorage,
+            )
+        }
+
         if (subscriptionPlansResult.data?.data == null) return@produceState
         value = subscriptionPlansResult.data!!.data!!
         viewModel.subscriptionPlans.value = value
@@ -149,8 +159,31 @@ fun ChooseSubscriptionScreen(
                             tint = MaterialTheme.colors.primary.copy(0.52f)
                         )
                     }
+
+                    BottomSheetScaffoldDetails(item = selectedPlan!!)
+
                     AppButton(onClick = {
                         coroutineScope.launch {
+                            bottomSheetScaffoldState.bottomSheetState.collapse()
+                            val notice = """
+                                    |1. Your 100% discount will run from now till the end of your tenure 
+                                    |2. You will experience ${selectedPlan!!.options?.get(0)?.feeDiscount?.toInt()}% discount on all transaction charges on Cashout alone. 
+                                    |3. Your subscription will get exhausted before you exceed ${selectedPlan!!.options?.get(0)?.maximumTransactionCount?.toInt()} transactions.
+                                    |4. Your subscription will get exhausted once you exceed a ${selectedPlan!!.options?.get(0)?.maximumBenefitVolume?.toCurrencyFormat()} in transaction value.
+                                    |5. When your subscription expires, you will be reverted to the base plan.
+                                    |6. You cannot pause a subscription.
+                                    |7. You cannot rollover a subscription.
+                                """.trimMargin()
+
+                            val shouldProceed = dialogProvider.getConfirmation(
+                                title = "Terms and Condition",
+                                subtitle = notice
+                            )
+
+                            if (!shouldProceed) {
+                                return@launch
+                            }
+
                             val subscriptionFeeResult = safeRunIO {
                                 subscriptionService.getSubscriptionFee(
                                     planId = activePlanId!!,
@@ -160,12 +193,11 @@ fun ChooseSubscriptionScreen(
                                 )
                             }
                             val feeMessage = "Subscription Fee is ${subscriptionFeeResult.data?.data?.roundTo2dp()}"
-                            bottomSheetScaffoldState.bottomSheetState.collapse()
                             val agentPin = dialogProvider
                                 .getAgentPin(subtitle = feeMessage) ?: return@launch
-                                chooseSubscription(selectedPlan!!, agentPin, false)
-
+                            chooseSubscription(selectedPlan!!, agentPin, false)
                         }
+
                     }) {
                         Text("Confirm ${selectedPlan!!.name} plan?")
                     }
@@ -231,6 +263,92 @@ fun ChooseSubscriptionScreen(
 }
 
 @Composable
+private inline fun BottomSheetScaffoldDetails(
+    item: SubscriptionPlan
+){
+    val formattedCurrent = remember(item) { (item.options?.get(0)?.maximumTransactionCount)!!.toInt() }
+
+    val formattedTarget = remember(item) { item.options?.get(0)?.maximumBenefitVolume!!.toCurrencyFormat() }
+
+    Column (
+        modifier = Modifier.fillMaxWidth()
+    ){
+        Row(
+            modifier = Modifier.padding(start = 16.dp, top = 10.dp, end = 20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                item.name,
+                color = colorResource(id = R.color.colorPrimary),
+                maxLines = 1,
+                style = MaterialTheme.typography.subtitle1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 0.dp),
+            )
+            Text(
+                text = remember{ item.fee.toCurrencyFormat() },
+                maxLines = 1,
+                style = MaterialTheme.typography.body1,
+                color = colorResource(R.color.ef_grey),
+            )
+        }
+
+        Row(
+            modifier = Modifier.padding(start = 16.dp, top = 10.dp, end = 20.dp, bottom = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = item.description,
+                maxLines = 1,
+                style = MaterialTheme.typography.body1,
+                color = colorResource(R.color.ef_grey),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 0.dp),
+            )
+            Text(
+                text =  item.options?.get(0)?.feeDiscount.toString() + "%",
+                maxLines = 1,
+                style = MaterialTheme.typography.body1,
+                color = colorResource(R.color.ef_grey),
+            )
+        }
+
+        Text(
+            text = "Tenure: " + item.validityPeriod.toString() + " days",
+            maxLines = 1,
+            style = MaterialTheme.typography.body1,
+            color = colorResource(R.color.ef_grey),
+            modifier = Modifier
+                .padding(start = 16.dp, bottom = 10.dp, end = 16.dp)
+                .fillMaxWidth(),
+        )
+
+        Text(
+            text = "Max Trans Count: $formattedCurrent transactions",
+            maxLines = 1,
+            style = MaterialTheme.typography.body1,
+            color = colorResource(R.color.ef_grey),
+            modifier = Modifier
+                .padding(start = 16.dp, bottom = 10.dp, end = 16.dp)
+                .fillMaxWidth(),
+        )
+
+        Text(
+            text = "Max Benefit Volume: $formattedTarget",
+            maxLines = 1,
+            style = MaterialTheme.typography.body1,
+            color = colorResource(R.color.ef_grey),
+            modifier = Modifier
+                .padding(start = 16.dp, bottom = 10.dp, end = 16.dp)
+                .fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
 private inline fun SubscriptionPlanItem(
     item: SubscriptionPlan,
     noinline onClick: () -> Unit) {
@@ -292,6 +410,7 @@ private fun SubscriptionPlanItemPreview() {
                 fee = 500.0,
                 validityPeriod = 30,
                 institutionCode = "100305",
+                options = null
             )
             SubscriptionPlanItem(item = subscriptionPlan, onClick = {})
         }
