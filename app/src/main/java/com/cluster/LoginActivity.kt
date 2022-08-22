@@ -1,5 +1,6 @@
 package com.cluster
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import androidx.compose.ui.graphics.Outline
 import androidx.core.content.edit
 import coil.Coil
 import coil.request.ImageRequest
@@ -41,8 +43,10 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import java.lang.reflect.Type
 import java.time.Instant
 import java.util.*
+import kotlin.collections.ArrayList
 
 private const val PASSWORD_LENGTH = 6
 
@@ -434,10 +438,20 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
 
         if(features.isSuccessful){
             for (i in features.data) {
-                Log.d("OkHttpClient", "${i.code}")
-                jsonPrefs.addItemToList("Feature_code", i.code)
+                Log.d("OkHttpClient", "${i?.code}")
+                jsonPrefs.addItemToList("Feature_code", i?.code)
             }
         }
+
+//        val returnedList = jsonPrefs.getList<ArrayList<Type>>("Feature_code")
+//        if(returnedList.isEmpty()){
+//            Log.d("OkHttpClient", "The value of the returned list is empty")
+//        }
+//        else {
+//            for (i in returnedList) {
+//                Log.d("OkHttpClient", "just here to print $i")
+//            }
+//        }
 
         return true
     }

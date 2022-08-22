@@ -25,7 +25,7 @@ data class GetFeatureResponse(
     @SerialName("ResponseCode")
     val responseCode: String? = null,
     @SerialName("Data")
-    val data : List<FeatureData>,
+    val data : List<FeatureData?>,
     @SerialName("IsSuccessful")
     val isSuccessful: Boolean = false
 )

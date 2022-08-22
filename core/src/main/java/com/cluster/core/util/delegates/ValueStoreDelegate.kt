@@ -1,14 +1,22 @@
 package com.cluster.core.util.delegates
 
 import android.content.SharedPreferences
+import android.preference.PreferenceManager
+import android.provider.Settings.Global.getString
 import androidx.core.content.edit
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.json.Json
-import javax.annotation.Nonnull
+import com.cluster.core.data.model.FeatureData
+import com.google.android.datatransport.cct.internal.LogResponse.fromJson
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.lang.reflect.Type
+import javax.annotation.Nonnull
 import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
+
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
