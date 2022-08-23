@@ -88,6 +88,7 @@ class TransactionReportAdapter(
 
             TransactionType.Registration -> 3
 
+            TransactionType.CrossBankTokenWithdrawal,
             TransactionType.BillsPayment,
             TransactionType.CashIn,
             TransactionType.CashOut,

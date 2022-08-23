@@ -1,6 +1,7 @@
 package com.cluster.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -10,24 +11,32 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.cluster.R
+import com.cluster.core.data.ClusterObjectBox
+import com.cluster.core.data.TRANSACTIONS_CLIENT
 import com.cluster.core.data.api.CardlessWithdrawalService
+import com.cluster.core.data.api.StaticService
 import com.cluster.core.data.api.retrofitService
-import com.cluster.core.data.model.SendCustomerTokenRequest
-import com.cluster.core.data.model.SubmitTokenRequest
-import com.cluster.core.data.model.ValidatingCustomerRequest
+import com.cluster.core.data.model.*
 import com.cluster.core.data.prefs.newTransactionReference
+import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.CreditClubFragment
+import com.cluster.core.util.delegates.defaultJson
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toString
 import com.cluster.databinding.CardlessTokenWithdrawalBinding
+import com.cluster.executeTransaction
 import com.cluster.receipt.tokenWithdrawalReceipt
 import com.cluster.ui.dataBinding
 import com.cluster.utility.FunctionIds
+import io.objectbox.Box
+import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import org.koin.android.ext.android.inject
 import java.time.Instant
 import java.util.*
 
@@ -41,6 +50,8 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
     private val submitTokenRequest = SubmitTokenRequest()
     private val additionalString = SubmitTokenRequest.Additional()
     private val uniqueReference = UUID.randomUUID().toString()
+    private val clusterObjectBox: ClusterObjectBox by inject()
+    private val transactionService : StaticService by retrofitService(TRANSACTIONS_CLIENT)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -275,10 +286,14 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
             terminalId = agent?.terminalID
         }
 
+        val customerName = viewModel.customerName.value
+        val accountNumber = viewModel.accountNumber.value
+        val bankName = viewModel.bankNames.value
+
         submitTokenRequest.apply {
             institutionCode = localStorage.institutionCode
             agentPhoneNumber = localStorage.agentPhone
-            customerAccountNumber = viewModel.accountNumber.value
+            customerAccountNumber = accountNumber
             amount = viewModel.amountString.value
             agentPin = pin
             customerToken = viewModel.customerToken.value
@@ -296,9 +311,38 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
             }
         }
 
-        val (response, error) = safeRunIO {
-            cardlessTokenService.confirmToken(submitTokenRequest)
-        }
+        val requestTime = Instant.now()
+        val pendingTransactionsBox: Box<PendingTransaction> = clusterObjectBox.boxStore.boxFor()
+        val pendingTransaction = PendingTransaction(
+            transactionType = TransactionType.CrossBankTokenWithdrawal,
+            requestJson = defaultJson.encodeToString(
+                SubmitTokenRequest.serializer(),
+                submitTokenRequest
+            ),
+            accountName = customerName,
+            accountNumber = accountNumber,
+            amount = submitTokenRequest.amount!!.toDouble(),
+            reference = submitTokenRequest.retrievalReferenceNumber!!,
+            createdAt = requestTime,
+            lastCheckedAt = null,
+            transactionPending = false,
+        )
+
+        val (response, error) = executeTransaction(
+            fetcher = { cardlessTokenService.confirmToken(submitTokenRequest) },
+            reFetcher = { transactionService.getTransactionStatusByReferenceNumber(
+                deviceNumber = localStorage.deviceNumber,
+                retrievalReferenceNumber = submitTokenRequest.retrievalReferenceNumber!!,
+                institutionCode = localStorage.institutionCode,
+            ) },
+            pendingTransaction = pendingTransaction,
+            pendingTransactionsBox = pendingTransactionsBox,
+            dialogProvider = dialogProvider,
+        )
+
+//        val (response, error) = safeRunIO {
+//            cardlessTokenService.confirmToken(submitTokenRequest)
+//        }
 
         dialogProvider.hideProgressBar()
 
@@ -311,20 +355,19 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
             return@coroutineScope
         }
 
-        if (!response.isSuccessful!!) {
-            val errorMessage = response.responseMessage ?: "An error occurred while confirming token"
+        if (!response.isSuccessful) {
+            val errorMessage = response.message ?: "An error occurred while confirming token"
             dialogProvider.showErrorAndWait(errorMessage)
             return@coroutineScope
         }
 
-        val customerName = viewModel.customerName.value
-
         val receipt = tokenWithdrawalReceipt(
             context = requireContext(),
             request = submitTokenRequest,
-            response = response,
+            response = response as SubmitTokenResponse,
             transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
-            customerName = customerName
+            customerName = customerName,
+            bankName = bankName
         )
 
         navigateToReceipt(receipt, true)

@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cluster.R
+import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.model.Bank
 import com.cluster.core.data.response.NameEnquiryResponse
 import com.cluster.core.ui.CreditClubFragment
@@ -113,7 +114,7 @@ fun CardlessWithdrawal(
                     ){
                         ChipButton(
                             label = stringResource(id = R.string.withdraw_using_token),
-                            onClick = { if(isSameBank == true) fragment.openPageById(R.id.token_withdrawal_button) else fragment.openPageById(R.id.fn_token_withdrawal) },
+                            onClick = { if(isSameBank == true) fragment.openPageById(R.id.token_withdrawal_button) else  fragment.openPageById(R.id.fn_token_withdrawal) },
                             imageVector = Icons.Outlined.SendToMobile
                         )
 //                        Spacer(modifier = Modifier.padding(top = 10.dp))
