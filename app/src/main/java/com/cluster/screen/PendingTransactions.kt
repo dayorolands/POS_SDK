@@ -22,11 +22,10 @@ import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.core.data.ClusterObjectBox
 import com.cluster.core.data.api.BillsPaymentService
+import com.cluster.core.data.api.CardlessWithdrawalService
 import com.cluster.core.data.api.FundsTransferService
-import com.cluster.core.data.model.PayBillRequest
-import com.cluster.core.data.model.PayBillResponse
-import com.cluster.core.data.model.PendingTransaction
-import com.cluster.core.data.model.PendingTransaction_
+import com.cluster.core.data.model.*
+import com.cluster.core.data.request.CrossBankRequest
 import com.cluster.core.data.request.FundsTransferRequest
 import com.cluster.core.type.TransactionType
 import com.cluster.core.util.delegates.defaultJson
@@ -37,6 +36,7 @@ import com.cluster.core.util.toString
 import com.cluster.navigateToReceipt
 import com.cluster.pos.printer.ParcelablePrintJob
 import com.cluster.receipt.billsPaymentReceipt
+import com.cluster.receipt.crossBankTokenReceipt
 import com.cluster.receipt.fundsTransferReceipt
 import com.cluster.ui.*
 import com.cluster.utility.FunctionIds
@@ -46,6 +46,7 @@ import io.objectbox.android.ObjectBoxLiveData
 import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
 import java.time.Instant
 
 @Composable
@@ -65,6 +66,7 @@ fun PendingTransactions(
     val dialogProvider by rememberDialogProvider()
     val fundsTransferService: FundsTransferService by rememberRetrofitService()
     val billsPaymentService: BillsPaymentService by rememberRetrofitService()
+    val cardlessTokenService: CardlessWithdrawalService by rememberRetrofitService()
     val checkStatus: suspend CoroutineScope.(transaction: PendingTransaction) -> Unit = remember {
         checkStatus@{ transaction ->
             dialogProvider.showProgressBar("Processing")
@@ -87,6 +89,13 @@ fun PendingTransactions(
                             transaction.requestJson,
                         )
                         billsPaymentService.billPaymentStatus(request)
+                    }
+                    TransactionType.CrossBankTokenWithdrawal -> {
+                        val request = defaultJson.decodeFromString(
+                            SubmitTokenRequest.serializer(),
+                            transaction.requestJson
+                        )
+                        cardlessTokenService.confirmToken(request)
                     }
                     else -> throw IllegalArgumentException(
                         "requery for ${transaction.transactionType} not supported"
@@ -136,6 +145,20 @@ fun PendingTransactions(
                         ),
                         transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
                         response = response as? PayBillResponse,
+                    )
+                }
+                TransactionType.CrossBankTokenWithdrawal
+                -> {
+                    crossBankTokenReceipt(
+                        context = context,
+                        request = defaultJson.decodeFromString(
+                            CrossBankRequest.serializer(),
+                            transaction.requestJson
+                        ),
+                        transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
+                        isSuccessful = response.isSuccessful,
+                        reason = response.responseMessage,
+                        customerName = ""
                     )
                 }
                 else -> throw IllegalArgumentException(

@@ -119,3 +119,25 @@ data class CollectionReportRequest(
     @SerialName("CustomerName")
     var customerName: String? = "",
 )
+
+@Serializable
+data class CrossBankRequest(
+    @SerialName("AgentPhoneNumber")
+    val agentPhoneNumber: String? = null,
+
+    @SerialName("Amount")
+    val amount: String? = "",
+
+    @SerialName("CustomerAccountNumber")
+    val customerAccountNumber: String?,
+
+    @SerialName("DeviceNumber")
+    val deviceNumber: Int = 0,
+
+    @SerialName("InstitutionCode")
+    var institutionCode: String? = "",
+
+    @SerialName("RetrievalReferenceNumber")
+    var retrievalReferenceNumber: String? = "",
+
+)
