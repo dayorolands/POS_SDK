@@ -194,6 +194,7 @@ dependencies {
     heritageImplementation(project(":wizar"))
     haloImplementation(project(":dspread"))
     haloImplementation(project(":nexgo"))
+    standardmfbImplementation(project(":nexgo"))
 
 
     implementation("androidx.activity:activity-ktx:${Versions.activityKtx}")
