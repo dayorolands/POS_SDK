@@ -172,3 +172,18 @@ inline fun <reified T> SharedPreferences.getList(
     }
     return listOf()
 }
+
+fun saveArrayList(list: java.util.ArrayList<String?>?, key: String?, pref: SharedPreferences) {
+    val editor: SharedPreferences.Editor = pref.edit()
+    val gson = Gson()
+    val json: String = gson.toJson(list)
+    editor.putString(key, json)
+    editor.apply()
+}
+
+fun getArrayList(key: String?, prefs: SharedPreferences): java.util.ArrayList<String?>? {
+    val gson = Gson()
+    val json: String? = prefs.getString(key, null)
+    val type: Type = object : TypeToken<java.util.ArrayList<String?>?>() {}.type
+    return gson.fromJson(json, type)
+}

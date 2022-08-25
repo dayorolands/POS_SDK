@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
@@ -59,6 +60,7 @@ class HomeFragment : CreditClubFragment() {
     private val appViewModel: AppViewModel by activityViewModels()
     private val notificationService: NotificationService by retrofitService()
     private val subscriptionService: SubscriptionService by retrofitService()
+    private val preferences by lazy { context?.getSharedPreferences("JSON_STORAGE", 0) }
     private val appDataStorage: AppDataStorage by inject()
     private val expectedValidityPeriod = 5
     private var validityPeriod = 0
@@ -154,6 +156,7 @@ class HomeFragment : CreditClubFragment() {
                                             mainNavController = fragmentNavController,
                                             composeNavController = composeNavController,
                                             fragment = this@HomeFragment,
+                                            preferences = preferences!!
                                         )
                                     }
                                 }
@@ -163,7 +166,8 @@ class HomeFragment : CreditClubFragment() {
                                     appViewModel = appViewModel,
                                     viewModelStoreOwner = viewModelStoreOwner,
                                     context = context,
-                                    fragment = this@HomeFragment
+                                    fragment = this@HomeFragment,
+                                    preferences = preferences!!
                                 )
                                 if (institutionConfig.categories.subscriptions) {
                                     subscriptionNavigation(

@@ -1,5 +1,6 @@
 package com.cluster.screen.home
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -37,7 +38,8 @@ import java.util.*
 fun HomeScreen(
     mainNavController: NavController,
     composeNavController: NavHostController,
-    fragment: CreditClubFragment
+    fragment: CreditClubFragment,
+    preferences: SharedPreferences
 ) {
     val composableRouteFunctionIds = remember {
         mapOf(
@@ -143,6 +145,7 @@ fun HomeScreen(
                         homeNavController = homeNavController,
                         composeNavController = composeNavController,
                         fragment = fragment,
+                        preferences = preferences
                     )
                 }
             }

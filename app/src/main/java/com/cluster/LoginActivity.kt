@@ -23,9 +23,7 @@ import com.cluster.core.data.response.isSuccessful
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.getLatestVersion
 import com.cluster.core.util.*
-import com.cluster.core.util.delegates.addItemToList
-import com.cluster.core.util.delegates.getList
-import com.cluster.core.util.delegates.jsonStore
+import com.cluster.core.util.delegates.*
 import com.cluster.databinding.ActivityLoginBinding
 import com.cluster.pos.InvalidRemoteConnectionInfo
 import com.cluster.pos.Platform
@@ -438,21 +436,20 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
 
         if(features.isSuccessful){
             for (i in features.data) {
-                Log.d("OkHttpClient", "${i?.code}")
-                jsonPrefs.addItemToList("Feature_code", i?.code)
+                Log.d("OkHttpClient", "This is a returned feature: ${i?.code}")
+                jsonPrefs.addItemToList("institution_features", i?.code)
             }
         }
 
-//        val returnedList = jsonPrefs.getList<ArrayList<Type>>("Feature_code")
-//        if(returnedList.isEmpty()){
-//            Log.d("OkHttpClient", "The value of the returned list is empty")
-//        }
-//        else {
-//            for (i in returnedList) {
-//                Log.d("OkHttpClient", "just here to print $i")
+//        val returnedList = getArrayList("institution_feature", jsonPrefs)
+//        if (returnedList != null) {
+//            for(i in returnedList) {
+//                Log.d("OkHttpClient", "just here to print the stored feature: $i")
 //            }
 //        }
-
+//        else {
+//            Log.d("OkHttpClient", "The value of the returned list is empty")
+//        }
         return true
     }
 

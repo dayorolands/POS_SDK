@@ -2,6 +2,7 @@ package com.cluster.screen.home
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -36,6 +37,7 @@ import com.cluster.core.data.api.SubscriptionService
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.debugOnly
+import com.cluster.core.util.delegates.getArrayList
 import com.cluster.core.util.packageInfo
 import com.cluster.pos.Platform
 import com.cluster.ui.rememberBean
@@ -49,6 +51,7 @@ import java.util.*
 fun ProfileScreen(
     composeNavController: NavHostController,
     fragment: CreditClubFragment,
+    preferences: SharedPreferences
 ) {
     val viewModel: AppViewModel = viewModel()
     val localStorage: LocalStorage by rememberBean()
@@ -56,6 +59,8 @@ fun ProfileScreen(
     val agent = localStorage.agent
     val context = LocalContext.current
     val subscriptionService: SubscriptionService by rememberRetrofitService()
+
+    val returnedList = getArrayList("institution_features", preferences)
 
     LaunchedEffect(1) {
         if (institutionConfig.categories.subscriptions) {
@@ -95,11 +100,13 @@ fun ProfileScreen(
             )
         }
 
-        if (institutionConfig.categories.subscriptions) {
-            item {
-                ActiveSubscription(
-                    openSubscription = { composeNavController.navigate(Routes.Subscription) },
-                )
+        if (returnedList != null) {
+            if(returnedList.contains("SUB") && institutionConfig.categories.subscriptions) {
+                item {
+                    ActiveSubscription(
+                        openSubscription = { composeNavController.navigate(Routes.Subscription) },
+                    )
+                }
             }
         }
 
@@ -110,11 +117,15 @@ fun ProfileScreen(
                     icon = painterResource(R.drawable.income),
                     onClick = { fragment.openPageById(R.id.agent_balance_enquiry_button) }
                 )
-                ChipButton(
-                    label = stringResource(R.string.title_activity_basic_mini_statement),
-                    icon = painterResource(R.drawable.deposit),
-                    onClick = { fragment.openPageById(R.id.agent_mini_statement_button) }
-                )
+                if(returnedList != null) {
+                    if(returnedList.contains("MST")) {
+                        ChipButton(
+                            label = stringResource(R.string.title_activity_basic_mini_statement),
+                            icon = painterResource(R.drawable.deposit),
+                            onClick = { fragment.openPageById(R.id.agent_mini_statement_button) }
+                        )
+                    }
+                }
             }
         }
 
@@ -130,14 +141,30 @@ fun ProfileScreen(
             }
         }
 
-        item {
-            NavigationRow(
-                title = stringResource(R.string.reports),
-                imageVector = Icons.Outlined.ReceiptLong,
-                onClick = {
-                    context.startActivity(Intent(context, ReportActivity::class.java))
+        if(returnedList != null) {
+            if(returnedList.contains("RPT")) {
+                item {
+                    NavigationRow(
+                        title = stringResource(R.string.reports),
+                        imageVector = Icons.Outlined.ReceiptLong,
+                        onClick = {
+                            context.startActivity(Intent(context, ReportActivity::class.java))
+                        }
+                    )
                 }
-            )
+            }
+
+            if (returnedList.contains("HLT")) {
+                item {
+                    NavigationRow(
+                        title = stringResource(R.string.hla_tagging),
+                        imageVector = Icons.Outlined.Place,
+                        onClick = {
+                            context.startActivity(Intent(context, HlaTaggingActivity::class.java))
+                        }
+                    )
+                }
+            }
         }
 
         item {
@@ -168,18 +195,6 @@ fun ProfileScreen(
                     composeNavController.navigate(Routes.SupportCases)
                 }
             )
-        }
-
-        if (institutionConfig.hasHlaTagging) {
-            item {
-                NavigationRow(
-                    title = stringResource(R.string.hla_tagging),
-                    imageVector = Icons.Outlined.Place,
-                    onClick = {
-                        context.startActivity(Intent(context, HlaTaggingActivity::class.java))
-                    }
-                )
-            }
         }
 
         item {

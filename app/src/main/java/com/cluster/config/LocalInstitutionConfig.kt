@@ -5,6 +5,7 @@ import com.cluster.BuildConfig
 import com.cluster.R
 import com.cluster.core.config.*
 import com.cluster.core.type.TransactionType
+import com.cluster.core.util.delegates.getArrayList
 import com.cluster.core.util.localStorage
 
 /**
@@ -22,8 +23,9 @@ class LocalInstitutionConfig private constructor(
 ) : InstitutionConfig {
 
     companion object {
-
         fun create(context: Context): LocalInstitutionConfig {
+            val preferences by lazy { context.getSharedPreferences("JSON_STORAGE", 0) }
+            val returnedList = getArrayList("institution_features", preferences)
             val resources = context.resources
             val config = LocalInstitutionConfig(
                 hasOnlineFunctions = resources.getBoolean(R.bool.online_functions_enabled),
@@ -32,7 +34,7 @@ class LocalInstitutionConfig private constructor(
                 categories = CategoryConfig(
                     loans = resources.getBoolean(R.bool.category_loan),
                     customers = resources.getBoolean(R.bool.category_customer),
-                    subscriptions = resources.getBoolean(R.bool.category_subscriptions),
+                    subscriptions = true,
                 ),
                 transactionTypes = resources.getStringArray(R.array.transaction_types).map {
                     TransactionType.valueOf(it)
