@@ -133,9 +133,6 @@ class SubmitTokenResponse  (
     @SerialName("Status")
     var status: Int? = null,
 
-    @SerialName("IsSuccessFul")
-    override var isSuccessful: Boolean = false,
-
     @SerialName("Code")
     var respCode: String? = null
 ) : BackendResponse()

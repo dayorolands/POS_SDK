@@ -350,14 +350,14 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
             dialogProvider.showErrorAndWait(error)
             return@coroutineScope
         }
+
         if (response == null) {
             dialogProvider.showErrorAndWait("A network-related error occurred while confirming token")
             return@coroutineScope
         }
 
         if (!response.isSuccessful) {
-            val errorMessage = response.message ?: "An error occurred while confirming token"
-            dialogProvider.showErrorAndWait(errorMessage)
+            dialogProvider.showErrorAndWait(response.message ?: "An error occurred while confirming token")
             return@coroutineScope
         }
 
