@@ -187,6 +187,7 @@ fun CreditClubFragment.openPageById(id: Int) {
 
         R.id.fn_token_withdrawal ->{
             findNavController().navigate(R.id.action_to_cardless_token)
+            TransactionType.CrossBankTokenWithdrawal
         }
 
         else -> dialogProvider.showError(

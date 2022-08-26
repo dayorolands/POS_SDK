@@ -25,7 +25,7 @@ android {
         multiDexEnabled  true
         vectorDrawables.useSupportLibrary = true
         versionCode 40
-        versionName "1.4.19"
+        versionName "1.5.0"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -137,6 +137,11 @@ android {
             dimension "flavor"
             applicationId "africa.cluster.halo"
         }
+
+        standardmfb {
+            dimension "flavor"
+            applicationId "com.creditclub.standardmfb"
+        }
     }
     sourceSets {
         main {
@@ -189,6 +194,7 @@ dependencies {
     heritageImplementation(project(":wizar"))
     haloImplementation(project(":dspread"))
     haloImplementation(project(":nexgo"))
+    standardmfbImplementation(project(":nexgo"))
 
 
     implementation("androidx.activity:activity-ktx:${Versions.activityKtx}")

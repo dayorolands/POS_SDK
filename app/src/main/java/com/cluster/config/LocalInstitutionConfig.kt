@@ -52,9 +52,12 @@ class LocalInstitutionConfig private constructor(
                 if (returnedList.contains("COL")){
                     transactionArray.add("CollectionPayment")
                 }
+                if (returnedList.contains("IBTW")){
+                    transactionArray.add("CrossBankTokenWithdrawal")
+                }
             }
             else {
-                transactionArray.add("POSCashOut")
+                transactionArray.add("Nothing")
             }
             val resources = context.resources
             val config = LocalInstitutionConfig(

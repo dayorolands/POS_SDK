@@ -28,7 +28,7 @@ open class BackendResponse : BackendResponseContract {
     override var isSuccessful: Boolean = false
 
     @SerialName("Message")
-    private val message: String? = null
+    var message: String? = null
 
     @SerialName("ResponseCode")
     val responseCode: String? = null

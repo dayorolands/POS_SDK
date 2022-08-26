@@ -15,6 +15,7 @@ import com.cluster.core.data.response.CollectionPaymentResponse
 import com.cluster.core.util.*
 import com.cluster.core.util.delegates.defaultJson
 import com.cluster.pos.printer.*
+import com.cluster.pos.receipt.crossBankTransactionStatus
 import com.cluster.pos.receipt.withdrawalTransactionStatus
 import java.time.Instant
 
@@ -90,16 +91,52 @@ fun withdrawalReceipt(
     footer(context)
 }
 
-fun tokenWithdrawalReceipt(
+fun crossBankTokenReceipt(
     context: Context,
-    request: SubmitTokenRequest,
-    response: SubmitTokenResponse?,
+    request: CrossBankRequest,
     transactionDate: String,
+    isSuccessful: Boolean = false,
+    reason: String? = null,
     customerName: String?
 ) = printJob {
     logo()
     text(
-        text = "Token Withdrawal",
+        "CrossBank Withdrawal",
+        align = Alignment.MIDDLE,
+        fontSize = 35,
+    )
+    text(
+        """
+        |Agent Code: ${context.localStorage.agent?.agentCode}
+        |Agent Phone: ${request.agentPhoneNumber}
+        |--------------------------
+        |Amount : NGN${request.amount}
+        |
+        |Customer Account: ${request.customerAccountNumber.mask(4, 2)}
+        |Customer Name: $customerName
+        |
+        |Transaction Date: $transactionDate
+        |RRN: ${request.deviceNumber}${request.retrievalReferenceNumber}""".trimMargin()
+    )
+    crossBankTransactionStatus(
+        context = context,
+        isSuccessful = isSuccessful,
+        reason = reason,
+    )
+    footer(context)
+}
+
+fun tokenWithdrawalReceipt(
+    context: Context,
+    request: SubmitTokenRequest,
+    response: SubmitTokenResponse? = null,
+    transactionDate: String,
+    customerName: String?,
+    bankName : String?
+) = printJob {
+    logo()
+    text(
+        text = "CrossBank Token Withdrawal",
         align = Alignment.MIDDLE,
         fontSize = 35
     )
@@ -110,6 +147,7 @@ fun tokenWithdrawalReceipt(
         |--------------------------
         |Amount NGN${request.amount}
         |
+        |Bank: $bankName
         |Account Number: ${request.customerAccountNumber.mask(4,2)}
         |Customer Name: $customerName
         |Token : ${request.customerToken}
@@ -120,8 +158,8 @@ fun tokenWithdrawalReceipt(
     transactionStatus(
         context = context,
         isSuccessful = response?.isSuccessful == true,
-        responseCode = response?.responseCode ?: "06",
-        reason = response?.responseMessage,
+        responseCode = response?.respCode ?: "06",
+        reason = response?.message,
     )
     footer(context)
 }

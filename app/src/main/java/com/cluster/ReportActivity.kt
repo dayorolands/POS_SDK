@@ -409,6 +409,26 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     )
                 )
             }
+            TransactionType.CrossBankTokenWithdrawal -> {
+                val request = CrossBankRequest(
+                    agentPhoneNumber = localStorage.agentPhone,
+                    institutionCode = localStorage.institutionCode,
+                    customerAccountNumber = item.to!!,
+                    amount = item.amount.toString(),
+                    retrievalReferenceNumber = item.uniqueReference,
+                    deviceNumber = localStorage.deviceNumber,
+                )
+                posPrinter.print(
+                    crossBankTokenReceipt(
+                        context = this,
+                        request = request,
+                        transactionDate = item.date?.replace("T"," ") ?: "",
+                        isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
+                        reason = selectedTransactionStatus.label,
+                        customerName = item.customerName
+                    )
+                )
+            }
             else -> {
             }
         }

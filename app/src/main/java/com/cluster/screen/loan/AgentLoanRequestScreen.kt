@@ -19,6 +19,7 @@ import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.ui.*
+import com.cluster.utility.roundTo2dp
 import com.cluster.viewmodel.AppViewModel
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Job
@@ -51,12 +52,12 @@ fun AgentLoanRequestScreen(
     val currentLoanTime = LocalDateTime.now()
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
-    val requestLoan = suspend requestLoan@{
+    suspend fun requestLoan(){
         val notice = """
             |1. You are about to request for an overdraft. 
             |2. Your overdraft offer is ${amount.toCurrencyFormat()}
             |3. You will be able to access ${amount.toCurrencyFormat()} more than your current balance.
-            |4. This is not Loan.
+            |4. This is not a Loan.
             |5. A processing fee of ${loan!!.feeRate}% will be charged upfront.
             |6. The overdraft amount will be available for use within 24hrs.
             |7. The automatic repayment will be processed after 24hrs.
@@ -67,11 +68,10 @@ fun AgentLoanRequestScreen(
             subtitle = notice
         )
         if (!shouldProceed) {
-            return@requestLoan
+            return
         }
-        val pin = dialogProvider.getAgentPin() ?: return@requestLoan
+        val pin = dialogProvider.getAgentPin() ?: return
 
-        loadingMessage = "Processing request"
         val agentLoanRequest = AgentLoanRequest(
             institutionCode = localStorage.institutionCode,
             agentPhoneNumber = localStorage.agentPhone,
@@ -81,27 +81,30 @@ fun AgentLoanRequestScreen(
             loanProductId = loan!!.loanProductId,
             tenure = loan!!.tenure,
             deviceNumber = localStorage.deviceNumber,
-            feeAmount = loan!!.feeRate * amount / 100.0,
+            feeAmount = ((loan!!.feeRate * amount) / 100.0).roundTo2dp(),
             requestReference = transactionReference,
             retrievalReferenceNumber = transactionReference,
         )
+
+        dialogProvider.showProgressBar("Processing request")
         val (response, error) = safeRunIO {
             agentLoansService.process(agentLoanRequest)
         }
-        loadingMessage = ""
+
+        dialogProvider.hideProgressBar()
 
         if (error != null) {
             dialogProvider.showErrorAndWait(error)
-            return@requestLoan
+            return
         }
         if (response!!.isFailure()) {
             dialogProvider.showErrorAndWait(response.responseMessage!!)
-            return@requestLoan
+            return
         }
 
-        val newAgentLoanEligibility = localStorage.agentLoanEligibility?.copy(isEligible = false)
+        /*val newAgentLoanEligibility = localStorage.agentLoanEligibility?.copy(isEligible = false)
         localStorage.agentLoanEligibility = newAgentLoanEligibility
-        appViewModel.agentLoan.value = newAgentLoanEligibility
+        appViewModel.agentLoan.value = newAgentLoanEligibility*/
         dialogProvider.showSuccessAndWait(response.responseMessage ?: "Successful")
         navController.popBackStack()
     }

@@ -440,16 +440,6 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                 jsonPrefs.addItemToList("institution_features", i?.code)
             }
         }
-
-//        val returnedList = getArrayList("institution_feature", jsonPrefs)
-//        if (returnedList != null) {
-//            for(i in returnedList) {
-//                Log.d("OkHttpClient", "just here to print the stored feature: $i")
-//            }
-//        }
-//        else {
-//            Log.d("OkHttpClient", "The value of the returned list is empty")
-//        }
         return true
     }
 

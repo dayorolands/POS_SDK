@@ -26,6 +26,7 @@ enum class TransactionType(val code: Int, val label: String) {
     PINChange(7, "PIN Change"),
     PINReset(8, "PIN Reset"),
     Registration(9, "Registration"),
+    CrossBankTokenWithdrawal(39, "CrossBank Token Withdrawal"),
     FundsTransferCommercialBank(10, "Funds Transfer Commercial Bank"),
     FundsTransferCashIn(11, "Funds Transfer Cash In"),
     FundsTransferCashOut(12, "Funds Transfer Cash Out"),
@@ -45,6 +46,7 @@ enum class TransactionType(val code: Int, val label: String) {
     BetaHealthRegistration(27, "Beta Health Registration"),
     BetaHealthSubPayment(28, "Beta Health SubPayment"),
     POSCashOut(29, "POS Cash Out"),
+    Nothing(0, "No report available"),
     CollectionPayment(32, "Collections");
 
     companion object {
