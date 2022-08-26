@@ -45,7 +45,8 @@ fun NavGraphBuilder.clusterNavigation(
     composable(Routes.CardlessWithdrawal) {
         CardlessWithdrawal(
             navController = navController,
-            fragment = fragment
+            fragment = fragment,
+            preferences = preferences
         )
     }
 

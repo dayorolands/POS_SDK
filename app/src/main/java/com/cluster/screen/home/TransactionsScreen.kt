@@ -2,19 +2,17 @@ package com.cluster.screen.home
 
 import android.content.SharedPreferences
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.Routes
@@ -41,7 +39,7 @@ fun TransactionsScreen(
         cells = GridCells.Adaptive(minSize = 100.dp)
     ) {
         if(returnedList != null) {
-            if (returnedList.contains("DPT")) {
+            if (returnedList.contains("DPS")) {
                 item {
                     SmallMenuButton(
                         text = "Deposit",
@@ -50,7 +48,7 @@ fun TransactionsScreen(
                     )
                 }
             }
-            if (returnedList.contains("TWT")) {
+            if (returnedList.contains("TWT") || returnedList.contains("IBTW")) {
                 item {
                     SmallMenuButton(
                         text = "Token Withdrawal",
@@ -122,7 +120,7 @@ fun TransactionsScreen(
         else{
             item {
                 Text(
-                    text = "No features available.",
+                    text = "No features available for this agent.",
                     modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp)
                         .fillMaxSize(),

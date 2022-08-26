@@ -5,9 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,7 +27,6 @@ import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.api.SubscriptionService
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.ui.CreditClubFragment
-import com.cluster.core.util.safeRunIO
 import com.cluster.ui.rememberBean
 import com.cluster.ui.rememberRetrofitService
 import com.cluster.utility.openPageById

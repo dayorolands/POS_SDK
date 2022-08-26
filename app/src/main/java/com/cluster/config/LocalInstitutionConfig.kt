@@ -26,6 +26,36 @@ class LocalInstitutionConfig private constructor(
         fun create(context: Context): LocalInstitutionConfig {
             val preferences by lazy { context.getSharedPreferences("JSON_STORAGE", 0) }
             val returnedList = getArrayList("institution_features", preferences)
+            val transactionArray = arrayListOf<String>()
+            if(returnedList!= null) {
+                if (returnedList.contains("DPS")){
+                    transactionArray.add("CashIn")
+                }
+                if (returnedList.contains("TWT")){
+                    transactionArray.add("CashOut")
+                }
+                if (returnedList.contains("CWT")){
+                    transactionArray.add("POSCashOut")
+                }
+                if (returnedList.contains("ATP")){
+                    transactionArray.add("Recharge")
+                }
+                if (returnedList.contains("BPM")){
+                    transactionArray.add("BillsPayment")
+                }
+                if (returnedList.contains("IFT")){
+                    transactionArray.add("FundsTransferCommercialBank")
+                }
+                if (returnedList.contains("LFT")){
+                    transactionArray.add("LocalFundsTransfer")
+                }
+                if (returnedList.contains("COL")){
+                    transactionArray.add("CollectionPayment")
+                }
+            }
+            else {
+                transactionArray.add("POSCashOut")
+            }
             val resources = context.resources
             val config = LocalInstitutionConfig(
                 hasOnlineFunctions = resources.getBoolean(R.bool.online_functions_enabled),
@@ -36,7 +66,7 @@ class LocalInstitutionConfig private constructor(
                     customers = resources.getBoolean(R.bool.category_customer),
                     subscriptions = true,
                 ),
-                transactionTypes = resources.getStringArray(R.array.transaction_types).map {
+                transactionTypes = transactionArray.map {
                     TransactionType.valueOf(it)
                 },
                 bankAccountNumberLength = 10,
