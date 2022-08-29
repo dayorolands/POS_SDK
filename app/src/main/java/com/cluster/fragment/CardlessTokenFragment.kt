@@ -356,11 +356,6 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
             return@coroutineScope
         }
 
-        if (!response.isSuccessful) {
-            dialogProvider.showErrorAndWait(response.message ?: "An error occurred while confirming token")
-            return@coroutineScope
-        }
-
         val receipt = tokenWithdrawalReceipt(
             context = requireContext(),
             request = submitTokenRequest,

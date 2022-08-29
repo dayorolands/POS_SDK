@@ -145,12 +145,11 @@ fun tokenWithdrawalReceipt(
         |Agent Code: ${context.localStorage.agent?.agentCode}
         |Agent Phone: ${context.localStorage.agentPhone}
         |--------------------------
-        |Amount NGN${request.amount}
+        |Amount: NGN${request.amount}
         |
         |Bank: $bankName
         |Account Number: ${request.customerAccountNumber.mask(4,2)}
         |Customer Name: $customerName
-        |Token : ${request.customerToken}
         |RRN: ${request.deviceNumber}${request.retrievalReferenceNumber}
         |Transaction Date: $transactionDate
         """.trimMargin()
