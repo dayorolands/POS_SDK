@@ -166,17 +166,18 @@ fun ChooseSubscriptionScreen(
                         coroutineScope.launch {
                             bottomSheetScaffoldState.bottomSheetState.collapse()
                             val notice = """
-                                    |1. Your 100% discount will run from now till the end of your tenure 
+                                    |1. Your ${selectedPlan!!.options?.get(0)?.feeDiscount?.toInt()}% discount will run from now till the end of your tenure 
                                     |2. You will experience ${selectedPlan!!.options?.get(0)?.feeDiscount?.toInt()}% discount on all transaction charges on Cashout alone. 
-                                    |3. Your subscription will get exhausted before you exceed ${selectedPlan!!.options?.get(0)?.maximumTransactionCount?.toInt()} transactions.
-                                    |4. Your subscription will get exhausted once you exceed a ${selectedPlan!!.options?.get(0)?.maximumBenefitVolume?.toCurrencyFormat()} in transaction value.
-                                    |5. When your subscription expires, you will be reverted to the base plan.
-                                    |6. You cannot pause a subscription.
-                                    |7. You cannot rollover a subscription.
+                                    |3. The ${selectedPlan!!.options?.get(0)?.feeDiscount?.toInt()}% discount for cashout will stop once you exceed ${selectedPlan!!.options?.get(0)?.maximumTransactionCount?.toInt()} cashout transactions.
+                                    |4. The ${selectedPlan!!.options?.get(0)?.feeDiscount?.toInt()}% discount will stop once you exceed ${selectedPlan!!.options?.get(0)?.maximumBenefitVolume?.toCurrencyFormat()} in transaction value.
+                                    |5. Once the ${selectedPlan!!.options?.get(0)?.feeDiscount?.toInt()}% discount stops, you will start getting charged a low fee until your subscription expires.
+                                    |6. When your subscription expires, you will be reverted to the base plan.
+                                    |7. You cannot pause a subscription.
+                                    |8. You cannot rollover a subscription.
                                 """.trimMargin()
 
                             val shouldProceed = dialogProvider.getConfirmation(
-                                title = "Terms and Condition",
+                                title = "Terms and Conditions",
                                 subtitle = notice
                             )
 
