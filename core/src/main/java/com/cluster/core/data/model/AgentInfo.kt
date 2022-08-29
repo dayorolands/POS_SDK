@@ -28,4 +28,7 @@ data class AgentInfo(
 
     @SerialName("CardLimit")
     val cardLimit: Double? = null,
+
+    @SerialName("AgentCategory")
+    val agentCategory: Int = 0
 )

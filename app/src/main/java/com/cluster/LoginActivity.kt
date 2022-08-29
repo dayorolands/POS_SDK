@@ -1,16 +1,21 @@
 package com.cluster
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
+import androidx.compose.ui.graphics.Outline
 import androidx.core.content.edit
 import coil.Coil
 import coil.request.ImageRequest
 import com.cluster.core.data.TRANSACTIONS_CLIENT
 import com.cluster.core.data.api.*
+import com.cluster.core.data.model.FeatureData
+import com.cluster.core.data.model.GetFeatureResponse
 import com.cluster.core.data.model.LoginRequest
 import com.cluster.core.data.model.SurveyQuestion
 import com.cluster.core.data.request.SubmitSurveyRequest
@@ -18,7 +23,7 @@ import com.cluster.core.data.response.isSuccessful
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.getLatestVersion
 import com.cluster.core.util.*
-import com.cluster.core.util.delegates.jsonStore
+import com.cluster.core.util.delegates.*
 import com.cluster.databinding.ActivityLoginBinding
 import com.cluster.pos.InvalidRemoteConnectionInfo
 import com.cluster.pos.Platform
@@ -36,7 +41,10 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import java.lang.reflect.Type
 import java.time.Instant
+import java.util.*
+import kotlin.collections.ArrayList
 
 private const val PASSWORD_LENGTH = 6
 
@@ -51,6 +59,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
     private val staticService: StaticService by retrofitService()
     private val authService: AuthService by retrofitService()
     private val versionService: VersionService by retrofitService()
+    private lateinit var featureCodes: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,6 +132,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                     setOnClickListener {
                         mainScope.launch {
                             if (!syncAgentInfo()) return@launch
+                            if (!getInstitutionFeatures()) return@launch
                             val intent = Intent(this@LoginActivity, MainActivity::class.java)
                             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
                             startActivity(intent)
@@ -301,7 +311,17 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
 
         if (!syncAgentInfo()) return
+        if (!getInstitutionFeatures()) return
         dialogProvider.showProgressBar("Logging you in")
+        val deviceID = localStorage.deviceNumber
+        val terminalID = localStorage.agent?.terminalID
+        val flowID = "LGN"
+        val uniqueReference = UUID.randomUUID().toString()
+        val locationTracking = localStorage.lastKnownLocation
+        val currentTimeStamp = Instant.now().toString("dd-MM-yyyy hh:mm")
+        val agentCategory = localStorage.agent!!.agentCategory
+        val userType = "UserType"
+        val instituteCode = localStorage.institutionCode
         val (response, error) = safeRunIO {
             val request = LoginRequest(
                 agentPhoneNumber = phoneNumber,
@@ -310,7 +330,13 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
                 institutionCode = localStorage.institutionCode!!,
                 password = pin,
             )
-            authService.login(request)
+            authService.login(
+                deviceReference = "$deviceID-$terminalID",
+                flowReference = "$flowID-$uniqueReference-$locationTracking",
+                operationReference = "$uniqueReference-$currentTimeStamp",
+                userReference = "$instituteCode-$agentCategory-$userType",
+                request
+            )
         }
         dialogProvider.hideProgressBar()
 
@@ -386,6 +412,35 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
 
         jobs.awaitAll()
+    }
+
+    private suspend fun getInstitutionFeatures(): Boolean {
+        dialogProvider.showProgressBar("Getting Agent Features")
+        val(features, error) = safeRunIO {
+            staticService.getInstitutionFeatures(
+                localStorage.institutionCode!!,
+                localStorage.agent!!.agentCategory
+            )
+        }
+        dialogProvider.hideProgressBar()
+
+        if(error != null){
+            dialogProvider.showErrorAndWait(error)
+            return false
+        }
+
+        if(features == null){
+            dialogProvider.showErrorAndWait("Error getting agent features")
+            return false
+        }
+
+        if(features.isSuccessful){
+            for (i in features.data) {
+                Log.d("OkHttpClient", "This is a returned feature: ${i?.code}")
+                jsonPrefs.addItemToList("institution_features", i?.code)
+            }
+        }
+        return true
     }
 
     private suspend fun syncAgentInfo(): Boolean {

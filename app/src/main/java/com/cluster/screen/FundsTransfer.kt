@@ -1,5 +1,7 @@
 package com.cluster.screen
 
+import android.content.SharedPreferences
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.Image
@@ -25,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,6 +49,7 @@ import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.*
 import com.cluster.core.util.delegates.defaultJson
+import com.cluster.core.util.delegates.getArrayList
 import com.cluster.pos.printer.PrintJob
 import com.cluster.receipt.fundsTransferReceipt
 import com.cluster.ui.*
@@ -62,7 +66,11 @@ import kotlin.math.roundToInt
 private const val FUNDS_TRANSFER_AUTH_TOKEN = "95C1D8B4-7589-4F70-8F20-473E89FB5F01"
 
 @Composable
-fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) {
+fun FundsTransfer(
+    navController: NavController,
+    dialogProvider: DialogProvider,
+    preferences: SharedPreferences
+) {
     val context = LocalContext.current
     val fundsTransferService: FundsTransferService by rememberRetrofitService()
     val fundsTransferTransactionService: FundsTransferService by rememberRetrofitService(
@@ -90,6 +98,9 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
     val accountNumberIsValid = remember(receiverAccountNumber) {
         receiverAccountNumber.isNotBlank() && receiverAccountNumber.length == institutionConfig.bankAccountNumberLength
     }
+
+    //Check the features for Funds transfer in the sharedpreference
+    val returnedList = getArrayList("institution_features", preferences);
 
     // variables for requery
     var transactionPending by remember { mutableStateOf(false)}
@@ -403,17 +414,30 @@ fun FundsTransfer(navController: NavController, dialogProvider: DialogProvider) 
                             .padding(top = 10.dp, start = 16.dp, end = 16.dp)
                             .fillMaxWidth(),
                     ) {
-                        SmallMenuButton(
-                            text = stringResource(R.string.funds_transfer_same_bank),
-                            icon = R.drawable.funds_transfer_same_bank,
-                            onClick = { isSameBank = true },
-                            draw = true,
-                        )
-                        SmallMenuButton(
-                            text = stringResource(R.string.other_bank),
-                            icon = R.drawable.ic_bank_building,
-                            onClick = { isSameBank = false },
-                        )
+                        if (returnedList != null) {
+                            if(returnedList.contains("IFT")) {
+                                SmallMenuButton(
+                                    text = stringResource(R.string.funds_transfer_same_bank),
+                                    icon = R.drawable.funds_transfer_same_bank,
+                                    onClick = { isSameBank = true },
+                                    draw = true,
+                                )
+                            }
+                            if(returnedList.contains("LFT")) {
+                                SmallMenuButton(
+                                    text = stringResource(R.string.other_bank),
+                                    icon = R.drawable.ic_bank_building,
+                                    onClick = { isSameBank = false },
+                                )
+                            }
+                        } else{
+                            Text(
+                                text = "No Transfer features available",
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                fontSize = 20.sp
+                            )
+                        }
                     }
                 }
             }

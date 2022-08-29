@@ -5,6 +5,7 @@ import com.cluster.BuildConfig
 import com.cluster.R
 import com.cluster.core.config.*
 import com.cluster.core.type.TransactionType
+import com.cluster.core.util.delegates.getArrayList
 import com.cluster.core.util.localStorage
 
 /**
@@ -22,8 +23,42 @@ class LocalInstitutionConfig private constructor(
 ) : InstitutionConfig {
 
     companion object {
-
         fun create(context: Context): LocalInstitutionConfig {
+            val preferences by lazy { context.getSharedPreferences("JSON_STORAGE", 0) }
+            val returnedList = getArrayList("institution_features", preferences)
+            val transactionArray = arrayListOf<String>()
+            if(returnedList!= null) {
+                if (returnedList.contains("DPS")){
+                    transactionArray.add("CashIn")
+                }
+                if (returnedList.contains("TWT")){
+                    transactionArray.add("CashOut")
+                }
+                if (returnedList.contains("CWT")){
+                    transactionArray.add("POSCashOut")
+                }
+                if (returnedList.contains("ATP")){
+                    transactionArray.add("Recharge")
+                }
+                if (returnedList.contains("BPM")){
+                    transactionArray.add("BillsPayment")
+                }
+                if (returnedList.contains("IFT")){
+                    transactionArray.add("FundsTransferCommercialBank")
+                }
+                if (returnedList.contains("LFT")){
+                    transactionArray.add("LocalFundsTransfer")
+                }
+                if (returnedList.contains("COL")){
+                    transactionArray.add("CollectionPayment")
+                }
+                if (returnedList.contains("IBTW")){
+                    transactionArray.add("CrossBankTokenWithdrawal")
+                }
+            }
+            else {
+                transactionArray.add("Nothing")
+            }
             val resources = context.resources
             val config = LocalInstitutionConfig(
                 hasOnlineFunctions = resources.getBoolean(R.bool.online_functions_enabled),
@@ -32,9 +67,9 @@ class LocalInstitutionConfig private constructor(
                 categories = CategoryConfig(
                     loans = resources.getBoolean(R.bool.category_loan),
                     customers = resources.getBoolean(R.bool.category_customer),
-                    subscriptions = resources.getBoolean(R.bool.category_subscriptions),
+                    subscriptions = true,
                 ),
-                transactionTypes = resources.getStringArray(R.array.transaction_types).map {
+                transactionTypes = transactionArray.map {
                     TransactionType.valueOf(it)
                 },
                 bankAccountNumberLength = 10,

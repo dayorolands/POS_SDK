@@ -6,6 +6,7 @@ import androidx.core.content.edit
 import com.cluster.core.data.model.AgentInfo
 import com.cluster.core.data.model.AgentLoanEligibility
 import com.cluster.core.data.model.AuthResponse
+import com.cluster.core.data.model.GetFeatureResponse
 import com.cluster.core.util.delegates.*
 
 /**
@@ -32,6 +33,12 @@ class LocalStorage(
         defaultJson
     )
 
+    var featureResponse: GetFeatureResponse? by jsonStore(
+        FEATURE_CODE,
+        GetFeatureResponse.serializer(),
+        defaultJson
+    )
+
     fun getString(key: String): String? = getString(key, null)
 
     fun putString(key: String, value: String?) = edit { putString(key, value) }
@@ -42,6 +49,7 @@ class LocalStorage(
         const val AGENT_PHONE = "AGENT_PHONE"
         const val AGENT_INFO = "AGENT_INFO"
         const val SESSION_ID = "SESSION_ID"
+        const val FEATURE_CODE = "FEATURE_CODE"
 
         const val SuccessCount = "SUCCESS_COUNT"
         const val NoInternetCount = "NO_INTERNET_COUNT"
