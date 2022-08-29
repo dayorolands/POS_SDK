@@ -1,6 +1,7 @@
 package com.cluster
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelStoreOwner
@@ -30,19 +31,22 @@ fun NavGraphBuilder.clusterNavigation(
     appViewModel: AppViewModel,
     viewModelStoreOwner: ViewModelStoreOwner,
     context: Context,
-    fragment: CreditClubFragment
+    fragment: CreditClubFragment,
+    preferences: SharedPreferences
 ) {
     composable(Routes.FundsTransfer) {
         FundsTransfer(
             navController = navController,
             dialogProvider = dialogProvider,
+            preferences = preferences
         )
     }
 
     composable(Routes.CardlessWithdrawal) {
         CardlessWithdrawal(
             navController = navController,
-            fragment = fragment
+            fragment = fragment,
+            preferences = preferences
         )
     }
 

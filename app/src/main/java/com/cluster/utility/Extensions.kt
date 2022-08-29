@@ -23,7 +23,6 @@ import com.cluster.core.util.logFunctionUsage
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.pos.Platform
-import com.cluster.fragment.CardlessTokenFragment
 import com.cluster.ui.rememberBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

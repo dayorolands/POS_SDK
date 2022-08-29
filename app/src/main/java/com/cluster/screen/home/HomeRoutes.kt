@@ -1,5 +1,6 @@
 package com.cluster.screen.home
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.AlertDialog
@@ -28,6 +29,7 @@ fun NavGraphBuilder.homeRoutes(
     homeNavController: NavHostController,
     composeNavController: NavHostController,
     fragment: CreditClubFragment,
+    preferences: SharedPreferences
 ) {
     composable(BottomNavScreens.Home.route) {
         ProvideViewModelStoreOwner(
@@ -66,6 +68,7 @@ fun NavGraphBuilder.homeRoutes(
             fragment = fragment,
             institutionConfig = institutionConfig,
             composeNavController = composeNavController,
+            preferences = preferences
         )
     }
     composable(BottomNavScreens.Loans.route) {
@@ -78,6 +81,7 @@ fun NavGraphBuilder.homeRoutes(
             ProfileScreen(
                 composeNavController = composeNavController,
                 fragment = fragment,
+                preferences = preferences
             )
         }
     }
