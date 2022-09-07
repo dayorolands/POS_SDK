@@ -112,11 +112,16 @@ fun ProfileScreen(
 
         item {
             Row(Modifier.padding(vertical = 10.dp)) {
-                ChipButton(
-                    label = stringResource(R.string.check_balance),
-                    icon = painterResource(R.drawable.income),
-                    onClick = { fragment.openPageById(R.id.agent_balance_enquiry_button) }
-                )
+                if(returnedList != null){
+                    if(returnedList.contains("BEQ")) {
+                        ChipButton(
+                            label = stringResource(R.string.check_balance),
+                            icon = painterResource(R.drawable.income),
+                            onClick = { fragment.openPageById(R.id.agent_balance_enquiry_button) }
+                        )
+                    }
+                }
+
                 if(returnedList != null) {
                     if(returnedList.contains("MST")) {
                         ChipButton(
@@ -267,7 +272,7 @@ fun ProfileScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { (context as Activity).logout() },
+                    .clickable { (context as Activity).logout(preferences) },
             ) {
                 Text(
                     stringResource(R.string.logout),

@@ -2,6 +2,8 @@ package com.cluster.utility
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.core.os.bundleOf
@@ -18,17 +20,19 @@ import com.cluster.core.type.CustomerRequestOption
 import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.CreditClubFragment
-import com.cluster.core.util.debug
-import com.cluster.core.util.logFunctionUsage
-import com.cluster.core.util.safeRunIO
-import com.cluster.core.util.toCurrencyFormat
+import com.cluster.core.util.*
+import com.cluster.core.util.delegates.deleteArrayList
 import com.cluster.pos.Platform
 import com.cluster.ui.rememberBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-fun Activity.logout() {
+fun Activity.logout(preferences: SharedPreferences) {
+    val checkDelete = deleteArrayList("institution_features", preferences)
+    if(checkDelete) debugOnly {
+        Log.d("OkHttpClient", "Features deleted successfully.")
+    }
     val intent = Intent(applicationContext, LoginActivity::class.java)
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
