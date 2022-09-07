@@ -1,20 +1,14 @@
 package com.cluster.core.util.delegates
 
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
-import android.provider.Settings.Global.getString
 import androidx.core.content.edit
-import com.cluster.core.data.model.FeatureData
-import com.google.android.datatransport.cct.internal.LogResponse.fromJson
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.lang.reflect.Type
 import javax.annotation.Nonnull
 import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 
@@ -173,12 +167,8 @@ inline fun <reified T> SharedPreferences.getList(
     return listOf()
 }
 
-fun saveArrayList(list: java.util.ArrayList<String?>?, key: String?, pref: SharedPreferences) {
-    val editor: SharedPreferences.Editor = pref.edit()
-    val gson = Gson()
-    val json: String = gson.toJson(list)
-    editor.putString(key, json)
-    editor.apply()
+fun deleteArrayList(key: String?, pref: SharedPreferences): Boolean {
+    return pref.edit().remove(key).commit()
 }
 
 fun getArrayList(key: String?, prefs: SharedPreferences): java.util.ArrayList<String?>? {

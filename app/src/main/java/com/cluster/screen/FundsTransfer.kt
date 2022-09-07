@@ -415,7 +415,7 @@ fun FundsTransfer(
                             .fillMaxWidth(),
                     ) {
                         if (returnedList != null) {
-                            if(returnedList.contains("IFT")) {
+                            if(returnedList.contains("LFT")) {
                                 SmallMenuButton(
                                     text = stringResource(R.string.funds_transfer_same_bank),
                                     icon = R.drawable.funds_transfer_same_bank,
@@ -423,7 +423,7 @@ fun FundsTransfer(
                                     draw = true,
                                 )
                             }
-                            if(returnedList.contains("LFT")) {
+                            if(returnedList.contains("IFT")) {
                                 SmallMenuButton(
                                     text = stringResource(R.string.other_bank),
                                     icon = R.drawable.ic_bank_building,

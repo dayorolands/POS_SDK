@@ -36,6 +36,7 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
 
     private var isActivation = false
     private var institutionCode: String = ""
+    private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
     private val appDataStorage: AppDataStorage by inject()
     private val staticService: StaticService by retrofitService()
     private val authService: AuthService by retrofitService()
@@ -73,7 +74,7 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
                 localStorage.putString("ACTIVATED", "ACTIVATED")
                 localStorage.putString("AGENT_CODE", institutionCode)
 
-                logout()
+                logout(jsonPrefs)
             }
         }
 
@@ -194,7 +195,7 @@ class AgentActivationActivity : CreditClubActivity(R.layout.activity_agent_activ
             syncAgentInfo()
             firebaseAnalytics.setUserId(localStorage.agent?.agentCode)
 
-            logout()
+            logout(jsonPrefs)
         } else {
             response.responseMessage ?: return showNetworkError()
             dialogProvider.showError(response.responseMessage)
