@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import androidx.compose.ui.graphics.Outline
 import androidx.core.content.edit
+import androidx.databinding.library.BuildConfig
 import coil.Coil
 import coil.request.ImageRequest
 import com.cluster.core.data.TRANSACTIONS_CLIENT
