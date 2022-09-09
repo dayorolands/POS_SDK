@@ -40,6 +40,7 @@
                     style="@style/AppTheme.MenuFlexLayout">
 
                     <include
+                        android:visibility="gone"
                         android:id="@+id/purchase_button"
                         layout="@layout/card_menu_button"
                         app:src='@{@drawable/ic_purchase}'
@@ -81,6 +82,7 @@
                         app:text='@{"Sales Completion"}' />
 
                     <include
+                        android:visibility="gone"
                         android:id="@+id/balance_button"
                         layout="@layout/card_menu_button"
                         app:src='@{@drawable/ic_reversal}'
@@ -118,6 +120,7 @@
                         app:text='@{"unsettled"}' />
 
                     <include
+                        android:visibility="gone"
                         android:id="@+id/chargeback_button"
                         layout="@layout/card_menu_button"
                         app:src='@{@drawable/ic_purchase}'

@@ -136,7 +136,7 @@ fun tokenWithdrawalReceipt(
 ) = printJob {
     logo()
     text(
-        text = "CrossBank Token Withdrawal",
+        text = "Token Withdrawal",
         align = Alignment.MIDDLE,
         fontSize = 35
     )

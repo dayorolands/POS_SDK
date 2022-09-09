@@ -23,11 +23,11 @@ class GetBankResponse {
         @SerialName("Name")
         val name: String = ""
         @SerialName("ShortName")
-        val shortName: String = ""
+        val shortName: String? = null
         @SerialName("Code")
         val dataCode: String = ""
         @SerialName("CBNCode")
-        val cbnCode: String = ""
+        val cbnCode: String? = null
 
         override fun toString(): String = name
     }

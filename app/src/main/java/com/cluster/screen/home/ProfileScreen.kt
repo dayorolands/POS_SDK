@@ -110,9 +110,9 @@ fun ProfileScreen(
             }
         }
 
-        item {
-            Row(Modifier.padding(vertical = 10.dp)) {
-                if(returnedList != null){
+        if(returnedList != null) {
+            item {
+                Row(Modifier.padding(vertical = 10.dp)) {
                     if(returnedList.contains("BEQ")) {
                         ChipButton(
                             label = stringResource(R.string.check_balance),
@@ -120,9 +120,7 @@ fun ProfileScreen(
                             onClick = { fragment.openPageById(R.id.agent_balance_enquiry_button) }
                         )
                     }
-                }
 
-                if(returnedList != null) {
                     if(returnedList.contains("MST")) {
                         ChipButton(
                             label = stringResource(R.string.title_activity_basic_mini_statement),
@@ -134,20 +132,22 @@ fun ProfileScreen(
             }
         }
 
-        if (institutionConfig.hasOnlineFunctions) {
-            item {
-                NavigationRow(
-                    title = stringResource(R.string.online_functions),
-                    imageVector = Icons.Outlined.Language,
-                    onClick = {
-                        context.startActivity(Intent(context, OnlineActivity::class.java))
-                    }
-                )
+        if (returnedList != null) {
+            if(returnedList.contains("HLT")) {
+                item {
+                    NavigationRow(
+                        title = stringResource(R.string.online_functions),
+                        imageVector = Icons.Outlined.Language,
+                        onClick = {
+                            context.startActivity(Intent(context, OnlineActivity::class.java))
+                        }
+                    )
+                }
             }
         }
 
         if(returnedList != null) {
-            if(returnedList.contains("RPT")) {
+            if (returnedList.contains("RPT")) {
                 item {
                     NavigationRow(
                         title = stringResource(R.string.reports),
@@ -158,19 +158,18 @@ fun ProfileScreen(
                     )
                 }
             }
-
-            if (returnedList.contains("HLT")) {
-                item {
-                    NavigationRow(
-                        title = stringResource(R.string.hla_tagging),
-                        imageVector = Icons.Outlined.Place,
-                        onClick = {
-                            context.startActivity(Intent(context, HlaTaggingActivity::class.java))
-                        }
-                    )
-                }
-            }
         }
+
+//            item {
+//                NavigationRow(
+//                    title = stringResource(R.string.hla_tagging),
+//                    imageVector = Icons.Outlined.Place,
+//                    onClick = {
+//                        context.startActivity(Intent(context, HlaTaggingActivity::class.java))
+//                    }
+//                )
+//            }
+//        }
 
         item {
             NavigationRow(

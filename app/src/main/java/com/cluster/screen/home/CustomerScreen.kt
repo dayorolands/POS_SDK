@@ -1,5 +1,6 @@
 package com.cluster.screen.home
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
@@ -8,6 +9,7 @@ import com.cluster.R
 import com.cluster.components.MenuButton
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.ui.CreditClubFragment
+import com.cluster.core.util.delegates.getArrayList
 import com.cluster.utility.openPageById
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -15,17 +17,21 @@ import com.cluster.utility.openPageById
 fun CustomerScreen(
     fragment: CreditClubFragment,
     institutionConfig: InstitutionConfig,
+    preferences: SharedPreferences
 ) {
     val flows = institutionConfig.flows
+    val returnedList = getArrayList("institution_features", preferences)
 
     SubMenu {
-        if (flows.accountOpening != null) {
-            item {
-                MenuButton(
-                    text = stringResource(R.string.account_opening),
-                    icon = painterResource(R.drawable.payday_loan),
-                    onClick = { fragment.openPageById(R.id.register_button) }
-                )
+        if (returnedList != null) {
+            if(returnedList.contains("ACC")) {
+                item {
+                    MenuButton(
+                        text = stringResource(R.string.account_opening),
+                        icon = painterResource(R.drawable.payday_loan),
+                        onClick = { fragment.openPageById(R.id.register_button) }
+                    )
+                }
             }
         }
         if (flows.walletOpening != null) {
@@ -37,12 +43,16 @@ fun CustomerScreen(
                 )
             }
         }
-        item {
-            MenuButton(
-                text = "Balance Enquiry",
-                icon = painterResource(R.drawable.income),
-                onClick = { fragment.openPageById(R.id.customer_balance_enquiry_button) }
-            )
+        if(returnedList != null) {
+            if(returnedList.contains("CBE")) {
+                item {
+                    MenuButton(
+                        text = "Balance Enquiry",
+                        icon = painterResource(R.drawable.income),
+                        onClick = { fragment.openPageById(R.id.customer_balance_enquiry_button) }
+                    )
+                }
+            }
         }
         if (flows.customerPinChange != null) {
             item {

@@ -20,6 +20,7 @@ import com.cluster.components.BottomNavScreens
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.model.SubscriptionPlan
 import com.cluster.core.ui.CreditClubFragment
+import com.cluster.core.util.delegates.getArrayList
 import com.cluster.viewmodel.AppViewModel
 import com.cluster.viewmodel.ProvideViewModelStoreOwner
 import org.koin.androidx.compose.viewModel
@@ -61,6 +62,7 @@ fun NavGraphBuilder.homeRoutes(
         CustomerScreen(
             fragment = fragment,
             institutionConfig = institutionConfig,
+            preferences = preferences
         )
     }
     composable(BottomNavScreens.Transactions.route) {
