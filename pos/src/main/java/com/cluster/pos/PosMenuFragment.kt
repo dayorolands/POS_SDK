@@ -2,6 +2,7 @@ package com.cluster.pos
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import com.cluster.ui.dataBinding
@@ -12,6 +13,7 @@ import com.cluster.pos.util.MenuPages
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.widget.TextFieldParams
+import com.cluster.core.util.delegates.getArrayList
 import com.cluster.core.util.format
 import com.cluster.core.util.safeRunIO
 import com.cluster.pos.api.PosApiService
@@ -25,6 +27,8 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
     private val posPreferences: PosPreferences by inject()
     private val defaultParameterStore: PosParameter by inject()
     private val posApiService: PosApiService by retrofitService()
+    val preferences by lazy { context!!.getSharedPreferences("JSON_STORAGE", 0) }
+    val returnedList = getArrayList("institution_features", preferences)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -65,6 +69,20 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
 
         mainScope.launch {
             binding.cont.visibility = View.VISIBLE
+            Log.d("OkHttpClient", "I want to check the returned list : $returnedList")
+            binding.run {
+                if (returnedList != null) {
+                    if (returnedList.contains("CHB")) {
+                        chargebackButton.cardMenu.visibility = View.VISIBLE
+                    }
+                    if (returnedList.contains("CWT")) {
+                        purchaseButton.cardMenu.visibility = View.VISIBLE
+                    }
+                    if (returnedList.contains("CBL")) {
+                        balanceButton.cardMenu.visibility = View.VISIBLE
+                    }
+                }
+            }
             checkKeysAndParameters()
             bindView()
         }

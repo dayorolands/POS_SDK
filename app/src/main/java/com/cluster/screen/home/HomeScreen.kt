@@ -27,6 +27,7 @@ import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.api.SubscriptionService
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.ui.CreditClubFragment
+import com.cluster.core.util.delegates.getArrayList
 import com.cluster.ui.rememberBean
 import com.cluster.ui.rememberRetrofitService
 import com.cluster.utility.openPageById
@@ -41,6 +42,7 @@ fun HomeScreen(
     fragment: CreditClubFragment,
     preferences: SharedPreferences
 ) {
+    val returnedList = getArrayList("institution_features", preferences)
     val composableRouteFunctionIds = remember {
         mapOf(
             R.id.agent_change_pin_button to Routes.PinChange,
@@ -61,7 +63,8 @@ fun HomeScreen(
     val bottomNavigationItems = remember {
         buildList {
             add(BottomNavScreens.Home)
-            if (institutionConfig.categories.customers) {
+            if (returnedList != null) {
+                if(returnedList.contains("ACC") || returnedList.contains("CBE"))
                 add(BottomNavScreens.Customer)
             }
             add(BottomNavScreens.Transactions)

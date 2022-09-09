@@ -61,7 +61,7 @@ class LocalInstitutionConfig private constructor(
             }
             val resources = context.resources
             val config = LocalInstitutionConfig(
-                hasOnlineFunctions = resources.getBoolean(R.bool.online_functions_enabled),
+                hasOnlineFunctions = true,
                 hasHlaTagging = resources.getBoolean(R.bool.hla_enabled),
                 name = resources.getString(R.string.institution_name),
                 categories = CategoryConfig(
