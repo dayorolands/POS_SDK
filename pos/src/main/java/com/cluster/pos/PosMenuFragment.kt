@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.fragment.findNavController
 import com.cluster.ui.dataBinding
 import com.cluster.pos.data.PosPreferences
@@ -27,8 +28,8 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
     private val posPreferences: PosPreferences by inject()
     private val defaultParameterStore: PosParameter by inject()
     private val posApiService: PosApiService by retrofitService()
-    val preferences by lazy { context!!.getSharedPreferences("JSON_STORAGE", 0) }
-    val returnedList = getArrayList("institution_features", preferences)
+    val preferences by lazy { context?.getSharedPreferences("JSON_STORAGE", 0) }
+    val returnedList = getArrayList("institution_features", preferences!!)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -73,13 +74,13 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
             binding.run {
                 if (returnedList != null) {
                     if (returnedList.contains("CHB")) {
-                        chargebackButton.cardMenu.visibility = View.VISIBLE
+                        chargebackButton.cardMenuDis.visibility = View.VISIBLE
                     }
                     if (returnedList.contains("CWT")) {
-                        purchaseButton.cardMenu.visibility = View.VISIBLE
+                        purchaseButton.cardMenuDis.visibility = View.VISIBLE
                     }
                     if (returnedList.contains("CBL")) {
-                        balanceButton.cardMenu.visibility = View.VISIBLE
+                        balanceButton.cardMenuDis.visibility = View.VISIBLE
                     }
                 }
             }
