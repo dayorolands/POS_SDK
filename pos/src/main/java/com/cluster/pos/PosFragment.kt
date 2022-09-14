@@ -1,5 +1,7 @@
 package com.cluster.pos
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import com.cluster.pos.data.PosDatabase
 import com.cluster.core.ui.CreditClubFragment
