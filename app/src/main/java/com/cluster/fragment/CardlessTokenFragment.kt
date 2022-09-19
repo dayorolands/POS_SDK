@@ -167,7 +167,7 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
 
         val maxLength = institutionConfig.bankAccountNumberLength
         if(accountNumberField.length != maxLength){
-            dialogProvider.showError("Account number cannot be more than $maxLength")
+            dialogProvider.showError("Account number can only be $maxLength digits")
             return@coroutineScope
         }
 
