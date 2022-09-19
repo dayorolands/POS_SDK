@@ -32,28 +32,32 @@ fun NavGraphBuilder.homeRoutes(
     fragment: CreditClubFragment,
     preferences: SharedPreferences
 ) {
+    val returnedList = getArrayList("institution_features", preferences)
     composable(BottomNavScreens.Home.route) {
         ProvideViewModelStoreOwner(
             viewModelStoreOwner = fragment.requireActivity(),
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 BalanceCard()
-                if(institutionConfig.flows.getALoan != null) {
-                    LoanOfferSection(
-                        onRequestOverdraft = {
-                            composeNavController.navigate(Routes.AgentLoanRequest)
-                        },
-                        onShowHistory = {
-                            composeNavController.navigate(Routes.AgentLoanHistory)
-                        },
-                        onOverdraftQualify = {
-                            composeNavController.navigate(Routes.OverdraftQualify)
-                        }
-                    )
+                if(returnedList != null) {
+                    if(returnedList.contains("AGL")) {
+                        LoanOfferSection(
+                            onRequestOverdraft = {
+                                composeNavController.navigate(Routes.AgentLoanRequest)
+                            },
+                            onShowHistory = {
+                                composeNavController.navigate(Routes.AgentLoanHistory)
+                            },
+                            onOverdraftQualify = {
+                                composeNavController.navigate(Routes.OverdraftQualify)
+                            }
+                        )
+                    }
                 }
                 HomeCategoryButtons(
                     homeNavController = homeNavController,
                     institutionConfig = institutionConfig,
+                    preferences = preferences
                 )
             }
         }

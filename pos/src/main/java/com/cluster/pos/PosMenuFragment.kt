@@ -29,19 +29,33 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
     private val posPreferences: PosPreferences by inject()
     private val defaultParameterStore: PosParameter by inject()
     private val posApiService: PosApiService by retrofitService()
-    private val preferences by lazy{ context!!.getSharedPreferences("JSON_STORAGE", 0) }
-    private val returnedList = getArrayList("institution_features", preferences)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val creditClubActivity = requireActivity() as CreditClubActivity
         creditClubActivity.setSupportActionBar(binding.toolbar)
         creditClubActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val preferences by lazy{ context!!.getSharedPreferences("JSON_STORAGE", 0) }
+        val returnedList = getArrayList("institution_features", preferences)
         binding.cont.visibility = View.INVISIBLE
         if (localStorage.agent == null) {
             findNavController().popBackStack()
         }
         checkRequirements()
+        Log.d("OkHttpClient", "I want to check the returned list : $returnedList")
+        binding.run {
+            if (returnedList != null) {
+                if (returnedList.contains("CHB")) {
+                    chargebackButton.cardMenu.visibility = View.VISIBLE
+                }
+                if (returnedList.contains("CWT")) {
+                    purchaseButton.cardMenu.visibility = View.VISIBLE
+                }
+                if (returnedList.contains("CBL")) {
+                    balanceButton.cardMenu.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     private fun checkRequirements() {
@@ -71,20 +85,6 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
 
         mainScope.launch {
             binding.cont.visibility = View.VISIBLE
-            Log.d("OkHttpClient", "I want to check the returned list : $returnedList")
-            binding.run {
-                if (returnedList != null) {
-                    if (returnedList.contains("CHB")) {
-                        chargebackButton.cardMenu.visibility = View.VISIBLE
-                    }
-                    if (returnedList.contains("CWT")) {
-                        purchaseButton.cardMenu.visibility = View.VISIBLE
-                    }
-                    if (returnedList.contains("CBL")) {
-                        balanceButton.cardMenu.visibility = View.VISIBLE
-                    }
-                }
-            }
             checkKeysAndParameters()
             bindView()
         }

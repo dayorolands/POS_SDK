@@ -11,6 +11,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import com.cluster.*
 import com.cluster.R
+import com.cluster.adapter.TransactionReportAdapter
+import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.CoreDatabase
 import com.cluster.core.data.api.StaticService
 import com.cluster.core.data.api.retrofitService
@@ -24,14 +26,27 @@ import com.cluster.core.util.*
 import com.cluster.core.util.delegates.deleteArrayList
 import com.cluster.pos.Platform
 import com.cluster.ui.rememberBean
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 fun Activity.logout(preferences: SharedPreferences) {
-    val checkDelete = deleteArrayList("institution_features", preferences)
-    if(checkDelete) debugOnly {
-        Log.d("OkHttpClient", "Features deleted successfully.")
+    val ioScope = CoroutineScope(Dispatchers.IO)
+    ioScope.launch {
+        safeRunIO {
+            CoreDatabase.getInstance(applicationContext).appFunctionUsageDao().deleteAll().run {
+                debugOnly {
+                    Log.d("OkHttpClient", "*********App Functions deleted successfully.**********")
+                }
+            }
+
+            deleteArrayList("institution_features", preferences).run {
+                debugOnly {
+                    Log.d("OkHttpClient", "************Features deleted successfully.************")
+                }
+            }
+        }
     }
     val intent = Intent(applicationContext, LoginActivity::class.java)
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)

@@ -55,6 +55,9 @@ class LocalInstitutionConfig private constructor(
                 if (returnedList.contains("IBTW")){
                     transactionArray.add("CrossBankTokenWithdrawal")
                 }
+                if (returnedList.contains("ACC")){
+                    transactionArray.add("Registration")
+                }
             }
             else {
                 transactionArray.add("Nothing")
