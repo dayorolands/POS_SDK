@@ -39,6 +39,12 @@ interface StaticService {
     @POST("CreditClubStatic/BalanceEnquiry")
     suspend fun balanceEnquiry(@Body request: BalanceEnquiryRequest): Balance?
 
+    @POST("CreditClubStatic/AgentBalanceEnquiry")
+    suspend fun agentBalanceEnquiry(@Body request: BalanceEnquiryRequest): Balance?
+
+    @POST("CreditClubStatic/CustomerBalanceEnquiry")
+    suspend fun customerBalanceEnquiry(@Body request: BalanceEnquiryRequest): Balance?
+
     @POST("CreditClubStatic/Deposit")
     suspend fun deposit(@Body request: DepositRequest): BackendResponse?
 

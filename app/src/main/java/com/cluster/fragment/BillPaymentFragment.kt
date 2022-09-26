@@ -398,8 +398,9 @@ class BillPaymentFragment : CreditClubFragment(R.layout.bill_payment_fragment) {
             lastCheckedAt = null,
             transactionPending = false,
         )
+        val requestOptions = if(isAirtime) billsPaymentService.runAirtimeTransaction(request) else billsPaymentService.runBillsTransaction(request)
         val (response, error) = executeTransaction(
-            fetcher = { billsPaymentService.runTransaction(request) },
+            fetcher = { requestOptions },
             reFetcher = { billsPaymentService.billPaymentStatus(request) },
             pendingTransaction = pendingTransaction,
             pendingTransactionsBox = pendingTransactionsBox,
