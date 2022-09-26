@@ -20,8 +20,11 @@ interface FundsTransferService {
     @POST("FundsTransfer/NameEnquiry")
     suspend fun nameEnquiry(@Body request: FundsTransferRequest): NameEnquiryResponse?
 
-    @POST("FundsTransfer/Transfer")
-    suspend fun transfer(@Body request: FundsTransferRequest): BackendResponse?
+    @POST("FundsTransfer/IntraBankTransfer")
+    suspend fun intraTransfer(@Body request: FundsTransferRequest): BackendResponse?
+
+    @POST("FundsTransfer/InterBankTransfer")
+    suspend fun interTransfer(@Body request: FundsTransferRequest): BackendResponse?
 
     @POST("FundsTransfer/Requery")
     suspend fun requery(@Body request: FundsTransferRequest): BackendResponse?

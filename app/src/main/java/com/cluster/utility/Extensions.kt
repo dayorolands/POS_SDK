@@ -123,7 +123,7 @@ fun CreditClubFragment.openPageById(id: Int) {
 
                 dialogProvider.showProgressBar("Getting Balance")
                 val (response) = safeRunIO {
-                    staticService.balanceEnquiry(request)
+                    staticService.agentBalanceEnquiry(request)
                 }
                 dialogProvider.hideProgressBar()
 

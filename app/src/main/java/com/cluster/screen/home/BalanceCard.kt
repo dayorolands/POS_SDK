@@ -57,7 +57,7 @@ fun BalanceCard() {
             )
 
             loading = true
-            val (response) = safeRunIO { staticService.balanceEnquiry(request) }
+            val (response) = safeRunIO { staticService.agentBalanceEnquiry(request) }
             loading = false
 
             if (response == null) return@loadBalance

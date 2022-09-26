@@ -381,7 +381,7 @@ suspend fun CreditClubActivity.customerBalanceEnquiry(accountInfo: AccountInfo) 
 
     dialogProvider.showProgressBar("Sending balance to customer")
     val (response, error) = safeRunIO {
-        staticService.balanceEnquiry(request)
+        staticService.customerBalanceEnquiry(request)
     }
     dialogProvider.hideProgressBar()
 
