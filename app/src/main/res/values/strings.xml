@@ -12,6 +12,7 @@
     <string name="action_settings">Settings</string>
     <string name="logout">Log out</string>
     <string name="activateAccount">Activate Account</string>
+    <string name="confirmOTP">Confirm OTP</string>
     <string name="verifyAccount">Verify Account</string>
     <string name="agentSetup">Agent Setup</string>
     <string name="section_format">Hello World from section: %1$d</string>

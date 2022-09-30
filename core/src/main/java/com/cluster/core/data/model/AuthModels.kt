@@ -66,6 +66,37 @@ data class VerificationRequest(
 )
 
 @Serializable
+data class SendLoginPinRequestOTP(
+    @SerialName("PhoneNumber")
+    val phoneNumber: String,
+    @SerialName("InstitutionCode")
+    val institutionCode: String = ""
+)
+
+@Serializable
+data class ConfirmLoginPinOTP(
+    @SerialName("OTP")
+    val requestOTP : String,
+    @SerialName("PhoneNumber")
+    val phoneNumber: String,
+    @SerialName("InstitutionCode")
+    val institutionCode: String? = ""
+)
+
+@Serializable
+data class ResetLoginPin(
+    @SerialName("Pin")
+    val loginPin : String,
+    @SerialName("OTP")
+    val requestOTP : String,
+    @SerialName("PhoneNumber")
+    val phoneNumber: String,
+    @SerialName("InstitutionCode")
+    val institutionCode: String? = ""
+)
+
+
+@Serializable
 data class ActivationRequest(
     @SerialName("ActivationCode")
     val activationCode: String,
