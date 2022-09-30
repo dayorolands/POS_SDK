@@ -34,7 +34,6 @@ class ForgotLoginPinActivity : CreditClubActivity(R.layout.forgot_login_pin) {
 
     private var isResetPassword = false
     private var isConfirmOTP = false
-    private var institutionCode: String = ""
     private val jsonPrefs by lazy { getSharedPreferences("JSON_STORAGE", 0) }
     private val staticService: StaticService by retrofitService()
     private val authService: AuthService by retrofitService()
@@ -53,15 +52,12 @@ class ForgotLoginPinActivity : CreditClubActivity(R.layout.forgot_login_pin) {
                     return@setOnClickListener
                 }
 
-
-                localStorage.institutionCode = institutionCode
                 localStorage.agentPhone = phoneNumber
                 localStorage.cacheAuth = Json.encodeToString(
                     AuthResponse.serializer(),
-                    AuthResponse(phoneNumber, institutionCode)
+                    AuthResponse(phoneNumber, phoneNumber)
                 )
-                localStorage.putString("ACTIVATED", "ACTIVATED")
-                localStorage.putString("AGENT_CODE", institutionCode)
+                localStorage.putString("PIN RESET", "RESET")
 
                 logout(jsonPrefs)
             }
@@ -120,7 +116,6 @@ class ForgotLoginPinActivity : CreditClubActivity(R.layout.forgot_login_pin) {
             return
         }
 
-
         val resetLoginPin = ResetLoginPin(
             loginPin = password,
             requestOTP = requestedOTP,
@@ -143,13 +138,12 @@ class ForgotLoginPinActivity : CreditClubActivity(R.layout.forgot_login_pin) {
         }
 
         if (response.isSuccessful) {
-            localStorage.institutionCode = institutionCode
             localStorage.agentPhone = phoneNumber
             localStorage.putString("PIN RESET", "PIN RESET")
 
             firebaseAnalytics.logEvent("activation", Bundle().apply {
                 putString("agent_code", localStorage.agent?.agentCode)
-                putString("institution_code", institutionCode)
+                putString("institution_code", localStorage.institutionCode)
                 putString("phone_number", phoneNumber)
             })
 
