@@ -13,11 +13,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         consumerProguardFiles 'proguard-rules.pro'
-
-        Properties properties = new Properties()
-        properties.load(project.rootProject.file("local.properties").newDataInputStream())
-
-        buildConfigField "String", "KEYSTORE_PASS", "\"${properties.getProperty ("KEYSTORE_PASS")}\""
     }
     buildFeatures {
         dataBinding true
