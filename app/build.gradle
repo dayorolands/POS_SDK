@@ -37,6 +37,11 @@ android {
                 ]
             }
         }
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+        buildConfigField "String", "KEYSTORE_PASS", "\"${properties.getProperty ("KEYSTORE_PASS")}\""
     }
 
 
