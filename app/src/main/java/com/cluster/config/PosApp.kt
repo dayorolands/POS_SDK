@@ -86,7 +86,7 @@ private fun getTrustManagers(context: Context): Array<TrustManager?> {
     Security.insertProviderAt(BouncyCastleProvider(), 1)
     val trustStore = KeyStore.getInstance("BKS")
     context.resources.openRawResource(R.raw.pos_trust_store).use { inputStream ->
-        trustStore.load(inputStream, BuildConfig.KEYSTORE_PASS.toCharArray())
+        trustStore.load(inputStream, BuildConfig.TRUESTORE_PASS.toCharArray())
     }
     val tmf = TrustManagerFactory.getInstance("X509")
     tmf.init(trustStore)
