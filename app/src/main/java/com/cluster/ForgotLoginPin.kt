@@ -268,7 +268,7 @@ class ForgotLoginPinActivity : CreditClubActivity(R.layout.forgot_login_pin) {
 
             binding.verifyOtp.visibility = View.GONE
             binding.pinLayout.visibility = View.VISIBLE
-            binding.submitBtn.text = "Reset Password"
+            binding.submitBtn.text = "Reset Login Pin"
             binding.instructionTv.text = "Reset Login Pin"
 
             dialogProvider.showSuccess(response.responseMessage)
