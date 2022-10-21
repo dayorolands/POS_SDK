@@ -32,13 +32,21 @@ fun TransactionsScreen(
     preferences: SharedPreferences
 ) {
     val flows = institutionConfig.flows
-
     val returnedList = getArrayList("institution_features", preferences)
 
     LazyVerticalGrid(
         cells = GridCells.Adaptive(minSize = 100.dp)
     ) {
-        if(returnedList != null) {
+        if (Platform.isPOS || Platform.hasPrinter) {
+            item {
+                SmallMenuButton(
+                    text = "Card Transactions",
+                    icon = painterResource(R.drawable.withdraw),
+                    onClick = { fragment.openPageById(R.id.card_withdrawal_button) }
+                )
+            }
+        }
+        if (returnedList != null) {
             if (returnedList.contains("DPS")) {
                 item {
                     SmallMenuButton(
@@ -68,15 +76,6 @@ fun TransactionsScreen(
                         onClick = {
                             composeNavController.navigate(Routes.UssdWithdrawal)
                         }
-                    )
-                }
-            }
-            if (Platform.isPOS) {
-                item {
-                    SmallMenuButton(
-                        text = "Card Transactions",
-                        icon = painterResource(R.drawable.withdraw),
-                        onClick = { fragment.openPageById(R.id.card_withdrawal_button) }
                     )
                 }
             }
@@ -117,18 +116,21 @@ fun TransactionsScreen(
                 }
             }
         }
-        else{
-            item {
-                Text(
-                    text = "No features available for this agent.",
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp)
-                        .fillMaxSize(),
-                    softWrap = true,
-                    style = MaterialTheme.typography.h6,
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
-                    textAlign = TextAlign.Center,
-                )
+        else //onClick = { fragment.openPageById(R.id.token_withdrawal_button) }
+        {
+            if (!Platform.isPOS && returnedList == null){
+                item {
+                    Text(
+                        text = "No features available for this agent.",
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp)
+                            .fillMaxSize(),
+                        softWrap = true,
+                        style = MaterialTheme.typography.h6,
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
         }
     }
