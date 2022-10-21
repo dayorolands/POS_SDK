@@ -98,6 +98,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cluster.MainActivity" />
         </activity>
+
+        <activity
+            android:name="com.cluster.ForgotLoginPinActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/agentSetup" />
+
         <activity
             android:name="com.cluster.LoginActivity"
             android:exported="false"

@@ -25,6 +25,15 @@ interface AuthService {
     @POST("Auth/Verify")
     suspend fun verify(@Body verificationRequest: VerificationRequest): BackendResponse?
 
+    @POST("Auth/SendLoginPinResetOTP")
+    suspend fun sendLoginPinResetOTP(@Body sendLoginPinRequestOTP: SendLoginPinRequestOTP): BackendResponse?
+
+    @POST("Auth/ConfirmLoginPinOTP")
+    suspend fun confirmLoginPinOTP(@Body confirmLoginPinOTP: ConfirmLoginPinOTP) : BackendResponse?
+
+    @POST("Auth/ResetLoginPin")
+    suspend fun resetLoginPinOTP(@Body resetLoginPin: ResetLoginPin) : BackendResponse?
+
     @POST("Auth/ChangePassword")
     suspend fun changePassword(@Body request: PasswordChangeRequest): BackendResponse?
 

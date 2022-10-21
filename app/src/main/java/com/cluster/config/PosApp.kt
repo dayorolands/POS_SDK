@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.WorkManager
+import com.cluster.BuildConfig
 import com.cluster.R
 import com.cluster.utility.extensions.registerPeriodicWorker
 import com.cluster.work.*
@@ -85,7 +86,7 @@ private fun getTrustManagers(context: Context): Array<TrustManager?> {
     Security.insertProviderAt(BouncyCastleProvider(), 1)
     val trustStore = KeyStore.getInstance("BKS")
     context.resources.openRawResource(R.raw.pos_trust_store).use { inputStream ->
-        trustStore.load(inputStream, "P@55w0rd123".toCharArray())
+        trustStore.load(inputStream, BuildConfig.TRUESTORE_PASS.toCharArray())
     }
     val tmf = TrustManagerFactory.getInstance("X509")
     tmf.init(trustStore)

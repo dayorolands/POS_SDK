@@ -70,6 +70,7 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             buildConfigField("String", "API_HOST", "\"https://www.cluster.africa\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
+            buildConfigField("String", "TRUESTORE_PASS", "\"P@55w0rd123\"")
             manifestPlaceholders = [usesCleartextTraffic: "false"]
         }
 
@@ -79,6 +80,7 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
+            buildConfigField("String", "TRUESTORE_PASS", "\"P@55w0rd123\"")
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             matchingFallbacks = ["release", "debug"]
             signingConfig signingConfigs.debug
@@ -89,6 +91,7 @@ android {
             debuggable true
             buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
+            buildConfigField("String", "TRUESTORE_PASS", "\"P@55w0rd123\"")
             manifestPlaceholders = [usesCleartextTraffic: "true"]
             ext.enableCrashlytics = false
             versionNameSuffix = "-dev"

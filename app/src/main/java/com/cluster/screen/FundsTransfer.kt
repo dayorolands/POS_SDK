@@ -236,9 +236,11 @@ fun FundsTransfer(
                     "Transfer in progress"
                 }
                 val (response, error) = safeRunIO {
-                    if (isFirstAttempt) {
-                        fundsTransferTransactionService.transfer(fundsTransferRequest)
-                    } else {
+                    if (isFirstAttempt && !isSameBank!!) {
+                        fundsTransferTransactionService.interTransfer(fundsTransferRequest)
+                    } else if(isFirstAttempt && isSameBank!!) {
+                        fundsTransferTransactionService.intraTransfer(fundsTransferRequest)
+                    } else{
                         fundsTransferService.requery(fundsTransferRequest)
                     }
                 }

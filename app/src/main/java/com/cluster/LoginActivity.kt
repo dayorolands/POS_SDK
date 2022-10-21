@@ -120,7 +120,7 @@ class LoginActivity : CreditClubActivity(R.layout.activity_login) {
         }
 
         binding.forgotPasswordBtn.setOnClickListener {
-            val intent = Intent(this, AgentActivationActivity::class.java).apply {
+            val intent = Intent(this, ForgotLoginPinActivity::class.java).apply {
                 putExtra("phone_number", localStorage.agentPhone)
             }
             startActivity(intent)
