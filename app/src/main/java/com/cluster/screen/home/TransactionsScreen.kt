@@ -37,7 +37,7 @@ fun TransactionsScreen(
     LazyVerticalGrid(
         cells = GridCells.Adaptive(minSize = 100.dp)
     ) {
-        if (Platform.isPOS || Platform.hasPrinter) {
+        if (Platform.isPOS) {
             item {
                 SmallMenuButton(
                     text = "Card Transactions",
