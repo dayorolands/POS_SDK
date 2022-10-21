@@ -195,6 +195,7 @@ dependencies {
     groomingImplementation(project(":telpo"))
     groomingImplementation(project(":nexgo"))
     heritageImplementation(project(":wizar"))
+    heritageImplementation(project(":telpo"))
     haloImplementation(project(":dspread"))
     haloImplementation(project(":nexgo"))
     standardmfbImplementation(project(":nexgo"))
