@@ -1,12 +1,31 @@
 package com.cluster.config
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.util.Log
 import com.cluster.BuildConfig
+import com.cluster.LoginActivity
 import com.cluster.R
-import com.cluster.core.config.*
+import com.cluster.core.config.AccountOpeningConfig
+import com.cluster.core.config.CategoryConfig
+import com.cluster.core.config.FlowConfig
+import com.cluster.core.config.InstitutionConfig
+import com.cluster.core.config.TokenWithdrawalConfig
+import com.cluster.core.data.api.StaticService
+import com.cluster.core.data.api.retrofitService
+import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.type.TransactionType
+import com.cluster.core.ui.CreditClubActivity
+import com.cluster.core.util.delegates.RetrofitServiceDelegate
+import com.cluster.core.util.delegates.addItemToList
+import com.cluster.core.util.delegates.deleteArrayList
 import com.cluster.core.util.delegates.getArrayList
 import com.cluster.core.util.localStorage
+import com.cluster.core.util.safeRunIO
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 17/10/2019.
@@ -20,14 +39,17 @@ class LocalInstitutionConfig private constructor(
     override val flows: FlowConfig,
     override var categories: CategoryConfig,
     override val bankAccountNumberLength: Int,
-) : InstitutionConfig {
-
+) : InstitutionConfig, CreditClubActivity() {
+    val staticService: StaticService by retrofitService()
     companion object {
         fun create(context: Context): LocalInstitutionConfig {
             val preferences by lazy { context.getSharedPreferences("JSON_STORAGE", 0) }
             val returnedList = getArrayList("institution_features", preferences)
             val transactionArray = arrayListOf<String>()
-            if(returnedList!= null) {
+            if(returnedList?.isEmpty()!!){
+                transactionArray.add("Nothing")
+            }
+            else if(returnedList != null) {
                 if (returnedList.contains("DPS")){
                     transactionArray.add("CashIn")
                 }
@@ -58,9 +80,6 @@ class LocalInstitutionConfig private constructor(
                 if (returnedList.contains("ACC")){
                     transactionArray.add("Registration")
                 }
-            }
-            else {
-                transactionArray.add("Nothing")
             }
             val resources = context.resources
             val config = LocalInstitutionConfig(
@@ -156,5 +175,28 @@ class LocalInstitutionConfig private constructor(
 
             return config
         }
+
+        private suspend fun getInstitutionFeatures(
+            localStorage: LocalStorage,
+            staticService: StaticService,
+            preferences : SharedPreferences
+        ) {
+            val (features) = safeRunIO {
+                staticService.getInstitutionFeatures(
+                    localStorage.institutionCode!!,
+                    localStorage.agent!!.agentCategory
+                )
+            }
+
+            if (features != null) {
+                if(features.isSuccessful){
+                    for (i in features.data) {
+                        Log.d("OkHttpClient", "This is a returned feature for reporting: ${i?.code}")
+                        preferences.addItemToList("institution_features", i?.code)
+                    }
+                }
+            }
+        }
     }
+
 }
