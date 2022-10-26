@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
  * Appzone Ltd
  */
 
-@IntDef(value = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29])
+@IntDef(value = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,32])
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 internal annotation class ReportTypeField
@@ -46,7 +46,7 @@ enum class TransactionType(val code: Int, val label: String) {
     BetaHealthRegistration(27, "Beta Health Registration"),
     BetaHealthSubPayment(28, "Beta Health SubPayment"),
     POSCashOut(29, "POS Cash Out"),
-    Nothing(0, "No report available"),
+    Nothing(16, "No Transactions Enabled"),
     CollectionPayment(32, "Collections");
 
     companion object {

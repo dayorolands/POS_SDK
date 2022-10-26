@@ -33,12 +33,12 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
     private var totalCount = 0
     private val posPrinter: PosPrinter by inject { parametersOf(this, dialogProvider) }
     private val transactionGroup = institutionConfig.transactionTypes
-    private var selectedTransactionType = transactionGroup.first()
+    private var selectedTransactionType = if(transactionGroup.isEmpty()) TransactionType.Nothing else transactionGroup.first()
     private var selectedTransactionStatus = TransactionStatus.Successful
     private var transactionAdapter = TransactionReportAdapter(emptyList(), selectedTransactionType)
     private var posReportAdapter = PosReportAdapter(emptyList())
     private var endDate = LocalDate.now()
-    private var startDate = endDate.minusDays(7)
+    private var startDate = endDate.minusDays(0)
     private val reportService: ReportService by retrofitService()
     private val collectionsService: CollectionsService by retrofitService()
 
