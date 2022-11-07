@@ -15,6 +15,7 @@ import com.cluster.core.util.setResult
 import com.cluster.pos.printer.ParcelablePrintJob
 import com.cluster.screen.*
 import com.cluster.screen.cardlesswithdrawal.CardlessWithdrawal
+import com.cluster.screen.cardlesswithdrawal.USSDTokenScreen
 import com.cluster.screen.loan.AgentLoanHistoryScreen
 import com.cluster.screen.loan.AgentLoanRequestScreen
 import com.cluster.screen.loan.OverdraftQualifyScreen
@@ -49,7 +50,11 @@ fun NavGraphBuilder.clusterNavigation(
             preferences = preferences
         )
     }
-
+    
+    composable(Routes.USSDTokenWithdrawal){
+        USSDTokenScreen(navController = navController)
+    }
+    
     composable(Routes.PinChange) {
         PinChange(navController = navController)
     }

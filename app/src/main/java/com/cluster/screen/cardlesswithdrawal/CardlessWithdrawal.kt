@@ -14,6 +14,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.SendToMobile
+import androidx.compose.material.icons.outlined.TransferWithinAStation
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.cluster.R
+import com.cluster.Routes
 import com.cluster.core.config.InstitutionConfig
 import com.cluster.core.data.model.Bank
 import com.cluster.core.data.response.NameEnquiryResponse
@@ -124,13 +126,12 @@ fun CardlessWithdrawal(
                             onClick = { if(isSameBank == true) fragment.openPageById(R.id.token_withdrawal_button) else  fragment.openPageById(R.id.fn_token_withdrawal) },
                             imageVector = Icons.Outlined.SendToMobile
                         )
-//                        Spacer(modifier = Modifier.padding(top = 10.dp))
-//                        ChipButton(
-//                            label = stringResource(id = R.string.withdraw_using_ussd),
-//                            onClick = {
-//                            },
-//                            imageVector = Icons.Outlined.TransferWithinAStation
-//                        )
+                        Spacer(modifier = Modifier.padding(top = 10.dp))
+                        ChipButton(
+                            label = stringResource(id = R.string.withdraw_using_ussd),
+                            onClick = { navController.navigate(Routes.USSDTokenWithdrawal) },
+                            imageVector = Icons.Outlined.TransferWithinAStation
+                        )
 //                        Spacer(modifier = Modifier.padding(top = 10.dp))
 //                        ChipButton(
 //                            label = stringResource(id = R.string.withdraw_using_mmo_wallet),
