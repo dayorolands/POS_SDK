@@ -390,6 +390,42 @@
           ]
         }
       }
+    }{
+      "client_info": {
+        "mobilesdk_app_id": "1:374244995616:android:00ddb98a06bf3df0114245",
+        "android_client_info": {
+          "package_name": "com.creditclub.mfbgeneric"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "374244995616-ua0jgchcltj7q73vuq52aeunmkq5sb6t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.creditclub.mfbgeneric",
+            "certificate_hash": "635254641cf7dc7df29139886deb0db3ad7b75b6"
+          }
+        },
+        {
+          "client_id": "374244995616-r5b0hcls5cbcritv8unbids9934uau4m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxV_Hi6_sN84FD9Ha3rAFRcuK2FT2Zozs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "374244995616-r5b0hcls5cbcritv8unbids9934uau4m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     },
     {
       "client_info": {
