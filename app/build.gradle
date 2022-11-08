@@ -145,6 +145,11 @@ android {
             dimension "flavor"
             applicationId "com.creditclub.standardmfb"
         }
+
+        mfbgeneric {
+            dimension "flavor"
+            applicationId "com.creditclub.mfbgeneric"
+        }
     }
     sourceSets {
         main {
@@ -199,7 +204,8 @@ dependencies {
     haloImplementation(project(":dspread"))
     haloImplementation(project(":nexgo"))
     standardmfbImplementation(project(":nexgo"))
-
+    mfbgenericImplementation(project(":telpo"))
+    mfbgenericImplementation(project(":nexgo"))
 
     implementation("androidx.activity:activity-ktx:${Versions.activityKtx}")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
