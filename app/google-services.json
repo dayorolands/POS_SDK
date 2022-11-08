@@ -390,7 +390,8 @@
           ]
         }
       }
-    }{
+    },
+    {
       "client_info": {
         "mobilesdk_app_id": "1:374244995616:android:00ddb98a06bf3df0114245",
         "android_client_info": {
