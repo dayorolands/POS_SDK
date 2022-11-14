@@ -52,7 +52,10 @@ fun NavGraphBuilder.clusterNavigation(
     }
     
     composable(Routes.USSDTokenWithdrawal){
-        USSDTokenScreen(navController = navController)
+        USSDTokenScreen(
+            navController = navController,
+            dialogProvider = dialogProvider
+        )
     }
     
     composable(Routes.PinChange) {
@@ -63,6 +66,9 @@ fun NavGraphBuilder.clusterNavigation(
     }
     composable(Routes.SupportCases) {
         SupportCases(navController = navController)
+    }
+    composable(Routes.PendingTransactions) {
+        PendingTransactions(navController = navController)
     }
     composable(Routes.SupportConversation) { backStackEntry ->
         val fcmToken by appViewModel.fcmToken
@@ -85,9 +91,7 @@ fun NavGraphBuilder.clusterNavigation(
     composable(Routes.UssdWithdrawal) {
         UssdWithdrawal(navController = navController)
     }
-    composable(Routes.PendingTransactions) {
-        PendingTransactions(navController = navController)
-    }
+
     composable(Routes.Receipt) {
         val printJob: ParcelablePrintJob? = navController
             .previousBackStackEntry

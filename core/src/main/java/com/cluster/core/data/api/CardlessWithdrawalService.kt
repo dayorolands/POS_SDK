@@ -1,6 +1,7 @@
 package com.cluster.core.data.api
 
 import com.cluster.core.data.model.*
+import com.cluster.core.data.response.ApiResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -27,4 +28,10 @@ interface CardlessWithdrawalService {
     suspend fun confirmToken(
         @Body request: SubmitTokenRequest
     ) : SubmitTokenResponse?
+
+    @GET("api/CrossBankTransaction/GetTransactionDetails")
+    suspend fun getTransactionDetails(
+        @Query("token") agentToken : String?,
+        @Query("agentCode") agentCode: String?,
+    ) : ApiResponse<GetTransactionDetails>
 }

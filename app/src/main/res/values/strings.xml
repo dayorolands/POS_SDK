@@ -5,6 +5,8 @@
     <string name="activation_instructions" />
     <string name="institution_website">https://www.appzonegroup.com/group/appzone-pos</string>
     <string name="home">Home</string>
+    <string name="customerText">Kindly instruct the customer to dial %1$s and input the agent code</string>
+    <string name="ussd_token_withdrawal">USSD Token Withdrawal</string>
     <string name="title_activity_login">Login</string>
     <string name="register_customer">Open Account</string>
     <string name="check_accounts">View Accounts</string>
@@ -190,6 +192,8 @@
     <string name="institution_code">Institution Code</string>
     <string name="select_your_institution">Select your institution</string>
     <string name="agentCode">Agent\'s Code</string>
+    <string name="agent_code">*AGENT CODE*</string>
+    <string name="placeholder">*614*9#</string>
     <string name="code">Code</string>
     <string name="enter_verification_code">Enter verification code&#8230;</string>
     <string name="enter_activation_code">Enter activation code&#8230;</string>
@@ -224,6 +228,7 @@
     <string name="token">Token</string>
     <string name="token_hint">Enter the token you received</string>
     <string name="confirm_otp">Confirm Token</string>
+    <string name="loading_message">Getting transaction details</string>
     <string name="otp_validation">OTP Validation</string>
     <string name="verify_bvn">BVN verification</string>
     <string name="error_cause">1. No internet Connection \n2. No BVN has been supplied</string>
@@ -427,6 +432,7 @@
     <string name="withdraw_using_mmo_wallet">Withdraw using MMO Wallet</string>
     <string name="withdraw_using_qr_code">Withdraw using QR Code</string>
     <string name="confirm">Confirm</string>
+    <string name="complete_transaction">Complete Transaction</string>
     <string name="select_bank">Select Bank</string>
     <string name="enter_account">Enter Account</string>
     <string name="share_receipt_to">Share receipt to</string>

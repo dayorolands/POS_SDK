@@ -31,7 +31,6 @@ class GetBankResponse {
 
         override fun toString(): String = name
     }
-
 }
 
 @Serializable
@@ -136,3 +135,24 @@ class SubmitTokenResponse  (
     @SerialName("Code")
     var respCode: String? = null
 ) : BackendResponse()
+
+@Serializable
+data class GetTransactionDetails(
+    @SerialName("AccountNumber")
+    val accountNumber : String,
+    @SerialName("Name")
+    val name : String,
+    @SerialName("BankCode")
+    val bankCode: String,
+    @SerialName("Amount")
+    val amount : Double,
+    @SerialName("PhoneNumber")
+    val phoneNumber: String,
+    @SerialName("TokenStatus")
+    val tokenStatus : TokenStatus
+)
+
+enum class TokenStatus{
+    Active,
+    Expired
+}
