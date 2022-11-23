@@ -354,6 +354,7 @@ fun fundsTransferReceipt(
         |Amount NGN${request.amountInNaira}
         |Beneficiary: $beneficiary
         |Transaction Date: $transactionDate
+        |Narration: ${request.narration}
         |RRN: ${request.deviceNumber}${request.retrievalReferenceNumber}""".trimMargin()
     )
     transactionStatus(
