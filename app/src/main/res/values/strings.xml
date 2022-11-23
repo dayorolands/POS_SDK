@@ -320,6 +320,7 @@
     <string name="hotlist_reason">Reason for hotlisting</string>
     <string name="hotlist_reason_hint">Why do you want to hot-list the card?</string>
     <string name="question">Question</string>
+    <string name="pay_with_transfer">Pay With Transfer</string>
     <string name="title_activity_token_cash_out">Token-based CashOut</string>
     <string name="online_functions">Online Functions</string>
     <string name="requires_internet">(Requires internet)</string>

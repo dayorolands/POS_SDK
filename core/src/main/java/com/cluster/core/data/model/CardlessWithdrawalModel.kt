@@ -140,8 +140,8 @@ class SubmitTokenResponse  (
 data class GetTransactionDetails(
     @SerialName("AccountNumber")
     val accountNumber : String,
-    @SerialName("Name")
-    val name : String,
+    @SerialName("Bank")
+    val bank : String,
     @SerialName("BankCode")
     val bankCode: String,
     @SerialName("Amount")
@@ -149,10 +149,5 @@ data class GetTransactionDetails(
     @SerialName("PhoneNumber")
     val phoneNumber: String,
     @SerialName("TokenStatus")
-    val tokenStatus : TokenStatus
+    val tokenStatus : Int,
 )
-
-enum class TokenStatus{
-    Active,
-    Expired
-}

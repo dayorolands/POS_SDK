@@ -1,5 +1,6 @@
 package com.cluster.screen.cardlesswithdrawal
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,9 +24,14 @@ import com.cluster.core.data.api.CardlessWithdrawalService
 import com.cluster.core.data.model.GetTransactionDetails
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.ui.widget.DialogProvider
-import com.cluster.core.util.*
+import com.cluster.core.util.getMessage
+import com.cluster.core.util.isKotlinNPE
+import com.cluster.core.util.safeRunIO
+import com.cluster.core.util.toCurrencyFormat
 import com.cluster.ui.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerializationException
 
 @Composable
 fun USSDTokenScreen(
@@ -35,21 +41,21 @@ fun USSDTokenScreen(
     val coroutineScope = rememberCoroutineScope()
     var tokenString by remember{ mutableStateOf("") }
     var agentPin by remember{ mutableStateOf("") }
-    val agentPinDigit = remember(agentPin) { agentPin }
+    var doneLoading by remember{ mutableStateOf(false) }
     val token = remember(tokenString){ tokenString}
-    val tokenIsValid = tokenString.isNotBlank()
     var getTransactionDetails: GetTransactionDetails? by remember{ mutableStateOf(null) }
-    val localStorage : LocalStorage by rememberBean()
-    val bankCode = remember(getTransactionDetails){
-        if(getTransactionDetails != null) getTransactionDetails!!.bankCode else null
+    val tokenIsActive = remember(getTransactionDetails != null){
+        getTransactionDetails?.tokenStatus == 0
     }
-    var showConfirmation by remember(bankCode){ mutableStateOf(false) }
+    val tokenIsValid = tokenString.isNotBlank() && tokenString.length == 5
+    val localStorage : LocalStorage by rememberBean()
+    var showConfirmation by remember(getTransactionDetails){ mutableStateOf(false) }
     val cardlessWithdrawalService : CardlessWithdrawalService by rememberRetrofitService()
     val context = LocalContext.current
     var loadingMessage by remember{ mutableStateOf("") }
     val title = when{
         getTransactionDetails == null -> stringResource(id = R.string.ussd_token_withdrawal)
-        showConfirmation -> stringResource(id = R.string.complete_transaction)
+        tokenIsActive -> stringResource(id = R.string.complete_transaction)
         else -> stringResource(id = R.string.ussd_token_withdrawal)
     }
     var errorMessage : String? by remember{ mutableStateOf(null) }
@@ -63,7 +69,7 @@ fun USSDTokenScreen(
         )
     )
 
-    val getTransDetailsCall: SuspendCallback =
+    val getTransDetailsCall: suspend CoroutineScope.() -> Unit =
         remember(tokenString){
             getTransDetailsCall@{
                 errorMessage = ""
@@ -76,24 +82,45 @@ fun USSDTokenScreen(
                 loadingMessage = context.getString(R.string.loading_message)
                 val(response, error) = safeRunIO {
                     cardlessWithdrawalService.getTransactionDetails(
+                        channel = LocalStorage.USSD_CHANNEL,
                         agentToken = token,
                         agentCode = localStorage.agent!!.agentCode
                     )
                 }
+                Log.d(
+                    "OkHttpClient",
+                    "************************This is the response : ${response?.data}"
+                )
                 loadingMessage = ""
-                if(error != null) errorMessage = error.getMessage(context)
-                if(response == null) return@getTransDetailsCall
-                if(response.isFailure()){
+                if (error != null) {
+                    if (error is SerializationException || error.isKotlinNPE()) {
+                        errorMessage = "Unable to get transaction details"
+                        return@getTransDetailsCall
+                    }
+                    errorMessage = error.getMessage(context)
+                    return@getTransDetailsCall
+                }
+                if(response == null){
+                    errorMessage = "Invalid token"
+                    return@getTransDetailsCall
+                }
+                if(!response.isUssdSuccess()){
+                    errorMessage = response.message
+                    return@getTransDetailsCall
+                }
+                if(response.data?.tokenStatus == 1){
                     errorMessage = response.message
                     return@getTransDetailsCall
                 }
                 getTransactionDetails = response.data
+                showConfirmation = true
+                doneLoading = true
             }
         }
 
-    val bankName = getTransactionDetails?.bankCode ?: "Unknown Bank"
+    val phoneNumber = getTransactionDetails?.phoneNumber ?: "No Phone Number"
     val accountNumber = getTransactionDetails?.accountNumber ?: "1234567890"
-    val accountName = getTransactionDetails?.name ?: "No name"
+    val bankName = getTransactionDetails?.bank ?: "No name"
     val formattedAmount = remember(getTransactionDetails){
         if(getTransactionDetails?.amount != null) getTransactionDetails?.amount!!.toCurrencyFormat() else ""
     }
@@ -107,7 +134,7 @@ fun USSDTokenScreen(
         )
 
         LazyColumn(modifier = Modifier.weight(1f)){
-            if(!showConfirmation) {
+            if(!tokenIsActive) {
                 item {
                     Spacer(modifier = Modifier.height(30.dp))
                     Text(
@@ -151,8 +178,7 @@ fun USSDTokenScreen(
                     }
                 }
             }
-
-            if(loadingMessage.isBlank() && bankCode != null){
+            if(tokenIsActive){
                 item(key = "confirm-bank") {
                     DataItem(
                         label = "Bank",
@@ -165,10 +191,10 @@ fun USSDTokenScreen(
                         value = accountNumber
                     )
                 }
-                item(key = "confirm-accountName"){
+                item(key = "confirm-phoneNumber"){
                     DataItem(
-                        label = "Account Name",
-                        value = accountName
+                        label = "Phone Number",
+                        value = phoneNumber
                     )
                 }
                 item(key = "Amount"){
@@ -181,8 +207,14 @@ fun USSDTokenScreen(
         }
         
         if(loadingMessage.isBlank() && tokenIsValid){
-            AppButton(
-                onClick = { coroutineScope.launch { if(getTransactionDetails == null) getTransDetailsCall() else getTransDetailsCall()} }
+            AppUssdButton(
+                onClick = {
+                    coroutineScope.launch {
+                        if(getTransactionDetails == null)
+                            getTransDetailsCall()
+                        else
+                            getTransDetailsCall()}
+                }
             ) {
                 Text(
                     text = if(getTransactionDetails == null) {

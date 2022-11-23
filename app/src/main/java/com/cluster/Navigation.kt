@@ -57,6 +57,10 @@ fun NavGraphBuilder.clusterNavigation(
             dialogProvider = dialogProvider
         )
     }
+
+    composable(Routes.PayWithTransfer){
+        PayWithTransfer(navController = navController)
+    }
     
     composable(Routes.PinChange) {
         PinChange(navController = navController)

@@ -50,6 +50,7 @@ class LocalStorage(
         const val AGENT_INFO = "AGENT_INFO"
         const val SESSION_ID = "SESSION_ID"
         const val FEATURE_CODE = "FEATURE_CODE"
+        const val USSD_CHANNEL = "USSD"
 
         const val SuccessCount = "SUCCESS_COUNT"
         const val NoInternetCount = "NO_INTERNET_COUNT"

@@ -17,6 +17,29 @@ import androidx.compose.ui.unit.dp
 inline fun AppButton(
     modifier: Modifier = Modifier,
     noinline onClick: () -> Unit,
+    crossinline content: @Composable RowScope.() -> Unit
+) {
+    Button(
+        modifier = Modifier
+            .padding(16.dp)
+            .height(50.dp)
+            .fillMaxWidth()
+            .then(modifier),
+        shape = RoundedCornerShape(8.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = colorResource(R.color.colorAccent),
+            contentColor = colorResource(R.color.colorAccentContrast),
+        ),
+        onClick = onClick
+    ) {
+        content()
+    }
+}
+
+@Composable
+inline fun AppUssdButton(
+    modifier: Modifier = Modifier,
+    noinline onClick: () -> Unit,
     crossinline content: @Composable RowScope.() -> Unit,
 ) {
     Button(
