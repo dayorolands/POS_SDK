@@ -22,16 +22,23 @@ import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.core.data.api.CardlessWithdrawalService
 import com.cluster.core.data.model.GetTransactionDetails
+import com.cluster.core.data.model.SubmitTokenRequest
+import com.cluster.core.data.model.SubmitTokenResponse
 import com.cluster.core.data.prefs.LocalStorage
+import com.cluster.core.data.prefs.newTransactionReference
 import com.cluster.core.ui.widget.DialogProvider
-import com.cluster.core.util.getMessage
-import com.cluster.core.util.isKotlinNPE
-import com.cluster.core.util.safeRunIO
-import com.cluster.core.util.toCurrencyFormat
+import com.cluster.core.util.*
+import com.cluster.fragment.navigateToReceipt
+import com.cluster.pos.printer.PrintJob
+import com.cluster.receipt.tokenWithdrawalReceipt
+import com.cluster.screen.ReceiptDetails
 import com.cluster.ui.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
+import java.time.Instant
 
 @Composable
 fun USSDTokenScreen(
@@ -40,13 +47,16 @@ fun USSDTokenScreen(
 ){
     val coroutineScope = rememberCoroutineScope()
     var tokenString by remember{ mutableStateOf("") }
-    var agentPin by remember{ mutableStateOf("") }
+    var assignPin by remember{ mutableStateOf("") }
     var doneLoading by remember{ mutableStateOf(false) }
     val token = remember(tokenString){ tokenString}
+    val uniqueReference = rememberTransactionReference()
     var getTransactionDetails: GetTransactionDetails? by remember{ mutableStateOf(null) }
     val tokenIsActive = remember(getTransactionDetails != null){
         getTransactionDetails?.tokenStatus == 0
     }
+    var receipt: PrintJob? by remember { mutableStateOf(null) }
+    var transactionPending by remember { mutableStateOf(false)}
     val tokenIsValid = tokenString.isNotBlank() && tokenString.length == 5
     val localStorage : LocalStorage by rememberBean()
     var showConfirmation by remember(getTransactionDetails){ mutableStateOf(false) }
@@ -73,12 +83,12 @@ fun USSDTokenScreen(
         remember(tokenString){
             getTransDetailsCall@{
                 errorMessage = ""
-                if (agentPin.isBlank()) {
-                    val pin = dialogProvider.getPin("Agent PIN") ?: return@getTransDetailsCall
-                    if (pin.isEmpty()) return@getTransDetailsCall dialogProvider.showError("Please enter your PIN")
-                    if (pin.length != 4) return@getTransDetailsCall dialogProvider.showError("PIN must be four digits")
-                    agentPin = pin
-                }
+//                if (assignPin.isBlank()) {
+//                    val pin = dialogProvider.getPin("Agent PIN") ?: return@getTransDetailsCall
+//                    if (pin.isEmpty()) return@getTransDetailsCall dialogProvider.showError("Please enter your PIN")
+//                    if (pin.length != 4) return@getTransDetailsCall dialogProvider.showError("PIN must be four digits")
+//                    assignPin = pin
+//                }
                 loadingMessage = context.getString(R.string.loading_message)
                 val(response, error) = safeRunIO {
                     cardlessWithdrawalService.getTransactionDetails(
@@ -87,10 +97,6 @@ fun USSDTokenScreen(
                         agentCode = localStorage.agent!!.agentCode
                     )
                 }
-                Log.d(
-                    "OkHttpClient",
-                    "************************This is the response : ${response?.data}"
-                )
                 loadingMessage = ""
                 if (error != null) {
                     if (error is SerializationException || error.isKotlinNPE()) {
@@ -120,10 +126,86 @@ fun USSDTokenScreen(
 
     val phoneNumber = getTransactionDetails?.phoneNumber ?: "No Phone Number"
     val accountNumber = getTransactionDetails?.accountNumber ?: "1234567890"
-    val bankName = getTransactionDetails?.bank ?: "No name"
+    val bankCode = getTransactionDetails?.bankCode
+    val bankName = getTransactionDetails?.bank ?: "No bank name"
+    val accountName = getTransactionDetails?.accountName ?: "No customer name"
     val formattedAmount = remember(getTransactionDetails){
         if(getTransactionDetails?.amount != null) getTransactionDetails?.amount!!.toCurrencyFormat() else ""
     }
+
+    val proceedTransaction: suspend CoroutineScope.() -> Unit =
+        proceedTransaction@{
+            if (assignPin.isBlank()) {
+                val pin = dialogProvider.getPin("Agent PIN") ?: return@proceedTransaction
+                if (pin.isEmpty()) return@proceedTransaction dialogProvider.showError("Please enter your PIN")
+                if (pin.length != 4) return@proceedTransaction dialogProvider.showError("PIN must be four digits")
+                assignPin = pin
+            }
+            val serializer = SubmitTokenRequest.Additional.serializer()
+            val agent = localStorage.agent
+            val additional = SubmitTokenRequest.Additional().apply {
+                agentCode = agent?.agentCode
+                terminalId = agent?.terminalID
+            }
+            val submitTokenRequest = SubmitTokenRequest().apply {
+                institutionCode = localStorage.institutionCode
+                agentPhoneNumber = localStorage.agentPhone
+                customerAccountNumber = accountNumber
+                amount = getTransactionDetails?.amount.toString()
+                agentPin = assignPin
+                customerToken = tokenString
+                geoLocation = localStorage.lastKnownLocation
+                retrievalReferenceNumber = localStorage.newTransactionReference()
+                deviceNumber = localStorage.deviceNumber
+                additionalInformation = Json.encodeToString(serializer, additional)
+                destinationBankCode = bankCode
+                requestReference = uniqueReference
+            }
+
+            dialogProvider.showProgressBar("Transaction Processing..", isCancellable = true) {
+                onClose {
+                    cancel()
+                }
+            }
+
+            val(response, error) = safeRunIO {
+                cardlessWithdrawalService.confirmToken(
+                    channel = LocalStorage.USSD_CHANNEL,
+                    request = submitTokenRequest
+                )
+            }
+
+            dialogProvider.hideProgressBar()
+
+            if (error != null) {
+                dialogProvider.showErrorAndWait(error)
+                return@proceedTransaction
+            }
+
+            if (response == null) {
+                dialogProvider.showErrorAndWait("A network-related error occurred while confirming token")
+                return@proceedTransaction
+            }
+
+            receipt = tokenWithdrawalReceipt(
+                context = context,
+                request = submitTokenRequest,
+                response = response,
+                transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
+                customerName = accountName,
+                bankName = bankName
+            )
+        }
+
+    if (receipt != null && loadingMessage.isBlank()) {
+        ReceiptDetails(
+            navController = navController,
+            printJob = receipt!!,
+            transactionPending = transactionPending
+        )
+        return
+    }
+    
 
     Column {
         CreditClubAppBar(
@@ -185,6 +267,12 @@ fun USSDTokenScreen(
                         value = bankName
                     )
                 }
+                item(key = "confirm-accountName"){
+                    DataItem(
+                        label = "Account Name",
+                        value = accountName
+                    )
+                }
                 item(key = "confirm-accountNumber"){
                     DataItem(
                         label = "Account Number",
@@ -213,7 +301,8 @@ fun USSDTokenScreen(
                         if(getTransactionDetails == null)
                             getTransDetailsCall()
                         else
-                            getTransDetailsCall()}
+                            proceedTransaction()
+                    }
                 }
             ) {
                 Text(

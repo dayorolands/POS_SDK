@@ -309,7 +309,7 @@ fun FundsTransfer(
                     transactionDate = Instant.now().toString("dd-MM-yyyy hh:mm"),
                     isSuccessful = response!!.isSuccessful,
                     reason = response.responseMessage,
-                    responseCode = response.responseCode
+                    responseCode = response.responseCode,
                 )
                 transferAttemptCount++
                 if (!response.isPendingOnMiddleware()) {

@@ -138,6 +138,8 @@ class SubmitTokenResponse  (
 
 @Serializable
 data class GetTransactionDetails(
+    @SerialName("AccountName")
+    val accountName:String,
     @SerialName("AccountNumber")
     val accountNumber : String,
     @SerialName("Bank")

@@ -27,6 +27,7 @@ interface CardlessWithdrawalService {
 
     @POST("api/CrossBankTransaction/Transact")
     suspend fun confirmToken(
+        @Header("channel") channel: String,
         @Body request: SubmitTokenRequest
     ) : SubmitTokenResponse?
 

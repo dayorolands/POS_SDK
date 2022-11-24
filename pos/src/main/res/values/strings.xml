@@ -125,4 +125,5 @@
     <string name="ptsp_name">3GEE PAY</string>
     <string name="cancel">Cancel</string>
     <string name="proceed">Proceed</string>
+    <string name="transaction_processing">Transaction Processing</string>
 </resources>
