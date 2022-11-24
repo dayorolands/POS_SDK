@@ -17,6 +17,7 @@ import com.cluster.core.data.api.CardlessWithdrawalService
 import com.cluster.core.data.api.StaticService
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.model.*
+import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.data.prefs.newTransactionReference
 import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.CreditClubFragment
@@ -329,7 +330,10 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
         )
 
         val (response, error) = executeTransaction(
-            fetcher = { cardlessTokenService.confirmToken(submitTokenRequest) },
+            fetcher = { cardlessTokenService.confirmToken(
+                channel = LocalStorage.USSD_CHANNEL,
+                submitTokenRequest
+            ) },
             reFetcher = { transactionService.getTransactionStatusByReferenceNumber(
                 deviceNumber = localStorage.deviceNumber,
                 retrievalReferenceNumber = submitTokenRequest.retrievalReferenceNumber!!,

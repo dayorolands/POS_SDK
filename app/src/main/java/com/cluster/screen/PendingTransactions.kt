@@ -95,7 +95,10 @@ fun PendingTransactions(
                             SubmitTokenRequest.serializer(),
                             transaction.requestJson
                         )
-                        cardlessTokenService.confirmToken(request)
+                        cardlessTokenService.confirmToken(
+                            channel = "mobile",
+                            request
+                        )
                     }
                     else -> throw IllegalArgumentException(
                         "requery for ${transaction.transactionType} not supported"

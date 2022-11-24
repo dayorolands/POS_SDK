@@ -18,9 +18,13 @@ data class ApiResponse<T>(
 
     @SerialName("Data")
     val data: T? = null,
+
+    @SerialName("Code")
+    val code: String = "00",
 ) {
     fun isSuccessful() = status == "00"
     fun isFailure() = status != "00"
+    fun isUssdSuccess() = code == "00"
 
     companion object {
         const val Success = "00"
