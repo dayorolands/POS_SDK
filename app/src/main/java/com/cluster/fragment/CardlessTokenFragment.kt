@@ -331,7 +331,7 @@ class CardlessTokenFragment : CreditClubFragment(R.layout.cardless_token_withdra
 
         val (response, error) = executeTransaction(
             fetcher = { cardlessTokenService.confirmToken(
-                channel = LocalStorage.USSD_CHANNEL,
+                channel = LocalStorage.MOBILE_CHANNEL,
                 submitTokenRequest
             ) },
             reFetcher = { transactionService.getTransactionStatusByReferenceNumber(
