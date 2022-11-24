@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class NotificationViewModel : ViewModel() {
     val notificationList = MutableStateFlow<List<Notification>>(emptyList())
+    val totalNotification = MutableStateFlow<Int>(0)
 }

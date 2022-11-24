@@ -63,7 +63,7 @@ data class NotificationResponse(
     val response: List<Notification>? = null,
 
     @SerialName("Total")
-    val total: Int = 0
+    val total: Int? = 0
 )
 
 const val NOTIFICATION_TYPE_1 = 1
