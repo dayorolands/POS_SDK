@@ -15,6 +15,7 @@ import com.cluster.core.util.setResult
 import com.cluster.pos.printer.ParcelablePrintJob
 import com.cluster.screen.*
 import com.cluster.screen.cardlesswithdrawal.CardlessWithdrawal
+import com.cluster.screen.cardlesswithdrawal.USSDTokenScreen
 import com.cluster.screen.loan.AgentLoanHistoryScreen
 import com.cluster.screen.loan.AgentLoanRequestScreen
 import com.cluster.screen.loan.OverdraftQualifyScreen
@@ -49,7 +50,18 @@ fun NavGraphBuilder.clusterNavigation(
             preferences = preferences
         )
     }
+    
+    composable(Routes.USSDTokenWithdrawal){
+        USSDTokenScreen(
+            navController = navController,
+            dialogProvider = dialogProvider
+        )
+    }
 
+    composable(Routes.PayWithTransfer){
+        PayWithTransfer(navController = navController)
+    }
+    
     composable(Routes.PinChange) {
         PinChange(navController = navController)
     }
@@ -58,6 +70,9 @@ fun NavGraphBuilder.clusterNavigation(
     }
     composable(Routes.SupportCases) {
         SupportCases(navController = navController)
+    }
+    composable(Routes.PendingTransactions) {
+        PendingTransactions(navController = navController)
     }
     composable(Routes.SupportConversation) { backStackEntry ->
         val fcmToken by appViewModel.fcmToken
@@ -80,9 +95,7 @@ fun NavGraphBuilder.clusterNavigation(
     composable(Routes.UssdWithdrawal) {
         UssdWithdrawal(navController = navController)
     }
-    composable(Routes.PendingTransactions) {
-        PendingTransactions(navController = navController)
-    }
+
     composable(Routes.Receipt) {
         val printJob: ParcelablePrintJob? = navController
             .previousBackStackEntry

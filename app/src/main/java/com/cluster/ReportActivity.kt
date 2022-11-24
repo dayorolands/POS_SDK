@@ -307,15 +307,14 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                     retrievalReferenceNumber = item.uniqueReference,
                     deviceNumber = localStorage.deviceNumber,
                 )
-                posPrinter.print(
-                    fundsTransferReceipt(
-                        context = this,
-                        request = fundsTransferRequest,
-                        transactionDate = item.date?.replace("T", " ") ?: "",
-                        isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
-                        reason = selectedTransactionStatus.label,
-                    )
+                val receipt = fundsTransferReceipt(
+                    context = this,
+                    request = fundsTransferRequest,
+                    transactionDate = item.date?.replace("T", " ") ?: "",
+                    isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
+                    reason = selectedTransactionStatus.label,
                 )
+                posPrinter.print(receipt)
             }
             TransactionType.BillsPayment,
             TransactionType.Recharge,

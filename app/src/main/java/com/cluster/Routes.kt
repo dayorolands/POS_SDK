@@ -18,6 +18,8 @@ object Routes {
     const val UpgradeSubscription = "subscription/upgrade"
     const val ChangeSubscription = "subscription/change"
     const val ExtendSubscription = "subscription/extend"
+    const val USSDTokenWithdrawal = "cardlessWithdrawal/ussdtokenwithdrawal"
+    const val PayWithTransfer = "transactions/paywithtransfer"
     const val SubscriptionHistory = "subscription/history"
     const val AgentLoanRequest = "agent/loan/request"
     const val AgentLoanHistory = "agent/loan/history"
