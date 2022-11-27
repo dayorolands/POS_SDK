@@ -10,4 +10,5 @@
     <color name="colorSplashBg">@color/white</color>
     <color name="colorBalanceCardBg">@color/white</color>
     <color name="menuButtonTextColor">@color/colorAccent</color>
+    <color name="unreadColor">#FEE8D6</color>
 </resources>

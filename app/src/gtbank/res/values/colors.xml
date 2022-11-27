@@ -16,4 +16,5 @@
     <color name="colorAccentContrast">@color/white</color>
     <color name="navHeaderLogoTint">#0000</color>
     <color name="colorOnSecondary">@color/white</color>
+    <color name="unreadColor">#FEE8D6</color>
 </resources>

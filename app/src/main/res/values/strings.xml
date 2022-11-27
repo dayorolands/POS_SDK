@@ -192,7 +192,7 @@
     <string name="institution_code">Institution Code</string>
     <string name="select_your_institution">Select your institution</string>
     <string name="agentCode">Agent\'s Code</string>
-    <string name="agent_code">*AGENT CODE*</string>
+    <string name="agent_code">AGENT CODE</string>
     <string name="placeholder">*614*9#</string>
     <string name="code">Code</string>
     <string name="enter_verification_code">Enter verification code&#8230;</string>

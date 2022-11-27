@@ -14,4 +14,5 @@
     <color name="colorSplashBg">#FFF</color>
     <color name="colorBalanceCardBg">#FFF</color>
     <color name="menuButtonTextColor">#6F6F70</color>
+    <color name="unreadColor">#99EDC3</color>
 </resources>
