@@ -28,6 +28,7 @@
     <color name="app_orange_transparent">@color/colorAccent</color>
     <color name="colorSplashBg">@color/colorPrimary</color>
     <color name="colorLoginBg">@color/colorPrimaryTransparent</color>
+    <color name="unreadNotColor">@color/unreadColor</color>
     <color name="toolbarLogoTint">#0000</color>
     <color name="navHeaderLogoTint">@color/colorAccent</color>
     <color name="fundsTransferSameBankTint">@color/colorAccent</color>

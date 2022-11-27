@@ -39,10 +39,12 @@ import com.cluster.core.data.model.Notification
 import com.cluster.core.data.model.NotificationRequest
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.core.util.createDialog
+import com.cluster.core.util.debug
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.timeAgo
 import com.cluster.ui.theme.CreditClubTheme
 import com.google.accompanist.insets.ProvideWindowInsets
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.*
@@ -77,7 +79,12 @@ class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) 
             modifier = Modifier.background(MaterialTheme.colors.surface),
         ) {
             items(notifications, key = { it.id }) {
-                NotificationItem(notification = it, onClick = { showDetails(it) })
+                NotificationItem(
+                    notification = it,
+                    onClick = {
+                        showDetails(it)
+                    }
+                )
             }
         }
     }
@@ -114,6 +121,28 @@ class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) 
         dialog.setContentView(binding.root)
         dialog.show()
         binding.btnDone.setOnClickListener { dialog.dismiss() }
+        ioScope.launch {
+            readNotification(notification)
+        }
+    }
+
+    private suspend fun readNotification(notification: Notification){
+        val agentPhone = localStorage.agentPhone
+        val referenceNumber = notification.reference
+        val instituteCode = localStorage.institutionCode
+        val (response, error) = safeRunIO {
+            notificationService.markAsRead(
+                agentPhoneNumber = agentPhone,
+                institutionCode =  instituteCode,
+                reference = referenceNumber
+            )
+        }
+        if(error != null) dialogProvider.showError(error)
+        if(response != null){
+            if(response.response){
+                debug("Notification read successfully")
+            }
+        }
     }
 }
 
@@ -122,6 +151,10 @@ private fun NotificationItem(notification: Notification, onClick: () -> Unit) {
     val formattedDate = remember(notification.dateLogged) {
         notification.dateLogged?.timeAgo() ?: ""
     }
+    val backgroundColour = if(notification.isRead == true) colorResource(id = R.color.white) else colorResource(
+        id = R.color.unreadNotColor
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -130,6 +163,8 @@ private fun NotificationItem(notification: Notification, onClick: () -> Unit) {
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(color = colorResource(R.color.ef_grey)),
             )
+            .background(backgroundColour)
+
     ) {
         Row(
             modifier = Modifier.padding(start = 16.dp, top = 10.dp, end = 16.dp),

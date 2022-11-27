@@ -11,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,6 +22,9 @@ import androidx.navigation.NavController
 import com.cluster.R
 import com.cluster.fragment.NotificationViewModel
 import com.google.accompanist.insets.statusBarsHeight
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.get
 
 @Composable
 fun HomeAppBar(
@@ -29,7 +34,8 @@ fun HomeAppBar(
 ) {
     val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
     val notificationViewModel: NotificationViewModel = viewModel()
-    val badgeCount = notificationViewModel.totalNotification.value
+    var badgeCount = notificationViewModel.totalNotification.value
+    val notifications by notificationViewModel.notificationList.collectAsState()
     // Draw a scrim over the status bar which matches the app bar
     Spacer(
         Modifier
@@ -49,6 +55,9 @@ fun HomeAppBar(
                     modifier = Modifier
                         .weight(1f),
                 )
+                for (notification in notifications) {
+                    if (notification.isRead == true) badgeCount -= 1 else badgeCount = badgeCount
+                }
                 BadgedBox(
                     modifier = Modifier
                         .padding(15.dp)
