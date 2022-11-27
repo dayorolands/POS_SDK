@@ -10,4 +10,5 @@
     <color name="navHeaderLogoTint">#0000</color>
     <color name="menuBackground">#114f3272</color>
     <color name="colorOnSecondary">@color/white</color>
+    <color name="unreadColor">#D6CADD</color>
 </resources>

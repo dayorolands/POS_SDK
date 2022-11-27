@@ -223,6 +223,7 @@ class HomeFragment : CreditClubFragment() {
 
         if (response?.response != null) {
             notificationViewModel.notificationList.value = response.response!!
+            notificationViewModel.totalNotification.value = response.total!!
             appViewModel.notificationList.value = response.response!!
         }
     }

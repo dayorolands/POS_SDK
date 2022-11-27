@@ -228,8 +228,9 @@ fun USSDTokenScreen(
                             .align(Alignment.CenterHorizontally)
                             .padding(20.dp)
                     )
+                    val agentCode = stringResource(id = R.string.agent_code) + ": ${localStorage.agent!!.agentCode}"
                     Text(
-                        text = stringResource(id = R.string.agent_code),
+                        text = agentCode,
                         fontSize = 25.sp,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold,
