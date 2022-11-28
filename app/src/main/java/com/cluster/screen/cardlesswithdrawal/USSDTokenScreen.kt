@@ -56,7 +56,7 @@ fun USSDTokenScreen(
         getTransactionDetails?.tokenStatus == 0
     }
     var receipt: PrintJob? by remember { mutableStateOf(null) }
-    var transactionPending by remember { mutableStateOf(false)}
+    val transactionPending by remember { mutableStateOf(false)}
     val tokenIsValid = tokenString.isNotBlank() && tokenString.length == 5
     val localStorage : LocalStorage by rememberBean()
     var showConfirmation by remember(getTransactionDetails){ mutableStateOf(false) }
@@ -220,7 +220,7 @@ fun USSDTokenScreen(
                 item {
                     Spacer(modifier = Modifier.height(30.dp))
                     Text(
-                        text = AnnotatedString(text = requiredText, spanStyles = spanStyles),
+                        text = stringResource(id = R.string.customerText),
                         fontSize = 15.sp,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -228,7 +228,7 @@ fun USSDTokenScreen(
                             .align(Alignment.CenterHorizontally)
                             .padding(20.dp)
                     )
-                    val agentCode = stringResource(id = R.string.agent_code) + ": ${localStorage.agent!!.agentCode}"
+                    val agentCode = stringResource(id = R.string.placeholder) + "${localStorage.agent!!.agentCode}" + "*Amount#"
                     Text(
                         text = agentCode,
                         fontSize = 25.sp,
