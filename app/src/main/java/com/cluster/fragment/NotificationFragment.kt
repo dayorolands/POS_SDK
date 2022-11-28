@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -45,6 +47,7 @@ import com.cluster.core.util.timeAgo
 import com.cluster.ui.theme.CreditClubTheme
 import com.google.accompanist.insets.ProvideWindowInsets
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.*
@@ -76,7 +79,8 @@ class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) 
     private fun NotificationsContent() {
         val notifications by viewModel.notificationList.collectAsState()
         LazyColumn(
-            modifier = Modifier.background(MaterialTheme.colors.surface),
+            modifier = Modifier
+                .background(MaterialTheme.colors.surface),
         ) {
             items(notifications, key = { it.id }) {
                 NotificationItem(
@@ -102,7 +106,10 @@ class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) 
             )
         }
 
-        if (response != null) viewModel.notificationList.value = response.response ?: emptyList()
+        if (response != null) {
+            viewModel.notificationList.value = response.response ?: emptyList()
+            viewModel.totalNotification.value = response.total ?: 0
+        }
         if (error != null) dialogProvider.showError(error)
         binding.swipeRefreshLayout.isRefreshing = false
     }
@@ -123,6 +130,11 @@ class NotificationFragment : CreditClubFragment(R.layout.notification_fragment) 
         binding.btnDone.setOnClickListener { dialog.dismiss() }
         ioScope.launch {
             readNotification(notification)
+        }
+        mainScope.launch {
+            coroutineScope {
+                getNotifications()
+            }
         }
     }
 
