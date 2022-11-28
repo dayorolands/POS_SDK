@@ -5,7 +5,7 @@
     <string name="activation_instructions" />
     <string name="institution_website">https://www.appzonegroup.com/group/appzone-pos</string>
     <string name="home">Home</string>
-    <string name="customerText">Kindly instruct the customer to dial %1$s and input the agent code</string>
+    <string name="customerText">Kindly instruct the customer to dial the code below</string>
     <string name="ussd_token_withdrawal">USSD Token Withdrawal</string>
     <string name="title_activity_login">Login</string>
     <string name="register_customer">Open Account</string>
@@ -193,7 +193,7 @@
     <string name="select_your_institution">Select your institution</string>
     <string name="agentCode">Agent\'s Code</string>
     <string name="agent_code">AGENT CODE</string>
-    <string name="placeholder">*614*9#</string>
+    <string name="placeholder">*614*</string>
     <string name="code">Code</string>
     <string name="enter_verification_code">Enter verification code&#8230;</string>
     <string name="enter_activation_code">Enter activation code&#8230;</string>
@@ -428,8 +428,8 @@
     <string name="funds_transfer">Funds Transfer</string>
     <string name="make_transfer">Make Transfer</string>
     <string name="other_bank">Other Bank</string>
-    <string name="withdraw_using_token">Withdraw using Token</string>
-    <string name="withdraw_using_ussd">Withdraw using USSD</string>
+    <string name="withdraw_using_token">Mobile Token</string>
+    <string name="withdraw_using_ussd">USSD Token</string>
     <string name="withdraw_using_mmo_wallet">Withdraw using MMO Wallet</string>
     <string name="withdraw_using_qr_code">Withdraw using QR Code</string>
     <string name="confirm">Confirm</string>
