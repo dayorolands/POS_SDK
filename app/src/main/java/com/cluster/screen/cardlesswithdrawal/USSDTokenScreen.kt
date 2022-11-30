@@ -1,6 +1,5 @@
 package com.cluster.screen.cardlesswithdrawal
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,12 +22,10 @@ import com.cluster.R
 import com.cluster.core.data.api.CardlessWithdrawalService
 import com.cluster.core.data.model.GetTransactionDetails
 import com.cluster.core.data.model.SubmitTokenRequest
-import com.cluster.core.data.model.SubmitTokenResponse
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.data.prefs.newTransactionReference
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.*
-import com.cluster.fragment.navigateToReceipt
 import com.cluster.pos.printer.PrintJob
 import com.cluster.receipt.tokenWithdrawalReceipt
 import com.cluster.screen.ReceiptDetails
@@ -83,12 +80,6 @@ fun USSDTokenScreen(
         remember(tokenString){
             getTransDetailsCall@{
                 errorMessage = ""
-//                if (assignPin.isBlank()) {
-//                    val pin = dialogProvider.getPin("Agent PIN") ?: return@getTransDetailsCall
-//                    if (pin.isEmpty()) return@getTransDetailsCall dialogProvider.showError("Please enter your PIN")
-//                    if (pin.length != 4) return@getTransDetailsCall dialogProvider.showError("PIN must be four digits")
-//                    assignPin = pin
-//                }
                 loadingMessage = context.getString(R.string.loading_message)
                 val(response, error) = safeRunIO {
                     cardlessWithdrawalService.getTransactionDetails(
@@ -228,7 +219,7 @@ fun USSDTokenScreen(
                             .align(Alignment.CenterHorizontally)
                             .padding(20.dp)
                     )
-                    val agentCode = stringResource(id = R.string.placeholder) + "${localStorage.agent!!.agentCode}" + "*Amount#"
+                    val agentCode = stringResource(id = R.string.placeholder) + "${localStorage.agent!!.ussdCode}" + "*Amount#"
                     Text(
                         text = agentCode,
                         fontSize = 25.sp,

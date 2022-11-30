@@ -17,6 +17,9 @@ data class AgentInfo(
     @SerialName("AgentCode")
     val agentCode: String? = null,
 
+    @SerialName("USSDCode")
+    val ussdCode: String? = null,
+
     @SerialName("PhoneNumber")
     val phoneNumber: String? = null,
 

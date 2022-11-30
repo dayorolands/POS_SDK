@@ -226,6 +226,7 @@
     <string name="customer_otp">Customer OTP</string>
     <string name="enter_customer_otp">Enter customer OTP&#8230;</string>
     <string name="token">Token</string>
+    <string name="transaction_fee">Transaction Fee</string>
     <string name="token_hint">Enter the token you received</string>
     <string name="confirm_otp">Confirm Token</string>
     <string name="loading_message">Getting transaction details</string>
