@@ -59,7 +59,10 @@ fun NavGraphBuilder.clusterNavigation(
     }
 
     composable(Routes.PayWithTransfer){
-        PayWithTransfer(navController = navController)
+        PayWithTransfer(
+            navController = navController,
+            dialogProvider = dialogProvider
+        )
     }
     
     composable(Routes.PinChange) {

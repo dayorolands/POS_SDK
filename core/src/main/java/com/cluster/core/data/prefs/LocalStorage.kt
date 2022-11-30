@@ -33,12 +33,6 @@ class LocalStorage(
         defaultJson
     )
 
-    var featureResponse: GetFeatureResponse? by jsonStore(
-        FEATURE_CODE,
-        GetFeatureResponse.serializer(),
-        defaultJson
-    )
-
     fun getString(key: String): String? = getString(key, null)
 
     fun putString(key: String, value: String?) = edit { putString(key, value) }
