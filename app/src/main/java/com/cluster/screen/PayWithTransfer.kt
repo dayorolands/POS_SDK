@@ -34,6 +34,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
+/**
+ * Created by Ifedayo Adekoya <iadekoya@appzonegroup.com> on 29/11/2022.
+ * Appzone Ltd
+ */
+
 @Composable
 fun PayWithTransfer(
     navController: NavController,
@@ -71,7 +76,7 @@ fun PayWithTransfer(
 
                 val initiatePaymentRequest = InitiatePaymentRequest(
                     agentPhoneNumber = agent?.phoneNumber,
-                    institutionCode = localStorage.institutionCode,
+                    institutionCode = "100616",
                     agentPin = assignPin,
                     customerName = "Ifedayo Adekoya",
                     retrievalReferenceNumber = localStorage.newTransactionReference(),
@@ -102,6 +107,10 @@ fun PayWithTransfer(
 
                 if (response == null) {
                     dialogProvider.showErrorAndWait("A network-related error occurred while getting details")
+                    return@initiatePayment
+                }
+                if(!response.isSuccessful()){
+                    dialogProvider.showErrorAndWait(response.message!!)
                     return@initiatePayment
                 }
                 initiatePaymentResponse = response.data
@@ -151,7 +160,7 @@ fun PayWithTransfer(
                                     errorMessage = error.getMessage(context)
                                 }
                                 if(response == null){
-                                    errorMessage = "Invalid Amount"
+                                    errorMessage = "No response from server"
                                     return@launch
                                 }
                                 if(!response.isUssdSuccess()){
@@ -190,7 +199,7 @@ fun PayWithTransfer(
             }
         }
         Spacer(modifier = Modifier.height(10.dp))
-        if(loadingMessage.isBlank() && amountIsValid){
+        if(loadingMessage.isBlank() && getFee != null){
             AppUssdButton(
                 onClick = {
                     coroutineScope.launch {

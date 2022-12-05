@@ -60,6 +60,52 @@ inline fun AppUssdButton(
 }
 
 @Composable
+inline fun AppPWTButton(
+    modifier: Modifier = Modifier,
+    noinline onClick: () -> Unit,
+    crossinline content: @Composable RowScope.() -> Unit,
+) {
+    Button(
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp)
+            .height(50.dp)
+            .fillMaxWidth()
+            .then(modifier),
+        shape = RoundedCornerShape(25.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = colorResource(R.color.darkGray),
+            contentColor = colorResource(R.color.white),
+        ),
+        onClick = onClick
+    ) {
+        content()
+    }
+}
+
+@Composable
+inline fun AppPWTWhiteButton(
+    modifier: Modifier = Modifier,
+    noinline onClick: () -> Unit,
+    crossinline content: @Composable RowScope.() -> Unit,
+) {
+    Button(
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp)
+            .height(50.dp)
+            .fillMaxWidth()
+            .then(modifier),
+        shape = RoundedCornerShape(25.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = colorResource(R.color.white),
+            contentColor = colorResource(R.color.ef_grey),
+        ),
+        onClick = onClick
+    ) {
+        content()
+    }
+}
+
+@Composable
 inline fun AppSecondButton(
     modifier: Modifier = Modifier,
     noinline onClick: () -> Unit,
