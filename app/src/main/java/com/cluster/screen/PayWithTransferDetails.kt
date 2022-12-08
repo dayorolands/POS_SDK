@@ -29,6 +29,7 @@ import androidx.navigation.compose.rememberNavController
 import com.cluster.R
 import com.cluster.Routes
 import com.cluster.components.HomeAppBar
+import com.cluster.core.data.model.InitiatePayment
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.ui.AppButton
 import com.cluster.ui.AppPWTButton
@@ -45,13 +46,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun PayWithTransferDetails(
     amount: Int?,
-    virtualAccountNo : String?,
-    navController: NavController
+    navController: NavController,
+    initiatePaymentResponse : InitiatePayment
 ) {
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-
 
     Column(
             modifier = Modifier.fillMaxSize()
@@ -119,7 +119,7 @@ fun PayWithTransferDetails(
                         )
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
-                            text = virtualAccountNo.toString(),
+                            text = initiatePaymentResponse.virtualAccountNumber.toString(),
                             textAlign = TextAlign.Center,
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
@@ -150,7 +150,7 @@ fun PayWithTransferDetails(
                                             context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
                                         val clipData: ClipData = ClipData.newPlainText(
                                             "Account Number",
-                                            virtualAccountNo
+                                            initiatePaymentResponse.virtualAccountNumber
                                         )
                                         clipboardManager.setPrimaryClip(clipData)
                                         Toast
@@ -228,7 +228,10 @@ fun DefaultPreview2() {
         PayWithTransferDetails(
             navController = rememberNavController(),
             amount = amountVar,
-            virtualAccountNo = "102345678"
+            initiatePaymentResponse = InitiatePayment(
+                trackingReference = null,
+                virtualAccountNumber = "102345678"
+            )
         )
     }
 }

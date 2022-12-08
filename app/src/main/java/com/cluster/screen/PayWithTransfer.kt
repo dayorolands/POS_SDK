@@ -109,7 +109,7 @@ fun PayWithTransfer(
                     dialogProvider.showErrorAndWait("A network-related error occurred while getting details")
                     return@initiatePayment
                 }
-                if(!response.isSuccessful()){
+                if(!response.isUssdSuccess()){
                     dialogProvider.showErrorAndWait(response.message!!)
                     return@initiatePayment
                 }
@@ -120,8 +120,8 @@ fun PayWithTransfer(
     if(loadingMessage.isBlank() && initiatePaymentResponse != null){
         PayWithTransferDetails(
             amount = amountString.toInt(),
-            virtualAccountNo = initiatePaymentResponse!!.virtualAccountNumber,
-            navController = navController
+            navController = navController,
+            initiatePaymentResponse = initiatePaymentResponse!!
         )
         return
     }

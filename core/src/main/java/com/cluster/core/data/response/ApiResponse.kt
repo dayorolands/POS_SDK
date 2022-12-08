@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ApiResponse<T>(
     @SerialName("Status")
-    val status: Int = 6,
+    val status: String = "06",
 
     @SerialName("Message")
     val message: String? = null,
@@ -22,8 +22,8 @@ data class ApiResponse<T>(
     @SerialName("Code")
     val code: String = "00",
 ) {
-    fun isSuccessful() = status == 3
-    fun isFailure() = status != 0
+    fun isSuccessful() = status == "00"
+    fun isFailure() = status != "00"
     fun isUssdSuccess() = code == "00"
 
     companion object {
@@ -34,4 +34,4 @@ data class ApiResponse<T>(
     }
 }
 
-val ApiResponse<*>?.isSuccessful: Boolean get() = this?.status == 0
+val ApiResponse<*>?.isSuccessful: Boolean get() = this?.status == "00"
