@@ -46,7 +46,7 @@ class LocalInstitutionConfig private constructor(
             val preferences by lazy { context.getSharedPreferences("JSON_STORAGE", 0) }
             val returnedList = getArrayList("institution_features", preferences)
             val transactionArray = arrayListOf<String>()
-            if(returnedList?.isEmpty()!!){
+            if(returnedList == null || returnedList.isEmpty()){
                 transactionArray.add("Nothing")
             }
             else if(returnedList != null) {

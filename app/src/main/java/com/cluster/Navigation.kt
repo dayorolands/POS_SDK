@@ -58,6 +58,10 @@ fun NavGraphBuilder.clusterNavigation(
         )
     }
 
+    composable(Routes.PendingTransactions) {
+        PendingTransactions(navController = navController)
+    }
+
     composable(Routes.PayWithTransfer){
         PayWithTransfer(
             navController = navController,
@@ -74,9 +78,7 @@ fun NavGraphBuilder.clusterNavigation(
     composable(Routes.SupportCases) {
         SupportCases(navController = navController)
     }
-    composable(Routes.PendingTransactions) {
-        PendingTransactions(navController = navController)
-    }
+
     composable(Routes.SupportConversation) { backStackEntry ->
         val fcmToken by appViewModel.fcmToken
         val arguments = backStackEntry.arguments!!

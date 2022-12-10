@@ -47,6 +47,7 @@ enum class TransactionType(val code: Int, val label: String) {
     BetaHealthSubPayment(28, "Beta Health SubPayment"),
     POSCashOut(29, "POS Cash Out"),
     Nothing(16, "No Transactions Enabled"),
+    PayWithTransfer(40, "Pay With Transfer"),
     CollectionPayment(32, "Collections");
 
     companion object {

@@ -469,6 +469,8 @@
     <string name="setYourLoginPassword">Set your login PIN</string>
     <string name="newPassword">New Password</string>
     <string name="confirmPassword">Confirm Password</string>
+    <string name="confirmPayment">Confirm Payment</string>
+    <string name="another_payment">Request Another Payment</string>
     <string name="new_login_pin">New Login PIN</string>
     <string name="confirm_login_pin">Confirm Login PIN</string>
     <string name="overdraft_history">Overdraft History</string>
