@@ -1,7 +1,5 @@
 package com.cluster.screen
 
-import android.content.SharedPreferences
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -121,7 +119,8 @@ fun PayWithTransfer(
         PayWithTransferDetails(
             amount = amountString.toInt(),
             navController = navController,
-            initiatePaymentResponse = initiatePaymentResponse!!
+            initiatePaymentResponse = initiatePaymentResponse!!,
+            dialogProvider = dialogProvider
         )
         return
     }

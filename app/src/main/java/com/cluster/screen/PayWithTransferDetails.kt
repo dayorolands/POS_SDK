@@ -7,10 +7,13 @@ import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.FileCopy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -28,38 +31,80 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.cluster.R
 import com.cluster.Routes
-import com.cluster.components.HomeAppBar
+import com.cluster.core.data.api.PayWithTransferService
 import com.cluster.core.data.model.InitiatePayment
+import com.cluster.core.data.prefs.LocalStorage
+import com.cluster.core.ui.widget.DialogProvider
+import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.toCurrencyFormat
-import com.cluster.ui.AppButton
-import com.cluster.ui.AppPWTButton
-import com.cluster.ui.AppPWTWhiteButton
-import com.cluster.ui.CreditClubAppBar
+import com.cluster.ui.*
 import com.cluster.ui.theme.CreditClubTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.concurrent.scheduleAtFixedRate
 
 /**
  * Created by Ifedayo Adekoya <iadekoya@appzonegroup.com> on 29/11/2022.
  * Appzone Ltd
  */
 
+private const val TIMER_DELAY = 60000L
+private const val TIMER_PERIOD = 10000L
 @Composable
 fun PayWithTransferDetails(
     amount: Int?,
     navController: NavController,
-    initiatePaymentResponse : InitiatePayment
+    initiatePaymentResponse : InitiatePayment,
+    dialogProvider: DialogProvider
 ) {
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val payWithTransferService : PayWithTransferService by rememberRetrofitService()
+    val ioScope = CoroutineScope(Dispatchers.IO)
+    val localStorage : LocalStorage by rememberBean()
+    val scrollState = rememberScrollState()
+    var timerTask : TimerTask? = null
+
+    val confirmStatus : suspend CoroutineScope.() -> Unit =
+        confirmStatus@{
+            val(response, error) = safeRunIO {
+                payWithTransferService.confirmStatus(
+                    institutionCode = "100616",
+                    reference = initiatePaymentResponse.trackingReference!!
+                )
+            }
+            if(response == null){
+                return@confirmStatus
+            }
+            if(response.isSuccessful()){
+                dialogProvider.showInfo(response.message)
+                timerTask?.cancel()
+            }
+        }
+
+    ioScope.launch {
+        timerTask = Timer().scheduleAtFixedRate(
+            TIMER_DELAY,
+            TIMER_PERIOD,
+        ){
+            ioScope.launch {
+                confirmStatus()
+            }
+        }
+    }
 
     Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
     ){
         CreditClubAppBar(
             title = stringResource(id = R.string.pay_with_transfer),
             onBackPressed = {
                 navController.popBackStack()
+                timerTask?.cancel()
             }
         )
         LazyColumn {
@@ -195,11 +240,9 @@ fun PayWithTransferDetails(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
         AppPWTButton(
             onClick = {
                 coroutineScope.launch {
-
                 }
             }
         ) {
@@ -210,6 +253,7 @@ fun PayWithTransferDetails(
         AppPWTWhiteButton(
             onClick = {
                 navController.navigate(Routes.PayWithTransfer)
+                timerTask?.cancel()
             }
         ) {
             Text(
@@ -220,7 +264,7 @@ fun PayWithTransferDetails(
 }
 
 const val amountVar = 1000
-
+private val dialogProvider : DialogProvider? = null
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview2() {
@@ -231,7 +275,8 @@ fun DefaultPreview2() {
             initiatePaymentResponse = InitiatePayment(
                 trackingReference = null,
                 virtualAccountNumber = "102345678"
-            )
+            ),
+            dialogProvider = dialogProvider!!
         )
     }
 }
