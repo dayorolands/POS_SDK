@@ -21,4 +21,10 @@ interface PayWithTransferService {
         @Query("agentPhoneNumber") phoneNumber : String,
         @Query("amount") amount: String,
     ) : ApiResponse<GetFee>
+
+    @GET("api/PayWithTransfer/ConfirmStatus")
+    suspend fun confirmStatus(
+        @Query("institutionCode") institutionCode: String,
+        @Query("reference") reference : String,
+    ) : ApiResponse<ConfirmStatusResponse>
 }

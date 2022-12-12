@@ -24,6 +24,14 @@ data class InitiatePayment(
 )
 
 @Serializable
+data class ConfirmStatusResponse(
+    @SerialName("AmountExpected")
+    val amountExpected : Int? = 0,
+    @SerialName("AmountPaid")
+    val amountPaid : Int? = 0
+)
+
+@Serializable
 data class InitiatePaymentRequest(
     @SerialName("AgentPhoneNumber")
     val agentPhoneNumber: String?,
