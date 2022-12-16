@@ -111,5 +111,11 @@ class CustomerRequest {
 
         @SerialName("City")
         var lga: String? = null
+
+        @SerialName("ReferralCode")
+        var referralCode: String? = null
+
+        @SerialName("ReferralAccountNo")
+        var referralAccountNo: String? = null
     }
 }

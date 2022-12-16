@@ -103,6 +103,8 @@ class CustomerRequestOpenAccountActivity : CreditClubActivity(R.layout.activity_
         additionalInformation.country = "NGN"
         additionalInformation.state = viewModel.addressState.value?.name
         additionalInformation.lga = viewModel.addressLga.value?.name
+        additionalInformation.referralCode = viewModel.referralCode.value
+        additionalInformation.referralAccountNo = viewModel.referralAcctNo.value
 
         //additionalInformation.setIDCard(idCardString);
         //additionalInformation.setOccupation(occupation);

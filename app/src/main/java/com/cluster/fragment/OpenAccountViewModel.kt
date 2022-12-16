@@ -29,6 +29,8 @@ class OpenAccountViewModel : ViewModel() {
     val starterPackNo = MutableLiveData<String>()
     val productName = MutableLiveData<String>()
     val productCode = MutableLiveData<String>()
+    val referralCode = MutableLiveData<String>()
+    val referralAcctNo = MutableLiveData<String>()
 
     val afterAccountInfo = MutableLiveData<Function0<Unit>>()
     val afterGeneralInfo = MutableLiveData<Function0<Unit>>()
