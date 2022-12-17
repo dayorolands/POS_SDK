@@ -18,6 +18,7 @@ import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.request.CustomerRequest
 import com.cluster.core.data.response.BackendResponse
 import com.cluster.core.ui.CreditClubActivity
+import com.cluster.core.util.format
 import com.cluster.core.util.hasOccurred
 import com.cluster.core.util.safeRunIO
 import com.cluster.core.util.showNetworkError
@@ -27,6 +28,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 class CustomerRequestOpenAccountActivity : CreditClubActivity(R.layout.activity_open_account) {
@@ -79,12 +82,14 @@ class CustomerRequestOpenAccountActivity : CreditClubActivity(R.layout.activity_
     private suspend fun createCustomer() {
         val gender = viewModel.gender.value
 
+        val newDateOfBirth = viewModel.dob.value
+        val formattedDate = LocalDate.parse(newDateOfBirth).format("uuuu-MM-dd")
         request.customerLastName = viewModel.surname.value?.trim()
         request.customerFirstName = viewModel.firstName.value?.trim()
-        request.dateOfBirth = viewModel.dob.value
+        request.dateOfBirth = formattedDate
         request.placeOfBirth = viewModel.placeOfBirth.value?.trim()
         request.customerPhoneNumber = viewModel.phoneNumber.value?.trim()
-        request.gender = gender?.substring(0, 1)?.toLowerCase(Locale.getDefault())
+        request.gender = gender?.substring(0, 1)?.lowercase(Locale.getDefault())
         request.geoLocation = localStorage.lastKnownLocation
         request.starterPackNumber = viewModel.starterPackNo.value?.trim()
         request.address = viewModel.address.value?.trim()
