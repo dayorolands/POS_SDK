@@ -261,6 +261,8 @@
     <string name="selectcabletype">Select Cable Type</string>
     <string name="selectpaymenttype">Select Payment Type</string>
     <string name="email">Email (optional)</string>
+    <string name="referralCode">Referral Code (optional)</string>
+    <string name="referralAccountNo">Referral Account No (optional)</string>
     <string name="Pay">Pay</string>
     <string name="destination_bank">Destination Bank</string>
     <string name="customer_bank">Customer Bank</string>
