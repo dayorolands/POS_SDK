@@ -1,6 +1,7 @@
 package com.cluster
 
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
@@ -83,10 +84,11 @@ class CustomerRequestOpenAccountActivity : CreditClubActivity(R.layout.activity_
         val gender = viewModel.gender.value
 
         val newDateOfBirth = viewModel.dob.value
-        val formattedDate = LocalDate.parse(newDateOfBirth).format("uuuu-MM-dd")
+        //Log.d("OkHttpClient", "Here to check the date: $newDateOfBirth")
+        //val formattedDate = LocalDate.parse(newDateOfBirth).format("uuuu-MM-dd")
         request.customerLastName = viewModel.surname.value?.trim()
         request.customerFirstName = viewModel.firstName.value?.trim()
-        request.dateOfBirth = formattedDate
+        request.dateOfBirth = newDateOfBirth
         request.placeOfBirth = viewModel.placeOfBirth.value?.trim()
         request.customerPhoneNumber = viewModel.phoneNumber.value?.trim()
         request.gender = gender?.substring(0, 1)?.lowercase(Locale.getDefault())
