@@ -1,6 +1,7 @@
 package com.cluster.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -16,8 +17,11 @@ import com.cluster.core.util.isKotlinNPE
 import com.cluster.requireAndValidateToken
 import com.cluster.core.data.api.StaticService
 import com.cluster.core.data.api.retrofitService
+import com.cluster.core.util.format
 import com.cluster.core.util.safeRunIO
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_request_account_info) {
     private val activity get() = getActivity() as CustomerRequestOpenAccountActivity
@@ -94,12 +98,15 @@ class AccountInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
             dialogProvider.showError("BVN is invalid")
             return
         }
+        val newDateOfBirth = result.dob
+        val formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy")
+        val formattedDate = LocalDate.parse(newDateOfBirth, formatter)
 
         viewModel.run {
             phoneNumber.value = result.phoneNumber
             firstName.value = result.firstName
             surname.value = result.lastName
-            dob.value = result.dob
+            dob.value = formattedDate.toString()
             middleName.value = result.otherNames
         }
 

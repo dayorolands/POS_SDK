@@ -127,11 +127,13 @@ fun CardlessWithdrawal(
                             imageVector = Icons.Outlined.SendToMobile
                         )
                         Spacer(modifier = Modifier.padding(top = 10.dp))
-                        ChipButton(
-                            label = stringResource(id = R.string.withdraw_using_ussd),
-                            onClick = { navController.navigate(Routes.USSDTokenWithdrawal) },
-                            imageVector = Icons.Outlined.TransferWithinAStation
-                        )
+                        if(!isSameBank!!) {
+                            ChipButton(
+                                label = stringResource(id = R.string.withdraw_using_ussd),
+                                onClick = { navController.navigate(Routes.USSDTokenWithdrawal) },
+                                imageVector = Icons.Outlined.TransferWithinAStation
+                            )
+                        }
 //                        Spacer(modifier = Modifier.padding(top = 10.dp))
 //                        ChipButton(
 //                            label = stringResource(id = R.string.withdraw_using_mmo_wallet),

@@ -58,10 +58,6 @@ fun NavGraphBuilder.clusterNavigation(
         )
     }
 
-    composable(Routes.PendingTransactions) {
-        PendingTransactions(navController = navController)
-    }
-
     composable(Routes.PayWithTransfer){
         PayWithTransfer(
             navController = navController,
@@ -134,6 +130,10 @@ fun NavGraphBuilder.clusterNavigation(
         ) {
             OverdraftQualifyScreen(navController = navController, context = context)
         }
+    }
+
+    composable(Routes.PendingTransactions) {
+        PendingTransactions(navController = navController)
     }
 }
 
