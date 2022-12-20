@@ -84,8 +84,6 @@ class CustomerRequestOpenAccountActivity : CreditClubActivity(R.layout.activity_
         val gender = viewModel.gender.value
 
         val newDateOfBirth = viewModel.dob.value
-        //Log.d("OkHttpClient", "Here to check the date: $newDateOfBirth")
-        //val formattedDate = LocalDate.parse(newDateOfBirth).format("uuuu-MM-dd")
         request.customerLastName = viewModel.surname.value?.trim()
         request.customerFirstName = viewModel.firstName.value?.trim()
         request.dateOfBirth = newDateOfBirth
@@ -112,6 +110,7 @@ class CustomerRequestOpenAccountActivity : CreditClubActivity(R.layout.activity_
         additionalInformation.lga = viewModel.addressLga.value?.name
         additionalInformation.referralCode = viewModel.referralCode.value
         additionalInformation.referralAccountNo = viewModel.referralAcctNo.value
+        additionalInformation.signature = viewModel.signatureString.value
 
         //additionalInformation.setIDCard(idCardString);
         //additionalInformation.setOccupation(occupation);

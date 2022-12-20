@@ -50,7 +50,7 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
                 )
             ) {
                 onSubmit { date ->
-                    val dateString = date.format("uuuu-MM-dd")
+                    val dateString = date.format("yyyy-MM-dd")
                     viewModel.dob.value = dateString
                     binding.dobInput.gravity = Gravity.START
                 }
@@ -155,6 +155,15 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
             indicateError(
                 getString(R.string.please_enter_a_valid_customer_address),
                 binding.addressEt
+            )
+            return
+        }
+
+        val dateOfBirth = viewModel.dob.value
+        if(dateOfBirth.isNullOrBlank()){
+            indicateError(
+                "Please enter a date of birth",
+                binding.dobInput
             )
             return
         }
