@@ -290,6 +290,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                app:counterEnabled="true"
+                app:counterMaxLength="10"
                 android:hint="@string/referralAccountNo"
                 app:startIconDrawable="@drawable/customer_account">
 
@@ -297,7 +299,8 @@
                     android:id="@+id/referral_account_no"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
+                    android:inputType="phone"
+                    android:maxLength="10"
                     android:text="@={viewModel.referralAcctNo}" />
             </com.google.android.material.textfield.TextInputLayout>
 
