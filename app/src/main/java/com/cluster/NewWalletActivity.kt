@@ -95,6 +95,7 @@ class NewWalletActivity : CreditClubActivity(R.layout.activity_open_account) {
 
         val additionalInformation = CustomerRequest.Additional()
         additionalInformation.passport = viewModel.passportString.value
+        additionalInformation.signature = viewModel.signatureString.value
         additionalInformation.email = viewModel.email.value?.trim()
         additionalInformation.middleName = viewModel.middleName.value?.trim()
         additionalInformation.title = if (gender == "female") "Ms" else "Mr"

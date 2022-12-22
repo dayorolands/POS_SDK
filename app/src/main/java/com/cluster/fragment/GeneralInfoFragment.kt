@@ -161,11 +161,14 @@ class GeneralInfoFragment : CreditClubFragment(R.layout.fragment_customer_reques
 
         val dateOfBirth = viewModel.dob.value
         if(dateOfBirth.isNullOrBlank()){
-            indicateError(
-                "Please enter a date of birth",
-                binding.dobInput
+            return dialogProvider.showError("Please enter a Date of birth")
+        }
+
+        if(viewModel.referralAcctNo.value?.length != 10){
+            return indicateError(
+                "Referral Account number cannot be more than 10 digits",
+                binding.referralAccountNo
             )
-            return
         }
 
 //        if (placeOfBirth.isEmpty()) {
