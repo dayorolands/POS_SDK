@@ -50,6 +50,7 @@ class LocalInstitutionConfig private constructor(
                 transactionArray.add("Nothing")
             }
             else if(returnedList != null) {
+                transactionArray.add("PayWithTransfer")
                 if (returnedList.contains("DPS")){
                     transactionArray.add("CashIn")
                 }

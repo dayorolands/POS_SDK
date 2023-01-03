@@ -3,6 +3,7 @@ package com.cluster.core.data.api
 import com.cluster.core.data.model.PosTransactionReport
 import com.cluster.core.data.model.TransactionReport
 import com.cluster.core.data.request.POSTransactionReportRequest
+import com.cluster.core.data.request.PWTTransactionReportRequest
 import com.cluster.core.type.ReportTypeField
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -30,4 +31,9 @@ interface ReportService {
 
     @POST("api/Report/POSCashOutTransactionsReport")
     suspend fun getPOSTransactions(@Body request: POSTransactionReportRequest): PosTransactionReport
+
+    @POST("api/Report/PayWithTransferTransactionsReport")
+    suspend fun getPWTTransactions(
+        @Body request: PWTTransactionReportRequest
+    ) : PosTransactionReport
 }

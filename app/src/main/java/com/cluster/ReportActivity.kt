@@ -3,6 +3,7 @@ package com.cluster
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.cluster.adapter.PWTReportAdapter
 import com.cluster.adapter.TransactionReportAdapter
 import com.cluster.databinding.ActivityReportBinding
 import com.cluster.receipt.*
@@ -37,6 +38,7 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
     private var selectedTransactionStatus = TransactionStatus.Successful
     private var transactionAdapter = TransactionReportAdapter(emptyList(), selectedTransactionType)
     private var posReportAdapter = PosReportAdapter(emptyList())
+    private var pwtReportAdapter = PWTReportAdapter(emptyList())
     private var endDate = LocalDate.now()
     private var startDate = endDate.minusDays(0)
     private val reportService: ReportService by retrofitService()
@@ -158,6 +160,31 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
         }
 
         when (selectedTransactionType) {
+            TransactionType.PayWithTransfer -> {
+                val request = PWTTransactionReportRequest(
+                    agentPhoneNumber = localStorage.agentPhone,
+                    agentCode = localStorage.agent?.agentCode,
+                    institutionCode = localStorage.institutionCode,
+                    from = binding.content.startDateContentTv.value,
+                    to = binding.content.endDateContentTv.value,
+                    status = selectedTransactionStatus.code,
+                    startIndex = "$startIndex",
+                    maxSize = "$maxSize"
+                )
+
+                dialogProvider.showProgressBar("Getting Pay With Transfer transactions")
+                val (response, error) = safeRunIO {
+                    reportService.getPWTTransactions(request)
+                }
+                dialogProvider.hideProgressBar()
+                if (error != null) return dialogProvider.showError(error)
+                response ?: return dialogProvider.showInternalError()
+
+                binding.content.totalCountContentTv.text = response.totalCount.toString()
+                binding.content.totalVolumeContentTv.text = response.totalAmount.toCurrencyFormat()
+                pwtReportAdapter.setData(response.reports?.toList())
+            }
+
             TransactionType.POSCashOut -> {
 
                 val request = POSTransactionReportRequest(
@@ -212,7 +239,13 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
     }
 
     private fun setAdapter() {
-        if (selectedTransactionType == TransactionType.POSCashOut) {
+        if(selectedTransactionType == TransactionType.PayWithTransfer){
+            pwtReportAdapter = PWTReportAdapter(emptyList())
+            binding.content.container.adapter = pwtReportAdapter
+            pwtReportAdapter.setOnPrintClickListener { item, type ->
+            }
+        }
+        else if (selectedTransactionType == TransactionType.POSCashOut) {
             posReportAdapter = PosReportAdapter(emptyList())
             binding.content.container.adapter = posReportAdapter
             posReportAdapter.setOnPrintClickListener{item, type ->
