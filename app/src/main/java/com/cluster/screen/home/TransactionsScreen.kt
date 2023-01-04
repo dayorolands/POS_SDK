@@ -46,6 +46,12 @@ fun TransactionsScreen(
                 )
             }
         }
+        item {
+            SmallMenuButton(
+                text = "Pay With Transfer",
+                icon = painterResource(id = R.drawable.payday_loan),
+                onClick = { composeNavController.navigate(Routes.PayWithTransfer)})
+        }
         if (returnedList != null) {
             if (returnedList.contains("DPS")) {
                 item {
@@ -105,12 +111,6 @@ fun TransactionsScreen(
                         onClick = { composeNavController.navigate(Routes.FundsTransfer) }
                     )
                 }
-            }
-            item {
-                SmallMenuButton(
-                    text = "Pay With Transfer",
-                    icon = painterResource(id = R.drawable.payday_loan),
-                    onClick = { composeNavController.navigate(Routes.PayWithTransfer)})
             }
             if (returnedList.contains("COL")) {
                 item {

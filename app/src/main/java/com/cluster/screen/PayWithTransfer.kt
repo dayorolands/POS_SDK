@@ -74,7 +74,7 @@ fun PayWithTransfer(
 
                 val initiatePaymentRequest = InitiatePaymentRequest(
                     agentPhoneNumber = agent?.phoneNumber,
-                    institutionCode = "100616",
+                    institutionCode = localStorage.institutionCode,
                     agentPin = assignPin,
                     customerName = "Ifedayo Adekoya",
                     retrievalReferenceNumber = localStorage.newTransactionReference(),
@@ -84,7 +84,7 @@ fun PayWithTransfer(
                     additionalInformation = Json.encodeToString(serializer, additional)
                 )
 
-                dialogProvider.showProgressBar("Generating Payment Details..", isCancellable = true) {
+                dialogProvider.showProgressBar("Generating Transfer Details..", isCancellable = true) {
                     onClose {
                         cancel()
                     }
@@ -146,7 +146,7 @@ fun PayWithTransfer(
                                 errorMessage = ""
                                 val (response, error) = safeRunIO {
                                     payWithTransferService.getAmountFee(
-                                        institutionCode = "100616",
+                                        institutionCode = localStorage.institutionCode!!,
                                         phoneNumber = localStorage.agentPhone!!,
                                         amount = it
                                     )

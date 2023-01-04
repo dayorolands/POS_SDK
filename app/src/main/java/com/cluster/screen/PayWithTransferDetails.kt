@@ -41,6 +41,7 @@ import com.cluster.ui.*
 import com.cluster.ui.theme.CreditClubTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.concurrent.scheduleAtFixedRate
@@ -72,16 +73,53 @@ fun PayWithTransferDetails(
         confirmStatus@{
             val(response, error) = safeRunIO {
                 payWithTransferService.confirmStatus(
-                    institutionCode = "100616",
+                    institutionCode = localStorage.institutionCode!!,
                     reference = initiatePaymentResponse.trackingReference!!
                 )
             }
             if(response == null){
                 return@confirmStatus
             }
-            if(response.isSuccessful()){
+            if(response.isUssdSuccess()){
                 dialogProvider.showInfo(response.message)
                 timerTask?.cancel()
+            }
+        }
+
+    val confirmStatusOnBtnPress : suspend CoroutineScope.() -> Unit =
+        confirmStatusOnBtnPress@{
+            dialogProvider.showProgressBar("Generating transaction status..", isCancellable = true) {
+                onClose {
+                    cancel()
+                }
+            }
+
+            val(response, error) = safeRunIO {
+                payWithTransferService.confirmStatus(
+                    institutionCode = localStorage.institutionCode!!,
+                    reference = initiatePaymentResponse.trackingReference!!
+                )
+            }
+
+            dialogProvider.hideProgressBar()
+
+            if (error != null) {
+                dialogProvider.showErrorAndWait(error)
+                return@confirmStatusOnBtnPress
+            }
+
+            if(response == null){
+                dialogProvider.showErrorAndWait("A network-related error occurred while getting details")
+                return@confirmStatusOnBtnPress
+            }
+
+            if(!response.isUssdSuccess()){
+                dialogProvider.showInfo(response.message)
+                return@confirmStatusOnBtnPress
+            }
+
+            if(response.isUssdSuccess()){
+                dialogProvider.showInfo(response.message)
             }
         }
 
@@ -243,6 +281,8 @@ fun PayWithTransferDetails(
         AppPWTButton(
             onClick = {
                 coroutineScope.launch {
+                    timerTask?.cancel()
+                    confirmStatusOnBtnPress()
                 }
             }
         ) {

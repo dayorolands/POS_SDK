@@ -26,9 +26,9 @@ data class InitiatePayment(
 @Serializable
 data class ConfirmStatusResponse(
     @SerialName("AmountExpected")
-    val amountExpected : Int? = 0,
+    val amountExpected : Double? = 0.0,
     @SerialName("AmountPaid")
-    val amountPaid : Int? = 0
+    val amountPaid : Double? = 0.0
 )
 
 @Serializable
