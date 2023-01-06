@@ -22,6 +22,7 @@
     <dimen name="large_sized_text">30sp</dimen>
     <dimen name="medium_large_sized_text">22sp</dimen>
     <dimen name="medium_sized_text">18sp</dimen>
+    <dimen name="semi_medium_sized_text">16sp</dimen>
     <dimen name="small_sized_text">14sp</dimen>
     <dimen name="very_small_sized_text">10sp</dimen>
     <dimen name="tiny_text">9sp</dimen>

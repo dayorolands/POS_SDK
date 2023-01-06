@@ -84,3 +84,42 @@ class PosTransactionReport {
         var transactionDateTime: String? = ""
     }
 }
+
+@Serializable
+class PWTTransactionReportResponse{
+    @SerialName("Reports")
+    var payWithTransferReport : List<PayWithTransferReport>? = null
+
+    @SerialName("totalCount")
+    var totalCount = 0
+
+    @Serializable
+    class PayWithTransferReport{
+        @SerialName("VirtualAccount")
+        var virtualAccountNumber: String? = ""
+        @SerialName("AgentPhoneNumber")
+        var agentPhoneNumber: String? = ""
+        @SerialName("AgentCode")
+        var agentCode : String? = ""
+        @SerialName("Narration")
+        var narration : String? = ""
+        @SerialName("CustomerAccountName")
+        var customerAccountName : String = ""
+        @SerialName("CustomerAccountNumber")
+        var customerAcctNumber : String? = ""
+        @SerialName("AmountReceived")
+        var amountReceived: Double = 0.00
+        @SerialName("CustomerName")
+        var customerName: String? = ""
+        @SerialName("AgentAccountName")
+        var agentAccountName: String = ""
+        @SerialName("Date")
+        var date: String? = ""
+        @SerialName("RRN")
+        var rrn: String? = ""
+        @SerialName("ExpectedAmount")
+        var expectedAmount: Double = 0.00
+        @SerialName("AgentAccount")
+        var agentAccount : String = ""
+    }
+}

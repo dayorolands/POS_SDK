@@ -147,6 +147,17 @@ fun ProfileScreen(
             }
         }
 
+        ///TODO : Ensure to remove this part of the code
+        item {
+            NavigationRow(
+                title = stringResource(R.string.reports),
+                imageVector = Icons.Outlined.ReceiptLong,
+                onClick = {
+                    context.startActivity(Intent(context, ReportActivity::class.java))
+                }
+            )
+        }
+
         if(returnedList != null) {
             if (returnedList.contains("RPT")) {
                 item {

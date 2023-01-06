@@ -4,6 +4,7 @@ import com.cluster.core.data.response.BackendResponse
 import com.cluster.core.data.response.BackendResponseContract
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.*
 
 @Serializable
 data class GetFee(
@@ -28,7 +29,7 @@ data class ConfirmStatusResponse(
     @SerialName("AmountExpected")
     val amountExpected : Double? = 0.0,
     @SerialName("AmountPaid")
-    val amountPaid : Double? = 0.0
+    val amountPaid : Double? = 0.0,
 )
 
 @Serializable

@@ -329,6 +329,44 @@ fun posCashoutReceipt(
     footer(context)
 }
 
+fun payWithTransferReceipt(
+    context: Context,
+    request: PWTReceiptRequest,
+    isSuccessful: Boolean = false,
+    reason: String? = null,
+    responseCode: String?
+) = printJob{
+
+    logo()
+    text(
+        text = "PAY WITH TRANSFER",
+        align = Alignment.MIDDLE,
+        fontSize = 35,
+    )
+    text(
+        """
+        |Agent Code: ${context.localStorage.agent?.agentCode}
+        |Agent Phone: ${request.agentPhoneNumber}
+        |--------------------------
+        |Expected Amount: NGN${request.expectedAmount}
+        |Received Amount: NGN${request.amountReceived}
+        |Customer Name: ${request.customerName}
+        |Customer Account Number: ${request.customerAcctNumber}
+        |Virtual Account : ${request.virtualAccountNumber}
+        |Transaction Date: ${request.date?.replace("T", " ")}
+        |Narration: ${request.narration}
+        |RRN: ${request.rrn}
+        """.trimMargin()
+    )
+    transactionStatus(
+        context = context,
+        isSuccessful = isSuccessful,
+        responseCode = responseCode!!,
+        reason = reason,
+    )
+    footer(context)
+}
+
 fun fundsTransferReceipt(
     context: Context,
     request: FundsTransferRequest,

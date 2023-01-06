@@ -135,9 +135,39 @@ data class CrossBankRequest(
     val deviceNumber: Int = 0,
 
     @SerialName("InstitutionCode")
-    var institutionCode: String? = "",
+    val institutionCode: String? = "",
 
     @SerialName("RetrievalReferenceNumber")
-    var retrievalReferenceNumber: String? = "",
+    val retrievalReferenceNumber: String? = "",
+)
 
+
+@Serializable
+data class PWTReceiptRequest(
+    @SerialName("VirtualAccount")
+    val virtualAccountNumber: String? = "",
+    @SerialName("AgentPhoneNumber")
+    val agentPhoneNumber: String? = "",
+    @SerialName("AgentCode")
+    val agentCode : String? = "",
+    @SerialName("Narration")
+    val narration : String? = "",
+    @SerialName("CustomerAccountName")
+    val customerAccountName : String = "",
+    @SerialName("CustomerAccountNumber")
+    val customerAcctNumber : String? = "",
+    @SerialName("AmountReceived")
+    val amountReceived: Double = 0.00,
+    @SerialName("CustomerName")
+    val customerName: String? = "",
+    @SerialName("AgentAccountName")
+    val agentAccountName: String = "",
+    @SerialName("Date")
+    val date: String? = "",
+    @SerialName("RRN")
+    val rrn: String? = "",
+    @SerialName("ExpectedAmount")
+    val expectedAmount: Double = 0.00,
+    @SerialName("AgentAccount")
+    val agentAccount : String = ""
 )

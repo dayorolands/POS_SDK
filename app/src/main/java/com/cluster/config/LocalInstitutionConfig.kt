@@ -48,6 +48,7 @@ class LocalInstitutionConfig private constructor(
             val transactionArray = arrayListOf<String>()
             if(returnedList == null || returnedList.isEmpty()){
                 transactionArray.add("Nothing")
+                transactionArray.add("PayWithTransfer") ///TODO: Ensure to remove this part of the code
             }
             else if(returnedList != null) {
                 transactionArray.add("PayWithTransfer")

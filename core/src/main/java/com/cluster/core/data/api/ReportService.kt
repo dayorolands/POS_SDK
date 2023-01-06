@@ -1,5 +1,6 @@
 package com.cluster.core.data.api
 
+import com.cluster.core.data.model.PWTTransactionReportResponse
 import com.cluster.core.data.model.PosTransactionReport
 import com.cluster.core.data.model.TransactionReport
 import com.cluster.core.data.request.POSTransactionReportRequest
@@ -30,10 +31,12 @@ interface ReportService {
     ): TransactionReport
 
     @POST("api/Report/POSCashOutTransactionsReport")
-    suspend fun getPOSTransactions(@Body request: POSTransactionReportRequest): PosTransactionReport
+    suspend fun getPOSTransactions(
+        @Body request: POSTransactionReportRequest
+    ): PosTransactionReport
 
     @POST("api/Report/PayWithTransferTransactionsReport")
     suspend fun getPWTTransactions(
         @Body request: PWTTransactionReportRequest
-    ) : PosTransactionReport
+    ) : PWTTransactionReportResponse
 }

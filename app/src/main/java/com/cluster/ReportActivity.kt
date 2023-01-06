@@ -181,8 +181,8 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
                 response ?: return dialogProvider.showInternalError()
 
                 binding.content.totalCountContentTv.text = response.totalCount.toString()
-                binding.content.totalVolumeContentTv.text = response.totalAmount.toCurrencyFormat()
-                pwtReportAdapter.setData(response.reports?.toList())
+                binding.content.totalVolumeContentTv.text = "--"
+                pwtReportAdapter.setData(response.payWithTransferReport?.toList())
             }
 
             TransactionType.POSCashOut -> {
@@ -242,7 +242,10 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
         if(selectedTransactionType == TransactionType.PayWithTransfer){
             pwtReportAdapter = PWTReportAdapter(emptyList())
             binding.content.container.adapter = pwtReportAdapter
-            pwtReportAdapter.setOnPrintClickListener { item, type ->
+            pwtReportAdapter.setOnPrintClickListener { item ->
+                mainScope.launch {
+                    printPayWithTransferReceipt(item)
+                }
             }
         }
         else if (selectedTransactionType == TransactionType.POSCashOut) {
@@ -267,6 +270,44 @@ class ReportActivity : CreditClubActivity(R.layout.activity_report) {
             }
         }
     }
+
+    private suspend fun printPayWithTransferReceipt(item: PWTTransactionReportResponse.PayWithTransferReport){
+        val pwtReceiptRequest = PWTReceiptRequest(
+            virtualAccountNumber = item.virtualAccountNumber,
+            agentPhoneNumber = item.agentPhoneNumber,
+            agentCode = item.agentCode,
+            narration = item.narration,
+            customerAccountName = item.customerAccountName,
+            customerAcctNumber = item.customerAcctNumber,
+            amountReceived = item.amountReceived,
+            customerName = item.customerName,
+            agentAccount = item.agentAccount,
+            agentAccountName = item.agentAccountName,
+            date = item.date,
+            rrn = item.rrn,
+            expectedAmount = item.expectedAmount
+        )
+        val responseCode =  when(selectedTransactionStatus) {
+            TransactionStatus.Successful -> "00"
+            TransactionStatus.Failed -> "06"
+            TransactionStatus.Pending -> "24"
+            TransactionStatus.NotFound -> "XX"
+            else -> {
+                "06"
+            }
+        }
+
+        posPrinter.print(
+            payWithTransferReceipt(
+                context = this,
+                request = pwtReceiptRequest,
+                isSuccessful = selectedTransactionStatus == TransactionStatus.Successful,
+                reason = selectedTransactionStatus.label,
+                responseCode = responseCode
+            )
+        )
+    }
+
 
     private suspend fun printPosCashoutReceipt(item: PosTransactionReport.Report, type: TransactionType){
         when(type) {

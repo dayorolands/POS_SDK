@@ -13,6 +13,9 @@
     <string name="institution_code">Institution Code</string>
     <string name="customer_account_number">Customer Account Number</string>
     <string name="amount">Amount</string>
+    <string name="expectedAmount">Expected Amount</string>
+    <string name="receivedAmount">Received Amount</string>
+    <string name="customerName">Customer Name</string>
     <string name="agent_pin">Agent PIN</string>
     <string name="DATA_SOURCE" translatable="false">Credit_Club_Offline_Data_Source</string>
     <string name="APP_DATA_SOURCE" translatable="false">Credit_Club_App_Data_Source</string>
