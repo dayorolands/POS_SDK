@@ -1,4 +1,4 @@
-package com.cluster.pos.providers.sunmi.utils;
+package com.creditclub.pos.providers.sunmi.utils;
 
 import java.math.BigInteger;
 import java.util.Arrays;

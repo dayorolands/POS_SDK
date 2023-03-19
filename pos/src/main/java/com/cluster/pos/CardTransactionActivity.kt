@@ -85,27 +85,11 @@ abstract class CardTransactionActivity : PosActivity() {
     abstract fun onPosReady()
 
     private fun checkParameters() {
-        val noKeysPresent = posParameter.pinKey.isEmpty()
-                || posParameter.masterKey.isEmpty()
-                || posParameter.sessionKey.isEmpty()
-
-        when {
-            noKeysPresent -> {
-                finishWithError("Please perform key download before proceeding")
-                return
-            }
-            posParameter.managementDataString.isEmpty() -> {
-                finishWithError("Please perform parameter download before proceeding")
-                return
-            }
-            else -> {
-                sessionData.getDukptConfig = { pan, amount ->
-                    posPreferences.binRoutes?.getSupportedRoute(pan, amount)?.dukptConfig
-                }
-                sessionData.getPosParameter = ::getPosParameter
-                onPosReady()
-            }
+        sessionData.getDukptConfig = { pan, amount ->
+            posPreferences.binRoutes?.getSupportedRoute(pan, amount)?.dukptConfig
         }
+        sessionData.getPosParameter = ::getPosParameter
+        onPosReady()
     }
 
     private fun finishWithError(message: String) {
@@ -154,18 +138,10 @@ abstract class CardTransactionActivity : PosActivity() {
                 else -> {
                     viewModel.cardReaderEvent.value = cardEvent
                     restartTimer()
-//                            accountType = AccountType.Default
-//                            onSelectAccountType()
 
                     showSelectAccountScreen { accountType ->
                         viewModel.accountType.value = accountType
                         onSelectAccountType()
-                    }
-
-                    if (cardEvent == CardReaderEvent.CHIP) {
-                        mainScope.launch {
-                            posManager.cardReader.onRemoveCard { finish() }
-                        }
                     }
                 }
             }
@@ -206,7 +182,7 @@ abstract class CardTransactionActivity : PosActivity() {
         stopTimer()
         posManager.sessionData.amount = viewModel.longAmount.value!!
 
-        val cardLimit: Double = localStorage.agent?.cardLimit ?: 50000.0
+        val cardLimit= 50000.0
         if (cardLimit < posManager.sessionData.amount / 100) {
             showError("The limit for this transaction is NGN${cardLimit}")
             return
@@ -239,24 +215,7 @@ abstract class CardTransactionActivity : PosActivity() {
                         return@launch
                     }
 
-                    if (cardData.pinBlock.isBlank()) {
-                        dialogProvider.hideProgressBar()
-                        renderTransactionFailure("Could not validate PIN")
-                        return@launch
-                    }
-
                     val route = getSupportedRoute(cardData.pan, viewModel.amount.value!!)
-                    Log.d("Result", "Just here to check the route ${route.id}")
-                    Log.d("Result", "Just here to check the route ${route.host}")
-                    Log.d("Result", "Just here to check the route ${route.dukptConfig}")
-                    Log.d("Result", "Just here to check the route ${route.key1}")
-                    Log.d("Result", "Just here to check the route ${route.key2}")
-                    Log.d("Result", "Just here to check the route ${route.label}")
-                    Log.d("Result", "Just here to check the route ${route.nodeName}")
-                    Log.d("Result", "Just here to check the route ${route.port}")
-                    Log.d("Result", "Just here to check the route ${route.requeryConfig}")
-                    Log.d("Result", "Just here to check the route ${route.sslEnabled}")
-                    Log.d("Result", "Just here to check the route ${route.timeout}")
                     if (route == InvalidRemoteConnectionInfo) {
                         dialogProvider.hideProgressBar()
                         renderTransactionFailure("No supported route for this card/amount combination")
@@ -325,8 +284,7 @@ abstract class CardTransactionActivity : PosActivity() {
         val amount = request.transactionAmount4?.toDoubleOrNull()?.div(100)
         val posTransaction = PosTransaction.create(
             isoMsg = request,
-            institutionCode = localStorage.institutionCode!!,
-            agent = localStorage.agent!!,
+            institutionCode = "100616",
             appName = "${getString(R.string.app_name)} ${appConfig.versionName}",
             ptsp = getString(R.string.ptsp_name),
             website = getString(R.string.institution_website),
@@ -344,11 +302,6 @@ abstract class CardTransactionActivity : PosActivity() {
 
         dialogProvider.showProgressBar("Receiving...")
         callHomeService.stopCallHomeTimer()
-        // Log transaction before making request
-        withContext(Dispatchers.IO) {
-            val posTransactionId = posDatabase.posTransactionDao().save(posTransaction)
-            posTransaction.apply { id = posTransactionId.toInt() }
-        }
 
         val requeryConfig = remoteConnectionInfo.requeryConfig
         val (response, error) = withContext(Dispatchers.IO) {
@@ -366,24 +319,14 @@ abstract class CardTransactionActivity : PosActivity() {
         try {
             callHomeService.startCallHomeTimer()
 
-            if (error != null) {
-                firebaseCrashlytics.recordException(error)
-            }
-
             if (response == null) {
                 showTransactionStatusPage(posTransaction)
-
-                // Routes currently only support either Requery or Reversal but not both
-                if (requeryConfig == null) {
-                    attemptReversal(isoSocketHelper, request)
-                }
 
                 val receipt = posReceipt(
                     posTransaction = posTransaction,
                     isCustomerCopy = true,
                 )
-                printer.printAsync(receipt)
-
+                printer.print(receipt)
                 return@launch
             }
 
@@ -395,36 +338,12 @@ abstract class CardTransactionActivity : PosActivity() {
 
             response.set(4, request.transactionAmount4)
 
-            val transaction = FinancialTransaction(response, cardType = cardType).apply {
-                createdAt = Instant.now()
-                cardHolder = cardData.holder
-                aid = cardData.aid
-                nodeName = remoteConnectionInfo.nodeName
-                if (remoteConnectionInfo is ConnectionInfo) {
-                    connectionInfo = remoteConnectionInfo
-                }
-            }
-
-            withContext(Dispatchers.IO) {
-                posDatabase.runInTransaction {
-                    posDatabase.financialTransactionDao().save(transaction)
-                    posTransaction.responseCode = response.responseCode39
-                    posDatabase.posTransactionDao().save(posTransaction)
-                }
-            }
 
             if (response.isSuccessful) {
-                handleSettlement(
-                    remoteConnectionInfo = remoteConnectionInfo,
-                    transaction = transaction,
-                )
                 if (transactionType == TransactionType.Balance) {
                     val additionalAmount = response.additionalAmounts54?.substring(8,20)
-                    Log.d("System.out", "Here to check the additional amount ${additionalAmount}")
                     val amountDouble = additionalAmount?.toDoubleOrNull()?.div(100)
-                    Log.d("System.out", "Here to check the amount double ${amountDouble}")
                     posTransaction.amount = amountDouble?.toCurrencyFormat() ?: "NGN0.00"
-                    Log.d("System.out", "Here to check the posTransaction amount ${posTransaction.amount}")
                 }
             }
 
@@ -433,14 +352,11 @@ abstract class CardTransactionActivity : PosActivity() {
                 posTransaction = posTransaction,
                 isCustomerCopy = true
             )
-            printer.printAsync(receipt)
+            printer.print(receipt)
         } catch (ex: Exception) {
             showTransactionStatusPage(posTransaction)
             firebaseCrashlytics.recordException(ex)
             debugOnly { Log.e("CardTrans", ex.message, ex) }
-            if (request.mti == "0200") {
-                attemptReversal(isoSocketHelper, request)
-            }
         } finally {
             dialogProvider.hideProgressBar()
         }
@@ -493,89 +409,6 @@ abstract class CardTransactionActivity : PosActivity() {
         }
 
         return result
-    }
-
-    private suspend fun handleSettlement(
-        remoteConnectionInfo: RemoteConnectionInfo,
-        transaction: FinancialTransaction,
-    ) {
-        when (transactionType) {
-            TransactionType.Purchase,
-            TransactionType.CashAdvance,
-            TransactionType.CashBack,
-            TransactionType.PreAuth,
-            TransactionType.SalesComplete,
-            -> {
-                val posNotification = PosNotification.create(transaction)
-                posNotification.terminalId = config.terminalId
-                posNotification.nodeName = remoteConnectionInfo.nodeName
-                if (remoteConnectionInfo is ConnectionInfo) {
-                    posNotification.connectionInfo = remoteConnectionInfo
-                }
-                withContext(Dispatchers.IO) {
-                    posDatabase.posNotificationDao().save(posNotification)
-                }
-                posApiService.logPosNotification(
-                    posDatabase,
-                    appConfig,
-                    posConfig,
-                    posNotification
-                )
-            }
-            else -> {
-
-            }
-        }
-    }
-
-    private suspend fun attemptReversal(isoSocketHelper: IsoSocketHelper, request: ISOMsg) {
-        if (request.mti != "0200") {
-            return
-        }
-
-        runOnUiThread {
-            dialogProvider.showProgressBar("Transmission Error \nReversing...")
-        }
-
-        withContext(Dispatchers.IO) {
-            delay(1000)
-
-            val reversal = request.generateReversal(cardData).apply {
-                processingCode3 = processingCode("00")
-                messageReasonCode56 = "4021"
-                applyManagementData(isoSocketHelper.parameters.managementData)
-            }
-
-            val success = isoSocketHelper.attempt(
-                request = reversal,
-                maxAttempts = 4,
-            ) {
-                runOnUiThread {
-                    dialogProvider.showProgressBar("Reversing...$it")
-                }
-
-                delay(1000)
-
-                reversal.mti = "0421"
-            }
-
-            if (!success) {
-                val reversalRecord = Reversal(
-                    isoMsg = reversal,
-                    cardType = cardTransactionType(request).type,
-                ).apply {
-                    nodeName = isoSocketHelper.remoteConnectionInfo.nodeName
-                    if (isoSocketHelper.remoteConnectionInfo is ConnectionInfo) {
-                        connectionInfo = isoSocketHelper.remoteConnectionInfo
-                    }
-                }
-                posDatabase.reversalDao().save(reversalRecord)
-            }
-        }
-
-        runOnUiThread {
-            dialogProvider.hideProgressBar()
-        }
     }
 
     fun processingCode(code: String) = "$code${viewModel.accountType.value?.code ?: "00"}00"

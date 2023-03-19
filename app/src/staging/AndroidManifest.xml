@@ -4,5 +4,8 @@
 
     <application
         android:debuggable="true"
-        tools:ignore="HardCodedDebugMode" />
+        tools:ignore="HardCodedDebugMode"
+        tools:replace="android:allowBackup"
+        android:allowBackup="true"
+        />
 </manifest>

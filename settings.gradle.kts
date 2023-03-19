@@ -9,10 +9,9 @@ include(":uicentral")
 include(":pos", ":poscore")
 
 // EMV Card Modules
-include(":wizar", ":wizar_cloudpos_sdk")
-include(":dspread")
-include(":nexgo", ":nexgo_smartpos_sdk")
-include(":telpo")
+//include(":dspread")
+include(":sunmi")
+include(":horizonpay")
 
 buildCache {
     local {

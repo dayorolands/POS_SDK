@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="online_functions_enabled">true</bool>
+    <bool name="hla_enabled">false</bool>
+    <string-array name="customer_request_options">
+        <item>1,Phone Number</item>
+        <item>2,Account Number</item>
+    </string-array>
+    <bool name="category_loan">false</bool>
+    <bool name="flow_get_a_loan">true</bool>
+    <bool name="category_subscriptions">true</bool>
+    <bool name="account_opening_products">false</bool>
+    <bool name="bill_payment_enabled">true</bool>
+    <bool name="flow_account_opening">false</bool>
+    <bool name="flow_airtime">true</bool>
+    <bool name="flow_token_withdrawal">true</bool>
+    <bool name="flow_customer_balance">false</bool>
+    <bool name="category_customer">false</bool>
+</resources>

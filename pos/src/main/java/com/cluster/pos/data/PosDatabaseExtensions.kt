@@ -9,7 +9,6 @@ import org.jpos.iso.ISOMsg
 
 fun PosTransaction.Companion.create(
     isoMsg: ISOMsg,
-    agent: AgentInfo,
     institutionCode: String,
     appName: String,
     ptsp: String,
@@ -25,9 +24,6 @@ fun PosTransaction.Companion.create(
 
     return PosTransaction(
         institutionCode = institutionCode,
-        agentPhoneNumber = agent.phoneNumber,
-        agentName = agent.agentName,
-        agentCode = agent.agentCode,
         appName = appName,
         ptsp = ptsp,
         website = website,

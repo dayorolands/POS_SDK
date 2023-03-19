@@ -14,13 +14,16 @@ import com.cluster.core.data.api.RequestFailureInterceptor
 import com.cluster.core.data.api.getRetrofitService
 import com.cluster.core.data.prefs.AppDataStorage
 import com.cluster.core.data.prefs.LocalStorage
+import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.debugOnly
 import com.cluster.pos.Platform
+import com.cluster.pos.PosManager
 import com.cluster.pos.printer.PosPrinter
 import com.cluster.receipt.PdfPrinter
 import com.cluster.ui.CreditClubDialogProvider
 import com.cluster.work.*
+import com.orda.horizonpay.HorizonPosManager
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -107,6 +110,9 @@ val uiModule = module {
     factory<DialogProvider> { (context: Context) ->
         CreditClubDialogProvider(context)
     }
+    factory<PosManager> { (activity: CreditClubActivity) ->
+        HorizonPosManager(activity)
+    }
 }
 
 val configModule = module {
@@ -136,6 +142,12 @@ val sharingModule = module {
         PdfPrinter(context, dialogProvider, get())
     }
 }
+
+//val parameterModule = module {
+//    factory<PosManager> { (activity: CreditClubActivity) ->
+//        SunmiPosManager(activity = activity)
+//    }
+//}
 
 val workerModule = module {
     worker { (workerParams: WorkerParameters) ->

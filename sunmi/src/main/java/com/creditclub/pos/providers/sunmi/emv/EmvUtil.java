@@ -1,7 +1,7 @@
-package com.cluster.pos.providers.sunmi.emv;
+package com.creditclub.pos.providers.sunmi.emv;
 
-import com.cluster.pos.providers.sunmi.utils.ByteUtil;
-import com.cluster.pos.providers.sunmi.utils.LogUtil;
+import com.creditclub.pos.providers.sunmi.utils.ByteUtil;
+import com.creditclub.pos.providers.sunmi.utils.LogUtil;
 import com.sunmi.pay.hardware.aidlv2.AidlConstantsV2;
 import com.sunmi.pay.hardware.aidlv2.bean.AidV2;
 import com.sunmi.pay.hardware.aidlv2.bean.CapkV2;
@@ -31,17 +31,17 @@ public final class EmvUtil {
     public static Map<String, String> getConfig(String country) {
         Map<String, String> map = new HashMap<>();
         map.put("countryCode", "0156");//country code(国家代码)
-        map.put("capability", "E0F8C8");//capability(终端性能)
+        map.put("capability", "E0F0C8");//capability(终端性能)
         map.put("5F2A", "0156");//transaction currency code(交易货币代码)
         map.put("5F36", "00");//transaction currency code exponent(交易货币代码指数)
         if (COUNTRY_RUSSIA.equalsIgnoreCase(country)) {
             map.put("countryCode", "0643");
-            map.put("capability", "E0F8C8");
+            map.put("capability", "E0F0C8");
             map.put("5F2A", "0643");
             map.put("5F36", "00");
         } else if (COUNTRY_INDIA.equalsIgnoreCase(country)) {
             map.put("countryCode", "0356");
-            map.put("capability", "E0F8C8");
+            map.put("capability", "E0F0C8");
             map.put("5F2A", "0356");
             map.put("5F36", "02");
         }

@@ -1,4 +1,4 @@
-package com.cluster.pos.providers.sunmi
+package com.creditclub.pos.providers.sunmi
 
 import android.content.Context
 import android.content.Intent
@@ -16,12 +16,13 @@ import com.cluster.pos.card.CardReader
 import com.cluster.pos.extensions.*
 import com.cluster.pos.printer.MockPosPrinter
 import com.cluster.pos.printer.PosPrinter
-import com.cluster.pos.providers.sunmi.emv.EmvUtil
+import com.creditclub.pos.providers.sunmi.emv.EmvUtil
 import com.sunmi.pay.hardware.aidlv2.bean.AidV2
 import com.sunmi.pay.hardware.aidlv2.bean.CapkV2
 import com.sunmi.pay.hardware.aidlv2.bean.EmvTermParamV2
 import com.sunmi.pay.hardware.aidlv2.emv.EMVOptV2
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -32,10 +33,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 04/12/2019.
- * Appzone Ltd
- */
 class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, KoinComponent {
     private val payKernel: SunmiPayKernel = SunmiPayKernel.getInstance()
     private var isConnected = false
@@ -51,11 +48,14 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
     override val sessionData = PosManager.SessionData()
 
     override suspend fun loadEmv() {
-        withContext(Dispatchers.IO) {
+        Log.d("SunmiPayKernel", "onEnterLoadEMV")
+        delay(3000)
+        withContext(Dispatchers.Main) {
             suspendCoroutine<Unit> { continuation ->
                 payKernel.initPaySDK(activity, object : ConnectCallback {
                     override fun onConnectPaySDK() {
-                        Log.d("SunmiPosManager", "onConnectPaySDK")
+                        Log.d("SunmiPayKernel", "onConnectPaySDK")
+                        Log.d("SunmiPayKernel", "CheckSunmiDevice")
 
                         val emvOptV2 = payKernel.mEMVOptV2
                         payKernel.mBasicOptV2
@@ -72,7 +72,7 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
 
                         val emvTermParam = EmvTermParamV2().apply {
                             countryCode = "0566"
-                            capability = "E040C8"
+                            capability = "E0F0C8"
                         }
                         val result: Int = emvOptV2.setTerminalParam(emvTermParam)
                         debug("Sunmi setTerminalParam result is $result")
@@ -80,7 +80,7 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
                     }
 
                     override fun onDisconnectPaySDK() {
-                        Log.e("SunmiPosManager", "onDisconnectPaySDK")
+                        Log.e("SunmiPayKernel", "onDisconnectPaySDK")
                         isConnected = false
                         activity.finish()
                     }
@@ -154,7 +154,7 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
                 SunmiPosManager(activity)
             }
             factory<PosPrinter> { (context: Context, dialogProvider: DialogProvider) ->
-                MockPosPrinter(
+                SunmiPrinter(
                     context,
                     dialogProvider
                 )
@@ -176,5 +176,7 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
         override fun setup(context: Context) {
 
         }
+
+
     }
 }

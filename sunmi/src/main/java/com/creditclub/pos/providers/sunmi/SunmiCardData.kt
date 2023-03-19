@@ -1,4 +1,4 @@
-package com.cluster.pos.providers.sunmi
+package com.creditclub.pos.providers.sunmi
 
 import com.cluster.pos.card.CardData
 

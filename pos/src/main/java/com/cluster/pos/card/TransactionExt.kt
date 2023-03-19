@@ -1,5 +1,6 @@
 package com.cluster.pos.card
 
+import android.util.Log
 import com.cluster.pos.PosParameter
 import com.cluster.pos.extension.*
 import com.cluster.pos.util.ISO87Packager
@@ -39,6 +40,7 @@ fun ISOMsg.applyCardData(data: CardData): ISOMsg = apply {
     retrievalReferenceNumber37 = rrnString
     serviceRestrictionCode40 = data.src
     iccData55 = data.iccString
+    Log.d("CheckingCryptogram","Checking the ICC Data: $iccData55")
     if (data.pinBlock.isNotBlank()) {
         pinData = data.pinBlock
     }

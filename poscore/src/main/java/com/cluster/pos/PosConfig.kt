@@ -38,7 +38,9 @@ interface RequeryConfig {
 
 interface DukptConfig {
     val ipek: String
+        get() = "3F2216D8297BCE9C"
     val ksn: String
+        get() = "0000000002DDDDE00001"
 }
 
 object InvalidRemoteConnectionInfo : RemoteConnectionInfo {

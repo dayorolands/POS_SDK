@@ -1,11 +1,11 @@
-package com.cluster.pos.providers.sunmi.emv;
+package com.creditclub.pos.providers.sunmi.emv;
 
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.cluster.pos.providers.sunmi.tuple.Tuple;
-import com.cluster.pos.providers.sunmi.tuple.TupleUtil;
-import com.cluster.pos.providers.sunmi.utils.ByteUtil;
+import com.creditclub.pos.providers.sunmi.tuple.Tuple;
+import com.creditclub.pos.providers.sunmi.tuple.TupleUtil;
+import com.creditclub.pos.providers.sunmi.utils.ByteUtil;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

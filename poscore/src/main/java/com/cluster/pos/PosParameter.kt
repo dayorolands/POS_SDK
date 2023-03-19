@@ -2,8 +2,8 @@ package com.cluster.pos
 
 import org.json.JSONArray
 
-const val DEFAULT_TRANSACTION_CURRENCY_CODE = "556"
-const val DEFAULT_TERMINAL_COUNTRY_CODE = "556"
+const val DEFAULT_TRANSACTION_CURRENCY_CODE = "566"
+const val DEFAULT_TERMINAL_COUNTRY_CODE = "566"
 
 interface PosParameter {
     var masterKey: String

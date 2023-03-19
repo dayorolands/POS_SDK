@@ -1,5 +1,6 @@
 package com.cluster.pos.extensions
 
+import android.text.TextUtils
 import java.util.*
 
 fun stringToHexBytes(dataString: String): ByteArray {

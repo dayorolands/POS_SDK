@@ -1,5 +1,6 @@
-package com.cluster.pos.providers.sunmi
+package com.creditclub.pos.providers.sunmi
 
+import com.cluster.pos.BuildConfig
 import com.cluster.pos.PosManagerCompanion
 import com.cluster.pos.PosManagerProvider
 

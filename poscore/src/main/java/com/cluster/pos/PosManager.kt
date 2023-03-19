@@ -25,6 +25,12 @@ interface PosManager {
         open var getDukptConfig: PanAmountFunction<DukptConfig?>? = null
         open var getPosParameter: PanAmountFunction<PosParameter?>? = null
     }
+
+    companion object {
+        const val IPEK = "3F2216D8297BCE9C"
+        const val KSN = "0000000002DDDDE00001"
+        const val KsnCounter = "0"
+    }
 }
 
 interface PosManagerCompanion {

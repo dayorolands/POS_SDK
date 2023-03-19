@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: "kotlin-kapt"
 
 android {
     compileSdkVersion versions.compileSdk
@@ -9,13 +10,23 @@ android {
         targetSdkVersion versions.tagetSdk
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'proguard-rules.pro'
     }
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
-    }
+//    repositories {
+//        flatDir {
+//            dirs 'libs'
+//        }
+//    }
+//    sourceSets {
+//        main {
+//            java.srcDirs = ['libs']
+//            java.srcDirs = [
+//                    "src/main/java"
+//            ]
+//        }
+//    }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
@@ -26,9 +37,18 @@ android {
 
 dependencies {
     implementation project(path: ':core')
-    implementation project(path: ':paylib')
     implementation project(path: ':poscore')
-    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation project(path: ':pos')
+    implementation project(path: ':uicentral')
+    implementation('com.sunmi:sunmiui:1.1.27')
+    implementation('com.sunmi:printerlibrary:1.0.7')
+    implementation fileTree(dir: 'jniLibs', include: ['*.so'])
+    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+    //debugImplementation files("libs/PayLib-release-1.4.65.aar")
+    //debugImplementation files("libs/jbig-android-release.aar")
+    //implementation('com.sunmi:printerlibrary:1.0.15')
+    implementation 'com.google.zxing:core:3.3.3'
+    implementation 'org.greenrobot:greendao:3.2.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
     implementation "androidx.core:core-ktx:${versions.coreKtx}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"

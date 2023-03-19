@@ -1,7 +1,8 @@
-package com.cluster.pos.providers.sunmi
+package com.creditclub.pos.providers.sunmi
 
 import android.os.Bundle
 import android.os.RemoteException
+import android.util.Log
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.util.debug
 import com.cluster.core.util.safeRun
@@ -11,6 +12,7 @@ import com.cluster.pos.card.CardReader
 import com.cluster.pos.card.CardReaderEvent
 import com.cluster.pos.card.CardReaderEventListener
 import com.sunmi.pay.hardware.aidl.AidlConstants
+import com.sunmi.pay.hardware.aidlv2.AidlConstantsV2
 import com.sunmi.pay.hardware.aidlv2.bean.EMVTransDataV2
 import com.sunmi.pay.hardware.aidlv2.readcard.CheckCardCallbackV2
 import kotlinx.coroutines.Dispatchers
@@ -21,17 +23,11 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 03/12/2019.
- * Appzone Ltd
- */
 class SunmiCardReader(
     private val activity: CreditClubActivity,
     private val kernel: SunmiPayKernel,
     private val sessionData: PosManager.SessionData,
-) :
-    CardReader,
-    KoinComponent {
+) : CardReader, KoinComponent {
     private var cardReader = kernel.mReadCardOptV2
     private var emv = kernel.mEMVOptV2
     private val dialogProvider = activity.dialogProvider
@@ -54,10 +50,10 @@ class SunmiCardReader(
         }
         emv.initEmvProcess()
         updateCardWaitingProgress("Insert or swipe card")
-        cardReaderEvent = withContext(Dispatchers.IO) { detectCard() }
-
+        cardReaderEvent = withContext(Dispatchers.Unconfined) {
+            detectCard()
+        }
         dialogProvider.hideProgressBar()
-
         return cardReaderEvent
     }
 
@@ -70,7 +66,7 @@ class SunmiCardReader(
                 }
             }
             val emvListener = SunmiEmvListener(activity, kernel, sessionData, continuation)
-            emv.setTlv(AidlConstants.EMV.TLVOpCode.OP_NORMAL, "9F33", "E040C8")
+            emv.setTlv(AidlConstants.EMV.TLVOpCode.OP_NORMAL, "9F33", "E0F0C8")
 
             val emvTransData = EMVTransDataV2()
             emvTransData.amount = sessionData.amount.toString()
@@ -87,19 +83,11 @@ class SunmiCardReader(
     }
 
     override suspend fun onRemoveCard(onEventChange: CardReaderEventListener) {
-//        withContext(Dispatchers.IO) {
-//            while (true) {
-//                if (userCancel) break
-//                if (isSessionOver) break
-//                if (cardReader.getCardExistStatus(AidlConstants.CardType.IC.value) != 2) break
-//            }
-//        }
-//
-//        if (!userCancel && !isSessionOver) {
-//            userCancel = true
-//            deviceClose()
-//            onEventChange(CardReaderEvent.REMOVED)
-//        }
+        if (!userCancel && !isSessionOver) {
+            userCancel = true
+            deviceClose()
+            onEventChange(CardReaderEvent.REMOVED)
+        }
     }
 
     private fun updateCardWaitingProgress(text: String = "Please insert card") {
@@ -114,7 +102,7 @@ class SunmiCardReader(
 
     private fun deviceClose() {
         safeRun { cardReader.cancelCheckCard() }
-//        cardReader.cardOff(allowedCardType)
+        //cardReader.cardOff(allowedCardType)
     }
 
     private suspend fun detectCard(): CardReaderEvent {
@@ -125,21 +113,21 @@ class SunmiCardReader(
             if (userCancel) {
                 return CardReaderEvent.CANCELLED
             }
-
+            initEmvTlvData()
             val ret = checkCard(allowedCardType, 60)
 
             if (ret == CardReaderEvent.MAG_STRIPE) {
                 if (!chipFailure) {
                     hybridDetected = true
-
                     updateCardWaitingProgress("Card is chip card. Please Insert Card")
-                } else return CardReaderEvent.MAG_STRIPE
-            } else if (ret == CardReaderEvent.CHIP) {
-                val powerOn = true//powerOnIcc()
+                }
+                else
+                    return CardReaderEvent.MAG_STRIPE
+            }
+            else if (ret == CardReaderEvent.CHIP) {
+                val powerOn = true //powerOnIcc()
 
                 if (powerOn) return CardReaderEvent.CHIP
-
-//                    hybridDetected = true
 
                 if (!powerOn && !hybridDetected) {
                     return CardReaderEvent.CHIP_FAILURE
@@ -149,6 +137,61 @@ class SunmiCardReader(
 
                 updateCardWaitingProgress("ICC Failure. Please Swipe Card")
             }
+        }
+    }
+
+    /**
+     * Set tlv essential tlv data
+     */
+    private fun initEmvTlvData() {
+        try {
+            // set PayPass(MasterCard) tlv data
+            val tagsPayPass = arrayOf(
+                "DF8117", "DF8118", "DF8119", "DF811F", "DF811E", "DF812C",
+                "DF8123", "DF8124", "DF8125", "DF8126",
+                "DF811B", "DF811D", "DF8122", "DF8120", "DF8121"
+            )
+            val valuesPayPass = arrayOf(
+                "E0", "F8", "F8", "E8", "00", "00",
+                "000000000000", "000000100000", "999999999999", "000000100000",
+                "30", "02", "0000000000", "000000000000", "000000000000"
+            )
+            emv.setTlvList(
+                AidlConstants.EMV.TLVOpCode.OP_PAYPASS,
+                tagsPayPass,
+                valuesPayPass
+            )
+
+            //set Visa tlv data
+            val tagsPayWave = arrayOf(
+                "DF8124", "DF8125", "DF8126"
+            )
+            val valuesPayWave = arrayOf(
+                "999999999999", "999999999999", "000000000000"
+            )
+            emv.setTlvList(
+                AidlConstants.EMV.TLVOpCode.OP_PAYWAVE,
+                tagsPayWave,
+                valuesPayWave
+            )
+
+            // set AMEX(AmericanExpress) tlv data
+            val tagsAE = arrayOf(
+                "9F6D", "9F6E", "9F33", "9F35",
+                "DF8168", "DF8167", "DF8169", "DF8170"
+                )
+            val valuesAE = arrayOf(
+                "C0", "D8E00000", "E0E888",
+                "22", "00", "00", "00", "60"
+            )
+            emv.setTlvList(AidlConstants.EMV.TLVOpCode.OP_AE, tagsAE, valuesAE)
+
+            //set JCB tlv data
+            val tagsJCB = arrayOf("9F53", "DF8161")
+            val valuesJCB = arrayOf("708000", "7F00")
+            emv.setTlvList(AidlConstants.EMV.TLVOpCode.OP_JCB, tagsJCB, valuesJCB)
+        } catch (e: RemoteException) {
+            e.printStackTrace()
         }
     }
 
@@ -166,22 +209,38 @@ class SunmiCardReader(
                 override fun findICCard(atr: String) {
                     debug("findICCard:$atr")
                     selectedCardType = AidlConstants.CardType.IC.value
-                    it.resume(CardReaderEvent.CHIP)
                 }
 
                 @Throws(RemoteException::class)
                 override fun findRFCard(uuid: String) {
                     debug("findRFCard:$uuid")
                     selectedCardType = AidlConstants.CardType.NFC.value
-                    it.resume(CardReaderEvent.NFC)
                 }
 
                 @Throws(RemoteException::class)
                 override fun onError(code: Int, message: String) {
                     safeRun { throw RuntimeException("Sunmi check card error $message -- $code") }
                     dialogProvider.hideProgressBar()
+                }
+
+                @Throws(RemoteException::class)
+                override fun findICCardEx(atr: Bundle?) {
+                    debug("findICCardEx:$atr")
+                    it.resume(CardReaderEvent.CHIP)
+                }
+
+                @Throws(RemoteException::class)
+                override fun findRFCardEx(bundle: Bundle?) {
+                    debug("findRFCardEx:$bundle")
+                    it.resume(CardReaderEvent.NFC)
+                }
+
+                @Throws(RemoteException::class)
+                override fun onErrorEx(bundle: Bundle?) {
+                    safeRun { throw RuntimeException("Sunmi check card error $bundle") }
                     it.resume(CardReaderEvent.Timeout)
                 }
+
             }, timeout)
         }
 }

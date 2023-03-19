@@ -18,7 +18,7 @@ value class SimplePrintJob(override val nodes: List<PrintNode>) : ParcelablePrin
 value class PrintJobScope(private val nodes: MutableList<PrintNode> = mutableListOf()) {
     fun image(
         @DrawableRes drawable: Int,
-        walkPaperAfterPrint: Int = 20,
+        walkPaperAfterPrint: Int = 5,
         align: Alignment = Alignment.MIDDLE,
         printGray: Int = 5,
     ) {
@@ -35,11 +35,11 @@ value class PrintJobScope(private val nodes: MutableList<PrintNode> = mutableLis
         text: String,
         leftDistance: Int = 0,
         lineDistance: Int = 0,
-        fontSize: Int = 15,
+        fontSize: Int = 20,
         printGray: Int = 5,
         isBold: Boolean = false,
         align: Alignment = Alignment.LEFT,
-        walkPaperAfterPrint: Int = 0,
+        walkPaperAfterPrint: Int = 5,
     ) {
         val textNode = TextNode(
             text = text,

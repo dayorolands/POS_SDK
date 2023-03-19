@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Cluster Agents</string>
-    <string name="ota_app_name">CreditClub</string>
-    <string name="institution_name">Cluster</string>
+    <string name="app_name">Orda Payment</string>
+    <string name="ota_app_name">Orda</string>
+    <string name="institution_name">Orda</string>
     <string name="activation_instructions" />
-    <string name="institution_website">https://www.appzonegroup.com/group/appzone-pos</string>
+    <string name="institution_website">https://orda.africa</string>
     <string name="home">Home</string>
     <string name="customerText">Kindly instruct the customer to dial the code below</string>
     <string name="ussd_token_withdrawal">USSD Token Withdrawal</string>
@@ -402,6 +402,7 @@
     <string name="title_activity_new_wallet">Open Wallet</string>
     <string name="title_activity_commissions_statement">Commissions</string>
     <string name="pos_card_purchase">Withdrawal</string>
+    <string name="card_test">Card Test</string>
     <string name="pos_enter_supervisor_pin">Enter device PIN</string>
     <string name="pos_new_supervisor_pin">New device PIN</string>
     <string name="pos_confirm_supervisor_pin">Confirm device PIN</string>

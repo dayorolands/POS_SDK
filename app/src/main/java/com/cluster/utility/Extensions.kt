@@ -101,6 +101,9 @@ fun CreditClubFragment.openPageById(id: Int) {
                 ioScope.launch { logFunctionUsage(FunctionIds.CARD_TRANSACTIONS) }
 
                 findNavController().navigate(R.id.action_to_pos_nav_graph)
+            } else{
+                ioScope.launch { logFunctionUsage(FunctionIds.CARD_TRANSACTIONS) }
+                findNavController().navigate(R.id.action_to_pos_nav_graph)
             }
         }
 

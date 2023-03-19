@@ -5,6 +5,7 @@ import com.cluster.pos.card.TransactionType
 import com.cluster.pos.card.applyCardData
 import com.cluster.pos.extension.processingCode3
 import com.cluster.pos.util.ISO87Packager
+import kotlinx.coroutines.launch
 import org.jpos.iso.ISOMsg
 
 class CardWithdrawalActivity : CardTransactionActivity() {

@@ -15,10 +15,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 6/20/2019.
- * Appzone Ltd
- */
 class Receipt(val context: Context, val transaction: FinancialTransaction) :
     PrintJob, KoinComponent {
     private val backendConfig by inject<AppConfig>()
@@ -108,7 +104,7 @@ RRN: $rrn"""
             nodes.add(
                 TextNode("-----------------------------").apply {
                     align = Alignment.MIDDLE
-                    wordFont = 15
+                    wordFont = 10
                 })
 
             nodes.add(TextNode(
@@ -126,7 +122,7 @@ RRN: $rrn"""
                 TextNode(
                     context.getString(R.string.institution_website),
                     align = Alignment.MIDDLE,
-                    walkPaperAfterPrint = 10,
+                    walkPaperAfterPrint = 15,
                     wordFont = 15,
                 )
             )
@@ -145,11 +141,13 @@ fun posReceipt(
         text(
             text = "***REPRINT***",
             align = Alignment.MIDDLE,
+            isBold = true,
         )
     }
     text(
         text = if (isCustomerCopy) "***CUSTOMER COPY***" else "***MERCHANT COPY***",
         align = Alignment.MIDDLE,
+        isBold = true,
     )
     text(
         """${posTransaction.merchantDetails}
@@ -168,16 +166,19 @@ fun posReceipt(
             |EXP:${posTransaction.expiryDate}
             |Acquirer: ${posTransaction.bankName}
             |PTSP:${posTransaction.ptsp}
-            |Verification Mode: PIN""".trimMargin()
+            |Verification Mode: PIN""".trimMargin(),
+        isBold = true,
+        printGray = 5
     )
     text(
         text = posTransaction.transactionType!!,
         align = Alignment.MIDDLE,
-        fontSize = 25,
+        fontSize = 35
     )
     text(
         text = """AMOUNT: ${posTransaction.amount}
-            |RRN: ${posTransaction.retrievalReferenceNumber}""".trimMargin()
+            |RRN: ${posTransaction.retrievalReferenceNumber}""".trimMargin(),
+        isBold = true
     )
 
     val isSuccessful = posTransaction.responseCode == "00"
@@ -185,30 +186,37 @@ fun posReceipt(
     text(
         text = message,
         align = Alignment.MIDDLE,
-        fontSize = 25,
+        fontSize = 35,
+        isBold = true
     )
     if (!isSuccessful) {
         text(
             text = isoResponseMessage(posTransaction.responseCode),
             align = Alignment.MIDDLE,
+            isBold = true
         )
     }
     text(
-        text = "-----------------------------",
+        text = "-------------------------------------",
         align = Alignment.MIDDLE,
         fontSize = 15,
+        isBold = true
     )
     text(
         text = "${posTransaction.appName}. Powered by ${posTransaction.bankName}",
         align = Alignment.MIDDLE,
         fontSize = 15,
+        isBold = true
     )
     text(
         text = posTransaction.website!!,
         align = Alignment.MIDDLE,
-        walkPaperAfterPrint = 10,
         fontSize = 15,
+        isBold = true
     )
+
+    //clear()
+
 }
 
 inline val ISOMsg.additionalAmount: String

@@ -1,35 +1,41 @@
-package com.cluster.pos.providers.sunmi
+package com.creditclub.pos.providers.sunmi
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.os.RemoteException
 import android.text.TextUtils
+import android.util.Log
 import androidx.core.content.edit
+import bsh.Interpreter
 import com.cluster.core.data.prefs.getEncryptedSharedPreferences
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.widget.DialogOptionItem
+import com.cluster.core.util.PinBlockHelper
+import com.cluster.core.util.SharedPref
 import com.cluster.core.util.debug
 import com.cluster.core.util.toCurrencyFormat
 import com.cluster.pos.PosManager
-import com.cluster.pos.PosParameter
 import com.cluster.pos.card.CardData
 import com.cluster.pos.card.CardReaderEvent
 import com.cluster.pos.card.CardTransactionStatus
 import com.cluster.pos.extensions.hexBytes
 import com.cluster.pos.extensions.hexString
-import com.cluster.pos.providers.sunmi.emv.TLV
-import com.cluster.pos.providers.sunmi.emv.TLVUtil
+import com.cluster.pos.providers.sunmi.R
 import com.cluster.pos.utils.asDesEdeKey
 import com.cluster.pos.utils.encrypt
+import com.creditclub.pos.providers.sunmi.emv.TLV
+import com.creditclub.pos.providers.sunmi.emv.TLVUtil
 import com.sunmi.pay.hardware.aidl.AidlConstants
+import com.sunmi.pay.hardware.aidl.AidlConstants.Security
+import com.sunmi.pay.hardware.aidlv2.AidlConstantsV2
 import com.sunmi.pay.hardware.aidlv2.AidlErrorCodeV2
 import com.sunmi.pay.hardware.aidlv2.bean.EMVCandidateV2
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
 import com.sunmi.pay.hardware.aidlv2.emv.EMVListenerV2
 import com.sunmi.pay.hardware.aidlv2.pinpad.PinPadListenerV2
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import sunmi.paylib.SunmiPayKernel
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidKeyException
@@ -40,6 +46,11 @@ import javax.crypto.*
 import javax.crypto.spec.SecretKeySpec
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
+
+/**
+ * Created by Ifedayo Adekoya <ifedayo.adekoya@starkitchensgroup.com> on 06/02/2023.
+ * Orda
+ */
 
 class SunmiEmvListener(
     private val activity: CreditClubActivity,
@@ -52,6 +63,7 @@ class SunmiEmvListener(
     private var mPinPadOptV2 = kernel.mPinPadOptV2
     private var mEMVOptV2 = kernel.mEMVOptV2
     private val dialogProvider = activity.dialogProvider
+    private val pinBlockHelper = PinBlockHelper()
 
     private val cardData = SunmiCardData()
 
@@ -155,7 +167,7 @@ class SunmiEmvListener(
 
     @Throws(RemoteException::class)
     override fun onRequestShowPinPad(pinType: Int, remainTime: Int) {
-        debug("onRequestShowPinPad pinType:$pinType remainTime:$remainTime")
+        Log.d("CheckDUKPT","onRequestShowPinPad pinType:$pinType remainTime:$remainTime")
         mPinType = pinType
         mProcessStep = EMV_SHOW_PIN_PAD
         mHandler.obtainMessage(EMV_SHOW_PIN_PAD)
@@ -226,14 +238,22 @@ class SunmiEmvListener(
 
         // card off
         mReadCardOptV2.cardOff(mCardType)
-//        activity.runOnUiThread {
-//            dialogProvider.confirm("See Phone", "execute See Phone flow") {
-//                onSubmit {
-//                    mEMVOptV2.initEmvProcess()
-//                    checkCard()
-//                }
-//            }
-//        }
+    }
+
+    override fun onRequestDataExchange(p0: String?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onTermRiskManagement() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onPreFirstGenAC() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onDataStorageProc(p0: Array<out String>?, p1: Array<out String>?) {
+        TODO("Not yet implemented")
     }
 
     private val mLooper = Looper.myLooper()
@@ -241,11 +261,10 @@ class SunmiEmvListener(
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             when (msg.what) {
-                EMV_FINAL_APP_SELECT -> mEMVOptV2.importAppFinalSelectStatus(0)
                 EMV_APP_SELECT -> {
                     dialogProvider.hideProgressBar()
-                    val candiNames = msg.obj as Array<String>
-                    val options = candiNames.map { DialogOptionItem(it) }
+                    val candiNames = msg.obj as Array<*>
+                    val options = candiNames.map { DialogOptionItem(it as String) }
                     dialogProvider.showOptions("Select App", options) {
                         onSubmit {
                             dialogProvider.showProgressBar(R.string.handling)
@@ -258,6 +277,7 @@ class SunmiEmvListener(
                         }
                     }
                 }
+                EMV_FINAL_APP_SELECT -> mEMVOptV2.importAppFinalSelectStatus(0)
                 EMV_CONFIRM_CARD_NO -> {
                     dialogProvider.hideProgressBar()
                     dialogProvider.confirm(
@@ -318,52 +338,20 @@ class SunmiEmvListener(
         if (sessionData.amount > 0) amountText = "Amount: ${amount.toCurrencyFormat()}"
         if (sessionData.cashBackAmount > 0) amountText = "$amount        " +
                 "Cashback Amount: ${amount.toCurrencyFormat()}"
-        val dukptConfig = sessionData.getDukptConfig?.invoke(cardData.pan, amount)
-        val posParameter: PosParameter =
-            sessionData.getPosParameter?.invoke(cardData.pan, sessionData.amount / 100.0) ?: get()
 
-        if (dukptConfig != null) {
-            val ipekBytes = dukptConfig.ipek.hexBytes
-            val ipekBytesPadded = dukptConfig.ipek.padEnd(32, '0').hexBytes
-            val ksnBytes = dukptConfig.ksn.hexBytes
-//            val cipheyKey = ipekBytes.asDesEdeKey
-//            val kcv = cipheyKey.encrypt(ByteArray(8)).hexString
-            val kcv = tdesECBEncypt(ipekBytesPadded, ByteArray(8)).hexString
-            if (prefs.getString("kcv", null) != kcv) {
-                val result = mSecurityOptV2.saveKeyDukpt(
-                    AidlConstants.Security.KEY_TYPE_DUPKT_IPEK,
-                    ipekBytes,
-                    kcv.hexBytes,
-                    ksnBytes,
-                    AidlConstants.Security.KEY_ALG_TYPE_3DES,
-                    0,
-                )
-                debug("Dukpt inject result is $result")
-                if (result == 0) prefs.edit { putString("kcv", kcv) }
-            }
-            mSecurityOptV2.dukptIncreaseKSN(0)
-        } else {
-            val masterKey = posParameter.masterKey.hexBytes
-            mSecurityOptV2.savePlaintextKey(
-                AidlConstants.Security.KEY_TYPE_TMK,
-                masterKey,
-                masterKey.asDesEdeKey.encrypt(ByteArray(8)),
+        if (prefs.getString("kcv", null) != "F2204B822FD84A65") {
+            val result = mSecurityOptV2.saveKeyDukpt(
+                AidlConstants.Security.KEY_TYPE_DUPKT_IPEK,
+                "86772A2D72A29EF0A4D03ED5074DB927".hexBytes,
+                "F2204B822FD84A65".hexBytes,
+                "FFFF9876543210E00000".hexBytes,
                 AidlConstants.Security.KEY_ALG_TYPE_3DES,
-                0,
+                0
             )
-            val tempPinKey = posParameter.pinKey.hexBytes
-            val pinKey = ByteArray(24)
-            System.arraycopy(tempPinKey, 0, pinKey, 0, 16)
-            System.arraycopy(tempPinKey, 0, pinKey, 16, 8)
-
-            mSecurityOptV2.savePlaintextKey(
-                AidlConstants.Security.KEY_TYPE_PIK,
-                pinKey,
-                pinKey.asDesEdeKey.encrypt(ByteArray(8)),
-                AidlConstants.Security.KEY_ALG_TYPE_3DES,
-                0,
-            )
+            Log.d("CheckDUKPT", "checking dukpt result $result")
+            if (result == 0) prefs.edit { putString("kcv", "F2204B822FD84A65") }
         }
+        mSecurityOptV2.dukptIncreaseKSN(0)
 
         val pinPadConfig = PinPadConfigV2().apply {
             pinPadType = 0
@@ -374,31 +362,38 @@ class SunmiEmvListener(
                 .toByteArray(charset("US-ASCII"))
             pan = panBytes
             timeout = 60 * 1000 // input password timeout
-
             pinKeyIndex = 12 // pik index
-
             maxInput = 4
             minInput = 4
-            keySystem = if (dukptConfig == null) 0 else 1
+            keySystem = 0
             algorithmType = 0
         }
 
         val mPinPadListener: PinPadListenerV2 = object : PinPadListenerV2.Stub() {
             override fun onPinLength(len: Int) {
-                debug("onPinLength:$len")
+                Interpreter.debug("onPinLength:$len")
                 mHandler.obtainMessage(PIN_CLICK_NUMBER, len)
                     .sendToTarget()
             }
 
             override fun onConfirm(i: Int, pinBlock: ByteArray?) {
                 if (pinBlock != null) {
-                    debug("onConfirm pin block:${pinBlock.hexString}")
                     mHandler.obtainMessage(PIN_CLICK_PIN, pinBlock).sendToTarget()
-                    cardData.pinBlock = pinBlock.hexString
-                    if (dukptConfig != null) {
-                        val ksnOutData = ByteArray(0)
-                        mSecurityOptV2.dukptCurrentKSN(0, ksnOutData)
-                        cardData.ksnData = ksnOutData.hexString
+                    if(pinBlock.hexString == "00"){
+                        cardData.pinBlock = ""
+                        cardData.ksnData = ""
+                    }
+                    else{
+                        val pinkey = "11111111111111111111111111111111".hexBytes
+                        val decryptedVal = tripleDesDecrypt(pinkey, pinBlock)
+                        Log.d("CheckDUKPT", "Here to check the clear pin block ${decryptedVal.hexString}")
+                        val storedKsn = SharedPref[activity, "ksn", ""]
+                        val incrementKsn = incrementKsn(activity, storedKsn!!)
+                        val workingKey = pinBlockHelper.getSessionKey(PosManager.IPEK, incrementKsn)
+                        val encryptedPinBlock = pinBlockHelper.desEncryptDukpt(workingKey, decryptedVal.hexString)
+                        val transactionKsn = pinBlockHelper.generateTransKsn(incrementKsn)
+                        cardData.pinBlock = encryptedPinBlock
+                        cardData.ksnData = transactionKsn?.uppercase()
                     }
                 } else {
                     mHandler.obtainMessage(PIN_CLICK_CONFIRM)
@@ -407,13 +402,13 @@ class SunmiEmvListener(
             }
 
             override fun onCancel() {
-                debug("onCancel")
+                Interpreter.debug("onCancel")
                 mHandler.obtainMessage(PIN_CLICK_CANCEL)
                     .sendToTarget()
             }
 
             override fun onError(code: Int) {
-                debug("onError:$code")
+                Interpreter.debug("onError:$code")
                 val msg = AidlErrorCodeV2.valueOf(code).msg
                 mHandler.obtainMessage(
                     PIN_ERROR,
@@ -424,6 +419,25 @@ class SunmiEmvListener(
             }
         }
         mPinPadOptV2.initPinPad(pinPadConfig, mPinPadListener)
+    }
+
+    fun tripleDesDecrypt(pinKey: ByteArray, encryptedPinBlock: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance("DESede/ECB/NoPadding")
+        val secretKeySpec = SecretKeySpec(pinKey, "DESede")
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec)
+        return cipher.doFinal(encryptedPinBlock)
+    }
+
+    private fun incrementKsn(context: Context, iKsn: String) : String {
+        var ksnValue = iKsn
+        ksnValue = ksnValue.substring(0, ksnValue.length - 5)
+        val counter = SharedPref[context, "ksnCounter", "0"]!!.toLong().plus(1)
+        SharedPref[activity, "ksnCounter"] = counter.toString()
+        if(counter > 99997){
+            SharedPref[activity, "ksnCounter"] = PosManager.KsnCounter
+        }
+        ksnValue += counter.toString().padStart(5, '0')
+        return ksnValue
     }
 
     private fun importPinInputStatus(inputResult: Int) {
@@ -498,6 +512,7 @@ class SunmiEmvListener(
             val tlvMap: Map<String, TLV> = TLVUtil.buildTLVMap(cardData.mIccString)
 
             cardData.apply {
+                ret = CardTransactionStatus.Success.code
                 transactionAmount = tlvMap.getValue(0x9F02)
                 exp = tlvMap.getValue(0x5F24)
                 holder = tlvMap.getValue(0x5F20, true)
@@ -509,9 +524,27 @@ class SunmiEmvListener(
                     markerIndex = track2.indexOf("=")
                 }
                 src = track2.substring(markerIndex + 5, markerIndex + 8)
+                
+                atc = tlvMap.getValue(0x9F36)
+                cryptogram = tlvMap.getValue(0x9F26)
+                cryptogramInformationData = tlvMap.getValue(0x9F27)
+                terminalCapabilities = tlvMap.getValue(0x9F33)
+                terminalType = tlvMap.getValue(0x9F35)
+                iad = tlvMap.getValue(0x9F10)
+                tvr = tlvMap.getValue(0x95)
+                unpredictedNumber = tlvMap.getValue(0x9F37)
+                dedicatedFileName = tlvMap.getValue(0x84)
+                transactionDate = tlvMap.getValue(0x9A)
+                transactionType = tlvMap.getValue(0x9C)
+                transactionCurrency = "566"
+                cardHolderVerificationMethod = tlvMap.getValue(0x9F34)
+                amountAuthorized = tlvMap.getValue(0x9F02)
+                amountOther = tlvMap.getValue(0x9F03)
+                
 
                 cardMethod = CardReaderEvent.CHIP
             }
+
             val tvr = tlvMap.getValue(0x95).hexBytes
             if (tvr.isNotEmpty() && tvr.last() == 1.toByte()) {
                 cardData.status = CardTransactionStatus.OfflinePinVerifyError
@@ -570,10 +603,9 @@ private fun Map<String, TLV>.getValue(
 fun tdesECBEncypt(keyBytes: ByteArray, input: ByteArray): ByteArray {
     val key = SecretKeySpec(keyBytes, "DES")
     val cipher: Cipher = Cipher.getInstance(
-        "DESede/ECB/NoPadding",
-//        BouncyCastleProvider(),
+        "DESede/ECB/NoPadding"
     )
-    cipher.init(1, key)
+    cipher.init(Cipher.ENCRYPT_MODE, key)
     val cipherText = ByteArray(cipher.getOutputSize(input.size))
     var ctLength = cipher.update(input, 0, input.size, cipherText, 0)
     ctLength += cipher.doFinal(cipherText, ctLength)

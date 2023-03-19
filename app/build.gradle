@@ -101,54 +101,9 @@ android {
     flavorDimensions "flavor"
 
     productFlavors {
-        creditclub {
+        orda {
             dimension "flavor"
-            applicationId "com.appzonegroup.app.creditclub.plus"
-        }
-
-        polaris {
-            dimension "flavor"
-            applicationId "com.appzonegroup.app.creditclub.polaris"
-        }
-
-        access {
-            dimension "flavor"
-            applicationId "com.creditclub.access"
-        }
-
-        gtbank {
-            dimension "flavor"
-            applicationId "com.creditclub.gtbank"
-        }
-
-        purple {
-            dimension "flavor"
-            applicationId "com.creditclub.purple"
-        }
-
-        grooming {
-            dimension "flavor"
-            applicationId "com.creditclub.grooming"
-        }
-
-        heritage {
-            dimension "flavor"
-            applicationId "africa.cluster.heritage"
-        }
-
-        halo {
-            dimension "flavor"
-            applicationId "africa.cluster.halo"
-        }
-
-        standardmfb {
-            dimension "flavor"
-            applicationId "com.creditclub.standardmfb"
-        }
-
-        mfbgeneric {
-            dimension "flavor"
-            applicationId "com.creditclub.mfbgeneric"
+            applicationId "com.orda.ordapayment"
         }
     }
     sourceSets {
@@ -189,28 +144,15 @@ dependencies {
     implementation(project(":pos"))
     implementation(project(":analytics"))
 
-    creditclubImplementation(project(":telpo"))
-    polarisImplementation(project(":nexgo"))
-    polarisImplementation(project(":telpo"))
-    accessImplementation(project(":telpo"))
-    gtbankImplementation(project(":dspread"))
-    purpleImplementation(project(":telpo"))
-    purpleImplementation(project(":nexgo"))
-    purpleImplementation(project(":dspread"))
-    groomingImplementation(project(":telpo"))
-    groomingImplementation(project(":nexgo"))
-    heritageImplementation(project(":wizar"))
-    heritageImplementation(project(":telpo"))
-    haloImplementation(project(":dspread"))
-    haloImplementation(project(":nexgo"))
-    standardmfbImplementation(project(":nexgo"))
-    standardmfbImplementation(project(":telpo"))
-    mfbgenericImplementation(project(":telpo"))
-    mfbgenericImplementation(project(":nexgo"))
-    mfbgenericImplementation(project(":dspread"))
+//    ordaImplementation(project(":dspread"))
+    ordaImplementation(project(":sunmi"))
+    ordaImplementation(project(":horizonpay"))
 
     implementation("androidx.activity:activity-ktx:${Versions.activityKtx}")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
+
+    //Timber
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 
     // Lifecycle components
     kapt("androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle}")

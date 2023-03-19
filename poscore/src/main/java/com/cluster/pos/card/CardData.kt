@@ -1,10 +1,6 @@
 package com.cluster.pos.card
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 4/15/2019.
- * Appzone Ltd
- */
 abstract class CardData(
     var pan: String = "",
     var holder: String = "",
@@ -21,6 +17,7 @@ abstract class CardData(
     var track1: String = "",
     var authRequest: String = "",
     var cryptogram: String = "",
+    var cryptogramInformationData: String = "",
     var iad: String = "",
     var unpredictedNumber: String = "",
     var atc: String = "",
@@ -35,6 +32,7 @@ abstract class CardData(
     var terminalCapabilities: String = "",
     var terminalType: String = "",
     var amountOther: String = "",
+    var amountAuthorized : String = "",
 
     // Status fields
     var aid: String = "",
