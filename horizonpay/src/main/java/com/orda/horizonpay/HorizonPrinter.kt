@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
 import android.util.Log
-import android.widget.Toast
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.pos.printer.*
 import com.horizonpay.smartpossdk.aidl.printer.AidlPrinterListener
@@ -14,7 +13,6 @@ import com.horizonpay.smartpossdk.data.PrinterConst.AlignMode
 import com.orda.horizonpay.printer.CombBitmap
 import com.orda.horizonpay.printer.GenerateBitmap
 import kotlinx.coroutines.*
-import org.koin.ext.clearQuotes
 
 class HorizonPrinter(
     override val context: Context,
@@ -24,7 +22,7 @@ class HorizonPrinter(
     private val combBitmap = CombBitmap()
     private val devicePrinter : IAidlPrinter = HorizonDeviceSingleton.getDevicePrinter()!!.printer
     private val assetManager = context.assets
-    private val fontType : Typeface? = Typeface.createFromAsset(assetManager, "fonts/Fangsong.ttf")
+    private val fontType : Typeface? = Typeface.createFromAsset(assetManager, "fonts/songti.ttf")
 
     override fun check(): PrinterStatus = runBlocking {
         withContext(Dispatchers.IO){

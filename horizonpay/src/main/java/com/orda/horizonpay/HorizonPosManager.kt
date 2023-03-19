@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.core.graphics.drawable.toIcon
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.widget.DialogProvider
+import com.cluster.core.util.debug
 import com.cluster.core.util.safeRun
 import com.cluster.pos.PosManager
 import com.cluster.pos.PosManagerCompanion
@@ -61,8 +62,6 @@ class HorizonPosManager(
                         HorizonDeviceSingleton.setDevicePrinter(device!!)
 
                         safeRun {
-//                            downloadAid()
-//                            downloadCapks()
                             injectAid()
                             injectCapk()
                         }
@@ -163,7 +162,7 @@ class HorizonPosManager(
         }
         aidEntityList.addAll(AidsUtil.getAllAids())
         val result = device?.emvL2?.addAids(aidEntityList)
-        Log.d("AddAIDResult", "Add AID result : $result")
+        debug("Add AID result : $result")
     }
 
     private fun injectCapk(){
@@ -187,7 +186,7 @@ class HorizonPosManager(
         }
         capkEntityList.addAll(AidsUtil.getAllCapks())
         val result = device?.emvL2?.addCapks(capkEntityList)
-        Log.d("AddAIDResult", "Add CAPKs result : $result")
+        debug("Add CAPKs result : $result")
     }
 
     override fun cleanUpEmv() {
