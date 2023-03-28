@@ -1,9 +1,11 @@
 package com.orda.horizonpay
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
 import android.util.Log
+import android.util.Printer
 import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.pos.printer.*
 import com.horizonpay.smartpossdk.aidl.printer.AidlPrinterListener
@@ -22,7 +24,7 @@ class HorizonPrinter(
     private val combBitmap = CombBitmap()
     private val devicePrinter : IAidlPrinter = HorizonDeviceSingleton.getDevicePrinter()!!.printer
     private val assetManager = context.assets
-    private val fontType : Typeface? = Typeface.createFromAsset(assetManager, "fonts/songti.ttf")
+    private val fontType : Typeface? = Typeface.createFromAsset(assetManager, "fonts/Fangsong.ttf")
 
     override fun check(): PrinterStatus = runBlocking {
         withContext(Dispatchers.IO){
@@ -49,23 +51,23 @@ class HorizonPrinter(
     ): PrinterStatus = withContext(Dispatchers.IO){
         if(devicePrinter.isSupport){
             devicePrinter.pushPaper()
-            for(node in printJob.nodes) when (node){
-                is ImageNode -> imageNode(node)
-                is TextNode -> textNode(node)
-                is WalkPaper -> walkpaper(node.walkPaperAfterPrint)
+            for(node in printJob.nodes) {
+                when(node){
+                    is ImageNode -> imageNode(node)
+                    is TextNode -> textNode(node)
+                    is WalkPaper -> walkpaper(node.walkPaperAfterPrint)
+                }
             }
         }
+        val printBitMap = combBitmap.combBitmap
+        devicePrinter.printBmp(true, true, printBitMap, 0, aidlPrinterListener)
         val status = translateStatus(devicePrinter.printerState)
-        devicePrinter.cutPaper()
         status
     }
 
     private fun imageNode(node: ImageNode){
-        val bitMap = BitmapFactory.decodeResource(context.resources, node.drawable)
+        val bitMap : Bitmap = BitmapFactory.decodeResource(context.resources, node.drawable)
         combBitmap.addBitmap(bitMap)
-        val printImageBitMap = combBitmap.combBitmap
-        devicePrinter.printBmp(true, false, printImageBitMap, AlignMode.CENTER, aidlPrinterListener)
-        walkpaper(node.walkPaperAfterPrint)
     }
 
     private fun walkpaper(distance: Int) {
@@ -81,12 +83,10 @@ class HorizonPrinter(
                         false
                     )
             )
-            val printWalkPrinter = combBitmap.combBitmap
-            devicePrinter.printBmp(true, false, printWalkPrinter, 1, aidlPrinterListener)
         }
     }
 
-    private suspend fun textNode(node: TextNode){
+    private fun textNode(node: TextNode){
         devicePrinter.printGray = PrinterConst.Gray.LEVEL_4
         combBitmap.addBitmap(
             GenerateBitmap
@@ -99,9 +99,6 @@ class HorizonPrinter(
                     false
                 )
         )
-
-        val printBitMap = combBitmap.combBitmap
-        devicePrinter.printBmp(true, false, printBitMap, 0, aidlPrinterListener)
         walkpaper(node.walkPaperAfterPrint)
     }
 
@@ -114,11 +111,13 @@ class HorizonPrinter(
                     return
                 PrinterConst.RetCode.ERROR_PRINT_NOPAPER ->
                     return
+                PrinterConst.RetCode.ERROR_OTHER ->
+                    return
             }
         }
 
         override fun onPrintSuccess() {
-            Log.d("PrintStatus", "Printing Success")
+            combBitmap.removeAll()
         }
     }
 

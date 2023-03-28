@@ -28,6 +28,7 @@ import com.cluster.pos.models.PosNotification
 import com.cluster.pos.models.PosTransaction
 import com.cluster.pos.models.Reversal
 import com.cluster.pos.printer.PrinterStatus
+import com.cluster.pos.printer.posHorizonReceipt
 import com.cluster.pos.printer.posReceipt
 import com.cluster.pos.service.CallHomeService
 import kotlinx.coroutines.Dispatchers
@@ -326,7 +327,7 @@ abstract class CardTransactionActivity : PosActivity() {
                     posTransaction = posTransaction,
                     isCustomerCopy = true,
                 )
-                printer.print(receipt)
+                printer.printAsync(receipt)
                 return@launch
             }
 
@@ -352,7 +353,7 @@ abstract class CardTransactionActivity : PosActivity() {
                 posTransaction = posTransaction,
                 isCustomerCopy = true
             )
-            printer.print(receipt)
+            printer.printAsync(receipt)
         } catch (ex: Exception) {
             showTransactionStatusPage(posTransaction)
             firebaseCrashlytics.recordException(ex)
