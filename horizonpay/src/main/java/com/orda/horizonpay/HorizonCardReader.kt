@@ -158,7 +158,7 @@ class HorizonCardReader(
                 }
 
                 override fun onSwipeCardFail() {
-                    TODO("Not yet implemented")
+                    it.resume(CardReaderEvent.HYBRID_FAILURE)
                 }
 
                 override fun onFindICCard() {
