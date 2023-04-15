@@ -144,7 +144,7 @@ dependencies {
     implementation(project(":pos"))
     implementation(project(":analytics"))
 
-//    ordaImplementation(project(":dspread"))
+    ordaImplementation(project(":dspread"))
     ordaImplementation(project(":sunmi"))
     ordaImplementation(project(":horizonpay"))
 

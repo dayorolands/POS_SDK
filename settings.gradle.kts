@@ -12,6 +12,7 @@ include(":pos", ":poscore")
 //include(":dspread")
 include(":sunmi")
 include(":horizonpay")
+include(":dspread")
 
 buildCache {
     local {
