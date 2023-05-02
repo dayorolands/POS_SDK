@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">Orda Payment</string>
-    <string name="institution_name">Orda Payment</string>
-    <string name="ota_app_name">Orda Payment</string>
-    <string name="funds_transfer_same_bank">Orda Payment</string>
+    <string name="app_name">Payment Demo</string>
+    <string name="institution_name">Payment Demo</string>
+    <string name="ota_app_name">Payment Demo</string>
+    <string name="funds_transfer_same_bank">Payment Demo</string>
     <string-array name="transaction_types">
         <item>CashIn</item>
         <item>CashOut</item>
