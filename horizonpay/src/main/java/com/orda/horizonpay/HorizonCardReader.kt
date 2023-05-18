@@ -25,7 +25,7 @@ class HorizonCardReader(
     private val activity: CreditClubActivity,
     private val device : IAidlDevice,
     private val sessionData: PosManager.SessionData,
-) : CardReader, KoinComponent{
+) : CardReaders, KoinComponent{
     private var cardReader = device.cardReader
     private var emv = device.emvL2
     private val dialogProvider = activity.dialogProvider

@@ -29,7 +29,7 @@ class QPosCardReader(
     private val pos: QPOSService,
     private val listener: QPosListener,
     private val mainScope: CoroutineScope
-) : CardReader, KoinComponent {
+) : CardReaders, KoinComponent {
 
     private val keyIndex = 0
     private var watchJob: Job? = null

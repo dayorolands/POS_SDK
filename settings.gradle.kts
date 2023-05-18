@@ -13,7 +13,7 @@ include(":pos", ":poscore")
 include(":sunmi")
 include(":horizonpay")
 include(":dspread")
-include(":newland", ":Newland-EMVL3-4.3.7")
+include(":newland")
 
 buildCache {
     local {

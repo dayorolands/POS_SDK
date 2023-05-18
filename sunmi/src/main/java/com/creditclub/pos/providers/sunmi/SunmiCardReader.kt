@@ -8,9 +8,9 @@ import com.cluster.core.util.debug
 import com.cluster.core.util.safeRun
 import com.cluster.pos.PosManager
 import com.cluster.pos.card.CardData
-import com.cluster.pos.card.CardReader
 import com.cluster.pos.card.CardReaderEvent
 import com.cluster.pos.card.CardReaderEventListener
+import com.cluster.pos.card.CardReaders
 import com.sunmi.pay.hardware.aidl.AidlConstants
 import com.sunmi.pay.hardware.aidlv2.AidlConstantsV2
 import com.sunmi.pay.hardware.aidlv2.bean.EMVTransDataV2
@@ -27,7 +27,7 @@ class SunmiCardReader(
     private val activity: CreditClubActivity,
     private val kernel: SunmiPayKernel,
     private val sessionData: PosManager.SessionData,
-) : CardReader, KoinComponent {
+) : CardReaders, KoinComponent {
     private var cardReader = kernel.mReadCardOptV2
     private var emv = kernel.mEMVOptV2
     private val dialogProvider = activity.dialogProvider

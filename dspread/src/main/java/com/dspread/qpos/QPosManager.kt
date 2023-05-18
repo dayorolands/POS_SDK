@@ -8,7 +8,7 @@ import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.pos.PosManager
 import com.cluster.pos.PosManagerCompanion
 import com.cluster.pos.PosParameter
-import com.cluster.pos.card.CardReader
+import com.cluster.pos.card.CardReaders
 import com.cluster.pos.printer.PosPrinter
 import com.dspread.xpos.QPOSService
 import kotlinx.coroutines.*
@@ -28,7 +28,7 @@ class QPosManager(
     )
 
     override val sessionData = PosManager.SessionData()
-    override val cardReader: CardReader = QPosCardReader(
+    override val cardReader: CardReaders = QPosCardReader(
         activity = activity,
         pos = pos,
         listener = listener,

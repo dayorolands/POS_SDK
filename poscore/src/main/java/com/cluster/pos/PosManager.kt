@@ -1,14 +1,14 @@
 package com.cluster.pos
 
 import android.content.Context
-import com.cluster.pos.card.CardReader
+import com.cluster.pos.card.CardReaders
 import com.cluster.pos.card.TransactionType
 import org.koin.core.module.Module
 
 typealias PanAmountFunction<R> = (pan: String, amount: Double) -> R
 
 interface PosManager {
-    val cardReader: CardReader
+    val cardReader: CardReaders
     val sessionData: SessionData
 
     suspend fun loadEmv()

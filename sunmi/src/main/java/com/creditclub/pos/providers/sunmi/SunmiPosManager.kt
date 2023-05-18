@@ -12,9 +12,26 @@ import com.cluster.core.util.safeRun
 import com.cluster.pos.PosManager
 import com.cluster.pos.PosManagerCompanion
 import com.cluster.pos.PosParameter
-import com.cluster.pos.card.CardReader
-import com.cluster.pos.extensions.*
-import com.cluster.pos.printer.MockPosPrinter
+import com.cluster.pos.card.CardReaders
+import com.cluster.pos.extensions.aid15
+import com.cluster.pos.extensions.appVersion18
+import com.cluster.pos.extensions.ddol20
+import com.cluster.pos.extensions.defaultTacValue29
+import com.cluster.pos.extensions.exponent38
+import com.cluster.pos.extensions.hashAlgorithm36
+import com.cluster.pos.extensions.hexByte
+import com.cluster.pos.extensions.hexBytes
+import com.cluster.pos.extensions.keyAlgorithm40
+import com.cluster.pos.extensions.keyIndex32
+import com.cluster.pos.extensions.maxTargetDomestic25
+import com.cluster.pos.extensions.modulus37
+import com.cluster.pos.extensions.offlineThresholdDomestic24
+import com.cluster.pos.extensions.rid35
+import com.cluster.pos.extensions.tacDenial30
+import com.cluster.pos.extensions.tacOnline31
+import com.cluster.pos.extensions.targetPercentageDomestic27
+import com.cluster.pos.extensions.tdol21
+import com.cluster.pos.extensions.tflDomestic22
 import com.cluster.pos.printer.PosPrinter
 import com.creditclub.pos.providers.sunmi.emv.EmvUtil
 import com.sunmi.pay.hardware.aidlv2.bean.AidV2
@@ -37,7 +54,7 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
     private val payKernel: SunmiPayKernel = SunmiPayKernel.getInstance()
     private var isConnected = false
     private val posParameter: PosParameter by inject()
-    override val cardReader: CardReader by lazy {
+    override val cardReader: CardReaders by lazy {
         SunmiCardReader(
             activity,
             payKernel,

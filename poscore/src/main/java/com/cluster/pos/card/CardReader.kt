@@ -9,7 +9,7 @@ package com.cluster.pos.card
 typealias CardReaderEventListener = (CardReaderEvent) -> Unit
 typealias CardDataListener = (CardData?) -> Unit
 
-interface CardReader {
+interface CardReaders {
     suspend fun waitForCard(): CardReaderEvent
 
     suspend fun read(amountStr: String): CardData?

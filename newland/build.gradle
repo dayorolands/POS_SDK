@@ -12,19 +12,13 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'proguard-rules.pro'
     }
-    repositories {
-        flatDir {
-            dirs 'libs'
-        }
-    }
+
     sourceSets {
         main {
-            java.srcDirs = ['libs']
-            java.srcDirs = [
-                    "src/main/java"
-            ]
+            jniLibs.srcDirs = ['libs']
         }
     }
+
     compileOptions {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_11
@@ -40,7 +34,7 @@ dependencies {
     implementation project(path: ':poscore')
     implementation project(path: ':pos')
     implementation project(path: ':uicentral')
-    implementation fileTree(dir: 'jniLibs', include: ['*.so'])
+    implementation fileTree(dir: 'jniLibs', include: ['*.so', '*.aar'])
     implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
     implementation 'com.google.zxing:core:3.3.3'
     implementation 'org.greenrobot:greendao:3.2.2'
