@@ -1,0 +1,26 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.cluster.pos.providers.sunmi">
+
+    <uses-permission android:name="com.sunmi.perm.LED" />
+    <uses-permission android:name="com.sunmi.perm.MSR" />
+    <uses-permission android:name="com.sunmi.perm.ICC" />
+    <uses-permission android:name="com.sunmi.perm.PINPAD" />
+    <uses-permission android:name="com.sunmi.perm.SECURITY" />
+    <uses-permission android:name="com.sunmi.perm.CONTACTLESS_CARD" />
+
+    <uses-permission android:name="android.permission.SET_TIME" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+    <application>
+        <provider
+            android:name="com.creditclub.pos.providers.sunmi.SunmiPosManagerProvider"
+            android:authorities="${applicationId}.SunmiPosManagerProvider"
+            android:enabled="true"
+            android:exported="false"
+            />
+    </application>
+<!--    <queries tools:ignore="ExtraText">-->
+<!--        <package android:name="woyou.aidlservice.jiuiv5"/>-->
+<!--    </queries>-->
+</manifest>

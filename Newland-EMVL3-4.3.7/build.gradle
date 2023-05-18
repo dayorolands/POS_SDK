@@ -1,0 +1,3 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file('Newland-EMVL3-4.3.7.aar'))
+artifacts.add("default", file('common_utils-release-1.4.16.aar'))
