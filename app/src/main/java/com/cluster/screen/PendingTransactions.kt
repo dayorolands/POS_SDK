@@ -46,7 +46,6 @@ import io.objectbox.android.ObjectBoxLiveData
 import io.objectbox.kotlin.boxFor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
 import java.time.Instant
 
 @Composable

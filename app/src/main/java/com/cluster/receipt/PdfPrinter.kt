@@ -25,8 +25,6 @@ import com.cluster.core.util.safeRunIO
 import com.cluster.pos.printer.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.io.File
 import java.time.Instant
 

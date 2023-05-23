@@ -1,6 +1,5 @@
 package com.cluster
 
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -8,15 +7,12 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
-import androidx.compose.ui.graphics.Outline
 import androidx.core.content.edit
 import androidx.databinding.library.BuildConfig
 import coil.Coil
 import coil.request.ImageRequest
 import com.cluster.core.data.TRANSACTIONS_CLIENT
 import com.cluster.core.data.api.*
-import com.cluster.core.data.model.FeatureData
-import com.cluster.core.data.model.GetFeatureResponse
 import com.cluster.core.data.model.LoginRequest
 import com.cluster.core.data.model.SurveyQuestion
 import com.cluster.core.data.request.SubmitSurveyRequest
@@ -42,10 +38,8 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import java.lang.reflect.Type
 import java.time.Instant
 import java.util.*
-import kotlin.collections.ArrayList
 
 private const val PASSWORD_LENGTH = 6
 

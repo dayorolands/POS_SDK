@@ -10,8 +10,6 @@ import com.cluster.pos.extension.*
 import com.cluster.pos.models.FinancialTransaction
 import com.cluster.pos.models.PosTransaction
 import com.cluster.pos.util.CurrencyFormatter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import org.jpos.iso.ISOMsg
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
