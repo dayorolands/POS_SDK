@@ -4,4 +4,5 @@
     <string name="emv_confirm_card_no">Confirm Card No</string>
     <string name="emv_confirm_cert">Confirm Cert</string>
     <string name="handling">Processing</string>
+    <string name="pin_try_count_remaining">Pin try count remaining</string>
 </resources>

@@ -116,12 +116,6 @@ class NewlandCardReader(
         }
     }
 
-    private suspend fun checkCardMock() : CardReaderEvent =
-        suspendCoroutine {
-            cardInterface = EmvL3Const.CardInterface.CONTACT
-            it.resume(CardReaderEvent.CHIP)
-        }
-
     private suspend fun checkCard() : CardReaderEvent =
         suspendCoroutine {
             val cardTypes = arrayOf(CardType.MAG_CARD, CardType.CONTACT_CARD, CardType.CONTACTLESS_CARD)
@@ -171,13 +165,16 @@ class NewlandCardReader(
 
     override suspend fun read(amountStr: String): CardData? {
         val cardData : CardData? = suspendCoroutine { continuation ->
+            if(!cardReader.isCardInserted){
+                return@suspendCoroutine dialogProvider.showError("No card detected, please insert card")
+            }
             dialogProvider.showProgressBar("Processing", "IC card detected...") {
                 onClose {
                     continuation.resume(null)
                 }
             }
             loadKeys()
-            val newlandEmvListener = NewlandEmvListener(emvL3, ordaActivity, sessionData, continuation)
+            val newlandEmvListener = NewlandEmvListener(emvL3, ordaActivity, continuation)
             val concatenatedTransactionData = getTransactionData().hexBytes
             CoroutineScope(Dispatchers.IO).launch {
                 emvL3.performTransaction(cardInterface, 60, concatenatedTransactionData, newlandEmvListener)
@@ -301,7 +298,7 @@ class NewlandCardReader(
             while (true) {
                 if (userCancel) break
                 if (isSessionOver) break
-                if (!cardReader.isCardPresent) break
+                if (!cardReader.isCardInserted) break
             }
         }
 

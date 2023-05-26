@@ -11,5 +11,8 @@
             android:enabled="true"
             android:exported="false"
             />
+        <activity
+            android:name=".pin.KeyBoardNumberActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 </manifest>
