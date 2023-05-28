@@ -68,6 +68,7 @@ class NewlandEmvListener(
             dialogProvider.showProgressBar("PROCESSING..")
             when (result) {
                 EmvL3Const.TransResult.L3_TXN_APPROVED -> {
+                    dialogProvider.hideProgressBar()
                     getEmvData(false)
                     emvL3.terminateTransaction()
                     continuation.resume(cardData.apply {
@@ -76,6 +77,7 @@ class NewlandEmvListener(
                 }
 
                 EmvL3Const.TransResult.L3_TXN_DECLINE -> {
+                    dialogProvider.hideProgressBar()
                     getEmvData(false)
                     emvL3.terminateTransaction()
                     continuation.resume(cardData.apply {
@@ -98,6 +100,7 @@ class NewlandEmvListener(
                     } else {
                         CardTransactionStatus.OfflinePinVerifyError
                     }
+                    dialogProvider.hideProgressBar()
                     emvL3.terminateTransaction()
                     continuation.resume(cardData.apply {
                         status = endTransactionStatus
@@ -169,6 +172,7 @@ class NewlandEmvListener(
                 Log.d("NewLandUIEvent", "End result : $result")
                 when(result){
                     EmvL3Const.TransResult.L3_TXN_APPROVED -> {
+                        dialogProvider.hideProgressBar()
                         cardData.status = CardTransactionStatus.Success
                         emvL3.terminateTransaction()
                         Singletons.clearEmvL3()
