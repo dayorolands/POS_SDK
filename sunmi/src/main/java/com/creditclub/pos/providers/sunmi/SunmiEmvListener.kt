@@ -24,6 +24,7 @@ import com.cluster.pos.extensions.hexBytes
 import com.cluster.pos.extensions.hexString
 import com.cluster.pos.providers.sunmi.R
 import com.cluster.pos.utils.asDesEdeKey
+import com.cluster.pos.utils.decrypt
 import com.cluster.pos.utils.encrypt
 import com.creditclub.pos.providers.sunmi.emv.TLV
 import com.creditclub.pos.providers.sunmi.emv.TLVUtil
@@ -385,8 +386,13 @@ class SunmiEmvListener(
                     }
                     else{
                         val pinkey = "11111111111111111111111111111111".hexBytes
+                        val devicePinKey = "11111111111111111111111111111111".hexBytes.asDesEdeKey
+                        val deviceEncryptedPinblock = devicePinKey.encrypt(pinBlock).copyOf(8) // Triple DES Encryption (All that is required now is the Pinkey)
+                        Log.d("CheckDUKPT", "Here to check the Triple DES pinblock ${deviceEncryptedPinblock.hexString}")
+                        Log.d("CheckDUKPT", "Here to decrypt the Triple DES pinblock ${devicePinKey.decrypt(pinBlock).copyOf(8).hexString}")
+
+                        //DUKPT Encryption
                         val decryptedVal = tripleDesDecrypt(pinkey, pinBlock)
-                        Log.d("CheckDUKPT", "Here to check the clear pin block ${decryptedVal.hexString}")
                         val storedKsn = SharedPref[activity, "ksn", ""]
                         val incrementKsn = incrementKsn(activity, storedKsn!!)
                         val workingKey = pinBlockHelper.getSessionKey(PosManager.IPEK, incrementKsn)
