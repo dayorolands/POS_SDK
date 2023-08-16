@@ -100,14 +100,14 @@ abstract class CardTransactionActivity : PosActivity() {
             delay(1000)
             dialogProvider.hideProgressBar()
 
-            if (Platform.hasPrinter) {
-                val printerStatus = withContext(Dispatchers.Default) { printer.check() }
-                if (printerStatus != PrinterStatus.READY) {
-                    dialogProvider.showErrorAndWait(printerStatus.message)
-                    finish()
-                    return@launch
-                }
-            }
+//            if (Platform.hasPrinter) {
+//                val printerStatus = withContext(Dispatchers.Default) { printer.check() }
+//                if (printerStatus != PrinterStatus.READY) {
+//                    dialogProvider.showErrorAndWait(printerStatus.message)
+//                    finish()
+//                    return@launch
+//                }
+//            }
 
             when (val cardEvent = posManager.cardReader.waitForCard()) {
                 CardReaderEvent.REMOVED, CardReaderEvent.CANCELLED -> {
@@ -319,7 +319,7 @@ abstract class CardTransactionActivity : PosActivity() {
                     posTransaction = posTransaction,
                     isCustomerCopy = true,
                 )
-                printer.printAsync(receipt)
+                //printer.printAsync(receipt)
                 return@launch
             }
 
@@ -345,7 +345,7 @@ abstract class CardTransactionActivity : PosActivity() {
                 posTransaction = posTransaction,
                 isCustomerCopy = true
             )
-            printer.printAsync(receipt)
+            //printer.printAsync(receipt)
         } catch (ex: Exception) {
             showTransactionStatusPage(posTransaction)
             firebaseCrashlytics.recordException(ex)

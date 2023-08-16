@@ -1,22 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black_text">#424843</color>
-    <color name="light_blue">#2595e1</color>
-    <color name="common_bg">#f1f2f7</color>
-    <color name="main_menu_item_press">#e5e5e5</color>
-    <color name="main_gv_bg">#cfcfcf</color>
-
-    <color name="enter_amount_bg">#B7B7B7</color>
-    <color name="colorPrimary">#313131</color>
-    <color name="keyboard_pressed_bg">#E8E8E8</color>
-    <color name="yellow_ffb940">#ffb940</color>
-
-    <color name="light_black">#333333</color>
-    <color name="colorPrimaryDark">#313131</color>
-    <color name="gray">#cfcfcf</color>
-    <color name="colorClick">#3F000000</color>
-    <color name="gray_font">#979797</color>
-    <color name="windowBackground">#ededed</color>
-    <color name="red">#FF0000</color>
-    <color name="translucent">#9000</color>
+    <color name="colorPrimary">#000000</color>
 </resources>

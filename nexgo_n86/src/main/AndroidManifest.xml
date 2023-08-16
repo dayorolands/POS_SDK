@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
-    package="com.creditclub.pos.nexgo.nexgo_n86">
+    package="com.nexgo">
 
     <dist:module dist:title="@string/module_nexgo">
         <dist:delivery>
@@ -9,12 +9,11 @@
         <dist:fusing dist:include="true" />
     </dist:module>
 
-    <application>
+    <application android:hasCode="true">
         <provider
-            android:name="com.creditclub.pos.nexgo.nexgo_n86.N86PosManagerProvider"
-            android:authorities="${applicationId}.N86PosMangerProvider"
+            android:name="com.nexgo.n86.N86PosManagerProvider"
+            android:authorities="${applicationId}.n86.N3PosManagerProvider"
             android:enabled="true"
-            android:exported="false"
-            />
+            android:exported="false" />
     </application>
 </manifest>

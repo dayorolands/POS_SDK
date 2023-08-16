@@ -1,13 +1,13 @@
-package com.creditclub.pos.nexgo.nexgo_n86
+package com.nexgo.n86
 
-import android.app.AlertDialog
+import android.content.Context
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil
 import com.cluster.core.data.prefs.getEncryptedSharedPreferences
 import com.cluster.core.ui.CreditClubActivity
-import com.cluster.core.util.debugOnly
-import com.cluster.core.util.toCurrencyFormat
+import com.cluster.core.util.*
 import com.cluster.pos.EmvException
 import com.cluster.pos.PosManager
 import com.cluster.pos.PosParameter
@@ -18,15 +18,16 @@ import com.cluster.pos.extensions.hexBytes
 import com.cluster.pos.extensions.hexString
 import com.cluster.pos.utils.asDesEdeKey
 import com.cluster.pos.utils.encrypt
-import com.creditclub.pos.nexgo.nexgo_n86.databinding.NexgoN86PinInputDialogBinding
-import com.creditclub.pos.providers.newland.util.getTag
-import com.creditclub.pos.providers.newland.util.getValue
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.nexgo.R
+import com.nexgo.databinding.NexgoN3PinInputDialogBinding
 import com.nexgo.oaf.apiv3.DeviceEngine
 import com.nexgo.oaf.apiv3.SdkResult
 import com.nexgo.oaf.apiv3.device.pinpad.*
 import com.nexgo.oaf.apiv3.device.reader.CardInfoEntity
 import com.nexgo.oaf.apiv3.emv.*
+import javax.crypto.Cipher
+import javax.crypto.spec.SecretKeySpec
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
@@ -39,34 +40,30 @@ class N86EmvListener(
 ) : OnEmvProcessListener2 {
     private var hasResumed: Boolean = false
     private val emvHandler2 = deviceEngine.getEmvHandler2("app2")
-    private val dialogProvider = activity.dialogProvider
     private val cardData = N86CardData()
     private var filed55: String? = null
     private val prefs = activity.getEncryptedSharedPreferences("com.nexgo.n3.manager")
+    private val pinBlockHelper = PinBlockHelper()
 
     override fun onSelApp(
-        appNameList: MutableList<String>?,
-        appInfoList: MutableList<CandidateAppInfoEntity>?,
-        isFirstSelect: Boolean
+        appNameList: List<String>?,
+        appInfoList: List<CandidateAppInfoEntity>?,
+        isFirstSelect: Boolean,
     ) {
-        Log.d("CardInfoEntity", "We passed here 1")
         appNameList ?: return
         emvHandler2.onSetSelAppResponse(1)
     }
 
     override fun onTransInitBeforeGPO() {
-        Log.d("CardInfoEntity", "We passed here 2")
         emvHandler2.setPureKernelCapab(byteArrayOf(0xE0.toByte(), 0x40.toByte(), 0xC8.toByte()))
         emvHandler2.onSetTransInitBeforeGPOResponse(true)
     }
 
-    override fun onConfirmCardNo(cardInfoEntity: CardInfoEntity?) {
-        Log.d("CardInfoEntity","The card info is ${cardInfoEntity?.cardNo}")
+    override fun onConfirmCardNo(cardInfo: CardInfoEntity) {
         emvHandler2.onSetConfirmCardNoResponse(true)
     }
 
     override fun onCardHolderInputPin(isOnlinePin: Boolean, leftTimes: Int) {
-        Log.d("CardInfoEntity", "We passed here 3")
         if (!isOnlinePin && leftTimes < 1) {
             emvHandler2.emvProcessCancel()
             if (!hasResumed) {
@@ -78,80 +75,98 @@ class N86EmvListener(
             return
         }
 
-        val pinPad : PinPad = deviceEngine.pinPad
-        val cardNumber = emvHandler2.emvCardDataInfo.cardNo
+        val pinPad: PinPad = deviceEngine.pinPad
+        val cardNo = emvHandler2.emvCardDataInfo.cardNo
         val amount = sessionData.amount / 100.0
         var amountText = ""
         if (sessionData.amount > 0) amountText = "Amount: ${amount.toCurrencyFormat()}"
         if (sessionData.cashBackAmount > 0) amountText = "$amount        " +
                 "Cashback Amount: ${amount.toCurrencyFormat()}"
-        //val dukptConfig = sessionData.getDukptConfig?.invoke(cardNumber, amount)
-        //val posParameter: PosParameter = sessionData.getPosParameter?.invoke(cardNumber, sessionData.amount / 100.0) ?: defaultPosParameter
-        val cipherKey = PosManager.IPEK.padEnd(32, '0').hexBytes.asDesEdeKey
+
+        //DUKPT encryption
+        val ipekByte = "C1D0F8FB4958670DBA40AB1F3752EF0D"
+        val ksnByte = "FFFF9876543210000000"
+        val cipherKey = ipekByte.padEnd(32, '0').hexBytes.asDesEdeKey
         val oldKcv = prefs.getString("kcv", null)
         val newKcv = cipherKey.encrypt(ByteArray(8)).hexString
-        Log.d("CardInfoEntity", "The old kcv is $oldKcv")
-        Log.d("CardInfoEntity", "The new kcv is $newKcv")
         pinPad.setAlgorithmMode(AlgorithmModeEnum.DUKPT)
         if (oldKcv != newKcv) {
             val result = pinPad.dukptKeyInject(
                 0,
                 DukptKeyTypeEnum.IPEK,
-                PosManager.IPEK.hexBytes,
-                PosManager.IPEK.hexBytes.size,
-                PosManager.KSN.hexBytes,
+                ipekByte.hexBytes,
+                ipekByte.hexBytes.size,
+                ksnByte.hexBytes,
             )
-            Log.d("CardInfoEntity","The result for DUKPT pin injection is $result")
-            //debug("Dukpt inject result is $result")
+            Log.d("CardInfoEntity", "The result of the DUKPT injection is $result")
+            debug("Dukpt inject result is $result")
             if (result == 0) prefs.edit { putString("kcv", newKcv) }
         }
         pinPad.dukptKsnIncrease(0)
 
         activity.runOnUiThread {
-            var passwordText = ""
+            var pwdText = ""
             val inflater = activity.layoutInflater
-            val binding = DataBindingUtil.inflate<NexgoN86PinInputDialogBinding>(inflater, R.layout.nexgo_n86_pin_input_dialog,null, false)
+            val binding =
+                DataBindingUtil.inflate<NexgoN3PinInputDialogBinding>(
+                    inflater,
+                    R.layout.nexgo_n3_pin_input_dialog,
+                    null,
+                    false
+                )
             binding.triesLeftTv.text = "$leftTimes"
             binding.amountTv.text = amountText
             val dialog = AlertDialog.Builder(activity).setView(binding.root).create()
+            dialog.setCanceledOnTouchOutside(false)
             dialog.show()
-            val pinPadInputListener = object : OnPinPadInputListener{
+            val pinPadInputListener = object : OnPinPadInputListener {
                 override fun onInputResult(retCode: Int, data: ByteArray?) {
-                    Log.d("CardInfoEntity", "The returned code for pin entry is $retCode")
-                    Log.d("CardInfoEntity", "The returned data for pin entry is $data")
+                    Log.d("CardInfoEntity", "The ret code is : $retCode")
+                    Log.d("CardInfoEntity", "The encrypted pin block: ${data?.hexString}")
                     dialog.dismiss()
-                    if(retCode == SdkResult.Success || retCode == SdkResult.PinPad_No_Pin_Input || retCode == SdkResult.PinPad_Input_Cancel){
-                        if(retCode == SdkResult.Success && data != null && isOnlinePin){
-                            cardData.pinBlock = data.hexString
-                            cardData.ksnData = pinPad.dukptCurrentKsn(0)?.hexString
-
-                            Log.d("CardInfoEntity", "The card pin block is ${data.hexString}")
-                            Log.d("CardInfoEntity", "The card ksn data is ${cardData.ksnData}")
+                    if (retCode == SdkResult.Success || retCode == SdkResult.PinPad_No_Pin_Input || retCode == SdkResult.PinPad_Input_Cancel) {
+                        if (retCode == SdkResult.Success && data != null && isOnlinePin) {
+                            val dukptEncrypt = pinPad.dukptEncrypt(0, DukptKeyModeEnum.RESPONSE, data, data.size, DesAlgorithmModeEnum.CBC, byteArrayOf(0,0,0,0,0,0,0,0))
+                            Log.d("CardInfoEntity", "The dukpt value is : ${dukptEncrypt.hexString}")
+                            val clearPinBlock = tripleDesDecrypt(ipekByte.hexBytes, dukptEncrypt)
+                            Log.d("CardInfoEntity", "The decrypted value of the data result is : ${clearPinBlock.hexString}")
+                            val storedKsn = SharedPref[activity, "ksn", ""]
+                            val incrementKsn = incrementKsn(activity, storedKsn!!)
+                            val workingKey = pinBlockHelper.getSessionKey(PosManager.IPEK, incrementKsn)
+                            val encryptedPinBlock = pinBlockHelper.desEncryptDukpt(workingKey, dukptEncrypt.hexString)
+                            val transactionKsn = pinBlockHelper.generateTransKsn(incrementKsn)
+                            cardData.pinBlock = encryptedPinBlock
+                            cardData.ksnData = transactionKsn?.uppercase()
+                            Log.d("CardInfoEntity", "The pinblock result is : ${cardData.pinBlock}")
+                            Log.d("CardInfoEntity", "The ksn result is : ${cardData.ksnData}")
                         }
                         emvHandler2.onSetPinInputResponse(
                             retCode != SdkResult.PinPad_Input_Cancel,
                             retCode == SdkResult.PinPad_No_Pin_Input
                         )
+                    } else {
+                        emvHandler2.onSetPinInputResponse(false, false)
                     }
                 }
 
                 override fun onSendKey(keyCode: Byte) {
                     activity.runOnUiThread {
                         if (keyCode == PinPadKeyCode.KEYCODE_CLEAR) {
-                            passwordText = ""
+                            pwdText = ""
                         } else {
-                            passwordText += "* "
+                            pwdText += "* "
                         }
-                        binding.pinTv.text = passwordText
+                        binding.pinTv.text = pwdText
                     }
                 }
             }
+
             pinPad.setPinKeyboardMode(PinKeyboardModeEnum.RANDOM)
             if (isOnlinePin) {
                 pinPad.inputOnlinePin(
                     intArrayOf(0x04),
                     60,
-                    cardNumber.toByteArray(),
+                    cardNo.toByteArray(),
                     0,
                     PinAlgorithmModeEnum.ISO9564FMT1,
                     pinPadInputListener,
@@ -162,15 +177,33 @@ class N86EmvListener(
         }
     }
 
-    override fun onContactlessTapCardAgain() {
+    private fun tripleDesDecrypt(pinKey: ByteArray, encryptedPinBlock: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance("DESede/ECB/NoPadding")
+        val secretKeySpec = SecretKeySpec(pinKey, "DESede")
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec)
+        return cipher.doFinal(encryptedPinBlock)
+    }
 
+    private fun incrementKsn(context: Context, iKsn: String) : String {
+        var ksnValue = iKsn
+        ksnValue = ksnValue.substring(0, ksnValue.length - 5)
+        val counter = SharedPref[context, "ksnCounter", "0"]!!.toLong().plus(1)
+        SharedPref[activity, "ksnCounter"] = counter.toString()
+        if(counter > 99997){
+            SharedPref[activity, "ksnCounter"] = PosManager.KsnCounter
+        }
+        ksnValue += counter.toString().padStart(5, '0')
+        return ksnValue
+    }
+
+    override fun onContactlessTapCardAgain() {
     }
 
     override fun onOnlineProc() {
         val emvOnlineResult = EmvOnlineResultEntity()
         emvOnlineResult.authCode = "123450"
         emvOnlineResult.rejCode = "00"
-        emvOnlineResult.recvField55 = getField55String().hexBytes
+        emvOnlineResult.recvField55 = getFiled55String().hexBytes
         emvHandler2.onSetOnlineProcResponse(SdkResult.Success, emvOnlineResult)
     }
 
@@ -183,7 +216,6 @@ class N86EmvListener(
     }
 
     override fun onFinish(retCode: Int, entity: EmvProcessResultEntity?) {
-        Log.d("CardInfoEntity","The retcode on finish is : $retCode")
         if (retCode != SdkResult.Success) {
             val exception = EmvException("Nexgo EMV failed with ret $retCode")
             debugOnly { Log.e("N3", exception.message, exception) }
@@ -192,7 +224,7 @@ class N86EmvListener(
         when (retCode) {
             SdkResult.Emv_Success_Arpc_Fail, SdkResult.Success, SdkResult.Emv_Script_Fail -> {
                 val cardDataInfo = emvHandler2.emvCardDataInfo
-                cardData.mIccString = getField55String()
+                cardData.mIccString = getFiled55String()
                 cardData.apply {
                     pan = cardDataInfo.cardNo
                     track2 = cardDataInfo.tk2
@@ -245,7 +277,7 @@ class N86EmvListener(
         }
     }
 
-    private fun getField55String(): String {
+    private fun getFiled55String(): String {
         if (filed55 != null) return filed55!!
         val tags = arrayOf(
             "82",

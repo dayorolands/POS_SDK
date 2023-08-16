@@ -1,6 +1,5 @@
-package com.creditclub.pos.nexgo.nexgo_n86
+package com.nexgo.n86
 
-import android.util.Log
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.util.debugOnly
 import com.cluster.core.util.safeRunIO
@@ -14,11 +13,10 @@ import com.nexgo.oaf.apiv3.device.reader.CardInfoEntity
 import com.nexgo.oaf.apiv3.device.reader.CardSlotTypeEnum
 import com.nexgo.oaf.apiv3.device.reader.OnCardInfoListener
 import com.nexgo.oaf.apiv3.emv.EmvEntryModeEnum
-import com.nexgo.oaf.apiv3.emv.EmvHandler2
 import com.nexgo.oaf.apiv3.emv.EmvProcessFlowEnum
 import com.nexgo.oaf.apiv3.emv.EmvTransConfigurationEntity
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
@@ -27,7 +25,6 @@ import java.time.LocalDateTime
 import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-
 
 class N86CardReader(
     private val activity: CreditClubActivity,
@@ -38,14 +35,16 @@ class N86CardReader(
     private val posConfig: PosConfig,
 ) : CardReaders {
     private var cardReader = deviceEngine.cardReader
-    private val emvHandler2 : EmvHandler2 = deviceEngine.getEmvHandler2("app2")
+    private val emvHandler2 = deviceEngine.getEmvHandler2("app2")
     private val dialogProvider = activity.dialogProvider
+
     private var cardReaderEvent: CardReaderEvent = CardReaderEvent.CANCELLED
+
     private var userCancel = false
     private var isSessionOver = false
+
     private var supportsChip = true
     private var supportsMagStripe = true
-
 
     override suspend fun waitForCard(): CardReaderEvent {
         dialogProvider.showProgressBar("Opening device", "Please wait...", true) {
@@ -58,6 +57,7 @@ class N86CardReader(
         delay(500)
         updateCardWaitingProgress("Insert or swipe card")
         cardReaderEvent = withContext(Dispatchers.IO) { detectCard() }
+
         dialogProvider.hideProgressBar()
 
         return cardReaderEvent
@@ -78,14 +78,44 @@ class N86CardReader(
                 continuation = continuation,
                 defaultPosParameter = defaultPosParameter,
             )
-            Log.d("CardInfoEntity", "Trans Amount : ${posManager.sessionData.amount.toString().padStart(12, '0')}")
-            Log.d("CardInfoEntity", "Trans type : ${transData.emvTransType}")
-            Log.d("CardInfoEntity", "Trans date : ${transData.transDate} and trans time ${transData.transTime}")
             emvHandler2.setTlv("9F33".hexBytes, "E040C8".hexBytes)
             emvHandler2.emvProcess(transData, emvListener)
         }
+        safeRunIO {
+            debugOnly {
+                val outputFile = File(
+                    activity.getExternalFilesDir(null)!!.absolutePath,
+                    "emv_logcat_${LocalDateTime.now()}.txt"
+                )
+                try {
+                    Runtime.getRuntime().exec("logcat -f " + outputFile.absolutePath)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
         dialogProvider.hideProgressBar()
         return cardData
+    }
+
+    override fun endWatch() {
+        isSessionOver = true
+    }
+
+    override suspend fun onRemoveCard(onEventChange: CardReaderEventListener) {
+        withContext(Dispatchers.IO) {
+            while (true) {
+                if (userCancel) break
+                if (isSessionOver) break
+                if (checkCard(CardSlotTypeEnum.ICC1, 1) != 0) break
+            }
+        }
+
+        if (!userCancel && !isSessionOver) {
+            userCancel = true
+            deviceClose()
+            onEventChange(CardReaderEvent.REMOVED)
+        }
     }
 
     private inline val transData
@@ -125,26 +155,33 @@ class N86CardReader(
             } else {
                 EmvEntryModeEnum.EMV_ENTRY_MODE_CONTACTLESS
             }
+//            isContactForceOnline = true
         }
 
-    override fun endWatch() {
-        isSessionOver = true
+    private fun openDevice() {
+        if (supportsMagStripe) cardReader.open(CardSlotTypeEnum.SWIPE)
+        if (supportsChip) cardReader.open(CardSlotTypeEnum.ICC1)
+//        if (isSupportNfc) EmvService.NfcOpenReader(1000)
     }
 
-    override suspend fun onRemoveCard(onEventChange: CardReaderEventListener) {
-        withContext(Dispatchers.IO) {
-            while (true) {
-                if (userCancel) break
-                if (isSessionOver) break
-                if (checkCard(CardSlotTypeEnum.ICC1, 1) != 0) break
-            }
+    private fun deviceClose() {
+        if (supportsMagStripe) cardReader.close(CardSlotTypeEnum.SWIPE)
+
+        if (supportsChip) {
+            if (cardReaderEvent == CardReaderEvent.CHIP) cardReader.close(CardSlotTypeEnum.ICC1)
         }
 
-        if (!userCancel && !isSessionOver) {
-            userCancel = true
-            deviceClose()
-            onEventChange(CardReaderEvent.REMOVED)
-        }
+//        if (isSupportNfc) {
+//            EmvService.NfcCloseReader()
+//        }
+    }
+
+    private fun powerOnIcc(): Boolean {
+        val ret = 1
+        cardReader.open(CardSlotTypeEnum.ICC1)
+        cardReader.stopSearch()
+
+        return ret == 1
     }
 
     private fun updateCardWaitingProgress(text: String = "Please insert card") {
@@ -155,19 +192,6 @@ class N86CardReader(
                 if (!activity.isFinishing) activity.finish()
             }
         }
-    }
-
-    private fun deviceClose() {
-        if (supportsMagStripe) cardReader.close(CardSlotTypeEnum.SWIPE)
-
-        if (supportsChip) {
-            if (cardReaderEvent == CardReaderEvent.CHIP) cardReader.close(CardSlotTypeEnum.ICC1)
-        }
-    }
-
-    private fun openDevice() {
-        if (supportsMagStripe) cardReader.open(CardSlotTypeEnum.SWIPE)
-        if (supportsChip) cardReader.open(CardSlotTypeEnum.ICC1)
     }
 
     private suspend fun checkCard(cardSlotType: CardSlotTypeEnum, timeout: Int = 60): Int =
@@ -214,6 +238,8 @@ class N86CardReader(
                     val powerOn = true//powerOnIcc()
 
                     if (powerOn) return CardReaderEvent.CHIP
+
+//                    hybridDetected = true
 
                     if (!powerOn && !hybridDetected) {
                         return CardReaderEvent.CHIP_FAILURE

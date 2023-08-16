@@ -1,4 +1,4 @@
-package com.creditclub.pos.nexgo.nexgo_n86
+package com.nexgo.n86
 
 import com.cluster.pos.card.CardData
 

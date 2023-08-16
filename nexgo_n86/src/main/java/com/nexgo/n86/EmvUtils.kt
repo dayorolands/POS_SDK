@@ -1,4 +1,4 @@
-package com.creditclub.pos.providers.newland.util
+package com.nexgo.n86
 
 import android.content.Context
 import android.util.Log
