@@ -14,6 +14,8 @@ include(":sunmi")
 include(":horizonpay")
 include(":dspread")
 include(":newland")
+include(":nexgo_n86_smartpos_sdk")
+include(":nexgo_n86")
 
 buildCache {
     local {

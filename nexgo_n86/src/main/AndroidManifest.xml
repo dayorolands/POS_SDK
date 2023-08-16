@@ -1,0 +1,20 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dist="http://schemas.android.com/apk/distribution"
+    package="com.creditclub.pos.nexgo.nexgo_n86">
+
+    <dist:module dist:title="@string/module_nexgo">
+        <dist:delivery>
+            <dist:on-demand/>
+        </dist:delivery>
+        <dist:fusing dist:include="true" />
+    </dist:module>
+
+    <application>
+        <provider
+            android:name="com.creditclub.pos.nexgo.nexgo_n86.N86PosManagerProvider"
+            android:authorities="${applicationId}.N86PosMangerProvider"
+            android:enabled="true"
+            android:exported="false"
+            />
+    </application>
+</manifest>

@@ -148,6 +148,7 @@ dependencies {
     ordaImplementation(project(":sunmi"))
     ordaImplementation(project(":horizonpay"))
     ordaImplementation(project(":newland"))
+    ordaImplementation(project(":nexgo_n86"))
 
     implementation("androidx.activity:activity-ktx:${Versions.activityKtx}")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
