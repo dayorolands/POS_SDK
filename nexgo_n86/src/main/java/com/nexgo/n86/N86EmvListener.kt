@@ -84,25 +84,35 @@ class N86EmvListener(
                 "Cashback Amount: ${amount.toCurrencyFormat()}"
 
         //DUKPT encryption
-        val ipekByte = "C1D0F8FB4958670DBA40AB1F3752EF0D"
-        val ksnByte = "FFFF9876543210000000"
-        val cipherKey = ipekByte.padEnd(32, '0').hexBytes.asDesEdeKey
-        val oldKcv = prefs.getString("kcv", null)
-        val newKcv = cipherKey.encrypt(ByteArray(8)).hexString
-        pinPad.setAlgorithmMode(AlgorithmModeEnum.DUKPT)
-        if (oldKcv != newKcv) {
-            val result = pinPad.dukptKeyInject(
-                0,
-                DukptKeyTypeEnum.IPEK,
-                ipekByte.hexBytes,
-                ipekByte.hexBytes.size,
-                ksnByte.hexBytes,
-            )
-            Log.d("CardInfoEntity", "The result of the DUKPT injection is $result")
-            debug("Dukpt inject result is $result")
-            if (result == 0) prefs.edit { putString("kcv", newKcv) }
-        }
-        pinPad.dukptKsnIncrease(0)
+//        val ipekByte = PosManager.IPEK
+//        val ksnByte = PosManager.KSN
+//        val cipherKey = ipekByte.padEnd(32, '0').hexBytes.asDesEdeKey
+//        val oldKcv = prefs.getString("kcv", null)
+//        val newKcv = cipherKey.encrypt(ByteArray(8)).hexString
+//        pinPad.setAlgorithmMode(AlgorithmModeEnum.DUKPT)
+//        if (oldKcv != newKcv) {
+//            val result = pinPad.dukptKeyInject(
+//                0,
+//                DukptKeyTypeEnum.IPEK,
+//                ipekByte.hexBytes,
+//                ipekByte.hexBytes.size,
+//                ksnByte.hexBytes,
+//            )
+//            Log.d("CardInfoEntity", "The result of the DUKPT injection is $result")
+//            debug("Dukpt inject result is $result")
+//            if (result == 0) prefs.edit { putString("kcv", newKcv) }
+//        }
+//        pinPad.dukptKsnIncrease(0)
+
+        //DES Encryption
+        pinPad.setAlgorithmMode(AlgorithmModeEnum.DES)
+        val masterKey = "3ECEDA9BF4DCCB0B105708E5B334E308".hexBytes
+        val masterResult = pinPad.writeMKey(0, masterKey, masterKey.size)
+        Log.d("CardInfoEntity", "The result of the master key injection is $masterResult")
+
+        val tempPinKey = "7CD53B62D66BD5574F928AF7F1D03752".hexBytes
+        val result = pinPad.writeWKey(0, WorkKeyTypeEnum.PINKEY, tempPinKey, tempPinKey.size)
+        Log.d("CardInfoEntity", "The result of the pinkey injection is $result")
 
         activity.runOnUiThread {
             var pwdText = ""
@@ -126,17 +136,19 @@ class N86EmvListener(
                     dialog.dismiss()
                     if (retCode == SdkResult.Success || retCode == SdkResult.PinPad_No_Pin_Input || retCode == SdkResult.PinPad_Input_Cancel) {
                         if (retCode == SdkResult.Success && data != null && isOnlinePin) {
-                            val dukptEncrypt = pinPad.dukptEncrypt(0, DukptKeyModeEnum.RESPONSE, data, data.size, DesAlgorithmModeEnum.CBC, byteArrayOf(0,0,0,0,0,0,0,0))
-                            Log.d("CardInfoEntity", "The dukpt value is : ${dukptEncrypt.hexString}")
-                            val clearPinBlock = tripleDesDecrypt(ipekByte.hexBytes, dukptEncrypt)
-                            Log.d("CardInfoEntity", "The decrypted value of the data result is : ${clearPinBlock.hexString}")
-                            val storedKsn = SharedPref[activity, "ksn", ""]
-                            val incrementKsn = incrementKsn(activity, storedKsn!!)
-                            val workingKey = pinBlockHelper.getSessionKey(PosManager.IPEK, incrementKsn)
-                            val encryptedPinBlock = pinBlockHelper.desEncryptDukpt(workingKey, dukptEncrypt.hexString)
-                            val transactionKsn = pinBlockHelper.generateTransKsn(incrementKsn)
-                            cardData.pinBlock = encryptedPinBlock
-                            cardData.ksnData = transactionKsn?.uppercase()
+//                            cardData.pinBlock = data.hexString
+//                            cardData.ksnData = pinPad.dukptCurrentKsn(0)?.hexString
+                            val secretKey = "7CD53B62D66BD5574F928AF7F1D03752".hexBytes.asDesEdeKey
+                            val pinPanXor = pinPad.desByWKey(
+                                0,
+                                WorkKeyTypeEnum.PINKEY,
+                                data,
+                                data.size,
+                                DesKeyModeEnum.KEY_ALL,
+                                CalcModeEnum.DECRYPT,
+                            )
+                            val encryptedPinBlock = secretKey.encrypt(pinPanXor).copyOf(8)
+                            cardData.pinBlock = encryptedPinBlock.hexString
                             Log.d("CardInfoEntity", "The pinblock result is : ${cardData.pinBlock}")
                             Log.d("CardInfoEntity", "The ksn result is : ${cardData.ksnData}")
                         }
