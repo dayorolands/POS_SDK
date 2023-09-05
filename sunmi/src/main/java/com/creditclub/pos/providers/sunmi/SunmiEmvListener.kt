@@ -98,7 +98,7 @@ class SunmiEmvListener(
             mEMVOptV2.setTlvList(AidlConstants.EMV.TLVOpCode.OP_NORMAL, tags, values)
         }
 
-        if (tag9F06value != null && tag9F06value.isNotEmpty()) {
+        if (!tag9F06value.isNullOrEmpty()) {
             val isVisa = tag9F06value.startsWith("A000000003")
             val isMaster = tag9F06value.startsWith("A000000004")
             val isUnion = tag9F06value.startsWith("A000000333")
@@ -280,22 +280,8 @@ class SunmiEmvListener(
                 }
                 EMV_FINAL_APP_SELECT -> mEMVOptV2.importAppFinalSelectStatus(0)
                 EMV_CONFIRM_CARD_NO -> {
-                    dialogProvider.hideProgressBar()
-                    dialogProvider.confirm(
-                        activity.getString(R.string.emv_confirm_card_no),
-                        cardData.pan,
-                    ) {
-                        onSubmit {
-                            dialogProvider.showProgressBar(R.string.handling)
-                            mEMVOptV2.importCardNoStatus(0)
-                        }
-
-                        onClose {
-                            continuation.resume(cardData.apply {
-                                status = CardTransactionStatus.UserCancel
-                            })
-                        }
-                    }
+                    dialogProvider.showProgressBar(R.string.handling)
+                    mEMVOptV2.importCardNoStatus(0)
                 }
                 EMV_CERT_VERIFY -> {
                     dialogProvider.showProgressBar(R.string.handling)
@@ -342,14 +328,13 @@ class SunmiEmvListener(
 
         if (prefs.getString("kcv", null) != "F2204B822FD84A65") {
             val result = mSecurityOptV2.saveKeyDukpt(
-                AidlConstants.Security.KEY_TYPE_DUPKT_IPEK,
+                Security.KEY_TYPE_DUPKT_IPEK,
                 "86772A2D72A29EF0A4D03ED5074DB927".hexBytes,
                 "F2204B822FD84A65".hexBytes,
                 "FFFF9876543210E00000".hexBytes,
-                AidlConstants.Security.KEY_ALG_TYPE_3DES,
+                Security.KEY_ALG_TYPE_3DES,
                 0
             )
-            Log.d("CheckDUKPT", "checking dukpt result $result")
             if (result == 0) prefs.edit { putString("kcv", "F2204B822FD84A65") }
         }
         mSecurityOptV2.dukptIncreaseKSN(0)
@@ -515,6 +500,7 @@ class SunmiEmvListener(
         if (len > 0) {
             val bytes = outData.copyOf(len)
             cardData.mIccString = bytes.hexString
+            Log.d("PrintCardInfo", "The ICC Card info is ${cardData.mIccString}")
             val tlvMap: Map<String, TLV> = TLVUtil.buildTLVMap(cardData.mIccString)
 
             cardData.apply {

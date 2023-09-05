@@ -3,6 +3,7 @@ package com.creditclub.pos.providers.sunmi
 import android.os.Bundle
 import android.os.RemoteException
 import android.util.Log
+import bsh.Interpreter
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.util.debug
 import com.cluster.core.util.safeRun
@@ -61,7 +62,6 @@ class SunmiCardReader(
         val cardData: CardData? = suspendCoroutine { continuation ->
             dialogProvider.showProgressBar("Processing", "IC card detected...") {
                 onClose {
-//                    emv.emvProcessCancel()
                     continuation.resume(null)
                 }
             }
@@ -102,7 +102,6 @@ class SunmiCardReader(
 
     private fun deviceClose() {
         safeRun { cardReader.cancelCheckCard() }
-        //cardReader.cardOff(allowedCardType)
     }
 
     private suspend fun detectCard(): CardReaderEvent {
@@ -116,7 +115,10 @@ class SunmiCardReader(
             initEmvTlvData()
             val ret = checkCard(allowedCardType, 60)
 
-            if (ret == CardReaderEvent.MAG_STRIPE) {
+            if (ret == CardReaderEvent.Timeout){
+                return CardReaderEvent.Timeout
+            }
+            else if (ret == CardReaderEvent.MAG_STRIPE) {
                 if (!chipFailure) {
                     hybridDetected = true
                     updateCardWaitingProgress("Card is chip card. Please Insert Card")
@@ -125,7 +127,7 @@ class SunmiCardReader(
                     return CardReaderEvent.MAG_STRIPE
             }
             else if (ret == CardReaderEvent.CHIP) {
-                val powerOn = true //powerOnIcc()
+                val powerOn = true
 
                 if (powerOn) return CardReaderEvent.CHIP
 
@@ -200,14 +202,14 @@ class SunmiCardReader(
             cardReader.checkCard(cardType, object : CheckCardCallbackV2.Stub() {
                 @Throws(RemoteException::class)
                 override fun findMagCard(bundle: Bundle) {
-                    debug("findMagCard:$bundle")
+                    Interpreter.debug("findMagCard:$bundle")
                     selectedCardType = AidlConstants.CardType.MAGNETIC.value
                     it.resume(CardReaderEvent.MAG_STRIPE)
                 }
 
                 @Throws(RemoteException::class)
                 override fun findICCard(atr: String) {
-                    debug("findICCard:$atr")
+                    Interpreter.debug("findICCard:$atr")
                     selectedCardType = AidlConstants.CardType.IC.value
                 }
 
@@ -220,7 +222,7 @@ class SunmiCardReader(
                 @Throws(RemoteException::class)
                 override fun onError(code: Int, message: String) {
                     safeRun { throw RuntimeException("Sunmi check card error $message -- $code") }
-                    dialogProvider.hideProgressBar()
+                    it.resume(CardReaderEvent.Timeout)
                 }
 
                 @Throws(RemoteException::class)

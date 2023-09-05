@@ -106,7 +106,7 @@
     <string name="pos_confirm_supervisor_pin">Confirm Device PIN</string>
     <string name="pos_supervisor_pin">Device PIN</string>
     <string name="pos_card_purchase">Withdrawal</string>
-    <string name="card_test">Card Test</string>
+    <string name="card_purchase">Purchase</string>
     <string name="pos_transaction_declined">Transaction Declined</string>
     <string name="pos_transaction_approved">Transaction Approved</string>
     <string name="pos_transaction_not_found">Transaction Not Found</string>

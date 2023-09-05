@@ -65,15 +65,11 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
     override val sessionData = PosManager.SessionData()
 
     override suspend fun loadEmv() {
-        Log.d("SunmiPayKernel", "onEnterLoadEMV")
-        delay(3000)
+        delay(1000)
         withContext(Dispatchers.Main) {
             suspendCoroutine<Unit> { continuation ->
                 payKernel.initPaySDK(activity, object : ConnectCallback {
                     override fun onConnectPaySDK() {
-                        Log.d("SunmiPayKernel", "onConnectPaySDK")
-                        Log.d("SunmiPayKernel", "CheckSunmiDevice")
-
                         val emvOptV2 = payKernel.mEMVOptV2
                         payKernel.mBasicOptV2
                         payKernel.mPinPadOptV2
@@ -97,7 +93,6 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
                     }
 
                     override fun onDisconnectPaySDK() {
-                        Log.e("SunmiPayKernel", "onDisconnectPaySDK")
                         isConnected = false
                         activity.finish()
                     }
@@ -112,10 +107,8 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
         for (i in 0 until arrayLength) {
             val jsonObject = jsonArray.getJSONObject(i)
             val emvApp = AidV2()
-//            emvApp.AppName = jsonObject.appName17.toByteArray(StandardCharsets.US_ASCII)
             emvApp.aid = jsonObject.aid15.hexBytes
             emvApp.selFlag = 0
-//            emvApp.Priority = jsonObject.selectionPriority19.hexByte
             emvApp.targetPer = jsonObject.targetPercentageDomestic27.hexByte
             emvApp.maxTargetPer = jsonObject.maxTargetDomestic25.hexByte
             emvApp.floorLimit = byteArrayOf(1)
@@ -152,7 +145,6 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
             capk.modul = jsonObject.modulus37.replace("\n", "").hexBytes
             capk.exponent = jsonObject.exponent38.hexBytes
             capk.expDate = "20311222".hexBytes
-//            capk.checkSum = jsonObject.hash39.hexBytes
             val ret = addCapk(capk)
             if (ret < 0) debug("Error setting CAPK value ${capk.rid}")
         }
@@ -187,7 +179,7 @@ class SunmiPosManager(private val activity: CreditClubActivity) : PosManager, Ko
                 pkgManager.queryIntentServices(intent, 0)
             }.data
 
-            return services != null && services.isNotEmpty()
+            return !services.isNullOrEmpty()
         }
 
         override fun setup(context: Context) {

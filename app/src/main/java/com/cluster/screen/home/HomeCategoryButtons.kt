@@ -18,34 +18,11 @@ import com.cluster.core.util.delegates.getArrayList
 @Composable
 fun HomeCategoryButtons(
     homeNavController: NavHostController,
-    institutionConfig: InstitutionConfig,
-    preferences: SharedPreferences
+    institutionConfig: InstitutionConfig
 ) {
-    val returnedList = getArrayList("institution_features", preferences)
     LazyVerticalGrid(
         cells = GridCells.Adaptive(minSize = 100.dp)
     ) {
-        if (returnedList != null) {
-            if(returnedList.contains("ACC") || (returnedList.contains("CBE"))) {
-                item {
-                    SmallMenuButton(
-                        text = "Customer",
-                        icon = painterResource(R.drawable.payday_loan),
-                        onClick = {
-                            homeNavController.navigate(
-                                BottomNavScreens.Customer.route
-                            ) {
-                                launchSingleTop = true
-                                popUpTo(BottomNavScreens.Home.route) {
-                                    inclusive = false
-                                }
-                            }
-                        },
-                    )
-                }
-            }
-        }
-
         item {
             SmallMenuButton(
                 text = "Transactions",
@@ -59,25 +36,6 @@ fun HomeCategoryButtons(
                     }
                 },
             )
-        }
-
-        if (institutionConfig.categories.loans) {
-            item {
-                SmallMenuButton(
-                    text = "Loans",
-                    icon = painterResource(R.drawable.personal_income),
-                    onClick = {
-                        homeNavController.navigate(
-                            BottomNavScreens.Loans.route
-                        ) {
-                            launchSingleTop = true
-                            popUpTo(BottomNavScreens.Home.route) {
-                                inclusive = false
-                            }
-                        }
-                    },
-                )
-            }
         }
     }
 }

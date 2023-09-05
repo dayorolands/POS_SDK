@@ -144,10 +144,10 @@ dependencies {
     implementation(project(":pos"))
     implementation(project(":analytics"))
 
-    ordaImplementation(project(":dspread"))
+    //ordaImplementation(project(":dspread"))
     ordaImplementation(project(":sunmi"))
-    ordaImplementation(project(":horizonpay"))
-    ordaImplementation(project(":newland"))
+    //ordaImplementation(project(":horizonpay"))
+    //ordaImplementation(project(":newland"))
 
     implementation("androidx.activity:activity-ktx:${Versions.activityKtx}")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
