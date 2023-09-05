@@ -3,6 +3,7 @@ package com.cluster.pos.service
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Looper
+import android.util.Log
 import androidx.annotation.RawRes
 import androidx.core.content.edit
 import com.cluster.pos.data.PosDatabase
@@ -18,6 +19,7 @@ import com.cluster.core.util.delegates.stringStore
 import com.cluster.core.util.delegates.valueStore
 import com.cluster.pos.*
 import com.cluster.pos.extensions.hexBytes
+import com.cluster.pos.extensions.hexString
 import com.cluster.pos.model.ConnectionInfo
 import com.cluster.pos.util.xor
 import com.cluster.pos.utils.asDesEdeKey
@@ -39,7 +41,7 @@ import java.time.Instant
 import java.util.*
 import kotlin.reflect.KProperty
 
-class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : PosParameter,
+class ParameterService(context: Context, var posMode: RemoteConnectionInfo) : PosParameter,
     KoinComponent {
     private val prefs: SharedPreferences = run {
         val suffix = "${posMode.host}:${posMode.port}"
@@ -60,6 +62,9 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
     override var capkList by ManagementDataDelegate("CAPK_ARRAY", R.raw.capk_data)
     override var emvAidList by ManagementDataDelegate("EMV_APP_ARRAY", R.raw.emv_app_data)
 
+    init {
+        posMode = config.remoteConnectionInfo
+    }
     override val managementData
         get() = safeRun {
             defaultJson.decodeFromString(ParameterObject.serializer(), managementDataString)
@@ -110,8 +115,8 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         val packedMsg = isoMsg.pack()
         packedMsg[19]++
 
-        val baos = sessionKey.hexBytes + packedMsg
-        val field64 = baos.sha256String.uppercase(Locale.getDefault())
+        val sessionKeyPacked = sessionKey.hexBytes + packedMsg
+        val field64 = sessionKeyPacked.sha256String.uppercase(Locale.getDefault())
         isoMsg.set(64, field64)
 
         val finalMsgBytes = packedMsg + field64.toByteArray()
@@ -122,6 +127,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
         val (output, error) = safeRun {
             SocketJob.execute(posMode, finalMsgBytes)
         }
+
         if (output == null) {
             isoRequestLog.saveToDb("TE")
             if (error != null) throw error
@@ -262,7 +268,7 @@ class ParameterService(context: Context, val posMode: RemoteConnectionInfo) : Po
             gpsCoordinates = localStorage.lastKnownLocation
             nodeName = posMode.nodeName
             if (posMode is ConnectionInfo) {
-                connectionInfo = posMode
+                connectionInfo = posMode as ConnectionInfo
             }
         }
     }

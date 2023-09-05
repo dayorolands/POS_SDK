@@ -81,7 +81,6 @@ class ClusterApplication : Application() {
                     uiModule,
                     configModule,
                     sharingModule,
-                    workerModule,
                     posModule,
                 )
             )
@@ -93,7 +92,6 @@ class ClusterApplication : Application() {
         Platform.test(this)
 
         if (Platform.isPOS) {
-            loadKoinModules(posWorkerModule)
             startPosApp()
             appDataStorage.deviceId = getPosSerialNumber()
         } else {

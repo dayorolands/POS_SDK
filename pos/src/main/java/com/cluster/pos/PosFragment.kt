@@ -3,6 +3,7 @@ package com.cluster.pos
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import com.cluster.pos.data.PosDatabase
 import com.cluster.core.ui.CreditClubFragment
 import com.cluster.pos.printer.PosPrinter
@@ -23,6 +24,7 @@ abstract class PosFragment(layout: Int) : CreditClubFragment(layout) {
         super.onCreate(savedInstanceState)
         firebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
         val remoteConnectionInfo = config.remoteConnectionInfo
+        Log.d("RemoteConnectionInfo", "The remote connection info is $remoteConnectionInfo")
         firebaseAnalytics.setUserProperty("default_pos_mode", localStorage.agent?.posMode)
         firebaseAnalytics.setUserProperty("pos_ip", remoteConnectionInfo.host)
         firebaseAnalytics.setUserProperty("pos_port", "${remoteConnectionInfo.port}")

@@ -89,6 +89,7 @@ android {
 
         debug {
             debuggable true
+            minifyEnabled true
             buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             buildConfigField("String", "TRUESTORE_PASS", "\"P@55w0rd123\"")
@@ -146,8 +147,6 @@ dependencies {
 
     //ordaImplementation(project(":dspread"))
     ordaImplementation(project(":sunmi"))
-    //ordaImplementation(project(":horizonpay"))
-    //ordaImplementation(project(":newland"))
 
     implementation("androidx.activity:activity-ktx:${Versions.activityKtx}")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")

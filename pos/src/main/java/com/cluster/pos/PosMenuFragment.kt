@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.cluster.core.data.api.retrofitService
 import com.cluster.core.ui.CreditClubActivity
@@ -43,8 +44,17 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
     }
 
     private fun checkRequirements() {
-        mainScope.launch {
+        if (config.terminalId.isEmpty()) {
+            return dialogProvider.showError(getString(R.string.pos_terminal_id_required)) {
+                onClose {
+                    super.onBackPressed()
+                }
+            }
+        }
+
+        lifecycleScope.launch {
             binding.cont.visibility = View.VISIBLE
+            checkKeysAndParameters()
             bindView()
         }
     }
@@ -53,5 +63,106 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
         binding.purchaseButton.button.setOnClickListener {
             startActivity(CardWithdrawalActivity::class.java)
         }
+
+        binding.keyDownloadButton.button.setOnClickListener {
+            lifecycleScope.launch {
+                downloadKeys()
+            }
+        }
+
+        binding.parameterDownloadButton.button.setOnClickListener {
+            lifecycleScope.launch {
+                downloadParameters()
+            }
+        }
+    }
+
+    private suspend fun checkKeysAndParameters() {
+        if (posParameterList.isEmpty()) {
+            dialogProvider.showError("No routes available")
+            return
+        }
+
+        val localDate = Instant.now().format("MMdd")
+        if (localDate == parameters.updatedAt) return
+
+        dialogProvider.showProgressBar("Downloading Keys")
+        for (parameterStore in posParameterList) {
+            val (_, error) = safeRunIO {
+                parameterStore.downloadKeys()
+                //parameterStore.downloadParameters()
+            }
+            if (error != null) {
+                dialogProvider.hideProgressBar()
+                dialogProvider.showError("Download Failed. ${error.message}")
+                parameters.updatedAt = ""
+                return
+            }
+        }
+        dialogProvider.hideProgressBar()
+
+        parameters.updatedAt = localDate
+        dialogProvider.showSuccess("Download successful")
+    }
+
+    private suspend fun downloadKeys() {
+        if (posParameterList.isEmpty()) {
+            dialogProvider.showError("No routes available")
+            return
+        }
+
+        dialogProvider.showProgressBar("Downloading Keys...")
+        for (parameterStore in posParameterList) {
+            val (_, error) = safeRunIO {
+                parameterStore.downloadKeys()
+            }
+            if (error != null) {
+                dialogProvider.hideProgressBar()
+                dialogProvider.showError("Download Failed. ${error.message}")
+                parameters.updatedAt = ""
+                return
+            }
+        }
+        dialogProvider.hideProgressBar()
+
+        parameters.updatedAt = Instant.now().format("MMdd")
+        dialogProvider.showSuccess("Key Download successful")
+    }
+
+    private suspend fun downloadParameters() {
+        if (posParameterList.isEmpty()) {
+            dialogProvider.showError("No routes available")
+            return
+        }
+
+        dialogProvider.showProgressBar("Downloading Parameters...")
+        for (parameterStore in posParameterList) {
+            val (_, error) = safeRunIO {
+                parameterStore.downloadParameters()
+            }
+            if (error != null) {
+                dialogProvider.hideProgressBar()
+                dialogProvider.showError("Download Failed. ${error.message}")
+                return
+            }
+        }
+        dialogProvider.hideProgressBar()
+
+        parameters.updatedAt = Instant.now().format("MMdd")
+        dialogProvider.showSuccess("Parameter Download successful")
+    }
+
+    private val posParameterList: List<PosParameter> by lazy {
+        val context = requireContext()
+        val connectionSequence = sequence {
+            if (config.remoteConnectionInfo != InvalidRemoteConnectionInfo) {
+                yield(config.remoteConnectionInfo)
+            }
+        }
+
+        return@lazy connectionSequence
+            .distinctBy { "${it.host}:${it.port}" }
+            .map { it.getParameter(context) }
+            .toList()
     }
 }

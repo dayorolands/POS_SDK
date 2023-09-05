@@ -2,23 +2,23 @@
   "Routes": [
     {
       "Name": "EPMS",
-      "IPAddress": "197.253.19.75",
-      "Port": 5006,
+      "IPAddress": "196.6.103.18",
+      "Port": 4036,
       "EnableSSL": true,
       "Timeout": 60,
-      "Key1": "25F7432326081AA82520647C61DCC83D",
-      "Key2": "F270D5A76ED6FB9298CD580E6D986723",
+      "Key1": "C48A1564CBFB3213A485BCE9195D321C",
+      "Key2": "FE169BD37C34B06215E919C4D3F75E79",
       "RequeryConfig": null,
       "Dukpt": null
     },
     {
       "Name": "POSVAS",
-      "IPAddress": "197.253.19.75",
-      "Port": 5007,
+      "IPAddress": "196.6.103.18",
+      "Port": 4036,
       "EnableSSL": true,
       "Timeout": 60,
-      "Key1": "25F7432326081AA82520647C61DCC83D",
-      "Key2": "F270D5A76ED6FB9298CD580E6D986723",
+      "Key1": "C48A1564CBFB3213A485BCE9195D321C",
+      "Key2": "FE169BD37C34B06215E919C4D3F75E79",
       "RequeryConfig": null,
       "Dukpt": null
     }

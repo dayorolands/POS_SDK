@@ -42,7 +42,7 @@ object Platform {
                 posId = posManagerCompanion.id
                 deviceType = posManagerCompanion.deviceType
                 posManagerCompanion.setup(application)
-                loadKoinModules(posModule)
+                //loadKoinModules(posModule)
                 loadKoinModules(posManagerCompanion.module)
                 return
             }
@@ -57,7 +57,7 @@ val posModule = module {
     single<RemoteConnectionInfo> {
         val infoList = get<PosTenant>().infoList
         if (infoList.isEmpty()) InvalidRemoteConnectionInfo
-        else infoList[0]
+        else infoList[1]
     }
     single { ConfigService(androidContext()) }.bind(PosConfig::class)
     single { PosDatabase.getInstance(androidContext()) }
