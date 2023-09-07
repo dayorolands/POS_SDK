@@ -5,7 +5,7 @@ import com.cluster.pos.card.CardReaders
 import com.cluster.pos.card.TransactionType
 import org.koin.core.module.Module
 
-typealias PanAmountFunction<R> = (pan: String, amount: Double) -> R
+typealias PanAmountFunction<R> = () -> R
 
 interface PosManager {
     val cardReader: CardReaders

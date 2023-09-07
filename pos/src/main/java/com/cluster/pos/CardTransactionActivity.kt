@@ -93,6 +93,7 @@ abstract class CardTransactionActivity : PosActivity() {
                 return
             }
             else -> {
+                sessionData.getPosParameter = ::getPosParameter
                 onPosReady()
             }
         }
@@ -104,6 +105,14 @@ abstract class CardTransactionActivity : PosActivity() {
                 finish()
             }
         }
+    }
+
+    private fun getPosParameter(): PosParameter {
+        return getSupportedRoute().getParameter(this)
+    }
+
+    private fun getSupportedRoute(): RemoteConnectionInfo {
+        return config.remoteConnectionInfo
     }
 
     fun requestCard() {

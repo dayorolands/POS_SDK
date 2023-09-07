@@ -320,24 +320,30 @@ class SunmiEmvListener(
     }
 
     private fun initPinPad() {
-        val amount = sessionData.amount / 100.0
-        var amountText = ""
-        if (sessionData.amount > 0) amountText = "Amount: ${amount.toCurrencyFormat()}"
-        if (sessionData.cashBackAmount > 0) amountText = "$amount        " +
-                "Cashback Amount: ${amount.toCurrencyFormat()}"
+        val posParameter = sessionData.getPosParameter?.invoke()
 
-        if (prefs.getString("kcv", null) != "F2204B822FD84A65") {
-            val result = mSecurityOptV2.saveKeyDukpt(
-                Security.KEY_TYPE_DUPKT_IPEK,
-                "86772A2D72A29EF0A4D03ED5074DB927".hexBytes,
-                "F2204B822FD84A65".hexBytes,
-                "FFFF9876543210E00000".hexBytes,
-                Security.KEY_ALG_TYPE_3DES,
-                0
-            )
-            if (result == 0) prefs.edit { putString("kcv", "F2204B822FD84A65") }
-        }
-        mSecurityOptV2.dukptIncreaseKSN(0)
+        val masterKey = posParameter?.masterKey?.hexBytes
+        val result = mSecurityOptV2.savePlaintextKey(
+            Security.KEY_TYPE_TMK,
+            masterKey,
+            masterKey?.asDesEdeKey?.encrypt(ByteArray(8)),
+            Security.KEY_ALG_TYPE_3DES,
+            0
+        )
+        Log.d("KeyInjection", "The result of the master key injection is $result")
+
+        val tempPinKey = posParameter?.pinKey?.hexBytes ?: ""
+        val pinKey = ByteArray(24)
+        System.arraycopy(tempPinKey, 0, pinKey, 0, 16)
+        System.arraycopy(tempPinKey, 0, pinKey, 16, 8)
+        val newResult = mSecurityOptV2.savePlaintextKey(
+            Security.KEY_TYPE_PIK,
+            pinKey,
+            pinKey.asDesEdeKey.encrypt(ByteArray(8)),
+            Security.KEY_ALG_TYPE_3DES,
+            0,
+        )
+        Log.d("KeyInjection", "The result of the pin key injection is $newResult")
 
         val pinPadConfig = PinPadConfigV2().apply {
             pinPadType = 0
@@ -370,21 +376,14 @@ class SunmiEmvListener(
                         cardData.ksnData = ""
                     }
                     else{
-                        val pinkey = "11111111111111111111111111111111".hexBytes
-                        val devicePinKey = "11111111111111111111111111111111".hexBytes.asDesEdeKey
-                        val deviceEncryptedPinblock = devicePinKey.encrypt(pinBlock).copyOf(8) // Triple DES Encryption (All that is required now is the Pinkey)
-                        Log.d("CheckDUKPT", "Here to check the Triple DES pinblock ${deviceEncryptedPinblock.hexString}")
-                        Log.d("CheckDUKPT", "Here to decrypt the Triple DES pinblock ${devicePinKey.decrypt(pinBlock).copyOf(8).hexString}")
+                        val pinkey = posParameter?.pinKey?.hexBytes
 
-                        //DUKPT Encryption
-                        val decryptedVal = tripleDesDecrypt(pinkey, pinBlock)
-                        val storedKsn = SharedPref[activity, "ksn", ""]
-                        val incrementKsn = incrementKsn(activity, storedKsn!!)
-                        val workingKey = pinBlockHelper.getSessionKey(PosManager.IPEK, incrementKsn)
-                        val encryptedPinBlock = pinBlockHelper.desEncryptDukpt(workingKey, decryptedVal.hexString)
-                        val transactionKsn = pinBlockHelper.generateTransKsn(incrementKsn)
-                        cardData.pinBlock = encryptedPinBlock
-                        cardData.ksnData = transactionKsn?.uppercase()
+                        //Triple DES Encryption
+                        val decryptedVal = tripleDesDecrypt(pinkey!!, pinBlock)
+                        Log.d("KeyInjection", "The result of the pin block decryption is $decryptedVal")
+
+                        cardData.pinBlock = pinBlock.hexString
+                        Log.d("KeyInjection", "The generated pinblock is ${cardData.pinBlock}")
                     }
                 } else {
                     mHandler.obtainMessage(PIN_CLICK_CONFIRM)
