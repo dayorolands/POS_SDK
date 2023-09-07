@@ -75,6 +75,30 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
                 downloadParameters()
             }
         }
+
+        binding.capkDownloadButton.button.setOnClickListener {
+            lifecycleScope.launch {
+                dialogProvider.showProgressBar("Downloading CAPK")
+                val (_, error) = safeRunIO {
+                    defaultParameterStore.downloadCapk()
+                }
+                dialogProvider.hideProgressBar()
+                if (error != null) return@launch dialogProvider.showError(error)
+                dialogProvider.showSuccess("CAPK Download successful")
+            }
+        }
+
+        binding.emvAidDownloadButton.button.setOnClickListener {
+            lifecycleScope.launch {
+                dialogProvider.showProgressBar("Downloading EMV AID")
+                val (_, error) = safeRunIO {
+                    defaultParameterStore.downloadAid()
+                }
+                dialogProvider.hideProgressBar()
+                if (error != null) return@launch dialogProvider.showError(error)
+                dialogProvider.showSuccess("EMV AID Download successful")
+            }
+        }
     }
 
     private suspend fun checkKeysAndParameters() {

@@ -78,11 +78,24 @@ abstract class CardTransactionActivity : PosActivity() {
     abstract fun onPosReady()
 
     private fun checkParameters() {
-        sessionData.getDukptConfig = { pan, amount ->
-            posPreferences.binRoutes?.getSupportedRoute(pan, amount)?.dukptConfig
+        val noKeysPresent = posParameter.pinKey.isEmpty()
+                || posParameter.masterKey.isEmpty()
+                || posParameter.sessionKey.isEmpty()
+
+        when {
+            noKeysPresent -> {
+                finishWithError("Please perform key download before proceeding")
+                return
+            }
+
+            posParameter.managementDataString.isEmpty() -> {
+                finishWithError("Please perform parameter download before proceeding")
+                return
+            }
+            else -> {
+                onPosReady()
+            }
         }
-        sessionData.getPosParameter = ::getPosParameter
-        onPosReady()
     }
 
     private fun finishWithError(message: String) {
@@ -175,12 +188,6 @@ abstract class CardTransactionActivity : PosActivity() {
         stopTimer()
         posManager.sessionData.amount = viewModel.longAmount.value!!
 
-        val cardLimit= 50000.0
-        if (cardLimit < posManager.sessionData.amount / 100) {
-            showError("The limit for this transaction is NGN${cardLimit}")
-            return
-        }
-
         mainScope.launch {
             posManager.cardReader.endWatch()
             val cardData = posManager.cardReader.read(viewModel.amountCurrencyFormat.value!!)
@@ -208,15 +215,9 @@ abstract class CardTransactionActivity : PosActivity() {
                         return@launch
                     }
 
-                    val route = getSupportedRoute(cardData.pan, viewModel.amount.value!!)
-                    if (route == InvalidRemoteConnectionInfo) {
-                        dialogProvider.hideProgressBar()
-                        renderTransactionFailure("No supported route for this card/amount combination")
-                        return@launch
-                    }
-
                     onReadCard(cardData)
                 }
+
                 CardTransactionStatus.UserCancel -> renderTransactionFailure("Transaction Cancelled")
                 CardTransactionStatus.Failure -> renderTransactionFailure("Failed to read card")
                 CardTransactionStatus.Timeout -> renderTransactionFailure("Timeout while reading card")
@@ -229,45 +230,18 @@ abstract class CardTransactionActivity : PosActivity() {
         }
     }
 
-    private fun getPosParameter(pan: String, amount: Double): PosParameter {
-        return getSupportedRoute(pan, amount).getParameter(this)
-    }
-
-    private fun getSupportedRoute(pan: String, amount: Double): RemoteConnectionInfo {
-        val supportedRoute = posPreferences.binRoutes?.getSupportedRoute(pan, amount)
-        return supportedRoute ?: config.remoteConnectionInfo
-    }
-
     fun makeRequest(request: ISOMsg) = mainScope.launch {
         stopTimer()
-        val supportedRoute =
-            posPreferences.binRoutes?.getSupportedRoute(request.pan!!, viewModel.amount.value!!)
-        val remoteConnectionInfo = supportedRoute ?: config.remoteConnectionInfo
+        val remoteConnectionInfo = config.remoteConnectionInfo
         posParameter = remoteConnectionInfo.getParameter(this@CardTransactionActivity)
 
         request.apply {
             applyManagementData(posParameter.managementData)
-            acquiringInstIdCode32 = localStorage.institutionCode
+            acquiringInstIdCode32 = "000000"
             terminalId41 = config.terminalId
         }
 
-        val cardType = when (cardData.aid) {
-            "A0000000032020" -> "VISA"
-            "A0000000031010", "A0000000032010" -> "VISA Debit"
-            "A0000004540010" -> "Etranzact Genesis Card"
-            "A0000004540011" -> "Etranzact Genesis Card"
-            "A0000000042203" -> "MasterCard US"
-            "A0000000041010" -> "MasterCard"
-            "A0000000044010" -> "MasterCard"
-            "A0000000041030" -> "MasterCard"
-            "A0000000046000" -> "MasterCard Specific"
-            "A0000000043060" -> "MasterCard Specific"
-            "A0000000042010" -> "MasterCard Specific"
-            "A0000000043010" -> "MasterCard Specific"
-            "A0000000045010" -> "MasterCard Specific"
-            "A0000003710001" -> "InterSwitch Verve Card"
-            else -> "Unknown Card"
-        }
+        val cardType = cardPaymentAIDConverter[cardData.aid] ?: "Unknown Card"
 
         val isoSocketHelper = IsoSocketHelper(
             config = config,
@@ -277,7 +251,7 @@ abstract class CardTransactionActivity : PosActivity() {
         val amount = request.transactionAmount4?.toDoubleOrNull()?.div(100)
         val posTransaction = PosTransaction.create(
             isoMsg = request,
-            institutionCode = "100616",
+            institutionCode = "ORDA",
             appName = "${getString(R.string.app_name)} ${appConfig.versionName}",
             ptsp = getString(R.string.ptsp_name),
             website = getString(R.string.institution_website),
@@ -296,21 +270,22 @@ abstract class CardTransactionActivity : PosActivity() {
         dialogProvider.showProgressBar("Receiving...")
         callHomeService.stopCallHomeTimer()
 
-        val requeryConfig = remoteConnectionInfo.requeryConfig
         val (response, error) = withContext(Dispatchers.IO) {
-            if (request.mti != "0200" || requeryConfig == null || requeryConfig.maxRetries < 1) {
+            if (request.mti != "0200") {
                 return@withContext isoSocketHelper.send(request)
             }
 
             handleRetryableRequest(
                 isoSocketHelper = isoSocketHelper,
-                requeryConfig = requeryConfig,
                 request = request,
             )
         }
 
         try {
             callHomeService.startCallHomeTimer()
+            if (error != null) {
+                firebaseCrashlytics.recordException(error)
+            }
 
             if (response == null) {
                 showTransactionStatusPage(posTransaction)
@@ -356,13 +331,12 @@ abstract class CardTransactionActivity : PosActivity() {
     }
 
     private suspend fun handleRetryableRequest(
-        requeryConfig: RequeryConfig,
         request: ISOMsg,
         isoSocketHelper: IsoSocketHelper,
     ): SafeRunResult<ISOMsg> {
         var result = SafeRunResult<ISOMsg>(null)
 
-        for (attempt in 1..(requeryConfig.maxRetries + 1)) {
+        for (attempt in 1..2) {
             val isRetry = attempt > 1
             if (isRetry) {
                 delay(20000)
