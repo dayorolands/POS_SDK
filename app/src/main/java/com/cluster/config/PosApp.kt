@@ -30,41 +30,7 @@ import javax.net.ssl.TrustManagerFactory
  */
 
 fun Application.startPosApp() {
-    SocketJob.setTrustManagers(getTrustManagers(this))
     encryptPosConfig()
-
-    val workManager = WorkManager.getInstance(this)
-
-    val constraints = Constraints.Builder()
-        .setRequiredNetworkType(NetworkType.CONNECTED)
-        .build()
-
-    workManager.registerPeriodicWorker<TransactionLogWorker>(
-        uniqueWorkName = "APP_TRANSACTION_LOG",
-        constraints = constraints,
-    )
-
-    workManager.registerPeriodicWorker<IsoRequestLogWorker>(
-        uniqueWorkName = "APP_ISO_REQUEST_LOG",
-        constraints = constraints,
-    )
-
-    workManager.registerPeriodicWorker<ReversalWorker>(
-        uniqueWorkName = "APP_REVERSAL",
-        constraints = constraints,
-    )
-
-    workManager.registerPeriodicWorker<CallHomeWorker>(constraints)
-
-    workManager.registerPeriodicWorker<PosNotificationWorker>(
-        uniqueWorkName = "APP_POS_NOTIFICATION",
-        constraints = constraints,
-    )
-
-    // mPOS app updates will be handled by google play store
-    if (Platform.deviceType != 2) {
-        workManager.registerPeriodicWorker<AppUpdateWorker>(constraints)
-    }
 }
 
 private fun Application.encryptPosConfig() {
@@ -79,16 +45,4 @@ private fun Application.encryptPosConfig() {
             deleteSharedPreferences(prefsName)
         }
     }
-}
-
-@Throws(Exception::class)
-private fun getTrustManagers(context: Context): Array<TrustManager?> {
-    Security.insertProviderAt(BouncyCastleProvider(), 1)
-    val trustStore = KeyStore.getInstance("BKS")
-    context.resources.openRawResource(R.raw.pos_trust_store).use { inputStream ->
-        trustStore.load(inputStream, BuildConfig.TRUESTORE_PASS.toCharArray())
-    }
-    val tmf = TrustManagerFactory.getInstance("X509")
-    tmf.init(trustStore)
-    return tmf.trustManagers
 }

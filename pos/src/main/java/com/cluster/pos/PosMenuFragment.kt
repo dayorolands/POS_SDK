@@ -90,7 +90,7 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
         for (parameterStore in posParameterList) {
             val (_, error) = safeRunIO {
                 parameterStore.downloadKeys()
-                //parameterStore.downloadParameters()
+                parameterStore.downloadParameters()
             }
             if (error != null) {
                 dialogProvider.hideProgressBar()

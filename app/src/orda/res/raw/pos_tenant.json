@@ -6,8 +6,8 @@
       "Port": 4036,
       "EnableSSL": true,
       "Timeout": 60,
-      "Key1": "C48A1564CBFB3213A485BCE9195D321C",
-      "Key2": "FE169BD37C34B06215E919C4D3F75E79",
+      "Key1": "04AD375251E90D26234975074364F4D6",
+      "Key2": "6BA88F3B3D890DCEB31FDF5DA254733D",
       "RequeryConfig": null,
       "Dukpt": null
     },
@@ -17,8 +17,8 @@
       "Port": 4036,
       "EnableSSL": true,
       "Timeout": 60,
-      "Key1": "C48A1564CBFB3213A485BCE9195D321C",
-      "Key2": "FE169BD37C34B06215E919C4D3F75E79",
+      "Key1": "04AD375251E90D26234975074364F4D6",
+      "Key2": "6BA88F3B3D890DCEB31FDF5DA254733D",
       "RequeryConfig": null,
       "Dukpt": null
     }

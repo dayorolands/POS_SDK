@@ -80,7 +80,6 @@ class ClusterApplication : Application() {
                     dataModule,
                     uiModule,
                     configModule,
-                    sharingModule,
                     posModule,
                 )
             )

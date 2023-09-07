@@ -33,10 +33,7 @@ fun NavGraphBuilder.homeRoutes(
     }
     composable(BottomNavScreens.Transactions.route) {
         TransactionsScreen(
-            fragment = fragment,
-            institutionConfig = institutionConfig,
-            composeNavController = composeNavController,
-            preferences = preferences
+            fragment = fragment
         )
     }
     composable(BottomNavScreens.Profile.route) {

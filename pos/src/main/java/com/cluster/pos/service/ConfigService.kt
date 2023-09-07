@@ -26,7 +26,7 @@ open class ConfigService(context: Context) : PosConfig, KoinComponent {
     override var port by prefs.intStore("PORT", AppConstants.PORT)
 
     override var callHome by prefs.valueStore("CALL_HOME", AppConstants.CALL_HOME)
-    override var terminalId by prefs.valueStore("TERMINAL_ID", "2076EU44")
+    override var terminalId by prefs.valueStore("TERMINAL_ID", "2076DT44") //2076EU44
     override var supervisorPin by prefs.valueStore("SUPERVISOR_PIN", "1111")
     override var adminPin by prefs.valueStore("ADMIN_PIN", "asdfg")
 

@@ -26,10 +26,7 @@ import com.cluster.utility.openPageById
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TransactionsScreen(
-    fragment: CreditClubFragment,
-    institutionConfig: InstitutionConfig,
-    composeNavController: NavController,
-    preferences: SharedPreferences
+    fragment: CreditClubFragment
 ) {
 
     LazyVerticalGrid(
