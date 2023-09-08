@@ -8,6 +8,7 @@ import com.cluster.pos.card.CardReaderEvent
 
 class PosTransactionViewModel : ViewModel() {
     val amountString = MutableLiveData("0")
+    val cashbackString = MutableLiveData("0")
     val longAmount = MutableLiveData(0L)
     val amount = MutableLiveData(0.00)
     val amountCurrencyFormat = MutableLiveData("NGN0.00")

@@ -4,7 +4,10 @@ import android.content.Context
 import com.cluster.core.data.api.AppConfig
 import com.cluster.core.util.format
 import com.cluster.core.util.localStorage
+import com.cluster.core.util.toCurrencyFormat
+import com.cluster.pos.PosManager
 import com.cluster.pos.R
+import com.cluster.pos.card.TransactionType
 import com.cluster.pos.card.isoResponseMessage
 import com.cluster.pos.extension.*
 import com.cluster.pos.models.FinancialTransaction
@@ -135,6 +138,7 @@ fun posReceipt(
     posTransaction: PosTransaction,
     isCustomerCopy: Boolean = false,
     isReprint: Boolean = false,
+    sessionData : PosManager.SessionData
 ) = printJob {
     logo()
     text("\n")
@@ -175,12 +179,26 @@ fun posReceipt(
         align = Alignment.MIDDLE,
         fontSize = 35
     )
-    text(
-        text = """AMOUNT: ${posTransaction.amount}
+    val transactionType = posTransaction.transactionType
+    val totalAmount = sessionData.amount.div(100.0) + sessionData.cashBackAmount.div(100.0)
+    val cashBackAmount = sessionData.cashBackAmount.div(100.0)
+    if(transactionType == TransactionType.CashBack.type){
+        text(
+            text = """AMOUNT: ${posTransaction.amount}
+                |CASHBACK AMOUNT : ${cashBackAmount.toCurrencyFormat()}
+                |TOTAL AMOUNT : ${totalAmount.toCurrencyFormat()}
             |RRN: ${posTransaction.retrievalReferenceNumber}""".trimMargin(),
-        isBold = true,
-        fontSize = 25
-    )
+            isBold = true,
+            fontSize = 25
+        )
+    } else {
+        text(
+            text = """AMOUNT: ${posTransaction.amount}
+            |RRN: ${posTransaction.retrievalReferenceNumber}""".trimMargin(),
+            isBold = true,
+            fontSize = 25
+        )
+    }
 
     val isSuccessful = posTransaction.responseCode == "00"
     val message = if (isSuccessful) "TRANSACTION APPROVED" else "TRANSACTION DECLINED"

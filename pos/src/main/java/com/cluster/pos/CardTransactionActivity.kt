@@ -18,7 +18,9 @@ import com.cluster.pos.data.PosPreferences
 import com.cluster.pos.data.create
 import com.cluster.pos.extension.*
 import com.cluster.pos.helpers.IsoSocketHelper
+import com.cluster.pos.model.ConnectionInfo
 import com.cluster.pos.model.getSupportedRoute
+import com.cluster.pos.models.FinancialTransaction
 import com.cluster.pos.models.PosTransaction
 import com.cluster.pos.printer.PrinterStatus
 import com.cluster.pos.printer.posReceipt
@@ -114,14 +116,14 @@ abstract class CardTransactionActivity : PosActivity() {
             delay(1000)
             dialogProvider.hideProgressBar()
 
-            if (Platform.hasPrinter) {
-                val printerStatus = withContext(Dispatchers.Default) { printer.check() }
-                if (printerStatus != PrinterStatus.READY) {
-                    dialogProvider.showErrorAndWait(printerStatus.message)
-                    finish()
-                    return@launch
-                }
-            }
+//            if (Platform.hasPrinter) {
+//                val printerStatus = withContext(Dispatchers.Default) { printer.check() }
+//                if (printerStatus != PrinterStatus.READY) {
+//                    dialogProvider.showErrorAndWait(printerStatus.message)
+//                    finish()
+//                    return@launch
+//                }
+//            }
 
             when (val cardEvent = posManager.cardReader.waitForCard()) {
                 CardReaderEvent.REMOVED, CardReaderEvent.CANCELLED -> {
@@ -256,7 +258,7 @@ abstract class CardTransactionActivity : PosActivity() {
             appName = "${getString(R.string.app_name)} ${appConfig.versionName}",
             ptsp = getString(R.string.ptsp_name),
             website = getString(R.string.institution_website),
-            bankName = getString(R.string.pos_acquirer),
+            bankName = getString(R.string.ptsp_name),
             cardHolder = cardData.holder,
             cardType = cardType,
             nodeName = remoteConnectionInfo.nodeName,
@@ -270,6 +272,12 @@ abstract class CardTransactionActivity : PosActivity() {
 
         dialogProvider.showProgressBar("Receiving...")
         callHomeService.stopCallHomeTimer()
+
+        //Log transaction before making request
+        withContext(Dispatchers.IO){
+            val posTransactionId = posDatabase.posTransactionDao().save(posTransaction = posTransaction)
+            posTransaction.apply { id = posTransactionId.toInt() }
+        }
 
         val (response, error) = withContext(Dispatchers.IO) {
             if (request.mti != "0200") {
@@ -294,6 +302,7 @@ abstract class CardTransactionActivity : PosActivity() {
                 val receipt = posReceipt(
                     posTransaction = posTransaction,
                     isCustomerCopy = true,
+                    sessionData = sessionData
                 )
                 printer.printAsync(receipt)
                 return@launch
@@ -306,7 +315,24 @@ abstract class CardTransactionActivity : PosActivity() {
             }
 
             response.set(4, request.transactionAmount4)
-            posTransaction.responseCode = response.responseCode39
+
+            val transaction = FinancialTransaction(response, cardType).apply {
+                createdAt = Instant.now()
+                cardHolder = cardData.holder
+                aid = cardData.aid
+                nodeName = remoteConnectionInfo.nodeName
+                if(remoteConnectionInfo is ConnectionInfo){
+                    connectionInfo = remoteConnectionInfo
+                }
+            }
+
+            withContext(Dispatchers.IO){
+                posDatabase.runInTransaction{
+                    posDatabase.financialTransactionDao().save(transaction)
+                    posTransaction.responseCode = response.responseCode39
+                    posDatabase.posTransactionDao().save(posTransaction)
+                }
+            }
 
             if (response.isSuccessful) {
                 if (transactionType == TransactionType.Balance) {
@@ -319,7 +345,8 @@ abstract class CardTransactionActivity : PosActivity() {
             showTransactionStatusPage(posTransaction)
             val receipt = posReceipt(
                 posTransaction = posTransaction,
-                isCustomerCopy = true
+                isCustomerCopy = true,
+                sessionData = sessionData
             )
             printer.printAsync(receipt)
         } catch (ex: Exception) {

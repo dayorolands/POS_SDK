@@ -21,7 +21,9 @@ class SunmiPrinter(override val context: Context, override val dialogProvider: D
     override fun check(): PrinterStatus = runBlocking {
         withContext(Dispatchers.IO){
             sunmiPrinterService?.enterPrinterBuffer(true)
-            val status = translateStatus(sunmiPrinterService.let { it!!.updatePrinterState() })
+            val status = translateStatus(
+                sunmiPrinterService?.let { it.updatePrinterState() } ?: 80
+            )
             sunmiPrinterService?.exitPrinterBuffer(true)
             status
         }
@@ -99,6 +101,7 @@ class SunmiPrinter(override val context: Context, override val dialogProvider: D
         3 -> PrinterStatus.NO_COMMUNICATION
         4 -> PrinterStatus.NO_PAPER
         5 -> PrinterStatus.OVER_HEAT
+        80 -> PrinterStatus.RETRY
         else -> {
             PrinterStatus.NOT_READY
         }

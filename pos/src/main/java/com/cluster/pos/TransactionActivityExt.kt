@@ -8,7 +8,9 @@ import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.cluster.core.util.format
+import com.cluster.core.util.toCurrencyFormat
 import com.cluster.pos.card.AccountType
 import com.cluster.pos.card.CardReaderEvent
 import com.cluster.pos.card.TransactionType
@@ -144,9 +146,17 @@ internal fun CardTransactionActivity.showTransactionStatusPage(posTransaction: P
     )
     binding.lifecycleOwner = this
 
+    val amountDouble = sessionData.amount.div(100.0)
+    val cashBackAmount = sessionData.cashBackAmount.div(100.0)
+    val totalAmount = amountDouble + cashBackAmount
+
     if (posTransaction.responseCode == "00") {
         binding.message.text = getString(R.string.transaction_successful)
-        binding.amountText.text = posTransaction.amount
+        if(transactionType == TransactionType.CashBack){
+            binding.amountText.text = totalAmount.toCurrencyFormat()
+        } else {
+            binding.amountText.text = posTransaction.amount
+        }
         binding.transactionStatusIcon.setImageResource(R.drawable.ic_sentiment_satisfied)
         ImageViewCompat.setImageTintList(
             binding.transactionStatusIcon, ColorStateList.valueOf(
@@ -165,7 +175,11 @@ internal fun CardTransactionActivity.showTransactionStatusPage(posTransaction: P
         binding.message.setTextColor(ContextCompat.getColor(this, R.color.app_orange))
     }
 
-    binding.amountText.text = posTransaction.amount
+    if(transactionType == TransactionType.CashBack){
+        binding.amountText.text = totalAmount.toCurrencyFormat()
+    } else {
+        binding.amountText.text = posTransaction.amount
+    }
     if (transactionType == TransactionType.Balance) {
         binding.printMerchantCopy.visibility = View.GONE
     }
@@ -174,6 +188,7 @@ internal fun CardTransactionActivity.showTransactionStatusPage(posTransaction: P
         val receipt = posReceipt(
             posTransaction = posTransaction,
             isCustomerCopy = false,
+            sessionData = sessionData
         )
         printer.printAsync(receipt)
     }
@@ -182,6 +197,7 @@ internal fun CardTransactionActivity.showTransactionStatusPage(posTransaction: P
         val receipt = posReceipt(
             posTransaction = posTransaction,
             isCustomerCopy = true,
+            sessionData = sessionData
         )
         printer.printAsync(receipt)
     }
@@ -204,15 +220,6 @@ internal inline fun CardTransactionActivity.showReferencePage(
     crossinline block: (FinancialTransaction) -> Unit
 ) {
     mainScope.launch {
-        if (Platform.hasPrinter) {
-            val printerStatus = withContext(Dispatchers.IO) { printer.check() }
-            if (printerStatus != PrinterStatus.READY) {
-                dialogProvider.showErrorAndWait(printerStatus.message)
-                finish()
-                return@launch
-            }
-        }
-
         val binding = DataBindingUtil.setContentView<PageInputRrnBinding>(
             this@showReferencePage,
             R.layout.page_input_rrn

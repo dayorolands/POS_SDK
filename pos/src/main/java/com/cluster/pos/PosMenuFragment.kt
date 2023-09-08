@@ -105,6 +105,18 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
                 startActivity(BalanceInquiryActivity::class.java)
             }
         }
+
+        binding.cashBackButton.button.setOnClickListener {
+            lifecycleScope.launch {
+                startActivity(CashBackActivity::class.java)
+            }
+        }
+
+        binding.refundButton.button.setOnClickListener {
+            supervisorAction {
+                startActivity(RefundActivity::class.java)
+            }
+        }
     }
 
     private suspend fun checkKeysAndParameters() {
@@ -133,6 +145,34 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
 
         parameters.updatedAt = localDate
         dialogProvider.showSuccess("Download successful")
+    }
+
+    private inline fun supervisorAction(crossinline next: () -> Unit){
+        dialogProvider.requestPIN("Enter Supervisor Pin") {
+            onSubmit { pin ->
+                confirmSupervisorPin(pin){ passed ->
+                    if (passed) next()
+                }
+            }
+        }
+    }
+
+    private inline fun confirmSupervisorPin(
+        pin : String,
+        closeOnFail : Boolean = false,
+        crossinline next : (Boolean) -> Unit
+    ){
+        val status = pin == config.supervisorPin
+        if(!status){
+            if(closeOnFail) return dialogProvider.showError("Authentication failed"){
+                onClose {
+                    findNavController().popBackStack()
+                }
+            }
+
+            dialogProvider.showError("Authentication failed")
+        }
+        next(status)
     }
 
     private suspend fun downloadKeys() {

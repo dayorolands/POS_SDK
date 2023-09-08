@@ -8,5 +8,6 @@ enum class PrinterStatus(val message: String) {
     NO_COMMUNICATION("Communication is Abnormal"),
     LOW_BATTERY("Battery Low"),
     IMAGE_NOT_FOUND("Image not found"),
-    NO_BLACK_BLOCK("Cannot find black block")
+    NO_BLACK_BLOCK("Cannot find black block"),
+    RETRY("Retry")
 }

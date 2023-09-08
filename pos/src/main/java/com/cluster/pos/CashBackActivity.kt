@@ -39,6 +39,7 @@ class CashBackActivity : CardTransactionActivity() {
             sessionData.amount = amount
             showAmountPage("Cash Back Amount") { cashBackAmount ->
                 this.cashBackAmount = cashBackAmount.toString()
+                viewModel.cashbackString.value = cashBackAmount.toString()
                 sessionData.cashBackAmount = cashBackAmount
                 confirmAmounts(sessionData) {
                     readCard()
