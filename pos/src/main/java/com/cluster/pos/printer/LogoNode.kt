@@ -9,7 +9,7 @@ fun LogoNode(
     align: Alignment = Alignment.MIDDLE,
     printGray: Int = 5,
 ) = ImageNode(
-    drawable = R.drawable.cc_printer_logo,
+    drawable = R.drawable.orda_logo_dark_payment,
     walkPaperAfterPrint = walkPaperAfterPrint,
     align = align,
     printGray = printGray,
@@ -20,7 +20,7 @@ fun PrintJobScope.logo(
     align: Alignment = Alignment.MIDDLE,
     printGray: Int = 5,
 ) = image(
-    drawable = R.drawable.cc_printer_logo,
+    drawable = R.drawable.orda_logo_dark_payment,
     walkPaperAfterPrint = walkPaperAfterPrint,
     align = align,
     printGray = printGray,

@@ -137,6 +137,7 @@ fun posReceipt(
     isReprint: Boolean = false,
 ) = printJob {
     logo()
+    text("\n")
     if (isReprint) {
         text(
             text = "***REPRINT***",
@@ -145,15 +146,14 @@ fun posReceipt(
         )
     }
     text(
-        text = if (isCustomerCopy) "***CUSTOMER COPY***" else "***MERCHANT COPY***",
+        text = if (isCustomerCopy) "CUSTOMER COPY" else "MERCHANT COPY",
         align = Alignment.MIDDLE,
         isBold = true,
+        fontSize = 30
     )
     text(
         """${posTransaction.merchantDetails}
             |Merchant Id: ${posTransaction.merchantId}
-            |Agent Name: ${posTransaction.agentName}
-            |Agent Code: ${posTransaction.agentCode}
             |TID: ${posTransaction.terminalId}
             |
             |${posTransaction.dateTime?.format("dd/MM/yyyy hh:mm", "+0100")}
@@ -178,7 +178,8 @@ fun posReceipt(
     text(
         text = """AMOUNT: ${posTransaction.amount}
             |RRN: ${posTransaction.retrievalReferenceNumber}""".trimMargin(),
-        isBold = true
+        isBold = true,
+        fontSize = 25
     )
 
     val isSuccessful = posTransaction.responseCode == "00"
@@ -193,7 +194,8 @@ fun posReceipt(
         text(
             text = isoResponseMessage(posTransaction.responseCode),
             align = Alignment.MIDDLE,
-            isBold = true
+            isBold = true,
+            fontSize = 20
         )
     }
     text(

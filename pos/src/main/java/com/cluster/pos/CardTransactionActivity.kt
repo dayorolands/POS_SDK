@@ -93,7 +93,7 @@ abstract class CardTransactionActivity : PosActivity() {
                 return
             }
             else -> {
-                sessionData.getPosParameter = ::getPosParameter
+                sessionData.getPosParameter = { config.remoteConnectionInfo.getParameter(this) }
                 onPosReady()
             }
         }
@@ -105,14 +105,6 @@ abstract class CardTransactionActivity : PosActivity() {
                 finish()
             }
         }
-    }
-
-    private fun getPosParameter(): PosParameter {
-        return getSupportedRoute().getParameter(this)
-    }
-
-    private fun getSupportedRoute(): RemoteConnectionInfo {
-        return config.remoteConnectionInfo
     }
 
     fun requestCard() {
@@ -246,7 +238,7 @@ abstract class CardTransactionActivity : PosActivity() {
 
         request.apply {
             applyManagementData(posParameter.managementData)
-            acquiringInstIdCode32 = "000000"
+            acquiringInstIdCode32 = "100305"
             terminalId41 = config.terminalId
         }
 
@@ -314,7 +306,7 @@ abstract class CardTransactionActivity : PosActivity() {
             }
 
             response.set(4, request.transactionAmount4)
-
+            posTransaction.responseCode = response.responseCode39
 
             if (response.isSuccessful) {
                 if (transactionType == TransactionType.Balance) {
@@ -345,7 +337,7 @@ abstract class CardTransactionActivity : PosActivity() {
     ): SafeRunResult<ISOMsg> {
         var result = SafeRunResult<ISOMsg>(null)
 
-        for (attempt in 1..2) {
+        for (attempt in 1..3) {
             val isRetry = attempt > 1
             if (isRetry) {
                 delay(20000)

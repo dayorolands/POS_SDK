@@ -1,5 +1,6 @@
 package com.creditclub.pos.providers.sunmi
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
@@ -322,29 +323,6 @@ class SunmiEmvListener(
     private fun initPinPad() {
         val posParameter = sessionData.getPosParameter?.invoke()
 
-        val masterKey = posParameter?.masterKey?.hexBytes
-        val result = mSecurityOptV2.savePlaintextKey(
-            Security.KEY_TYPE_TMK,
-            masterKey,
-            masterKey?.asDesEdeKey?.encrypt(ByteArray(8)),
-            Security.KEY_ALG_TYPE_3DES,
-            0
-        )
-        Log.d("KeyInjection", "The result of the master key injection is $result")
-
-        val tempPinKey = posParameter?.pinKey?.hexBytes ?: ""
-        val pinKey = ByteArray(24)
-        System.arraycopy(tempPinKey, 0, pinKey, 0, 16)
-        System.arraycopy(tempPinKey, 0, pinKey, 16, 8)
-        val newResult = mSecurityOptV2.savePlaintextKey(
-            Security.KEY_TYPE_PIK,
-            pinKey,
-            pinKey.asDesEdeKey.encrypt(ByteArray(8)),
-            Security.KEY_ALG_TYPE_3DES,
-            0,
-        )
-        Log.d("KeyInjection", "The result of the pin key injection is $newResult")
-
         val pinPadConfig = PinPadConfigV2().apply {
             pinPadType = 0
             pinType = mPinType
@@ -376,14 +354,11 @@ class SunmiEmvListener(
                         cardData.ksnData = ""
                     }
                     else{
-                        val pinkey = posParameter?.pinKey?.hexBytes
-
                         //Triple DES Encryption
-                        val decryptedVal = tripleDesDecrypt(pinkey!!, pinBlock)
-                        Log.d("KeyInjection", "The result of the pin block decryption is $decryptedVal")
-
-                        cardData.pinBlock = pinBlock.hexString
-                        Log.d("KeyInjection", "The generated pinblock is ${cardData.pinBlock}")
+                        val pinkey = "11111111111111111111111111111111".hexBytes
+                        val decryptPinblock = tripleDesDecrypt(pinkey, pinBlock)
+                        val secretKey = posParameter?.pinKey?.hexBytes?.asDesEdeKey?.encrypt(decryptPinblock)?.copyOf(8)
+                        cardData.pinBlock = secretKey!!.hexString
                     }
                 } else {
                     mHandler.obtainMessage(PIN_CLICK_CONFIRM)
@@ -416,18 +391,6 @@ class SunmiEmvListener(
         val secretKeySpec = SecretKeySpec(pinKey, "DESede")
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec)
         return cipher.doFinal(encryptedPinBlock)
-    }
-
-    private fun incrementKsn(context: Context, iKsn: String) : String {
-        var ksnValue = iKsn
-        ksnValue = ksnValue.substring(0, ksnValue.length - 5)
-        val counter = SharedPref[context, "ksnCounter", "0"]!!.toLong().plus(1)
-        SharedPref[activity, "ksnCounter"] = counter.toString()
-        if(counter > 99997){
-            SharedPref[activity, "ksnCounter"] = PosManager.KsnCounter
-        }
-        ksnValue += counter.toString().padStart(5, '0')
-        return ksnValue
     }
 
     private fun importPinInputStatus(inputResult: Int) {
@@ -485,7 +448,12 @@ class SunmiEmvListener(
             "9F10", "9F37", "9C", "9A", "9F02", "5F2A", "82", "9F34", "9F1E", "84", "4F",
             "9F09", "9F41", "5F20", "9F12", "50", "9F02",
         )
+
+        val tagListForField55 = arrayOf("82", "84", "95", "9F26", "9F27", "9F10", "9F37", "9F36", "9A",
+            "9C", "9F02", "9F03", "5F2A", "9F1A", "9F03", "9F33", "9F34", "9F35", "9F09", "9F41"
+        )
         val outData = ByteArray(2048)
+        val outDataForField55 = ByteArray(1024)
         val tlvOpCode: Int = if (AidlConstants.CardType.NFC.value == mCardType) {
             when (mAppSelect) {
                 2 -> AidlConstants.EMV.TLVOpCode.OP_PAYPASS
@@ -496,11 +464,11 @@ class SunmiEmvListener(
             AidlConstants.EMV.TLVOpCode.OP_NORMAL
         }
         val len = mEMVOptV2.getTlvList(tlvOpCode, tagList, outData)
+        val len55 = mEMVOptV2.getTlvList(tlvOpCode, tagListForField55, outDataForField55)
         if (len > 0) {
             val bytes = outData.copyOf(len)
-            cardData.mIccString = bytes.hexString
-            Log.d("PrintCardInfo", "The ICC Card info is ${cardData.mIccString}")
-            val tlvMap: Map<String, TLV> = TLVUtil.buildTLVMap(cardData.mIccString)
+            cardData.mIccString = outDataForField55.copyOf(len55).hexString
+            val tlvMap: Map<String, TLV> = TLVUtil.buildTLVMap(bytes.hexString)
 
             cardData.apply {
                 ret = CardTransactionStatus.Success.code
@@ -545,7 +513,7 @@ class SunmiEmvListener(
 }
 
 private fun getCandidateNames(candiList: List<EMVCandidateV2>?): Array<String> {
-    if (candiList == null || candiList.isEmpty()) return emptyArray()
+    if (candiList.isNullOrEmpty()) return emptyArray()
     return Array(candiList.size) { i ->
         val candi = candiList[i]
         var name = candi.appPreName
