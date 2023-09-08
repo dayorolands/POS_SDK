@@ -99,6 +99,12 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
                 dialogProvider.showSuccess("EMV AID Download successful")
             }
         }
+
+        binding.balanceButton.button.setOnClickListener {
+            lifecycleScope.launch {
+                startActivity(BalanceInquiryActivity::class.java)
+            }
+        }
     }
 
     private suspend fun checkKeysAndParameters() {
