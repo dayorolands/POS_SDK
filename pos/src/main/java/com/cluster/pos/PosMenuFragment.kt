@@ -135,6 +135,24 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
         binding.cashAdvButton.button.setOnClickListener {
             startActivity(CashAdvanceActivity::class.java)
         }
+
+        binding.adminButton.button.setOnClickListener {
+            mainScope.launch {
+                val textParam = TextFieldParams(hint = "Administrator Password", type = "textPassword")
+                val password = dialogProvider.getInput(textParam) ?: return@launch
+                val passed = password == config.adminPin
+                if(passed){
+                    val intent = Intent(requireActivity().applicationContext, MenuActivity::class.java)
+                    intent.apply {
+                        putExtra(MenuPage.TITLE, MenuPages[MenuPages.ADMIN]?.name)
+                        putExtra(MenuPage.PAGE_NUMBER, MenuPages.ADMIN)
+                    }
+                    startActivity(intent)
+                } else {
+                    dialogProvider.showError("Incorrect Password")
+                }
+            }
+        }
     }
 
     private suspend fun checkKeysAndParameters() {

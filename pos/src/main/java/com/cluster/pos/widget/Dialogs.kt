@@ -87,7 +87,7 @@ object Dialogs {
 
             override fun onChange(digit: Byte) {
                 restartTimer()
-                if (pin.size > 7) return
+                if (pin.size  == 4) return
 
                 pin.add(digit)
                 binding.pinTv.text = "*".repeat(pin.size)

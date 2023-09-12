@@ -201,6 +201,9 @@ class TerminalOptionsActivity : PosActivity(R.layout.activity_network_parameters
                 if (pin.isEmpty()) {
                     showError("${getString(R.string.pos_supervisor_pin)} cannot be empty")
                     return@requestPin
+                } else if(pin.length > 4){
+                    showError("${getString(R.string.pos_supervisor_pin)} cannot be more than 4 digits")
+                    return@requestPin
                 } else Dialogs.requestPin(
                     this,
                     getString(R.string.pos_confirm_supervisor_pin)
