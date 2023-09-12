@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import com.cluster.BuildConfig
-import com.cluster.LoginActivity
 import com.cluster.R
 import com.cluster.core.config.AccountOpeningConfig
 import com.cluster.core.config.CategoryConfig
@@ -16,16 +15,10 @@ import com.cluster.core.data.api.retrofitService
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.type.TransactionType
 import com.cluster.core.ui.CreditClubActivity
-import com.cluster.core.util.delegates.RetrofitServiceDelegate
 import com.cluster.core.util.delegates.addItemToList
-import com.cluster.core.util.delegates.deleteArrayList
 import com.cluster.core.util.delegates.getArrayList
 import com.cluster.core.util.localStorage
 import com.cluster.core.util.safeRunIO
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import retrofit2.Retrofit
 
 /**
  * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 17/10/2019.

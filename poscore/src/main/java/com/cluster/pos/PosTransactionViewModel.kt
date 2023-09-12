@@ -11,6 +11,7 @@ class PosTransactionViewModel : ViewModel() {
     val cashbackString = MutableLiveData("0")
     val longAmount = MutableLiveData(0L)
     val amount = MutableLiveData(0.00)
+    val preAuthStan = MutableLiveData("0")
     val amountCurrencyFormat = MutableLiveData("NGN0.00")
     val amountNumberFormat = MutableLiveData("0.00")
     val accountType = MutableLiveData<AccountType>()

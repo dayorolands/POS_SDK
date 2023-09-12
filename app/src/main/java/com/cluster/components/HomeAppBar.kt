@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.cluster.R
-import com.cluster.fragment.NotificationViewModel
+import com.cluster.pos.models.view.NotificationViewModel
 import com.google.accompanist.insets.statusBarsHeight
 
 @Composable
@@ -28,10 +28,6 @@ fun HomeAppBar(
     navigationIcon: @Composable () -> Unit,
 ) {
     val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
-    val notificationViewModel: NotificationViewModel = viewModel()
-    val badgeCount = notificationViewModel.totalNotification.collectAsState()
-    var badgeValue = badgeCount.value
-    val notifications by notificationViewModel.notificationList.collectAsState()
     // Draw a scrim over the status bar which matches the app bar
     Spacer(
         Modifier
@@ -51,27 +47,6 @@ fun HomeAppBar(
                     modifier = Modifier
                         .weight(1f),
                 )
-                for (notification in notifications) {
-                    if (notification.isRead == true) badgeValue -= 1 else badgeValue = badgeValue
-                }
-                BadgedBox(
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .clickable { mainNavController.navigate(R.id.home_to_notifications) },
-                    badge = {
-                        if(badgeValue > 0){
-                            Badge{
-                                Text(text = badgeValue.toString())
-                            }
-                        }
-                    }
-                ) {
-                    Icon(
-                        Icons.Filled.Notifications,
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.primary.copy(0.52f),
-                    )
-                }
             }
         },
         backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0f),

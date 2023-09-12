@@ -117,6 +117,24 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
                 startActivity(RefundActivity::class.java)
             }
         }
+
+        binding.reversalButton.button.setOnClickListener {
+            supervisorAction {
+                startActivity(ReversalActivity::class.java)
+            }
+        }
+
+        binding.authButton.button.setOnClickListener {
+            startActivity(PreAuthActivity::class.java)
+        }
+
+        binding.salesCompletionButton.button.setOnClickListener {
+            startActivity(SalesCompleteActivity::class.java)
+        }
+
+        binding.cashAdvButton.button.setOnClickListener {
+            startActivity(CashAdvanceActivity::class.java)
+        }
     }
 
     private suspend fun checkKeysAndParameters() {

@@ -16,14 +16,6 @@
         app:popExitAnim="@anim/fade_out" />
 
     <action
-        android:id="@+id/action_to_bill_payment"
-        app:destination="@id/billPaymentFragment"
-        app:enterAnim="@anim/fade_in"
-        app:exitAnim="@anim/fade_out"
-        app:popEnterAnim="@anim/fade_in"
-        app:popExitAnim="@anim/fade_out" />
-
-    <action
         android:id="@+id/action_to_receipt"
         app:destination="@id/receiptFragment"
         app:enterAnim="@anim/fade_in"
@@ -31,88 +23,15 @@
         app:popEnterAnim="@anim/fade_in"
         app:popExitAnim="@anim/fade_out" />
 
-
-    <action
-        android:id="@+id/action_to_cardless_token"
-        app:destination="@id/cardlessTokenWithdrawal"
-        app:enterAnim="@anim/fade_in"
-        app:exitAnim="@anim/fade_out"
-        app:popEnterAnim="@anim/fade_in"
-        app:popExitAnim="@anim/fade_out" />
-
-    <action
-        android:id="@+id/action_to_collection_payment"
-        app:destination="@id/collectionGraph"
-        app:enterAnim="@anim/fade_in"
-        app:exitAnim="@anim/fade_out"
-        app:popEnterAnim="@anim/fade_in"
-        app:popExitAnim="@anim/fade_out" />
-
-    <fragment
-        android:id="@+id/billPaymentFragment"
-        android:name="com.cluster.fragment.BillPaymentFragment"
-        android:label="Bill Payment"
-        tools:layout="@layout/bill_payment_fragment" />
-
-    <fragment
-        android:id="@+id/notificationFragment"
-        android:name="com.cluster.fragment.NotificationFragment"
-        android:label="Notification"
-        tools:layout="@layout/notification_fragment" />
-
     <fragment
         android:id="@+id/receiptFragment"
         android:name="com.cluster.fragment.ReceiptFragment"
         android:label="Receipt" />
 
     <fragment
-        android:id="@+id/cardlessTokenWithdrawal"
-        android:name="com.cluster.fragment.CardlessTokenFragment"
-        android:label="Cardless Token Withdrawal"
-        tools:layout="@layout/cardless_token_withdrawal"/>
-
-    <fragment
         android:id="@+id/homeFragment"
         android:name="com.cluster.fragment.HomeFragment"
         android:label="Home">
-        <action
-            android:id="@+id/action_home_to_bill_payment"
-            app:destination="@id/billPaymentFragment"
-            app:enterAnim="@anim/fade_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/fade_out" />
-        <action
-            android:id="@+id/home_to_notifications"
-            app:destination="@id/notificationFragment"
-            app:enterAnim="@anim/fade_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/fade_out" />
     </fragment>
-
-    <navigation
-        android:id="@+id/collectionGraph"
-        app:startDestination="@id/collectionPaymentFragment">
-        <fragment
-            android:id="@+id/collectionPaymentFragment"
-            android:name="com.cluster.fragment.CollectionPaymentFragment"
-            android:label="Collections"
-            tools:layout="@layout/collection_payment_fragment">
-            <action
-                android:id="@+id/action_collection_payment_to_reference_generation"
-                app:destination="@id/collectionReferenceGenerationFragment"
-                app:enterAnim="@anim/fade_in"
-                app:exitAnim="@anim/fade_out"
-                app:popEnterAnim="@anim/fade_in"
-                app:popExitAnim="@anim/fade_out" />
-        </fragment>
-
-        <fragment
-            android:id="@+id/collectionReferenceGenerationFragment"
-            android:name="com.cluster.fragment.CollectionReferenceGenerationFragment"
-            android:label="Generate Collection Reference"
-            tools:layout="@layout/fragment_collection_reference_generation" />
-    </navigation>
 
 </navigation>

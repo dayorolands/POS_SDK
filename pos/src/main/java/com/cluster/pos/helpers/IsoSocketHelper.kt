@@ -27,10 +27,6 @@ import org.koin.core.parameter.parametersOf
 import java.time.Duration
 import java.time.Instant
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/15/2019.
- * Appzone Ltd
- */
 class IsoSocketHelper(
     val config: PosConfig,
     val parameters: PosParameter,
@@ -38,8 +34,6 @@ class IsoSocketHelper(
 ) : KoinComponent {
     private val database: PosDatabase by inject()
     private val localStorage: LocalStorage by inject()
-    private var firebaseAnalytics = FirebaseAnalytics.getInstance(get<Context>().applicationContext)
-        private set
 
     fun send(request: ISOMsg, isRetry: Boolean = false): SafeRunResult<ISOMsg> {
 
@@ -66,29 +60,6 @@ class IsoSocketHelper(
             }
         }
 
-        firebaseAnalytics.logEvent("nibss_iso_req_log", Bundle().apply {
-            this.putString("processing_code", request.processingCode3)
-            this.putString("trans_amount", request.transactionAmount4)
-            this.putString("trans_date_time", request.transmissionDateTime7)
-            this.putString("stan", request.stan11)
-            this.putString("local_time", request.localTransactionTime12)
-            this.putString("local_date", request.localTransactionDate13)
-            this.putString("exp_date", request.cardExpirationDate14)
-            this.putString("merchant_type", request.merchantType18)
-            this.putString("pos_entry_mode", request.posEntryMode22)
-            this.putString("card_sequence_no", request.cardSequenceNumber23)
-            this.putString("pos_cond_code", request.posConditionCode25)
-            this.putString("transaction_fee", request.transactionFee28)
-            this.putString("acquiring_id", request.acquiringInstIdCode32)
-            this.putString("rrn", request.retrievalReferenceNumber37)
-            this.putString("src", request.serviceRestrictionCode40)
-            this.putString("terminal_id", request.terminalId41)
-            this.putString("card_acceptor_id", request.cardAcceptorIdCode42)
-            this.putString("card_acceptor_location", request.cardAcceptorNameLocation43)
-            this.putString("pinblock", request.pinData)
-            this.putString("pos_data_code", request.posDataCode123)
-        })
-
         val result = safeRun {
             val sessionKey = parameters.sessionKey
             val outputData = request.prepare(sessionKey)
@@ -98,10 +69,6 @@ class IsoSocketHelper(
                 packager = ISO87Packager()
                 unpack(output)
             }
-
-            firebaseAnalytics.logEvent("nibss_iso_resp_log", Bundle().apply {
-                this.putString("response_code", response.responseCode39)
-            })
 
             response.log()
 

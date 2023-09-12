@@ -116,14 +116,14 @@ abstract class CardTransactionActivity : PosActivity() {
             delay(1000)
             dialogProvider.hideProgressBar()
 
-//            if (Platform.hasPrinter) {
-//                val printerStatus = withContext(Dispatchers.Default) { printer.check() }
-//                if (printerStatus != PrinterStatus.READY) {
-//                    dialogProvider.showErrorAndWait(printerStatus.message)
-//                    finish()
-//                    return@launch
-//                }
-//            }
+            if (Platform.hasPrinter) {
+                val printerStatus = withContext(Dispatchers.Default) { printer.check() }
+                if (printerStatus != PrinterStatus.READY) {
+                    dialogProvider.showErrorAndWait(printerStatus.message)
+                    finish()
+                    return@launch
+                }
+            }
 
             when (val cardEvent = posManager.cardReader.waitForCard()) {
                 CardReaderEvent.REMOVED, CardReaderEvent.CANCELLED -> {

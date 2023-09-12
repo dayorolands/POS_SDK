@@ -9,6 +9,7 @@ import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.pos.printer.*
 import com.sunmi.peripheral.printer.*
 import kotlinx.coroutines.*
+import java.lang.Exception
 
 class SunmiPrinter(override val context: Context, override val dialogProvider: DialogProvider) : PosPrinter {
     var sunmiPrinterService : SunmiPrinterService? = null
@@ -22,7 +23,7 @@ class SunmiPrinter(override val context: Context, override val dialogProvider: D
         withContext(Dispatchers.IO){
             sunmiPrinterService?.enterPrinterBuffer(true)
             val status = translateStatus(
-                sunmiPrinterService?.let { it.updatePrinterState() } ?: 80
+                sunmiPrinterService?.updatePrinterState() ?: 80
             )
             sunmiPrinterService?.exitPrinterBuffer(true)
             status
@@ -57,21 +58,12 @@ class SunmiPrinter(override val context: Context, override val dialogProvider: D
                 walkpaper(node.walkPaperAfterPrint)
             }
         }
-        val status = translateStatus(sunmiPrinterService.let { it!!.updatePrinterState() })
+        val status = translateStatus(sunmiPrinterService?.updatePrinterState() ?: 80)
         sunmiPrinterService?.exitPrinterBuffer(true)
         status
     }
 
     private fun textNode(node: TextNode){
-        if (node.lineDistance > 255) {
-            Toast.makeText(context, "Beyond the row space", Toast.LENGTH_LONG).show()
-            return
-        }
-
-        if(node.text.isEmpty()){
-            Toast.makeText(context, "The content is empty", Toast.LENGTH_LONG).show()
-            return
-        }
         sunmiPrinterService?.setAlignment(node.align.asAlignEnum, innerResultCallback)
         sunmiPrinterService?.setFontSize(node.wordFont.toFloat(), innerResultCallback)
         sunmiPrinterService?.printText(

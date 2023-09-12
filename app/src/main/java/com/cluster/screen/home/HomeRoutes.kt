@@ -36,15 +36,4 @@ fun NavGraphBuilder.homeRoutes(
             fragment = fragment
         )
     }
-    composable(BottomNavScreens.Profile.route) {
-        ProvideViewModelStoreOwner(
-            viewModelStoreOwner = fragment.requireActivity(),
-        ) {
-            ProfileScreen(
-                composeNavController = composeNavController,
-                fragment = fragment,
-                preferences = preferences
-            )
-        }
-    }
 }

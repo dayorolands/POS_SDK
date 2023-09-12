@@ -44,7 +44,6 @@ fun registerAppFunctions() {
     AppFunctions.register(FunctionIds.CARDLESS_TOKEN, AppFunction(R.id.fn_token_withdrawal, R.string.withdrawal_by_token,R.drawable.withdrawal))
     AppFunctions.register(FunctionIds.TOKEN_WITHDRAWAL, AppFunction(R.id.token_withdrawal_button, R.string.withdrawal_by_token, R.drawable.withdrawal))
     AppFunctions.register(FunctionIds.LOAN_REQUEST, AppFunction(R.id.loan_request_button, R.string.loan_request, R.drawable.personal_income))
-    AppFunctions.register(FunctionIds.BVN_UPDATE, AppFunction(R.id.bvn_update_button, R.string.title_activity_bvnUpdate, R.drawable.secured_loan))
     AppFunctions.register(FunctionIds.CUSTOMER_BALANCE_ENQUIRY, AppFunction(R.id.customer_balance_enquiry_button, R.string.customer_balance, R.drawable.income))
     AppFunctions.register(FunctionIds.AGENT_BALANCE_ENQUIRY, AppFunction(R.id.agent_balance_enquiry_button, R.string.agent_s_balance, R.drawable.income))
     AppFunctions.register(FunctionIds.PAY_BILL, AppFunction(R.id.fn_bill_payment, R.string.pay_a_bill, R.drawable.payday_loan))

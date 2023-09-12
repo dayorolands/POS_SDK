@@ -211,7 +211,7 @@ internal fun CardTransactionActivity.showReferencePage(dialogTitle: String = "En
         sessionData.amount = transaction.isoMsg.transactionAmount4?.toLong() ?: 0
         viewModel.amountString.value = sessionData.amount.toString()
         previousMessage = transaction.isoMsg
-        requestCard()
+        showStanPage(dialogTitle)
     }
 }
 
@@ -246,5 +246,50 @@ internal inline fun CardTransactionActivity.showReferencePage(
         }
         binding.header.goBack.setOnClickListener { finish() }
         binding.cancelButton.setOnClickListener { finish() }
+    }
+}
+
+internal fun CardTransactionActivity.showStanPage(dialogTitle: String = "Enter STAN"){
+    showStanPage(dialogTitle){
+        requestCard()
+    }
+}
+
+internal inline fun CardTransactionActivity.showStanPage(
+    title: String = "Enter Stan",
+    crossinline block: () -> Unit
+){
+
+    mainScope.launch {
+        if(Platform.hasPrinter) {
+            val printerStatus = withContext(Dispatchers.IO){
+                printer.check()
+            }
+            if(printerStatus != PrinterStatus.READY){
+                dialogProvider.showErrorAndWait(printerStatus.message)
+                finish()
+                return@launch
+            }
+        }
+
+        val binding = DataBindingUtil.setContentView<PageInputStanBinding>(
+            this@showStanPage,
+            R.layout.page_input_stan
+        )
+
+        binding.lifecycleOwner = this@showStanPage
+        binding.header.subtitle = title
+        binding.confirmRrnButton.setOnClickListener {
+            val stan = binding.stanInput.text.toString().trim { it <= ' '}
+            if(stan.length != 6){
+                return@setOnClickListener dialogProvider.showError("STAN must be 6 digits")
+            }
+            mainScope.launch {
+                viewModel.preAuthStan.value = stan
+                block()
+            }
+            binding.header.goBack.setOnClickListener { finish() }
+            binding.cancelButton.setOnClickListener { finish() }
+        }
     }
 }

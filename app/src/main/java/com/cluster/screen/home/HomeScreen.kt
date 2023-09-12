@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -42,7 +43,6 @@ fun HomeScreen(
     fragment: CreditClubFragment,
     preferences: SharedPreferences
 ) {
-    val returnedList = getArrayList("institution_features", preferences)
     val composableRouteFunctionIds = remember {
         mapOf(
             R.id.agent_change_pin_button to Routes.PinChange,
@@ -63,15 +63,7 @@ fun HomeScreen(
     val bottomNavigationItems = remember {
         buildList {
             add(BottomNavScreens.Home)
-            if (returnedList != null) {
-                if(returnedList.contains("ACC") || returnedList.contains("CBE"))
-                add(BottomNavScreens.Customer)
-            }
             add(BottomNavScreens.Transactions)
-            if (institutionConfig.categories.loans) {
-                add(BottomNavScreens.Loans)
-            }
-            add(BottomNavScreens.Profile)
         }
     }
     val currentRoute = currentRoute(homeNavController)
@@ -110,16 +102,9 @@ fun HomeScreen(
                 title = title,
                 navigationIcon = {
                     if (currentRoute != BottomNavScreens.Profile.route) {
-                        IconButton(onClick = {
-                            homeNavController.navigate(BottomNavScreens.Profile.route) {
-                                launchSingleTop = true
-                                popUpTo(BottomNavScreens.Home.route) {
-                                    inclusive = false
-                                }
-                            }
-                        }) {
+                        IconButton(onClick = {}) {
                             Icon(
-                                Icons.Outlined.AccountCircle,
+                                Icons.Outlined.Home,
                                 contentDescription = null,
                                 tint = MaterialTheme.colors.primary.copy(0.52f)
                             )

@@ -10,7 +10,6 @@ import android.net.NetworkRequest
 import android.os.Build
 import android.provider.Settings
 import android.telephony.TelephonyManager
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import com.cluster.config.*
 import com.cluster.core.R
@@ -19,14 +18,12 @@ import com.cluster.core.data.prefs.AppDataStorage
 import com.cluster.core.data.prefs.LocalStorage
 import com.cluster.core.data.prefs.moveTo
 import com.cluster.core.util.SharedPref
-import com.cluster.model.online.AuthResponse
 import com.cluster.pos.Platform
 import com.cluster.pos.PosManager
 import com.cluster.pos.extension.getPosSerialNumber
 import com.cluster.pos.posModule
 import com.cluster.utility.extensions.registerWorkers
 import com.cluster.utility.registerAppFunctions
-import com.google.android.gms.common.util.Base64Utils
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
@@ -34,30 +31,12 @@ import org.koin.android.ext.koin.androidFileProperties
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.fragment.koin.fragmentFactory
 import org.koin.androidx.workmanager.koin.workManagerFactory
-import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import timber.log.Timber
 
 class ClusterApplication : Application() {
     private val appDataStorage: AppDataStorage by inject()
-    private val localStorage: LocalStorage by inject()
-
-    val authResponse: AuthResponse by lazy {
-        val phoneNumber = "234${localStorage.agentPhone?.substring(1)}"
-        val newAuth = localStorage.authResponse
-            ?: return@lazy AuthResponse(
-                phoneNumber = phoneNumber,
-                sessionId = localStorage.getString("AGENT_CODE") ?: "",
-                activationCode = localStorage.getString("AGENT_CODE") ?: ""
-            )
-
-        return@lazy AuthResponse(
-            newAuth.phoneNumber ?: phoneNumber,
-            newAuth.sessionId ?: localStorage.getString("AGENT_CODE") ?: "",
-            newAuth.activationCode ?: localStorage.getString("AGENT_CODE") ?: ""
-        )
-    }
 
     override fun onCreate() {
         super.onCreate()
