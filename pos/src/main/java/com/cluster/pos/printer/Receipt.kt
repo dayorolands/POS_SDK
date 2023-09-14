@@ -45,19 +45,20 @@ class Receipt(val context: Context, val transaction: FinancialTransaction) :
         get() {
             val nodes = arrayListOf<PrintNode>(LogoNode())
 
+            TextNodeWithNewLine("")
             if (isReprint) nodes.add(
-                TextNode("***REPRINT***").apply {
+                TextNodeWithNewLine("     ***REPRINT***").apply {
                     align = Alignment.MIDDLE
                 })
 
             nodes.add(
-                TextNode(if (isCustomerCopy) "***CUSTOMER COPY***" else "***MERCHANT COPY***")
+                TextNodeWithNewLine(if (isCustomerCopy) "***CUSTOMER COPY***" else "***MERCHANT COPY***")
                     .apply {
                         align = Alignment.MIDDLE
                     })
 
             nodes.add(
-                TextNode(
+                TextNodeWithNewLine(
                     """$merchantDetails
 Merchant Id: $merchantId
 Agent Name: ${context.localStorage.agent?.agentName}
@@ -78,39 +79,39 @@ Verification Mode: PIN"""
                 )
             )
 
-            nodes.add(TextNode(transaction.type).apply {
+            nodes.add(TextNodeWithNewLine(transaction.type).apply {
                 align = Alignment.MIDDLE
                 wordFont = 25
             })
 
             nodes.add(
-                TextNode(
+                TextNodeWithNewLine(
                     """AMOUNT: $amount
 RRN: $rrn"""
                 )
             )
 
             nodes.add(
-                TextNode(if (successful) "TRANSACTION APPROVED" else "TRANSACTION DECLINED")
+                TextNodeWithNewLine(if (successful) "TRANSACTION APPROVED" else "TRANSACTION DECLINED")
                     .apply {
                         align = Alignment.MIDDLE
                         wordFont = 25
                     })
 
             if (!successful) nodes.add(
-                TextNode(
+                TextNodeWithNewLine(
                     transaction.isoMsg.responseMessage
                 ).apply {
                     align = Alignment.MIDDLE
                 })
 
             nodes.add(
-                TextNode("-----------------------------").apply {
+                TextNodeWithNewLine("-----------------------------").apply {
                     align = Alignment.MIDDLE
                     wordFont = 10
                 })
 
-            nodes.add(TextNode(
+            nodes.add(TextNodeWithNewLine(
                 "${context.getString(R.string.app_name)} v${backendConfig.versionName}. Powered by ${
                     context.getString(
                         R.string.institution_name
@@ -122,7 +123,7 @@ RRN: $rrn"""
             })
 
             nodes.add(
-                TextNode(
+                TextNodeWithNewLine(
                     context.getString(R.string.institution_website),
                     align = Alignment.MIDDLE,
                     walkPaperAfterPrint = 15,

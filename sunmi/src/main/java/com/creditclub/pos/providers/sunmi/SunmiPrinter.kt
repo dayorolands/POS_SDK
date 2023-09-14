@@ -57,6 +57,9 @@ class SunmiPrinter(override val context: Context, override val dialogProvider: D
             is WalkPaper -> {
                 walkpaper(node.walkPaperAfterPrint)
             }
+            is TextNodeWithNewLine -> {
+                textNodeWithNewLine(node)
+            }
         }
         val status = translateStatus(sunmiPrinterService?.updatePrinterState() ?: 80)
         sunmiPrinterService?.exitPrinterBuffer(true)
@@ -77,6 +80,15 @@ class SunmiPrinter(override val context: Context, override val dialogProvider: D
         val bitmap = BitmapFactory.decodeResource(context.resources, node.drawable)
         sunmiPrinterService?.setAlignment(node.align.asAlignEnum, null)
         sunmiPrinterService?.printBitmap(bitmap, innerResultCallback)
+    }
+
+    private fun textNodeWithNewLine(node: TextNodeWithNewLine){
+        sunmiPrinterService?.setAlignment(node.align.asAlignEnum, innerResultCallback)
+        sunmiPrinterService?.setFontSize(node.wordFont.toFloat(), innerResultCallback)
+        sunmiPrinterService?.printText(
+            node.text + "\n",
+            innerResultCallback
+        )
     }
 
     private fun walkpaper(distance: Int){

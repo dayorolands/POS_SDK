@@ -54,6 +54,21 @@ value class PrintJobScope(private val nodes: MutableList<PrintNode> = mutableLis
         nodes.add(textNode)
     }
 
+    fun textWithNewLine(
+        text: String,
+        align: Alignment = Alignment.MIDDLE,
+        fontSize: Int = 20,
+        walkPaperAfterPrint: Int = 0,
+    ){
+        val textNode = TextNodeWithNewLine(
+            text = text,
+            align = align,
+            walkPaperAfterPrint = walkPaperAfterPrint,
+            wordFont = fontSize
+        )
+        nodes.add(textNode)
+    }
+
     fun walkPaper(distance: Int = 20) {
         nodes.add(WalkPaper(distance))
     }

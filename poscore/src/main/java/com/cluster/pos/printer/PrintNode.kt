@@ -30,6 +30,14 @@ data class TextNode(
 ) : PrintNode
 
 @Parcelize
+data class TextNodeWithNewLine(
+    val text: String,
+    override var walkPaperAfterPrint: Int = 0,
+    override var align: Alignment = Alignment.LEFT,
+    var wordFont: Int = 22,
+) : PrintNode
+
+@Parcelize
 data class WalkPaper(
     override val walkPaperAfterPrint: Int = 20,
     override var align: Alignment = Alignment.LEFT,

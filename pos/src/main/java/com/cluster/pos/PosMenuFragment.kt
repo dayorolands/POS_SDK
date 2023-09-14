@@ -142,7 +142,10 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
                 val password = dialogProvider.getInput(textParam) ?: return@launch
                 val passed = password == config.adminPin
                 if(passed){
-                    val intent = Intent(requireActivity().applicationContext, MenuActivity::class.java)
+                    val intent = Intent(
+                        requireActivity(),
+                        MenuActivity::class.java
+                    )
                     intent.apply {
                         putExtra(MenuPage.TITLE, MenuPages[MenuPages.ADMIN]?.name)
                         putExtra(MenuPage.PAGE_NUMBER, MenuPages.ADMIN)
@@ -150,6 +153,26 @@ class PosMenuFragment : PosFragment(R.layout.pos_menu_fragment) {
                     startActivity(intent)
                 } else {
                     dialogProvider.showError("Incorrect Password")
+                }
+            }
+        }
+
+        binding.eodButton.button.setOnClickListener {
+            supervisorAction {
+                startActivity(Intent(
+                    requireContext(),
+                    MenuActivity::class.java
+                ).apply {
+                    putExtra(MenuPage.TITLE, MenuPages[MenuPages.REPRINT_EODS]?.name)
+                    putExtra(MenuPage.PAGE_NUMBER, MenuPages.REPRINT_EODS)
+                })
+            }
+        }
+
+        binding.reprintButton.button.setOnClickListener {
+            lifecycleScope.launch {
+                supervisorAction {
+                    startActivity(ReprintMenuActivity::class.java)
                 }
             }
         }

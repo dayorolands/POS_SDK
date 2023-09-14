@@ -59,11 +59,11 @@
                         app:src='@{@drawable/ic_auth}'
                         app:text='@{"Del All Trans"}' />
 
-                    <include
-                        android:id="@+id/unsettled_transactions_button"
-                        layout="@layout/card_menu_button"
-                        app:src='@{@drawable/ic_admin}'
-                        app:text='@{"Unsettled Trans"}' />
+<!--                    <include-->
+<!--                        android:id="@+id/unsettled_transactions_button"-->
+<!--                        layout="@layout/card_menu_button"-->
+<!--                        app:src='@{@drawable/ic_admin}'-->
+<!--                        app:text='@{"Unsettled Trans"}' />-->
 
                 </com.google.android.flexbox.FlexboxLayout>
             </LinearLayout>

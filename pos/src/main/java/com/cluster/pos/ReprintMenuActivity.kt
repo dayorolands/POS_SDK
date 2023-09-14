@@ -60,8 +60,13 @@ class ReprintMenuActivity : PosActivity(R.layout.activity_reprint_menu) {
             }.show()
         }
 
-        binding.unsettledTransactionsButton.button.setOnClickListener {
-            startActivity(Intent(this, UnsettledTransactionsActivity::class.java))
-        }
+//        binding.unsettledTransactionsButton.button.setOnClickListener {
+//            startActivity(Intent(this, UnsettledTransactionsActivity::class.java))
+//        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.unbind()
     }
 }
