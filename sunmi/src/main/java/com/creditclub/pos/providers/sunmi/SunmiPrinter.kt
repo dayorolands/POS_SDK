@@ -10,23 +10,37 @@ import com.cluster.pos.printer.*
 import com.sunmi.peripheral.printer.*
 import kotlinx.coroutines.*
 import java.lang.Exception
+import java.lang.IllegalArgumentException
 
 class SunmiPrinter(override val context: Context, override val dialogProvider: DialogProvider) : PosPrinter {
     var sunmiPrinterService : SunmiPrinterService? = null
+    private var isBindPrinterServiceCalled : Boolean = false
     private val mainScope = CoroutineScope(Dispatchers.Main)
+    private val lock = Any()
 
     init {
-        bindPrintService()
+        runBlocking {
+            synchronized(lock = lock){
+                bindPrintService()
+                isBindPrinterServiceCalled = true
+            }
+        }
     }
 
     override fun check(): PrinterStatus = runBlocking {
         withContext(Dispatchers.IO){
-            sunmiPrinterService?.enterPrinterBuffer(true)
-            val status = translateStatus(
-                sunmiPrinterService?.updatePrinterState() ?: 80
-            )
-            sunmiPrinterService?.exitPrinterBuffer(true)
-            status
+            synchronized(lock = lock){
+                if(!isBindPrinterServiceCalled){
+                    throw IllegalStateException("Bind printer service must be called first")
+                }
+
+                sunmiPrinterService?.enterPrinterBuffer(true)
+                val status = translateStatus(
+                    sunmiPrinterService?.updatePrinterState() ?: 80
+                )
+                sunmiPrinterService?.exitPrinterBuffer(true)
+                status
+            }
         }
     }
 

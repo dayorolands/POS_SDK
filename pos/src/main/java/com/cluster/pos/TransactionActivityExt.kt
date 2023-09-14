@@ -266,7 +266,7 @@ internal inline fun CardTransactionActivity.showStanPage(
                 printer.check()
             }
             if(printerStatus != PrinterStatus.READY){
-                dialogProvider.showErrorAndWait(printerStatus.message)
+                dialogProvider.showErrorAndWait(title = "Printer status", message = printerStatus.message)
                 finish()
                 return@launch
             }
