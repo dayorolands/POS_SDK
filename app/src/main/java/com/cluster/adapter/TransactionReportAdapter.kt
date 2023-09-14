@@ -15,10 +15,6 @@ import com.cluster.ui.databinding.*
 import com.cluster.ui.databinding.ItemReport1Binding as ItemReport1Binding1
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 25/09/2019.
- * Appzone Ltd
- */
 class TransactionReportAdapter(
     override var values: List<TransactionReport.ReportItem>,
     private val transactionType: TransactionType

@@ -11,11 +11,6 @@ import com.cluster.core.util.toInstant
 import com.cluster.ui.R
 import com.cluster.ui.databinding.ItemPosCashoutBinding
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 25/09/2019.
- * Appzone Ltd
- */
 class PosReportAdapter(override var values: List<PosTransactionReport.Report>) :
     SimpleBindingAdapter<PosTransactionReport.Report, ItemPosCashoutBinding>(R.layout.item_pos_cashout) {
 

@@ -4,11 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/4/2019.
- * Appzone Ltd
- */
-
 @Serializable
 data class BalanceEnquiryRequest (
     @SerialName("AgentPhoneNumber")

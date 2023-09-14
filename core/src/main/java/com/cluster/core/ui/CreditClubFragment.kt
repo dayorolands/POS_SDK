@@ -14,10 +14,6 @@ import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@app zonegroup.com> on 28/08/2019.
- * Appzone Ltd
- */
 open class CreditClubFragment : Fragment {
     constructor() : super()
     constructor(layout: Int) : super(layout)

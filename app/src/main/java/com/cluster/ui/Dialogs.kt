@@ -3,10 +3,6 @@ package com.cluster.ui
 import android.view.View
 import com.cluster.R
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 3/1/2019.
- * Appzone Ltd
- */
 
 object Dialogs {
     interface PinChangeHandler {

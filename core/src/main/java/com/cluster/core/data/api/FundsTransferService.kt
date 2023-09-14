@@ -12,10 +12,6 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/16/2019.
- * Appzone Ltd
- */
 interface FundsTransferService {
     @POST("FundsTransfer/NameEnquiry")
     suspend fun nameEnquiry(@Body request: FundsTransferRequest): NameEnquiryResponse?

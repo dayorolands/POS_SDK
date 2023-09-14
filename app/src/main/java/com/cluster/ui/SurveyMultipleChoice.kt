@@ -6,11 +6,6 @@ import com.cluster.core.ui.SimpleBindingAdapter
 import com.cluster.core.ui.widget.DialogOptionItem
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 18/11/2019.
- * Appzone Ltd
- */
-
 class SurveyMultipleChoiceAdapter(
     override var values: List<DialogOptionItem>,
     val onItemClick: (Int) -> Unit

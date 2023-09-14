@@ -4,12 +4,6 @@ import com.cluster.R
 import com.cluster.core.AppFunction
 import com.cluster.core.AppFunctions
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 22/10/2019.
- * Appzone Ltd
- */
-
 object FunctionIds {
     const val ACCOUNT_OPENING = 0
     const val NEW_WALLET = 1

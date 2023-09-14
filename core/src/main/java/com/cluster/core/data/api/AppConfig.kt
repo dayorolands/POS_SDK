@@ -1,10 +1,5 @@
 package com.cluster.core.data.api
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 06/02/2020.
- * Appzone Ltd
- */
 interface AppConfig {
     val apiHost: String
     val posNotificationToken: String

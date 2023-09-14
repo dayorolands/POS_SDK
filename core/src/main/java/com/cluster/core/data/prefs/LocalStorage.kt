@@ -9,10 +9,7 @@ import com.cluster.core.data.model.AuthResponse
 import com.cluster.core.data.model.GetFeatureResponse
 import com.cluster.core.util.delegates.*
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
- * Appzone Ltd
- */
+
 class LocalStorage(
     context: Context,
     pref: SharedPreferences = context.getEncryptedSharedPreferences("agent_0"),

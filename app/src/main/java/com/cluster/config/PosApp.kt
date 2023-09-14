@@ -23,12 +23,6 @@ import java.security.Security
 import javax.net.ssl.TrustManager
 import javax.net.ssl.TrustManagerFactory
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 07/11/2019.
- * Appzone Ltd
- */
-
 fun Application.startPosApp() {
     encryptPosConfig()
 }

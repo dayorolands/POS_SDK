@@ -4,10 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 2/27/2019.
- * Appzone Ltd
- */
 
 data class AppFunction(
     @IdRes val id: Int,

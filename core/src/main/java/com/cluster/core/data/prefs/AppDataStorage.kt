@@ -11,10 +11,7 @@ import com.cluster.core.util.delegates.jsonStore
 import com.cluster.core.util.delegates.valueStore
 import java.io.File
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
- * Appzone Ltd
- */
+
 class AppDataStorage(
     context: Context,
     pref: SharedPreferences = context.getSharedPreferences(

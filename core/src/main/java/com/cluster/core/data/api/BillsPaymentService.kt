@@ -8,11 +8,6 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/5/2019.
- * Appzone Ltd
- */
 interface BillsPaymentService {
 
     @GET("api/PayBills/GetBillers")

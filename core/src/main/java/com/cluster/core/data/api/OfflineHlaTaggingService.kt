@@ -8,10 +8,6 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 05/11/2019.
- * Appzone Ltd
- */
 interface OfflineHlaTaggingService {
 
     @POST("api/OfflineHLATagging/PostOfflineTaggingData")

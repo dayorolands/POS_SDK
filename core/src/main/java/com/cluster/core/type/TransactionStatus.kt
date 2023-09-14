@@ -5,10 +5,6 @@ import androidx.annotation.StringRes
 import com.cluster.core.R
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/8/2019.
- * Appzone Ltd
- */
 enum class TransactionStatus(
     val code: Int,
     val label: String,

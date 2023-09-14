@@ -20,10 +20,6 @@ import com.cluster.core.util.delegates.getArrayList
 import com.cluster.core.util.localStorage
 import com.cluster.core.util.safeRunIO
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 17/10/2019.
- * Appzone Ltd
- */
 class LocalInstitutionConfig private constructor(
     override var name: String,
     override var hasOnlineFunctions: Boolean,

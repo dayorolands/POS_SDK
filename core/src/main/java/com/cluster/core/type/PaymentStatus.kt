@@ -4,11 +4,6 @@ import android.content.Context
 import androidx.annotation.StringRes
 import com.cluster.core.R
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/8/2019.
- * Appzone Ltd
- */
 enum class PaymentStatus(
     val code: Int,
     val label: String, @StringRes val labelRes: Int = R.string.please_replace

@@ -12,10 +12,6 @@ import kotlinx.serialization.Serializable
 import java.io.ByteArrayOutputStream
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 06/11/2019.
- * Appzone Ltd
- */
 @Serializable(with = CreditClubImageSerializer::class)
 class CreditClubImage(context: Context, private val image: Image) {
 

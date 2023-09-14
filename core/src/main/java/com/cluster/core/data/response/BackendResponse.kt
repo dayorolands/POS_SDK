@@ -3,10 +3,6 @@ package com.cluster.core.data.response
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/4/2019.
- * Appzone Ltd
- */
 
 enum class RetryPolicy {
     AutoRetry,

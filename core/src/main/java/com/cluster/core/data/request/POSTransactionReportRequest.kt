@@ -3,10 +3,6 @@ package com.cluster.core.data.request
 import kotlinx.serialization.Serializable
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/21/2019.
- * Appzone Ltd
- */
 @Serializable
 data class POSTransactionReportRequest(
     val agentPhoneNumber: String? = "",

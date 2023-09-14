@@ -23,10 +23,6 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 03/02/2020.
- * Appzone Ltd
- */
 class TransactionLogWorker(context: Context, params: WorkerParameters) :
     BaseWorker(context, params) {
 

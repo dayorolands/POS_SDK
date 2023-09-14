@@ -3,10 +3,6 @@ package com.cluster.core.data.request
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 05/11/2019.
- * Appzone Ltd
- */
 
 @Serializable
 class OfflineHLATaggingRequest {

@@ -12,11 +12,6 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 8/8/2019.
- * Appzone Ltd
- */
-
 interface ReportService {
     @GET("api/Report/GetTransactions")
     suspend fun getTransactions(

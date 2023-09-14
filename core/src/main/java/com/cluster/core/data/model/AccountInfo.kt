@@ -4,11 +4,6 @@ import com.cluster.core.util.mask
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 5/8/2019.
- * Appzone Ltd
- */
-
 @Serializable
 data class AccountInfo(
     @SerialName("AccountName")

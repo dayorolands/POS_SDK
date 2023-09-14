@@ -41,11 +41,6 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 23/09/2019.
- * Appzone Ltd
- */
-
 const val CACHE_SIZE = 50L * 1024L * 1024L // 50 MB
 
 val dataModule = module {

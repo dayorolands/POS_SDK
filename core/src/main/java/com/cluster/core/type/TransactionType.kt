@@ -5,11 +5,6 @@ import com.cluster.core.serializer.TransactionTypeSerializer
 import kotlinx.serialization.Serializable
 
 
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 7/1/2019.
- * Appzone Ltd
- */
-
 @IntDef(value = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,32])
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
