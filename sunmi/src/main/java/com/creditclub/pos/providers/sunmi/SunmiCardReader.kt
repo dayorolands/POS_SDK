@@ -3,7 +3,6 @@ package com.creditclub.pos.providers.sunmi
 import android.os.Bundle
 import android.os.RemoteException
 import android.util.Log
-import bsh.Interpreter
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.util.debug
 import com.cluster.core.util.safeRun
@@ -39,7 +38,7 @@ class SunmiCardReader(
     private var isSessionOver = false
 
     private var allowedCardType: Int =
-        AidlConstants.CardType.MAGNETIC.value or AidlConstants.CardType.IC.value
+        AidlConstants.CardType.MAGNETIC.value or AidlConstants.CardType.IC.value or AidlConstants.CardType.NFC.value
     private var selectedCardType = 0
 
     override suspend fun waitForCard(): CardReaderEvent {
@@ -49,8 +48,9 @@ class SunmiCardReader(
                 deviceClose()
             }
         }
+        emv.abortTransactProcess()
         emv.initEmvProcess()
-        updateCardWaitingProgress("Insert or swipe card")
+        updateCardWaitingProgress("Insert or Tap card")
         cardReaderEvent = withContext(Dispatchers.Unconfined) {
             detectCard()
         }
@@ -60,17 +60,25 @@ class SunmiCardReader(
 
     override suspend fun read(amountStr: String): CardData? {
         val cardData: CardData? = suspendCoroutine { continuation ->
+
+            Log.d("DetectCard", "Time to read the card")
+
             dialogProvider.showProgressBar("Processing", "IC card detected...") {
                 onClose {
                     continuation.resume(null)
                 }
             }
+            Log.d("DetectCard", "The selected card is : $selectedCardType")
+
             val emvListener = SunmiEmvListener(activity, kernel, sessionData, continuation)
             emv.setTlv(AidlConstants.EMV.TLVOpCode.OP_NORMAL, "9F33", "E0F0C8")
-
             val emvTransData = EMVTransDataV2()
             emvTransData.amount = sessionData.amount.toString()
-            emvTransData.flowType = 1
+            if(selectedCardType == AidlConstants.CardType.NFC.value) {
+                emvTransData.flowType = AidlConstants.EMV.FlowType.TYPE_NFC_SPEEDUP
+            } else {
+                emvTransData.flowType = AidlConstants.EMV.FlowType.TYPE_EMV_STANDARD
+            }
             emvTransData.cardType = selectedCardType
             emv.transactProcess(emvTransData, emvListener)
         }
@@ -125,6 +133,11 @@ class SunmiCardReader(
                 }
                 else
                     return CardReaderEvent.MAG_STRIPE
+            }
+            else if(ret == CardReaderEvent.NFC){
+                val powerOn = true
+
+                if(powerOn) return CardReaderEvent.NFC
             }
             else if (ret == CardReaderEvent.CHIP) {
                 val powerOn = true
@@ -202,14 +215,14 @@ class SunmiCardReader(
             cardReader.checkCard(cardType, object : CheckCardCallbackV2.Stub() {
                 @Throws(RemoteException::class)
                 override fun findMagCard(bundle: Bundle) {
-                    Interpreter.debug("findMagCard:$bundle")
+                    debug("findMagCard:$bundle")
                     selectedCardType = AidlConstants.CardType.MAGNETIC.value
                     it.resume(CardReaderEvent.MAG_STRIPE)
                 }
 
                 @Throws(RemoteException::class)
                 override fun findICCard(atr: String) {
-                    Interpreter.debug("findICCard:$atr")
+                    debug("findICCard:$atr")
                     selectedCardType = AidlConstants.CardType.IC.value
                 }
 

@@ -1,22 +1,17 @@
 package com.creditclub.pos.providers.sunmi
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.os.RemoteException
 import android.text.TextUtils
 import android.util.Log
-import androidx.core.content.edit
 import bsh.Interpreter
 import com.cluster.core.data.prefs.getEncryptedSharedPreferences
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.widget.DialogOptionItem
 import com.cluster.core.util.PinBlockHelper
-import com.cluster.core.util.SharedPref
 import com.cluster.core.util.debug
-import com.cluster.core.util.toCurrencyFormat
 import com.cluster.pos.PosManager
 import com.cluster.pos.card.CardData
 import com.cluster.pos.card.CardReaderEvent
@@ -25,13 +20,11 @@ import com.cluster.pos.extensions.hexBytes
 import com.cluster.pos.extensions.hexString
 import com.cluster.pos.providers.sunmi.R
 import com.cluster.pos.utils.asDesEdeKey
-import com.cluster.pos.utils.decrypt
 import com.cluster.pos.utils.encrypt
 import com.creditclub.pos.providers.sunmi.emv.TLV
 import com.creditclub.pos.providers.sunmi.emv.TLVUtil
 import com.sunmi.pay.hardware.aidl.AidlConstants
-import com.sunmi.pay.hardware.aidl.AidlConstants.Security
-import com.sunmi.pay.hardware.aidlv2.AidlConstantsV2
+import com.sunmi.pay.hardware.aidl.bean.CardInfo
 import com.sunmi.pay.hardware.aidlv2.AidlErrorCodeV2
 import com.sunmi.pay.hardware.aidlv2.bean.EMVCandidateV2
 import com.sunmi.pay.hardware.aidlv2.bean.PinPadConfigV2
@@ -44,10 +37,13 @@ import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
 import java.security.NoSuchProviderException
 import java.util.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 import javax.crypto.*
 import javax.crypto.spec.SecretKeySpec
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
+
 
 /**
  * Created by Ifedayo Adekoya <ifedayo.adekoya@starkitchensgroup.com> on 06/02/2023.
@@ -81,6 +77,7 @@ class SunmiEmvListener(
 
     @Throws(RemoteException::class)
     override fun onWaitAppSelect(appNameList: List<EMVCandidateV2>, isFirstSelect: Boolean) {
+        Log.d("DetectCard", "onWaitAppSelect >>>> $appNameList , $isFirstSelect")
         debug("onWaitAppSelect isFirstSelect:$isFirstSelect")
         mProcessStep = EMV_APP_SELECT
         val candidateNames: Array<String> = getCandidateNames(appNameList)
@@ -90,7 +87,8 @@ class SunmiEmvListener(
 
     @Throws(RemoteException::class)
     override fun onAppFinalSelect(tag9F06value: String?) {
-        debug("onAppFinalSelect tag9F06value:$tag9F06value")
+        debug("onAppFinalSelect tag9F06value >>>> $tag9F06value")
+        Log.d("DetectCard", "onAppFinalSelect $tag9F06value")
 
         run {
             // set normal tlv data
@@ -161,6 +159,7 @@ class SunmiEmvListener(
     @Throws(RemoteException::class)
     override fun onConfirmCardNo(cardNo: String) {
         debug("onConfirmCardNo cardNo:$cardNo")
+        Log.d("DetectCard", "onConfirmCardNo >>>> Card pan: $cardNo")
         cardData.pan = cardNo
         mProcessStep = EMV_CONFIRM_CARD_NO
         mHandler.obtainMessage(EMV_CONFIRM_CARD_NO)
@@ -169,8 +168,13 @@ class SunmiEmvListener(
 
     @Throws(RemoteException::class)
     override fun onRequestShowPinPad(pinType: Int, remainTime: Int) {
+        Log.d("DetectCard", "onRequestShowPinPad >>>>> pinType: $pinType remainTime: $remainTime")
         Log.d("CheckDUKPT","onRequestShowPinPad pinType:$pinType remainTime:$remainTime")
         mPinType = pinType
+        if(cardData.pan.isEmpty()){
+            cardData.pan = getCardNo()
+            Log.d("DetectCard", "The new card pan >>>>>> ${cardData.pan}")
+        }
         mProcessStep = EMV_SHOW_PIN_PAD
         mHandler.obtainMessage(EMV_SHOW_PIN_PAD)
             .sendToTarget()
@@ -178,6 +182,7 @@ class SunmiEmvListener(
 
     @Throws(RemoteException::class)
     override fun onRequestSignature() {
+        Log.d("DetectCard", "onRequestSignature >>>>>> request signature")
         debug("onRequestSignature")
         mProcessStep = EMV_SIGNATURE
         mHandler.obtainMessage(EMV_SIGNATURE).sendToTarget()
@@ -185,6 +190,7 @@ class SunmiEmvListener(
 
     @Throws(RemoteException::class)
     override fun onCertVerify(certType: Int, certInfo: String) {
+        Log.d("DetectCard", "onCertVerify >>>>>> on request ceritificate verification")
         debug("onCertVerify certType:$certType certInfo:$certInfo")
         mCertInfo = certInfo
         mProcessStep = EMV_CERT_VERIFY
@@ -193,6 +199,7 @@ class SunmiEmvListener(
 
     @Throws(RemoteException::class)
     override fun onOnlineProc() {
+        Log.d("DetectCard", "onOnlineProcess >>>>>>")
         debug("onOnlineProcess")
         mProcessStep = EMV_ONLINE_PROCESS
         mHandler.obtainMessage(EMV_ONLINE_PROCESS)
@@ -201,12 +208,14 @@ class SunmiEmvListener(
 
     @Throws(RemoteException::class)
     override fun onCardDataExchangeComplete() {
+        Log.d("DetectCard", "onCardDataExchangeComplete >>>>>>>")
         debug("onCardDataExchangeComplete")
     }
 
     @Throws(RemoteException::class)
     override fun onTransResult(code: Int, desc: String?) {
         debug("onTransResult code:$code desc:$desc")
+        Log.d("DetectCard", "onTransResult >>>>>>> code : $code desc: $desc")
         debug("***************************************************************")
         debug("****************************End Process************************")
         debug("***************************************************************")
@@ -243,19 +252,19 @@ class SunmiEmvListener(
     }
 
     override fun onRequestDataExchange(p0: String?) {
-        TODO("Not yet implemented")
+        Log.d("DetectCard", "onRequestDataExchange >>>>>>>")
     }
 
     override fun onTermRiskManagement() {
-        TODO("Not yet implemented")
+        Log.d("DetectCard", "onTerminalRiskManagement >>>>>>>")
     }
 
     override fun onPreFirstGenAC() {
-        TODO("Not yet implemented")
+        Log.d("DetectCard", "onPreFirstGenAC >>>>>>>")
     }
 
     override fun onDataStorageProc(p0: Array<out String>?, p1: Array<out String>?) {
-        TODO("Not yet implemented")
+        Log.d("DetectCard", "onDataStorageProcessing >>>>>>")
     }
 
     private val mLooper = Looper.myLooper()
@@ -308,8 +317,8 @@ class SunmiEmvListener(
                 }
                 EMV_TRANS_FAIL -> {
                     cardData.status = CardTransactionStatus.Failure
-                    continuation.resume(cardData)
                     dialogProvider.hideProgressBar()
+                    continuation.resume(cardData)
                 }
                 EMV_TRANS_SUCCESS -> {
                     cardData.status = CardTransactionStatus.Success
@@ -427,7 +436,7 @@ class SunmiEmvListener(
                 if (AidlConstants.CardType.MAGNETIC.value != mCardType) {
                     getTlvData()
                 }
-                Thread.sleep(1500)
+                Thread.sleep(2000)
                 // notice  ==  import the online result to SDK and end the process.
                 importOnlineProcessStatus(0)
             } catch (e: Exception) {
@@ -509,6 +518,72 @@ class SunmiEmvListener(
                 cardData.status = CardTransactionStatus.OfflinePinVerifyError
             }
         }
+    }
+
+    private fun getCardNo(): String {
+        try {
+            val tagList = arrayOf("57", "5A")
+            val outData = ByteArray(256)
+            val len: Int = mEMVOptV2.getTlvList(AidlConstants.EMV.TLVOpCode.OP_NORMAL, tagList, outData)
+            if (len <= 0) {
+                Log.d("DetectCard", "getCardNo error,code:$len")
+                return ""
+            }
+            val bytes = outData.copyOf(len)
+            val tlvMap = TLVUtil.buildTLVMap(bytes)
+            if (!TextUtils.isEmpty(Objects.requireNonNull(tlvMap["57"])?.value)) {
+                val tlv57 = tlvMap["57"]
+                val cardInfo: CardInfo = parseTrack2(tlv57!!.value)
+                return cardInfo.cardNo
+            }
+            if (!TextUtils.isEmpty(Objects.requireNonNull(tlvMap["5A"])?.value)) {
+                return Objects.requireNonNull(tlvMap["5A"])!!.value
+            }
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+        }
+        return ""
+    }
+
+    private fun parseTrack2(track2: String): CardInfo {
+        Log.d("DetectCard", "track2:$track2")
+        val track_2: String = stringFilter(track2)
+        var index = track_2.indexOf("=")
+        if (index == -1) {
+            index = track_2.indexOf("D")
+        }
+        val cardInfo = CardInfo()
+        if (index == -1) {
+            return cardInfo
+        }
+        var cardNumber = ""
+        if (track_2.length > index) {
+            cardNumber = track_2.substring(0, index)
+        }
+        var expiryDate = ""
+        if (track_2.length > index + 5) {
+            expiryDate = track_2.substring(index + 1, index + 5)
+        }
+        var serviceCode = ""
+        if (track_2.length > index + 8) {
+            serviceCode = track_2.substring(index + 5, index + 8)
+        }
+        Log.d("DetectCard", ">>>>>>>> cardNumber:$cardNumber expireDate:$expiryDate serviceCode:$serviceCode")
+        cardInfo.cardNo = cardNumber
+        cardInfo.expireDate = expiryDate
+        cardInfo.serviceCode = serviceCode
+        return cardInfo
+    }
+
+    private fun stringFilter(str: String?): String {
+        val regEx = "[^0-9=D]"
+        val p: Pattern = Pattern.compile(regEx)
+        val matcher: Matcher? = str?.let { p.matcher(it) }
+        if (matcher != null) {
+            return matcher.replaceAll("").trim { it <= ' ' }
+        }
+
+        return ""
     }
 }
 
