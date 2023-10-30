@@ -16,6 +16,7 @@ include(":dspread")
 include(":newland")
 include(":nexgo_n86_smartpos_sdk")
 include(":nexgo_n86")
+include(":urovo_v67", "urovosdkLibs-v67")
 
 buildCache {
     local {
