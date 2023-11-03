@@ -23,7 +23,7 @@ import com.cluster.pos.printer.PosPrinter
 import com.cluster.receipt.PdfPrinter
 import com.cluster.ui.CreditClubDialogProvider
 import com.cluster.work.*
-import com.orda.horizonpay.HorizonPosManager
+//import com.orda.horizonpay.HorizonPosManager
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -34,11 +34,6 @@ import org.koin.dsl.module
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-
-/**
- * Created by Emmanuel Nosakhare <enosakhare@appzonegroup.com> on 23/09/2019.
- * Appzone Ltd
- */
 
 const val CACHE_SIZE = 50L * 1024L * 1024L // 50 MB
 
@@ -110,9 +105,9 @@ val uiModule = module {
     factory<DialogProvider> { (context: Context) ->
         CreditClubDialogProvider(context)
     }
-    factory<PosManager> { (activity: CreditClubActivity) ->
-        HorizonPosManager(activity)
-    }
+//    factory<PosManager> { (activity: CreditClubActivity) ->
+//        HorizonPosManager(activity)
+//    }
 }
 
 val configModule = module {

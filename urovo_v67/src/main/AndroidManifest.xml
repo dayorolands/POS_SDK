@@ -2,17 +2,10 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     package="com.nexgo">
 
-    <dist:module dist:title="@string/module_nexgo">
-        <dist:delivery>
-            <dist:on-demand/>
-        </dist:delivery>
-        <dist:fusing dist:include="true" />
-    </dist:module>
-
     <application android:hasCode="true">
         <provider
-            android:name="com.nexgo.n86.N86PosManagerProvider"
-            android:authorities="${applicationId}.n86.N3PosManagerProvider"
+            android:name="com.urovo.v67.UrovoPosManagerProvider"
+            android:authorities="${applicationId}.UrovoPosManagerProvider"
             android:enabled="true"
             android:exported="false" />
     </application>

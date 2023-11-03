@@ -1,5 +1,6 @@
 package com.urovo.v67
 
+import android.device.IccManager
 import android.util.Log
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.pos.PosManager
@@ -11,9 +12,12 @@ import com.urovo.i9000s.api.emv.EmvNfcKernelApi
 import com.urovo.sdk.insertcard.InsertCardHandlerImpl
 import com.urovo.sdk.insertcard.utils.Constant
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import java.util.*
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class UrovoCardReader(
@@ -22,6 +26,7 @@ class UrovoCardReader(
     private val emvNfcKernelApi: EmvNfcKernelApi
 ) : CardReaders, KoinComponent {
     private val dialogProvider = activity.dialogProvider
+    private val mICReader = IccManager()
     private var cardReaderEvent: CardReaderEvent = CardReaderEvent.CANCELLED
 
     private val cardReader = InsertCardHandlerImpl.getInstance()
@@ -36,19 +41,20 @@ class UrovoCardReader(
         dialogProvider.showProgressBar(
             title = "Please insert card",
             message = "Waiting...",
-            isCancellable = true,
+            isCancellable = true
         ) {
             onClose {
                 userCancel = true
+                deviceClose()
                 if (!activity.isFinishing) activity.finish()
             }
         }
 
-        cardReaderEvent = withContext(Dispatchers.Unconfined){
-            detectCard()
+        delay(200)
+        cardReaderEvent = suspendCoroutine { continuation ->
+            detectCard(continuation)
         }
         dialogProvider.hideProgressBar()
-
         return cardReaderEvent
     }
 
@@ -57,29 +63,29 @@ class UrovoCardReader(
     }
 
     override fun endWatch() {
-
+        cardReader.powerDown(cardType)
+        emvNfcKernelApi.abortKernel()
     }
 
     override suspend fun onRemoveCard(onEventChange: CardReaderEventListener) {
 
     }
 
-    private fun detectCard(): CardReaderEvent {
+    private fun detectCard(continuation: Continuation<CardReaderEvent>) {
         val atrData = ByteArray(64)
-
         while (true) {
             if (userCancel) {
-                return CardReaderEvent.CANCELLED
+                return continuation.resume(CardReaderEvent.CANCELLED)
             }
             if(supportsChip){
-                val ret = cardReader.powerUp(cardType, atrData)
-
-                if (ret > 0 && cardReader.isCardIn) {
-                    return CardReaderEvent.CHIP
+                val ret = mICReader.open(cardType, "1".toByte(), 1)
+                if (ret == 0) {
+                    val powerOn = cardReader.powerUp(cardType, atrData)
+                    if(powerOn > 0) return continuation.resume(CardReaderEvent.CHIP)
                 }
                 else if (ret < 0) {
                     updateCardWaitingProgress("ICC Failure. Please Swipe Card")
-                    return CardReaderEvent.CHIP_FAILURE
+                    return continuation.resume(CardReaderEvent.CHIP_FAILURE)
                 }
             }
         }
