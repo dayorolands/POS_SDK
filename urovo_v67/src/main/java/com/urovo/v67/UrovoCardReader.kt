@@ -1,24 +1,29 @@
 package com.urovo.v67
 
 import android.device.IccManager
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.pos.PosManager
 import com.cluster.pos.card.CardData
 import com.cluster.pos.card.CardReaderEvent
 import com.cluster.pos.card.CardReaderEventListener
 import com.cluster.pos.card.CardReaders
+import com.urovo.i9000s.api.emv.ContantPara
 import com.urovo.i9000s.api.emv.EmvNfcKernelApi
 import com.urovo.sdk.insertcard.InsertCardHandlerImpl
 import com.urovo.sdk.insertcard.utils.Constant
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
-import java.util.*
+import java.util.Hashtable
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
 
 class UrovoCardReader(
     private val activity: CreditClubActivity,
@@ -28,6 +33,7 @@ class UrovoCardReader(
     private val dialogProvider = activity.dialogProvider
     private val mICReader = IccManager()
     private var cardReaderEvent: CardReaderEvent = CardReaderEvent.CANCELLED
+    private var checkCardMode = ContantPara.CheckCardMode.SWIPE_OR_INSERT_OR_TAP
 
     private val cardReader = InsertCardHandlerImpl.getInstance()
     private val cardType = Constant.Mode.MODE_USER
@@ -59,7 +65,36 @@ class UrovoCardReader(
     }
 
     override suspend fun read(amountStr: String): CardData? {
-        TODO("Not yet implemented")
+        val cardData : CardData? = suspendCoroutine { continuation ->
+            dialogProvider.showProgressBar("Processing", "IC Card Detected...")
+            val emvListener = UrovoListener(activity, emvNfcKernelApi, sessionData, continuation)
+
+            CoroutineScope(Dispatchers.IO).launch {
+                startKernel(checkCardMode)
+            }
+            emvNfcKernelApi.setListener(emvListener)
+            emvNfcKernelApi.setContext(activity)
+        }
+        deviceClose()
+        dialogProvider.hideProgressBar()
+        return cardData
+    }
+    private fun startKernel(checkCardMode : ContantPara.CheckCardMode){
+        val emvTransactionData = Hashtable<String, Any>()
+        emvTransactionData.apply {
+            put("checkCardMode", checkCardMode)
+            put("currencyCode", "566")
+            put("emvOption", ContantPara.EmvOption.START)
+            put("amount", sessionData.amount.toString())
+            put("checkCardTimeout", "30")
+            put("transactionType", "00")
+            put("FallbackSwitch", "0")
+            put("supportDRL", true)
+            put("enableBeeper", false)
+            put("enableTapSwipeCollision", false)
+        }
+        emvNfcKernelApi.updateTerminalParamters(ContantPara.CardSlot.UNKNOWN, "9F3303E0F0C8")
+        emvNfcKernelApi.startKernel(emvTransactionData)
     }
 
     override fun endWatch() {
@@ -68,7 +103,11 @@ class UrovoCardReader(
     }
 
     override suspend fun onRemoveCard(onEventChange: CardReaderEventListener) {
-
+        if (!userCancel && !isSessionOver) {
+            userCancel = true
+            deviceClose()
+            onEventChange(CardReaderEvent.REMOVED)
+        }
     }
 
     private fun detectCard(continuation: Continuation<CardReaderEvent>) {

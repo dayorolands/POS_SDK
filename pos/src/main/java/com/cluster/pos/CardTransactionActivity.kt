@@ -97,7 +97,7 @@ abstract class CardTransactionActivity : PosActivity() {
         mainScope.launch {
             dialogProvider.showProgressBar("Loading card functions")
             posManager.loadEmv()
-            delay(1000)
+            //delay(1000)
             dialogProvider.hideProgressBar()
 
 //            if (Platform.hasPrinter) {
