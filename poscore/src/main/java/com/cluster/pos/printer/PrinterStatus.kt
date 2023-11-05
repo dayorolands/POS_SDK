@@ -5,6 +5,7 @@ enum class PrinterStatus(val message: String) {
     NO_PAPER("No paper"),
     OVER_HEAT("Printer Overheating"),
     NOT_READY("Printer not ready"),
+    BUSY("Printer Busy"),
     NO_COMMUNICATION("Communication is Abnormal"),
     LOW_BATTERY("Battery Low"),
     IMAGE_NOT_FOUND("Image not found"),

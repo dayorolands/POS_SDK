@@ -90,11 +90,12 @@ class UrovoCardReader(
     }
     private fun startKernel(checkCardMode : ContantPara.CheckCardMode){
         val emvTransactionData = Hashtable<String, Any>()
+        val divideAmount = sessionData.amount / 100
         emvTransactionData.apply {
             put("checkCardMode", checkCardMode)
             put("currencyCode", "566")
             put("emvOption", ContantPara.EmvOption.START)
-            put("amount", sessionData.amount.toString())
+            put("amount", divideAmount.toString())
             put("checkCardTimeout", "30")
             put("transactionType", "00")
             put("FallbackSwitch", "0")
@@ -102,7 +103,7 @@ class UrovoCardReader(
             put("enableBeeper", false)
             put("enableTapSwipeCollision", false)
         }
-        emvNfcKernelApi.updateTerminalParamters(ContantPara.CardSlot.UNKNOWN, "9F3303E0F0C8")
+        emvNfcKernelApi.updateTerminalParamters(ContantPara.CardSlot.UNKNOWN, "9F3303E0F0C89F1A020566")
         emvNfcKernelApi.startKernel(emvTransactionData)
     }
 
@@ -151,5 +152,6 @@ class UrovoCardReader(
 
     private fun deviceClose(){
         cardReader.powerDown(cardType)
+        emvNfcKernelApi.abortKernel()
     }
 }

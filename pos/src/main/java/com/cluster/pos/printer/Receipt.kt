@@ -153,7 +153,7 @@ fun posReceipt(
         """${posTransaction.merchantDetails}
             |Merchant Id: ${posTransaction.merchantId}
             |Agent Name: ${posTransaction.agentName}
-            |Agent Code: ${posTransaction.agentCode}
+            |Agent Code:${posTransaction.agentCode}
             |TID: ${posTransaction.terminalId}
             |
             |${posTransaction.dateTime?.format("dd/MM/yyyy hh:mm", "+0100")}
@@ -167,13 +167,14 @@ fun posReceipt(
             |Acquirer: ${posTransaction.bankName}
             |PTSP:${posTransaction.ptsp}
             |Verification Mode: PIN""".trimMargin(),
-        isBold = true,
+        isBold = false,
         printGray = 5
     )
     text(
         text = posTransaction.transactionType!!,
         align = Alignment.MIDDLE,
-        fontSize = 35
+        fontSize = 35,
+        isBold = true
     )
     text(
         text = """AMOUNT: ${posTransaction.amount}
@@ -187,32 +188,32 @@ fun posReceipt(
         text = message,
         align = Alignment.MIDDLE,
         fontSize = 35,
-        isBold = true
+        isBold = false
     )
     if (!isSuccessful) {
         text(
             text = isoResponseMessage(posTransaction.responseCode),
             align = Alignment.MIDDLE,
-            isBold = true
+            isBold = false
         )
     }
     text(
         text = "-------------------------------------",
         align = Alignment.MIDDLE,
         fontSize = 15,
-        isBold = true
+        isBold = false
     )
     text(
         text = "${posTransaction.appName}. Powered by ${posTransaction.bankName}",
         align = Alignment.MIDDLE,
         fontSize = 15,
-        isBold = true
+        isBold = false
     )
     text(
         text = posTransaction.website!!,
         align = Alignment.MIDDLE,
         fontSize = 15,
-        isBold = true
+        isBold = false
     )
 
 }

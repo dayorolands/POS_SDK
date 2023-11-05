@@ -39,7 +39,7 @@ value class PrintJobScope(private val nodes: MutableList<PrintNode> = mutableLis
         printGray: Int = 5,
         isBold: Boolean = false,
         align: Alignment = Alignment.LEFT,
-        walkPaperAfterPrint: Int = 5,
+        walkPaperAfterPrint: Int = 6,
     ) {
         val textNode = TextNode(
             text = text,

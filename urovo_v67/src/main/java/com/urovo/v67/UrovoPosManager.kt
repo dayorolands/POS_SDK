@@ -3,6 +3,7 @@ package com.urovo.v67
 import android.content.Context
 import android.os.Build
 import com.cluster.core.ui.CreditClubActivity
+import com.cluster.core.ui.widget.DialogProvider
 import com.cluster.core.util.safeRun
 import com.cluster.pos.PosManager
 import com.cluster.pos.PosManagerCompanion
@@ -23,6 +24,7 @@ import com.cluster.pos.extensions.offlineThresholdDomestic24
 import com.cluster.pos.extensions.rid35
 import com.cluster.pos.extensions.targetPercentageDomestic27
 import com.cluster.pos.extensions.tdol21
+import com.cluster.pos.printer.PosPrinter
 import com.urovo.i9000s.api.emv.ContantPara
 import com.urovo.i9000s.api.emv.EmvNfcKernelApi
 import com.urovo.v67.aidUtils.AIDBean
@@ -124,6 +126,12 @@ class UrovoPosManager(
         override val module: Module = module {
             factory<PosManager>{ (activity : CreditClubActivity) ->
                 UrovoPosManager(activity)
+            }
+            factory<PosPrinter> { (context: Context, dialogProvider: DialogProvider) ->
+                UrovoPrinter(
+                    context,
+                    dialogProvider
+                )
             }
         }
 
