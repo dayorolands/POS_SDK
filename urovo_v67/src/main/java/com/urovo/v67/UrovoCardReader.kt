@@ -66,6 +66,15 @@ class UrovoCardReader(
 
     override suspend fun read(amountStr: String): CardData? {
         val cardData : CardData? = suspendCoroutine { continuation ->
+            if(!cardReader.isCardIn){
+                return@suspendCoroutine dialogProvider.showError("No card detected, please insert card"){
+                    onClose {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            waitForCard()
+                        }
+                    }
+                }
+            }
             dialogProvider.showProgressBar("Processing", "IC Card Detected...")
             val emvListener = UrovoListener(activity, emvNfcKernelApi, sessionData, continuation)
 

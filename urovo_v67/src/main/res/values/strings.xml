@@ -2,4 +2,8 @@
 <resources>
     <string name="enter_pin">Enter PIN</string>
     <string name="tries_left">Tries Left</string>
+    <string name="success">Success</string>
+    <string name="emv_confirm_card_no">Confirm Card No</string>
+    <string name="emv_confirm_cert">Confirm Cert</string>
+    <string name="handling">Processing</string>
 </resources>
