@@ -92,6 +92,10 @@ class ParameterService(context: Context, var posMode: RemoteConnectionInfo) : Po
         masterKey = masterKeyBytes.hexString
         sessionKey = sessionKeyBytes.hexString
         updatedAt = Instant.now().format("MMdd")
+
+        Log.d("KeyDownloadValues", "The master key is >>> $masterKey")
+        Log.d("KeyDownloadValues", "The pin key is >>> $pinKey")
+        Log.d("KeyDownloadValues", "The session key is >>> $sessionKey")
     }
 
     @Throws(ParameterDownloadException::class)

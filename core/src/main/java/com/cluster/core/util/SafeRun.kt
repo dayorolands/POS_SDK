@@ -1,7 +1,6 @@
 package com.cluster.core.util
 
 import android.util.Log
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @JvmInline
 value class SafeRunResult<out T>(val value: Any?) {
@@ -57,7 +56,6 @@ inline fun <T> safeRun(crossinline block: () -> T): SafeRunResult<T> {
     return try {
         SafeRunResult(block())
     } catch (ex: Exception) {
-        FirebaseCrashlytics.getInstance().recordException(ex)
         debugOnly { Log.e("safeRun", ex.message, ex) }
         SafeRunResult(createFailure(ex))
     }

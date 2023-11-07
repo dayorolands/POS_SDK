@@ -25,7 +25,6 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -53,8 +52,6 @@ abstract class CreditClubActivity : AppCompatActivity {
     protected lateinit var firebaseAnalytics: FirebaseAnalytics
         private set
 
-    protected val firebaseCrashlytics by lazy { FirebaseCrashlytics.getInstance() }
-
     inline var TextView.value: String
         get() = text.toString().trim { it <= ' ' }
         set(value) {
@@ -72,20 +69,13 @@ abstract class CreditClubActivity : AppCompatActivity {
             }
         }
 
-        val firebaseCrashlytics = FirebaseCrashlytics.getInstance()
         localStorage.agent?.let { agent ->
             firebaseAnalytics.setUserId(agent.agentCode)
             firebaseAnalytics.setUserProperty("agent_name", agent.agentName)
             firebaseAnalytics.setUserProperty("agent_code", agent.agentCode)
             firebaseAnalytics.setUserProperty("agent_phone", agent.phoneNumber)
-
-            firebaseCrashlytics.setUserId(localStorage.agent?.agentCode ?: "guest")
         }
         firebaseAnalytics.setUserProperty("agent_institution", localStorage.institutionCode)
-        firebaseCrashlytics.setCustomKey(
-            "agent_institution",
-            localStorage.institutionCode ?: "none"
-        )
 
         if (ActivityCompat.checkSelfPermission(
                 this,

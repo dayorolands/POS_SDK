@@ -1,7 +1,6 @@
 package com.cluster.core.util
 
 import android.util.Log
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -18,7 +17,6 @@ suspend inline fun <T> safeRunIO(crossinline block: suspend () -> T): SafeRunRes
         try {
             SafeRunResult(block())
         } catch (ex: Exception) {
-            FirebaseCrashlytics.getInstance().recordException(ex)
             debugOnly { Log.e("safeRunIO", ex.message, ex) }
             SafeRunResult(createFailure(ex))
         }
@@ -28,7 +26,6 @@ suspend inline fun <T> safeRunSuspend(crossinline block: suspend () -> T): SafeR
     return try {
         SafeRunResult(block())
     } catch (ex: Exception) {
-        FirebaseCrashlytics.getInstance().recordException(ex)
         debugOnly { Log.e("safeRun", ex.message, ex) }
         SafeRunResult(createFailure(ex))
     }

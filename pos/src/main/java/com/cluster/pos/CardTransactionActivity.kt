@@ -292,10 +292,6 @@ abstract class CardTransactionActivity : PosActivity() {
 
         try {
             callHomeService.startCallHomeTimer()
-            if (error != null) {
-                firebaseCrashlytics.recordException(error)
-            }
-
             if (response == null) {
                 showTransactionStatusPage(posTransaction)
 
@@ -351,7 +347,6 @@ abstract class CardTransactionActivity : PosActivity() {
             printer.printAsync(receipt)
         } catch (ex: Exception) {
             showTransactionStatusPage(posTransaction)
-            firebaseCrashlytics.recordException(ex)
             debugOnly { Log.e("CardTrans", ex.message, ex) }
         } finally {
             dialogProvider.hideProgressBar()

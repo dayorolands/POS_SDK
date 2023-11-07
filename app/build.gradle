@@ -89,7 +89,6 @@ android {
 
         debug {
             debuggable true
-            minifyEnabled true
             buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             buildConfigField("String", "TRUESTORE_PASS", "\"P@55w0rd123\"")
@@ -144,6 +143,7 @@ dependencies {
     implementation(project(":poscore"))
     implementation(project(":pos"))
     implementation(project(":analytics"))
+    implementation 'com.google.android.gms:play-services-measurement-api:20.0.0'
 
     ordaImplementation(project(":dspread"))
     ordaImplementation(project(":sunmi"))

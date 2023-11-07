@@ -1,29 +1,24 @@
 package com.cluster.pos.helpers
 
-import android.content.Context
-import android.os.Bundle
 import android.os.Looper
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.cluster.core.data.prefs.LocalStorage
-import com.cluster.core.data.response.isSuccessful
 import com.cluster.core.util.SafeRunResult
 import com.cluster.core.util.safeRun
 import com.cluster.pos.PosConfig
 import com.cluster.pos.PosParameter
 import com.cluster.pos.RemoteConnectionInfo
-import com.cluster.pos.card.isoResponseMessage
 import com.cluster.pos.data.PosDatabase
-import com.cluster.pos.extension.*
+import com.cluster.pos.extension.generateLog
+import com.cluster.pos.extension.log
+import com.cluster.pos.extension.prepare
+import com.cluster.pos.extension.responseCode39
+import com.cluster.pos.extension.terminalId41
 import com.cluster.pos.model.ConnectionInfo
 import com.cluster.pos.util.ISO87Packager
 import com.cluster.pos.util.SocketJob
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.ktx.Firebase
 import org.jpos.iso.ISOMsg
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.component.inject
-import org.koin.core.parameter.parametersOf
 import java.time.Duration
 import java.time.Instant
 
