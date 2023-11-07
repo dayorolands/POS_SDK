@@ -1,23 +1,36 @@
 package com.urovo.v67
 
 import android.device.SEManager
+import android.graphics.Color
 import android.os.Bundle
 import android.os.IInputActionListener
 import android.util.Log
+import androidx.core.content.edit
+import com.cluster.core.data.prefs.getEncryptedSharedPreferences
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.util.mask
+import com.cluster.core.util.toCurrencyFormat
 import com.cluster.pos.PosManager
 import com.cluster.pos.card.CardData
 import com.cluster.pos.card.CardReaderEvent
 import com.cluster.pos.card.CardTransactionStatus
 import com.cluster.pos.extensions.hexBytes
+import com.cluster.pos.extensions.hexString
+import com.cluster.pos.utils.asDesEdeKey
+import com.cluster.pos.utils.encrypt
 import com.nexgo.R
 import com.urovo.i9000s.api.emv.ContantPara
 import com.urovo.i9000s.api.emv.EmvListener
 import com.urovo.i9000s.api.emv.EmvNfcKernelApi
+import com.urovo.sdk.pinpad.PinPadProviderImpl
+import com.urovo.sdk.pinpad.listener.PinInputListener
+import com.urovo.sdk.pinpad.utils.Constant
+import com.urovo.sdk.utils.BytesUtil
 import org.koin.core.component.KoinComponent
 import java.util.Hashtable
 import java.util.Locale
+import javax.crypto.Cipher
+import javax.crypto.spec.SecretKeySpec
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
@@ -30,6 +43,8 @@ class UrovoListener(
     private val dialogProvider = activity.dialogProvider
     private val cardData = UrovoCardData()
     private var field55 : String? = null
+    private val pinPadProviderImpl : PinPadProviderImpl = PinPadProviderImpl.getInstance()
+    private val prefs = activity.getEncryptedSharedPreferences("com.urovo.manager")
     override fun onRequestSetAmount() {
         Log.d("PrintValues", "onRequestSetAmount()>>>>>>>>>>")
     }
@@ -46,8 +61,12 @@ class UrovoListener(
         Log.d("PrintValues", "onReturnCheckCardResult()>>>>>>>>>> $p0 ")
     }
 
-    override fun onRequestPinEntry(p0: ContantPara.PinEntrySource?) {
-        Log.d("PrintValues", "onRequestPinEntry() online pin entry>>>>>>>>>> $p0 ")
+    override fun onRequestPinEntry(pinEntrySource: ContantPara.PinEntrySource?) {
+        Log.d("PrintValues", "onRequestPinEntry() online pin entry>>>>>>>>>> $pinEntrySource ")
+
+        if(pinEntrySource == ContantPara.PinEntrySource.KEYPAD){
+            processOnlinePin()
+        }
     }
 
     override fun onRequestOfflinePinEntry(p0: ContantPara.PinEntrySource?, p1: Int) {
@@ -220,8 +239,8 @@ class UrovoListener(
             putBoolean("onlinePin", false)
             putBoolean("FullScreen", true)
             putLong("timeOutMS", 60000)
-            putString("supportPinLen", "0,4,5,6,7,8,9,10,11,12")
-            putString("title", "Pin Pad")
+            putString("supportPinLen", "0,4")
+            putString("title", "Security Keyboard")
             putBoolean("randomKeyboard", true)
         }
 
@@ -352,6 +371,127 @@ class UrovoListener(
         return ret
     }
 
+    private fun processOnlinePin(){
+        val parameters = Bundle()
+        val cardNumber = cardData.pan
+        val amount = (sessionData.amount / 100.0).toCurrencyFormat()
+        val dukptConfig = false
+        if (dukptConfig){
+            parameters.putInt("PINKeyNo", INDEX_DUKPT_PIN)
+            val ipekValue = "3F2216D8297BCE9C"
+            val ksnValue = "0000000002DDDDE00001"
+            val cipherKey = "3F2216D8297BCE9C".padEnd(32, '0').hexBytes.asDesEdeKey
+            val oldKcv = prefs.getString("kcv", null)
+            val newKcv = cipherKey.encrypt(ByteArray(8)).hexString
+            if (oldKcv != newKcv) {
+                val ret = pinPadProviderImpl.downloadKeyDukpt(
+                    INDEX_DUKPT_PIN,
+                    null,
+                    0,
+                    ksnValue.hexBytes,
+                    ksnValue.length,
+                    ipekValue.hexBytes,
+                    ipekValue.length
+                )
+                Log.d("PrintValues", "The result of DUKPT pin injection is $ret")
+                if (ret == 0) {
+                    prefs.edit { putString("kcv", newKcv) }
+                }
+            }
+
+        } else {
+            parameters.putInt("PINKeyNo", INDEX_WORKING_KEY)
+            val masterKey = "3ECEDA9BF4DCCB0B105708E5B334E308"
+            val masterKeyKcv = masterKey.padEnd(32, '0').hexBytes.asDesEdeKey.encrypt(ByteArray(8))
+            val masterKeyRet = pinPadProviderImpl.loadMainKey(INDEX_WORKING_KEY, "11111111111111111111111111111111".hexBytes, "82E13665B4624DF5".hexBytes)
+            Log.d("PrintValues", "The result of master key  injection is $masterKeyRet")
+            val pinKey = "950973182317F80B950973182317F80B"
+            val pinKeyRet = pinPadProviderImpl.loadWorkKey(Constant.KeyType.PIN_KEY, INDEX_MASTER_KEY, INDEX_WORKING_KEY, BytesUtil.hexString2Bytes("950973182317F80B950973182317F80B"), BytesUtil.hexString2Bytes("00962B60AA556E65"))
+            Log.d("PrintValues", "The result of pin key  injection is $pinKeyRet")
+        }
+
+        parameters.apply {
+            putString("cardNo", cardNumber)
+            putBoolean("sound", true)
+            putBoolean("onlinePin", true)
+            putBoolean("FullScreen", true)
+            putLong("timeOutMS", 60000)
+            putString("supportPinLen","0,4") // "4,4
+            putString("title", "Security Keyboard")
+            putString("message", "Please Enter PIN \n$amount")
+            putBoolean("ShowLine", false);
+            putShortArray("textSize", shortArrayOf(20, 20, 20, 20, 20, 20, 20))
+            putShortArray("leftMargin", shortArrayOf(20, 30, 40, 50, 40, 30, 20))
+            putShortArray("topMargin", shortArrayOf(20, 30, 40, 50, 40, 30, 20))
+            putShortArray("rightMargin", shortArrayOf(20, 30, 40, 50, 40, 30, 20))
+            putShortArray("bottomMargin",shortArrayOf(20, 30, 40, 50, 40, 30, 20))
+            putStringArray("numberText", arrayOf("0","1","2","3","4","5","6","7","8","9"))
+            putIntArray("backgroundColor", intArrayOf(Color.BLUE, Color.YELLOW, Color.GREEN, Color.GRAY, Color.RED, Color.BLACK, Color.LTGRAY))
+            putString("deleteText", "DELETE")
+            putString("cancelText", "CANCEL")
+            putString("okText", "OK")
+            putBoolean("randomKeyboard", true)
+        }
+
+        val adminInputListener : PinInputListener = object : PinInputListener {
+            override fun onInput(len: Int, key: Int) {
+                Log.d("PrintValues", "key entered: $key")
+                Log.d("PrintValues", "key length: $len")
+            }
+            override fun onConfirm(pinBlock: ByteArray, isNonePin: Boolean) {
+                if (isNonePin) {
+                    // mKernelApi.bypassPinEntry();//bypass
+                    emvNfcKernelApi.ProcOnlinePinAgain()
+                } else {
+                    Log.d("PrintValues", "pinblock:" + pinBlock.hexString)
+                    val pinblockData = tripleDesDecrypt("950973182317F80B950973182317F80B".hexBytes, pinBlock)
+                    Log.d("PrintValues", "The decrypted value of the data is ${pinblockData.hexString}")
+                    emvNfcKernelApi.sendPinEntry()
+                }
+            }
+
+            override fun onConfirm_dukpt(PinBlock: ByteArray, ksn: ByteArray) {
+                if (PinBlock.isEmpty()) {
+                    // mKernelApi.bypassPinEntry();//bypass
+                    emvNfcKernelApi.ProcOnlinePinAgain()
+                } else {
+                    Log.d("PrintValues", "pinblock:" + String(PinBlock))
+                    Log.d("PrintValues", "ksn:" + String(ksn))
+                    emvNfcKernelApi.sendPinEntry()
+                }
+            }
+
+            override fun onCancel() {
+                Log.d("PrintValues", "PINPAD cancel")
+                emvNfcKernelApi.cancelPinEntry()
+            }
+
+            override fun onTimeOut() {
+                emvNfcKernelApi.cancelPinEntry()
+            }
+
+            override fun onError(i: Int) {
+                emvNfcKernelApi.cancelPinEntry()
+            }
+        }
+
+        activity.runOnUiThread {
+            if(dukptConfig){
+                pinPadProviderImpl.GetDukptPinBlock(parameters, adminInputListener)
+            } else {
+                pinPadProviderImpl.getPinBlockEx(parameters, adminInputListener)
+            }
+        }
+    }
+
+    fun tripleDesDecrypt(pinKey: ByteArray, encryptedPinBlock: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance("DESede/ECB/NoPadding")
+        val secretKeySpec = SecretKeySpec(pinKey, "DESede")
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec)
+        return cipher.doFinal(encryptedPinBlock)
+    }
+
+
     private fun getTlvData(){
         cardData.mIccString = getField55String()
         cardData.apply {
@@ -401,4 +541,61 @@ class UrovoListener(
         field55 = emvNfcKernelApi.getTlvByTagLists(tags.toMutableList())
         return field55!!
     }
+
+    companion object {
+        const val INDEX_DUKPT_PIN = 3
+        const val INDEX_WORKING_KEY = 10
+        const val INDEX_MASTER_KEY = 10
+    }
+}
+
+private class AdminInputListener : PinInputListener {
+
+    val emvNfcKernelApi: EmvNfcKernelApi = EmvNfcKernelApi.getInstance()
+    override fun onInput(len: Int, key: Int) {
+        Log.d("PrintValues", "key entered: $key")
+        Log.d("PrintValues", "key length: $len")
+    }
+    override fun onConfirm(pinBlock: ByteArray, isNonePin: Boolean) {
+        if (isNonePin) {
+            // mKernelApi.bypassPinEntry();//bypass
+            emvNfcKernelApi.ProcOnlinePinAgain()
+        } else {
+            Log.d("PrintValues", "pinblock:" + pinBlock.hexString)
+            val pinblockData = tripleDesDecrypt("950973182317F80B950973182317F80B".hexBytes, pinBlock)
+            Log.d("PrintValues", "The decrypted value of the data is ${pinblockData.hexString}")
+            emvNfcKernelApi.sendPinEntry()
+        }
+    }
+
+    override fun onConfirm_dukpt(PinBlock: ByteArray, ksn: ByteArray) {
+        if (PinBlock.isEmpty()) {
+            // mKernelApi.bypassPinEntry();//bypass
+            emvNfcKernelApi.ProcOnlinePinAgain()
+        } else {
+            Log.d("PrintValues", "pinblock:" + String(PinBlock))
+            Log.d("PrintValues", "ksn:" + String(ksn))
+            emvNfcKernelApi.sendPinEntry()
+        }
+    }
+
+    override fun onCancel() {
+        Log.d("PrintValues", "PINPAD cancel")
+        emvNfcKernelApi.cancelPinEntry()
+    }
+
+    override fun onTimeOut() {
+        emvNfcKernelApi.cancelPinEntry()
+    }
+
+    override fun onError(i: Int) {
+        emvNfcKernelApi.cancelPinEntry()
+    }
+}
+
+fun tripleDesDecrypt(pinKey: ByteArray, encryptedPinBlock: ByteArray): ByteArray {
+    val cipher = Cipher.getInstance("DESede/ECB/NoPadding")
+    val secretKeySpec = SecretKeySpec(pinKey, "DESede")
+    cipher.init(Cipher.DECRYPT_MODE, secretKeySpec)
+    return cipher.doFinal(encryptedPinBlock)
 }
