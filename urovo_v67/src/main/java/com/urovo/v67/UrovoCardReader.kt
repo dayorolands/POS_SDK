@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.pos.PosManager
+import com.cluster.pos.PosParameter
 import com.cluster.pos.card.CardData
 import com.cluster.pos.card.CardReaderEvent
 import com.cluster.pos.card.CardReaderEventListener
@@ -28,7 +29,8 @@ import kotlin.coroutines.suspendCoroutine
 class UrovoCardReader(
     private val activity: CreditClubActivity,
     private val sessionData: PosManager.SessionData,
-    private val emvNfcKernelApi: EmvNfcKernelApi
+    private val emvNfcKernelApi: EmvNfcKernelApi,
+    private val defaultPosParameter: PosParameter
 ) : CardReaders, KoinComponent {
     private val dialogProvider = activity.dialogProvider
     private val mICReader = IccManager()
@@ -76,7 +78,7 @@ class UrovoCardReader(
                 }
             }
             dialogProvider.showProgressBar("Processing", "IC Card Detected...")
-            val emvListener = UrovoListener(activity, emvNfcKernelApi, sessionData, continuation)
+            val emvListener = UrovoListener(activity, emvNfcKernelApi, sessionData, continuation, defaultPosParameter)
 
             CoroutineScope(Dispatchers.IO).launch {
                 startKernel(checkCardMode)

@@ -51,7 +51,8 @@ class UrovoPosManager(
         UrovoCardReader(
             activity = activity,
             sessionData = sessionData,
-            emvNfcKernelApi = mKernelApi
+            emvNfcKernelApi = mKernelApi,
+            defaultPosParameter = posParameter
         )
     }
 

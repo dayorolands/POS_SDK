@@ -11,6 +11,7 @@ enum class CardTransactionStatus(val code: Int) {
     CardRestricted(-6),
     CardExpired(-7),
     CardRemoved(-9),
+    CardRestrictedDukpt(-10),
     Error(-1);
 
     companion object {

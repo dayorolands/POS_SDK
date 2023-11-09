@@ -225,6 +225,7 @@ abstract class CardTransactionActivity : PosActivity() {
                 CardTransactionStatus.CardExpired -> renderTransactionFailure("Card Expired")
                 CardTransactionStatus.NoPin -> renderTransactionFailure("No PIN entered")
                 CardTransactionStatus.CardRemoved -> renderTransactionFailure("Card has been removed")
+                CardTransactionStatus.CardRestrictedDukpt -> renderTransactionFailure("Online cards restricted for this processor")
                 else -> renderTransactionFailure(EmvErrorMessage[cardData.ret])
             }
         }
@@ -320,7 +321,7 @@ abstract class CardTransactionActivity : PosActivity() {
                     posTransaction = posTransaction,
                     isCustomerCopy = true,
                 )
-                printer.printAsync(receipt)
+                //printer.printAsync(receipt)
                 return@launch
             }
 
