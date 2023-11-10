@@ -74,7 +74,7 @@ class UrovoPrinter(override val context: Context, override val dialogProvider: D
                 format.putInt("align", node.align.asAlignEnum)
                 format.putBoolean("fontBold", node.isBold)
                 format.putString("fontName", fontPath)
-                format.putInt("lineHeight", 0)
+                format.putInt("lineHeight", 2)
                 textNode(format, node)
             }
             is ImageNode -> {
@@ -102,7 +102,7 @@ class UrovoPrinter(override val context: Context, override val dialogProvider: D
     private fun walkPaper(distance: Int) {
         if (distance > 0) {
             val format = Bundle()
-            printer.addText(format, "\n".repeat(distance / 3))
+            printer.addText(format, "\n".repeat(distance / 10))
         }
     }
 

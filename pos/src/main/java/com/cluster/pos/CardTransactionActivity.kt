@@ -321,7 +321,7 @@ abstract class CardTransactionActivity : PosActivity() {
                     posTransaction = posTransaction,
                     isCustomerCopy = true,
                 )
-                //printer.printAsync(receipt)
+                printer.printAsync(receipt)
                 return@launch
             }
 

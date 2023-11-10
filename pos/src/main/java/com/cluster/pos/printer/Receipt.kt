@@ -150,11 +150,11 @@ fun posReceipt(
         isBold = true,
     )
     text(
-        """${posTransaction.merchantDetails}
-            |Merchant Id: ${posTransaction.merchantId}
-            |Agent Name: ${posTransaction.agentName}
-            |Agent Code:${posTransaction.agentCode}
-            |TID: ${posTransaction.terminalId}
+        """APPZONE LIMITED         LA  LANG
+            |Merchant Id: 040026005003566
+            |Agent Name: Appzone Pilot Test Appzone
+            |Agent Code:$00057392
+            |TID: 2APPFE05
             |
             |${posTransaction.dateTime?.format("dd/MM/yyyy hh:mm", "+0100")}
             |
@@ -165,7 +165,7 @@ fun posReceipt(
             |Cardholder: ${posTransaction.cardHolder}
             |EXP:${posTransaction.expiryDate}
             |Acquirer: ${posTransaction.bankName}
-            |PTSP:${posTransaction.ptsp}
+            |PTSP:APPZONE
             |Verification Mode: PIN""".trimMargin(),
         isBold = false,
         printGray = 5
@@ -198,7 +198,7 @@ fun posReceipt(
         )
     }
     text(
-        text = "-------------------------------------",
+        text = "-----------------------------",
         align = Alignment.MIDDLE,
         fontSize = 15,
         isBold = false

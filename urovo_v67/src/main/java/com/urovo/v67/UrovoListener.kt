@@ -1,11 +1,9 @@
 package com.urovo.v67
 
 import android.device.SEManager
-import android.graphics.Color
 import android.os.Bundle
 import android.os.IInputActionListener
 import android.util.Log
-import androidx.core.content.edit
 import com.cluster.core.data.prefs.getEncryptedSharedPreferences
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.util.mask
@@ -19,6 +17,7 @@ import com.cluster.pos.extensions.hexBytes
 import com.cluster.pos.extensions.hexString
 import com.cluster.pos.utils.asDesEdeKey
 import com.cluster.pos.utils.encrypt
+import com.cluster.pos.xor
 import com.nexgo.R
 import com.urovo.i9000s.api.emv.ContantPara
 import com.urovo.i9000s.api.emv.EmvListener
@@ -27,6 +26,7 @@ import com.urovo.sdk.pinpad.PinPadProviderImpl
 import com.urovo.sdk.pinpad.listener.PinInputListener
 import com.urovo.sdk.pinpad.utils.Constant
 import com.urovo.sdk.utils.BytesUtil
+import com.urovo.v67.otherUtils.PinpadUtil
 import org.koin.core.component.KoinComponent
 import java.util.Hashtable
 import java.util.Locale
@@ -428,9 +428,9 @@ class UrovoListener(
             return
         } else {
             parameters.putInt("PINKeyNo", INDEX_WORKING_KEY) //INDEX_WORKING_KEY = 10
-            val masterKey = posParameter.masterKey.hexBytes
+            val masterKey = "FB706E7C9783BF70A14FF29BD9406ECD".hexBytes
             pinPadProviderImpl.loadMainKey(INDEX_MASTER_KEY, masterKey, null)
-            val pinKey = posParameter.pinKey.hexBytes
+            val pinKey = "B5E9579B38EFF867CD62C483F831A852".hexBytes
             pinPadProviderImpl.loadWorkKey(Constant.KeyType.PIN_KEY, INDEX_MASTER_KEY, INDEX_WORKING_KEY, pinKey, null)
             val kcv = ByteArray(8)
             pinPadProviderImpl.calculateDes(Constant.DesMode.ENC, Constant.Algorithm.ECB, Constant.KeyType.PIN_KEY, INDEX_WORKING_KEY, BytesUtil.hexString2Bytes("0000000000000000"), kcv)
@@ -467,9 +467,25 @@ class UrovoListener(
                 } else {
                     Log.d("PrintValues", "string value pinblock from the pin pad is: ${String(pinBlock)}" )
                     Log.d("PrintValues", "original pinblock from the pin pad is >>>>>> ${pinBlock.hexString}" )
-                    val actualPinBlock = posParameter.pinKey.hexBytes.asDesEdeKey.encrypt(String(pinBlock).hexBytes).copyOf(8)
+                    val actualPinBlock = "B5E9579B38EFF867CD62C483F831A852".hexBytes.asDesEdeKey.encrypt(String(pinBlock).hexBytes).copyOf(8)
                     Log.d("PrintValues", "The pinblock for des encryption is ${actualPinBlock.hexString}")
                     cardData.pinBlock = actualPinBlock.hexString
+
+
+                    val decryptedPinData = PinpadUtil.getPinData(
+                        INDEX_WORKING_KEY,
+                        cardNumber,
+                        BytesUtil.hexString2Bytes(String(pinBlock)),
+                        "B5E9579B38EFF867CD62C483F831A852"
+                    )
+
+                    Log.d("PrintValues", "The decrypted pin data is >>>>>> $decryptedPinData")
+                    val pinDetails = "0${decryptedPinData.length}$decryptedPinData".padEnd(16, 'F')
+                    Log.d("PrintValues", "The clear pin is >>>>>> $pinDetails")
+                    val panBlock = cardNumber.substring(3, cardNumber.lastIndex).padStart(16, '0')
+                    val cryptData = pinDetails.hexBytes xor panBlock.hexBytes
+                    val newPinblock = "B5E9579B38EFF867CD62C483F831A852".hexBytes.asDesEdeKey.encrypt(cryptData).copyOf(8).hexString
+                    Log.d("PrintValues", "The new encrypted pinblock is >>>>>> $newPinblock")
                     emvNfcKernelApi.sendPinEntry()
                 }
             }
