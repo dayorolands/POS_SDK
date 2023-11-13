@@ -150,26 +150,114 @@ fun posReceipt(
         isBold = true,
     )
     text(
-        """APPZONE LIMITED         LA  LANG
-            |Merchant Id: 040026005003566
-            |Agent Name: Appzone Pilot Test Appzone
-            |Agent Code:$00057392
-            |TID: 2APPFE05
-            |
-            |${posTransaction.dateTime?.format("dd/MM/yyyy hh:mm", "+0100")}
-            |
-            |${posTransaction.cardType}
-            |Card: ${posTransaction.pan}
-            |STAN: ${posTransaction.stan}
-            |PAN Seq No: 01
-            |Cardholder: ${posTransaction.cardHolder}
-            |EXP:${posTransaction.expiryDate}
-            |Acquirer: ${posTransaction.bankName}
-            |PTSP:APPZONE
-            |Verification Mode: PIN""".trimMargin(),
+        text = "APPZONE LIMITED             LA  LANG",
+        align = Alignment.MIDDLE,
+    )
+    text(
+        text = "Merchant Id: 040026005003566",
+        align = Alignment.LEFT,
+    )
+    text(
+        text = "Agent Name: Appzone Pilot Test Appzone",
+        align = Alignment.LEFT,
         isBold = false,
         printGray = 5
     )
+    text(
+        text = "Agent Code: 00057392",
+        align = Alignment.LEFT,
+        isBold = false,
+        printGray = 5
+    )
+    text(
+        text = "TID: 2APPFE05",
+        align = Alignment.LEFT,
+        isBold = false,
+        printGray = 5
+    )
+    text(
+        text = "${posTransaction.dateTime?.format("dd/MM/yyyy hh:mm", "+0100")}",
+        align = Alignment.LEFT,
+        isBold = false,
+        printGray = 5
+    )
+    text(
+        text = "${posTransaction.cardType}",
+        align = Alignment.LEFT,
+        isBold = false,
+        printGray = 5
+    )
+    text(
+        text = "Card: ${posTransaction.pan}",
+        align = Alignment.LEFT,
+        isBold = false,
+        printGray = 5
+    )
+    text(
+        text = "STAN: ${posTransaction.stan}",
+        align = Alignment.LEFT,
+        isBold = false,
+        printGray = 5
+    )
+    text(
+        text = "PAN Seq No: 01",
+        align = Alignment.LEFT,
+        isBold = false,
+        printGray = 5
+    )
+    text(
+        text = "Cardholder: ${posTransaction.cardHolder}",
+        align = Alignment.LEFT,
+        isBold = false,
+        printGray = 5
+    )
+    text(
+        text = "EXP:${posTransaction.expiryDate}",
+        align = Alignment.LEFT,
+        isBold = false,
+        printGray = 5
+    )
+    text(
+        text = "Acquirer: ${posTransaction.bankName}",
+        align = Alignment.LEFT,
+        isBold = false,
+        printGray = 5
+    )
+    text(
+        text = "PTSP: APPZONE",
+        align = Alignment.LEFT,
+        isBold = false,
+        printGray = 5
+    )
+    text(
+        text = "Verification Mode: PIN",
+        align = Alignment.LEFT,
+        isBold = false,
+        printGray = 5
+    )
+
+
+//    text(
+//        """APPZONE LIMITED             LA  LANG
+//            |Merchant Id: 040026005003566
+//            |Agent Name: Appzone Pilot Test Appzone
+//            |Agent Code: 00057392
+//            |TID: 2APPFE05
+//            |
+//            |${posTransaction.dateTime?.format("dd/MM/yyyy hh:mm", "+0100")}
+//            |
+//            |${posTransaction.cardType}
+//            |Card: ${posTransaction.pan}
+//            |STAN: ${posTransaction.stan}
+//            |PAN Seq No: 01
+//            |Cardholder: ${posTransaction.cardHolder}
+//            |EXP:${posTransaction.expiryDate}
+//            |Acquirer: ${posTransaction.bankName}
+//            |PTSP:APPZONE
+//            |Verification Mode: PIN""".trimMargin().trim(),
+//        isBold = false,
+//        printGray = 5
+//    )
     text(
         text = posTransaction.transactionType!!,
         align = Alignment.MIDDLE,

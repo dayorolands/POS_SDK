@@ -113,8 +113,14 @@ class UrovoListener(
                     cardData.status = CardTransactionStatus.Success
                     continuation.resume(cardData)
                 } else {
-                    val responseDataFromOnlineProcessing = "710F860D842400000817C217D34162474C910A1397ECEFC7A6051100128A023030"
-                    emvNfcKernelApi.sendOnlineProcessResult(true, responseDataFromOnlineProcessing)
+                    val cardType = CardPaymentAIDConverter[cardData.aid] ?: "Unknown Card"
+                    if (cardType.contains(MASTERCARD)){
+                        cardData.status = CardTransactionStatus.Success
+                        continuation.resume(cardData)
+                    } else {
+                        val responseDataFromOnlineProcessing = "710F860D842400000817C217D34162474C910A1397ECEFC7A6051100128A023030"
+                        emvNfcKernelApi.sendOnlineProcessResult(true, responseDataFromOnlineProcessing)
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -586,5 +592,28 @@ class UrovoListener(
         const val INDEX_DUKPT_PIN = 3
         const val INDEX_WORKING_KEY = 10
         const val INDEX_MASTER_KEY = 10
+        const val MASTERCARD = "MasterCard"
     }
+
+    private val CardPaymentAIDConverter = hashMapOf(
+        "A0000000032020" to "VISA",
+        "A0000000032010" to "VISA Debit",
+        "A0000004540010" to "Etranzact Genesis Card",
+        "A0000004540011" to "Etranzact Genesis Card",
+        "A0000000042203" to "MasterCard US",
+        "A0000000041010" to "MasterCard",
+        "A0000000031010" to "VISA Debit",
+        "A0000000044010" to "MasterCard",
+        "A0000000041030" to "MasterCard",
+        "A0000000046000" to "MasterCard Specific",
+        "A0000000043060" to "MasterCard Specific",
+        "A0000000042010" to "MasterCard Specific",
+        "A0000000043010" to "MasterCard Specific",
+        "A0000000045010" to "MasterCard Specific",
+        "A0000003710001" to "InterSwitch Verve Card",
+        "A000000891010101" to "AfrigoPay Debit",
+        "A000000891010102" to "AfrigoPay Credit",
+        "A000000891010103" to "AfrigoPay Prepaid",
+        "A000000891010104" to "AfrigoPay Virtual"
+    )
 }
