@@ -145,8 +145,9 @@ dependencies {
     implementation(project(":analytics"))
     implementation 'com.google.android.gms:play-services-measurement-api:20.0.0'
 
-    ordaImplementation(project(":dspread"))
-    ordaImplementation(project(":sunmi"))
+    //ordaImplementation(project(":dspread"))
+    //ordaImplementation(project(":sunmi"))
+    ordaImplementation(project(":horizonpay"))
 
     implementation("androidx.activity:activity-ktx:${Versions.activityKtx}")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")

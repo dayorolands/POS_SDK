@@ -40,7 +40,7 @@ class HorizonCardReader(
                 deviceClose()
             }
         }
-        updateCardWaitingProgress("Insert or Swipe Card")
+        updateCardWaitingProgress("Insert or Tap Card")
         cardReaderEvent = withContext(Dispatchers.Unconfined){
             detectCard()
         }
@@ -130,6 +130,11 @@ class HorizonCardReader(
                 }
                 else
                     return CardReaderEvent.MAG_STRIPE
+            }
+            else if(ret == CardReaderEvent.NFC){
+                val powerOn = true
+
+                if(powerOn) return CardReaderEvent.NFC
             }
             else if (ret == CardReaderEvent.CHIP) {
                 val powerOn = true //powerOnIcc()

@@ -116,14 +116,14 @@ abstract class CardTransactionActivity : PosActivity() {
             delay(1000)
             dialogProvider.hideProgressBar()
 
-            if (Platform.hasPrinter) {
-                val printerStatus = withContext(Dispatchers.Default) { printer.check() }
-                if (printerStatus != PrinterStatus.READY) {
-                    dialogProvider.showErrorAndWait(printerStatus.message)
-                    finish()
-                    return@launch
-                }
-            }
+//            if (Platform.hasPrinter) {
+//                val printerStatus = withContext(Dispatchers.Default) { printer.check() }
+//                if (printerStatus != PrinterStatus.READY) {
+//                    dialogProvider.showErrorAndWait(printerStatus.message)
+//                    finish()
+//                    return@launch
+//                }
+//            }
 
             when (val cardEvent = posManager.cardReader.waitForCard()) {
                 CardReaderEvent.REMOVED, CardReaderEvent.CANCELLED -> {
@@ -147,11 +147,12 @@ abstract class CardTransactionActivity : PosActivity() {
                 else -> {
                     viewModel.cardReaderEvent.value = cardEvent
                     restartTimer()
+                    onSelectAccountType()
 
-                    showSelectAccountScreen { accountType ->
-                        viewModel.accountType.value = accountType
-                        onSelectAccountType()
-                    }
+//                    showSelectAccountScreen { accountType ->
+//                        viewModel.accountType.value = accountType
+//                        onSelectAccountType()
+//                    }
                 }
             }
         }
@@ -413,7 +414,8 @@ abstract class CardTransactionActivity : PosActivity() {
             sessionData.amount = amount
             sessionData.transactionType = transactionType
             confirmAmounts(sessionData) {
-                readCard()
+                requestCard()
+                //readCard()
             }
         }
 

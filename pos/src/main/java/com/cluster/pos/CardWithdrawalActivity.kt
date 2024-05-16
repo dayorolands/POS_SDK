@@ -12,7 +12,7 @@ class CardWithdrawalActivity : CardTransactionActivity() {
     override var transactionType = TransactionType.Purchase
 
     override fun onPosReady() {
-        requestCard()
+        showAmountPage()
     }
 
     override fun onReadCard(cardData: CardData) {
@@ -27,7 +27,7 @@ class CardWithdrawalActivity : CardTransactionActivity() {
     }
 
     override fun onSelectAccountType() {
-        showAmountPage()
+        readCard()
     }
 }
 
