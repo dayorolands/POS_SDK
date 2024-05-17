@@ -22,7 +22,7 @@ class HorizonPrinter(
 ) : PosPrinter{
     private val mainScope = CoroutineScope(Dispatchers.Main)
     private val combBitmap = CombBitmap()
-    private val devicePrinter : IAidlPrinter = HorizonDeviceSingleton.getDevicePrinter()!!.printer
+    private val devicePrinter : IAidlPrinter = HorizonDeviceSingleton.getDevice()!!.printer
     private val assetManager = context.assets
     private val fontType : Typeface? = Typeface.createFromAsset(assetManager, "fonts/Fangsong.ttf")
 

@@ -76,7 +76,7 @@ android {
 
         staging {
             debuggable true
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", "\"C175CFBE-E036-487B-9CC5-D8DFD2199989\"")
@@ -89,6 +89,7 @@ android {
 
         debug {
             debuggable true
+            minifyEnabled false
             buildConfigField("String", "API_HOST", "\"http://52.168.85.231\"")
             buildConfigField("String", "NOTIFICATION_TOKEN", '"C175CFBE-E036-487B-9CC5-D8DFD2199989"')
             buildConfigField("String", "TRUESTORE_PASS", "\"P@55w0rd123\"")

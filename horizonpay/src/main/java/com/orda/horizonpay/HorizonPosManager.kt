@@ -6,23 +6,38 @@ import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.os.IBinder
 import android.util.Log
-import androidx.core.graphics.drawable.toIcon
 import com.cluster.core.ui.CreditClubActivity
 import com.cluster.core.ui.widget.DialogProvider
-import com.cluster.core.util.debug
-import com.cluster.core.util.safeRun
 import com.cluster.pos.PosManager
 import com.cluster.pos.PosManagerCompanion
 import com.cluster.pos.PosParameter
-import com.cluster.pos.extensions.*
+import com.cluster.pos.extensions.aid15
+import com.cluster.pos.extensions.appVersion18
+import com.cluster.pos.extensions.ddol20
+import com.cluster.pos.extensions.defaultTacValue29
+import com.cluster.pos.extensions.exponent38
+import com.cluster.pos.extensions.hash39
+import com.cluster.pos.extensions.hashAlgorithm36
+import com.cluster.pos.extensions.hexByte
+import com.cluster.pos.extensions.hexString
+import com.cluster.pos.extensions.keyAlgorithm40
+import com.cluster.pos.extensions.keyIndex32
+import com.cluster.pos.extensions.maxTargetDomestic25
+import com.cluster.pos.extensions.modulus37
+import com.cluster.pos.extensions.rid35
+import com.cluster.pos.extensions.tacDenial30
+import com.cluster.pos.extensions.tacOnline31
+import com.cluster.pos.extensions.targetPercentageDomestic27
 import com.cluster.pos.printer.PosPrinter
 import com.horizonpay.smartpossdk.PosAidlDeviceServiceUtil
 import com.horizonpay.smartpossdk.aidl.IAidlDevice
 import com.horizonpay.smartpossdk.aidl.emv.AidEntity
 import com.horizonpay.smartpossdk.aidl.emv.CapkEntity
-import com.horizonpay.smartpossdk.aidl.emv.IAidlEmvL2
-import com.orda.horizonpay.utils.AidsUtil
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.dsl.module
@@ -35,6 +50,7 @@ class HorizonPosManager(
     private val mainScope = MainScope()
     private var device : IAidlDevice? = null
     private val posParameter : PosParameter by inject()
+    private val scope = CoroutineScope(Dispatchers.IO)
     private var isConnected = false
 
     override val sessionData = PosManager.SessionData()
@@ -47,44 +63,19 @@ class HorizonPosManager(
     }
 
     override suspend fun loadEmv() {
-        delay(1000)
         withContext(Dispatchers.Main){
             suspendCoroutine<Unit> { continuation ->
-                PosAidlDeviceServiceUtil.connectDeviceService(activity, object : PosAidlDeviceServiceUtil.DeviceServiceListen{
-                    override fun onConnected(horizonDevice: IAidlDevice?) {
-                        device = horizonDevice
-                        device?.getPinpad(false)
-                        device?.m1Card
-                        device?.m0Ev1Card
-                        device?.sysHandler
-                        device?.emvL2?.enableTraceLog(true)
+                val horizonDevice = HorizonDeviceSingleton.getDevice()
+                device = horizonDevice
 
-                        HorizonDeviceSingleton.setDevicePrinter(device!!)
-
-                        safeRun {
-                            injectAid()
-                            injectCapk()
-                        }
-
-                        device?.asBinder()?.linkToDeath(deathRecipient, 0)
-                        isConnected = true
-                        continuation.resume(Unit)
-                    }
-
-                    override fun error(horizonDevice: Int) {
-                        isConnected = false
-                    }
-
-                    override fun onDisconnected() {
-                        isConnected = false
-                        activity.finish()
-                    }
-
-                    override fun onUnCompatibleDevice() {
-
-                    }
-
-                })
+                scope.launch {
+                    device?.getPinpad(false)
+                    device?.emvL2?.enableTraceLog(true)
+                    injectAid()
+                    injectCapk()
+                    device?.asBinder()?.linkToDeath(deathRecipient, 0)
+                }
+                continuation.resume(Unit)
             }
         }
     }
@@ -105,70 +96,42 @@ class HorizonPosManager(
         }
     }
 
-    private fun downloadAid(){
-        device?.emvL2?.deleteAllAids()
-        val aidEntityList : List<AidEntity> = AidsUtil.getAllAids()
-        for (i in aidEntityList.indices){
-            val emvAidPara = aidEntityList[i]
-            try {
-                device?.emvL2?.addAid(emvAidPara)
-            } catch (e: Exception){
-                e.printStackTrace()
-            }
-        }
-    }
-
-    private fun downloadCapks(){
-        device?.emvL2?.deleteAllCapks()
-        val capkEntityList : List<CapkEntity> = AidsUtil.getAllCapks()
-        try {
-            device?.emvL2?.addCapks(capkEntityList)
-            for(i in capkEntityList.indices){
-                val capkParameter = capkEntityList[i]
-                device?.emvL2?.addCapk(capkParameter)
-            }
-        } catch (e: Exception){
-            e.printStackTrace()
-        }
-    }
-
     private inline val String.prependLength get() = "${length / 2}${this}"
 
     private fun injectAid(){
-        device?.emvL2?.deleteAllAids()
-        val aidEntityList = mutableListOf<AidEntity>()
         val jsonArray = posParameter.emvAidList ?: return
+        val aidEntityList = mutableListOf<AidEntity>()
         val arrayLength = jsonArray.length()
         for(i in 0 until arrayLength){
             val jsonObject = jsonArray.getJSONObject(i)
             val aidEntity = AidEntity.builder().apply {
-                AID(jsonObject.aid15)
-                selFlag(0)
-                appVersion(jsonObject.appVersion18)
-                DDOL(jsonObject.ddol20.prependLength)
-                tacDefault(jsonObject.defaultTacValue29)
-                tacOnline(jsonObject.tacOnline31)
-                tacDenial(jsonObject.tacDenial30)
-                rdCtlsFloorLimit(0)
-                rdCtlsCvmLimit(0)
-                rdCtlsTransLimit(10000)
-                rdVisaTransLimit(10000)
-                onlinePinCap(true)
-                maxTargetPer(jsonObject.maxTargetDomestic25.hexByte.toInt())
-                targetPer(jsonObject.targetPercentageDomestic27.hexByte.toInt())
+                with(jsonObject) {
+                    AID(aid15)
+                    selFlag(0)
+                    appVersion(appVersion18)
+                    DDOL(ddol20.prependLength)
+                    tacDefault(defaultTacValue29)
+                    tacOnline(tacOnline31)
+                    tacDenial(tacDenial30)
+                    rdCtlsFloorLimit(0L)
+                    rdCtlsCvmLimit(15000L)
+                    rdCtlsTransLimit(50000L)
+                    rdVisaTransLimit(1000L)
+                    onlinePinCap(true)
+                    maxTargetPer(maxTargetDomestic25.hexByte.toInt())
+                    targetPer(targetPercentageDomestic27.hexByte.toInt())
+                }
                 threshold(100)
             }.build()
             aidEntityList.add(aidEntity)
+            val result = device?.emvL2?.addAids(aidEntityList)
+            println("CHECK-POINT Add AID result : $result")
         }
-        aidEntityList.addAll(AidsUtil.getAllAids())
-        val result = device?.emvL2?.addAids(aidEntityList)
-        debug("Add AID result : $result")
     }
 
     private fun injectCapk(){
-        device?.emvL2?.deleteAllCapks()
-        val capkEntityList = mutableListOf<CapkEntity>()
         val jsonArray = posParameter.capkList ?: return
+        val capkEntityList = mutableListOf<CapkEntity>()
         val arrayLength = jsonArray.length()
         for(i in 0 until arrayLength){
             val jsonObject = jsonArray.getJSONObject(i)
@@ -183,10 +146,9 @@ class HorizonPosManager(
                 checkSum(jsonObject.hash39)
             }.build()
             capkEntityList.add(capkEntity)
+            val result = device?.emvL2?.addCapks(capkEntityList)
+            println("CHECK-POINT Add CAPKs result : $result")
         }
-        capkEntityList.addAll(AidsUtil.getAllCapks())
-        val result = device?.emvL2?.addCapks(capkEntityList)
-        debug("Add CAPKs result : $result")
     }
 
     override fun cleanUpEmv() {
@@ -196,7 +158,7 @@ class HorizonPosManager(
 
     companion object : PosManagerCompanion{
         override val id = "HorizonPOS"
-        override val deviceType = 5
+        override val deviceType = 7
         override val module = module {
             factory<PosManager> { (activity: CreditClubActivity) ->
                 HorizonPosManager(activity)
@@ -217,7 +179,22 @@ class HorizonPosManager(
         }
 
         override fun setup(context: Context) {
+            CoroutineScope(Dispatchers.IO).launch {
+                PosAidlDeviceServiceUtil.connectDeviceService(context, object : PosAidlDeviceServiceUtil.DeviceServiceListen{
+                    override fun onConnected(horizonDevice: IAidlDevice?) {
+                        horizonDevice?.let {
+                            HorizonDeviceSingleton.setDevice(it)
+                        }
+                    }
 
+                    override fun error(horizonDevice: Int) {}
+
+                    override fun onDisconnected() {}
+
+                    override fun onUnCompatibleDevice() {}
+
+                })
+            }
         }
 
         private fun createExplicitFromImplicitIntent(
@@ -270,11 +247,11 @@ class HorizonDeviceSingleton{
     companion object {
         private var devicePrinter : IAidlDevice? = null
 
-        fun setDevicePrinter(iAidlDevice: IAidlDevice){
+        fun setDevice(iAidlDevice: IAidlDevice){
             devicePrinter = iAidlDevice
         }
 
-        fun getDevicePrinter() : IAidlDevice?{
+        fun getDevice() : IAidlDevice?{
             return devicePrinter
         }
     }

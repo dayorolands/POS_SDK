@@ -26,7 +26,7 @@ fun ISOMsg.applyCardData(data: CardData): ISOMsg = apply {
     localTransactionTime12 = dateParams.localTime
     localTransactionDate13 = dateParams.localDate
     cardExpirationDate14 = data.exp.substring(0, 4)
-    posEntryMode22 = if (data.cardMethod == CardReaderEvent.MAG_STRIPE) "021" else "051"
+    posEntryMode22 = if (data.cardMethod == CardReaderEvent.MAG_STRIPE) "021" else if (data.cardMethod == CardReaderEvent.NFC) "071" else "051"
 
     cardSequenceNumber23 = if (data.cardSequenceNumber.isNotEmpty()) {
         String.format("%03d", Integer.parseInt(data.cardSequenceNumber))
@@ -40,7 +40,6 @@ fun ISOMsg.applyCardData(data: CardData): ISOMsg = apply {
     retrievalReferenceNumber37 = rrnString
     serviceRestrictionCode40 = data.src
     iccData55 = data.iccString
-    Log.d("CheckingCryptogram","Checking the ICC Data: $iccData55")
     if (data.pinBlock.isNotBlank()) {
         pinData = data.pinBlock
     }
@@ -49,14 +48,18 @@ fun ISOMsg.applyCardData(data: CardData): ISOMsg = apply {
     }
 
     posDataCode123 = run {
-        val tmpPosDataCode = StringBuilder("510101511344101")
-        if (data.holder.isNotEmpty()) {
-            tmpPosDataCode[4] = '0'
+        if (data.cardMethod == CardReaderEvent.NFC){
+            "A10101711344101"
+        } else {
+            val tmpPosDataCode = StringBuilder("510101511344101")
+            if (data.holder.isNotEmpty()) {
+                tmpPosDataCode[4] = '0'
+            }
+            if (data.cardMethod == CardReaderEvent.MAG_STRIPE) {
+                tmpPosDataCode[6] = '2'
+            }
+            tmpPosDataCode.toString()
         }
-        if (data.cardMethod == CardReaderEvent.MAG_STRIPE) {
-            tmpPosDataCode[6] = '2'
-        }
-        tmpPosDataCode.toString()
     }
 }
 

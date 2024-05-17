@@ -113,7 +113,7 @@ abstract class CardTransactionActivity : PosActivity() {
         mainScope.launch {
             dialogProvider.showProgressBar("Loading card functions")
             posManager.loadEmv()
-            delay(1000)
+            //delay(1000)
             dialogProvider.hideProgressBar()
 
 //            if (Platform.hasPrinter) {
@@ -193,8 +193,9 @@ abstract class CardTransactionActivity : PosActivity() {
         posManager.sessionData.amount = viewModel.longAmount.value!!
 
         mainScope.launch {
-            posManager.cardReader.endWatch()
+            //posManager.cardReader.endWatch()
             val cardData = posManager.cardReader.read(viewModel.amountCurrencyFormat.value!!)
+
             if (cardData == null) {
                 renderTransactionFailure("Transaction Cancelled", "")
                 return@launch

@@ -41,7 +41,7 @@ class HorizonCardReader(
             }
         }
         updateCardWaitingProgress("Insert or Tap Card")
-        cardReaderEvent = withContext(Dispatchers.Unconfined){
+        cardReaderEvent = withContext(Dispatchers.IO){
             detectCard()
         }
         dialogProvider.hideProgressBar()
@@ -54,27 +54,33 @@ class HorizonCardReader(
 
     override suspend fun read(amountStr: String): CardData? {
         val cardData : CardData? = suspendCoroutine { continuation ->
-            dialogProvider.showProgressBar("Processing", "IC card detected...") {
+            dialogProvider.showProgressBar("Processing", if(cardReaderEvent == CardReaderEvent.NFC) "Please leave card on device" else "IC card detected...") {
                 onClose {
                     continuation.resume(null)
                 }
             }
-            val emvListener = HorizonListener(
-                activity = activity,
-                device = device,
-                sessionData = sessionData,
-                continuation = continuation
-            )
-            setEmvTransactionDataExt()
             val terminalConfig = EmvTermConfig()
             terminalConfig.capability = "E0F0C8"
             terminalConfig.countryCode = "0566"
             terminalConfig.transCurrCode = "0566"
+            terminalConfig.extCapability = "E000F0A001"
+            terminalConfig.termType = 0x22
+            terminalConfig.transCurrExp = 2
             emv.termConfig = terminalConfig
             val emvTransactionData = EmvTransData()
             emvTransactionData.amount = sessionData.amount
+            emvTransactionData.otherAmount = 0
             emvTransactionData.isForceOnline = true
-            emvTransactionData.emvFlowType = 0
+            emvTransactionData.emvFlowType = EmvConstant.EmvTransFlow.FULL
+            setEmvTransactionDataExt()
+            println("CHECK-POINT this is where it stops.")
+            val emvListener = HorizonListener(
+                activity = activity,
+                device = device,
+                sessionData = sessionData,
+                cardReaderEvent = cardReaderEvent,
+                continuation = continuation
+            )
             emv.startEmvProcess(emvTransactionData, emvListener)
         }
 
@@ -113,7 +119,7 @@ class HorizonCardReader(
     }
 
     private suspend fun detectCard(): CardReaderEvent {
-        Log.d("CheckInput", "Here to check the input 5")
+        println("CHECK-POINT - Here to detect the card")
         var hybridDetected = false
         var chipFailure = false
 
@@ -122,16 +128,7 @@ class HorizonCardReader(
                 return CardReaderEvent.CANCELLED
             }
             val ret = checkCard()
-
-            if (ret == CardReaderEvent.MAG_STRIPE) {
-                if (!chipFailure) {
-                    hybridDetected = true
-                    updateCardWaitingProgress("Card is chip card. Please Insert Card")
-                }
-                else
-                    return CardReaderEvent.MAG_STRIPE
-            }
-            else if(ret == CardReaderEvent.NFC){
+            if(ret == CardReaderEvent.NFC){
                 val powerOn = true
 
                 if(powerOn) return CardReaderEvent.NFC
@@ -167,10 +164,12 @@ class HorizonCardReader(
                 }
 
                 override fun onFindICCard() {
+                    deviceClose()
                     it.resume(CardReaderEvent.CHIP)
                 }
 
                 override fun onFindRFCard(p0: Int) {
+                    deviceClose()
                     it.resume(CardReaderEvent.NFC)
                 }
 

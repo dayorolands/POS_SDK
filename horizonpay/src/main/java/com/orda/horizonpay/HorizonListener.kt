@@ -13,6 +13,7 @@ import com.cluster.core.util.PinBlockHelper
 import com.cluster.core.util.SharedPref
 import com.cluster.core.util.debug
 import com.cluster.core.util.debugOnly
+import com.cluster.core.util.mask
 import com.cluster.pos.EmvException
 import com.cluster.pos.PosManager
 import com.cluster.pos.card.CardData
@@ -45,6 +46,7 @@ class HorizonListener(
     private val activity: CreditClubActivity,
     device: IAidlDevice,
     private val sessionData: PosManager.SessionData,
+    private val cardReaderEvent : CardReaderEvent,
     private val continuation: Continuation<CardData?>
 ) : AidlEmvStartListener.Stub(), KoinComponent {
     private var hasResumed: Boolean = false
@@ -59,6 +61,7 @@ class HorizonListener(
     private val MASTER_KEY_INDEX = 0
 
     override fun onRequestAmount() {
+        println("CHECK-POINT did it enter here at all for amount?")
         mEmvL2.requestAmountResp(sessionData.amount.toString())
     }
 
@@ -69,28 +72,18 @@ class HorizonListener(
 
     override fun onFinalSelectAid(p0: EmvFinalSelectData?) {
         Log.d("SunmiListener", p0.toString())
+        mEmvL2.requestFinalSelectAidResp("")
     }
 
     override fun onConfirmCardNo(cardNo: String?) {
-        dialogProvider.hideProgressBar()
-        cardData.pan = cardNo!!
-        dialogProvider.confirm(
-            "Confirm Card Pan",
-            cardData.pan
-        ){
-            onSubmit {
-                dialogProvider.showProgressBar(R.string.processing)
-                mEmvL2.confirmCardNoResp(true)
-            }
-            onClose {
-                continuation.resume(cardData.apply {
-                    status = CardTransactionStatus.UserCancel
-                })
-            }
-        }
+        println("CHECK-POINT did it enter here at all?")
+        cardData.pan = cardNo.orEmpty()
+        mEmvL2.confirmCardNoResp(true)
     }
 
     override fun onRequestPin(isOnlinePin: Boolean, leftTimes: Int) {
+        println("CHECK-POINT onRequestPin isOnline $isOnlinePin")
+        println("CHECK-POINT onRequestPin leftTimes $leftTimes")
         dialogProvider.hideProgressBar()
         if(!isOnlinePin && leftTimes < 1){
             mEmvL2.stopEmvProcess()
@@ -104,15 +97,16 @@ class HorizonListener(
         }
 
         if(isOnlinePin){
-            inputOnlinePin(cardData.pan.replace("F", ""))
+            inputOnlinePin(mEmvL2.getTagValue(EmvTags.EMV_TAG_IC_PAN))
         } else {
-            inputOfflinePin(cardData.pan.replace("F", ""), leftTimes)
+            inputOfflinePin(mEmvL2.getTagValue(EmvTags.EMV_TAG_IC_PAN), leftTimes)
         }
     }
 
     private fun inputOnlinePin(cardPan : String){
         val bundle = setupPinPad(true)
         mPinPad.setKeyAlgorithm(PinpadConst.KeyAlgorithm.DES)
+        println("CHECK-POINT pos parameter: ${sessionData.getPosParameter}")
         val masterKey = "3ECEDA9BF4DCCB0B105708E5B334E308"
         val masterKeyKcv = masterKey.padEnd(32, '0').hexBytes.asDesEdeKey.encrypt(ByteArray(8))
         mPinPad.injectSecureTMK(MASTER_KEY_INDEX, MASTER_KEY_INDEX, masterKey.hexBytes, masterKeyKcv)
@@ -120,14 +114,17 @@ class HorizonListener(
         val pinKeyKcv = HexUtil.hexStringToByte("00000000")
         mPinPad.injectWorkKey(WORKING_KEY_INDEX, PinpadConst.PinPadKeyType.TPINK, pinkey.hexBytes, pinKeyKcv)
         activity.runOnUiThread {
+            println("CHECK-POINT enter to insert pin")
             mPinPad.inputOnlinePin(bundle, intArrayOf(4,6), 30, cardPan, 0, PinpadConst.PinAlgorithmMode.ISO9564FMT1, object : AidlPinPadInputListener.Stub(){
                 override fun onConfirm(pinblockData: ByteArray?, noPin: Boolean, ksnData: String?) {
-                    mEmvL2.requestPinResp(pinblockData, noPin)
-
                     //to decrypt the pin block now
                     val decryptPinblock = tripleDesDecrypt(pinkey.hexBytes, pinblockData!!)
                     val secretKey = pinkey.hexBytes.asDesEdeKey.encrypt(decryptPinblock).copyOf(8)
                     cardData.pinBlock = secretKey.hexString
+
+                    println("CHECK-POINT : PINBLOCK IS ${cardData.pinBlock}")
+
+                    mEmvL2.requestPinResp(pinblockData, noPin)
                 }
 
                 override fun onSendKey(keyCode: Int) {
@@ -225,6 +222,7 @@ class HorizonListener(
     }
 
     override fun onRequestOnline(p0: EmvTransOutputData?) {
+        println("CHECK-POINT : onRequest online")
         activity.runOnUiThread {
             dialogProvider.showProgressBar("Processing")
         }
@@ -234,39 +232,54 @@ class HorizonListener(
     }
 
     override fun onFinish(emvResult: Int, emvTransOutputData: EmvTransOutputData?) {
+        println("CHECK-POINT still don't understand : onFinished Results $emvResult")
+        println("CHECK-POINT still don't understand : onFinished Results emv type ${emvTransOutputData?.acType}")
+        dialogProvider.hideProgressBar()
         if(emvResult != EmvConstant.EmvTransResultCode.SUCCESS){
             val exception = EmvException("Horizon Emv failed with ret $emvResult")
             debugOnly { Log.e("HorizonK11", exception.message, exception) }
+            cardData.status = CardTransactionStatus.Failure
+            continuation.resume(cardData)
         }
 
         when(emvResult) {
             EmvConstant.EmvTransResultCode.SUCCESS -> {
+                println("CHECK-POINT : it entered here for success")
                 cardData.mIccString = getField55String()
+                println("CHECK-POINT print the iccString ${cardData.mIccString}")
                 cardData.apply {
+                    println("CHECK-POINT : enter apply card data")
                     track2 = mEmvL2.getTagValue(EmvTags.EMV_TAG_IC_TRACK2DATA)
+                    println("CHECK-POINT track2: ${cardData.track2}")
                     var markerIndex = track2.indexOf("D")
                     if (markerIndex < 0) {
                         markerIndex = track2.indexOf("=")
                     }
                     src = track2.substring(markerIndex + 5, markerIndex + 8)
+                    println("CHECK-POINT track2: ${cardData.src}")
                     status = CardTransactionStatus.Success
+                    println("CHECK-POINT track2: ${cardData.status}")
+                    pan = mEmvL2.getTagValue(EmvTags.EMV_TAG_IC_PAN)
+                    println("CHECK-POINT track2: ${cardData.pan}")
                     transactionAmount = mEmvL2.getTagValue(EmvTags.EMV_TAG_TM_AUTHAMNTN)
-                    exp = mEmvL2.getTagValue(EmvTags.EMV_TAG_IC_APPEXPIREDATE)
-                    holder = String(mEmvL2.getTagValue(EmvTags.EMV_TAG_IC_CHNAME).hexBytes)
+                    println("CHECK-POINT track2: ${cardData.transactionAmount}")
+                    exp = track2.substring(markerIndex + 1, markerIndex + 5)
+                    println("CHECK-POINT track2: ${cardData.exp}")
+                    holder = if(cardReaderEvent == CardReaderEvent.NFC) String(mEmvL2.getTagValue(EmvTags.EMV_TAG_IC_TRACK1DATA).orEmpty().hexBytes) else String(mEmvL2.getTagValue(EmvTags.EMV_TAG_IC_CHNAME).orEmpty().hexBytes)
+                    println("CHECK-POINT track2: ${cardData.holder}")
                     cardSequenceNumber = mEmvL2.getTagValue(EmvTags.EMV_TAG_IC_PANSN)
+                    println("CHECK-POINT track2: ${cardData.cardSequenceNumber}")
                     aid = mEmvL2.getTagValue(EmvTags.EMV_TAG_IC_AID)
-                    cardMethod = CardReaderEvent.CHIP
-                }
-                val tvr = mEmvL2.getTagValue(EmvTags.EMV_TAG_TM_TVR).hexBytes
-                if (tvr.isNotEmpty() && tvr.last() == 1.toByte()) {
-                    cardData.ret = CardTransactionStatus.OfflinePinVerifyError.code
-                    return
+                    println("CHECK-POINT track2: ${cardData.aid}")
+                    cardMethod = cardReaderEvent
+                    println("CHECK-POINT : it finished here $cardMethod")
                 }
             }
             else -> {
                 cardData.status = CardTransactionStatus.Failure
             }
         }
+        println("CHECK-POINT we are back from reading the card ${cardData.status}")
         if(!hasResumed){
             hasResumed = true
             continuation.resume(cardData)
@@ -276,7 +289,7 @@ class HorizonListener(
     internal inline val ByteArray.hexString: String
         get() {
             val stringBuilder = StringBuilder("")
-            if (size <= 0) return ""
+            if (isEmpty()) return ""
             val buffer = CharArray(2)
             for (i in indices) {
                 buffer[0] = Character.forDigit(get(i).toInt() ushr 4 and 0x0F, 16)
